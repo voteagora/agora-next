@@ -7,8 +7,6 @@ export default function Navbar() {
       <Link href="/" className="proposalsNav">
         Proposals
       </Link>
-      <br/>
-      <br/>
       <Link href="/delegates" className="delegatesNav">
         Delegates
       </Link>
