@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import Header from "@/components/Header";
 import "./globals.scss";
 import { Inter } from "next/font/google";
 
@@ -24,7 +24,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        <Navbar />
+        <Header />
         {children}
       </body>
     </html>
