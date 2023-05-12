@@ -1,6 +1,6 @@
 .agora_title {
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    margin-left: 0.6rem;
     font-weight: bold;
     color: #000;
     span {
@@ -12,13 +12,13 @@
 }
 
 .connectWallet {
-    background-color: lightgray;
-    padding: 0.5rem;
+    background-color: rgb(243, 239, 239);
+    padding: 0.5rem 0.8rem;
     border-radius: 9999px;
     color: black;
     cursor: pointer;
     &:hover {
-        background-color: rgb(208, 203, 203);
+        background-color: rgb(222, 220, 220);
     }
 }
 
