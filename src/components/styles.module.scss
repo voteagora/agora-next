@@ -10,3 +10,14 @@
         font-family: sans-serif;
     }
 }
+
+.connectWallet {
+    background-color: lightgray;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    color: black;
+    cursor: pointer;
+    &:hover {
+        background-color: rgb(208, 203, 203);
+    }
+}

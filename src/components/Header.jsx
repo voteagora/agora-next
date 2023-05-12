@@ -21,7 +21,9 @@ export default function Header() {
           </div>
         </div>
         <div className="hidden sm:mt-10 sm:flex lg:mt-0 lg:grow lg:basis-0 lg:justify-end">
-          <Button href="#">Connect Wallet</Button>
+          <Button className={styles.connectWallet} href="#">
+            Connect Wallet
+          </Button>
         </div>
       </Container>
     </header>
