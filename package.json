@@ -24,6 +24,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "cypress": "^12.11.0"
+    "cypress": "^12.11.0",
+    "sass": "^1.62.1"
   }
 }
