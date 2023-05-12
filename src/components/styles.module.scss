@@ -21,3 +21,13 @@
         background-color: rgb(208, 203, 203);
     }
 }
+
+.dev_banner {
+    padding:3px;
+    background-color: #000;
+    text-align: center;
+    p {
+        color: red;
+        font-size: 0.8rem;
+    }
+}
