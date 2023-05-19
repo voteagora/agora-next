@@ -10,7 +10,7 @@ export const metadata = {
   description: "The future of DAO governance",
 };
 
-const isDev = process.env.AGORA_ENV === "dev";
+const isNotProduction = process.env.AGORA_ENV != "production";
 
 export default function RootLayout({
   children,
@@ -27,7 +27,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        {isDev && <DevBanner />}
+        {isNotProduction && <DevBanner />}
         <Header />
         {children}
       </body>
