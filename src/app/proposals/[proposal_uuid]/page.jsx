@@ -5,7 +5,13 @@ import HumanVote from "@/components/shared/HumanVote";
 
 async function getProposal(proposal_uuid) {
   const res = await fetch(
-    `http://localhost:8000/api/v1/proposals/${proposal_uuid}`
+    `http://localhost:8000/api/v1/proposals/${proposal_uuid}`,
+    {
+      method: "GET",
+      headers: {
+        "agora-api-key": process.env.AGORA_API_KEY,
+      },
+    }
   );
   if (!res.ok) {
     throw new Error(res.statusText);
@@ -15,7 +21,13 @@ async function getProposal(proposal_uuid) {
 
 async function getVotes(proposal_uuid) {
   const res = await fetch(
-    `http://localhost:8000/api/v1/proposals/${proposal_uuid}/votes`
+    `http://localhost:8000/api/v1/proposals/${proposal_uuid}/votes`,
+    {
+      method: "GET",
+      headers: {
+        "agora-api-key": process.env.AGORA_API_KEY,
+      },
+    }
   );
   if (!res.ok) {
     throw new Error(res.statusText);
@@ -24,8 +36,8 @@ async function getVotes(proposal_uuid) {
 }
 
 export default async function Page({ params: { proposal_uuid } }) {
-  const proposalData =  getProposal(proposal_uuid);
-  const votesData =  getVotes(proposal_uuid);
+  const proposalData = getProposal(proposal_uuid);
+  const votesData = getVotes(proposal_uuid);
 
   const proposal = await proposalData;
 
@@ -59,7 +71,10 @@ async function ProposalVotes({ promise }) {
     <ul>
       {votes.map((vote) => (
         <li key={vote.id}>
-          <p><HumanAddress address={vote.address} /> voted <HumanVote support={vote.support} /></p>
+          <p>
+            <HumanAddress address={vote.address} /> voted{" "}
+            <HumanVote support={vote.support} />
+          </p>
         </li>
       ))}
     </ul>

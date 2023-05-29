@@ -3,7 +3,10 @@ import styles from "./styles.module.scss";
 
 async function getProposals() {
   const res = await fetch("http://localhost:8000/api/v1/proposals", {
-    cache: "no-store",
+    method: "GET",
+    headers: {
+      "agora-api-key": process.env.AGORA_API_KEY,
+    },
   });
   if (!res.ok) {
     throw new Error(res.statusText);
