@@ -4,6 +4,7 @@ import { Container } from "./Container";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
 import styles from "./styles.module.scss";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -12,7 +13,9 @@ export default function Header() {
         <div className="inline-flex mt-10 lg:mt-0 lg:grow lg:basis-0">
           <Logo />
           <h1 className={styles.agora_title}>
-            Agora <span>(alpha)</span>
+            <Link href="/">
+              Agora <span>(alpha)</span>
+            </Link>
           </h1>
         </div>
         <div className="order-first -mx-4 flex flex-auto basis-full overflow-x-auto whitespace-nowrap border-b border-blue-600/10 py-4 font-mono text-sm text-blue-600 sm:-mx-6 lg:order-none lg:mx-0 lg:basis-auto lg:border-0 lg:py-0">

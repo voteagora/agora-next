@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import styles from "./styles.module.scss";
 import HumanAddress from "@/components/shared/HumanAddress";
 import HumanVote from "@/components/shared/HumanVote";
+import Image from "next/image";
 
 async function getProposal(proposal_uuid) {
   const res = await fetch(
@@ -52,7 +53,20 @@ export default async function Page({ params: { proposal_uuid } }) {
           </div>
           <div className="lg:col-start-3 lg:row-end-1">
             <h1>Votes</h1>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense
+              fallback={
+                <div>
+                  Loading...{" "}
+                  <br/>
+                  <Image
+                    src="/images/blink.gif"
+                    alt="Blinging Agora Logo"
+                    width={50}
+                    height={20}
+                  />
+                </div>
+              }
+            >
               <ProposalVotes promise={votesData} />
             </Suspense>
           </div>

@@ -25,3 +25,16 @@ html {
   flex-direction: column;
   min-height: 100vh;
 }
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+nav {
+  a.active {
+    background-color: #f0efef;
+    color: black;
+  }
+}
