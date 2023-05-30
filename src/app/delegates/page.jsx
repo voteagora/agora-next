@@ -1,37 +1,19 @@
-import styles from './styles.module.scss';
-import { ArrowDownTrayIcon, ArrowLeftIcon, ArrowRightIcon, EnvelopeIcon, PhoneIcon } from "@heroicons/react/20/solid";
+import styles from "./styles.module.scss";
+import {
+  ArrowRightIcon,
+  UserIcon,
+} from "@heroicons/react/20/solid";
 
-const people = [
-  {
-    name: "Jane Cooper",
-    title: "Regional Paradigm Technician",
-    role: "Admin",
-    email: "janecooper@example.com",
-    telephone: "+1-202-555-0170",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
-  },
-  {
-    name: "Jane Cooper",
-    title: "Regional Paradigm Technician",
-    role: "Admin",
-    email: "janecooper@example.com",
-    telephone: "+1-202-555-0170",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
-  },
-  {
-    name: "Jane Cooper",
-    title: "Regional Paradigm Technician",
-    role: "Admin",
-    email: "janecooper@example.com",
-    telephone: "+1-202-555-0170",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
-  },
-];
+import faker from "faker";
 
-export default function Example() {
+const people = Array.from({ length: 33 }, () => ({
+  name: faker.name.findName(),
+  title: faker.name.jobTitle(),
+  email: faker.internet.email(),
+  telephone: faker.phone.phoneNumber(),
+}));
+
+export default function Page() {
   return (
     <div>
       <h1 className="pageTitle">Delegates</h1>
@@ -50,19 +32,12 @@ export default function Example() {
                   <h3 className="truncate text-sm font-medium text-gray-900">
                     {person.name}
                   </h3>
-                  <span className="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                    {person.role}
-                  </span>
                 </div>
                 <p className="mt-1 truncate text-sm text-gray-500">
                   {person.title}
                 </p>
               </div>
-              <img
-                className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
-                src={person.imageUrl}
-                alt=""
-              />
+              <UserIcon className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300" />
             </div>
             <div>
               <div className="-mt-px flex divide-x divide-gray-200">
