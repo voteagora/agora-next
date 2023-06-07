@@ -1,24 +1,20 @@
 import styles from "./styles.module.scss";
-import AgoraAPI from "../../lib/agora-api";
-
-import {
-  ArrowRightIcon,
-  UserIcon,
-} from "@heroicons/react/20/solid";
+import AgoraAPI from "../lib/agoraAPI";
 
 import { DelegateCardList } from "../../components/Delegates/DelegateCardList";
 
 async function getDelegates() {
-  await AgoraAPI.get("/delegates");
+  const data = await AgoraAPI.get("/gov/op/delegates");
+  return data;
 }
 
 export default async function Page() {
   const delegates = await getDelegates();
 
   return (
-    <section className={styles.proposals_container}>
+    <section>
       <h1>Delegates</h1>
-      <DelegateCardList list={delegates} />
+      <DelegateCardList delegateList={delegates} />
     </section>
   );
 }
