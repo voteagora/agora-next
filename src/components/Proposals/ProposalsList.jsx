@@ -10,6 +10,8 @@ export const ProposalsList = ({ list }) => {
     router.push(`/proposals/${proposalId}`);
   };
 
+  console.log(list);
+
   return (
     <div className="mt-6 overflow-hidden border-t border-gray-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -38,10 +40,12 @@ export const ProposalsList = ({ list }) => {
                     <div className="absolute bottom-0 right-full h-px w-screen bg-gray-100" />
                     <div className="absolute bottom-0 left-0 h-px w-screen bg-gray-100" />
                   </td>
-                  <td className="hidden py-5 pr-6 sm:table-cell">
+                  <td className="relative py-5 pr-6">
                     <div className="text-sm leading-6 text-gray-900">
-                      {item.status}
+                      {item.proposal_stats[0].status}
                     </div>
+                  </td>
+                  <td className="hidden py-5 pr-6 sm:table-cell">
                     <div className="mt-1 justify-center leading-5 text-gray-500">
                       <div className="flex text-xs">Requesting</div>
                       <div className="mt-1 leading-5 text-gray-500">

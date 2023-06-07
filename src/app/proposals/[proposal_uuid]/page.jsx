@@ -56,8 +56,7 @@ export default async function Page({ params: { proposal_uuid } }) {
             <Suspense
               fallback={
                 <div>
-                  Loading...{" "}
-                  <br/>
+                  Loading... <br />
                   <Image
                     src="/images/blink.gif"
                     alt="Blinging Agora Logo"

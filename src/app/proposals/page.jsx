@@ -7,6 +7,7 @@ async function getProposals() {
     headers: {
       "agora-api-key": process.env.AGORA_API_KEY,
     },
+    cache: "no-store",
   });
   if (!res.ok) {
     throw new Error(res.statusText);
