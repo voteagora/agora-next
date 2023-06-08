@@ -6,11 +6,8 @@ export const ProposalsList = ({ list }) => {
   const router = useRouter();
 
   const viewProposal = (proposalId) => {
-    // Perform any necessary logic before navigating to the proposal
     router.push(`/proposals/${proposalId}`);
   };
-
-  console.log(list);
 
   return (
     <div className="mt-6 overflow-hidden border-t border-gray-100">
