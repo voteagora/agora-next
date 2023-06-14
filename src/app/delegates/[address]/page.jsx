@@ -1,7 +1,8 @@
 import AgoraAPI from "../../lib/agoraAPI";
 
 async function getDelegate(address) {
-  const data = await AgoraAPI.get(`/gov/op/delegates/${address}`);
+  const api = new AgoraAPI();
+  const data = await api.get(`/delegates/${address}`);
   return data;
 }
 

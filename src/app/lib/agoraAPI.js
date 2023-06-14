@@ -3,13 +3,22 @@
  */
 class AgoraAPI {
   /**
+   * Initializes a new instance of the AgoraAPI class.
+   */
+  constructor() {
+    this.apiKey = process.env.AGORA_API_KEY;
+    this.instanceToken = process.env.AGORA_INSTANCE_TOKEN;
+    this.baseURL = process.env.AGORA_BASE_URL || "http://localhost:8000/api/v1";
+  }
+
+  /**
    * Performs a GET request to the Agora API.
-   */ 
-  static async get(endpoint) {
-    const res = await fetch(`http://localhost:8000/api/v1${endpoint}`, {
+   */
+  async get(endpoint, instanceToken = this.instanceToken) {
+    const res = await fetch(`${this.baseURL}/${instanceToken}${endpoint}`, {
       method: "GET",
       headers: {
-        "agora-api-key": process.env.AGORA_API_KEY,
+        "agora-api-key": this.apiKey,
       },
       cache: "no-store",
     });

@@ -4,7 +4,8 @@ import AgoraAPI from "../lib/agoraAPI";
 import { DelegateCardList } from "../../components/Delegates/DelegateCardList";
 
 async function getDelegates() {
-  const data = await AgoraAPI.get("/gov/op/delegates");
+  const api = new AgoraAPI();
+  const data = await api.get("/delegates");
   return data;
 }
 

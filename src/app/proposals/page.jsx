@@ -1,18 +1,12 @@
 import ProposalsList from "../../components/Proposals/ProposalsList";
 import styles from "./styles.module.scss";
+import AgoraAPI from "../lib/agoraAPI";
 
 async function getProposals() {
-  const res = await fetch("http://localhost:8000/api/v1/proposals", {
-    method: "GET",
-    headers: {
-      "agora-api-key": process.env.AGORA_API_KEY,
-    },
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
-  return res.json();
+
+    const api = new AgoraAPI();
+    const data = await api.get("/proposals");
+    return data;
 }
 
 export default async function Page() {
