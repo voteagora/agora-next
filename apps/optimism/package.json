@@ -1,0 +1,10 @@
+{
+  "name": "optimism",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "eslint-config-custom": "workspace:*",
+    "tsconfig": "workspace:*",
+    "ui": "workspace:*"
+  }
+}
