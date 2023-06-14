@@ -1,4 +1,4 @@
-export function Logo(props) {
+export function Logo({ className }: { className?: string }) {
   return (
     <svg
       width="16"
@@ -6,6 +6,7 @@ export function Logo(props) {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <g clipPath="url(#clip0_379_1614)">
         <ellipse
@@ -47,5 +48,5 @@ export function Logo(props) {
         </clipPath>
       </defs>
     </svg>
-  );
+  )
 }
