@@ -1,0 +1,25 @@
+{
+  "printWidth": 80,
+  "tabWidth": 2,
+  "trailingComma": "none",
+  "singleQuote": false,
+  "semi": false,
+  "importOrderMergeDuplicateImports": true,
+  "importOrderBuiltinModulesToTop": true,
+  "importOrderCombineTypeAndValueImports": true,
+  "importOrder": [
+    "^@core/(.*)$",
+    "",
+    "^@server/(.*)$",
+    "",
+    "^@ui/(.*)$",
+    "",
+    "^[./]"
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderTypeScriptVersion": "5.0.0",
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ]
+}
