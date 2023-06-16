@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import styles from "./styles.module.scss";
-import HumanAddress from "@/components/shared/HumanAddress";
-import HumanVote from "@/components/shared/HumanVote";
+import { ProposalVotes } from "@/components/Proposals/ProposalVotes";
 import Image from "next/image";
 
 async function getProposal(proposal_uuid) {
@@ -20,25 +19,8 @@ async function getProposal(proposal_uuid) {
   return res.json();
 }
 
-async function getVotes(proposal_uuid) {
-  const res = await fetch(
-    `http://localhost:8000/api/v1/proposals/${proposal_uuid}/votes`,
-    {
-      method: "GET",
-      headers: {
-        "agora-api-key": process.env.AGORA_API_KEY,
-      },
-    }
-  );
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
-  return res.json();
-}
-
 export default async function Page({ params: { proposal_uuid } }) {
   const proposalData = getProposal(proposal_uuid);
-  const votesData = getVotes(proposal_uuid);
 
   const proposal = await proposalData;
 
@@ -52,7 +34,7 @@ export default async function Page({ params: { proposal_uuid } }) {
             <div>{proposal.description}</div>
           </div>
           <div className="lg:col-start-3 lg:row-end-1">
-            <h1>Votes</h1>
+            <h2>Votes</h2>
             <Suspense
               fallback={
                 <div>
@@ -66,7 +48,7 @@ export default async function Page({ params: { proposal_uuid } }) {
                 </div>
               }
             >
-              <ProposalVotes promise={votesData} />
+              <ProposalVotes proposal={proposal} />
             </Suspense>
           </div>
         </div>
@@ -75,21 +57,3 @@ export default async function Page({ params: { proposal_uuid } }) {
   );
 }
 
-// ProposalVotes Component
-async function ProposalVotes({ promise }) {
-  // Wait for the proposal promise to resolve
-  const votes = await promise;
-
-  return (
-    <ul>
-      {votes.map((vote) => (
-        <li key={vote.id}>
-          <p>
-            <HumanAddress address={vote.address} /> voted{" "}
-            <HumanVote support={vote.support} />
-          </p>
-        </li>
-      ))}
-    </ul>
-  );
-}

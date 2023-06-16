@@ -20,6 +20,7 @@ class AgoraAPI {
       headers: {
         "agora-api-key": this.apiKey,
       },
+      cache: "no-cache",
     });
 
     if (!res.ok) {

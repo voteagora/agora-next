@@ -33,7 +33,7 @@ export default function Page() {
 
   return (
     <section>
-      <h1>Proposals {proposals.length}</h1>
+      <h1>Proposals</h1>
       <ProposalsList list={proposals} />
       <button onClick={goToPreviousPage} disabled={currentPage === 1}>
         Previous Page
