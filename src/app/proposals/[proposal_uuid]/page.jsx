@@ -1,28 +1,16 @@
-import { Suspense } from "react";
 import styles from "./styles.module.scss";
 import { ProposalVotes } from "@/components/Proposals/ProposalVotes";
-import Image from "next/image";
+import AgoraAPI from "@/app/lib/agoraAPI";
+import AgoraSuspense from "@/components/shared/AgoraSuspense";
 
 async function getProposal(proposal_uuid) {
-  const res = await fetch(
-    `http://localhost:8000/api/v1/proposals/${proposal_uuid}`,
-    {
-      method: "GET",
-      headers: {
-        "agora-api-key": process.env.AGORA_API_KEY,
-      },
-    }
-  );
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
-  return res.json();
+  const api = new AgoraAPI();
+  const data = await api.get(`/proposals/${proposal_uuid}`);
+  return data;
 }
 
 export default async function Page({ params: { proposal_uuid } }) {
-  const proposalData = getProposal(proposal_uuid);
-
-  const proposal = await proposalData;
+  const proposal = await getProposal(proposal_uuid);
 
   return (
     <section className={styles.proposal_show}>
@@ -35,25 +23,12 @@ export default async function Page({ params: { proposal_uuid } }) {
           </div>
           <div className="lg:col-start-3 lg:row-end-1">
             <h2>Votes</h2>
-            <Suspense
-              fallback={
-                <div>
-                  Loading... <br />
-                  <Image
-                    src="/images/blink.gif"
-                    alt="Blinging Agora Logo"
-                    width={50}
-                    height={20}
-                  />
-                </div>
-              }
-            >
+            <AgoraSuspense>
               <ProposalVotes proposal={proposal} />
-            </Suspense>
+            </AgoraSuspense>
           </div>
         </div>
       </div>
     </section>
   );
 }
-

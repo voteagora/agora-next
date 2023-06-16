@@ -1,6 +1,7 @@
 "use client";
-import AgoraAPI from "../lib/agoraAPI";
+import AgoraAPI from "@/app/lib/agoraAPI";
 import React from "react";
+import AgoraSuspense from "@/components/shared/AgoraSuspense";
 
 import { DelegateCardList } from "../../components/Delegates/DelegateCardList";
 
@@ -33,7 +34,9 @@ export default function Page() {
   return (
     <section>
       <h1 class="text-xl">Delegates</h1>
-      <DelegateCardList delegateList={delegates} />
+      <AgoraSuspense>
+        <DelegateCardList delegateList={delegates} />
+      </AgoraSuspense>
       <button onClick={goToPreviousPage} disabled={currentPage === 1}>
         Previous Page
       </button>
