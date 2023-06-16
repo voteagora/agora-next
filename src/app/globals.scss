@@ -38,3 +38,10 @@ nav {
     color: black;
   }
 }
+
+section {
+  h1 {
+      @apply text-4xl font-bold;
+      @apply mb-4;
+    }
+}

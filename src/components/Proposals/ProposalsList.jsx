@@ -39,7 +39,7 @@ export const ProposalsList = ({ list }) => {
                   </td>
                   <td className="relative py-5 pr-6">
                     <div className="text-sm leading-6 text-gray-900">
-                      {item.proposal_stats[0].status}
+                      {item.status}
                     </div>
                   </td>
                   <td className="hidden py-5 pr-6 sm:table-cell">

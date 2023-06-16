@@ -1,3 +1,8 @@
+/* 
+* Show page for a single delegate
+* Takes in the delegate address as a parameter
+*/
+
 import AgoraAPI from "../../lib/agoraAPI";
 
 async function getDelegate(address) {

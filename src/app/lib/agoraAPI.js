@@ -15,13 +15,11 @@ class AgoraAPI {
    * Performs a GET request to the Agora API.
    */
   async get(endpoint, instanceToken = this.instanceToken) {
-    console.log(process.env.AGORA_INSTANCE_TOKEN);
     const res = await fetch(`${this.baseURL}/${instanceToken}${endpoint}`, {
       method: "GET",
       headers: {
         "agora-api-key": this.apiKey,
       },
-      cache: "no-store",
     });
 
     if (!res.ok) {

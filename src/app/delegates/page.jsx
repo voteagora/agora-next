@@ -1,6 +1,4 @@
 "use client";
-
-import styles from "./styles.module.scss";
 import AgoraAPI from "../lib/agoraAPI";
 import React from "react";
 
@@ -24,18 +22,18 @@ export default function Page() {
     });
   }, [currentPage]);
 
-    const goToNextPage = () => {
-      setCurrentPage(currentPage + 1);
-    };
+  const goToNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
 
-    const goToPreviousPage = () => {
-      setCurrentPage(currentPage > 1 ? currentPage - 1 : 1);
-    };
-
+  const goToPreviousPage = () => {
+    setCurrentPage(currentPage > 1 ? currentPage - 1 : 1);
+  };
 
   return (
     <section>
-      <h1>Delegates</h1>
+      <h1 class="text-xl">Delegates</h1>
+      <DelegateCardList delegateList={delegates} />
       <button onClick={goToPreviousPage} disabled={currentPage === 1}>
         Previous Page
       </button>
@@ -45,7 +43,6 @@ export default function Page() {
       >
         Next Page
       </button>
-      <DelegateCardList delegateList={delegates} />
     </section>
   );
 }
