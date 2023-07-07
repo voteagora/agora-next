@@ -17,11 +17,19 @@ export default function Navbar() {
       </Link>
       <Link
         href="/delegates"
-        className={`relative -ml-px inline-flex items-center rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10 ${
+        className={`relative -ml-px inline-flex items-center  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10 ${
           pathname.includes("delegates") ? "active" : ""
         }`}
       >
         Delegates
+      </Link>
+      <Link
+        href="/events"
+        className={`relative -ml-px inline-flex items-center rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10 ${
+          pathname.includes("events") ? "active" : ""
+        }`}
+      >
+        Activity Feed
       </Link>
     </nav>
   );

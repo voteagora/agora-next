@@ -1,13 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-export const ProposalsList = ({ list }) => {
-  const router = useRouter();
-
-  const viewProposal = (proposalId) => {
-    router.push(`/proposals/${proposalId}`);
-  };
+export const EventFeed = ({ events }) => {
 
   return (
     <div className="mt-6 overflow-hidden border-t border-gray-100">
@@ -15,21 +8,17 @@ export const ProposalsList = ({ list }) => {
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
           <table className="w-full text-left">
             <tbody>
-              {list.map((item) => (
+              {events.map((event) => (
                 <tr
                   className="cursor-pointer"
-                  key={item.id}
-                  onClick={() => viewProposal(item.uuid)}
+                  key={event.id}
                 >
                   <td className="relative py-5 pr-6">
                     <div className="flex gap-x-6">
                       <div className="flex-auto">
                         <div className="">
                           <div className="flex leading-8 text-xs text-gray-500">
-                            Proposed by {item.proposer_addr}
-                          </div>
-                          <div className="text-md font-bold leading-4 text-gray-600">
-                            <h2>{item.description.substring(0, 30)}</h2>
+                            {event.kind}
                           </div>
                         </div>
                       </div>
@@ -39,15 +28,7 @@ export const ProposalsList = ({ list }) => {
                   </td>
                   <td className="relative py-5 pr-6">
                     <div className="text-sm leading-6 text-gray-900">
-                      {item.status}
-                    </div>
-                  </td>
-                  <td className="hidden py-5 pr-6 sm:table-cell">
-                    <div className="mt-1 justify-center leading-5 text-gray-500">
-                      <div className="flex text-xs">Requesting</div>
-                      <div className="mt-1 leading-5 text-gray-500">
-                        --- ETH
-                      </div>
+                      {event.event_data}
                     </div>
                   </td>
                 </tr>
@@ -60,4 +41,4 @@ export const ProposalsList = ({ list }) => {
   );
 };
 
-export default ProposalsList;
+export default EventFeed;

@@ -21,7 +21,7 @@ export const ProposalVotes = ({ proposal }) => {
       setVotes(votes);
       setMeta(meta);
     });
-  }, [currentPage, proposal, votes]);
+  }, [currentPage, proposal]);
 
   const goToNextPage = () => {
     setCurrentPage(currentPage + 1);
@@ -38,6 +38,7 @@ export const ProposalVotes = ({ proposal }) => {
           <p>
             <HumanAddress address={vote.address} /> voted{" "}
             <HumanVote support={vote.support} />
+            {vote.reason}
           </p>
         </li>
       ))}
