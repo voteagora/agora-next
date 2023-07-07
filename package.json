@@ -10,6 +10,7 @@
     "cypress": "cypress open"
   },
   "dependencies": {
+    "@ensdomains/ensjs": "^3.0.0-alpha.64",
     "@heroicons/react": "^2.0.18",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/node": "20.1.1",
@@ -20,6 +21,7 @@
     "clsx": "^1.2.1",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
+    "ethers": "^6.6.2",
     "faker": "4.1.0",
     "lucide-react": "^0.258.0",
     "next": "13.4.1",
