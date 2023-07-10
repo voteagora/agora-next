@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 
 const EnsName = ({ address }) => {
-  const [ensName, setEnsName] = useState(null);
+  const [ensName, setEnsName] = useState(address); // Initialize with the address as the ENS name
 
   useEffect(() => {
     const getEnsName = async () => {
@@ -16,7 +16,7 @@ const EnsName = ({ address }) => {
         setEnsName(name);
       } catch (error) {
         console.error(`Failed to get ENS name for address ${address}:`, error);
-        setEnsName("Error: Failed to get ENS name");
+        // Don't change the ensName state in case of an error
       }
     };
 
