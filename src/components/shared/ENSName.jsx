@@ -9,7 +9,7 @@ const ENSName = ({ address }) => {
     const getEnsName = async () => {
       const provider = new ethers.AlchemyProvider(
         "mainnet",
-        process.env.NEXT_PUBLIC_ALCHEMY_ID
+        process.env.ALCHEMY_ID
       );
 
       try {
