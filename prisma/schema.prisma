@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,186 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model address_stats {
+  id                   String  @id
+  account              String
+  tokens_owned         Int
+  number_of_delegators BigInt?
+  total_voting_power   Int?
+  updated_at           BigInt
+  token                String? @db.VarChar
+
+  @@unique([account, token], map: "index_address_stats_on_account_and_token")
+}
+
+model api_users {
+  id          BigInt    @id @default(autoincrement())
+  api_key     String?   @db.VarChar
+  expires_at  DateTime? @db.Timestamp(6)
+  name        String    @db.VarChar
+  description String?
+  created_at  DateTime  @db.Timestamp(6)
+  updated_at  DateTime  @db.Timestamp(6)
+}
+
+model ar_internal_metadata {
+  key        String   @id @db.VarChar
+  value      String?  @db.VarChar
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+}
+
+model balances {
+  id         String  @id
+  address    String?
+  token      String
+  amount     Decimal @db.Decimal
+  created_at BigInt?
+  updated_at BigInt?
+}
+
+model daos {
+  id         BigInt   @id @default(autoincrement())
+  name       String   @db.VarChar
+  token      String   @db.VarChar
+  chain      String   @db.VarChar
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+}
+
+model delegate_bios {
+  id                        BigInt              @id @default(autoincrement())
+  delegate_statement_id     BigInt
+  address                   String              @db.VarChar
+  token                     String              @db.VarChar
+  signature_data            Json?
+  twitter_handle            String?             @db.VarChar
+  discord_handle            String?             @db.VarChar
+  farcaster_handle          String?             @db.VarChar
+  telegram_handle           String?             @db.VarChar
+  email                     String?             @db.VarChar
+  website                   String?             @db.VarChar
+  github_handle             String?             @db.VarChar
+  email_verified            Boolean?            @default(false)
+  open_to_delegation        Boolean?            @default(false)
+  open_to_proposals         Boolean?            @default(false)
+  open_to_questions         Boolean?            @default(false)
+  agreed_to_code_of_conduct Boolean?            @default(false)
+  created_at                DateTime            @db.Timestamp(6)
+  updated_at                DateTime            @db.Timestamp(6)
+  delegate_statements       delegate_statements @relation(fields: [delegate_statement_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_055814562f")
+
+  @@index([delegate_statement_id], map: "index_delegate_bios_on_delegate_statement_id")
+}
+
+model delegate_statements {
+  id            BigInt          @id @default(autoincrement())
+  address       String          @db.VarChar
+  statement     String
+  token         String          @db.VarChar
+  created_at    DateTime        @db.Timestamp(6)
+  updated_at    DateTime        @db.Timestamp(6)
+  delegate_bios delegate_bios[]
+}
+
+model delegations {
+  id             String  @id
+  delegator_addr String
+  delegatee_addr String
+  token          String
+  amount         Decimal @db.Decimal
+  kind           String
+  updated_at     BigInt
+}
+
+model ens_records {
+  id         BigInt   @id @default(autoincrement())
+  address    String?  @db.VarChar
+  username   String?  @db.VarChar
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+
+  @@index([address], map: "index_ens_records_on_address")
+}
+
+model events {
+  id         String  @id
+  kind       String?
+  token      String
+  event_data String?
+  created_at BigInt?
+}
+
+model nouns_nft {
+  id         String  @id
+  owner      String
+  background Decimal @db.Decimal
+  body       Decimal @db.Decimal
+  accessory  Decimal @db.Decimal
+  head       Decimal @db.Decimal
+  glasses    Decimal @db.Decimal
+}
+
+model proposal_stats {
+  id                         String   @id
+  proposal_uuid              String?
+  token                      String
+  total_votes                BigInt
+  total_votes_for            Int
+  total_votes_against        Int
+  total_votes_abstain        Int
+  total_voting_power         Decimal? @db.Decimal
+  total_voting_power_for     Decimal? @db.Decimal
+  total_voting_power_against Decimal? @db.Decimal
+  total_voting_power_abstain Decimal? @db.Decimal
+  total_votes_with_reason    Int
+}
+
+model proposals {
+  id            String  @id
+  uuid          String?
+  proposer_addr String?
+  token         String
+  targets       String?
+  values        String?
+  signatures    String?
+  start_block   String?
+  end_block     String?
+  description   String?
+}
+
+model raw_logs {
+  id                String   @id
+  address           String?
+  event_signature   String?
+  event_params      String[]
+  block_number      BigInt?
+  block_hash        String?
+  log_index         BigInt?
+  transaction_hash  String?
+  transaction_index BigInt?
+  data              String?
+  topics            String?
+}
+
+model schema_migrations {
+  version String @id @db.VarChar
+}
+
+model users {
+  id         String @id
+  account    String @unique(map: "index_users_on_account")
+  updated_at BigInt
+}
+
+model votes {
+  id          String  @id
+  address     String?
+  proposal_id String?
+  support     Int
+  amount      Decimal @db.Decimal
+  reason      String?
+  created_at  BigInt
 }
