@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 
+// This component will display the ENS name for a given address
 const ENSName = ({ address }) => {
   const [ensName, setEnsName] = useState(address); // Initialize with the address as the ENS name
 
@@ -16,7 +17,6 @@ const ENSName = ({ address }) => {
         setEnsName(name);
       } catch (error) {
         console.error(`Failed to get ENS name for address ${address}:`, error);
-        // Don't change the ensName state in case of an error
       }
     };
 
