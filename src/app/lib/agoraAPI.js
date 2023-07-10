@@ -8,15 +8,14 @@ class AgoraAPI {
   constructor() {
     this.apiKey = process.env.AGORA_API_KEY;
     this.instanceToken = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
-    this.baseURL =
-      process.env.NEXT_PUBLIC_AGORA_BASE_URL || "http://localhost:9000/api/v1";
+    this.baseURL = "http://localhost:3000/api/v1";
   }
 
   /**
    * Performs a GET request to the Agora API.
    */
   async get(endpoint, instanceToken = this.instanceToken) {
-    const res = await fetch(`${this.baseURL}/${instanceToken}${endpoint}`, {
+    const res = await fetch(`${this.baseURL}/${endpoint}`, {
       method: "GET",
       headers: {
         "agora-api-key": this.apiKey,
