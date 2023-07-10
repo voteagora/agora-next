@@ -1,8 +1,12 @@
-import React from "react";
+import React, { Suspense } from "react";
+import EnsName from "EnsName"; // adjust the import path as per your project structure
 
-const HumanAddress = ({ address }) => {
-  const humanAddress = `${address.slice(0, 4)}...${address.slice(-4)}`;
-  return <span>{humanAddress}</span>;
-};
+function HumanAddress({ address }) {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <EnsName address={address} />
+    </Suspense>
+  );
+}
 
 export default HumanAddress;
