@@ -8,7 +8,8 @@ class AgoraAPI {
   constructor() {
     this.apiKey = process.env.AGORA_API_KEY;
     this.instanceToken = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
-    this.baseURL = process.env.AGORA_BASE_URL || "http://localhost:8000/api/v1";
+    this.baseURL =
+      process.env.NEXT_PUBLIC_AGORA_BASE_URL || "http://localhost:9000/api/v1";
   }
 
   /**
