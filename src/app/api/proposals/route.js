@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser"
 
 export async function GET(request) {
+  
+  // Check if the session is authenticated first
+  const authResponse = authenticateAgoraApiUser(request);
+  if (authResponse) {
+    return authResponse;
+  }
+
   const prisma = new PrismaClient();
 
   let page = parseInt(request.nextUrl.searchParams.get("page"), 10);
@@ -20,7 +28,7 @@ export async function GET(request) {
 
   await prisma.$disconnect();
 
-  // Construct the response
+  // Build out proposal response
   const response = {
     meta: {
       current_page: page,
@@ -29,6 +37,7 @@ export async function GET(request) {
       total_count: total_count,
     },
     proposals: proposals.map((proposal) => ({
+      // Just testing out, not meant for production
       id: proposal.id,
       uuid: proposal.uuid,
     })),
