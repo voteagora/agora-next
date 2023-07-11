@@ -15,7 +15,7 @@ class AgoraAPI {
    * Performs a GET request to the Agora API.
    */
   async get(endpoint, instanceToken = this.instanceToken) {
-    const res = await fetch(`${this.baseURL}/${endpoint}`, {
+    const res = await fetch(`${this.baseURL}${endpoint}`, {
       method: "GET",
       headers: {
         "agora-api-key": this.apiKey,
