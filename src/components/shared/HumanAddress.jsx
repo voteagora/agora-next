@@ -3,11 +3,7 @@ import ENSName from "./ENSName"; // adjust the import path as per your project s
 
 // This component will display the ENS name for a given address
 function HumanAddress({ address }) {
-  return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <ENSName address={address} />
-    </Suspense>
-  );
+  return <ENSName address={address} />;
 }
 
 export default HumanAddress;

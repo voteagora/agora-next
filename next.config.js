@@ -5,22 +5,6 @@ module.exports = {
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",
-        port: "",
-        pathname: "**",
-      },
-      {
-        protocol: "http",
-        hostname: "**",
-        port: "",
-        pathname: "**",
-      },
-    ],
-  },
 };  
 
 const nextConfig = {}

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser"
+import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
-export async function GET(request) {
-  
+export async function GET(request, { params }) {
   // Check if the session is authenticated first
   const authResponse = authenticateAgoraApiUser(request);
   if (authResponse) {
@@ -17,11 +16,12 @@ export async function GET(request) {
     page = 1;
   }
 
-  const pageSize = 25;
+  const pageSize = 50;
   const total_count = await prisma.proposals.count();
   const total_pages = Math.ceil(total_count / pageSize);
 
-  const proposals = await prisma.proposals.findMany({
+  const votes = await prisma.votes.findMany({
+    where: { proposal_id: params.proposal_id },
     take: pageSize,
     skip: (page - 1) * pageSize,
   });
@@ -36,15 +36,12 @@ export async function GET(request) {
       page_size: pageSize,
       total_count: total_count,
     },
-    proposals: proposals.map((proposal) => ({
-      // Just testing out, not meant for production
-      id: proposal.id,
-      uuid: proposal.uuid,
-      proposer_addr: proposal.proposer_addr,
-      token: proposal.token,
-      start_block: proposal.start_block,
-      end_block: proposal.end_block,
-      description: proposal.description,
+    votes: votes.map((vote) => ({
+      address: vote.address,
+      proposal_id: vote.proposal_id,
+      support: vote.support,
+      amount: vote.amount,
+      reason: vote.reason,
     })),
   };
 

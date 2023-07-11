@@ -15,21 +15,21 @@ export const ProposalsList = ({ list }) => {
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
           <table className="w-full text-left">
             <tbody>
-              {list.map((item) => (
+              {list.map((proposal) => (
                 <tr
                   className="cursor-pointer"
-                  key={item.id}
-                  onClick={() => viewProposal(item.uuid)}
+                  key={proposal.id}
+                  onClick={() => viewProposal(proposal.uuid)}
                 >
                   <td className="relative py-5 pr-6">
                     <div className="flex gap-x-6">
                       <div className="flex-auto">
                         <div className="">
                           <div className="flex leading-8 text-xs text-gray-500">
-                            Proposed by {item.proposer_addr}
+                            Proposed by {proposal.proposer_addr}
                           </div>
                           <div className="text-md font-bold leading-4 text-gray-600">
-                            <h2>{item.description.substring(0, 30)}</h2>
+                            <h2>{proposal.description.substring(0, 30)}</h2>
                           </div>
                         </div>
                       </div>
@@ -39,7 +39,7 @@ export const ProposalsList = ({ list }) => {
                   </td>
                   <td className="relative py-5 pr-6">
                     <div className="text-sm leading-6 text-gray-900">
-                      {item.status}
+                      {proposal.status}
                     </div>
                   </td>
                   <td className="hidden py-5 pr-6 sm:table-cell">

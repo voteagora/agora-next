@@ -1,9 +1,12 @@
+"use client";
+
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 
 // This component will display the ENS name for a given address
 const ENSName = ({ address }) => {
-  const [ensName, setEnsName] = useState(address); // Initialize with the address as the ENS name
+  const addy = address.split("-")[0];
+  const [ensName, setEnsName] = useState(addy); // Initialize with the address as the ENS name
 
   useEffect(() => {
     const getEnsName = async () => {
@@ -13,15 +16,15 @@ const ENSName = ({ address }) => {
       );
 
       try {
-        const name = await provider.lookupAddress(address);
+        const name = await provider.lookupAddress(addy);
         setEnsName(name);
       } catch (error) {
-        console.error(`Failed to get ENS name for address ${address}:`, error);
+        console.error(`Failed to get ENS name for address ${addy}:`, error);
       }
     };
 
     getEnsName();
-  }, [address]);
+  }, [addy]);
 
   return <span>{ensName}</span>;
 };
