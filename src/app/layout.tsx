@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import "./globals.scss";
 import { Inter } from "next/font/google";
 import DevBanner from "@/components/DevBanner";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,7 @@ export default function RootLayout({
         <Header />
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {children}
+          <Analytics />
         </main>
       </body>
     </html>
