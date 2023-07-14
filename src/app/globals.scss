@@ -134,6 +134,7 @@ section {
   word-wrap: break-word;  
 }
 
+
 .agora_markdown h1,
 .agora_markdown h2,
 .agora_markdown h3,
@@ -219,4 +220,10 @@ section {
   /* optional: to center the image if you like */
   margin: 2rem auto;
   /* optional: to center the image if you like */
+}
+
+// Votes
+.agora_votes {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }

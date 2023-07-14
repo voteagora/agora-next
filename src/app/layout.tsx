@@ -30,7 +30,7 @@ export default function RootLayout({
         <noscript>You need to enable JavaScript to run this app.</noscript>
         {isNotProduction && <DevBanner />}
         <Header />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 break-words overflow-hidden">
           {children}
           <Analytics />
         </main>
