@@ -130,7 +130,8 @@ section {
   line-height: 1.6;
   font-size: 1rem;
   color: #333;
-  /* or any color that suits your design */
+  overflow-wrap: break-word;
+  word-wrap: break-word;  
 }
 
 .agora_markdown h1,
@@ -145,6 +146,7 @@ section {
 
 .agora_markdown h1 {
   font-size: 2em;
+  margin-top: 0.5em;
 }
 
 .agora_markdown h2 {
@@ -197,6 +199,7 @@ section {
   padding: 1em;
   border-radius: 3px;
   overflow-x: auto;
+  white-space: pre-wrap;
 }
 
 .agora_markdown a {
