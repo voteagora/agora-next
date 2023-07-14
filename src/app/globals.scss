@@ -227,3 +227,8 @@ section {
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
+
+// Proposal lists
+.proposal_list_title h1 {
+  @apply text-xl;
+}

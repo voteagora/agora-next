@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import HumanAddress from "../shared/HumanAddress";
 
 export const ProposalsList = ({ list }) => {
   const router = useRouter();
@@ -26,10 +28,19 @@ export const ProposalsList = ({ list }) => {
                       <div className="flex-auto">
                         <div className="">
                           <div className="flex leading-8 text-xs text-gray-500">
-                            Proposed by {proposal.proposer_addr}
+                            <p className="flex-auto">
+                              Prop {proposal.uuid} by {" "}
+                              <HumanAddress address={proposal.proposer_addr} />
+                            </p>
                           </div>
-                          <div className="text-md font-bold leading-4 text-gray-600">
-                            <h2>{proposal.description.substring(0, 30)}</h2>
+                          <div className="proposal_list_title text-gray-600">
+                            <ReactMarkdown>
+                              {
+                                proposal.description
+                                  .replace(/\\n/g, "\n")
+                                  .split("\n")[0]
+                              }
+                            </ReactMarkdown>
                           </div>
                         </div>
                       </div>

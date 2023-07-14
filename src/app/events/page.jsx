@@ -2,7 +2,7 @@
 
 import { EventFeed } from "../../components/Events/EventFeed";
 import AgoraAPI from "../lib/agoraAPI";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
 async function getEvents(page = 1) {
@@ -12,16 +12,15 @@ async function getEvents(page = 1) {
 }
 
 export default function Page() {
-  // Set up state for events and pagination meta
-  const [events, setEvents] = React.useState([]);
-  const [meta, setMeta] = React.useState({});
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [events, setEvents] = useState([]);
+  const [meta, setMeta] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setPageLoading] = useState(false);
 
-  // Fetch events when the component mounts and when currentPage changes
-  React.useEffect(() => {
+  useEffect(() => {
     setIsLoading(true);
-    getEvents([currentPage])
+    getEvents()
       .then(({ events, meta }) => {
         setEvents(events);
         setMeta(meta);
@@ -31,19 +30,33 @@ export default function Page() {
         console.error("Failed to fetch events", error);
         setIsLoading(false);
       });
-  }, [currentPage]);
+  }, []);
 
-  // Pagination functions
-  const goToNextPage = () => {
-    setCurrentPage(currentPage + 1);
-  };
+  useEffect(() => {
+    function handleScroll() {
+      if (
+        window.innerHeight + document.documentElement.scrollTop !==
+          document.documentElement.offsetHeight ||
+        isPageLoading
+      ) {
+        return;
+      }
+      setPageLoading(true);
+      getEvents(currentPage + 1).then(
+        ({ events: newEvents, meta: newMeta }) => {
+          setEvents((prevEvents) => [...prevEvents, ...newEvents]);
+          setMeta(newMeta);
+          setCurrentPage((prevPage) => prevPage + 1);
+          setPageLoading(false);
+        }
+      );
+    }
 
-  const goToPreviousPage = () => {
-    setCurrentPage(currentPage > 1 ? currentPage - 1 : 1);
-  };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [currentPage, isPageLoading]);
 
-  // If we're still loading, show a loading indicator
-  if (isLoading) {
+  if (isLoading && events.length === 0) {
     return (
       <div>
         Loading... <br />
@@ -56,21 +69,22 @@ export default function Page() {
       </div>
     );
   }
-  
-  // Otherwise, render the events
+
   return (
     <section>
       <h1>Activity Feed</h1>
-      <button onClick={goToPreviousPage} disabled={currentPage === 1}>
-        Previous Page
-      </button>
-      <button
-        onClick={goToNextPage}
-        disabled={currentPage === meta.total_pages}
-      >
-        Next Page
-      </button>
       <EventFeed events={events} />
+      {isPageLoading && (
+        <div>
+          Loading... <br />
+          <Image
+            src="/images/blink.gif"
+            alt="Blinking Agora Logo"
+            width={50}
+            height={20}
+          />
+        </div>
+      )}
     </section>
   );
 }
