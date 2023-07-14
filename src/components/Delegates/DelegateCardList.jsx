@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import HumanAddress from "../shared/HumanAddress";
 
 export const DelegateCardList = ({ delegateList }) => {
 
@@ -31,7 +32,10 @@ export const DelegateCardList = ({ delegateList }) => {
             <a href="#" className="focus:outline-none">
               <span className="absolute inset-0" aria-hidden="true" />
               <p className="text-sm font-medium text-gray-900">
-                {delegate.total_voting_power}
+                <HumanAddress address={delegate.address} />
+              </p>
+              <p className="text-sm font-medium text-gray-900">
+                Voting power: {delegate.total_voting_power}
               </p>
               <p className="text-sm text-gray-500">
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit.

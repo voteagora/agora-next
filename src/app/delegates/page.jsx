@@ -33,7 +33,7 @@ export default function Page() {
 
   return (
     <section>
-      <h1 class="text-xl">Delegates</h1>
+      <h1 className="text-xl">Delegates</h1>
       <AgoraSuspense>
         <DelegateCardList delegateList={delegates} />
       </AgoraSuspense>

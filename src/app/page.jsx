@@ -1,34 +1,45 @@
-import { ArrowDownIcon, ArrowUpIcon, BookmarkSquareIcon, CalculatorIcon, UserCircleIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+"use client";
+
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  BookmarkSquareIcon,
+  CalculatorIcon,
+  UserCircleIcon,
+  UserGroupIcon,
+} from "@heroicons/react/20/solid";
 import {
   CursorArrowRaysIcon,
   EnvelopeOpenIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "@/components/ui/button"
+import { ProposalsList } from "@/components/Proposals/ProposalsList";
+import AgoraAPI from "./lib/agoraAPI";
+import React from "react";
 
 const stats = [
   {
     id: 1,
-    name: "Voters",
-    subHeading: "71,897",
+    name: "Voters / Noun Holders",
+    subHeading: "311 / 394",
     icon: UserGroupIcon,
   },
   {
     id: 2,
-    name: "Quroum",
-    subHeading: "58.16%",
+    name: "Quorum floor",
+    subHeading: "77 nouns (10% of supply)",
     icon: EnvelopeOpenIcon,
   },
   {
     id: 3,
-    name: "Threshold",
-    subHeading: "24.57%",
+    name: "Proposal threshold",
+    subHeading: "2 nouns",
     icon: CalculatorIcon,
   },
   {
     id: 4,
-    name: "Avg. Turnout",
-    subHeading: "24.57%",
+    name: "Avg voter turnout",
+    subHeading: "40%",
     icon: UserCircleIcon,
   },
 ];
@@ -37,11 +48,37 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+async function getProposals(page = 1) {
+  const api = new AgoraAPI();
+  const data = await api.get(`/proposals?page=${page}`);
+  return { proposals: data.proposals, meta: data.meta };
+}
+
 export default function Example() {
+  // Set up state for proposals and meta
+  const [proposals, setProposals] = React.useState([]);
+  const [meta, setMeta] = React.useState({});
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  React.useEffect(() => {
+    getProposals([currentPage]).then(({ proposals, meta }) => {
+      setProposals(proposals);
+      setMeta(meta);
+    });
+  }, [currentPage]);
+
+  const goToNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(currentPage > 1 ? currentPage - 1 : 1);
+  };
+
   return (
     <>
       <div>
-        <h1 className="pageTitle">Stats</h1>
+        <h1 className="pageTitle">DAO Metrics</h1>
 
         <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((item) => (
@@ -58,17 +95,25 @@ export default function Example() {
                 </p>
               </dt>
               <dd className="ml-16 flex items-baseline">
-                <p className="text-md font-semibold text-gray-900">
-                  {item.subHeading}
-                </p>
+                <p className="text-md text-gray-900">{item.subHeading}</p>
               </dd>
             </div>
           ))}
         </dl>
       </div>
-      <div>
-        <Button>Button</Button>
-      </div>
+      <section className="mt-10">
+        <h1 className="pageTitle">DAO Metrics</h1>
+        <ProposalsList list={proposals} />
+        <button onClick={goToPreviousPage} disabled={currentPage === 1}>
+          Previous Page
+        </button>
+        <button
+          onClick={goToNextPage}
+          disabled={currentPage === meta.total_pages}
+        >
+          Next Page
+        </button>
+      </section>
     </>
   );
 }
