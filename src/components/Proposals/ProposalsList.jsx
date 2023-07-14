@@ -29,8 +29,7 @@ export const ProposalsList = ({ list }) => {
                         <div className="">
                           <div className="flex leading-8 text-xs text-gray-500">
                             <p className="flex-auto">
-                              Prop {proposal.uuid} by {" "}
-                              <HumanAddress address={proposal.proposer_addr} />
+                              Prop {proposal.uuid} by {proposal.proposer_addr}
                             </p>
                           </div>
                           <div className="proposal_list_title text-gray-600">
