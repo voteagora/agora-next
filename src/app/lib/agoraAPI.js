@@ -28,6 +28,26 @@ class AgoraAPI {
 
     return res.json();
   }
+
+  /**
+   * POST request to the Agora API.
+   */
+  async post(endpoint, data, instanceToken = this.instanceToken) {
+    const res = await fetch(`${this.baseURL}${endpoint}`, {
+      method: "POST",
+      headers: {
+        "agora-api-key": this.apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+
+    return res.json();
+  }
 }
 
 export default AgoraAPI;
