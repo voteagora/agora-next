@@ -4,6 +4,16 @@ import { Inter } from "next/font/google";
 import DevBanner from "@/components/DevBanner";
 import { Analytics } from "@vercel/analytics/react";
 
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+
+BigInt.prototype.toJSON = function (): string {
+  return this.toString();
+};
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {

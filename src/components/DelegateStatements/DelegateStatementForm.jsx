@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AgoraAPI from "../../app/lib/agoraAPI";
 
 export default function DelegateStatementForm() {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ export default function DelegateStatementForm() {
     // Send POST request to your API
     const api = new AgoraAPI();
 
-    const response = await api.post("/api/statements", formData);
+    const response = await api.post("/statements", formData);
 
     if (!response.ok) {
       // Handle error response here

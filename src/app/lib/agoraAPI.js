@@ -32,7 +32,9 @@ class AgoraAPI {
   /**
    * POST request to the Agora API.
    */
-  async post(endpoint, data, instanceToken = this.instanceToken) {
+  async post(endpoint, data) {
+    console.log(data);
+    console.log(JSON.stringify(data));
     const res = await fetch(`${this.baseURL}${endpoint}`, {
       method: "POST",
       headers: {
