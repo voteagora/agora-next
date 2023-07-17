@@ -14,15 +14,18 @@ export async function POST(request) {
   }
   const prisma = new PrismaClient();
 
-  const { title, content } = request.body;
+
+  const data = await request.json();
+
+  const { title, content } = data
 
   // Attempt to create the new statement in the database
   try {
     const statement = await prisma.delegate_statements.create({
       data: {
-        address: 'test2',
-        statement: 'test2',
-        token: 'NOUN',
+        address: title,
+        statement: content,
+        token: "NOUN",
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -32,7 +35,6 @@ export async function POST(request) {
     return NextResponse.json(statement, { status: 201 });
   } catch (error) {
     console.error(error);
-
     // Handle any errors that occurred when trying to save to the database
     return NextResponse.json(
       {

@@ -5,6 +5,7 @@ import { Logo } from "./Logo";
 import { Button } from "./Button";
 import styles from "./styles.module.scss";
 import Link from "next/link";
+import { ConnectKitButton } from "connectkit";
 
 export default function Header() {
   return (
@@ -24,9 +25,7 @@ export default function Header() {
           </div>
         </div>
         <div className="hidden sm:mt-10 sm:flex lg:mt-0 lg:grow lg:basis-0 lg:justify-end">
-          <Button className={styles.connectWallet} href="#">
-            Connect Wallet
-          </Button>
+          <ConnectKitButton />
         </div>
       </Container>
     </header>

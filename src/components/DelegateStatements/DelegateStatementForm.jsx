@@ -45,6 +45,7 @@ export default function DelegateStatementForm() {
     const api = new AgoraAPI();
 
     const response = await api.post("/statements", formData);
+    console.log(response);
 
     if (!response.ok) {
       // Handle error response here
