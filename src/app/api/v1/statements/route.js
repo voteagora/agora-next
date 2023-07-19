@@ -5,7 +5,7 @@ import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgo
 export async function GET(request) {
   return NextResponse.json({}, { status: 200 });
 }
-
+    
 export async function POST(request) {
   // Check if the session is authenticated first
   const authResponse = authenticateAgoraApiUser(request);
