@@ -5,7 +5,7 @@ import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, SIWEConfig, getDefaultConfig } from "connectkit";
 import DevBanner from "@/components/DevBanner";
 import { Analytics } from "@vercel/analytics/react";
-import Header from "@/components/Header";
+import Header from "@/components/Header/Header";
 import { Inter } from "next/font/google";
 import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
 

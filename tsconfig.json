@@ -31,7 +31,7 @@
     "**/*.jsx",
     "**/*.js",
     ".next/types/**/*.ts",
-    "src/components/Header.jsx",
+    "src/components/Header/Header.jsx",
     "src/components/Container.jsx",
     "src/components/Button.jsx",
     "src/components/Navbar.jsx",
