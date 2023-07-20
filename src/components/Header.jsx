@@ -2,7 +2,6 @@
 import Navbar from "./Navbar";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
-import { Button } from "./Button";
 import styles from "./styles.module.scss";
 import Link from "next/link";
 import { ConnectKitButton } from "connectkit";
@@ -25,9 +24,85 @@ export default function Header() {
           </div>
         </div>
         <div className="hidden sm:mt-10 sm:flex lg:mt-0 lg:grow lg:basis-0 lg:justify-end">
-          <ConnectKitButton />
+          <ConnectWalletButton />
         </div>
       </Container>
     </header>
+  );
+}
+
+function ConnectWalletButton() {
+  const isMobile = useMediaQuery({
+    query: `(max-width: ${theme.maxWidth.md})`,
+  });
+
+  if (isMobile) {
+    return <MobileButton />;
+  }
+
+  return <DesktopButton />;
+}
+
+export const MobileButton = () => {
+  return (
+    <ConnectKitButton.Custom>
+      {({ isConnected, show }) => {
+        return (
+          <div
+            className={css`
+              margin-top: 13px;
+            `}
+            onClick={show}
+          >
+            {isConnected ? (
+              <img src={icons.walletConnected} alt="connect wallet button" />
+            ) : (
+              <img src={icons.wallet} alt="connect wallet button" />
+            )}
+          </div>
+        );
+      }}
+    </ConnectKitButton.Custom>
+  );
+};
+
+function DesktopButton() {
+  const { address: accountAddress } = useAccount();
+
+  const { delegate } = null;
+
+  return (
+    <ConnectKitButton.Custom>
+      {({ show }) => (
+        <div
+          className={css`
+            border: 1px solid ${theme.colors.gray.eb};
+            background-color: ${theme.colors.gray.fa};
+            border-radius: ${theme.borderRadius.full};
+            transition: 0.3s background-color;
+            position: relative;
+            top: 10px;
+
+            :hover {
+              background: ${theme.colors.gray.eb};
+            }
+          `}
+        >
+          {delegate ? (
+            <h2>Dropdown here</h2>
+          ) : (
+            <div
+              className={css`
+                padding: ${theme.spacing[2]} ${theme.spacing[5]};
+                cursor: pointer;
+              `}
+              onClick={show}
+            >
+              Connect Wallet
+            </div>
+          )}
+        </div>
+      )}
+    </ConnectKitButton.Custom>
   );
 }
