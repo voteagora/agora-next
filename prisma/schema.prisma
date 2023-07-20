@@ -4,19 +4,18 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgres://eng:ev9bCKZwLdG4@ep-purple-recipe-810627-pooler.us-east-2.aws.neon.tech/agora-goldsky-dev?schema=goldsky_daos&pgbouncer=true&connect_timeout=10"
 }
 
 model address_stats {
   id                   String  @id
   account              String
-  tokens_owned         Int
+  vid                  BigInt
+  total_voting_power   Int
   number_of_delegators BigInt?
-  total_voting_power   Int?
-  updated_at           BigInt
-  token                String? @db.VarChar
-
-  @@unique([account, token], map: "index_address_stats_on_account_and_token")
+  tokens_owned         Int
+  token                String
+  block_number         BigInt
 }
 
 model api_users {
@@ -37,12 +36,12 @@ model ar_internal_metadata {
 }
 
 model balances {
-  id         String  @id
-  address    String?
-  token      String
-  amount     Decimal @db.Decimal
-  created_at BigInt?
-  updated_at BigInt?
+  id           String  @id
+  address      String
+  token        String
+  amount       Decimal @db.Decimal
+  block_number BigInt
+  vid          BigInt
 }
 
 model daos {
@@ -96,7 +95,8 @@ model delegations {
   token          String
   amount         Decimal @db.Decimal
   kind           String
-  updated_at     BigInt
+  block_number   BigInt
+  vid            BigInt
 }
 
 model ens_records {
@@ -128,17 +128,17 @@ model nouns_nft {
 }
 
 model proposal_stats {
-  id                         String   @id
-  proposal_uuid              String?
+  id                         String  @id
+  proposal_uuid              String
   token                      String
   total_votes                BigInt
   total_votes_for            Int
   total_votes_against        Int
   total_votes_abstain        Int
-  total_voting_power         Decimal? @db.Decimal
-  total_voting_power_for     Decimal? @db.Decimal
-  total_voting_power_against Decimal? @db.Decimal
-  total_voting_power_abstain Decimal? @db.Decimal
+  total_voting_power         Decimal @db.Decimal
+  total_voting_power_for     Decimal @db.Decimal
+  total_voting_power_against Decimal @db.Decimal
+  total_voting_power_abstain Decimal @db.Decimal
   total_votes_with_reason    Int
 }
 
@@ -150,9 +150,10 @@ model proposals {
   targets       String?
   values        String?
   signatures    String?
-  start_block   String?
-  end_block     String?
+  start_block   BigInt?
+  end_block     BigInt?
   description   String?
+  created_at    BigInt
 }
 
 model raw_logs {
@@ -174,17 +175,19 @@ model schema_migrations {
 }
 
 model users {
-  id         String @id
-  account    String @unique(map: "index_users_on_account")
-  updated_at BigInt
+  id           String @id
+  account      String
+  block_number BigInt
 }
 
 model votes {
-  id          String  @id
-  address     String?
-  proposal_id String?
-  support     Int
-  amount      Decimal @db.Decimal
-  reason      String?
-  created_at  BigInt
+  id           String  @id
+  address      String
+  proposal_id  String
+  support      Int
+  amount       Decimal @db.Decimal
+  reason       String?
+  token        String
+  block_number BigInt
+  vid          BigInt
 }

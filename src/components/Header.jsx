@@ -1,9 +1,14 @@
 // Header component
 import Navbar from "./Navbar";
+import { css } from "@emotion/css";
+import { icons } from "../icons/icons";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
 import styles from "./styles.module.scss";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+import { useMediaQuery } from "react-responsive";
+import * as theme from "../lib/theme";
 import { ConnectKitButton } from "connectkit";
 
 export default function Header() {
@@ -69,7 +74,7 @@ export const MobileButton = () => {
 function DesktopButton() {
   const { address: accountAddress } = useAccount();
 
-  const { delegate } = null;
+  const { delegate } = {};
 
   return (
     <ConnectKitButton.Custom>

@@ -24,6 +24,9 @@ export async function GET(request) {
   const proposals = await prisma.proposals.findMany({
     take: pageSize,
     skip: (page - 1) * pageSize,
+    orderBy: {
+      end_block: "desc",
+    },
   });
 
   await prisma.$disconnect();
