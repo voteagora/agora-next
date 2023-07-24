@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",
+    "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
     "@prisma/client": "4.16.2",
     "@radix-ui/react-slot": "^1.0.2",

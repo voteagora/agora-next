@@ -1,19 +1,17 @@
 import { css } from "@emotion/css";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useFragment, graphql } from "react-relay";
 import React, { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
-import { BigNumber } from "ethers";
+import { BigNumberish } from "ethers";
 
-import * as theme from "../theme";
-import { inset0 } from "../theme";
-import { shortAddress } from "../utils/address";
-import { icons } from "../icons/icons";
+import * as theme from "../../lib/theme";
+import { inset0 } from "../../lib/theme";
+import { shortAddress } from "../../lib/utils";
+import { icons } from "../../icons/icons";
 
-import { HStack, VStack } from "./VStack";
-import { Link } from "./HammockRouter/Link";
+import Link from "next/link";
 import { PanelRow } from "./VoterPanel/Rows/PanelRow";
 import { NounResolvedName } from "./NounResolvedName";
 import { NounGridChildren } from "./NounGrid";
