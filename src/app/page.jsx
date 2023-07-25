@@ -1,17 +1,12 @@
 "use client";
 
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  BookmarkSquareIcon,
   CalculatorIcon,
   UserCircleIcon,
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
 import {
-  CursorArrowRaysIcon,
   EnvelopeOpenIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { ProposalsList } from "@/components/Proposals/ProposalsList";
 import AgoraAPI from "./lib/agoraAPI";

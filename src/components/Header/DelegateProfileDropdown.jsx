@@ -1,33 +1,76 @@
+import {
+  Cloud,
+  CreditCard,
+  Github,
+  Keyboard,
+  LifeBuoy,
+  LogOut,
+  Mail,
+  MessageSquare,
+  Plus,
+  PlusCircle,
+  Settings,
+  User,
+  UserPlus,
+  Users,
+  PowerIcon
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ENSName from "../shared/ENSName";
+import { icons } from "../../icons/icons";
+import Link from "next/link";
 
 export default function DelegateProfileDropdown({ address }) {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline">🟢  &nbsp;<ENSName address={address} /></Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80">
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <h4 className="font-medium leading-none">Dimensions</h4>
-            <p className="text-sm text-muted-foreground">
-              Set the dimensions for the layer.
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <div className="grid grid-cols-3 items-center gap-4"></div>
-            <div className="grid grid-cols-3 items-center gap-4"></div>
-            <div className="grid grid-cols-3 items-center gap-4"></div>
-            <div className="grid grid-cols-3 items-center gap-4"></div>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">
+          {" "}
+          🟢 &nbsp;
+          <ENSName address={address} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-100">
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Link href="/profile">
+              View My Profile
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Button>Create delegate statement</Button>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <LifeBuoy className="mr-2 h-4 w-4" />
+          <span>Support</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Cloud className="mr-2 h-4 w-4" />
+          <span>Agora API</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <PowerIcon className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
