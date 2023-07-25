@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser"
+import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
 export async function GET(request) {
-  
   // Check if the session is authenticated first
   const authResponse = authenticateAgoraApiUser(request);
   if (authResponse) {
@@ -15,7 +14,7 @@ export async function GET(request) {
     page = 1;
   }
 
-  const pageSize = 25;
+  const pageSize = 10;
   const total_count = await prisma.proposals.count();
   const total_pages = Math.ceil(total_count / pageSize);
 
@@ -40,10 +39,9 @@ export async function GET(request) {
       id: proposal.id,
       uuid: proposal.uuid,
       proposer_addr: proposal.proposer_addr,
-      token: proposal.token,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
-      description: proposal.description,
+      description: proposal.description.replace(/\\n/g, "\n").split("\n")[0],
     })),
   };
 
