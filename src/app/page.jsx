@@ -5,12 +5,12 @@ import {
   UserCircleIcon,
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
-import {
-  EnvelopeOpenIcon,
-} from "@heroicons/react/24/outline";
+import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import { ProposalsList } from "@/components/Proposals/ProposalsList";
 import AgoraAPI from "./lib/agoraAPI";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import Image from "next/image";
 
 const stats = [
   {
@@ -51,24 +51,25 @@ async function getProposals(page = 1) {
 
 export default function Example() {
   // Set up state for proposals and meta
-  const [proposals, setProposals] = React.useState([]);
-  const [meta, setMeta] = React.useState({});
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [proposals, setProposals] = useState([]);
+  const [meta, setMeta] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const { ref, inView } = useInView({
+    threshold: 0,
+  });
 
-  React.useEffect(() => {
-    getProposals([currentPage]).then(({ proposals, meta }) => {
-      setProposals(proposals);
+  useEffect(() => {
+    getProposals(currentPage).then(({ proposals, meta }) => {
+      setProposals((prevProposals) => [...prevProposals, ...proposals]);
       setMeta(meta);
     });
   }, [currentPage]);
 
-  const goToNextPage = () => {
-    setCurrentPage(currentPage + 1);
-  };
-
-  const goToPreviousPage = () => {
-    setCurrentPage(currentPage > 1 ? currentPage - 1 : 1);
-  };
+  useEffect(() => {
+    if (inView && currentPage < meta.total_pages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  }, [inView]);
 
   return (
     <>
@@ -97,17 +98,17 @@ export default function Example() {
         </dl>
       </div>
       <section className="mt-10">
-        <h1 className="pageTitle">DAO Metrics</h1>
+        <h1 className="pageTitle">Proposals</h1>
         <ProposalsList list={proposals} />
-        <button onClick={goToPreviousPage} disabled={currentPage === 1}>
-          Previous Page
-        </button>
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage === meta.total_pages}
-        >
-          Next Page
-        </button>
+        <div ref={ref}>
+          Loading... <br />
+          <Image
+            src="/images/blink.gif"
+            alt="Blinking Agora Logo"
+            width={50}
+            height={20}
+          />
+        </div>
       </section>
     </>
   );
