@@ -4,12 +4,13 @@ import { css } from "@emotion/css";
 import { icons } from "../../icons/icons";
 import { Container } from "../Container";
 import { Logo } from "../Logo";
-import styles from "./styles.module.scss";
+import styles from "../styles.module.scss";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useMediaQuery } from "react-responsive";
 import * as theme from "../../lib/theme";
 import { ConnectKitButton } from "connectkit";
+import DelegateProfileDropdown from "./DelegateProfileDropdown";
 
 export default function Header() {
   return (
@@ -93,7 +94,7 @@ function DesktopButton() {
           `}
         >
           {address ? (
-            <h2>Dropdown here</h2>
+            <DelegateProfileDropdown address={address} />
           ) : (
             <div
               className={css`
