@@ -33,7 +33,6 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
   };
 
   const proposals = pages.reduce((all, page) => all.concat(page.proposals), []);
-  console.log(proposals);
 
   return (
     <div className="mt-6 overflow-hidden border-t border-gray-100">
