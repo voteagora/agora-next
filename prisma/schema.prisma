@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://eng:ev9bCKZwLdG4@ep-purple-recipe-810627-pooler.us-east-2.aws.neon.tech/agora-goldsky-dev?schema=goldsky_daos&pgbouncer=true&connect_timeout=10"
+  url      = env("DATABASE_URL")
 }
 
 model address_stats {
