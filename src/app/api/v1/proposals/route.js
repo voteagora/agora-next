@@ -35,13 +35,12 @@ export async function GET(request) {
       total_count: total_count,
     },
     proposals: proposals.map((proposal) => ({
-      // Just testing out, not meant for production
       id: proposal.id,
       uuid: proposal.uuid,
       proposer_addr: proposal.proposer_addr,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
-      description: proposal.description.replace(/\\n/g, "\n").split("\n")[0],
+      markdowntitle: proposal.description.replace(/\\n/g, "\n").split("\n")[0],
     })),
   };
 

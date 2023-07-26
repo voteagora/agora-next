@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import ReactMarkdown from "react-markdown";
 import InfiniteScroll from "react-infinite-scroller";
+import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 import Image from "next/image";
 
 export default function ProposalsList({ initialProposals, fetchProposals }) {
@@ -17,7 +17,11 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
       fetching.current = true;
 
       const data = await fetchProposals(page);
-      setPages((prev) => [...prev, data]);
+      const existingIds = new Set(proposals.map((p) => p.id));
+      const uniqueProposals = data.proposals.filter(
+        (p) => !existingIds.has(p.id)
+      );
+      setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
       setMeta(data.meta);
 
       fetching.current = false;
@@ -29,6 +33,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
   };
 
   const proposals = pages.reduce((all, page) => all.concat(page.proposals), []);
+  console.log(proposals);
 
   return (
     <div className="mt-6 overflow-hidden border-t border-gray-100">
@@ -39,7 +44,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
             pageStart={0}
             loadMore={loadMore}
             loader={
-              <div>
+              <div key="loader">
                 Loading... <br />
                 <Image
                   src="/images/blink.gif"
@@ -52,16 +57,18 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
             element="main"
           >
             {proposals.map((proposal) => (
-              <div key={proposal.id} className="my-4 border-b-2">
+              <div
+                onClick={() => viewProposal(proposal.uuid)}
+                key={proposal.uuid}
+                className="my-4 border-b-2"
+              >
                 ID: {proposal.id}
                 <br />
                 Start block {proposal.start_block}
                 <br />
                 End block {proposal.end_block}
                 <br />
-                <button onClick={() => viewProposal(proposal.uuid)}>
-                  View Proposal
-                </button>
+                <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
               </div>
             ))}
           </InfiniteScroll>
