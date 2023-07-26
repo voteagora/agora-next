@@ -1,16 +1,11 @@
-"use client";
-
 import {
   CalculatorIcon,
   UserCircleIcon,
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
-import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
-import { ProposalsList } from "@/components/Proposals/ProposalsList";
+import { EnvelopeOpenIcon } from "@heroicons/react/24/outline"; 
+import ProposalsList from "@/components/Proposals/ProposalsList";
 import AgoraAPI from "./lib/agoraAPI";
-import React, { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import Image from "next/image";
 
 const stats = [
   {
@@ -43,33 +38,16 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-async function getProposals(page = 1) {
+async function fetchProposals(page = 1) {
+  "use server";
+
   const api = new AgoraAPI();
   const data = await api.get(`/proposals?page=${page}`);
   return { proposals: data.proposals, meta: data.meta };
 }
 
-export default function Example() {
-  // Set up state for proposals and meta
-  const [proposals, setProposals] = useState([]);
-  const [meta, setMeta] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const { ref, inView } = useInView({
-    threshold: 0,
-  });
-
-  useEffect(() => {
-    getProposals(currentPage).then(({ proposals, meta }) => {
-      setProposals((prevProposals) => [...prevProposals, ...proposals]);
-      setMeta(meta);
-    });
-  }, [currentPage]);
-
-  useEffect(() => {
-    if (inView && currentPage < meta.total_pages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  }, [inView]);
+export default async function Home() {
+  const proposals = await fetchProposals();
 
   return (
     <>
@@ -99,16 +77,10 @@ export default function Example() {
       </div>
       <section className="mt-10">
         <h1 className="pageTitle">Proposals</h1>
-        <ProposalsList list={proposals} />
-        <div ref={ref}>
-          Loading... <br />
-          <Image
-            src="/images/blink.gif"
-            alt="Blinking Agora Logo"
-            width={50}
-            height={20}
-          />
-        </div>
+        <ProposalsList
+          initialProposals={proposals}
+          fetchProposals={fetchProposals}
+        />
       </section>
     </>
   );
