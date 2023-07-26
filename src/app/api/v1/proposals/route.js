@@ -16,7 +16,7 @@ export async function GET(request) {
     page = 1;
   }
 
-  const pageSize = 10;
+  const pageSize = 25;
   const total_count = await prisma.proposals.count();
   const total_pages = Math.ceil(total_count / pageSize);
 
