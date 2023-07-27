@@ -1,7 +1,6 @@
-// Define and export a new Prisma client instance
-// every time the function is called in development
-// or use the global instance in production
 import { PrismaClient } from "@prisma/client";
+
+let prisma;
 
 if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient();
