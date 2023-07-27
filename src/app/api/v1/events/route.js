@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/lib/prisma";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
 export async function GET(request) {
@@ -8,8 +8,6 @@ export async function GET(request) {
   if (authResponse) {
     return authResponse;
   }
-
-  const prisma = new PrismaClient();
 
   let page = parseInt(request.nextUrl.searchParams.get("page"), 10);
   if (isNaN(page) || page < 1) {
@@ -25,7 +23,6 @@ export async function GET(request) {
     skip: (page - 1) * pageSize,
   });
 
-  await prisma.$disconnect();
 
   // Build out proposal response
   const response = {
