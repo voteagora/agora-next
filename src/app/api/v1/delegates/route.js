@@ -16,7 +16,7 @@ export async function GET(request) {
     page = 1;
   }
 
-  const pageSize = 50;
+  const pageSize = 25;
   const total_count = await prisma.events.count();
   const total_pages = Math.ceil(total_count / pageSize);
 
@@ -39,6 +39,7 @@ export async function GET(request) {
       total_count: total_count,
     },
     delegates: delegates.map((delegate) => ({
+      id: delegate.vid,
       address: delegate.account,
       total_voting_power: delegate.total_voting_power,
     })),
