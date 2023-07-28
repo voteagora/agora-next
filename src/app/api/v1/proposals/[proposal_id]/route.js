@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/lib/prisma";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
 export async function GET(request, { params }) {
@@ -9,13 +9,9 @@ export async function GET(request, { params }) {
     return authResponse;
   }
 
-  const prisma = new PrismaClient();
-
   const proposal = await prisma.proposals.findFirst({
     where: { uuid: params.proposal_id },
   });
-
-  await prisma.$disconnect();
 
   // Build out proposal response
   const response = {
