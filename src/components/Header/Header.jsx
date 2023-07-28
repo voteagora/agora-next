@@ -11,6 +11,7 @@ import { useMediaQuery } from "react-responsive";
 import * as theme from "../../lib/theme";
 import { ConnectKitButton } from "connectkit";
 import DelegateProfileDropdown from "./DelegateProfileDropdown";
+import Image from "next/image";
 
 export default function Header() {
   return (
@@ -61,9 +62,9 @@ export const MobileButton = () => {
             onClick={show}
           >
             {isConnected ? (
-              <img src={icons.walletConnected} alt="connect wallet button" />
+              <Image src={icons.walletConnected} alt="connect wallet button" />
             ) : (
-              <img src={icons.wallet} alt="connect wallet button" />
+              <Image src={icons.wallet} alt="connect wallet button" />
             )}
           </div>
         );
