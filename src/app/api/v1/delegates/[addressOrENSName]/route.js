@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
+// TODO
+// Add fallback to Ethers if this is slow, or not responding.
 async function resolveENSName(ensName) {
   const query = `
     query {
@@ -25,6 +27,9 @@ async function resolveENSName(ensName) {
     }
   `;
 
+  // TODO
+  // Remove hardcode and make sure that we have a more flexible way of doing this in case we
+  // get shut down
   const url = "https://query.indexing.co/graphql";
   const options = {
     method: "POST",
@@ -37,6 +42,7 @@ async function resolveENSName(ensName) {
 
   const response = await fetch(url, options);
   const data = await response.json();
+  // TODO: Build a type or model around this. Feels ugly
   const address = data.data.ensProfiles[0].addresses[0]['address'];
 
   return address;
