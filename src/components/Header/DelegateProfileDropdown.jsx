@@ -49,14 +49,11 @@ export default function DelegateProfileDropdown({ address }) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Link href="/profile">
-              View My Profile
+              My Profile
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Button>Create delegate statement</Button>
-        </DropdownMenuItem>
         <DropdownMenuItem>
           <LifeBuoy className="mr-2 h-4 w-4" />
           <span>Support</span>

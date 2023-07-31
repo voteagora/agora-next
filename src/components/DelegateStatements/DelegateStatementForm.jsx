@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import AgoraAPI from "../../app/lib/agoraAPI";
 
-export default function DelegateStatementForm() {
+export default function DelegateStatementForm(address) {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -44,7 +46,12 @@ export default function DelegateStatementForm() {
     // Send POST request to your API
     const api = new AgoraAPI();
 
-    const response = await api.post("/statements", formData);
+    const fullFormData = {
+      ...formData,
+      address: address,
+    };
+
+    const response = await api.post("/statements", fullFormData);
     console.log(response);
 
     if (!response.ok) {

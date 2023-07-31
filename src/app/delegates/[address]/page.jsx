@@ -5,14 +5,15 @@
 
 import AgoraAPI from "@/app/lib/agoraAPI";
 
-async function getDelegate(address) {
+async function getDelegate(addressOrENSName) {
+  "use server";
   const api = new AgoraAPI();
-  const data = await api.get(`/delegates/${address}`);
+  const data = await api.get(`/delegates/${addressOrENSName}`);
   return data;
 }
 
-export default async function Page({ params: { address } }) {
-  const delegate = await getDelegate(address);
+export default async function Page({ params: { addressOrENSName } }) {
+  const delegate = await getDelegate(addressOrENSName);
 
   return (
     <section>
