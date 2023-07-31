@@ -28,7 +28,12 @@ class AgoraAPI {
       throw new Error(res.statusText);
     }
 
-    return res.json();
+    const data = await res.json();
+    if (Object.keys(data).length === 0 && data.constructor === Object) {
+      throw new Error("Can't find resource");
+    }
+
+    return data;
   }
 
   /**
@@ -50,7 +55,6 @@ class AgoraAPI {
 
     return NextResponse.json({ data }, { status: 201 });
   }
-
 }
 
 export default AgoraAPI;
