@@ -3,7 +3,29 @@ import { PrismaClient } from "@prisma/client";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
 export async function GET(request) {
-  return NextResponse.json({}, { status: 200 });
+  // Check if the session is authenticated first
+  const authResponse = authenticateAgoraApiUser(request);
+  if (authResponse) {
+    return authResponse;
+  }
+
+  const statement = await prisma.delegate_statements.findOne({
+    where: {
+      id: 1,
+    }
+  });
+
+  // Build out proposal response
+  const response = {
+    statement: events.map((event) => ({
+      // Just testing out, not meant for production
+      id: event.id,
+      kind: event.kind,
+      event_data: event.event_data,
+    })),
+  };
+
+  return NextResponse.json(response);
 }
     
 export async function POST(request) {

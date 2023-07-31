@@ -48,8 +48,9 @@ class AgoraAPI {
       throw new Error(res.statusText);
     }
 
-    return NextResponse.json({data}, { status: 201 });
+    return NextResponse.json({ data }, { status: 201 });
   }
+
 }
 
 export default AgoraAPI;
