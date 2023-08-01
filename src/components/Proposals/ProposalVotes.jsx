@@ -84,8 +84,7 @@ export const ProposalVotes = ({ proposal }) => {
                   <HumanAddress address={vote.address} />
                 </span>{" "}
                 voted <HumanVote support={vote.support} />
-              </div>
-              {/* Replace '1d ago' and '2023-01-24T09:20' with your actual date and dateTime */}
+              </div>              
               <time
                 dateTime="2023-01-24T09:20"
                 className="flex-none py-0.5 text-xs leading-5 text-gray-500"
