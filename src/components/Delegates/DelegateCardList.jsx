@@ -29,6 +29,10 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
     }
   };
 
+  const viewDelegate = (delegateAddressOrENSName) => {
+    router.push(`/delegates/${delegateAddressOrENSName}`);
+  };
+
   const delegates = pages.reduce((all, page) => all.concat(page.delegates), []);
 
   return (
