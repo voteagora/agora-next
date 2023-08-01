@@ -9,7 +9,14 @@ async function getDelegate(addressOrENSName) {
   "use server";
   const api = new AgoraAPI();
   const data = await api.get(`/delegates/${addressOrENSName}`);
-  return data;
+  return data.delegate;
+}
+
+async function getVotes(addressOrENSName) {
+  "use server";
+  const api = new AgoraAPI();
+  const data = await api.get(`/delegates/${addressOrENSName}/votes`);
+  return data.votes;
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
