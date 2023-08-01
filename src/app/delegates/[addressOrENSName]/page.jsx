@@ -20,7 +20,8 @@ async function getDelegateVotes(addressOrENSName, page = 1) {
   const data = await api.get(
     `/delegates/${addressOrENSName}/votes?page=${page}`
   );
-  return { votes: data.votes, meta: data.meta };
+  console.log(data);
+  return { delegateVotes: data.votes, meta: data.meta };
 }
 
 export default async function Page({ params: { addressOrENSName } }) {

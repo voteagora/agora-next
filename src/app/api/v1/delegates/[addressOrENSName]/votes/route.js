@@ -32,9 +32,7 @@ export async function GET(request, { params }) {
     skip: (page - 1) * pageSize,
   });
 
-  const total_count = await prisma.votes
-    .findMany({ where: { address: address } })
-    .count();
+  const total_count = await prisma.votes.count({ where: { address: address } });
 
   const total_pages = Math.ceil(total_count / pageSize);
 
