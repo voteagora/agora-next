@@ -4,7 +4,9 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroller";
 import { ReactMarkdown } from "react-markdown/lib/react-markdown";
+import { getHumanBlockTime } from "@/lib/blockTimes";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ProposalsList({ initialProposals, fetchProposals }) {
   const router = useRouter();
@@ -26,10 +28,6 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
 
       fetching.current = false;
     }
-  };
-
-  const viewProposal = (proposalId) => {
-    router.push(`/proposals/${proposalId}`);
   };
 
   const proposals = pages.reduce((all, page) => all.concat(page.proposals), []);
@@ -56,18 +54,16 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
             element="main"
           >
             {proposals.map((proposal) => (
-              <div
-                onClick={() => viewProposal(proposal.uuid)}
-                key={proposal.uuid}
-                className="my-4 border-b-2"
-              >
+              <div key={proposal.uuid} className="my-4 border-b-2">
                 ID: {proposal.id}
                 <br />
-                Start block {proposal.start_block}
+                <p>{getHumanBlockTime(proposal.start_block)}</p>
                 <br />
-                End block {proposal.end_block}
+                <p>{getHumanBlockTime(proposal.end_block)}</p>
                 <br />
-                <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
+                <Link href={`/proposals/${proposal.uuid}`}>
+                  <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
+                </Link>
               </div>
             ))}
           </InfiniteScroll>
