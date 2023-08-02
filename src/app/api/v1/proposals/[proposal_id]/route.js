@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { getHumanBlockTime } from "@/lib/blockTimes";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
 export async function GET(request, { params }) {
@@ -23,6 +24,8 @@ export async function GET(request, { params }) {
       token: proposal.token,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
+      start_time: getHumanBlockTime(proposal.start_block),
+      end_time: getHumanBlockTime(proposal.end_block),
       description: proposal.description,
     },
   };
