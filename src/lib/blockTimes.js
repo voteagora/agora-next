@@ -1,18 +1,15 @@
-import { ethers } from "ethers";
+const secondsPerBlock = BigInt(12);
 
-const secondsPerBlock = 12;
-
-export async function getHumanBlockTime(blockNumber) {
-  const provider = new ethers.AlchemyProvider(
-    "mainnet",
-    process.env.NEXT_PUBLIC_ALCHEMY_ID
-  );
-
-  let latestBlock = await provider.getBlock("latest");
-
+export function getHumanBlockTime(
+  blockNumber,
+  latestBlockNumber,
+  latestBlockTimestamp
+) {
   return new Date(
-    (latestBlock.timestamp +
-      secondsPerBlock * (blockNumber - latestBlock.number)) *
-      1000
+    Number(
+      (BigInt(latestBlockTimestamp) +
+        secondsPerBlock * (BigInt(blockNumber) - BigInt(latestBlockNumber))) *
+        BigInt(1000)
+    )
   );
 }

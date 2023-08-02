@@ -57,9 +57,9 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
               <div key={proposal.uuid} className="my-4 border-b-2">
                 ID: {proposal.id}
                 <br />
-                <p>{getHumanBlockTime(proposal.start_block)}</p>
+                <p>Start time: {proposal.start_time}</p>
                 <br />
-                <p>{getHumanBlockTime(proposal.end_block)}</p>
+                <p>End time: {proposal.end_time}</p>
                 <br />
                 <Link href={`/proposals/${proposal.uuid}`}>
                   <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
