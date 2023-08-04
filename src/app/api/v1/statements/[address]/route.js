@@ -9,15 +9,17 @@ export async function GET(request, { params }) {
     return authResponse;
   }
 
-  const proposal = await prisma.delegate_statements.findFirst({
-    where: { uuid: params.address },
+  const statement = await prisma.delegate_statements.findFirst({
+    where: { address: params.address },
+    include: {
+      delegate_bios: true,
+    },
   });
 
-  // Build out proposal response
+  // Build out statement response
   const response = {
     statement: {
-      // Just testing out, not meant for production
-      id: proposal.id,
+      ...statement,
     },
   };
 
