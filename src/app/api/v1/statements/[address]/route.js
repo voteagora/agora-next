@@ -12,7 +12,6 @@ export async function GET(request, { params }) {
   // update to capture all the relevant fields from the updated form
   const proposal = await prisma.delegate_statements.create({
     data: {
-      // include all the fields from the `delegate_statements` and `delegate_bios` definitions
       id: formData.id,
       address: formData.address,
       statement: formData.statement,
