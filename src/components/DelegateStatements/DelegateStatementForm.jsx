@@ -5,7 +5,6 @@ import AgoraAPI from "../../app/lib/agoraAPI";
 
 export default function DelegateStatementForm(address) {
   const [formData, setFormData] = useState({
-    // include all the fields from the `delegate_statements` and `delegate_bios` definitions
     id: "",
     address: "",
     statement: "",
@@ -36,7 +35,33 @@ export default function DelegateStatementForm(address) {
   });
 
   const [error, setError] = useState({ 
-    // replace with all the fields from the `delegate_statements` and `delegate_bios` definitions
+    id: "",
+    address: "",
+    statement: "",
+    token: "",
+    created_at: "",
+    updated_at: "",
+    delegate_bios: {
+      id: "",
+      delegate_statement_id: "",
+      address: "",
+      token: "",
+      signature_data: "",
+      twitter_handle: "",
+      discord_handle: "",
+      farcaster_handle: "",
+      telegram_handle: "",
+      email: "",
+      website: "",
+      github_handle: "",
+      email_verified: false,
+      open_to_delegation: false,
+      open_to_proposals: false,
+      open_to_questions: false,
+      agreed_to_code_of_conduct: false,
+      created_at: "",
+      updated_at: "",
+    },
   });
 
   const handleChange = (event) => {
