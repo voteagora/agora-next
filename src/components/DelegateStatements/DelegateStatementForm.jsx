@@ -5,16 +5,17 @@ import AgoraAPI from "../../app/lib/agoraAPI";
 
 export default function DelegateStatementForm(address) {
   const [formData, setFormData] = useState({
-    title: "",
-    content: "",
+    // replace with all the fields from the `delegate_statements` and `delegate_bios` definitions
   });
 
-  const [error, setError] = useState({ title: "", content: "" });
+  const [error, setError] = useState({ 
+    // replace with all the fields from the `delegate_statements` and `delegate_bios` definitions
+  });
 
   const handleChange = (event) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value,
+      // update for all the fields from the `delegate_statements` and `delegate_bios` definitions
     });
   };
 
@@ -23,22 +24,7 @@ export default function DelegateStatementForm(address) {
 
     // TODO make this validation more robust
     let hasError = false;
-    if (!formData.title) {
-      setError((prevError) => ({ ...prevError, title: "Title is required." }));
-      hasError = true;
-    } else {
-      setError((prevError) => ({ ...prevError, title: "" }));
-    }
-
-    if (!formData.content) {
-      setError((prevError) => ({
-        ...prevError,
-        content: "Content is required.",
-      }));
-      hasError = true;
-    } else {
-      setError((prevError) => ({ ...prevError, content: "" }));
-    }
+    // add basic error handling for each field based on its type
 
     // If there's an error, stop form submission
     if (hasError) return;
@@ -47,7 +33,7 @@ export default function DelegateStatementForm(address) {
     const api = new AgoraAPI();
 
     const fullFormData = {
-      ...formData,
+      // update for all the fields from the `delegate_statements` and `delegate_bios` definitions
       address: address,
     };
 
@@ -82,45 +68,7 @@ export default function DelegateStatementForm(address) {
             <div className="px-4 py-5 bg-white sm:p-6">
               <div className="grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-4">
-                  <label
-                    htmlFor="title"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    autoComplete="off"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                  />
-                  {error.title && (
-                    <p className="text-red-500 text-xs mt-2">{error.title}</p>
-                  )}
-                </div>
-                <div className="col-span-6">
-                  <label
-                    htmlFor="content"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Content
-                  </label>
-                  <textarea
-                    id="content"
-                    name="content"
-                    rows={3}
-                    value={formData.content}
-                    onChange={handleChange}
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                    placeholder="Enter your statement content"
-                  ></textarea>
-                  {error.content && (
-                    <p className="text-red-500 text-xs mt-2">{error.content}</p>
-                  )}
-                </div>
+                  // replace with all the fields from the `delegate_statements` and `delegate_bios` definitions
               </div>
             </div>
             <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
