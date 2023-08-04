@@ -122,7 +122,15 @@ export default function DelegateStatementForm(address) {
             <div className="px-4 py-5 bg-white sm:p-6">
               <div className="grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-4">
-                  // replace with all the fields from the `delegate_statements` and `delegate_bios` definitions
+                  <label htmlFor="id" className="block text-sm font-medium text-gray-700">ID</label>
+                  <input type="text" name="id" id="id" autoComplete="off" value={formData.id} onChange={handleChange} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                  {error.id && (<p className="text-red-500 text-xs mt-2">{error.id}</p>)}
+
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+                  <input type="text" name="address" id="address" autoComplete="off" value={formData.address} onChange={handleChange} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                  {error.address && (<p className="text-red-500 text-xs mt-2">{error.address}</p>)}
+
+                  // Continue this pattern for the rest of the fields in `delegate_statements` and `delegate_bios`
               </div>
             </div>
             <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
