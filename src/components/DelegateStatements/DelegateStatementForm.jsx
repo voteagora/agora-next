@@ -7,9 +7,13 @@ export default function DelegateStatementForm(address) {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+    bio: "",
+    token: "",
+    created_at: "",
+    updated_at: "",
   });
 
-  const [error, setError] = useState({ title: "", content: "" });
+  const [error, setError] = useState({ title: "", content: "", bio: "", token: "", created_at: "", updated_at: "" });
 
   const handleChange = (event) => {
     setFormData({
@@ -38,6 +42,46 @@ export default function DelegateStatementForm(address) {
       hasError = true;
     } else {
       setError((prevError) => ({ ...prevError, content: "" }));
+    }
+
+    if (!formData.bio) {
+      setError((prevError) => ({
+        ...prevError,
+        bio: "Bio is required.",
+      }));
+      hasError = true;
+    } else {
+      setError((prevError) => ({ ...prevError, bio: "" }));
+    }
+
+    if (!formData.token) {
+      setError((prevError) => ({
+        ...prevError,
+        token: "Token is required.",
+      }));
+      hasError = true;
+    } else {
+      setError((prevError) => ({ ...prevError, token: "" }));
+    }
+
+    if (!formData.created_at) {
+      setError((prevError) => ({
+        ...prevError,
+        created_at: "Created at is required.",
+      }));
+      hasError = true;
+    } else {
+      setError((prevError) => ({ ...prevError, created_at: "" }));
+    }
+
+    if (!formData.updated_at) {
+      setError((prevError) => ({
+        ...prevError,
+        updated_at: "Updated at is required.",
+      }));
+      hasError = true;
+    } else {
+      setError((prevError) => ({ ...prevError, updated_at: "" }));
     }
 
     // If there's an error, stop form submission
@@ -119,6 +163,86 @@ export default function DelegateStatementForm(address) {
                   ></textarea>
                   {error.content && (
                     <p className="text-red-500 text-xs mt-2">{error.content}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="bio"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Bio
+                  </label>
+                  <input
+                    type="text"
+                    name="bio"
+                    id="bio"
+                    autoComplete="off"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.bio && (
+                    <p className="text-red-500 text-xs mt-2">{error.bio}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="token"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Token
+                  </label>
+                  <input
+                    type="text"
+                    name="token"
+                    id="token"
+                    autoComplete="off"
+                    value={formData.token}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.token && (
+                    <p className="text-red-500 text-xs mt-2">{error.token}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="created_at"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Created At
+                  </label>
+                  <input
+                    type="date"
+                    name="created_at"
+                    id="created_at"
+                    autoComplete="off"
+                    value={formData.created_at}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.created_at && (
+                    <p className="text-red-500 text-xs mt-2">{error.created_at}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="updated_at"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Updated At
+                  </label>
+                  <input
+                    type="date"
+                    name="updated_at"
+                    id="updated_at"
+                    autoComplete="off"
+                    value={formData.updated_at}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.updated_at && (
+                    <p className="text-red-500 text-xs mt-2">{error.updated_at}</p>
                   )}
                 </div>
               </div>
