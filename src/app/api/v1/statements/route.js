@@ -39,7 +39,7 @@ export async function POST(request) {
 
   const data = await request.json();
 
-  const { title, content } = data
+  const { title, content, bio, token, created_at, updated_at } = data
 
   // Attempt to create the new statement in the database
   try {
@@ -47,9 +47,10 @@ export async function POST(request) {
       data: {
         address: title,
         statement: content,
-        token: "NOUN",
-        created_at: new Date(),
-        updated_at: new Date(),
+        bio: bio,
+        token: token,
+        created_at: created_at,
+        updated_at: updated_at,
       },
     });
 
@@ -61,6 +62,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         message: "An error occured trying to save the statement",
+        error: error.message,
       },
       {
         status: 500,
