@@ -130,6 +130,14 @@ export default function DelegateStatementForm(address) {
                   <input type="text" name="address" id="address" autoComplete="off" value={formData.address} onChange={handleChange} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
                   {error.address && (<p className="text-red-500 text-xs mt-2">{error.address}</p>)}
 
+                  <label htmlFor="statement" className="block text-sm font-medium text-gray-700">Statement</label>
+                  <input type="text" name="statement" id="statement" autoComplete="off" value={formData.statement} onChange={handleChange} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                  {error.statement && (<p className="text-red-500 text-xs mt-2">{error.statement}</p>)}
+
+                  <label htmlFor="token" className="block text-sm font-medium text-gray-700">Token</label>
+                  <input type="text" name="token" id="token" autoComplete="off" value={formData.token} onChange={handleChange} className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                  {error.token && (<p className="text-red-500 text-xs mt-2">{error.token}</p>)}
+
                   // Continue this pattern for the rest of the fields in `delegate_statements` and `delegate_bios`
               </div>
             </div>
