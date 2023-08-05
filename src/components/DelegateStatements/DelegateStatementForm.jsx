@@ -7,12 +7,21 @@ export default function DelegateStatementForm(address) {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    field1: "",
-    field2: "",
-    field3: "",
+    twitter_handle: "",
+    discord_handle: "",
+    farcaster_handle: "",
+    telegram_handle: "",
+    email: "",
+    website: "",
+    github_handle: "",
+    email_verified: "",
+    open_to_delegation: "",
+    open_to_proposals: "",
+    open_to_questions: "",
+    agreed_to_code_of_conduct: "",
   });
 
-  const [error, setError] = useState({ title: "", content: "", field1: "", field2: "", field3: "" });
+  const [error, setError] = useState({ title: "", content: "", twitter_handle: "", discord_handle: "", farcaster_handle: "", telegram_handle: "", email: "", website: "", github_handle: "", email_verified: "", open_to_delegation: "", open_to_proposals: "", open_to_questions: "", agreed_to_code_of_conduct: "" });
 
   const handleChange = (event) => {
     setFormData({
@@ -156,62 +165,242 @@ export default function DelegateStatementForm(address) {
                 </div>
                 <div className="col-span-6 sm:col-span-4">
                   <label
-                    htmlFor="field1"
+                    htmlFor="twitter_handle"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Field1
+                    Twitter Handle
                   </label>
                   <input
                     type="text"
-                    name="field1"
-                    id="field1"
+                    name="twitter_handle"
+                    id="twitter_handle"
                     autoComplete="off"
-                    value={formData.field1}
+                    value={formData.twitter_handle}
                     onChange={handleChange}
                     className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                   />
-                  {error.field1 && (
-                    <p className="text-red-500 text-xs mt-2">{error.field1}</p>
+                  {error.twitter_handle && (
+                    <p className="text-red-500 text-xs mt-2">{error.twitter_handle}</p>
                   )}
                 </div>
                 <div className="col-span-6 sm:col-span-4">
                   <label
-                    htmlFor="field2"
+                    htmlFor="discord_handle"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Field2
+                    Discord Handle
                   </label>
                   <input
                     type="text"
-                    name="field2"
-                    id="field2"
+                    name="discord_handle"
+                    id="discord_handle"
                     autoComplete="off"
-                    value={formData.field2}
+                    value={formData.discord_handle}
                     onChange={handleChange}
                     className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                   />
-                  {error.field2 && (
-                    <p className="text-red-500 text-xs mt-2">{error.field2}</p>
+                  {error.discord_handle && (
+                    <p className="text-red-500 text-xs mt-2">{error.discord_handle}</p>
                   )}
                 </div>
                 <div className="col-span-6 sm:col-span-4">
                   <label
-                    htmlFor="field3"
+                    htmlFor="farcaster_handle"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Field3
+                    Farcaster Handle
                   </label>
                   <input
                     type="text"
-                    name="field3"
-                    id="field3"
+                    name="farcaster_handle"
+                    id="farcaster_handle"
                     autoComplete="off"
-                    value={formData.field3}
+                    value={formData.farcaster_handle}
                     onChange={handleChange}
                     className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                   />
-                  {error.field3 && (
-                    <p className="text-red-500 text-xs mt-2">{error.field3}</p>
+                  {error.farcaster_handle && (
+                    <p className="text-red-500 text-xs mt-2">{error.farcaster_handle}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="telegram_handle"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Telegram Handle
+                  </label>
+                  <input
+                    type="text"
+                    name="telegram_handle"
+                    id="telegram_handle"
+                    autoComplete="off"
+                    value={formData.telegram_handle}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.telegram_handle && (
+                    <p className="text-red-500 text-xs mt-2">{error.telegram_handle}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    name="email"
+                    id="email"
+                    autoComplete="off"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.email && (
+                    <p className="text-red-500 text-xs mt-2">{error.email}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="website"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Website
+                  </label>
+                  <input
+                    type="text"
+                    name="website"
+                    id="website"
+                    autoComplete="off"
+                    value={formData.website}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.website && (
+                    <p className="text-red-500 text-xs mt-2">{error.website}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="github_handle"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Github Handle
+                  </label>
+                  <input
+                    type="text"
+                    name="github_handle"
+                    id="github_handle"
+                    autoComplete="off"
+                    value={formData.github_handle}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.github_handle && (
+                    <p className="text-red-500 text-xs mt-2">{error.github_handle}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="email_verified"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Email Verified
+                  </label>
+                  <input
+                    type="text"
+                    name="email_verified"
+                    id="email_verified"
+                    autoComplete="off"
+                    value={formData.email_verified}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.email_verified && (
+                    <p className="text-red-500 text-xs mt-2">{error.email_verified}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="open_to_delegation"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Open to Delegation
+                  </label>
+                  <input
+                    type="text"
+                    name="open_to_delegation"
+                    id="open_to_delegation"
+                    autoComplete="off"
+                    value={formData.open_to_delegation}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.open_to_delegation && (
+                    <p className="text-red-500 text-xs mt-2">{error.open_to_delegation}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="open_to_proposals"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Open to Proposals
+                  </label>
+                  <input
+                    type="text"
+                    name="open_to_proposals"
+                    id="open_to_proposals"
+                    autoComplete="off"
+                    value={formData.open_to_proposals}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.open_to_proposals && (
+                    <p className="text-red-500 text-xs mt-2">{error.open_to_proposals}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="open_to_questions"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Open to Questions
+                  </label>
+                  <input
+                    type="text"
+                    name="open_to_questions"
+                    id="open_to_questions"
+                    autoComplete="off"
+                    value={formData.open_to_questions}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.open_to_questions && (
+                    <p className="text-red-500 text-xs mt-2">{error.open_to_questions}</p>
+                  )}
+                </div>
+                <div className="col-span-6 sm:col-span-4">
+                  <label
+                    htmlFor="agreed_to_code_of_conduct"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Agreed to Code of Conduct
+                  </label>
+                  <input
+                    type="text"
+                    name="agreed_to_code_of_conduct"
+                    id="agreed_to_code_of_conduct"
+                    autoComplete="off"
+                    value={formData.agreed_to_code_of_conduct}
+                    onChange={handleChange}
+                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                  {error.agreed_to_code_of_conduct && (
+                    <p className="text-red-500 text-xs mt-2">{error.agreed_to_code_of_conduct}</p>
                   )}
                 </div>
               </div>
