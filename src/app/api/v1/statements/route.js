@@ -39,7 +39,7 @@ export async function POST(request) {
 
   const data = await request.json();
 
-  const { title, content } = data
+  const { title, content, twitter_handle, discord_handle, farcaster_handle, telegram_handle, email, website, github_handle, email_verified, open_to_delegation, open_to_proposals, open_to_questions, agreed_to_code_of_conduct } = data
 
   // Attempt to create the new statement in the database
   try {
@@ -47,9 +47,24 @@ export async function POST(request) {
       data: {
         address: title,
         statement: content,
+        twitter_handle: twitter_handle,
+        discord_handle: discord_handle,
+        farcaster_handle: farcaster_handle,
+        telegram_handle: telegram_handle,
+        email: email,
+        website: website,
+        github_handle: github_handle,
+        email_verified: email_verified,
+        open_to_delegation: open_to_delegation,
+        open_to_proposals: open_to_proposals,
+        open_to_questions: open_to_questions,
+        agreed_to_code_of_conduct: agreed_to_code_of_conduct,
         token: "NOUN",
         created_at: new Date(),
         updated_at: new Date(),
+      },
+      include: {
+        delegate_bios: true,
       },
     });
 
@@ -61,6 +76,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         message: "An error occured trying to save the statement",
+        error: error.message,
       },
       {
         status: 500,
