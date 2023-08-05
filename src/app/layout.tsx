@@ -1,6 +1,6 @@
 import "./globals.scss";
 import ClientLayout from './Web3Provider'
-import Footer from './components/Footer'
+import Footer from "@/components/Footer";
 
 
 declare global {
@@ -33,7 +33,6 @@ export default function RootLayout({
         />
       </head>
       <ClientLayout>{children}</ClientLayout>
-      <Footer />
     </html>
   );
 }

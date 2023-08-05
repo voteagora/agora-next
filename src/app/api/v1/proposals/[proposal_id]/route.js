@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { ethers } from "ethers";
 import prisma from "@/app/lib/prisma";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
+
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 export async function GET(request, { params }) {
   // Check if the session is authenticated first
@@ -9,6 +14,12 @@ export async function GET(request, { params }) {
   if (authResponse) {
     return authResponse;
   }
+
+  const provider = new ethers.AlchemyProvider(
+    "mainnet",
+    process.env.NEXT_PUBLIC_ALCHEMY_ID
+  );
+  const latestBlock = await provider.getBlock("latest");
 
   const proposal = await prisma.proposals.findFirst({
     where: { uuid: params.proposal_id },
@@ -24,8 +35,16 @@ export async function GET(request, { params }) {
       token: proposal.token,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
-      start_time: getHumanBlockTime(proposal.start_block),
-      end_time: getHumanBlockTime(proposal.end_block),
+      start_time: getHumanBlockTime(
+        proposal.start_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      ),
+      end_time: getHumanBlockTime(
+        proposal.end_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      ),
       description: proposal.description,
     },
   };
