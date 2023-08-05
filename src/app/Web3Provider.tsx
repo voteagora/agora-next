@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Header from "@/components/Header/Header";
 import { Inter } from "next/font/google";
 import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
+import Footer from "@/components/Footer";
 
 const isNotProduction = process.env.NODE_ENV != "production";
 
@@ -32,6 +33,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
           {children}
           <Analytics />
         </main>
+        <Footer />
       </body>
     </ConnectKitProvider>
   </WagmiConfig>
