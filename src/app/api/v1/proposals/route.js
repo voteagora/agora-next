@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
+import { getQuorumForProposal } from "@/lib/proposalUtils";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -49,6 +50,7 @@ export async function GET(request) {
     proposals: proposals.map((proposal) => ({
       id: proposal.id,
       uuid: proposal.uuid,
+      quorum: getQuorumForProposal(proposal, provider),
       proposer_addr: proposal.proposer_addr,
       start_block: proposal.start_block,
       end_block: proposal.end_block,

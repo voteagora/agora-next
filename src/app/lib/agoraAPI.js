@@ -55,7 +55,6 @@ class AgoraAPI {
 
     return NextResponse.json({ data }, { status: 201 });
   }
-
 }
 
 export default AgoraAPI;
