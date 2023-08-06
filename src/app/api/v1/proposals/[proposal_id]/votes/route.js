@@ -16,6 +16,8 @@ export async function GET(request, { params }) {
     page = 1;
   }
 
+  const sortByPower = request.nextUrl.searchParams.get("sortByPower");
+
   const pageSize = 50;
   const total_count = await prisma.proposals.count();
   const total_pages = Math.ceil(total_count / pageSize);
@@ -24,6 +26,13 @@ export async function GET(request, { params }) {
     where: { proposal_id: params.proposal_id },
     take: pageSize,
     skip: (page - 1) * pageSize,
+    orderBy: sortByPower
+      ? {
+          amount: "desc", // or "asc" if you want ascending order
+        }
+      : {
+          block_number: "desc", // or "asc" if you want ascending order
+        },
   });
 
   await prisma.$disconnect();
