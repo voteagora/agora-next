@@ -25,7 +25,7 @@ export async function GET(request, { params }) {
       token: statement.token,
       created_at: statement.created_at,
       updated_at: statement.updated_at,
-      delegate_bios: {
+      delegate_bio: {
         id: statement.delegate_bios.id,
         delegate_statement_id: statement.delegate_bios.delegate_statement_id,
         address: statement.delegate_bios.address,
@@ -41,7 +41,8 @@ export async function GET(request, { params }) {
         open_to_delegation: statement.delegate_bios.open_to_delegation,
         open_to_proposals: statement.delegate_bios.open_to_proposals,
         open_to_questions: statement.delegate_bios.open_to_questions,
-        agreed_to_code_of_conduct: statement.delegate_bios.agreed_to_code_of_conduct,
+        agreed_to_code_of_conduct:
+          statement.delegate_bios.agreed_to_code_of_conduct,
         created_at: statement.delegate_bios.created_at,
         updated_at: statement.delegate_bios.updated_at,
       },
