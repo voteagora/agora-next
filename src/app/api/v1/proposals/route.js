@@ -39,18 +39,12 @@ export async function GET(request) {
     },
   });
 
-  // Build out proposal response
-  const response = {
-    meta: {
-      current_page: page,
-      total_pages: total_pages,
-      page_size: pageSize,
-      total_count: total_count,
-    },
-    proposals: proposals.map((proposal) => ({
+  const proposalPromises = proposals.map(async (proposal) => {
+    const quorum = await getQuorumForProposal(proposal, "NOUN", provider);
+    return {
       id: proposal.id,
       uuid: proposal.uuid,
-      quorum: getQuorumForProposal(proposal, provider),
+      quorum: quorum,
       proposer_addr: proposal.proposer_addr,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
@@ -65,7 +59,20 @@ export async function GET(request) {
         latestBlock.timestamp
       ),
       markdowntitle: proposal.description.replace(/\\n/g, "\n").split("\n")[0],
-    })),
+    };
+  });
+
+  const resolvedProposals = await Promise.all(proposalPromises);
+
+  // Build out proposal response
+  const response = {
+    meta: {
+      current_page: page,
+      total_pages: total_pages,
+      page_size: pageSize,
+      total_count: total_count,
+    },
+    proposals: resolvedProposals,
   };
 
   return NextResponse.json(response);
