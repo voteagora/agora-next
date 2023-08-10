@@ -18,10 +18,7 @@ export async function GET(request, { params }) {
 
   // Check if statement is found
   if (!statement) {
-    return NextResponse.json(
-      { error: "No statemement found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ statement: {} }, { status: 404 });
   } else {
     // Build out statement response if found
     const response = {
