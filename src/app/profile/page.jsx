@@ -3,6 +3,14 @@
 import DelegateStatementForm from "@/components/DelegateStatements/DelegateStatementForm";
 import { useAccount } from "wagmi";
 
+async function fetchDelegateStaement(address) {
+  "use server";
+
+  const api = new AgoraAPI();
+  const data = await api.get(`/statement?address=${address}`);
+  return { proposals: data.proposals, meta: data.meta };
+}
+
 export default async function Page() {
   const { address } = useAccount();
   const isAuthenticated = Boolean(address);
