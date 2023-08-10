@@ -1,6 +1,5 @@
 import "./globals.scss";
 import ClientLayout from './Web3Provider'
-import Footer from "@/components/Footer";
 
 
 declare global {
