@@ -24,10 +24,6 @@ class AgoraAPI {
       },
     });
 
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-
     const data = await res.json();
     if (Object.keys(data).length === 0 && data.constructor === Object) {
       throw new Error("Can't find resource");
