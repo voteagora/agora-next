@@ -32,7 +32,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ENSName from "../shared/ENSName";
-import { icons } from "../../icons/icons";
 import Link from "next/link";
 
 export default function DelegateProfileDropdown({ address }) {
