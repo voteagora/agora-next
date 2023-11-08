@@ -28,24 +28,18 @@ export async function GET(request) {
   const latestBlock = await provider.getBlock("latest");
 
   const pageSize = 25;
-  const total_count = await prisma.proposals.count();
+  const total_count = await prisma.ProposalsList.count();
   const total_pages = Math.ceil(total_count / pageSize);
 
-  const proposals = await prisma.proposals.findMany({
+  const proposals = await prisma.ProposalsList.findMany({
     take: pageSize,
     skip: (page - 1) * pageSize,
-    orderBy: {
-      end_block: "desc",
-    },
   });
 
   const proposalPromises = proposals.map(async (proposal) => {
     const quorum = await getQuorumForProposal(proposal, "NOUN", provider);
     return {
-      id: proposal.id,
-      uuid: proposal.uuid,
-      quorum: quorum,
-      proposer_addr: proposal.proposer_addr,
+      id: proposal.proposal_id,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
       start_time: getHumanBlockTime(
@@ -59,6 +53,7 @@ export async function GET(request) {
         latestBlock.timestamp
       ),
       markdowntitle: proposal.description.replace(/\\n/g, "\n").split("\n")[0],
+      proposaData: proposal.proposal_data,
     };
   });
 
