@@ -119,6 +119,21 @@ view charlie_events_all {
   @@schema("center")
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ProposalsData {
+  block_number     BigInt?
+  transaction_hash String @db.VarChar(66) @unique
+  proposal_id      String?
+  proposer         String?
+  start_block      String?
+  end_block        String?
+  description      String?
+  proposal_data    String?
+
+  @@map("proposals_data")
+  @@schema("center")
+}
+
 enum network {
   optimism_mainnet @map("optimism-mainnet")
   ethereum_mainnet @map("ethereum-mainnet")
