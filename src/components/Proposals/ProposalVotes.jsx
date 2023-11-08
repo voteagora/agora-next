@@ -9,21 +9,21 @@ function classNames(...classes) {
 }
 
 // A function to fetch votes
-async function fetchVotesForProposal(proposal, page = 1) {
+async function fetchVotesForProposal(proposal_id, page = 1) {
   const api = new AgoraAPI();
-  const data = await api.get(`/proposals/${proposal.uuid}/votes?page=${page}`);
+  const data = await api.get(`/proposals/${proposal_id}/votes?page=${page}`);
   return data;
 }
 
 // ProposalVotes Component
-export const ProposalVotes = ({ proposal }) => {
+export const ProposalVotes = ({ proposal_id }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [votes, setVotes] = useState([]);
   const [meta, setMeta] = useState({});
 
   // Fetch votes when the component mounts and when currentPage changes
   useEffect(() => {
-    fetchVotesForProposal(proposal, currentPage)
+    fetchVotesForProposal(proposal_id, currentPage)
       .then(({ votes, meta }) => {
         setVotes(votes);
         setMeta(meta);
@@ -31,7 +31,7 @@ export const ProposalVotes = ({ proposal }) => {
       .catch((error) => {
         console.error("Failed to fetch votes", error);
       });
-  }, [proposal, currentPage]);
+  }, [proposal_id, currentPage]);
 
   const goToNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
@@ -84,7 +84,7 @@ export const ProposalVotes = ({ proposal }) => {
                   <HumanAddress address={vote.address} />
                 </span>{" "}
                 voted <HumanVote support={vote.support} />
-              </div>              
+              </div>
               <time
                 dateTime="2023-01-24T09:20"
                 className="flex-none py-0.5 text-xs leading-5 text-gray-500"
