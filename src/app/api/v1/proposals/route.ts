@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   const provider = new ethers.AlchemyProvider(
-    "mainnet",
+    "optimism",
     process.env.NEXT_PUBLIC_ALCHEMY_ID
   );
   const latestBlock = await provider.getBlock("latest");
