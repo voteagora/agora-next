@@ -1,17 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { authenticateAgoraApiUser } from "src/app/lib/middlewear/authenticateAgoraApiUser";
 
-export async function GET(request, { params }) {
-  // Check if the session is authenticated first
-  const authResponse = authenticateAgoraApiUser(request);
-  if (authResponse) {
-    return authResponse;
-  }
-
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { proposal_id: string } }
+) {
   const prisma = new PrismaClient();
 
-  let page = parseInt(request.nextUrl.searchParams.get("page"), 10);
+  let page = parseInt(request.nextUrl.searchParams.get("page") ?? "0", 10);
   if (isNaN(page) || page < 1) {
     page = 1;
   }
@@ -19,7 +15,9 @@ export async function GET(request, { params }) {
   const sortByPower = request.nextUrl.searchParams.get("sortByPower");
 
   const pageSize = 50;
-  const total_count = await prisma.proposals.count();
+  const total_count = await prisma.votes.count({
+    where: { proposal_id: params.proposal_id },
+  });
   const total_pages = Math.ceil(total_count / pageSize);
 
   const votes = await prisma.votes.findMany({
@@ -28,7 +26,7 @@ export async function GET(request, { params }) {
     skip: (page - 1) * pageSize,
     orderBy: sortByPower
       ? {
-          amount: "desc", // or "asc" if you want ascending order
+          weight: "desc", // or "as" if you want ascending order
         }
       : {
           block_number: "desc", // or "asc" if you want ascending order
@@ -46,10 +44,10 @@ export async function GET(request, { params }) {
       total_count: total_count,
     },
     votes: votes.map((vote) => ({
-      address: vote.address,
+      address: vote.voter,
       proposal_id: vote.proposal_id,
       support: vote.support,
-      amount: vote.amount,
+      amount: vote.weight,
       reason: vote.reason,
     })),
   };
