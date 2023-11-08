@@ -61,7 +61,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
                 <br />
                 <p>End time: {proposal.end_time}</p>
                 <br />
-                <Link href={`/proposals/${proposal.uuid}`}>
+                <Link href={`/proposals/${proposal.id}`}>
                   <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
                 </Link>
                 <br />
