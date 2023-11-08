@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
   const resolvedProposals = proposals.map((proposal) => {
     return {
       id: proposal.proposal_id,
+      proposer: proposal.proposer,
       start_block: proposal.start_block,
       end_block: proposal.end_block,
       start_time: latestBlock
