@@ -93,14 +93,16 @@ view regular_proposals_list {
   @@ignore
   @@schema("public")
 }
-view proposals_list {
+
+view ProposalsList {
   block_number  BigInt?
-  proposal_id   String @unique
+  proposal_id   String  @unique
   description   String?
   start_block   String?
   end_block     String?
   proposal_data String?
 
+  @@map("proposals_list")
   @@schema("center")
 }
 
