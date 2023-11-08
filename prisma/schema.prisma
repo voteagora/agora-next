@@ -97,6 +97,7 @@ view regular_proposals_list {
 view ProposalsList {
   block_number  BigInt?
   proposal_id   String  @unique
+  proposer      String?
   description   String?
   start_block   String?
   end_block     String?
