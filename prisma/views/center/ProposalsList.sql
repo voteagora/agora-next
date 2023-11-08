@@ -1,6 +1,7 @@
 SELECT
   pr.block_number,
   pr.proposal_id,
+  pr.proposer,
   pr.description,
   pr.start_block,
   pr.end_block,
@@ -48,6 +49,7 @@ UNION
 SELECT
   optimism_proposal_created_0xe1a17f47_events.block_number,
   optimism_proposal_created_0xe1a17f47_events.proposal_id,
+  optimism_proposal_created_0xe1a17f47_events.proposer,
   optimism_proposal_created_0xe1a17f47_events.description,
   optimism_proposal_created_0xe1a17f47_events.start_block,
   optimism_proposal_created_0xe1a17f47_events.end_block,
