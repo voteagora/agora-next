@@ -119,10 +119,9 @@ view charlie_events_all {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ProposalsData {
   block_number     BigInt?
-  transaction_hash String @db.VarChar(66) @unique
+  transaction_hash String  @unique @db.VarChar(66)
   proposal_id      String?
   proposer         String?
   start_block      String?
@@ -131,6 +130,20 @@ view ProposalsData {
   proposal_data    String?
 
   @@map("proposals_data")
+  @@schema("center")
+}
+
+view Votes {
+  block_number     BigInt?
+  transaction_hash String @unique @db.VarChar(66)
+  voter            String?
+  proposal_id      String?
+  support          String?
+  weight           String?
+  reason           String?
+  params           String?
+
+  @@map("votes")
   @@schema("center")
 }
 
