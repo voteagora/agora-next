@@ -1,13 +1,13 @@
 // Cast for more accurate arithmetic
-const secondsPerBlock = BigInt(12);
+const secondsPerBlock = BigInt(2);
 
 /*
-* @param {number} blockNumber
-* @param {number} latestBlockNumber
-* @param {number} latestBlockTimestamp
-* @returns {Date}
-* @description Converts a block number to a human readable date
-*/
+ * @param {number} blockNumber
+ * @param {number} latestBlockNumber
+ * @param {number} latestBlockTimestamp
+ * @returns {Date}
+ * @description Converts a block number to a human readable date
+ */
 export function getHumanBlockTime(
   blockNumber,
   latestBlockNumber,

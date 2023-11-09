@@ -3,7 +3,7 @@ import {
   UserCircleIcon,
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
-import { EnvelopeOpenIcon } from "@heroicons/react/24/outline"; 
+import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import ProposalsList from "@/components/Proposals/ProposalsList";
 import AgoraAPI from "./lib/agoraAPI";
 

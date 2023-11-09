@@ -54,18 +54,18 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
             element="main"
           >
             {proposals.map((proposal) => (
-              <div key={proposal.uuid} className="my-4 border-b-2">
-                ID: {proposal.id}
+              <div key={proposal.id} className="my-4 border-b-2">
+                proposal by {proposal.proposer}
                 <br />
                 <p>Start time: {proposal.start_time}</p>
                 <br />
                 <p>End time: {proposal.end_time}</p>
                 <br />
-                <p>Quorum: {proposal.quorum}</p>
-                <br/>
-                <Link href={`/proposals/${proposal.uuid}`}>
+                <Link href={`/proposals/${proposal.id}`}>
                   <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
                 </Link>
+                <br />
+                <p>Proposal Data: {proposal.proposaData}</p>
               </div>
             ))}
           </InfiniteScroll>
