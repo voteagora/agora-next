@@ -1,193 +1,155 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema", "views"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["center", "public"]
 }
 
-model address_stats {
-  id                   String  @id
-  account              String
-  vid                  BigInt
-  total_voting_power   Int
-  number_of_delegators BigInt?
-  tokens_owned         Int
-  token                String
-  block_number         BigInt
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view kent_proposal_stats_test {
+  proposal_id                String?
+  proposer                   String?
+  description                String?
+  created_at                 String?
+  end_block                  String?
+  deadline                   String?
+  quorum                     String?
+  cancelled_at               BigInt?
+  executed_at                BigInt?
+  total_votes                BigInt?
+  total_voting_power         Decimal? @db.Decimal
+  total_voting_power_for     Decimal? @db.Decimal
+  total_voting_power_against Decimal? @db.Decimal
+  total_voting_power_abstain Decimal? @db.Decimal
+  total_votes_for            BigInt?
+  total_votes_against        BigInt?
+  total_votes_abstain        BigInt?
+  total_votes_with_reason    BigInt?
+  status                     String?
+
+  @@ignore
+  @@schema("center")
 }
 
-model api_users {
-  id          BigInt    @id @default(autoincrement())
-  api_key     String?   @db.VarChar
-  expires_at  DateTime? @db.Timestamp(6)
-  name        String    @db.VarChar
-  description String?
-  created_at  DateTime  @db.Timestamp(6)
-  updated_at  DateTime  @db.Timestamp(6)
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view proposals_chronological_desc {
+  block_number BigInt?
+  proposal_id  String?
+  proposer     String?
+  start_block  String?
+  end_block    String?
+  description  String?
+  inputs       Json?
+
+  @@ignore
+  @@schema("center")
 }
 
-model ar_internal_metadata {
-  key        String   @id @db.VarChar
-  value      String?  @db.VarChar
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view charlie_delegates_test {
+  address            String?
+  tokens_owned       Decimal? @db.Decimal
+  tokens_represented Decimal? @db.Decimal
+  total_voting_power Decimal? @db.Decimal
+  delegators         String[]
+  delegatees         BigInt?
+
+  @@ignore
+  @@schema("center")
 }
 
-model balances {
-  id           String  @id
-  address      String
-  token        String
-  amount       Decimal @db.Decimal
-  block_number BigInt
-  vid          BigInt
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view charlie_voting_power_snapshot {
+  proposal_id  String?
+  address      String?
+  voting_power Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
 }
 
-model daos {
-  id         BigInt   @id @default(autoincrement())
-  name       String   @db.VarChar
-  token      String   @db.VarChar
-  chain      String   @db.VarChar
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view approval_proposal_votes_per_option {
+  param       Int?
+  weight      String?
+  proposal_id String?
+
+  @@ignore
+  @@schema("public")
 }
 
-model delegate_bios {
-  id                        BigInt              @id @default(autoincrement())
-  delegate_statement_id     BigInt
-  address                   String              @db.VarChar
-  token                     String              @db.VarChar
-  signature_data            Json?
-  twitter_handle            String?             @db.VarChar
-  discord_handle            String?             @db.VarChar
-  farcaster_handle          String?             @db.VarChar
-  telegram_handle           String?             @db.VarChar
-  email                     String?             @db.VarChar
-  website                   String?             @db.VarChar
-  github_handle             String?             @db.VarChar
-  email_verified            Boolean?            @default(false)
-  open_to_delegation        Boolean?            @default(false)
-  open_to_proposals         Boolean?            @default(false)
-  open_to_questions         Boolean?            @default(false)
-  agreed_to_code_of_conduct Boolean?            @default(false)
-  created_at                DateTime            @db.Timestamp(6)
-  updated_at                DateTime            @db.Timestamp(6)
-  delegate_statements       delegate_statements @relation(fields: [delegate_statement_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_055814562f")
-
-  @@index([delegate_statement_id], map: "index_delegate_bios_on_delegate_statement_id")
-}
-
-model delegate_statements {
-  id            BigInt          @id @default(autoincrement())
-  address       String          @db.VarChar
-  statement     String
-  token         String          @db.VarChar
-  created_at    DateTime        @db.Timestamp(6)
-  updated_at    DateTime        @db.Timestamp(6)
-  delegate_bios delegate_bios[]
-}
-
-model delegations {
-  id             String  @id
-  delegator_addr String
-  delegatee_addr String
-  token          String
-  amount         Decimal @db.Decimal
-  kind           String
-  block_number   BigInt
-  vid            BigInt
-}
-
-model ens_records {
-  id         BigInt   @id @default(autoincrement())
-  address    String?  @db.VarChar
-  username   String?  @db.VarChar
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
-
-  @@index([address], map: "index_ens_records_on_address")
-}
-
-model events {
-  id         String  @id
-  kind       String?
-  token      String
-  event_data String?
-  created_at BigInt?
-}
-
-model nouns_nft {
-  id         String  @id
-  owner      String
-  background Decimal @db.Decimal
-  body       Decimal @db.Decimal
-  accessory  Decimal @db.Decimal
-  head       Decimal @db.Decimal
-  glasses    Decimal @db.Decimal
-}
-
-model proposal_stats {
-  id                         String  @id
-  proposal_uuid              String
-  token                      String
-  total_votes                BigInt
-  total_votes_for            Int
-  total_votes_against        Int
-  total_votes_abstain        Int
-  total_voting_power         Decimal @db.Decimal
-  total_voting_power_for     Decimal @db.Decimal
-  total_voting_power_against Decimal @db.Decimal
-  total_voting_power_abstain Decimal @db.Decimal
-  total_votes_with_reason    Int
-}
-
-model proposals {
-  id            String  @id
-  uuid          String?
-  proposer_addr String?
-  token         String
-  targets       String?
-  values        String?
-  signatures    String?
-  start_block   BigInt?
-  end_block     BigInt?
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view regular_proposals_list {
+  proposal_id   String?
   description   String?
-  created_at    BigInt
+  start_block   String?
+  end_block     String?
+  proposal_data Json?   @db.Json
+
+  @@ignore
+  @@schema("public")
 }
 
-model raw_logs {
-  id                String   @id
-  address           String?
-  event_signature   String?
-  event_params      String[]
-  block_number      BigInt?
-  block_hash        String?
-  log_index         BigInt?
-  transaction_hash  String?
-  transaction_index BigInt?
-  data              String?
-  topics            String?
+view ProposalsList {
+  block_number  BigInt?
+  proposal_id   String  @unique
+  proposer      String?
+  description   String?
+  start_block   String?
+  end_block     String?
+  proposal_data String?
+
+  @@map("proposals_list")
+  @@schema("center")
 }
 
-model schema_migrations {
-  version String @id @db.VarChar
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view charlie_events_all {
+  event_type   String?
+  block_number BigInt?
+  executor     String?
+  details      String?
+  inputs       Json?
+
+  @@ignore
+  @@schema("center")
 }
 
-model users {
-  id           String @id
-  account      String
-  block_number BigInt
+view ProposalsData {
+  block_number     BigInt?
+  transaction_hash String  @unique @db.VarChar(66)
+  proposal_id      String?
+  proposer         String?
+  start_block      String?
+  end_block        String?
+  description      String?
+  proposal_data    String?
+
+  @@map("proposals_data")
+  @@schema("center")
 }
 
-model votes {
-  id           String  @id
-  address      String
-  proposal_id  String
-  support      Int
-  amount       Decimal @db.Decimal
-  reason       String?
-  token        String
-  block_number BigInt
-  vid          BigInt
+view Votes {
+  block_number     BigInt?
+  transaction_hash String @unique @db.VarChar(66)
+  voter            String?
+  proposal_id      String?
+  support          String?
+  weight           String?
+  reason           String?
+  params           String?
+
+  @@map("votes")
+  @@schema("center")
+}
+
+enum network {
+  optimism_mainnet @map("optimism-mainnet")
+  ethereum_mainnet @map("ethereum-mainnet")
+
+  @@schema("public")
 }
