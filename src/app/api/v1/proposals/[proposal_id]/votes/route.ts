@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/lib/prisma";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { proposal_id: string } }
 ) {
-  const prisma = new PrismaClient();
-
   let page = parseInt(request.nextUrl.searchParams.get("page") ?? "0", 10);
   if (isNaN(page) || page < 1) {
     page = 1;
@@ -32,8 +30,6 @@ export async function GET(
           block_number: "desc", // or "asc" if you want ascending order
         },
   });
-
-  await prisma.$disconnect();
 
   // Build out proposal response
   const response = {
