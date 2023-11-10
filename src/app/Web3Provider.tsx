@@ -3,16 +3,14 @@
 import { FC, PropsWithChildren } from "react";
 import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, SIWEConfig, getDefaultConfig } from "connectkit";
-import DevBanner from "@/components/DevBanner";
-import { Analytics } from "@vercel/analytics/react";
 import Header from "@/components/Header/Header";
-import { Inter } from "next/font/google";
+import { inter, rubik } from "@/styles/fonts";
+import { cn } from "@/lib/utils";
 import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
 import Footer from "@/components/Footer";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const isNotProduction = process.env.NODE_ENV != "production";
-
-const inter = Inter({ subsets: ["latin"] });
 
 const config = createConfig(
   getDefaultConfig({
@@ -26,13 +24,10 @@ const config = createConfig(
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
     <ConnectKitProvider debugMode>
-      <body className={inter.className}>
+      <body className={cn(rubik.variable, inter.variable)}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <Header />
-        <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 break-words overflow-hidden">
-          {children}
-          <Analytics />
-        </main>
+        <PageContainer>{children}</PageContainer>
         <Footer />
       </body>
     </ConnectKitProvider>
