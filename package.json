@@ -27,6 +27,7 @@
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
     "ethers": "^6.6.2",
+    "ethers-multicall-provider": "^5.0.0",
     "faker": "4.1.0",
     "lokijs": "^1.5.12",
     "lucide-react": "^0.258.0",
