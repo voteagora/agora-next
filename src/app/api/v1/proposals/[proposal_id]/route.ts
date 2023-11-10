@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ethers } from "ethers";
 import prisma from "@/app/lib/prisma";
 import { getHumanBlockTime } from "@/lib/blockTimes";
+import provider from "@/app/lib/provider";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -11,10 +11,6 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { proposal_id: string } }
 ) {
-  const provider = new ethers.AlchemyProvider(
-    "optimism",
-    process.env.NEXT_PUBLIC_ALCHEMY_ID
-  );
   const latestBlock = await provider.getBlock("latest");
 
   const proposal = await prisma.proposalsData.findFirst({
