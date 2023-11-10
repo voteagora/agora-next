@@ -1,8 +1,8 @@
-import { ethers } from "ethers";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { getQuorumForProposal } from "@/lib/proposalUtils";
+import provider from "@/app/lib/provider";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -14,10 +14,6 @@ export async function GET(request: NextRequest) {
     page = 1;
   }
 
-  const provider = new ethers.AlchemyProvider(
-    "optimism",
-    process.env.NEXT_PUBLIC_ALCHEMY_ID
-  );
   const latestBlock = await provider.getBlock("latest");
 
   const pageSize = 25;
