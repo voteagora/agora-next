@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://vercel:%3EVbX%24Z%3F%22%26%5E%27Iz2%23%28@104.196.246.98/prod"
+  url      = env("DATABASE_URL")
   schemas  = ["center", "public"]
 }
 
