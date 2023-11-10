@@ -135,13 +135,14 @@ view ProposalsData {
 
 view Votes {
   block_number     BigInt?
-  transaction_hash String @unique @db.VarChar(66)
+  transaction_hash String  @unique @db.VarChar(66)
   voter            String?
   proposal_id      String?
   support          String?
   weight           String?
   reason           String?
   params           String?
+  proposal_data    String?
 
   @@map("votes")
   @@schema("center")

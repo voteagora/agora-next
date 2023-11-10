@@ -13,10 +13,8 @@ export async function GET(
   const sortByPower = request.nextUrl.searchParams.get("sortByPower");
 
   const pageSize = 50;
-  const total_count = await prisma.votes.count({
-    where: { proposal_id: params.proposal_id },
-  });
-  const total_pages = Math.ceil(total_count / pageSize);
+  // TODO: Figure out a better way to paginate
+  const total_pages = Math.ceil(10000 / pageSize);
 
   const votes = await prisma.votes.findMany({
     where: { proposal_id: params.proposal_id },
@@ -37,7 +35,7 @@ export async function GET(
       current_page: page,
       total_pages: total_pages,
       page_size: pageSize,
-      total_count: total_count,
+      total_count: 10000,
     },
     votes: votes.map((vote) => ({
       address: vote.voter,
@@ -45,7 +43,7 @@ export async function GET(
       support: parseSupport(vote.support, !!vote.params),
       amount: vote.weight,
       reason: vote.reason,
-      params: vote.params,
+      params: parseParams(vote.params, vote.proposal_data),
     })),
   };
 
@@ -60,5 +58,27 @@ function parseSupport(support: string | null, hasParams: boolean) {
       return hasParams ? 0 : 1; // ABSTAIN / FOR
     case 2:
       return -1;
+  }
+}
+
+function parseParams(
+  params: string | null,
+  proposaData: string | null
+): string[] | null {
+  if (params === null) {
+    return null;
+  }
+
+  try {
+    const parsedParams = JSON.parse(params);
+    const parsedProposalData = JSON.parse(proposaData ?? "[]");
+    const proposalOptions = parsedProposalData[0];
+
+    return parsedParams[0].map((param: string) => {
+      const idx = Number(param);
+      return proposalOptions[idx][3];
+    });
+  } catch (e) {
+    return null;
   }
 }
