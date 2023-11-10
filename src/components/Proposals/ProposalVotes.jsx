@@ -92,6 +92,7 @@ export const ProposalVotes = ({ proposal_id }) => {
                 1d ago
               </time>
             </div>
+            <p className="text-sm leading-6 text-gray-500">{vote.params}</p>
             <p className="text-sm leading-6 text-gray-500">{vote.reason}</p>
           </div>
         </li>

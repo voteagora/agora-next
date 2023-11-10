@@ -42,11 +42,23 @@ export async function GET(
     votes: votes.map((vote) => ({
       address: vote.voter,
       proposal_id: vote.proposal_id,
-      support: vote.support,
+      support: parseSupport(vote.support, !!vote.params),
       amount: vote.weight,
       reason: vote.reason,
+      params: vote.params,
     })),
   };
 
   return NextResponse.json(response);
+}
+
+function parseSupport(support: string | null, hasParams: boolean) {
+  switch (Number(support)) {
+    case 0:
+      return hasParams ? 1 : -1; // FOR / AGAINST
+    case 1:
+      return hasParams ? 0 : 1; // ABSTAIN / FOR
+    case 2:
+      return -1;
+  }
 }
