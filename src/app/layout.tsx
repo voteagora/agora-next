@@ -1,6 +1,5 @@
-import "./globals.scss";
-import ClientLayout from './Web3Provider'
-
+import "@/styles/globals.scss";
+import ClientLayout from "./Web3Provider";
 
 declare global {
   interface BigInt {
@@ -12,9 +11,8 @@ BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
-
 export const metadata = {
-  title: "Agora Next",
+  title: "Agora Next Again",
   description: "The future of DAO governance",
 };
 
@@ -26,10 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <ClientLayout>{children}</ClientLayout>
     </html>
