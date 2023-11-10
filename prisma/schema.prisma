@@ -72,28 +72,6 @@ view charlie_voting_power_snapshot {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view approval_proposal_votes_per_option {
-  param       Int?
-  weight      String?
-  proposal_id String?
-
-  @@ignore
-  @@schema("public")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view regular_proposals_list {
-  proposal_id   String?
-  description   String?
-  start_block   String?
-  end_block     String?
-  proposal_data Json?   @db.Json
-
-  @@ignore
-  @@schema("public")
-}
-
 view ProposalsList {
   block_number  BigInt?
   proposal_id   String  @unique
@@ -135,7 +113,7 @@ view ProposalsData {
 
 view Votes {
   block_number     BigInt?
-  transaction_hash String @unique @db.VarChar(66)
+  transaction_hash String  @unique @db.VarChar(66)
   voter            String?
   proposal_id      String?
   support          String?
