@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["center", "public"]
+  schemas  = ["center"]
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -126,9 +126,13 @@ view Votes {
   @@schema("center")
 }
 
-enum network {
-  optimism_mainnet @map("optimism-mainnet")
-  ethereum_mainnet @map("ethereum-mainnet")
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ProposalsResults {
+  proposal_id      String  @unique
+  standard_results Json?
+  approval_results Json?
+  proposal_data    String?
 
-  @@schema("public")
+  @@map("proposals_results")
+  @@schema("center")
 }
