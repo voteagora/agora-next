@@ -6,6 +6,7 @@ import AgoraSuspense from "@/components/shared/AgoraSuspense";
 // import ReactMarkdown from "react-markdown";
 import ProposalDescription from "@/components/Proposals/ProposalDescription";
 import { ProposalVotes } from "@/components/Proposals/ProposalVotes";
+import ProposalResults from "@/components/Proposals/ProposalResults";
 
 export default function Page({ params: { proposal_id } }) {
   return (
@@ -16,6 +17,8 @@ export default function Page({ params: { proposal_id } }) {
             <ProposalDescription proposal_id={proposal_id} />
           </div>
           <div className="lg:col-start-3 lg:row-end-1 agora_votes">
+            <h2>Results</h2>
+            <ProposalResults proposal_id={proposal_id} />
             <h2>Votes</h2>
             <AgoraSuspense>
               <ProposalVotes proposal_id={proposal_id} />

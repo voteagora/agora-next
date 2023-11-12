@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(
   request: NextRequest,
@@ -13,23 +14,32 @@ export async function GET(
   const sortByPower = request.nextUrl.searchParams.get("sortByPower");
 
   const pageSize = 50;
-  const total_count = await prisma.votes.count({
-    where: { proposal_id: params.proposal_id },
-  });
-  const total_pages = Math.ceil(total_count / pageSize);
+  // TODO: Figure out a better way to paginate -- use cursor
+  const total_pages = Math.ceil(10000 / pageSize);
 
-  const votes = await prisma.votes.findMany({
-    where: { proposal_id: params.proposal_id },
-    take: pageSize,
-    skip: (page - 1) * pageSize,
-    orderBy: sortByPower
-      ? {
-          weight: "desc", // or "as" if you want ascending order
-        }
-      : {
-          block_number: "desc", // or "asc" if you want ascending order
-        },
-  });
+  const votes = await prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
+    Prisma.sql`
+      SELECT * FROM center.votes
+      WHERE proposal_id = ${params.proposal_id}
+      ORDER BY ${sortByPower ? "weight" : "block_number"} DESC
+      LIMIT ${pageSize}
+      OFFSET ${(page - 1) * pageSize}
+    `
+  );
+
+  // TODO: This is too slow because prisma default sorts by block_number -- need to add an index
+  // const votes = await prisma.votes.findMany({
+  //   where: { proposal_id: params.proposal_id },
+  //   take: pageSize,
+  //   skip: (page - 1) * pageSize,
+  //   orderBy: sortByPower
+  //     ? {
+  //         weight: "desc", // or "as" if you want ascending order
+  //       }
+  //     : {
+  //         block_number: "desc", // or "asc" if you want ascending order
+  //       },
+  // });
 
   // Build out proposal response
   const response = {
@@ -37,16 +47,50 @@ export async function GET(
       current_page: page,
       total_pages: total_pages,
       page_size: pageSize,
-      total_count: total_count,
+      total_count: 10000,
     },
     votes: votes.map((vote) => ({
       address: vote.voter,
       proposal_id: vote.proposal_id,
-      support: vote.support,
+      support: parseSupport(vote.support, !!vote.params),
       amount: vote.weight,
       reason: vote.reason,
+      params: parseParams(vote.params, vote.proposal_data),
     })),
   };
 
   return NextResponse.json(response);
+}
+
+function parseSupport(support: string | null, hasParams: boolean) {
+  switch (Number(support)) {
+    case 0:
+      return hasParams ? 1 : -1; // FOR / AGAINST
+    case 1:
+      return hasParams ? 0 : 1; // ABSTAIN / FOR
+    case 2:
+      return -1;
+  }
+}
+
+function parseParams(
+  params: string | null,
+  proposaData: string | null
+): string[] | null {
+  if (params === null) {
+    return null;
+  }
+
+  try {
+    const parsedParams = JSON.parse(params);
+    const parsedProposalData = JSON.parse(proposaData ?? "[]");
+    const proposalOptions = parsedProposalData[0];
+
+    return parsedParams[0].map((param: string) => {
+      const idx = Number(param);
+      return proposalOptions[idx][3];
+    });
+  } catch (e) {
+    return null;
+  }
 }
