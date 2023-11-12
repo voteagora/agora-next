@@ -1,7 +1,5 @@
-import { ethers } from "ethers";
-import { NOUNS_GOVERNOR_CURRENT } from "./contracts/contracts";
 import { Prisma } from "@prisma/client";
-import provider from "@/app/lib/provider";
+import { NounsContracts, OptimismContracts } from "./contracts/contracts";
 
 /**
  *
@@ -9,22 +7,21 @@ import provider from "@/app/lib/provider";
  *
  **/
 export async function getQuorumForProposal(
-  proposal: Prisma.ProposalsListGetPayload<true>,
+  proposal: Prisma.ProposalsListGetPayload<true> | null,
   dao: "OPTIMISM" | "NOUNS"
 ) {
   switch (dao) {
     case "NOUNS": {
-      let result = 0;
-      let contract = new ethers.Contract(
-        NOUNS_GOVERNOR_CURRENT.address,
-        NOUNS_GOVERNOR_CURRENT.abi,
-        provider
-      );
-      result = await contract.quorumVotes(proposal.proposal_id);
-      return Number(result);
+      if (!proposal) {
+        return null;
+      }
+      return NounsContracts.governor.quorumVotes(proposal.proposal_id);
     }
     case "OPTIMISM": {
-      return 30;
+      if (!proposal?.start_block) {
+        return null;
+      }
+      return OptimismContracts.governor.quorum(proposal.start_block);
     }
   }
 }
