@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { parseProposalType } from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
@@ -43,14 +44,6 @@ export async function GET(
   };
 
   return NextResponse.json(response);
-}
-
-function parseProposalType(proposalData: string): "STANDARD" | "APPROVAL" {
-  const data = JSON.parse(proposalData);
-  if (Array.isArray(data)) {
-    return "APPROVAL";
-  }
-  return "STANDARD";
 }
 
 function parseStandardResults(
