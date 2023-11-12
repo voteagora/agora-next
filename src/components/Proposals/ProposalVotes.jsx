@@ -92,6 +92,12 @@ export const ProposalVotes = ({ proposal_id }) => {
                 1d ago
               </time>
             </div>
+            {vote.params &&
+              vote.params.map((param, paramIdx) => (
+                <p className="text-sm leading-6 text-gray-500" key={paramIdx}>
+                  {param}
+                </p>
+              ))}
             <p className="text-sm leading-6 text-gray-500">{vote.reason}</p>
           </div>
         </li>
