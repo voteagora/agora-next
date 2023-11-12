@@ -29,6 +29,7 @@ export default function ProposalResults({ proposal_id }) {
         <>
           <div>{JSON.stringify(results.results.approval)}</div>
           <div>{JSON.stringify(results.results.standard)}</div>
+          <div>Quorum: {results.quorum}</div>
         </>
       );
   }

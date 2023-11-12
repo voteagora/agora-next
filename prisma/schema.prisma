@@ -100,7 +100,7 @@ view charlie_events_all {
 view ProposalsData {
   block_number     BigInt?
   transaction_hash String  @unique @db.VarChar(66)
-  proposal_id      String?
+  proposal_id      String  @unique
   proposer         String?
   start_block      String?
   end_block        String?
