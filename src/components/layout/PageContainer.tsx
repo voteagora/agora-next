@@ -12,7 +12,7 @@ type Props = {
 
 export function PageContainer({ children }: Props) {
   return (
-    <VStack alignItems="items-center" className="font-sans">
+    <VStack alignItems="items-center">
       <div className="bg-dotted-pattern" />
       <div className="bg-radial-gradient" />
       {children}
