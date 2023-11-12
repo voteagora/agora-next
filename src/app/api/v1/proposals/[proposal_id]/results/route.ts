@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { parseProposalType } from "@/lib/proposalUtils";
+import { getQuorumForProposal, parseProposalType } from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { proposal_id: string } }
 ) {
-  console.log(params.proposal_id);
-
   const results = await prisma.proposalsResults.findFirst({
     where: { proposal_id: params.proposal_id },
   });
@@ -16,11 +14,17 @@ export async function GET(
     return NextResponse.json({ error: "Proposal not found" }, { status: 404 });
   }
 
+  const proposal = await prisma.proposalsData.findFirst({
+    where: { proposal_id: params.proposal_id },
+  });
+
   const proposalType = parseProposalType(results.proposal_data ?? "{}");
+  const quorum = await getQuorumForProposal(proposal, "OPTIMISM");
 
   // Build out proposal response
   const response = {
     proposalType: proposalType,
+    quorum: quorum,
     results: {
       approval:
         proposalType === "APPROVAL"
