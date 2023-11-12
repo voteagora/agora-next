@@ -1,0 +1,9 @@
+//relative overflow-hidden rounded-lg bg-white p-4 shadow
+
+.card {
+  @apply relative;
+  @apply overflow-hidden;
+  @apply rounded-lg;
+  @apply bg-white;
+  @apply shadow;
+}
