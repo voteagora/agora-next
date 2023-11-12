@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { getHumanBlockTime } from "@/lib/blockTimes";
-import { getQuorumForProposal } from "@/lib/proposalUtils";
+import { getQuorumForProposal, parseProposalType } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
 
 BigInt.prototype.toJSON = function () {
@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
         : null,
       markdowntitle: proposal.description?.replace(/\\n/g, "\n").split("\n")[0],
       proposaData: proposal.proposal_data,
+      proposalType: parseProposalType(proposal.proposal_data ?? "{}"),
     };
   });
 
