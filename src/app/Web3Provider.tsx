@@ -8,7 +8,7 @@ import { inter, rubik } from "@/styles/fonts";
 import { cn } from "@/lib/utils";
 import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
 import Footer from "@/components/Footer";
-import { PageContainer } from "@/components/layout/PageContainer";
+import { PageContainer } from "@/components/Layout/PageContainer";
 
 const isNotProduction = process.env.NODE_ENV != "production";
 

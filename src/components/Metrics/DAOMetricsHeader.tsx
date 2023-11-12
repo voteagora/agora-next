@@ -4,7 +4,7 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
 import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
-import { HStack, VStack } from "../layout/Stack";
+import { HStack, VStack } from "../Layout/Stack";
 import styles from "@/styles/components.module.scss";
 
 const stats = [
