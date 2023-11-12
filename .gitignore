@@ -39,3 +39,6 @@ next-env.d.ts
 
 # prisma views
 /prisma/views
+
+# typechain
+src/lib/contracts/generated

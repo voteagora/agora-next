@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "cypress": "cypress open"
+    "cypress": "cypress open",
+    "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json"
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",
@@ -52,12 +53,14 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
+    "@typechain/ethers-v6": "^0.5.1",
     "@types/node": "20.1.1",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "@types/react-infinite-scroller": "^1.2.5",
     "cypress": "^12.11.0",
     "sass": "^1.62.1",
+    "typechain": "^8.3.2",
     "typescript": "5.0.4"
   }
 }
