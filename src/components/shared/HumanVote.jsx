@@ -8,11 +8,11 @@ const HumanVote = ({ support }) => {
       output = "for";
       color = "green";
       break;
-    case 0:
+    case -1:
       output = "against";
       color = "red";
       break;
-    case -1:
+    case 0:
       output = "abstain";
       color = "black";
       break;
