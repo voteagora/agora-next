@@ -6,6 +6,7 @@ import {
 import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import { HStack, VStack } from "../Layout/Stack";
 import styles from "@/styles/components.module.scss";
+import { cn } from "@/lib/utils";
 
 const stats = [
   {
@@ -36,29 +37,18 @@ const stats = [
 
 export default function DAOMetricsHeader() {
   return (
-    <div>
-      <VStack gap="gap-3">
-        <h1 className="pageTitle">DAO Metrics</h1>
-        <HStack gap="gap-3">
-          <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((item) => (
-              <div key={item.id} className={styles.card}>
-                <dt>
-                  <div className="absolute rounded-md bg-gray-100 p-3">
-                    <item.icon className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <p className="ml-16 truncate text-sm font-medium text-gray-500">
-                    {item.name}
-                  </p>
-                </dt>
-                <dd className="ml-16 flex items-baseline">
-                  <p className="text-md text-gray-900">{item.subHeading}</p>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </HStack>
-      </VStack>
+    <div className={styles.dao_metric_container}>
+      {stats.map((item) => (
+        <div key={item.id} className={styles.dao_metric_card}>
+          <HStack className="p-2" alignItems="items-center">
+            <item.icon className="icon-class h-8" aria-hidden="true" />
+            <div className="ml-2">
+              <h4 className="text-class">{item.name}</h4>
+              <h3 className="number-class">{item.subHeading}</h3>
+            </div>
+          </HStack>
+        </div>
+      ))}
     </div>
   );
 }
