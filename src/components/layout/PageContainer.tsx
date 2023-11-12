@@ -3,7 +3,7 @@
 // find their styles in the global.scss file
 
 import React, { ReactNode } from "react";
-import { VStack } from "@/components/layout/Stack";
+import { VStack } from "@/components/Layout/Stack";
 import { Analytics } from "@vercel/analytics/react";
 
 type Props = {
