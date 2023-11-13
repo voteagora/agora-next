@@ -5,8 +5,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import { HStack, VStack } from "../Layout/Stack";
-import styles from "@/styles/components.module.scss";
-import { cn } from "@/lib/utils";
+import styles from "./styles.module.scss";
 
 const stats = [
   {
@@ -42,7 +41,7 @@ export default function DAOMetricsHeader() {
         <div key={item.id} className={styles.dao_metric_card}>
           <HStack className="p-2" alignItems="items-center">
             <item.icon className="icon-class h-8" aria-hidden="true" />
-            <div className="ml-2">
+            <div>
               <h4 className="text-class">{item.name}</h4>
               <h3 className="number-class">{item.subHeading}</h3>
             </div>
