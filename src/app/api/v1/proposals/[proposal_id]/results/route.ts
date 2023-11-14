@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { getQuorumForProposal, parseProposalType } from "@/lib/proposalUtils";
+import { parseProposalType } from "@/lib/proposalUtils";
+import { getQuorumForProposal } from "@/lib/governorUtils";
 
 export async function GET(
   request: NextRequest,
