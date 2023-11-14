@@ -31,11 +31,15 @@ export async function GET(
       votingPower: votingPower?.voting_power || 0,
       votingPowerRelativeToVotableSupply:
         votingPower?.relative_voting_power || 0,
-      votingPowerRelativeToQuorum: Number(
-        BigInt(votingPower?.voting_power || 0) / (quorum || 0n)
-      ),
+      votingPowerRelativeToQuorum:
+        Number(
+          (BigInt(votingPower?.voting_power || 0) * 10000n) / (quorum || 0n)
+        ) / 10000,
       proposalsCreated: voterStats?.proposals_created || 0,
       proposalsVotedOn: voterStats?.proposals_voted || 0,
+      votedFor: voterStats?.for || 0,
+      votedAgainst: voterStats?.against || 0,
+      votedAbstain: voterStats?.abstain || 0,
       votingParticipation: voterStats?.participation_rate || 0,
       lastTenProps: voterStats?.last_10_props || 0,
       numOfDelegators: numOfDelegators?.num_for_delegators || 0,
