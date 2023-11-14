@@ -18,6 +18,9 @@ export async function GET(
   const votingPower = await prisma.votingPower.findFirst({
     where: { delegate: address },
   });
+  const numOfDelegators = await prisma.numberOfDelegators.findFirst({
+    where: { delegate: address },
+  });
 
   const quorum = await getCurrentQuorum("OPTIMISM");
 
@@ -35,6 +38,7 @@ export async function GET(
       proposalsVotedOn: voterStats?.proposals_voted || 0,
       votingParticipation: voterStats?.participation_rate || 0,
       lastTenProps: voterStats?.last_10_props || 0,
+      numOfDelegators: numOfDelegators?.num_for_delegators || 0,
     },
   };
 
