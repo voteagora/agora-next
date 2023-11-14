@@ -166,11 +166,19 @@ view Proposers {
 }
 
 view VotingPower {
-  raw_number            BigInt @unique
+  raw_number            BigInt   @unique
   delegate              String?
   voting_power          String?
   relative_voting_power Decimal? @db.Decimal
 
   @@map("voting_power")
+  @@schema("center")
+}
+
+view NumberOfDelegators {
+  delegate           String @unique // This is not actually unique, but Prisma requires a unique field
+  num_for_delegators BigInt?
+
+  @@map("num_of_delegators")
   @@schema("center")
 }
