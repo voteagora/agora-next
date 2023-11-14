@@ -126,7 +126,6 @@ view Votes {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ProposalsResults {
   proposal_id      String  @unique
   standard_results Json?
@@ -134,5 +133,44 @@ view ProposalsResults {
   proposal_data    String?
 
   @@map("proposals_results")
+  @@schema("center")
+}
+
+view NumberOfProposals {
+  num_of_props BigInt @unique
+
+  @@map("num_of_props")
+  @@schema("center")
+}
+
+view VoterStats {
+  voter              String   @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  proposals_created  BigInt?
+  for                Decimal? @db.Decimal
+  abstain            Decimal? @db.Decimal
+  against            Decimal? @db.Decimal
+
+  @@map("voter_stats")
+  @@schema("center")
+}
+
+view Proposers {
+  proposer String  @unique
+  count    BigInt?
+
+  @@map("proposers")
+  @@schema("center")
+}
+
+view VotingPower {
+  raw_number            BigInt @unique
+  delegate              String?
+  voting_power          String?
+  relative_voting_power Decimal? @db.Decimal
+
+  @@map("voting_power")
   @@schema("center")
 }
