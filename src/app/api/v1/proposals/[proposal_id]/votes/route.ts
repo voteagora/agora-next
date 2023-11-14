@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { parseParams, parseSupport } from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
@@ -60,37 +61,4 @@ export async function GET(
   };
 
   return NextResponse.json(response);
-}
-
-function parseSupport(support: string | null, hasParams: boolean) {
-  switch (Number(support)) {
-    case 0:
-      return hasParams ? 1 : -1; // FOR / AGAINST
-    case 1:
-      return hasParams ? 0 : 1; // ABSTAIN / FOR
-    case 2:
-      return -1;
-  }
-}
-
-function parseParams(
-  params: string | null,
-  proposaData: string | null
-): string[] | null {
-  if (params === null) {
-    return null;
-  }
-
-  try {
-    const parsedParams = JSON.parse(params);
-    const parsedProposalData = JSON.parse(proposaData ?? "[]");
-    const proposalOptions = parsedProposalData[0];
-
-    return parsedParams[0].map((param: string) => {
-      const idx = Number(param);
-      return proposalOptions[idx][3];
-    });
-  } catch (e) {
-    return null;
-  }
 }
