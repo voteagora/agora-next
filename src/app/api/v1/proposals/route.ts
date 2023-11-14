@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { getHumanBlockTime } from "@/lib/blockTimes";
-import { getQuorumForProposal, parseProposalType } from "@/lib/proposalUtils";
+import { parseProposalType } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
 
 BigInt.prototype.toJSON = function () {
