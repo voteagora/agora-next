@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroller";
 import HumanVote from "../shared/HumanVote";
 import HumanAddress from "../shared/HumanAddress";
@@ -12,28 +11,25 @@ function classNames(...classes) {
 }
 
 export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
-  const router = useRouter();
-  const fetching = React.useRef(false);
+  // const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialVotes]);
-  const [meta, setMeta] = React.useState(initialVotes.meta);
+  // const [meta, setMeta] = React.useState(initialVotes.meta);
 
   const loadMore = async (page) => {
-    if (!fetching.current && page <= meta.total_pages) {
-      fetching.current = true;
-
-      const data = await fetchDelegateVotes(page);
-      const existingIds = new Set(delegateVotes.map((v) => v.id));
-      const uniqueDelegateVotes = data.delegateVotes.filter(
-        (p) => !existingIds.has(p.id)
-      );
-      setPages((prev) => [
-        ...prev,
-        { ...data, delegateVotes: uniqueDelegateVotes },
-      ]);
-      setMeta(data.meta);
-
-      fetching.current = false;
-    }
+    // if (!fetching.current && page <= meta.total_pages) {
+    //   fetching.current = true;
+    //   const data = await fetchDelegateVotes(page);
+    //   const existingIds = new Set(delegateVotes.map((v) => v.id));
+    //   const uniqueDelegateVotes = data.delegateVotes.filter(
+    //     (p) => !existingIds.has(p.id)
+    //   );
+    //   setPages((prev) => [
+    //     ...prev,
+    //     { ...data, delegateVotes: uniqueDelegateVotes },
+    //   ]);
+    //   setMeta(data.meta);
+    //   fetching.current = false;
+    // }
   };
 
   const delegateVotes = pages.reduce(
@@ -47,7 +43,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
           <ul role="list" className="space-y-6">
             <InfiniteScroll
-              hasMore={pages.length < meta.total_pages}
+              hasMore={false}
               pageStart={0}
               loadMore={loadMore}
               loader={
