@@ -27,3 +27,28 @@ export function pluralizeVote(count: BigInt, token: keyof typeof tokens) {
     .map((it) => it.value)
     .join("")} votes`;
 }
+
+export function formatNumber(
+  amount: string | BigInt,
+  token: keyof typeof tokens,
+  maximumSignificantDigits = 4
+) {
+  const number = Number(
+    ethers.formatUnits(amount.toString(), tokens[token].decimals)
+  );
+
+  const numberFormat = new Intl.NumberFormat("en", {
+    style: "currency",
+    currency: "USD",
+    currencyDisplay: "code",
+    compactDisplay: "short",
+    notation: "compact",
+    maximumSignificantDigits,
+  });
+
+  const parts = numberFormat.formatToParts(number);
+  return parts
+    .filter((part) => part.type !== "currency" && part.type !== "literal")
+    .map((part) => part.value)
+    .join("");
+}
