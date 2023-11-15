@@ -57,3 +57,44 @@ export function colorForSupportType(
       return theme.colors.green["700"];
   }
 }
+
+/**
+ * Proposal title extraction
+ */
+
+const extractTitle = (body: string | undefined): string | null => {
+  if (!body) return null;
+  const hashResult = body.match(/^\s*#{1,6}\s+([^\n]+)/);
+  if (hashResult) {
+    return hashResult[1];
+  }
+
+  const equalResult = body.match(/^\s*([^\n]+)\n(={3,25}|-{3,25})/);
+  if (equalResult) {
+    return equalResult[1];
+  }
+
+  const textResult = body.match(/^\s*([^\n]+)\s*/);
+  if (textResult) {
+    return textResult[1];
+  }
+
+  return null;
+};
+
+const removeBold = (text: string | null): string | null =>
+  text ? text.replace(/\*\*/g, "") : text;
+
+const removeItalics = (text: string | null): string | null =>
+  text ? text.replace(/__/g, "") : text;
+
+export function getTitleFromProposalDescription(description: string = "") {
+  const normalizedDescription = description
+    .replace(/\\n/g, "\n")
+    .replace(/(^['"]|['"]$)/g, "");
+
+  return (
+    removeItalics(removeBold(extractTitle(normalizedDescription)))?.trim() ??
+    "Untitled"
+  );
+}

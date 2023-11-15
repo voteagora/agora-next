@@ -121,6 +121,8 @@ view Votes {
   reason           String?
   params           String?
   proposal_data    String?
+  prop_start_block String?
+  prop_description String?
 
   @@map("votes")
   @@schema("center")
