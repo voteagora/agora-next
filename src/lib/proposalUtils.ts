@@ -13,11 +13,11 @@ export function parseProposalType(
 export function parseSupport(support: string | null, hasParams: boolean) {
   switch (Number(support)) {
     case 0:
-      return hasParams ? 1 : -1; // FOR / AGAINST
+      return hasParams ? "FOR" : "AGAINST";
     case 1:
-      return hasParams ? 0 : 1; // ABSTAIN / FOR
+      return hasParams ? "ABSTAIN" : "FOR";
     case 2:
-      return -1;
+      return "AGAINST";
   }
 }
 
