@@ -1,9 +1,11 @@
 import React, { ReactNode } from "react";
 import { cn } from "@/lib/utils"; // Importing the custom cn function
+import * as theme from "@/lib/theme";
+import { css, cx } from "@emotion/css";
 
 type Props = {
   className?: string;
-  gap?: string; // Tailwind gap classes
+  gap?: keyof (typeof theme)["spacing"];
   justifyContent?:
     | "justify-around"
     | "justify-between"
@@ -29,12 +31,14 @@ function Stack({
 }: Props) {
   return (
     <div
-      className={cn(
-        "flex", // Static class for flex
-        gap, // Dynamic gap class
-        justifyContent, // Dynamic justify-content class
-        alignItems, // Dynamic align-items class
-        className // Additional custom class names
+      className={cx(
+        css`
+          display: flex;
+          gap: ${gap && theme.spacing[gap]};
+          justify-content: ${justifyContent};
+          align-items: ${alignItems};
+        `,
+        className
       )}
     >
       {children}
