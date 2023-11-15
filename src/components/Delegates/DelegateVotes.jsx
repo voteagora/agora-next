@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import InfiniteScroll from "react-infinite-scroller";
-import HumanVote from "../shared/HumanVote";
-import HumanAddress from "../shared/HumanAddress";
-import Image from "next/image";
+import { VStack } from "../Layout/Stack";
+import { css } from "@emotion/css";
+import * as theme from "@/lib/theme";
+import { colorForSupportType } from "@/lib/proposalUtils";
+import { pluralizeVote } from "@/lib/tokenUtils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -38,79 +39,149 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
   );
 
   return (
-    <div className="mt-6 overflow-hidden border-t border-gray-100">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
-          <ul role="list" className="space-y-6">
-            <InfiniteScroll
-              hasMore={false}
-              pageStart={0}
-              loadMore={loadMore}
-              loader={
-                <div key="loader">
-                  Loading... <br />
-                  <Image
-                    src="/images/blink.gif"
-                    alt="Blinking Agora Logo"
-                    width={50}
-                    height={20}
-                  />
-                </div>
-              }
-              element="main"
-            >
-              {delegateVotes.map(
-                (vote, voteIdx) =>
-                  vote && (
-                    <li
-                      key={vote.address}
-                      className="relative flex gap-x-4 w-full"
-                    >
-                      <div
-                        className={classNames(
-                          voteIdx === delegateVotes.length - 1
-                            ? "h-6"
-                            : "-bottom-6",
-                          "absolute left-0 top-0 flex w-6 justify-center"
-                        )}
-                      >
-                        <div className="w-px bg-gray-200" />
-                      </div>
+    <VStack gap="4">
+      {delegateVotes.map(
+        (vote, voteIdx) =>
+          vote && (
+            <VoteDetailsContainer key={voteIdx}>
+              <div
+                className={css`
+                  display: grid;
+                  overflow-y: hidden;
+                  grid-template-columns: 1fr 1px 1fr;
 
-                      <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                        <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
-                      </div>
-                      <div
-                        className={classNames(
-                          "flex-auto rounded-md p-3 ring-1 ring-inset",
-                          vote.support === 1 ? "ring-green-200" : "ring-red-200"
-                        )}
-                      >
-                        <div className="flex justify-between gap-x-4">
-                          <div className="py-0.5 text-xs leading-5 text-gray-500">
-                            <span className="font-medium text-gray-900">
-                              <HumanAddress address={vote.address} />
-                            </span>{" "}
-                            voted <HumanVote support={vote.support} />
-                          </div>
-                          <time
-                            dateTime="2023-01-24T09:20"
-                            className="flex-none py-0.5 text-xs leading-5 text-gray-500"
-                          >
-                            1d ago
-                          </time>
-                        </div>
-                        <p className="text-sm leading-6 text-gray-500">
-                          {vote.reason}
-                        </p>
-                      </div>
-                    </li>
-                  )
-              )}
-            </InfiniteScroll>
-          </ul>
-        </div>
-      </div>
+                  @media (max-width: ${theme.maxWidth["2xl"]}) {
+                    grid-template-rows: 1fr;
+                    grid-template-columns: none;
+                    overflow-y: scroll;
+                  }
+                `}
+              >
+                {vote.proposalType === "APPROVAL" && (
+                  <ApprovalVoteContainer {...vote} />
+                )}
+                {vote.proposalType === "STANDARD" && (
+                  <StandardVoteContainer {...vote} />
+                )}
+                {vote.reason && <VoteReason reason={vote.reason} />}
+              </div>
+            </VoteDetailsContainer>
+          )
+      )}
+    </VStack>
+  );
+}
+
+function VoteDetailsContainer({ children }) {
+  return (
+    <VStack
+      gap="3"
+      className={css`
+        border-radius: ${theme.borderRadius.lg};
+        border-width: ${theme.spacing.px};
+        border-color: ${theme.colors.gray.eb};
+        background: ${theme.colors.white};
+        box-shadow: ${theme.shadow};
+        max-height: 15rem;
+      `}
+    >
+      {children}
+    </VStack>
+  );
+}
+
+function StandardVoteContainer({ support, weight }) {
+  return (
+    <span
+      className={css`
+        color: ${colorForSupportType(support)};
+        font-size: ${theme.fontSize.xs};
+        font-weight: ${theme.fontWeight.medium};
+      `}
+    >
+      <span
+        className={css`
+          text-transform: capitalize;
+        `}
+      >
+        {support}
+      </span>{" "}
+      with {pluralizeVote(weight, "optimism")}
+    </span>
+  );
+}
+
+function ApprovalVoteContainer({ params, support, weight }) {
+  return (
+    <div
+      className={css`
+        font-size: ${theme.fontSize.xs};
+        font-weight: ${theme.fontWeight.medium};
+        color: #66676b;
+      `}
+    >
+      Voted :{" "}
+      {params?.map((option, i) => (
+        <>
+          {option}
+          {/* add a coma here if not last option */}
+          {i !== params.length - 1 && ", "}
+        </>
+      ))}
+      {params?.length === 0 && "Abstain"}
+      <span
+        className={css`
+          color: ${colorForSupportType(support)};
+          font-size: ${theme.fontSize.xs};
+          font-weight: ${theme.fontWeight.medium};
+        `}
+      >
+        {" "}
+        with {pluralizeVote(weight, "optimism")}
+      </span>
     </div>
+  );
+}
+
+function VoteReason({ reason }) {
+  return (
+    <>
+      <div
+        className={css`
+          width: ${theme.spacing.px};
+          background: #ebebeb;
+
+          @media (max-width: ${theme.maxWidth["2xl"]}) {
+            display: none;
+          }
+        `}
+      />
+
+      <VStack
+        className={css`
+          overflow-y: scroll;
+          overflow-x: scroll;
+          padding: ${theme.spacing["4"]} ${theme.spacing["6"]};
+
+          @media (max-width: ${theme.maxWidth["2xl"]}) {
+            padding-top: 0;
+            height: fit-content;
+          }
+        `}
+      >
+        <pre
+          className={css`
+            font-family: ${theme.fontFamily.sans};
+            font-size: ${theme.fontSize.xs};
+            font-weight: ${theme.fontWeight.medium};
+            white-space: pre-wrap;
+            color: #66676b;
+            width: fit-content;
+          `}
+        >
+          {reason}
+        </pre>
+      </VStack>
+    </>
   );
 }
