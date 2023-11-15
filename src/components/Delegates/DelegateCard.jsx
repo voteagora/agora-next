@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import HumanAddress from "../shared/HumanAddress";
-import styles from "./styles.module.scss";
+import * as theme from "@/lib/theme";
+import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
-import ENSAvatar from "../shared/ENSAvatar";
+import { bpsToString, pluralizeAddresses } from "@/lib/utils";
+import { DelegateProfileImage } from "./DelegateProfileImage";
 
 export default function DelegateCard({ delegate }) {
   console.log(delegate);
@@ -12,46 +12,130 @@ export default function DelegateCard({ delegate }) {
     return null;
   }
   return (
-    <VStack key={delegate.address} className={styles.delegate_card}>
-      <HStack className={styles.delegate_card__header} gap="4">
-        <ENSAvatar address={delegate.address} />
-        <VStack gap="2">
-          <HumanAddress address={delegate.address} />
-          <p className="text-sm font-medium text-gray-900">
-            {delegate.votingPower}
-          </p>
+    <VStack
+      className={css`
+        position: sticky;
+        top: ${theme.spacing["16"]};
+        flex-shrink: 0;
+        width: ${theme.maxWidth.xs};
+
+        @media (max-width: ${theme.maxWidth["6xl"]}) {
+          position: static;
+        }
+
+        @media (max-width: ${theme.maxWidth.lg}) {
+          width: 100%;
+        }
+      `}
+    >
+      <VStack
+        className={css`
+          background-color: ${theme.colors.white};
+          border-radius: ${theme.spacing["3"]};
+          border-width: ${theme.spacing.px};
+          border-color: ${theme.colors.gray["300"]};
+          box-shadow: ${theme.boxShadow.newDefault};
+        `}
+      >
+        <VStack
+          alignItems="stretch"
+          className={css`
+            padding: ${theme.spacing["6"]};
+            border-bottom: ${theme.spacing.px} solid ${theme.colors.gray["300"]};
+          `}
+        >
+          <DelegateProfileImage
+            address={delegate.address}
+            votingPower={delegate.votingPower}
+          />
         </VStack>
-      </HStack>
-      <div className="min-w-0 flex-1">
-        <span className="absolute inset-0" aria-hidden="true" />
-        <p className="text-sm font-medium text-gray-900">
-          <HumanAddress address={delegate.address} />
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          Voting power: {delegate.votingPower}
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          Proposals voted: {delegate.proposalsVotedOn} (
-          {delegate.votingParticipation * 100}%)
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          For / Againts / Abstain: {delegate.votedFor} / {delegate.votedAgainst}{" "}
-          / {delegate.votedAbstain}
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          Voting Power: {delegate.votingPowerRelativeToVotableSupply * 100}%
-          votable supply {delegate.votingPowerRelativeToQuorum * 100}% quorum
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          Recent Activity: {delegate.lastTenProps} of 10 last props
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          Proposals Created: {delegate.proposalsCreated}
-        </p>
-        <p className="text-sm font-medium text-gray-900">
-          Delegated From: {delegate.numOfDelegators}
-        </p>
-      </div>
+
+        <div
+          className={css`
+            ${css`
+              display: flex;
+              flex-direction: column;
+              padding: ${theme.spacing["6"]} ${theme.spacing["6"]};
+            `};
+          `}
+        >
+          <VStack gap="4">
+            <PanelRow
+              title="Proposals Voted"
+              detail={
+                !delegate.proposalsVotedOn
+                  ? "N/A"
+                  : `${delegate.proposalsVotedOn} (${bpsToString(
+                      delegate.votingParticipation * 100
+                    )})`
+              }
+            />
+
+            <PanelRow
+              title="For / Against / Abstain"
+              detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
+            />
+
+            <PanelRow
+              title="Vote Power"
+              detail={
+                <>
+                  {bpsToString(
+                    delegate.votingPowerRelativeToVotableSupply * 100
+                  )}{" "}
+                  votable supply
+                  <br />
+                  {bpsToString(delegate.votingPowerRelativeToQuorum * 100)}{" "}
+                  quorum
+                </>
+              }
+            />
+
+            <PanelRow
+              title="Recent activity"
+              detail={
+                delegate.lastTenProps
+                  ? `${delegate.lastTenProps} of 10 last props`
+                  : "N/A"
+              }
+            />
+
+            <PanelRow
+              title="Proposals created"
+              detail={`${delegate.proposalsCreated}`}
+            />
+
+            <PanelRow
+              title="Delegated from"
+              detail={pluralizeAddresses(delegate.numOfDelegators)}
+            />
+          </VStack>
+        </div>
+      </VStack>
     </VStack>
   );
 }
+
+export const PanelRow = ({ title, detail }) => {
+  return (
+    <HStack gap="2" justifyContent="space-between" alignItems="baseline">
+      <span
+        className={css`
+          white-space: nowrap;
+        `}
+      >
+        {title}
+      </span>
+
+      <span
+        className={css`
+          font-size: ${theme.fontSize.sm};
+          color: #4f4f4f;
+          text-align: right;
+        `}
+      >
+        {detail}
+      </span>
+    </HStack>
+  );
+};
