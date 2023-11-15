@@ -32,26 +32,3 @@ export function pluralizeAddresses(count: number) {
     return `${format.format(count).toLowerCase()} addresses`;
   }
 }
-
-export function formatNumber(
-  amount: string | BigInt,
-  decimals: number,
-  maximumSignificantDigits = 4
-) {
-  const number = Number(ethers.formatUnits(amount.toString(), decimals));
-
-  const numberFormat = new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "USD",
-    currencyDisplay: "code",
-    compactDisplay: "short",
-    notation: "compact",
-    maximumSignificantDigits,
-  });
-
-  const parts = numberFormat.formatToParts(number);
-  return parts
-    .filter((part) => part.type !== "currency" && part.type !== "literal")
-    .map((part) => part.value)
-    .join("");
-}
