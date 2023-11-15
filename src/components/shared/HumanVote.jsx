@@ -1,26 +1,21 @@
 import React from "react";
 
 const HumanVote = ({ support }) => {
-  let output;
   let color;
   switch (support) {
-    case 1:
-      output = "for";
+    case "FOR":
       color = "green";
       break;
-    case -1:
-      output = "against";
+    case "AGAINST":
       color = "red";
       break;
-    case 0:
-      output = "abstain";
+    case "ABSTAIN":
       color = "black";
       break;
     default:
-      output = "Invalid input";
       color = "black";
   }
-  return <span style={{ color }}>{output}</span>;
+  return <span style={{ color }}>{support.toLowerCase()}</span>;
 };
 
 export default HumanVote;

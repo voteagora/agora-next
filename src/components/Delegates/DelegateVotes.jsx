@@ -104,7 +104,7 @@ function StandardVoteContainer({ support, weight }) {
           text-transform: capitalize;
         `}
       >
-        {support}
+        {support.toLowerCase()}
       </span>{" "}
       with {pluralizeVote(weight, "optimism")}
     </span>
