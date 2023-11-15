@@ -3,12 +3,12 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
 import HumanAddress from "../shared/HumanAddress";
-import { formatNumber } from "@/lib/utils";
 import { useEnsName } from "wagmi";
+import { formatNumber } from "@/lib/tokenUtils";
 
 export function DelegateProfileImage({ address, votingPower }) {
   // TODO: Load token params from config
-  const formattedNumber = formatNumber(votingPower, 18, 4);
+  const formattedNumber = formatNumber(votingPower, "optimism", 4);
 
   const { data } = useEnsName({
     chainId: 1,
