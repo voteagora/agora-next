@@ -20,8 +20,6 @@ const imageLoader = ({ src }) => {
 
 // TODO: Might be better to load the avatar on the server
 export default function ENSAvatar({ ensName }) {
-  const [isClient, setIsClient] = useState(false);
-
   const { data } = useEnsAvatar({
     chainId: 1,
     name: ensName,
@@ -41,35 +39,33 @@ export default function ENSAvatar({ ensName }) {
   const altAvatar =
     avatars[!ensName ? 0 : (ensName.charCodeAt(0) % 97) % avatars.length];
 
+  const [avatar, setAvatar] = useState(altAvatar);
+
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    setAvatar(data);
+  }, [data]);
 
   return (
     <div className={styles.ens_avatar}>
-      {isClient && data && (
-        <Image
-          loader={imageLoader}
-          alt="ENS Avatar"
-          className={css`
-            @keyframes fade-in {
-              from {
-                opacity: 0;
-              }
-              to {
-                opacity: 1;
-              }
+      <Image
+        loader={imageLoader}
+        alt="ENS Avatar"
+        className={css`
+          @keyframes fade-in {
+            from {
+              opacity: 0;
             }
+            to {
+              opacity: 1;
+            }
+          }
 
-            animation: 0.3s forwards fade-in;
-          `}
-          src={data}
-          width={44}
-          height={44}
-        />
-      )}
-
-      <Image alt="Avatar" src={altAvatar} />
+          animation: 0.3s forwards fade-in;
+        `}
+        src={avatar}
+        width={44}
+        height={44}
+      />
     </div>
   );
 }
