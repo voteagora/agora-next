@@ -4,9 +4,16 @@ import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
 import HumanAddress from "../shared/HumanAddress";
 import { formatNumber } from "@/lib/utils";
+import { useEnsName } from "wagmi";
 
 export function DelegateProfileImage({ address, votingPower }) {
+  // TODO: Load token params from config
   const formattedNumber = formatNumber(votingPower, 18, 4);
+
+  const { data } = useEnsName({
+    chainId: 1,
+    address,
+  });
 
   return (
     <HStack gap="4">
@@ -22,7 +29,7 @@ export function DelegateProfileImage({ address, votingPower }) {
             height: 44px;
             border-radius: 100%;
           `}
-          address={address}
+          ensName={data}
         />
       </div>
 
@@ -42,6 +49,7 @@ export function DelegateProfileImage({ address, votingPower }) {
             color: #4f4f4f;
           `}
         >
+          {/** // TODO: Make currency symbol dynamic */}
           {formattedNumber} OP
         </div>
       </VStack>
