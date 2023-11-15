@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
-import { parseParams, parseSupport } from "@/lib/proposalUtils";
+import {
+  parseParams,
+  parseProposalType,
+  parseSupport,
+} from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
@@ -22,9 +26,11 @@ export async function GET(
       address: vote.voter,
       proposal_id: vote.proposal_id,
       support: parseSupport(vote.support, !!vote.params),
-      amount: vote.weight,
+      weight: vote.weight,
       reason: vote.reason,
       params: parseParams(vote.params, vote.proposal_data),
+      proposalType: parseProposalType(vote.proposal_data ?? "{}"),
+      proposalData: vote.proposal_data,
     })),
   };
 

@@ -1,3 +1,5 @@
+import * as theme from "@/lib/theme";
+
 export function parseProposalType(
   proposalData: string
 ): "STANDARD" | "APPROVAL" {
@@ -38,5 +40,20 @@ export function parseParams(
     });
   } catch (e) {
     return null;
+  }
+}
+
+export function colorForSupportType(
+  supportType: "AGAINST" | "ABSTAIN" | "FOR"
+) {
+  switch (supportType) {
+    case "AGAINST":
+      return theme.colors.red["700"];
+
+    case "ABSTAIN":
+      return theme.colors.gray["700"];
+
+    case "FOR":
+      return theme.colors.green["700"];
   }
 }
