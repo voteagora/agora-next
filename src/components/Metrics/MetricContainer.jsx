@@ -1,7 +1,7 @@
 import { HStack, VStack } from "../Layout/Stack";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
-import styles from "./styles.module.scss";
+import styles from "./metrics.module.scss";
 
 export default function MetricContainer({ icon, title, body, link = null }) {
   return (

@@ -3,6 +3,8 @@ import AgoraAPI from "./lib/agoraAPI";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { VStack } from "@/components/Layout/Stack";
 import styles from "@/styles/homepage.module.scss";
+import Hero from "@/components/Hero/Hero";
+import { PageDivider } from "@/components/Layout/PageDivider";
 
 async function fetchProposals(page = 1) {
   "use server";
@@ -17,8 +19,9 @@ export default async function Home() {
 
   return (
     <VStack className={styles.metrics_container}>
-      <h1 className="section_title">Proposal metrics</h1>
+      <Hero />
       <DAOMetricsHeader />
+      <PageDivider />
       {/* <ProposalsList
         initialProposals={proposals}
         fetchProposals={fetchProposals}
