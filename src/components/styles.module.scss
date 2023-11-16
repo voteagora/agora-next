@@ -1,33 +1,56 @@
+@import "@/styles/variables";
+
 .agora_title {
-    font-size: 0.9rem;
-    margin-left: 0.5rem;
-    font-weight: bold;
-    color: #000;
-    span {
-        color: gray;
-        font-size: 0.7rem;
-        font-weight: 600;
-        font-family: sans-serif;
-    }
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  font-weight: bold;
+  color: #000;
+  span {
+    color: gray;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: sans-serif;
+  }
 }
 
 .connectWallet {
-    background-color: rgb(243, 239, 239);
-    padding: 0.5rem 0.8rem;
-    border-radius: 9999px;
-    color: black;
-    cursor: pointer;
-    &:hover {
-        background-color: rgb(222, 220, 220);
-    }
+  background-color: rgb(243, 239, 239);
+  padding: 0.5rem 0.8rem;
+  border-radius: 9999px;
+  color: black;
+  cursor: pointer;
+  &:hover {
+    background-color: rgb(222, 220, 220);
+  }
 }
 
 .dev_banner {
-    padding:3px;
-    background-color: #000;
-    text-align: center;
-    p {
-        color: red;
-        font-size: 0.8rem;
-    }
+  padding: 3px;
+  background-color: #000;
+  text-align: center;
+  p {
+    color: red;
+    font-size: 0.8rem;
+  }
+}
+
+.button {
+  border-radius: $spacing-2;
+  border-width: $spacing-px;
+  border-color: $gray-eb;
+  font-weight: $font-weight-medium;
+  box-shadow: $box-shadow-default;
+  cursor: pointer;
+  padding: $spacing-3 $spacing-4;
+  transition: all 200ms;
+  &:hover {
+    background-color: $gray-100;
+  }
+  &:active {
+    box-shadow: $box-shadow-none;
+  }
+  &:disabled {
+    background: $gray-eb;
+    color: $gray-700;
+  }
 }
