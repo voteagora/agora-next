@@ -1,0 +1,42 @@
+@import "@/styles/variables";
+
+.hero_container {
+  margin-top: $spacing-8;
+  margin-bottom: -44px;
+  width: $max-width-6xl;
+  padding: 0 $spacing-4;
+  @media (max-width: $max-width-md) {
+    flex-direction: column;
+    text-align: center;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+  .content_container {
+    max-width: $max-width-xl;
+    margin-top: $spacing-8;
+    @media (max-width: $max-width-md) {
+      margin-top: 0;
+      margin-bottom: $spacing-8;
+    }
+    h1 {
+      font-weight: $font-weight-extrabold;
+      font-size: $font-size-2xl;
+      margin-bottom: $spacing-2;
+      span {
+        font-size: $font-size-lg;
+        padding: $spacing-2 $spacing-3;
+        background-color: $daos-optimism;
+        color: $white;
+        border-radius: $border-radius-full;
+        font-family: $font-family-serif;
+        text-transform: uppercase;
+        font-style: italic;
+        letter-spacing: $letter-spacing-tight;
+      }
+    }
+    p {
+      color: $gray-700;
+      font-size: $font-size-base;
+    }
+  }
+}
