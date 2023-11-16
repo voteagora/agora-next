@@ -1,4 +1,4 @@
-import * as theme from "@/lib/theme";
+import * as theme from "@/styles/theme";
 
 export function parseProposalType(
   proposalData: string
