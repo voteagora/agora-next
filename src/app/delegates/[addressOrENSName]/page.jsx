@@ -6,6 +6,9 @@
 import AgoraAPI from "@/app/lib/agoraAPI";
 import DelegateCard from "@/components/Delegates/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import { css } from "@emotion/css";
+import * as theme from "@/styles/theme";
 
 async function getDelegate(addressOrENSName) {
   "use server";
@@ -29,18 +32,72 @@ export default async function Page({ params: { addressOrENSName } }) {
   const delegateVotes = await getDelegateVotes(addressOrENSName);
 
   return (
-    <section>
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          <div className="-mx-4 px-4 py-8 shadow-sm ring-1 ring-gray-900/5 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pb-20 xl:pt-16">
-            <DelegateCard delegate={delegate} />
-            <DelegateVotes
-              initialVotes={delegateVotes}
-              fetchDelegateVotes={getDelegateVotes}
-            />
+    <HStack
+      gap="16"
+      justifyContent="space-between"
+      alignItems="flex-start"
+      className={css`
+        margin: ${theme.spacing["16"]};
+        margin-top: ${theme.spacing["8"]};
+        padding-left: ${theme.spacing["4"]};
+        padding-right: ${theme.spacing["4"]};
+        width: 100%;
+        max-width: ${theme.maxWidth["6xl"]};
+
+        @media (max-width: ${theme.maxWidth["6xl"]}) {
+          flex-direction: column;
+          align-items: center;
+        }
+      `}
+    >
+      <VStack
+        className={css`
+          position: sticky;
+          top: ${theme.spacing["16"]};
+          flex-shrink: 0;
+          width: ${theme.maxWidth.xs};
+
+          @media (max-width: ${theme.maxWidth["6xl"]}) {
+            position: static;
+          }
+
+          @media (max-width: ${theme.maxWidth.lg}) {
+            width: 100%;
+          }
+        `}
+      >
+        <DelegateCard delegate={delegate} />
+
+        {!delegate.statement && (
+          <div
+            className={css`
+              color: #66676b;
+              line-height: ${theme.lineHeight.normal};
+              font-size: ${theme.fontSize.xs};
+              padding: ${theme.spacing["2"]};
+            `}
+          >
+            This voter has not submitted a statement. Is this you? Connect your
+            wallet to verify your address, and tell your community what you’d
+            like to see.
           </div>
-        </div>
-      </div>
-    </section>
+        )}
+      </VStack>
+
+      <VStack
+        gap="8"
+        className={css`
+          min-width: 0;
+          flex: 1;
+        `}
+      >
+        {/** Statement section goes here */}
+
+        <DelegateVotes
+          initialVotes={delegateVotes}
+          fetchDelegateVotes={getDelegateVotes}
+        />
+      </VStack>
+    </HStack>
   );
 }
