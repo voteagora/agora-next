@@ -1,8 +1,8 @@
 import * as theme from "@/lib/theme";
 
-export function parseProposalType(
-  proposalData: string
-): "STANDARD" | "APPROVAL" {
+type ProposalType = "STANDARD" | "APPROVAL";
+
+export function parseProposalType(proposalData: string): ProposalType {
   const data = JSON.parse(proposalData);
   if (Array.isArray(data)) {
     return "APPROVAL";
@@ -10,12 +10,15 @@ export function parseProposalType(
   return "STANDARD";
 }
 
-export function parseSupport(support: string | null, hasParams: boolean) {
+export function parseSupport(
+  support: string | null,
+  proposalType: ProposalType
+) {
   switch (Number(support)) {
     case 0:
-      return hasParams ? "FOR" : "AGAINST";
+      return proposalType === "APPROVAL" ? "FOR" : "AGAINST";
     case 1:
-      return hasParams ? "ABSTAIN" : "FOR";
+      return proposalType === "APPROVAL" ? "ABSTAIN" : "FOR";
     case 2:
       return "AGAINST";
   }
