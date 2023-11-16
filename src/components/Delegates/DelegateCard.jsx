@@ -120,7 +120,7 @@ export default function DelegateCard({ delegate }) {
 
 const PanelRow = ({ title, detail }) => {
   return (
-    <HStack gap="2" justifyContent="space-between" alignItems="baseline">
+    <HStack gap="2" justifyContent="justify-between" alignItems="baseline">
       <span
         className={css`
           white-space: nowrap;
