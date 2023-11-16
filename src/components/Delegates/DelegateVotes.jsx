@@ -193,15 +193,14 @@ function ApprovalVoteContainer({ params, support, weight }) {
         color: #66676b;
       `}
     >
-      Voted :{" "}
       {params?.map((option, i) => (
         <>
-          {option}
+          Voted: {option}
           {/* add a coma here if not last option */}
           {i !== params.length - 1 && ", "}
         </>
       ))}
-      {params?.length === 0 && "Abstain"}
+      {(!params || params?.length === 0) && "Abstain"}
       <span
         className={css`
           color: ${colorForSupportType(support)};
