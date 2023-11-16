@@ -7,7 +7,6 @@ import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 
 export default function DelegateCard({ delegate }) {
-  console.log(delegate);
   if (!delegate) {
     return null;
   }
