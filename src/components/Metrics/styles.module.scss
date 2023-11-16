@@ -1,27 +1,35 @@
-.dao_metric_container {
-  display: flex;
-  flex-direction: column;
-  @apply w-full;
-  @apply px-1;
+@import "@/styles/variables";
 
-  @screen md {
-    flex-direction: row;
-    justify-content: space-between;
+.metric_card_container {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-3;
+  border-width: $spacing-px;
+  border-color: $gray-300;
+  box-shadow: $box-shadow-newDefault;
+  .icon_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $spacing-2;
+    border-width: $spacing-px;
+    border-color: $gray-300;
+    flex-shrink: 0;
+    padding: $spacing-3;
+    background-color: $gray-fa;
   }
-}
-
-.dao_metric_card {
-  @apply my-2;
-  @apply bg-white;
-  @apply shadow;
-  @apply rounded-lg;
-  @apply w-full;
-
-  @screen sm {
-    @apply my-2;
-    @apply mx-4;
+  .header_container {
+    display: flex;
+    font-size: $font-size-sm;
+    color: $gray-700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    a {
+      margin: $spacing-1;
+    }
   }
-  @screen md {
-    @apply my-0;
+  .body_container {
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
