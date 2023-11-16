@@ -6,11 +6,9 @@ import { HStack } from "../Layout/Stack";
 import { useAccount } from "wagmi";
 import { useMediaQuery } from "react-responsive";
 import * as theme from "../../styles/theme";
-import { ConnectKitButton } from "connectkit";
 import DelegateProfileDropdown from "./DelegateProfileDropdown";
 import Image from "next/image";
 import LogoLink from "./LogoLink";
-import styles from "./header.module.scss";
 
 export default function Header() {
   return (
@@ -36,7 +34,7 @@ function ConnectWalletButton() {
 
 export const MobileButton = () => {
   return (
-    <ConnectKitButton.Custom>
+    <w3m-button balance={false}>
       {({ isConnected, show }) => {
         return (
           <div
@@ -53,7 +51,7 @@ export const MobileButton = () => {
           </div>
         );
       }}
-    </ConnectKitButton.Custom>
+    </w3m-button>
   );
 };
 
@@ -61,7 +59,7 @@ function DesktopButton() {
   const { address } = useAccount();
 
   return (
-    <ConnectKitButton.Custom>
+    <>
       {({ show }) => (
         <div
           className={css`
@@ -92,6 +90,7 @@ function DesktopButton() {
           )}
         </div>
       )}
-    </ConnectKitButton.Custom>
+      <w3m-button balance={false} />
+    </>
   );
 }
