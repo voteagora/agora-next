@@ -16,7 +16,7 @@ export async function GET(
   { params: { addressOrENSName } }: { params: { addressOrENSName: string } }
 ) {
   let address = isAddress(addressOrENSName)
-    ? addressOrENSName
+    ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
 
   const delegateVotes = await prisma.votes.findMany({
