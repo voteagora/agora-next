@@ -3,6 +3,7 @@
 // find their styles in the global.scss file
 
 import React, { ReactNode } from "react";
+
 import { VStack } from "@/components/Layout/Stack";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -12,11 +13,11 @@ type Props = {
 
 export function PageContainer({ children }: Props) {
   return (
-    <VStack alignItems="items-center">
+    <div className="container my-4 mx-auto sm:px-6 lg:px-8">
       <div className="bg-dotted-pattern" />
       <div className="bg-radial-gradient" />
       {children}
       <Analytics />
-    </VStack>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import * as theme from "@/lib/theme";
+import * as theme from "@/styles/theme";
 import ENSAvatar from "../shared/ENSAvatar";
 import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
