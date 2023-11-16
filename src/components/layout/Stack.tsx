@@ -1,7 +1,5 @@
 import React, { ReactNode } from "react";
-import { cn } from "@/lib/utils"; // Importing the custom cn function
-import * as theme from "@/lib/theme";
-import { css, cx } from "@emotion/css";
+import * as theme from "@/styles/theme";
 
 type Props = {
   className?: string;
@@ -12,13 +10,32 @@ type Props = {
     | "justify-evenly"
     | "justify-center"
     | "justify-end"
-    | "justify-start";
+    | "justify-start"
+    | "space-around"
+    | "space-between"
+    | "space-evenly"
+    | "stretch"
+    | "center"
+    | "end"
+    | "flex-end"
+    | "flex-start"
+    | "start";
   alignItems?:
     | "items-stretch"
     | "items-center"
     | "items-start"
     | "items-end"
-    | "items-baseline";
+    | "items-baseline"
+    | "center"
+    | "end"
+    | "flex-end"
+    | "flex-start"
+    | "start"
+    | "self-end"
+    | "self-start"
+    | "baseline"
+    | "normal"
+    | "stretch";
   children: ReactNode;
 };
 
@@ -29,17 +46,13 @@ function Stack({
   justifyContent,
   children,
 }: Props) {
+  const gapClass = gap ? `gap-${gap}` : "";
+
   return (
     <div
-      className={cx(
-        css`
-          display: flex;
-          gap: ${gap && theme.spacing[gap]};
-          justify-content: ${justifyContent};
-          align-items: ${alignItems};
-        `,
-        className
-      )}
+      className={`flex ${justifyContent} ${alignItems} ${gapClass} ${
+        className || ""
+      }`}
     >
       {children}
     </div>
@@ -50,7 +63,7 @@ export function VStack(props: Props) {
   return (
     <Stack
       {...props}
-      className={cn("flex-col", props.className)} // Add 'flex-col' for vertical stack
+      className={`flex-col ${props.className}`} // Add 'flex-col' for vertical stack
     />
   );
 }
@@ -59,7 +72,7 @@ export function HStack(props: Props) {
   return (
     <Stack
       {...props}
-      className={cn("flex-row", props.className)} // Add 'flex-row' for horizontal stack
+      className={`flex-row ${props.className || ""}`} // Add 'flex-row' for horizontal stack
     />
   );
 }

@@ -1,0 +1,265 @@
+// Screens
+$screen-sm: 640px;
+$screen-md: 768px;
+$screen-lg: 1024px;
+$screen-xl: 1280px;
+
+// Spacing
+$spacing-px: 1px;
+$spacing-0: 0;
+$spacing-1: 0.25rem;
+$spacing-2: 0.5rem;
+$spacing-3: 0.75rem;
+$spacing-4: 1rem;
+$spacing-5: 1.25rem;
+$spacing-6: 1.5rem;
+$spacing-8: 2rem;
+$spacing-10: 2.5rem;
+$spacing-12: 3rem;
+$spacing-16: 4rem;
+$spacing-20: 5rem;
+$spacing-24: 6rem;
+$spacing-32: 8rem;
+$spacing-40: 10rem;
+$spacing-48: 12rem;
+$spacing-56: 14rem;
+$spacing-64: 16rem;
+
+// Font Sizes
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+$font-size-5xl: 3rem; // 48px
+$font-size-6xl: 4rem; // 64px
+
+// Font Weights
+$font-weight-hairline: 100;
+$font-weight-thin: 200;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+$font-weight-black: 900;
+
+// White
+$white: #ffffff;
+
+// Gray Colors
+$gray-af: #afafaf;
+$gray-eb: #ebebeb;
+$gray-fa: #fafafa;
+$gray-4f: #4f4f4f;
+$gray-100: #f7fafc;
+$gray-200: #edf2f7;
+$gray-300: #e2e8f0;
+$gray-400: #cbd5e0;
+$gray-500: #a0aec0;
+$gray-600: #718096;
+$gray-700: #4a5568;
+$gray-800: #2d3748;
+$gray-900: #1a202c;
+
+// Red Colors
+$red-100: #fff5f5;
+$red-200: #fed7d7;
+$red-300: #feb2b2;
+$red-400: #fc8181;
+$red-500: #f56565;
+$red-600: #e53e3e;
+$red-700: #c53030;
+$red-800: #9b2c2c;
+$red-900: #742a2a;
+
+// Orange Colors
+$orange-100: #fffaf0;
+$orange-200: #feebc8;
+$orange-300: #fbd38d;
+$color-orange-400: #f6ad55;
+$color-orange-500: #ed8936;
+$color-orange-600: #dd6b20;
+$color-orange-700: #c05621;
+$color-orange-800: #9c4221;
+$color-orange-900: #7b341e;
+
+// Yellow Colors
+$color-yellow-100: #fffff0;
+$color-yellow-200: #fefcbf;
+$color-yellow-300: #faf089;
+$color-yellow-400: #f6e05e;
+$color-yellow-500: #ecc94b;
+$color-yellow-600: #d69e2e;
+$color-yellow-700: #b7791f;
+$color-yellow-800: #975a16;
+$color-yellow-900: #744210;
+
+// Green Colors
+$color-green-100: #f0fff4;
+$color-green-200: #c6f6d5;
+$color-green-300: #9ae6b4;
+$color-green-400: #68d391;
+$color-green-500: #48bb78;
+$color-green-600: #38a169;
+$color-green-700: #2f855a;
+$color-green-800: #276749;
+$color-green-900: #22543d;
+
+// Teal Colors
+$color-teal-100: #e6fffa;
+$color-teal-200: #b2f5ea;
+$color-teal-300: #81e6d9;
+$color-teal-400: #4fd1c5;
+$color-teal-500: #38b2ac;
+$color-teal-600: #319795;
+$color-teal-700: #2c7a7b;
+$color-teal-800: #285e61;
+$color-teal-900: #234e52;
+
+// Blue Colors
+$color-blue-100: #ebf8ff;
+$color-blue-200: #bee3f8;
+$color-blue-300: #90cdf4;
+$color-blue-400: #63b3ed;
+$color-blue-500: #4299e1;
+$color-blue-600: #3182ce;
+$color-blue-700: #2b6cb0;
+$color-blue-800: #2c5282;
+$color-blue-900: #2a4365;
+
+// Indigo Colors
+$color-indigo-100: #ebf4ff;
+$color-indigo-200: #c3dafe;
+$color-indigo-300: #a3bffa;
+$color-indigo-400: #7f9cf5;
+$color-indigo-500: #667eea;
+$color-indigo-600: #5a67d8;
+$color-indigo-700: #4c51bf;
+$color-indigo-800: #434190;
+$color-indigo-900: #3c366b;
+
+// Purple Colors
+$color-purple-100: #faf5ff;
+$color-purple-200: #e9d8fd;
+$color-purple-300: #d6bcfa;
+$color-purple-400: #b794f4;
+$color-purple-500: #9c35ee;
+$color-purple-600: #805ad5;
+$color-purple-700: #6b46c1;
+$color-purple-800: #553c9a;
+$color-purple-900: #44337a;
+
+// Pink Colors
+$color-pink-100: #fff5f7;
+$color-pink-200: #fed7e2;
+$color-pink-300: #fbb6ce;
+$color-pink-400: #f687b3;
+$color-pink-500: #ed64a6;
+$color-pink-600: #d53f8c;
+$color-pink-700: #b83280;
+$color-pink-800: #97266d;
+$color-pink-900: #702459;
+
+// Border Radius
+$border-radius-none: 0;
+$border-radius-sm: 0.125rem;
+$border-radius-default: 0.25rem;
+$border-radius-md: 0.375rem;
+$border-radius-lg: 0.5rem;
+$border-radius-xl: 0.75rem;
+$border-radius-full: 9999px;
+
+// Letter Spacing
+$letter-spacing-tighter: -0.05em;
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
+
+// Line Heights
+$line-height-none: 1;
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+$line-height-3: 0.75rem;
+$line-height-4: 1rem;
+$line-height-5: 1.25rem;
+$line-height-6: 1.5rem;
+$line-height-7: 1.75rem;
+$line-height-8: 2rem;
+$line-height-9: 2.25rem;
+$line-height-10: 2.5rem;
+
+// Box Shadows
+$box-shadow-newDefault: 0px 4px 12px rgba(0, 0, 0, 0.02),
+  0px 2px 2px rgba(0, 0, 0, 0.03);
+$box-shadow-xs: 0 0 0 1px rgba(0, 0, 0, 0.05);
+$box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$box-shadow-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+  0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$box-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$box-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$box-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$box-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+$box-shadow-outline: 0 0 0 3px rgba(66, 153, 225, 0.5);
+$box-shadow-none: none;
+
+// Max Widths
+$max-width-none: none;
+$max-width-xs: 20rem;
+$max-width-sm: 24rem;
+$max-width-md: 28rem;
+$max-width-lg: 32rem;
+$max-width-xl: 36rem;
+$max-width-2xl: 42rem;
+$max-width-3xl: 48rem;
+$max-width-4xl: 56rem;
+$max-width-5xl: 64rem;
+$max-width-6xl: 76rem;
+$max-width-full: 100%;
+
+// Font Families
+$font-family-sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
+$font-family-serif: "Georgia, Cambria, 'Times New Roman', Times, serif";
+$font-family-mono: "Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+$font-family-code: "IBM Plex Mono";
+
+// mixins
+// ex: usage
+//  .section_name {
+//      @include inset0;
+//  }
+@mixin inset0 {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

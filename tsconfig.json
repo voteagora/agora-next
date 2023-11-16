@@ -34,7 +34,7 @@
     "src/components/Header/Header.jsx",
     "src/components/Container.jsx",
     "src/components/Button.jsx",
-    "src/components/Navbar.jsx",
+    "src/components/Header/Navbar.jsx",
     "src/app/page.jsx",
     "src/components/Proposals/ProposalVotes.jsx",
     "src/components/Delegates/DelegateCards.jsx"
