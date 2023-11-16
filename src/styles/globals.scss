@@ -3,7 +3,10 @@
 @tailwind utilities;
 @import "@/styles/variables";
 
-.section_title {
+//////////////////////////
+// Titles
+//////////////////////////
+.gl_section_title {
   font-size: $font-size-2xl;
   font-weight: $font-weight-extrabold;
   padding: 0 $spacing-4;
@@ -11,6 +14,24 @@
   @media (max-width: $max-width-lg) {
     margin-bottom: 0px;
   }
+}
+
+//////////////////////////
+// HERO Section
+//////////////////////////
+.gl_hero_bg_image {
+  max-width: $max-width-md;
+}
+
+//////////////////////////
+// Layout Utilities
+//////////////////////////
+.gl_page_divider {
+  background: $gray-300;
+  width: 100%;
+  height: 1px;
+  margin-top: -$spacing-8;
+  z-index: -1;
 }
 
 .bg-radial-gradient {
