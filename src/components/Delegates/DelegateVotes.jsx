@@ -8,7 +8,7 @@ import {
   colorForSupportType,
   getTitleFromProposalDescription,
 } from "@/lib/proposalUtils";
-import { pluralizeVote } from "@/lib/tokenUtils";
+import { formatNumber, pluralizeVote } from "@/lib/tokenUtils";
 import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 
@@ -95,11 +95,18 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                     >
                       Prop {shortAddress(vote.proposal_id)}
                     </a>
-                    {/* <>
-                      {!amount.isZero() ? (
-                        <> asking {utils.formatEther(amount)} ETH</>
+                    <>
+                      {vote.proposalValue != 0n ? (
+                        <>
+                          {" "}
+                          asking {formatNumber(
+                            vote.proposalValue,
+                            "optimism"
+                          )}{" "}
+                          ETH
+                        </>
                       ) : null}{" "}
-                    </> */}
+                    </>
                     {vote.timestamp && (
                       <div>
                         - {formatDistanceToNow(new Date(vote.timestamp))} ago

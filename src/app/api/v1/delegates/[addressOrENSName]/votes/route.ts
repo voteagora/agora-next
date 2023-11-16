@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import {
+  getProposalTotalValue,
   parseParams,
   parseProposalType,
   parseSupport,
@@ -43,6 +44,10 @@ export async function GET(
       proposalType: parseProposalType(vote.proposal_data ?? "{}"),
       proposalData: vote.proposal_data,
       proposalDescription: vote.prop_description,
+      proposalValue: getProposalTotalValue({
+        key: parseProposalType(vote.proposal_data ?? "{}"),
+        kind: JSON.parse(vote.proposal_data ?? "{}"),
+      }),
     })),
   };
 

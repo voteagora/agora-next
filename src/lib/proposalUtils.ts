@@ -98,3 +98,52 @@ export function getTitleFromProposalDescription(description: string = "") {
     "Untitled"
   );
 }
+
+/**
+ * Extract proposal total value
+ */
+
+type ProposalData = {
+  STANDARD: {
+    key: "STANDARD";
+    kind: {
+      targets: string;
+      values: string;
+      signatures: string;
+      calldatas: string;
+    };
+  };
+  // [options, settings]
+  // options: [targets[], values[], calldatas[], description]
+  // settings: [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount
+  APPROVAL: {
+    key: "APPROVAL";
+    kind: [
+      [string[], string[], string[], string][],
+      [string, string, string, string, string]
+    ];
+  };
+};
+
+export function getProposalTotalValue(
+  proposalData: ProposalData["STANDARD"] | ProposalData["APPROVAL"]
+) {
+  switch (proposalData.key) {
+    case "STANDARD": {
+      return (JSON.parse(proposalData.kind.values) as string[]).reduce(
+        (acc, val) => {
+          return acc + BigInt(val);
+        },
+        0n
+      );
+    }
+    case "APPROVAL": {
+      return proposalData.kind[0].reduce((acc, option) => {
+        const values = option[1] as string[];
+        return values.reduce((sum, val) => {
+          return BigInt(val) + sum;
+        }, 0n);
+      }, 0n);
+    }
+  }
+}
