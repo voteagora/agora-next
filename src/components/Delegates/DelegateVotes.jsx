@@ -90,7 +90,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                     `}
                   >
                     <a
-                      href={`/proposals/vote.proposal_id`}
+                      href={`/proposals/${vote.proposal_id}`}
                       title={`Prop ${vote.proposal_id}`}
                     >
                       Prop {shortAddress(vote.proposal_id)}
@@ -121,7 +121,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                       text-overflow: ellipsis;
                     `}
                   >
-                    <a href={`/proposals/vote.proposal_id`}>
+                    <a href={`/proposals/${vote.proposal_id}`}>
                       {shortPropTitle(
                         getTitleFromProposalDescription(
                           vote.proposalDescription
