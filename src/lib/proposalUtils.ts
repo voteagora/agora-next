@@ -20,7 +20,7 @@ export function parseSupport(
     case 1:
       return proposalType === "APPROVAL" ? "ABSTAIN" : "FOR";
     case 2:
-      return "AGAINST";
+      return "ABSTAIN";
   }
 }
 
