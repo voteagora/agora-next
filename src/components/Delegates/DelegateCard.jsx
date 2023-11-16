@@ -1,6 +1,6 @@
 "use client";
 
-import * as theme from "@/lib/theme";
+import * as theme from "@/styles/theme";
 import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { HStack, VStack } from "../Layout/Stack";
 import { css } from "@emotion/css";
-import * as theme from "@/lib/theme";
+import * as theme from "@/styles/theme";
 import {
   colorForSupportType,
   getTitleFromProposalDescription,
