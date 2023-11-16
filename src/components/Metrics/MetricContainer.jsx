@@ -1,6 +1,4 @@
 import { HStack, VStack } from "../Layout/Stack";
-import * as theme from "@/styles/theme";
-import { css } from "@emotion/css";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import styles from "./styles.module.scss";
