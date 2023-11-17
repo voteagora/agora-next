@@ -2,7 +2,7 @@
 
 import * as theme from "@/styles/theme";
 import { css } from "@emotion/css";
-import { HStack, VStack } from "../Layout/Stack";
+import { HStack, VStack } from "../../Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import { DelegateActions } from "./DelegateActions";
