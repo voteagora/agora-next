@@ -1,0 +1,50 @@
+@import "@/styles/variables.scss";
+
+tr.proposal_row_on_chain {
+  :not(:last-child) {
+    border-bottom: 1px solid $gray-300;
+  }
+  transition: background-color 0.1s ease-in-out;
+
+  :hover {
+    background: $gray-fa;
+  }
+
+  @media (max-width: $max-width-lg) {
+    max-width: 100%;
+  }
+  td.proposal_row_cell_primary {
+    padding: 0;
+    width: 50%;
+    .cell_content {
+      padding: $spacing-4 $spacing-6;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+      .cell_content_title {
+        font-size: $font-size-xs;
+        color: $gray-700;
+      }
+      .cell_content_body {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+  td.proposal_row_cell {
+    padding: 0;
+    .cell_content {
+      padding: $spacing-4 $spacing-6;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+      .cell_content_title {
+        font-size: $font-size-xs;
+        color: $gray-700;
+      }
+    }
+  }
+}
