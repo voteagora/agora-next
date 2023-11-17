@@ -10,32 +10,13 @@ type Props = {
     | "justify-evenly"
     | "justify-center"
     | "justify-end"
-    | "justify-start"
-    | "space-around"
-    | "space-between"
-    | "space-evenly"
-    | "stretch"
-    | "center"
-    | "end"
-    | "flex-end"
-    | "flex-start"
-    | "start";
+    | "justify-start";
   alignItems?:
     | "items-stretch"
     | "items-center"
     | "items-start"
     | "items-end"
-    | "items-baseline"
-    | "center"
-    | "end"
-    | "flex-end"
-    | "flex-start"
-    | "start"
-    | "self-end"
-    | "self-start"
-    | "baseline"
-    | "normal"
-    | "stretch";
+    | "items-baseline";
   children: ReactNode;
 };
 
@@ -60,19 +41,9 @@ function Stack({
 }
 
 export function VStack(props: Props) {
-  return (
-    <Stack
-      {...props}
-      className={`flex-col ${props.className}`} // Add 'flex-col' for vertical stack
-    />
-  );
+  return <Stack {...props} className={`flex-col ${props.className}`} />;
 }
 
 export function HStack(props: Props) {
-  return (
-    <Stack
-      {...props}
-      className={`flex-row ${props.className || ""}`} // Add 'flex-row' for horizontal stack
-    />
-  );
+  return <Stack {...props} className={`flex-row ${props.className || ""}`} />;
 }

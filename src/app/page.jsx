@@ -1,4 +1,4 @@
-import ProposalsList from "@/components/Proposals/ProposalsList";
+import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import AgoraAPI from "./lib/agoraAPI";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { VStack } from "@/components/Layout/Stack";
@@ -22,10 +22,10 @@ export default async function Home() {
       <Hero />
       <DAOMetricsHeader />
       <PageDivider />
-      {/* <ProposalsList
+      <ProposalsList
         initialProposals={proposals}
         fetchProposals={fetchProposals}
-      /> */}
+      />
     </VStack>
   );
 }
