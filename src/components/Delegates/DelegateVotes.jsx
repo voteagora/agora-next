@@ -193,9 +193,10 @@ function ApprovalVoteContainer({ params, support, weight }) {
         color: #66676b;
       `}
     >
+      {params?.length > 1 && "Voted: "}
       {params?.map((option, i) => (
         <>
-          Voted: {option}
+          {option}
           {/* add a coma here if not last option */}
           {i !== params.length - 1 && ", "}
         </>
