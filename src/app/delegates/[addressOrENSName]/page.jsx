@@ -4,7 +4,7 @@
  */
 
 import AgoraAPI from "@/app/lib/agoraAPI";
-import DelegateCard from "@/components/Delegates/DelegateCard";
+import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";

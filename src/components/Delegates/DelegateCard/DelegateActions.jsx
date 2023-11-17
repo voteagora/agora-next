@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
-import { Button } from "../Button";
-import { HStack } from "../Layout/Stack";
+import { Button } from "../../Button";
+import { HStack } from "../../Layout/Stack";
 import { useContractWrite } from "wagmi";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 
