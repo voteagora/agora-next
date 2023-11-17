@@ -10,6 +10,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import Link from "next/link";
 import Image from "next/image";
+import Proposal from "../Proposal/Proposal";
 
 export default function ProposalsList({ initialProposals, fetchProposals }) {
   const router = useRouter();
@@ -62,19 +63,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
               element="main"
             >
               {proposals.map((proposal) => (
-                <div key={proposal.id} className="my-4 border-b-2">
-                  proposal by {proposal.proposer}
-                  <br />
-                  <p>Start time: {proposal.start_time}</p>
-                  <br />
-                  <p>End time: {proposal.end_time}</p>
-                  <br />
-                  <Link href={`/proposals/${proposal.id}`}>
-                    <ReactMarkdown>{proposal.markdowntitle}</ReactMarkdown>
-                  </Link>
-                  <br />
-                  <p>Proposal Data: {proposal.proposaData}</p>
-                </div>
+                <Proposal key={proposal.id} proposal={proposal} />
               ))}
             </InfiniteScroll>
           </tbody>
