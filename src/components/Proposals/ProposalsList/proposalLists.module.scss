@@ -1,0 +1,21 @@
+@import "@/styles/variables";
+
+.proposals_list_container {
+  max-width: $max-width-6xl;
+  padding: 0 $spacing-4;
+
+  .proposals_table_container {
+    margin: $spacing-4 0 $spacing-12 0;
+    border: 1px solid $gray-300;
+    border-radius: $border-radius-xl;
+    box-shadow: $box-shadow-newDefault;
+    overflow: hidden;
+
+    .proposals_table {
+      table-layout: fixed;
+      width: 100%;
+      border-collapse: collapse;
+      background-color: $white;
+    }
+  }
+}
