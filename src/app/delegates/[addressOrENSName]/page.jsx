@@ -6,6 +6,8 @@
 import AgoraAPI from "@/app/lib/agoraAPI";
 import DelegateCard from "@/components/Delegates/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import styles from "./styles.module.scss";
 
 async function getDelegate(addressOrENSName) {
   "use server";
@@ -29,19 +31,31 @@ export default async function Page({ params: { addressOrENSName } }) {
   const delegateVotes = await getDelegateVotes(addressOrENSName);
 
   return (
-    <section>
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          <div className="-mx-4 px-4 py-8 shadow-sm ring-1 ring-gray-900/5 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pb-20 xl:pt-16">
-            <h1>{addressOrENSName}</h1>
-            <DelegateCard delegate={delegate} />
-            <DelegateVotes
-              initialVotes={delegateVotes}
-              fetchDelegateVotes={getDelegateVotes}
-            />
-          </div>
-        </div>
-      </div>
-    </section>
+    <HStack
+      className={styles.delegate_container}
+      justifyContent="justify-between"
+      gap={6}
+    >
+      <VStack className={styles.left_container}>
+        <DelegateCard delegate={delegate} />
+
+        {!delegate.statement && (
+          <p>
+            This voter has not submitted a statement. Is this you? Connect your
+            wallet to verify your address, and tell your community what you’d
+            like to see.
+          </p>
+        )}
+      </VStack>
+
+      <VStack className={styles.right_container}>
+        {/** Statement section goes here */}
+
+        <DelegateVotes
+          initialVotes={delegateVotes}
+          fetchDelegateVotes={getDelegateVotes}
+        />
+      </VStack>
+    </HStack>
   );
 }

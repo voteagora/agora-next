@@ -9,7 +9,7 @@ export async function GET(
   { params: { addressOrENSName } }: { params: { addressOrENSName: string } }
 ) {
   const address = isAddress(addressOrENSName)
-    ? addressOrENSName
+    ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
 
   const voterStats = await prisma.voterStats.findFirst({
