@@ -90,7 +90,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                     `}
                   >
                     <a
-                      href={`/proposals/vote.proposal_id`}
+                      href={`/proposals/${vote.proposal_id}`}
                       title={`Prop ${vote.proposal_id}`}
                     >
                       Prop {shortAddress(vote.proposal_id)}
@@ -121,7 +121,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                       text-overflow: ellipsis;
                     `}
                   >
-                    <a href={`/proposals/vote.proposal_id`}>
+                    <a href={`/proposals/${vote.proposal_id}`}>
                       {shortPropTitle(
                         getTitleFromProposalDescription(
                           vote.proposalDescription
@@ -193,15 +193,14 @@ function ApprovalVoteContainer({ params, support, weight }) {
         color: #66676b;
       `}
     >
-      Voted :{" "}
       {params?.map((option, i) => (
         <>
-          {option}
+          Voted: {option}
           {/* add a coma here if not last option */}
           {i !== params.length - 1 && ", "}
         </>
       ))}
-      {params?.length === 0 && "Abstain"}
+      {(!params || params?.length === 0) && "Abstain"}
       <span
         className={css`
           color: ${colorForSupportType(support)};

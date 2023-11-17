@@ -4,11 +4,14 @@ import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
 import HumanAddress from "../shared/HumanAddress";
 import { useEnsName } from "wagmi";
-import { formatNumber } from "@/lib/tokenUtils";
+import { formatNumber, tokens } from "@/lib/tokenUtils";
+import { useMemo } from "react";
 
 export function DelegateProfileImage({ address, votingPower }) {
   // TODO: Load token params from config
-  const formattedNumber = formatNumber(votingPower, "optimism", 4);
+  const formattedNumber = useMemo(() => {
+    return formatNumber(votingPower, "optimism", 4);
+  }, [votingPower]);
 
   const { data } = useEnsName({
     chainId: 1,
@@ -50,7 +53,7 @@ export function DelegateProfileImage({ address, votingPower }) {
           `}
         >
           {/** // TODO: Make currency symbol dynamic */}
-          {formattedNumber} OP
+          {formattedNumber} {tokens["optimism"].symbol}
         </div>
       </VStack>
     </HStack>

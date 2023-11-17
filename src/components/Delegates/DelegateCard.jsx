@@ -5,9 +5,9 @@ import { css } from "@emotion/css";
 import { HStack, VStack } from "../Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
+import { DelegateActions } from "./DelegateActions";
 
 export default function DelegateCard({ delegate }) {
-  console.log(delegate);
   if (!delegate) {
     return null;
   }
@@ -109,6 +109,8 @@ export default function DelegateCard({ delegate }) {
               title="Delegated from"
               detail={pluralizeAddresses(delegate.numOfDelegators)}
             />
+
+            <DelegateActions address={delegate.address} />
           </VStack>
         </div>
       </VStack>
@@ -116,9 +118,9 @@ export default function DelegateCard({ delegate }) {
   );
 }
 
-export const PanelRow = ({ title, detail }) => {
+const PanelRow = ({ title, detail }) => {
   return (
-    <HStack gap="2" justifyContent="space-between" alignItems="baseline">
+    <HStack gap="2" justifyContent="justify-between" alignItems="baseline">
       <span
         className={css`
           white-space: nowrap;
