@@ -1,0 +1,22 @@
+@import "@/styles/variables.scss";
+
+.status-defeated,
+.status-cancelled,
+.status-vetoed,
+.status-expired {
+  color: $red-600;
+}
+
+.status-succeeded,
+.status-executed,
+.status-queued {
+  color: $color-green-600;
+}
+
+.status-pending {
+  color: $black;
+}
+
+.status-active {
+  color: $color-blue-600;
+}
