@@ -9,7 +9,6 @@ import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-import * as theme from "@/lib/theme";
 
 const chains = [mainnet, optimism];
 const metadata = {
