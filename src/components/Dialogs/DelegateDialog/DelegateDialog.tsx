@@ -1,5 +1,5 @@
 import * as theme from "@/styles/theme";
-import { useAccount, useContractWrite } from "wagmi";
+import { useAccount, useBalance, useContractWrite } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { css } from "@emotion/css";
 import { ReactNode, useMemo } from "react";
@@ -43,7 +43,7 @@ export function DelegateDialog({
   );
 }
 
-function OPAmountDisplay({ amount }: { amount: string }) {
+function OPAmountDisplay({ amount }: { amount: bigint | string }) {
   const formattedNumber = useMemo(() => {
     return formatNumber(amount, "optimism", 4);
   }, [amount]);
@@ -74,6 +74,10 @@ function DelegateDialogContents({
   completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
+  const { data: balance } = useBalance({
+    address: accountAddress,
+    token: OptimismContracts.token.address as any,
+  });
 
   const { data, isLoading, isSuccess, isError, write } = useContractWrite({
     address: OptimismContracts.token.address as any,
@@ -109,17 +113,16 @@ function DelegateDialogContents({
           gap={3}
         >
           {(() => {
-            if (true) {
+            if (!balance) {
               return <div>{`You don't have any tokens to delegate`}</div>;
             }
+            return (
+              <>
+                <div>Delegating your</div>
 
-            // return (
-            //   <>
-            //     <div>Delegating your</div>
-
-            //     <OPAmountDisplay fragment={currentAccount.amountOwned.amount} />
-            //   </>
-            // );
+                <OPAmountDisplay amount={balance.value} />
+              </>
+            );
           })()}
         </VStack>
 
