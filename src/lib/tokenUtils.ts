@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-const tokens = {
+export const tokens = {
   optimism: {
     name: "Optimism",
     symbol: "OP",
