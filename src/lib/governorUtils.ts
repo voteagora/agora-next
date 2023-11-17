@@ -16,13 +16,13 @@ export async function getQuorumForProposal(
       if (!proposal) {
         return null;
       }
-      return NounsContracts.governor.quorumVotes(proposal.proposal_id);
+      return NounsContracts.governor.contract.quorumVotes(proposal.proposal_id);
     }
     case "OPTIMISM": {
       if (!proposal?.start_block) {
         return null;
       }
-      return OptimismContracts.governor.quorum(proposal.start_block);
+      return OptimismContracts.governor.contract.quorum(proposal.start_block);
     }
   }
 }
@@ -35,7 +35,7 @@ export async function getCurrentQuorum(dao: "OPTIMISM") {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return OptimismContracts.governor.quorum(latestBlock.number - 1);
+      return OptimismContracts.governor.contract.quorum(latestBlock.number - 1);
     }
   }
 }
