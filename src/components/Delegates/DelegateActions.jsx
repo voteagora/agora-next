@@ -1,6 +1,8 @@
 import { css } from "@emotion/css";
 import { Button } from "../Button";
 import { HStack } from "../Layout/Stack";
+import { useContractWrite } from "wagmi";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 // TODO: add twitter and discord links (from delegate statement)
 export function DelegateActions({ className, address }) {
@@ -17,14 +19,17 @@ export function DelegateActions({ className, address }) {
 }
 
 function DelegateButton({ full, address }) {
-  const makeDelegation = async () => {
-    // TODO: write to token contract
-  };
+  const { data, isLoading, isSuccess, write } = useContractWrite({
+    address: OptimismContracts.token.address,
+    abi: OptimismContracts.token.abi,
+    functionName: "delegate",
+    args: [address],
+  });
 
   return (
     <Button
       onClick={() => {
-        makeDelegation();
+        write();
       }}
       className={
         full &&
