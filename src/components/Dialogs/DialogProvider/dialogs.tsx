@@ -11,6 +11,7 @@ export type DelegateDialogType = {
   type: "DELEGATE";
   params: {
     target: string;
+    votingPower: string;
   };
 };
 
@@ -49,8 +50,14 @@ export type DelegateDialogType = {
 // };
 
 export const dialogs: DialogDefinitions<DialogType> = {
-  DELEGATE: ({ target }, closeDialog) => {
-    return <DelegateDialog target={target} completeDelegation={closeDialog} />;
+  DELEGATE: ({ target, votingPower }, closeDialog) => {
+    return (
+      <DelegateDialog
+        target={target}
+        votingPower={votingPower}
+        completeDelegation={closeDialog}
+      />
+    );
   },
   // CAST_VOTE: ({ ...props }, closeDialog) => {
   //   return <CastVoteDialog {...props} closeDialog={closeDialog} />;
