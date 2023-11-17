@@ -1,0 +1,19 @@
+@import "@/styles/variables";
+
+.page_header_container {
+  margin-top: $spacing-16;
+  margin-bottom: $spacing-4;
+  @media (max-width: $max-width-lg) {
+    max-width: 100%;
+    flex-direction: column;
+    margin-bottom: $spacing-0;
+    margin-top: $spacing-4;
+  }
+  h1 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-extrabold;
+    @media (max-width: $max-width-lg) {
+      margin-bottom: $spacing-0;
+    }
+  }
+}
