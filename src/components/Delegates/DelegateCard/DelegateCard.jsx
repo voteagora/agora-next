@@ -110,7 +110,10 @@ export default function DelegateCard({ delegate }) {
               detail={pluralizeAddresses(delegate.numOfDelegators)}
             />
 
-            <DelegateActions address={delegate.address} />
+            <DelegateActions
+              address={delegate.address}
+              votingPower={delegate.votingPower}
+            />
           </VStack>
         </div>
       </VStack>
