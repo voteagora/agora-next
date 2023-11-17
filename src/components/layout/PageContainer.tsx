@@ -14,8 +14,8 @@ type Props = {
 export function PageContainer({ children }: Props) {
   return (
     <div className="container my-4 mx-auto sm:px-6 lg:px-8">
-      <div className="bg-dotted-pattern" />
-      <div className="bg-radial-gradient" />
+      <div className="gl_bg-dotted-pattern" />
+      <div className="gl_bg-radial-gradient" />
       {children}
       <Analytics />
     </div>
