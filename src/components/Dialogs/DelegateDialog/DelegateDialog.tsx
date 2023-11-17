@@ -11,9 +11,11 @@ import styles from "./delegateDialog.module.scss";
 
 export function DelegateDialog({
   target,
+  votingPower,
   completeDelegation,
 }: {
   target: string;
+  votingPower: string;
   completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
@@ -76,7 +78,7 @@ export function DelegateDialog({
               To <ENSName address={target} /> who represents
             </div>
 
-            <DelegationDisplayAmount amount={"500000000000000000000000"} />
+            <DelegationDisplayAmount amount={votingPower} />
           </VStack>
         </VStack>
         {!accountAddress && (
