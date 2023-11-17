@@ -17,7 +17,9 @@ export default function Proposal({ proposal }) {
               </>
             </div>
             <div className={styles.cell_content_body}>
-              {proposal.markdowntitle}
+              {proposal.markdowntitle.length > 100
+                ? `${proposal.markdowntitle.slice(0, 98)}...`
+                : proposal.markdowntitle}
             </div>
           </VStack>
         </Link>
@@ -27,6 +29,14 @@ export default function Proposal({ proposal }) {
           <div className={styles.cell_content_title}>Title</div>
           <div className={styles.cell_content_body}>
             <ProposalStatus proposal={proposal} />
+          </div>
+        </VStack>
+      </td>
+      <td className={styles.proposal_row_cell}>
+        <VStack className={styles.cell_content} alignItems="items-start">
+          <div className={styles.cell_content_title}>Vote ended 2 days ago</div>
+          <div className={styles.cell_content_body}>
+            8 Options
           </div>
         </VStack>
       </td>
