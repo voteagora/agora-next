@@ -1,20 +1,18 @@
 import { Button } from "@/components/Button";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { css } from "@emotion/css";
-import { useContractWrite } from "wagmi";
 
 export function DelegateButton({ full, address }) {
-  const { data, isLoading, isSuccess, write } = useContractWrite({
-    address: OptimismContracts.token.address,
-    abi: OptimismContracts.token.abi,
-    functionName: "delegate",
-    args: [address],
-  });
+  const openDialog = useOpenDialog();
 
   return (
     <Button
-      onClick={() => {
-        write();
+      onClick={(e) => {
+        e.preventDefault();
+        openDialog({
+          type: "DELEGATE",
+          params: { target: address },
+        });
       }}
       className={
         full &&
