@@ -1,14 +1,13 @@
 import * as theme from "@/styles/theme";
-import ENSAvatar from "../shared/ENSAvatar";
+import ENSAvatar from "../../shared/ENSAvatar";
 import { css } from "@emotion/css";
-import { HStack, VStack } from "../Layout/Stack";
-import HumanAddress from "../shared/HumanAddress";
+import { HStack, VStack } from "../../Layout/Stack";
+import HumanAddress from "../../shared/HumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber, tokens } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 
 export function DelegateProfileImage({ address, votingPower }) {
-  // TODO: Load token params from config
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower, "optimism", 4);
   }, [votingPower]);
@@ -52,7 +51,6 @@ export function DelegateProfileImage({ address, votingPower }) {
             color: #4f4f4f;
           `}
         >
-          {/** // TODO: Make currency symbol dynamic */}
           {formattedNumber} {tokens["optimism"].symbol}
         </div>
       </VStack>
