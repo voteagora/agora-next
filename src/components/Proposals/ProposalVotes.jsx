@@ -3,6 +3,7 @@ import AgoraAPI from "@/app/lib/agoraAPI";
 import HumanAddress from "@/components/shared/HumanAddress";
 import HumanVote from "@/components/shared/HumanVote";
 import Image from "next/image";
+import { formatDistanceToNow } from "date-fns";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -85,12 +86,10 @@ export const ProposalVotes = ({ proposal_id }) => {
                 </span>{" "}
                 voted <HumanVote support={vote.support} />
               </div>
-              <time
-                dateTime="2023-01-24T09:20"
-                className="flex-none py-0.5 text-xs leading-5 text-gray-500"
-              >
-                1d ago
-              </time>
+
+              <div className="flex-none py-0.5 text-xs leading-5 text-gray-500">
+                {formatDistanceToNow(new Date(vote.timestamp))} ago
+              </div>
             </div>
             {vote.params &&
               vote.params.map((param, paramIdx) => (

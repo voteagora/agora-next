@@ -6,6 +6,8 @@ import {
   parseProposalType,
   parseSupport,
 } from "@/lib/proposalUtils";
+import provider from "@/app/lib/provider";
+import { getHumanBlockTime } from "@/lib/blockTimes";
 
 export async function GET(
   request: NextRequest,
@@ -47,6 +49,7 @@ export async function GET(
   // });
 
   const proposalType = parseProposalType(votes[0].proposal_data ?? "{}");
+  const latestBlock = await provider.getBlock("latest");
 
   // Build out proposal response
   const response = {
@@ -63,6 +66,13 @@ export async function GET(
       amount: vote.weight,
       reason: vote.reason,
       params: parseParams(vote.params, vote.proposal_data),
+      timestamp: latestBlock
+        ? getHumanBlockTime(
+            vote.block_number,
+            latestBlock.number,
+            latestBlock.timestamp
+          )
+        : null,
     })),
   };
 
