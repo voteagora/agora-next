@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { parseParams, parseSupport } from "@/lib/proposalUtils";
+import {
+  parseParams,
+  parseProposalType,
+  parseSupport,
+} from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
@@ -42,6 +46,8 @@ export async function GET(
   //       },
   // });
 
+  const proposalType = parseProposalType(votes[0].proposal_data ?? "{}");
+
   // Build out proposal response
   const response = {
     meta: {
@@ -53,7 +59,7 @@ export async function GET(
     votes: votes.map((vote) => ({
       address: vote.voter,
       proposal_id: vote.proposal_id,
-      support: parseSupport(vote.support, !!vote.params),
+      support: parseSupport(vote.support, proposalType),
       amount: vote.weight,
       reason: vote.reason,
       params: parseParams(vote.params, vote.proposal_data),
