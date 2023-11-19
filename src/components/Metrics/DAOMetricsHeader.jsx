@@ -6,7 +6,7 @@ import {
 import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import { HStack } from "../Layout/Stack";
 import MetricContainer from "./MetricContainer";
-import { formatNumber, tokens } from "@/lib/tokenUtils";
+import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 
 const stats = [
@@ -39,9 +39,9 @@ const stats = [
 export default function DAOMetricsHeader({ metrics }) {
   const formattedMetrics = useMemo(() => {
     return {
-      votableSupply: formatNumber(metrics.votableSupply, "optimism", 4),
-      totalSupply: formatNumber(metrics.totalSupply, "optimism", 4),
-      quorum: formatNumber(metrics.quorum, "optimism", 4),
+      votableSupply: formatNumber(metrics.votableSupply),
+      totalSupply: formatNumber(metrics.totalSupply),
+      quorum: formatNumber(metrics.quorum),
     };
   }, [metrics]);
 
@@ -54,8 +54,8 @@ export default function DAOMetricsHeader({ metrics }) {
         title="Delegated / Total supply"
         body={
           <>
-            {formattedMetrics.votableSupply} {tokens.optimism.symbol} /{" "}
-            {formattedMetrics.totalSupply} {tokens.optimism.symbol}
+            {formattedMetrics.votableSupply} {TOKEN.symbol} /{" "}
+            {formattedMetrics.totalSupply} {TOKEN.symbol}
           </>
         }
       />
@@ -64,7 +64,7 @@ export default function DAOMetricsHeader({ metrics }) {
         title="Quorum"
         body={
           <>
-            {formattedMetrics.quorum} {tokens.optimism.symbol}
+            {formattedMetrics.quorum} {TOKEN.symbol}
           </>
         }
       />
