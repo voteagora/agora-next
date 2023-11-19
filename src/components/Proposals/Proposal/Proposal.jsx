@@ -7,8 +7,15 @@ import ProposalStatus from "../ProposalStatus/ProposalStatus";
 export default function Proposal({ proposal }) {
   return (
     <Link href={`/proposals/${proposal.id}`}>
-      <HStack justifyContent="justify-between" alignItems="items-start" className="p-4 border-b-2">
-        <VStack className={styles.cell_content} alignItems="items-start">
+      <HStack
+        justifyContent="justify-between"
+        alignItems="items-start"
+        className="p-4 border-b-2"
+      >
+        <VStack
+          className={styles.cell_content_primary}
+          alignItems="items-start"
+        >
           <div className={styles.cell_content_title}>
             <>
               Proposal by {proposal.proposer}
@@ -16,8 +23,8 @@ export default function Proposal({ proposal }) {
             </>
           </div>
           <div className={styles.cell_content_body}>
-            {proposal.markdowntitle.length > 100
-              ? `${proposal.markdowntitle.slice(0, 98)}...`
+            {proposal.markdowntitle.length > 80
+              ? `${proposal.markdowntitle.slice(0, 80)}...`
               : proposal.markdowntitle}
           </div>
         </VStack>
