@@ -6,8 +6,8 @@ import ProposalStatus from "../ProposalStatus/ProposalStatus";
 
 export default function Proposal({ proposal }) {
   return (
-    <tr className={styles.proposal_row_on_chain}>
-      <td className={styles.proposal_row_cell_primary}>
+    <div className={styles.proposal_row_on_chain}>
+      <div className={styles.proposal_row_cell_primary}>
         <Link href={`/proposals/${proposal.id}`}>
           <VStack className={styles.cell_content} alignItems="items-start">
             <div className={styles.cell_content_title}>
@@ -23,23 +23,21 @@ export default function Proposal({ proposal }) {
             </div>
           </VStack>
         </Link>
-      </td>
-      <td className={styles.proposal_row_cell}>
+      </div>
+      <div className={styles.proposal_row_cell}>
         <VStack className={styles.cell_content} alignItems="items-start">
           <div className={styles.cell_content_title}>Title</div>
           <div className={styles.cell_content_body}>
             <ProposalStatus proposal={proposal} />
           </div>
         </VStack>
-      </td>
-      <td className={styles.proposal_row_cell}>
+      </div>
+      <div className={styles.proposal_row_cell}>
         <VStack className={styles.cell_content} alignItems="items-start">
           <div className={styles.cell_content_title}>Vote ended 2 days ago</div>
-          <div className={styles.cell_content_body}>
-            8 Options
-          </div>
+          <div className={styles.cell_content_body}>8 Options</div>
         </VStack>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 }
