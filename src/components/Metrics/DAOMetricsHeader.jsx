@@ -5,10 +5,9 @@ import {
 } from "@heroicons/react/20/solid";
 import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import { HStack } from "../Layout/Stack";
-import * as theme from "@/styles/theme";
-import { css } from "@emotion/css";
 import MetricContainer from "./MetricContainer";
-import { bpsToString } from "@/lib/utils";
+import { formatNumber, tokens } from "@/lib/tokenUtils";
+import { useMemo } from "react";
 
 const stats = [
   {
@@ -37,15 +36,38 @@ const stats = [
   },
 ];
 
-export default function DAOMetricsHeader() {
+export default function DAOMetricsHeader({ metrics }) {
+  const formattedMetrics = useMemo(() => {
+    return {
+      votableSupply: formatNumber(metrics.votableSupply, "optimism", 4),
+      totalSupply: formatNumber(metrics.totalSupply, "optimism", 4),
+      quorum: formatNumber(metrics.quorum, "optimism", 4),
+    };
+  }, [metrics]);
+
+  console.log(metrics);
+
   return (
     <HStack justifyContent="justify-between" gap={10}>
       <MetricContainer
-        icon="ballot"
+        icon="community"
         title="Delegated / Total supply"
-        body={<>79.79M OP / 4.295B OP</>}
+        body={
+          <>
+            {formattedMetrics.votableSupply} {tokens.optimism.symbol} /{" "}
+            {formattedMetrics.totalSupply} {tokens.optimism.symbol}
+          </>
+        }
       />
-      <MetricContainer icon="ballot" title="Quorum" body={`24.09M OP`} />
+      <MetricContainer
+        icon="ballot"
+        title="Quorum"
+        body={
+          <>
+            {formattedMetrics.quorum} {tokens.optimism.symbol}
+          </>
+        }
+      />
       <MetricContainer
         icon="pedestrian"
         title="Learn more"

@@ -183,3 +183,10 @@ view NumberOfDelegators {
   @@map("num_of_delegators")
   @@schema("center")
 }
+
+view VotableSupply {
+  votable_supply String @unique
+
+  @@map("votable_supply")
+  @@schema("center")
+}

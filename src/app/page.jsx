@@ -14,13 +14,22 @@ async function fetchProposals(page = 1) {
   return { proposals: data.proposals, meta: data.meta };
 }
 
+async function fetchDaoMetrics() {
+  "use server";
+
+  const api = new AgoraAPI();
+  const data = await api.get(`/metrics`);
+  return data;
+}
+
 export default async function Home() {
   const proposals = await fetchProposals();
+  const metrics = await fetchDaoMetrics();
 
   return (
     <VStack className={styles.metrics_container}>
       <Hero />
-      <DAOMetricsHeader />
+      <DAOMetricsHeader metrics={metrics} />
       <PageDivider />
       <ProposalsList
         initialProposals={proposals}
