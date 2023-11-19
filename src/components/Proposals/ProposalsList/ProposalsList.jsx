@@ -43,31 +43,29 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
       <PageHeader headerText="All Proposals" />
 
       <VStack className={styles.proposals_table_container}>
-        <table className={styles.proposals_table}>
-          <tbody>
-            <InfiniteScroll
-              hasMore={pages.length < meta.total_pages}
-              pageStart={0}
-              loadMore={loadMore}
-              loader={
-                <div key="loader">
-                  Loading... <br />
-                  <Image
-                    src="/images/blink.gif"
-                    alt="Blinking Agora Logo"
-                    width={50}
-                    height={20}
-                  />
-                </div>
-              }
-              element="main"
-            >
-              {proposals.map((proposal) => (
-                <Proposal key={proposal.id} proposal={proposal} />
-              ))}
-            </InfiniteScroll>
-          </tbody>
-        </table>
+        <div className={styles.proposals_table}>
+          <InfiniteScroll
+            hasMore={pages.length < meta.total_pages}
+            pageStart={0}
+            loadMore={loadMore}
+            loader={
+              <div key="loader">
+                Loading... <br />
+                <Image
+                  src="/images/blink.gif"
+                  alt="Blinking Agora Logo"
+                  width={50}
+                  height={20}
+                />
+              </div>
+            }
+            element="main"
+          >
+            {proposals.map((proposal) => (
+              <Proposal key={proposal.id} proposal={proposal} />
+            ))}
+          </InfiniteScroll>
+        </div>
       </VStack>
     </VStack>
   );

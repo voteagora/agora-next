@@ -11,7 +11,7 @@ tr.proposal_row_on_chain {
   @media (max-width: $max-width-lg) {
     max-width: 100%;
   }
-  td.proposal_row_cell_primary {
+  .proposal_row_cell_primary {
     padding: 0;
     width: 50%;
     .cell_content {
@@ -31,7 +31,7 @@ tr.proposal_row_on_chain {
       }
     }
   }
-  td.proposal_row_cell {
+  .proposal_row_cell {
     padding: 0;
     .cell_content {
       padding: $spacing-4 $spacing-6;
