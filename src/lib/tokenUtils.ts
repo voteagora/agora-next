@@ -68,7 +68,7 @@ export function formatNumber(
  * Contract calls
  *
  */
-export async function getVotableSupply(dao: "OPTIMISM") {
+export async function getTokenSupply(dao: "OPTIMISM") {
   switch (dao) {
     case "OPTIMISM": {
       return OptimismContracts.token.contract.totalSupply();
