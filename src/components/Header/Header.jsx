@@ -58,39 +58,45 @@ export const MobileButton = () => {
 function DesktopButton() {
   const { address } = useAccount();
 
+  const renderContent = (show) => {
+    return (
+      <div
+        className={css`
+          border: 1px solid ${theme.colors.gray.eb};
+          background-color: ${theme.colors.gray.fa};
+          border-radius: ${theme.borderRadius.full};
+          transition: 0.3s background-color;
+          position: relative;
+          top: 10px;
+
+          :hover {
+            background: ${theme.colors.gray.eb};
+          }
+        `}
+      >
+        {address ? (
+          <DelegateProfileDropdown address={address} />
+        ) : (
+          <div
+            className={css`
+              padding: ${theme.spacing[2]} ${theme.spacing[5]};
+              cursor: pointer;
+            `}
+            onClick={show}
+          >
+            Connect Wallet
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
-      {({ show }) => (
-        <div
-          className={css`
-            border: 1px solid ${theme.colors.gray.eb};
-            background-color: ${theme.colors.gray.fa};
-            border-radius: ${theme.borderRadius.full};
-            transition: 0.3s background-color;
-            position: relative;
-            top: 10px;
-
-            :hover {
-              background: ${theme.colors.gray.eb};
-            }
-          `}
-        >
-          {address ? (
-            <DelegateProfileDropdown address={address} />
-          ) : (
-            <div
-              className={css`
-                padding: ${theme.spacing[2]} ${theme.spacing[5]};
-                cursor: pointer;
-              `}
-              onClick={show}
-            >
-              Connect Wallet
-            </div>
-          )}
-        </div>
-      )}
-      <w3m-button balance={false} />
+      {/* Assuming w3m-button component handles children as a render prop */}
+      <w3m-button balance={false}>
+        {({ show }) => renderContent(show)}
+      </w3m-button>
     </>
   );
 }
