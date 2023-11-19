@@ -9,7 +9,7 @@ import { useMemo } from "react";
 
 export function DelegateProfileImage({ address, votingPower }) {
   const formattedNumber = useMemo(() => {
-    return formatNumber(votingPower, "optimism", 4);
+    return formatNumber(votingPower);
   }, [votingPower]);
 
   const { data } = useEnsName({

@@ -97,14 +97,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                     </a>
                     <>
                       {vote.proposalValue != 0n ? (
-                        <>
-                          {" "}
-                          asking {formatNumber(
-                            vote.proposalValue,
-                            "optimism"
-                          )}{" "}
-                          ETH
-                        </>
+                        <> asking {formatNumber(vote.proposalValue)} ETH</>
                       ) : null}{" "}
                     </>
                     {vote.timestamp && (

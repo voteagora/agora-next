@@ -1,13 +1,24 @@
 import { ethers } from "ethers";
 import { OptimismContracts } from "./contracts/contracts";
+import { DEPLOYMENT_NAME, Deployments } from "./config";
 
-export const tokens = {
-  optimism: {
-    name: "Optimism",
-    symbol: "OP",
-    decimals: 18,
-  },
-};
+// TODO: This file seems messy -- consider refactoring
+
+const tokens: Map<
+  Deployments,
+  { name: string; symbol: string; decimals: number }
+> = new Map([
+  [
+    "optimism",
+    {
+      name: "Optimism",
+      symbol: "OP",
+      decimals: 18,
+    },
+  ],
+]);
+
+export const TOKEN = tokens.get(DEPLOYMENT_NAME)!;
 
 const format = new Intl.NumberFormat("en", {
   style: "decimal",
@@ -15,9 +26,9 @@ const format = new Intl.NumberFormat("en", {
   notation: "compact",
 });
 
-export function pluralizeVote(count: BigInt, token: keyof typeof tokens) {
+export function pluralizeVote(count: BigInt) {
   const votes = Number(
-    ethers.formatUnits(count.toString(), tokens[token].decimals)
+    ethers.formatUnits(count.toString(), tokens.get(DEPLOYMENT_NAME)!.decimals)
   );
 
   if (votes === 1) {
@@ -31,11 +42,10 @@ export function pluralizeVote(count: BigInt, token: keyof typeof tokens) {
 
 export function formatNumber(
   amount: string | BigInt,
-  token: keyof typeof tokens,
   maximumSignificantDigits = 4
 ) {
   const number = Number(
-    ethers.formatUnits(amount.toString(), tokens[token].decimals)
+    ethers.formatUnits(amount.toString(), tokens.get(DEPLOYMENT_NAME)!.decimals)
   );
 
   const numberFormat = new Intl.NumberFormat("en", {
