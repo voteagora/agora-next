@@ -7,7 +7,7 @@ import { inter, rubik } from "@/styles/fonts";
 import { cn } from "@/lib/utils";
 import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
-import { PageContainer } from "@/components/Layout/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
 const chains = [mainnet, optimism];
