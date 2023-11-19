@@ -1,7 +1,7 @@
 import * as theme from "@/styles/theme";
 import ENSAvatar from "../../shared/ENSAvatar";
 import { css } from "@emotion/css";
-import { HStack, VStack } from "../../Layout/Stack";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "../../shared/HumanAddress";
 import { useEnsName } from "wagmi";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";

@@ -1,8 +1,6 @@
-import * as theme from "@/styles/theme";
 import { useAccount, useBalance, useContractWrite } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import { css } from "@emotion/css";
-import { VStack } from "../../Layout/Stack";
+import { VStack } from "@/components/Layout/Stack";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import ENSName from "@/components/shared/ENSName";
 import { DelegationDisplayAmount } from "./DelegationDisplayAmount";
