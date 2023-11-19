@@ -1,5 +1,5 @@
 import { HStack } from "@/components/Layout/Stack";
-import { formatNumber, tokens } from "@/lib/tokenUtils";
+import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import Image from "next/image";
 import { useMemo } from "react";
 import tokenIcon from "@/icons/tokenIcon.svg";
@@ -11,7 +11,7 @@ export function DelegationDisplayAmount({
   amount: bigint | string;
 }) {
   const formattedNumber = useMemo(() => {
-    return formatNumber(amount, "optimism", 4);
+    return formatNumber(amount);
   }, [amount]);
 
   return (
@@ -20,8 +20,8 @@ export function DelegationDisplayAmount({
       className={styles.token_amount_container}
       alignItems="items-center"
     >
-      <Image src={tokenIcon} alt={"OP"} width={32} height={32} />
-      {formattedNumber} {tokens.optimism.symbol}
+      <Image src={tokenIcon} alt={TOKEN.symbol} width={32} height={32} />
+      {formattedNumber} {TOKEN.symbol}
     </HStack>
   );
 }
