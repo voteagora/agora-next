@@ -7,27 +7,34 @@
   :hover {
     background: $gray-fa;
   }
+}
 
-  .proposal_row_cell_primary {
-    .cell_content {
-      .cell_content_title {
-        font-size: $font-size-xs;
-        color: $gray-700;
-      }
-      .cell_content_body {
-      }
-    }
+.cell_content {
+  padding: $spacing-4 $spacing-6;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  .cell_content_title {
+    font-size: $font-size-xs;
+    color: $gray-700;
   }
-  .proposal_row_cell {
-    padding: 0;
-    .cell_content {
-      padding: $spacing-4 $spacing-6;
-      .cell_content_title {
-        font-size: $font-size-xs;
-        color: $gray-700;
-      }
-      .cell_content_body {
-      }
-    }
+  .cell_content_body {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.cell_content_primary {
+  padding: $spacing-4 $spacing-6;
+  white-space: nowrap;
+  width:50%;
+  text-overflow: ellipsis;
+  .cell_content_title {
+    font-size: $font-size-xs;
+    color: $gray-700;
+  }
+  .cell_content_body {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
