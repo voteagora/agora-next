@@ -42,3 +42,6 @@ next-env.d.ts
 
 # typechain
 src/lib/contracts/generated
+
+# Sentry Config File
+.sentryclirc
