@@ -1,4 +1,4 @@
-import { HStack } from "../../Layout/Stack";
+import { HStack } from "@/components/Layout/Stack";
 import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
 
