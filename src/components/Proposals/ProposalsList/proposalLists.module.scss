@@ -9,12 +9,5 @@
     border-radius: $border-radius-xl;
     box-shadow: $box-shadow-newDefault;
     overflow: hidden;
-
-    .proposals_table {
-      table-layout: fixed;
-      width: 100%;
-      border-collapse: collapse;
-      background-color: $white;
-    }
   }
 }
