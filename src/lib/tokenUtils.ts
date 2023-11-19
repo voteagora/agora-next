@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { OptimismContracts } from "./contracts/contracts";
 
 export const tokens = {
   optimism: {
@@ -51,4 +52,16 @@ export function formatNumber(
     .filter((part) => part.type !== "currency" && part.type !== "literal")
     .map((part) => part.value)
     .join("");
+}
+
+/**
+ * Contract calls
+ *
+ */
+export async function getVotableSupply(dao: "OPTIMISM") {
+  switch (dao) {
+    case "OPTIMISM": {
+      return OptimismContracts.token.contract.totalSupply();
+    }
+  }
 }
