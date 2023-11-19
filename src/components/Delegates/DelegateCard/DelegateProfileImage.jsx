@@ -4,7 +4,7 @@ import { css } from "@emotion/css";
 import { HStack, VStack } from "../../Layout/Stack";
 import HumanAddress from "../../shared/HumanAddress";
 import { useEnsName } from "wagmi";
-import { formatNumber, tokens } from "@/lib/tokenUtils";
+import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 
 export function DelegateProfileImage({ address, votingPower }) {
@@ -51,7 +51,7 @@ export function DelegateProfileImage({ address, votingPower }) {
             color: #4f4f4f;
           `}
         >
-          {formattedNumber} {tokens["optimism"].symbol}
+          {formattedNumber} {TOKEN.symbol}
         </div>
       </VStack>
     </HStack>
