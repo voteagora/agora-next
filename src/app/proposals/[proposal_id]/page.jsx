@@ -1,31 +1,38 @@
-"use client";
+import React from "react";
+import AgoraAPI from "../../../app/lib/agoraAPI";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import ProposalDescription from "@/components/Proposals/ProposalPage/ProposalDescription";
+import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
+import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 
-import styles from "./styles.module.scss";
-// import AgoraAPI from "@/app/lib/agoraAPI";
-import AgoraSuspense from "@/components/shared/AgoraSuspense";
-// import ReactMarkdown from "react-markdown";
-import ProposalDescription from "@/components/Proposals/ProposalDescription";
-import { ProposalVotes } from "@/components/Proposals/ProposalVotes";
-import ProposalResults from "@/components/Proposals/ProposalResults";
+async function fetchProposal(proposal_id) {
+  "use server";
 
-export default function Page({ params: { proposal_id } }) {
+  const api = new AgoraAPI();
+  const data = await api.get(`/proposals/${proposal_id}`);
+  return { proposal: data.proposal };
+}
+
+export default async function Page({ params: { proposal_id } }) {
+  const { proposal } = await fetchProposal(proposal_id);
+  console.log(proposal);
+
+  let RenderComponent;
+  switch (proposal.proposalType) {
+    case "STANDARD":
+      RenderComponent = OPProposalPage;
+      break;
+    case "APPROVAL":
+      RenderComponent = OPProposalApprovalPage;
+      break;
+    default:
+      RenderComponent = null; // Or some default component
+  }
+
   return (
-    <section className={styles.proposal_show}>
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          <div className="-mx-4 px-2 py-8 sm:mx-0 sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pb-20 xl:pt-4">
-            <ProposalDescription proposal_id={proposal_id} />
-          </div>
-          <div className="lg:col-start-3 lg:row-end-1 agora_votes">
-            <h2>Results</h2>
-            <ProposalResults proposal_id={proposal_id} />
-            <h2>Votes</h2>
-            <AgoraSuspense>
-              <ProposalVotes proposal_id={proposal_id} />
-            </AgoraSuspense>
-          </div>
-        </div>
-      </div>
-    </section>
+    <HStack justifyContent="justify-between">
+      <div>{RenderComponent && <RenderComponent proposal={proposal} />}</div>
+      <VStack gap={6}></VStack>
+    </HStack>
   );
 }
