@@ -190,3 +190,12 @@ view VotableSupply {
   @@map("votable_supply")
   @@schema("center")
 }
+
+view Delegates {
+  delegate           String   @unique
+  voting_power       Decimal? @db.Decimal
+  num_for_delegators BigInt?
+
+  @@map("delegates")
+  @@schema("center")
+}
