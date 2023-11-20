@@ -42,7 +42,9 @@ export default function ENSAvatar({ ensName }) {
   const [avatar, setAvatar] = useState(altAvatar);
 
   useEffect(() => {
-    setAvatar(data);
+    if (data) {
+      setAvatar(data);
+    }
   }, [data]);
 
   return (
