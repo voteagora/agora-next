@@ -9,10 +9,6 @@ import {
 } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
 
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
-
 export async function GET(request: NextRequest) {
   let page = parseInt(request.nextUrl.searchParams.get("page") ?? "0", 10);
   if (isNaN(page) || page < 1) {
@@ -28,11 +24,13 @@ export async function GET(request: NextRequest) {
       ordinal: "desc",
     },
   });
+  const hasNextPage = proposals.length > pageSize;
+  const theProposals = proposals.slice(0, pageSize);
 
   const latestBlock = await provider.getBlock("latest");
 
   const resolvedProposals = Promise.all(
-    proposals.slice(0, -1).map(async (proposal) => {
+    theProposals.map(async (proposal) => {
       const proposalData = parseProposalData(
         JSON.stringify(proposal.proposal_data || {}),
         proposal.proposal_type as "STANDARD" | "APPROVAL"
@@ -81,8 +79,6 @@ export async function GET(request: NextRequest) {
       };
     })
   );
-
-  const hasNextPage = proposals.length > pageSize;
 
   // Build out proposal response
   const response = {
