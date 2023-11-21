@@ -17,13 +17,12 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
   const [meta, setMeta] = React.useState(initialDelegates.meta);
 
   const loadMore = async (page) => {
-    console.log("loadMore", page);
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchDelegates(page);
-      const existingIds = new Set(delegates.map((p) => p.id));
+      const existingIds = new Set(delegates.map((d) => d.address));
       const uniqueDelegates = data.delegates.filter(
-        (p) => !existingIds.has(p.id)
+        (d) => !existingIds.has(d.address)
       );
       setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
       setMeta(data.meta);
@@ -34,14 +33,9 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
   const delegates = pages.reduce((all, page) => all.concat(page.delegates), []);
 
   return (
-    <div
-      className={css`
-        overflow: auto;
-        max-height: 80vh;
-      `}
-    >
+    <div>
       <InfiniteScroll
-        hasMore={false}
+        hasMore={meta.hasNextPage}
         pageStart={0}
         loadMore={loadMore}
         loader={
