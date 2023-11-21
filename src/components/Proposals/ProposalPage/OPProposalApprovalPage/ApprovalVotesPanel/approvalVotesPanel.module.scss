@@ -1,0 +1,26 @@
+@import "@/styles/variables.scss";
+
+.approval_votes_panel_container {
+  display: flex;
+  flex-direction: column;
+  .approval_votes_panel {
+    position: relative;
+    min-height: 0;
+    height: 100%;
+    font-family: $font-family-sans;
+    .approval_vote_tab_container {
+      height: $spacing-12;
+      padding-top: $spacing-4;
+      padding-left: $spacing-4;
+      padding-right: $spacing-4;
+      div {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        line-height: $line-height-normal;
+        color: $gray-af;
+        padding-right: $spacing-4;
+        cursor: pointer;
+      }
+    }
+  }
+}
