@@ -8,29 +8,34 @@ import {
   getTitleFromProposalDescription,
 } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
+import { paginatePrismaResult } from "@/app/lib/pagination";
 
 export async function GET(request: NextRequest) {
   let page = parseInt(request.nextUrl.searchParams.get("page") ?? "0", 10);
   if (isNaN(page) || page < 1) {
     page = 1;
   }
-
   const pageSize = 4;
 
-  const proposals = await prisma.proposals.findMany({
-    take: pageSize + 1,
-    skip: (page - 1) * pageSize,
-    orderBy: {
-      ordinal: "desc",
-    },
-  });
-  const hasNextPage = proposals.length > pageSize;
-  const theProposals = proposals.slice(0, pageSize);
+  const { meta, data: proposals } = await paginatePrismaResult(
+    (skip: number, take: number) =>
+      prisma.proposals.findMany({
+        take,
+        skip,
+        orderBy: {
+          ordinal: "desc",
+        },
+      }),
+    page,
+    pageSize
+  );
+
+  console.log(proposals);
 
   const latestBlock = await provider.getBlock("latest");
 
   const resolvedProposals = Promise.all(
-    theProposals.map(async (proposal) => {
+    proposals.map(async (proposal) => {
       const proposalData = parseProposalData(
         JSON.stringify(proposal.proposal_data || {}),
         proposal.proposal_type as "STANDARD" | "APPROVAL"
@@ -82,11 +87,7 @@ export async function GET(request: NextRequest) {
 
   // Build out proposal response
   const response = {
-    meta: {
-      currentPage: page,
-      pageSize,
-      hasNextPage,
-    },
+    meta,
     proposals: await resolvedProposals,
   };
 
