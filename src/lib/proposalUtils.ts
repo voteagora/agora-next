@@ -1,4 +1,6 @@
 import * as theme from "@/styles/theme";
+import { getQuorumForProposal } from "./governorUtils";
+import { Prisma } from "@prisma/client";
 
 type ProposalType = "STANDARD" | "APPROVAL";
 
@@ -149,4 +151,247 @@ export function getProposalTotalValue(
       }, 0n);
     }
   }
+}
+
+type ParsedProposalData = {
+  STANDARD: {
+    key: "STANDARD";
+    kind: {
+      targets: string[];
+      values: string[];
+      signatures: string[];
+      calldatas: string[];
+    };
+  };
+  APPROVAL: {
+    key: "APPROVAL";
+    kind: {
+      options: {
+        targets: string[];
+        values: string[];
+        calldatas: string[];
+        description: string;
+      }[];
+      proposalSettings: {
+        maxApprovals: number;
+        criteria: "THRESHOLD" | "TOP_CHOICES";
+        budgetToken: string;
+        criteriaValue: bigint;
+        budgetAmount: bigint;
+      };
+    };
+  };
+};
+
+export function parseProposalData(
+  proposalData: string,
+  proposalType: ProposalType
+): ParsedProposalData[ProposalType] {
+  switch (proposalType) {
+    case "STANDARD": {
+      const parsedProposalData = JSON.parse(proposalData);
+      return {
+        key: "STANDARD",
+        kind: {
+          targets: parsedProposalData.targets,
+          values: parsedProposalData.values,
+          signatures: parsedProposalData.signatures,
+          calldatas: parsedProposalData.calldatas,
+        },
+      };
+    }
+    case "APPROVAL": {
+      const parsedProposalData = JSON.parse(proposalData);
+      const [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount] =
+        parsedProposalData[1] as [string, string, string, string, string];
+      return {
+        key: "APPROVAL",
+        kind: {
+          options: (
+            parsedProposalData[0] as Array<
+              [string[], string[], string[], string]
+            >
+          ).map((option) => {
+            return {
+              targets: option[0],
+              values: option[1],
+              calldatas: option[2],
+              description: option[3],
+            };
+          }),
+          proposalSettings: {
+            maxApprovals: Number(maxApprovals),
+            criteria: toApprovalVotingCriteria(Number(criteria)),
+            budgetToken,
+            criteriaValue: BigInt(criteriaValue),
+            budgetAmount: BigInt(budgetAmount),
+          },
+        },
+      };
+    }
+  }
+}
+
+function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
+  switch (value) {
+    case 0:
+      return "THRESHOLD";
+    case 1:
+      return "TOP_CHOICES";
+    default:
+      throw new Error(`unknown type ${value}`);
+  }
+}
+
+/**
+ * Parse proposal results
+ */
+
+type ParsedProposalResults = {
+  STANDARD: {
+    key: "STANDARD";
+    kind: {
+      for: bigint;
+      against: bigint;
+      abstain: bigint;
+    };
+  };
+  APPROVAL: {
+    key: "APPROVAL";
+    kind: {
+      for: bigint;
+      abstain: bigint;
+      options: {
+        option: string;
+        votes: bigint;
+      }[];
+      criteria: "THRESHOLD" | "TOP_CHOICES";
+      criteriaValue: bigint;
+    };
+  };
+};
+
+export function parseProposalResults(
+  proposalResults: string,
+  proposalData: ParsedProposalData[ProposalType]
+): ParsedProposalResults[ProposalType] {
+  switch (proposalData.key) {
+    case "STANDARD": {
+      const parsedProposalResults = JSON.parse(proposalResults).standard;
+
+      return {
+        key: "STANDARD",
+        kind: {
+          for: BigInt(parsedProposalResults?.[1] ?? 0),
+          against: BigInt(parsedProposalResults?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults?.[2] ?? 0),
+        },
+      };
+    }
+    case "APPROVAL": {
+      const parsedProposalResults = JSON.parse(proposalResults);
+      return {
+        key: "APPROVAL",
+        kind: {
+          for:
+            parsedProposalResults.approval?.reduce(
+              (sum: bigint, { votes }: { votes: string }) => {
+                return sum + BigInt(votes);
+              },
+              0n
+            ) ?? 0n,
+          abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          options: proposalData.kind.options.map((option, idx) => {
+            return {
+              option: option.description,
+              votes: parsedProposalResults.approval?.[idx] ?? 0n,
+            };
+          }),
+          criteria: proposalData.kind.proposalSettings.criteria,
+          criteriaValue: proposalData.kind.proposalSettings.criteriaValue,
+        },
+      };
+    }
+  }
+}
+
+/**
+ * Parse proposal status
+ */
+
+export type ProposalStatus =
+  | "CANCELLED"
+  | "SUCCEEDED"
+  | "DEFEATED"
+  | "ACTIVE"
+  | "PENDING"
+  | "QUEUED"
+  | "EXECUTED";
+
+export async function getProposalStatus(
+  proposal: Prisma.ProposalsGetPayload<true>,
+  proposalResults: ParsedProposalResults[ProposalType],
+  latestBlock: number
+): Promise<ProposalStatus> {
+  if (proposal.cancelled_block) {
+    return "CANCELLED";
+  }
+  if (proposal.executed_block) {
+    return "EXECUTED";
+  }
+  if (
+    !proposal.start_block ||
+    !latestBlock ||
+    Number(proposal.start_block) > latestBlock
+  ) {
+    return "PENDING";
+  }
+  if (!proposal.end_block || Number(proposal.end_block) > latestBlock) {
+    return "ACTIVE";
+  }
+
+  const quorum = await getQuorumForProposal(proposal);
+
+  switch (proposalResults.key) {
+    case "STANDARD": {
+      const {
+        for: forVotes,
+        against: againstVotes,
+        abstain: abstainVotes,
+      } = proposalResults.kind;
+      const proposalQuorumVotes = forVotes + abstainVotes;
+
+      if ((quorum && proposalQuorumVotes < quorum) || forVotes < againstVotes) {
+        return "DEFEATED";
+      }
+
+      if (forVotes > againstVotes) {
+        return "SUCCEEDED";
+      }
+
+      break;
+    }
+    case "APPROVAL": {
+      const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
+      const proposalQuorumVotes = forVotes + abstainVotes;
+
+      if (quorum && proposalQuorumVotes < quorum) {
+        return "DEFEATED";
+      }
+
+      if (proposalResults.kind.criteria === "THRESHOLD") {
+        for (const option of proposalResults.kind.options) {
+          if (option.votes > proposalResults.kind.criteriaValue) {
+            return "SUCCEEDED";
+          }
+        }
+
+        return "DEFEATED";
+      } else {
+        return "SUCCEEDED";
+      }
+    }
+  }
+
+  return "QUEUED";
 }

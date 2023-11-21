@@ -1,6 +1,7 @@
 import provider from "@/app/lib/provider";
 import { NounsContracts, OptimismContracts } from "./contracts/contracts";
 import { Prisma } from "@prisma/client";
+import { DEPLOYMENT_NAME } from "./config";
 
 /**
  *
@@ -8,17 +9,16 @@ import { Prisma } from "@prisma/client";
  *
  **/
 export async function getQuorumForProposal(
-  proposal: Prisma.ProposalsListGetPayload<true> | null,
-  dao: "OPTIMISM" | "NOUNS"
+  proposal: Prisma.ProposalsGetPayload<true> | null
 ) {
-  switch (dao) {
-    case "NOUNS": {
+  switch (DEPLOYMENT_NAME) {
+    case "nouns": {
       if (!proposal) {
         return null;
       }
       return NounsContracts.governor.contract.quorumVotes(proposal.proposal_id);
     }
-    case "OPTIMISM": {
+    case "optimism": {
       if (!proposal?.start_block) {
         return null;
       }
