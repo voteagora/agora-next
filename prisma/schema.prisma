@@ -72,19 +72,6 @@ view charlie_voting_power_snapshot {
   @@schema("center")
 }
 
-view ProposalsList {
-  block_number  BigInt?
-  proposal_id   String  @unique
-  proposer      String?
-  description   String?
-  start_block   String?
-  end_block     String?
-  proposal_data String?
-
-  @@map("proposals_list")
-  @@schema("center")
-}
-
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view charlie_events_all {
   event_type   String?
@@ -125,16 +112,6 @@ view Votes {
   prop_description String?
 
   @@map("votes")
-  @@schema("center")
-}
-
-view ProposalsResults {
-  proposal_id      String  @unique
-  standard_results Json?
-  approval_results Json?
-  proposal_data    String?
-
-  @@map("proposals_results")
   @@schema("center")
 }
 
@@ -197,5 +174,23 @@ view Delegates {
   num_for_delegators BigInt?
 
   @@map("delegates")
+  @@schema("center")
+}
+
+view Proposals {
+  proposal_id      String   @unique
+  proposer         String?
+  description      String?
+  ordinal          Decimal? @db.Decimal
+  created_block    BigInt?
+  start_block      String?
+  end_block        String?
+  cancelled_block  BigInt?
+  executed_block   BigInt?
+  proposal_data    Json?
+  proposal_type    String?
+  proposal_results Json?
+
+  @@map("proposals")
   @@schema("center")
 }
