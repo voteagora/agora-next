@@ -14,8 +14,12 @@ const ENSName = ({ address }) => {
   const { data } = useEnsName({ chainId: 1, address });
 
   useEffect(() => {
-    setEnsName(data);
-  }, [data]);
+    if (data) {
+      setEnsName(data); // Set ENS name if available
+    } else {
+      setEnsName(truncateAddress(address)); // Fallback to truncated address
+    }
+  }, [data, address]);
 
   return <span>{ensName}</span>;
 };

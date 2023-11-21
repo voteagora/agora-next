@@ -1,6 +1,6 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalResults from "../ProposalResults";
-import ProposalDescription from "../ProposalDescription";
+import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalVotes } from "../ProposalVotes";
 
 export default function OPProposalApprovalPage({ proposal }) {
