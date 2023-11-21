@@ -43,10 +43,7 @@ export default function ProposalDescription({ proposal }) {
 
   return (
     <VStack gap={4} className={styles.proposal_description}>
-      <ProposalTitle
-        title={shortTitle}
-        proposerAddress={proposal.proposer_addr}
-      />
+      <ProposalTitle title={shortTitle} proposerAddress={proposal.proposer} />
       <VStack gap={2}>
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}
