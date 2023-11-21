@@ -3,17 +3,16 @@ import prisma from "@/app/lib/prisma";
 import { Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
-  const page = request.nextUrl.searchParams.get("page");
+  const page = Number(request.nextUrl.searchParams.get("page") ?? 1);
   const pageSize = 100;
   const seed = Number(
     request.nextUrl.searchParams.get("seed") ?? Math.random()
   );
-  console.log(seed);
   const delegates = await (() => {
     switch (request.nextUrl.searchParams.get("sort")) {
       case "most_delegators":
         return prisma.delegates.findMany({
-          skip: (Number(page ?? 1) - 1) * pageSize,
+          skip: (page - 1) * pageSize,
           take: 101,
           orderBy: {
             num_for_delegators: "desc",
@@ -26,12 +25,13 @@ export async function GET(request: NextRequest) {
           FROM center.delegates
           WHERE voting_power > 0
           ORDER BY -log(random()) / voting_power
-          LIMIT ${pageSize};
+          OFFSET ${pageSize * (page - 1)}
+          LIMIT ${pageSize + 1};
           `
         );
       default:
         return prisma.delegates.findMany({
-          skip: Number(page ?? 1) * pageSize,
+          skip: (page - 1) * pageSize,
           take: 101,
           orderBy: {
             voting_power: "desc",
