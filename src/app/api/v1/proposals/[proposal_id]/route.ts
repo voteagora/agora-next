@@ -4,10 +4,6 @@ import { getHumanBlockTime } from "@/lib/blockTimes";
 import provider from "@/app/lib/provider";
 import { parseProposalType } from "@/lib/proposalUtils";
 
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
-
 export async function GET(
   request: NextRequest,
   { params }: { params: { proposal_id: string } }
