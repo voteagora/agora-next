@@ -12,28 +12,34 @@ import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
 
 export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
-  // const fetching = React.useRef(false);
-
-  // const [meta, setMeta] = React.useState(initialDelegates.meta);
+  const fetching = React.useRef(false);
+  const [pages, setPages] = React.useState([initialDelegates]);
+  const [meta, setMeta] = React.useState(initialDelegates.meta);
 
   const loadMore = async (page) => {
-    // if (!fetching.current && page <= meta.total_pages) {
-    //   fetching.current = true;
-    //   const data = await fetchDelegates(page);
-    //   const existingIds = new Set(delegates.map((p) => p.id));
-    //   const uniqueDelegates = data.delegates.filter(
-    //     (p) => !existingIds.has(p.id)
-    //   );
-    //   setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
-    //   setMeta(data.meta);
-    //   fetching.current = false;
-    // }
+    console.log("loadMore", page);
+    if (!fetching.current && meta.hasNextPage) {
+      fetching.current = true;
+      const data = await fetchDelegates(page);
+      const existingIds = new Set(delegates.map((p) => p.id));
+      const uniqueDelegates = data.delegates.filter(
+        (p) => !existingIds.has(p.id)
+      );
+      setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
+      setMeta(data.meta);
+      fetching.current = false;
+    }
   };
 
-  // const delegates = pages.reduce((all, page) => all.concat(page.delegates), []);
+  const delegates = pages.reduce((all, page) => all.concat(page.delegates), []);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div
+      className={css`
+        overflow: auto;
+        max-height: 80vh;
+      `}
+    >
       <InfiniteScroll
         hasMore={false}
         pageStart={0}
@@ -51,7 +57,7 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
         }
         element="main"
       >
-        {initialDelegates.delegates.map((delegate) => (
+        {delegates.map((delegate) => (
           <div
             key={delegate.address}
             className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
