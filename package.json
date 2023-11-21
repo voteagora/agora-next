@@ -32,6 +32,7 @@
     "ethers": "^6.6.2",
     "ethers-multicall-provider": "^5.0.0",
     "faker": "4.1.0",
+    "framer-motion": "^10.16.5",
     "lokijs": "^1.5.12",
     "lucide-react": "^0.258.0",
     "next": "^14.0.1",

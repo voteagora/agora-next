@@ -13,6 +13,14 @@ async function fetchProposal(proposal_id) {
   return { proposal: data.proposal };
 }
 
+async function fetchProposalResults(proposal_id) {
+  "use server";
+
+  const api = new AgoraAPI();
+  const data = await api.get(`/proposals/${proposal_id}/results`);
+  return { data };
+}
+
 export default async function Page({ params: { proposal_id } }) {
   const { proposal } = await fetchProposal(proposal_id);
 
@@ -30,7 +38,7 @@ export default async function Page({ params: { proposal_id } }) {
   }
 
   return (
-    <HStack justifyContent="justify-between">
+    <HStack justifyContent="justify-between" className="mt-12">
       <div>{RenderComponent && <RenderComponent proposal={proposal} />}</div>
       <VStack gap={6}></VStack>
     </HStack>
