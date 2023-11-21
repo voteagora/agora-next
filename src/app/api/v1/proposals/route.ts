@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   const latestBlock = await provider.getBlock("latest");
 
-  const pageSize = 20;
+  const pageSize = 4;
   const total_count = await prisma.proposalsList.count();
   const total_pages = Math.ceil(total_count / pageSize);
 

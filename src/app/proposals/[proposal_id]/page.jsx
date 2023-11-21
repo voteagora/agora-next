@@ -15,8 +15,8 @@ async function fetchProposal(proposal_id) {
 
 export default async function Page({ params: { proposal_id } }) {
   const { proposal } = await fetchProposal(proposal_id);
-  console.log(proposal);
 
+  // Figure out which style of proposal to show here
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
