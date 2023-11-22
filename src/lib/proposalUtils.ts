@@ -1,10 +1,8 @@
 import * as theme from "@/styles/theme";
 import { getQuorumForProposal } from "./governorUtils";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
-
-type ProposalType = "STANDARD" | "APPROVAL";
 
 export function parseProposalType(proposalData: string): ProposalType {
   const data = JSON.parse(proposalData);
