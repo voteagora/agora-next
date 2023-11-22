@@ -9,17 +9,25 @@ import { VStack } from "@/components/Layout/Stack";
 async function fetchProposals(page = 1) {
   "use server";
 
-  const api = new AgoraAPI();
-  const data = await api.get(`/proposals?page=${page}`);
-  return { proposals: data.proposals, meta: data.meta };
+  try {
+    const api = new AgoraAPI();
+    const data = await api.get(`/proposals?page=${page}`);
+    return { proposals: data.proposals, meta: data.meta };
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function fetchDaoMetrics() {
   "use server";
 
-  const api = new AgoraAPI();
-  const data = await api.get(`/metrics`);
-  return data;
+  try {
+    const api = new AgoraAPI();
+    const data = await api.get(`/metrics`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export default async function Home() {
