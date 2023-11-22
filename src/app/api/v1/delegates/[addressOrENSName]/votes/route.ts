@@ -4,12 +4,12 @@ import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import {
   getProposalTotalValue,
-  parseParams,
-  parseProposalType,
+  parseProposalData,
   parseSupport,
 } from "@/lib/proposalUtils";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import provider from "@/app/lib/provider";
+import { parseParams } from "@/lib/voteUtils";
 
 export async function GET(
   request: NextRequest,
@@ -28,7 +28,10 @@ export async function GET(
   // Build out proposal response
   const response = {
     votes: delegateVotes.map((vote) => {
-      const proposalType = parseProposalType(vote.proposal_data ?? "{}");
+      const proposalData = parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      );
       return {
         timestamp: latestBlock
           ? getHumanBlockTime(
@@ -39,17 +42,14 @@ export async function GET(
           : null,
         address: vote.voter,
         proposal_id: vote.proposal_id,
-        support: parseSupport(vote.support, proposalType),
+        support: parseSupport(vote.support, vote.proposal_type),
         weight: vote.weight,
         reason: vote.reason,
-        params: parseParams(vote.params, vote.proposal_data),
-        proposalType: proposalType,
+        params: parseParams(vote.params, proposalData),
+        proposalType: vote.proposal_type,
         proposalData: vote.proposal_data,
-        proposalDescription: vote.prop_description,
-        proposalValue: getProposalTotalValue({
-          key: proposalType,
-          kind: JSON.parse(vote.proposal_data ?? "{}"),
-        }),
+        proposalDescription: vote.description,
+        proposalValue: getProposalTotalValue(proposalData),
       };
     }),
   };

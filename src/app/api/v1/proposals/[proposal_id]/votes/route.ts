@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { parseSupport } from "@/lib/proposalUtils";
+import { parseProposalData, parseSupport } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { paginatePrismaResult } from "@/app/lib/pagination";
@@ -45,25 +45,27 @@ export async function GET(
   // Build out proposal response
   const response = {
     meta,
-    votes: votes.map((vote) => ({
-      address: vote.voter,
-      proposal_id: vote.proposal_id,
-      support: parseSupport(vote.support, vote.proposal_type),
-      amount: vote.weight,
-      reason: vote.reason,
-      params: parseParams(
-        vote.params,
+    votes: votes.map((vote) => {
+      const proposalData = parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
-      ),
-      timestamp: latestBlock
-        ? getHumanBlockTime(
-            vote.block_number,
-            latestBlock.number,
-            latestBlock.timestamp
-          )
-        : null,
-    })),
+      );
+      return {
+        address: vote.voter,
+        proposal_id: vote.proposal_id,
+        support: parseSupport(vote.support, vote.proposal_type),
+        amount: vote.weight,
+        reason: vote.reason,
+        params: parseParams(vote.params, proposalData),
+        timestamp: latestBlock
+          ? getHumanBlockTime(
+              vote.block_number,
+              latestBlock.number,
+              latestBlock.timestamp
+            )
+          : null,
+      };
+    }),
   };
 
   return NextResponse.json(response);

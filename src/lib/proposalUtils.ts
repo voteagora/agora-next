@@ -153,52 +153,30 @@ export async function parseProposal(
  * Extract proposal total value
  */
 
-type ProposalData = {
-  STANDARD: {
-    key: "STANDARD";
-    kind: {
-      targets: string;
-      values: string;
-      signatures: string;
-      calldatas: string;
-    };
-  };
-  // [options, settings]
-  // options: [targets[], values[], calldatas[], description]
-  // settings: [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount
-  APPROVAL: {
-    key: "APPROVAL";
-    kind: [
-      [string[], string[], string[], string][],
-      [string, string, string, string, string]
-    ];
-  };
-};
-
 export function getProposalTotalValue(
-  proposalData: ProposalData["STANDARD"] | ProposalData["APPROVAL"]
+  proposalData: ParsedProposalData[ProposalType]
 ) {
+  console.log(proposalData);
+
   switch (proposalData.key) {
     case "STANDARD": {
-      return (JSON.parse(proposalData.kind.values) as string[]).reduce(
-        (acc, val) => {
-          return acc + BigInt(val);
-        },
-        0n
-      );
+      return proposalData.kind.values.reduce((acc, val) => {
+        return acc + BigInt(val);
+      }, 0n);
     }
     case "APPROVAL": {
-      return proposalData.kind[0].reduce((acc, option) => {
-        const values = option[1] as string[];
-        return values.reduce((sum, val) => {
-          return BigInt(val) + sum;
-        }, 0n);
+      return proposalData.kind.options.reduce((acc, option) => {
+        return (
+          option.values.reduce((sum, val) => {
+            return BigInt(val) + sum;
+          }, 0n) + acc
+        );
       }, 0n);
     }
   }
 }
 
-type ParsedProposalData = {
+export type ParsedProposalData = {
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -238,10 +216,10 @@ export function parseProposalData(
       return {
         key: "STANDARD",
         kind: {
-          targets: parsedProposalData.targets,
-          values: parsedProposalData.values,
-          signatures: parsedProposalData.signatures,
-          calldatas: parsedProposalData.calldatas,
+          targets: JSON.parse(parsedProposalData.targets),
+          values: JSON.parse(parsedProposalData.values),
+          signatures: JSON.parse(parsedProposalData.signatures),
+          calldatas: JSON.parse(parsedProposalData.calldatas),
         },
       };
     }
