@@ -1,5 +1,5 @@
 import HumanAddress from "@/components/shared/HumanAddress";
-import styles from "./ProposalTitle.module.scss";
+import styles from "./proposalTitle.module.scss";
 import { VStack } from "@/components/Layout/Stack";
 
 export default function ProposalTitle({ title, proposerAddress }) {
