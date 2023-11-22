@@ -99,17 +99,18 @@ view ProposalsData {
 }
 
 view Votes {
-  block_number     BigInt
   transaction_hash String  @unique @db.VarChar(66)
-  voter            String?
-  proposal_id      String?
-  support          String?
-  weight           String?
+  proposal_id      String
+  voter            String
+  support          String
+  weight           String
   reason           String?
+  block_number     BigInt
   params           String?
-  proposal_data    String?
-  prop_start_block String?
-  prop_description String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    String
 
   @@map("votes")
   @@schema("center")
