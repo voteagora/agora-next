@@ -4,7 +4,6 @@ import * as React from "react";
 import { HStack, VStack } from "../Layout/Stack";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
-import { getTitleFromProposalDescription } from "@/lib/proposalUtils";
 import { colorForSupportType } from "@/lib/voteUtils";
 import { formatNumber, pluralizeVote } from "@/lib/tokenUtils";
 import { shortAddress } from "@/lib/utils";
@@ -113,11 +112,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                     `}
                   >
                     <a href={`/proposals/${vote.proposal_id}`}>
-                      {shortPropTitle(
-                        getTitleFromProposalDescription(
-                          vote.proposalDescription
-                        )
-                      )}
+                      {shortPropTitle(vote.proposalTitle)}
                     </a>
                   </h2>
                   {vote.proposalType === "APPROVAL" && (
