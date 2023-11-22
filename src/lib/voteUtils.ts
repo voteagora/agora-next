@@ -1,6 +1,10 @@
 import * as theme from "@/styles/theme";
 import { Prisma, ProposalType } from "@prisma/client";
-import { ParsedProposalData, parseProposalData } from "./proposalUtils";
+import {
+  ParsedProposalData,
+  getProposalTotalValue,
+  parseProposalData,
+} from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 
@@ -83,6 +87,8 @@ export type VotesResponse = {
   weight: string;
   reason: string | null;
   params: ParsedParams[ProposalType]["kind"];
+  proposalValue: bigint;
+  proposalDescription: string;
   timestamp: Date | null;
 };
 
@@ -102,6 +108,9 @@ export function parseVotes(
       weight: vote.weight,
       reason: vote.reason,
       params: parseParams(vote.params, proposalData),
+      proposalValue: getProposalTotalValue(proposalData),
+      proposalDescription: vote.description || "",
+      proposalType: vote.proposal_type,
       timestamp: latestBlock
         ? getHumanBlockTime(
             vote.block_number,
