@@ -99,7 +99,7 @@ view ProposalsData {
 }
 
 view Votes {
-  block_number     BigInt?
+  block_number     BigInt
   transaction_hash String  @unique @db.VarChar(66)
   voter            String?
   proposal_id      String?
@@ -182,9 +182,9 @@ view Proposals {
   proposer         String
   description      String?
   ordinal          Decimal? @db.Decimal
-  created_block    BigInt?
-  start_block      String?
-  end_block        String?
+  created_block    BigInt
+  start_block      String
+  end_block        String
   cancelled_block  BigInt?
   executed_block   BigInt?
   proposal_data    Json?
