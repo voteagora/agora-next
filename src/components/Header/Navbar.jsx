@@ -19,10 +19,6 @@ export default function Navbar() {
       <HeaderLink href="/delegates" isActive={pathname.includes("delegates")}>
         Voters
       </HeaderLink>
-
-      <HeaderLink href="/events" isActive={pathname.includes("events")}>
-        Activity Feed
-      </HeaderLink>
     </HStack>
   );
 }
