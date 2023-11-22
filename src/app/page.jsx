@@ -1,10 +1,10 @@
-import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
+import ProposalsList from "../components/Proposals/ProposalsList/ProposalsList";
 import AgoraAPI from "./lib/agoraAPI";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
-import { VStack } from "@/components/Layout/Stack";
-import styles from "@/styles/homepage.module.scss";
-import Hero from "@/components/Hero/Hero";
-import { PageDivider } from "@/components/Layout/PageDivider";
+import DAOMetricsHeader from "../components/Metrics/DAOMetricsHeader";
+import styles from "../styles/homepage.module.scss";
+import Hero from "../components/Hero/Hero";
+import { PageDivider } from "../components/Layout/PageDivider";
+import { VStack } from "../components/Layout/Stack";
 
 async function fetchProposals(page = 1) {
   "use server";
