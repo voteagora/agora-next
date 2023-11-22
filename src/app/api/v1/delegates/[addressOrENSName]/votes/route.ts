@@ -3,7 +3,8 @@ import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import provider from "@/app/lib/provider";
-import { parseVotes } from "@/lib/voteUtils";
+import { parseVote } from "@/lib/voteUtils";
+import { parseProposalData } from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +22,13 @@ export async function GET(
 
   // Build out proposal response
   const response = {
-    votes: parseVotes(delegateVotes, latestBlock),
+    votes: delegateVotes.map((vote) => {
+      const proposalData = parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      );
+      return parseVote(vote, proposalData, latestBlock);
+    }),
   };
 
   return NextResponse.json(response);

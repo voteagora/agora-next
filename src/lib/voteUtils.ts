@@ -89,35 +89,31 @@ export type VotesResponse = {
   params: ParsedParams[ProposalType]["kind"];
   proposalValue: bigint;
   proposalDescription: string;
+  proposalType: ProposalType;
   timestamp: Date | null;
 };
 
-export function parseVotes(
-  votes: Prisma.VotesGetPayload<true>[],
+export function parseVote(
+  vote: Prisma.VotesGetPayload<true>,
+  proposalData: ParsedProposalData[ProposalType],
   latestBlock: Block | null
-): VotesResponse[] {
-  return votes.map((vote) => {
-    const proposalData = parseProposalData(
-      JSON.stringify(vote.proposal_data || {}),
-      vote.proposal_type
-    );
-    return {
-      address: vote.voter,
-      proposal_id: vote.proposal_id,
-      support: parseSupport(vote.support, vote.proposal_type),
-      weight: vote.weight,
-      reason: vote.reason,
-      params: parseParams(vote.params, proposalData),
-      proposalValue: getProposalTotalValue(proposalData),
-      proposalDescription: vote.description || "",
-      proposalType: vote.proposal_type,
-      timestamp: latestBlock
-        ? getHumanBlockTime(
-            vote.block_number,
-            latestBlock.number,
-            latestBlock.timestamp
-          )
-        : null,
-    };
-  });
+): VotesResponse {
+  return {
+    address: vote.voter,
+    proposal_id: vote.proposal_id,
+    support: parseSupport(vote.support, vote.proposal_type),
+    weight: vote.weight,
+    reason: vote.reason,
+    params: parseParams(vote.params, proposalData),
+    proposalValue: getProposalTotalValue(proposalData),
+    proposalDescription: vote.description || "",
+    proposalType: vote.proposal_type,
+    timestamp: latestBlock
+      ? getHumanBlockTime(
+          vote.block_number,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
+      : null,
+  };
 }
