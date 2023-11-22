@@ -99,7 +99,7 @@ view ProposalsData {
 }
 
 view Votes {
-  transaction_hash String  @unique @db.VarChar(66)
+  transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
   voter            String
   support          String
@@ -110,7 +110,7 @@ view Votes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    String
+  proposal_type    ProposalType
 
   @@map("votes")
   @@schema("center")
@@ -189,9 +189,17 @@ view Proposals {
   cancelled_block  BigInt?
   executed_block   BigInt?
   proposal_data    Json?
-  proposal_type    String?
+  proposal_type    String
   proposal_results Json?
 
   @@map("proposals")
+  @@schema("center")
+}
+
+enum ProposalType {
+  STANDARD
+  APPROVAL
+
+  @@map("proposal_type")
   @@schema("center")
 }
