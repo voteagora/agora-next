@@ -9,9 +9,9 @@ const secondsPerBlock = BigInt(2);
  * @description Converts a block number to a human readable date
  */
 export function getHumanBlockTime(
-  blockNumber,
-  latestBlockNumber,
-  latestBlockTimestamp
+  blockNumber: number | string | bigint,
+  latestBlockNumber: number | string | bigint,
+  latestBlockTimestamp: number | string | bigint
 ) {
   return new Date(
     Number(
