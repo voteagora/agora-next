@@ -51,7 +51,7 @@ export default async function Page({ params: { addressOrENSName } }) {
       </VStack>
 
       <VStack className={styles.right_container}>
-        {!statement.delegateStatement && (
+        {!statement && !statement?.delegateStatement && (
           <p>
             This voter has not submitted a statement. Is this you? Connect your
             wallet to verify your address, and tell your community what you’d
@@ -59,10 +59,8 @@ export default async function Page({ params: { addressOrENSName } }) {
           </p>
         )}
 
-        {statement.delegateStatement && (
-          <DelegateStatement
-            statement={statement.delegateStatement}
-          />
+        {statement && statement.delegateStatement && (
+          <DelegateStatement statement={statement.delegateStatement} />
         )}
 
         <DelegateVotes
