@@ -12,23 +12,24 @@ export function parseProposalType(proposalData: string): ProposalType {
   return "STANDARD";
 }
 
+export type Support = "AGAINST" | "ABSTAIN" | "FOR";
+
 export function parseSupport(
   support: string | null,
   proposalType: ProposalType
-) {
+): Support {
   switch (Number(support)) {
     case 0:
       return proposalType === "APPROVAL" ? "FOR" : "AGAINST";
     case 1:
       return proposalType === "APPROVAL" ? "ABSTAIN" : "FOR";
-    case 2:
+
+    default:
       return "ABSTAIN";
   }
 }
 
-export function colorForSupportType(
-  supportType: "AGAINST" | "ABSTAIN" | "FOR"
-) {
+export function colorForSupportType(supportType: Support) {
   switch (supportType) {
     case "AGAINST":
       return theme.colors.red["700"];
