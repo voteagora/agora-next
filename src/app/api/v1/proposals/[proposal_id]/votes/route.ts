@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { paginatePrismaResult } from "@/app/lib/pagination";
-import { parseVotes } from "@/lib/voteUtils";
+import { parseVote } from "@/lib/voteUtils";
+import { parseProposalData } from "@/lib/proposalUtils";
 
 type SortOrder = "asc" | "desc";
 type Sort = "weight" | "block_number";
@@ -39,11 +40,15 @@ export async function GET(
   );
 
   const latestBlock = await provider.getBlock("latest");
+  const proposalData = parseProposalData(
+    JSON.stringify(votes[0].proposal_data || {}),
+    votes[0].proposal_type
+  );
 
   // Build out proposal response
   const response = {
     meta,
-    votes: parseVotes(votes, latestBlock),
+    votes: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
   };
 
   return NextResponse.json(response);
