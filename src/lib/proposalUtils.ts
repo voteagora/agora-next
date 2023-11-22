@@ -4,14 +4,6 @@ import { Prisma, ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 
-export function parseProposalType(proposalData: string): ProposalType {
-  const data = JSON.parse(proposalData);
-  if (Array.isArray(data)) {
-    return "APPROVAL";
-  }
-  return "STANDARD";
-}
-
 export type Support = "AGAINST" | "ABSTAIN" | "FOR";
 
 export function parseSupport(
