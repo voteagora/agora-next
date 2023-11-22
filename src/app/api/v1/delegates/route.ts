@@ -13,10 +13,11 @@ export async function GET(request: NextRequest) {
   const seed = Number(
     request.nextUrl.searchParams.get("seed") ?? Math.random()
   );
+  const sort = request.nextUrl.searchParams.get("sort");
 
   const { meta, data: delegates } = await paginatePrismaResult(
-    (skip: number, take: number, seed: number) => {
-      switch (request.nextUrl.searchParams.get("sort")) {
+    (skip: number, take: number, sort: string, seed: number) => {
+      switch (sort) {
         case "most_delegators":
           return prisma.delegates.findMany({
             skip,
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
             WHERE voting_power > 0
             ORDER BY -log(random()) / voting_power
             OFFSET ${skip}
-            LIMIT ${take}; // Fetch one extra record
+            LIMIT ${take};
             `
           );
         default:
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     },
     page,
     pageSize,
-    { seed }
+    [sort, seed]
   );
 
   const response = {
