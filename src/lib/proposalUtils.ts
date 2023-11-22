@@ -1,6 +1,8 @@
 import * as theme from "@/styles/theme";
 import { getQuorumForProposal } from "./governorUtils";
 import { Prisma } from "@prisma/client";
+import { getHumanBlockTime } from "./blockTimes";
+import { Block } from "ethers";
 
 type ProposalType = "STANDARD" | "APPROVAL";
 
@@ -102,6 +104,73 @@ export function getTitleFromProposalDescription(description: string = "") {
     removeItalics(removeBold(extractTitle(normalizedDescription)))?.trim() ??
     "Untitled"
   );
+}
+
+/**
+ * Parse proposal into proposal response
+ */
+
+export type ProposalResponse = {
+  id: string;
+  proposer: string;
+  created_time: Date | null;
+  start_time: Date | null;
+  end_time: Date | null;
+  markdowntitle: string;
+  proposaData: ParsedProposalData[ProposalType]["kind"];
+  proposalResults: ParsedProposalResults[ProposalType]["kind"];
+  proposalType: ProposalType | null;
+  status: ProposalStatus | null;
+};
+
+export async function parseProposal(
+  proposal: Prisma.ProposalsGetPayload<true>,
+  latestBlock: Block | null
+): Promise<ProposalResponse> {
+  const proposalData = parseProposalData(
+    JSON.stringify(proposal.proposal_data || {}),
+    proposal.proposal_type as "STANDARD" | "APPROVAL"
+  );
+  const proposalResutsls = parseProposalResults(
+    JSON.stringify(proposal.proposal_results || {}),
+    proposalData
+  );
+  return {
+    id: proposal.proposal_id,
+    proposer: proposal.proposer,
+    created_time: latestBlock
+      ? getHumanBlockTime(
+          proposal.created_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
+      : null,
+    start_time: latestBlock
+      ? getHumanBlockTime(
+          proposal.start_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
+      : null,
+    end_time: latestBlock
+      ? getHumanBlockTime(
+          proposal.end_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
+      : null,
+    markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
+    proposaData: proposalData.kind,
+    proposalResults: proposalResutsls.kind,
+    proposalType: proposal.proposal_type as ProposalType,
+    status: latestBlock
+      ? await getProposalStatus(
+          proposal,
+          proposalResutsls,
+          Number(latestBlock.number)
+        )
+      : null,
+  };
 }
 
 /**
