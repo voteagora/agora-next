@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { paginatePrismaResult } from "@/app/lib/pagination";
-import { parseVote } from "@/lib/voteUtils";
+import { Sort, SortOrder, parseVote } from "@/lib/voteUtils";
 import { parseProposalData } from "@/lib/proposalUtils";
-
-type SortOrder = "asc" | "desc";
-type Sort = "weight" | "block_number";
 
 export async function GET(
   request: NextRequest,
