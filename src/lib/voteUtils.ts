@@ -3,6 +3,7 @@ import { Prisma, ProposalType } from "@prisma/client";
 import {
   ParsedProposalData,
   getProposalTotalValue,
+  getTitleFromProposalDescription,
   parseProposalData,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
@@ -88,7 +89,7 @@ export type VotesResponse = {
   reason: string | null;
   params: ParsedParams[ProposalType]["kind"];
   proposalValue: bigint;
-  proposalDescription: string;
+  proposalTitle: string;
   proposalType: ProposalType;
   timestamp: Date | null;
 };
@@ -106,7 +107,7 @@ export function parseVote(
     reason: vote.reason,
     params: parseParams(vote.params, proposalData),
     proposalValue: getProposalTotalValue(proposalData),
-    proposalDescription: vote.description || "",
+    proposalTitle: getTitleFromProposalDescription(vote.description || ""),
     proposalType: vote.proposal_type,
     timestamp: latestBlock
       ? getHumanBlockTime(
