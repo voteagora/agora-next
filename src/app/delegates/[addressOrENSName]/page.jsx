@@ -24,7 +24,7 @@ async function getDelegateVotes(addressOrENSName, page = 1) {
   const data = await api.get(
     `/delegates/${addressOrENSName}/votes?page=${page}`
   );
-  return { delegateVotes: data.votes, meta: data.meta };
+  return { votes: data.votes, meta: data.meta };
 }
 
 async function getDelegateStatement(addressOrENSName) {
@@ -65,7 +65,11 @@ export default async function Page({ params: { addressOrENSName } }) {
 
         <DelegateVotes
           initialVotes={delegateVotes}
-          fetchDelegateVotes={getDelegateVotes}
+          fetchDelegateVotes={async (page) => {
+            "use server";
+
+            return getDelegateVotes(addressOrENSName, page);
+          }}
         />
       </VStack>
     </HStack>
