@@ -30,14 +30,7 @@
     "**/*.tsx",
     "**/*.jsx",
     "**/*.js",
-    ".next/types/**/*.ts",
-    "src/components/Header/Header.jsx",
-    "src/components/Container.jsx",
-    "src/components/Button.jsx",
-    "src/components/Header/Navbar.jsx",
-    "src/app/page.jsx",
-    "src/components/Proposals/ProposalPage/ProposalVotes.jsx",
-    "src/components/Delegates/DelegateCards.jsx"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
