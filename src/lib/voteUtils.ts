@@ -80,6 +80,8 @@ export function parseParams(
 /**
  * Parse votes into votes response
  */
+export type SortOrder = "asc" | "desc";
+export type Sort = "weight" | "block_number";
 
 export type VotesResponse = {
   address: string;
