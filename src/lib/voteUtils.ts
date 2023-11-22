@@ -6,6 +6,7 @@ import { Prisma, ProposalType } from "@prisma/client";
 import {
   ParsedProposalData,
   Support,
+  getProposalTotalValue,
   parseProposalData,
   parseSupport,
 } from "./proposalUtils";
@@ -43,23 +44,23 @@ export function parseParams(
 }
 
 /**
- * Parse proposal into proposal response
+ * Parse votes into votes response
  */
 
-export type VotesForProposalResponse = {
+export type VotesResponse = {
   address: string;
   proposal_id: string;
   support: Support;
-  amount: string;
+  weight: string;
   reason: string | null;
   params: ParsedParams[ProposalType]["kind"];
   timestamp: Date | null;
 };
 
-export function parseVotesForProposal(
+export function parseVotes(
   votes: Prisma.VotesGetPayload<true>[],
   latestBlock: Block | null
-): VotesForProposalResponse[] {
+): VotesResponse[] {
   return votes.map((vote) => {
     const proposalData = parseProposalData(
       JSON.stringify(vote.proposal_data || {}),
@@ -69,7 +70,7 @@ export function parseVotesForProposal(
       address: vote.voter,
       proposal_id: vote.proposal_id,
       support: parseSupport(vote.support, vote.proposal_type),
-      amount: vote.weight,
+      weight: vote.weight,
       reason: vote.reason,
       params: parseParams(vote.params, proposalData),
       timestamp: latestBlock
