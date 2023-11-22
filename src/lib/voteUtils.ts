@@ -1,17 +1,46 @@
+import * as theme from "@/styles/theme";
+import { Prisma, ProposalType } from "@prisma/client";
+import { ParsedProposalData, parseProposalData } from "./proposalUtils";
+import { getHumanBlockTime } from "./blockTimes";
+import { Block } from "ethers";
+
+/**
+ * Vote primitives
+ */
+
+export type Support = "AGAINST" | "ABSTAIN" | "FOR";
+
+export function parseSupport(
+  support: string | null,
+  proposalType: ProposalType
+): Support {
+  switch (Number(support)) {
+    case 0:
+      return proposalType === "APPROVAL" ? "FOR" : "AGAINST";
+    case 1:
+      return proposalType === "APPROVAL" ? "ABSTAIN" : "FOR";
+
+    default:
+      return "ABSTAIN";
+  }
+}
+
+export function colorForSupportType(supportType: Support) {
+  switch (supportType) {
+    case "AGAINST":
+      return theme.colors.red["700"];
+
+    case "ABSTAIN":
+      return theme.colors.gray["700"];
+
+    case "FOR":
+      return theme.colors.green["700"];
+  }
+}
+
 /**
  * Parse vote params
  */
-
-import { Prisma, ProposalType } from "@prisma/client";
-import {
-  ParsedProposalData,
-  Support,
-  getProposalTotalValue,
-  parseProposalData,
-  parseSupport,
-} from "./proposalUtils";
-import { getHumanBlockTime } from "./blockTimes";
-import { Block } from "ethers";
 
 type ParsedParams = {
   APPROVAL: {
