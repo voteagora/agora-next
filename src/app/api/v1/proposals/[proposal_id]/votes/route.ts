@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { Prisma } from "@prisma/client";
-import {
-  parseParams,
-  parseProposalType,
-  parseSupport,
-} from "@/lib/proposalUtils";
+import { parseSupport } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
 import { getHumanBlockTime } from "@/lib/blockTimes";
+import { paginatePrismaResult } from "@/app/lib/pagination";
+import { parseParams } from "@/lib/voteUtils";
+
+type SortOrder = "asc" | "desc";
+type Sort = "weight" | "block_number";
 
 export async function GET(
   request: NextRequest,
@@ -18,54 +18,44 @@ export async function GET(
     page = 1;
   }
 
-  const sortByPower = request.nextUrl.searchParams.get("sortByPower");
+  const sort: Sort =
+    request.nextUrl.searchParams.get("sort") === "weight"
+      ? "weight"
+      : "block_number";
+  const sortOrder: SortOrder =
+    request.nextUrl.searchParams.get("sort_order") === "asc" ? "asc" : "desc";
+  const pageSize = 25;
 
-  const pageSize = 50;
-  // TODO: Figure out a better way to paginate -- use cursor
-  const total_pages = Math.ceil(10000 / pageSize);
-
-  const votes = await prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
-    Prisma.sql`
-      SELECT * FROM center.votes
-      WHERE proposal_id = ${params.proposal_id}
-      ORDER BY ${sortByPower ? "weight" : "block_number"} DESC
-      LIMIT ${pageSize}
-      OFFSET ${(page - 1) * pageSize}
-    `
+  const { meta, data: votes } = await paginatePrismaResult(
+    (skip: number, take: number) =>
+      prisma.votes.findMany({
+        where: { proposal_id: params.proposal_id },
+        take,
+        skip,
+        orderBy: {
+          [sort]: sortOrder,
+        },
+      }),
+    page,
+    pageSize
   );
 
-  // TODO: This is too slow because prisma default sorts by block_number -- need to add an index
-  // const votes = await prisma.votes.findMany({
-  //   where: { proposal_id: params.proposal_id },
-  //   take: pageSize,
-  //   skip: (page - 1) * pageSize,
-  //   orderBy: sortByPower
-  //     ? {
-  //         weight: "desc", // or "as" if you want ascending order
-  //       }
-  //     : {
-  //         block_number: "desc", // or "asc" if you want ascending order
-  //       },
-  // });
-
-  const proposalType = parseProposalType(votes[0].proposal_data ?? "{}");
   const latestBlock = await provider.getBlock("latest");
 
   // Build out proposal response
   const response = {
-    meta: {
-      current_page: page,
-      total_pages: total_pages,
-      page_size: pageSize,
-      total_count: 10000,
-    },
+    meta,
     votes: votes.map((vote) => ({
       address: vote.voter,
       proposal_id: vote.proposal_id,
-      support: parseSupport(vote.support, proposalType),
+      support: parseSupport(vote.support, vote.proposal_type),
       amount: vote.weight,
       reason: vote.reason,
-      params: parseParams(vote.params, vote.proposal_data),
+      params: parseParams(
+        vote.params,
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      ),
       timestamp: latestBlock
         ? getHumanBlockTime(
             vote.block_number,

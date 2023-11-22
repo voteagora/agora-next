@@ -26,28 +26,6 @@ export function parseSupport(
   }
 }
 
-export function parseParams(
-  params: string | null,
-  proposaData: string | null
-): string[] | null {
-  if (params === null) {
-    return null;
-  }
-
-  try {
-    const parsedParams = JSON.parse(params);
-    const parsedProposalData = JSON.parse(proposaData ?? "[]");
-    const proposalOptions = parsedProposalData[0];
-
-    return parsedParams[0].map((param: string) => {
-      const idx = Number(param);
-      return proposalOptions[idx][3];
-    });
-  } catch (e) {
-    return null;
-  }
-}
-
 export function colorForSupportType(
   supportType: "AGAINST" | "ABSTAIN" | "FOR"
 ) {
@@ -127,7 +105,7 @@ export async function parseProposal(
 ): Promise<ProposalResponse> {
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
-    proposal.proposal_type as "STANDARD" | "APPROVAL"
+    proposal.proposal_type as ProposalType
   );
   const proposalResutsls = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
@@ -295,6 +273,9 @@ export function parseProposalData(
           },
         },
       };
+    }
+    default: {
+      throw new Error(`unknown type ${proposalType}`);
     }
   }
 }
