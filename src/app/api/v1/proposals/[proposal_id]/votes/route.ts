@@ -4,7 +4,7 @@ import { parseProposalData, parseSupport } from "@/lib/proposalUtils";
 import provider from "@/app/lib/provider";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { paginatePrismaResult } from "@/app/lib/pagination";
-import { parseParams } from "@/lib/voteUtils";
+import { parseParams, parseVotesForProposal } from "@/lib/voteUtils";
 
 type SortOrder = "asc" | "desc";
 type Sort = "weight" | "block_number";
@@ -45,27 +45,7 @@ export async function GET(
   // Build out proposal response
   const response = {
     meta,
-    votes: votes.map((vote) => {
-      const proposalData = parseProposalData(
-        JSON.stringify(vote.proposal_data || {}),
-        vote.proposal_type
-      );
-      return {
-        address: vote.voter,
-        proposal_id: vote.proposal_id,
-        support: parseSupport(vote.support, vote.proposal_type),
-        amount: vote.weight,
-        reason: vote.reason,
-        params: parseParams(vote.params, proposalData),
-        timestamp: latestBlock
-          ? getHumanBlockTime(
-              vote.block_number,
-              latestBlock.number,
-              latestBlock.timestamp
-            )
-          : null,
-      };
-    }),
+    votes: parseVotesForProposal(votes, latestBlock),
   };
 
   return NextResponse.json(response);
