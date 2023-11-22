@@ -84,6 +84,7 @@ export type SortOrder = "asc" | "desc";
 export type Sort = "weight" | "block_number";
 
 export type VotesResponse = {
+  transactionHash: string;
   address: string;
   proposal_id: string;
   support: Support;
@@ -102,6 +103,7 @@ export function parseVote(
   latestBlock: Block | null
 ): VotesResponse {
   return {
+    transactionHash: vote.transaction_hash,
     address: vote.voter,
     proposal_id: vote.proposal_id,
     support: parseSupport(vote.support, vote.proposal_type),
