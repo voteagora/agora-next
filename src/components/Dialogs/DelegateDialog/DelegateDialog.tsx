@@ -79,30 +79,7 @@ export function DelegateDialog({
             <DelegationDisplayAmount amount={votingPower} />
           </VStack>
         </VStack>
-        {!accountAddress && (
-          <w3m-button />
-          //   {({ isConnected, show, address }) => {
-          //     return (
-          //       <button
-          //         onClick={show}
-          //         className={css`
-          //           text-align: center;
-          //           border-radius: ${theme.spacing["2"]};
-          //           border: 1px solid ${theme.colors.gray.eb};
-          //           font-weight: ${theme.fontWeight.semibold};
-          //           padding: ${theme.spacing["4"]} 0;
-          //           cursor: pointer;
-          //           :hover {
-          //             background: ${theme.colors.gray.eb};
-          //           }
-          //         `}
-          //       >
-          //         {isConnected ? address : "Connect your wallet"}
-          //       </button>
-          //     );
-          //   }}
-          // </w3m-button>
-        )}
+        {!accountAddress && <w3m-button />}
         {isLoading && (
           <Button href={null} disabled={false}>
             Submitting your delegation...
