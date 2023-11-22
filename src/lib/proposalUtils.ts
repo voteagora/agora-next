@@ -118,8 +118,6 @@ export async function parseProposal(
 export function getProposalTotalValue(
   proposalData: ParsedProposalData[ProposalType]
 ) {
-  console.log(proposalData);
-
   switch (proposalData.key) {
     case "STANDARD": {
       return proposalData.kind.values.reduce((acc, val) => {
