@@ -11,6 +11,7 @@
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.454.0",
     "@emotion/css": "^11.11.2",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
