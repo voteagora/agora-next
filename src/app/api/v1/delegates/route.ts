@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const sort = request.nextUrl.searchParams.get("sort");
 
   const { meta, data: delegates } = await paginatePrismaResult(
-    (skip: number, take: number, sort: string, seed: number) => {
+    (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
           return prisma.delegates.findMany({
@@ -48,8 +48,7 @@ export async function GET(request: NextRequest) {
       }
     },
     page,
-    pageSize,
-    [sort, seed]
+    pageSize
   );
 
   const response = {
