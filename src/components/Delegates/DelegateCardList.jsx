@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 import Image from "next/image";
 import Link from "next/link";
 import HumanAddress from "../shared/HumanAddress";
@@ -13,7 +12,7 @@ import * as theme from "@/styles/theme";
 
 export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
   const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialDelegates]);
+  const [pages, setPages] = React.useState([initialDelegates] || []);
   const [meta, setMeta] = React.useState(initialDelegates.meta);
 
   const loadMore = async (page) => {

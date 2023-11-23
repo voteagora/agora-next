@@ -1,43 +1,17 @@
-import {
-  CalculatorIcon,
-  UserCircleIcon,
-  UserGroupIcon,
-} from "@heroicons/react/20/solid";
-import { EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 import { HStack } from "../Layout/Stack";
 import MetricContainer from "./MetricContainer";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 
-const stats = [
-  {
-    id: 1,
-    name: "Voters / Noun Holders",
-    subHeading: "311 / 394",
-    icon: UserGroupIcon,
-  },
-  {
-    id: 2,
-    name: "Quorum floor",
-    subHeading: "77 nouns (10% of supply)",
-    icon: EnvelopeOpenIcon,
-  },
-  {
-    id: 3,
-    name: "Proposal threshold",
-    subHeading: "2 nouns",
-    icon: CalculatorIcon,
-  },
-  {
-    id: 4,
-    name: "Avg voter turnout",
-    subHeading: "40%",
-    icon: UserCircleIcon,
-  },
-];
+const defaultMetrics = {
+  votableSupply: 0,
+  totalSupply: 0,
+  quorum: 0,
+};
 
 export default function DAOMetricsHeader({ metrics }) {
   const formattedMetrics = useMemo(() => {
+    if (!metrics) return defaultMetrics;
     return {
       votableSupply: formatNumber(metrics.votableSupply),
       totalSupply: formatNumber(metrics.totalSupply),
