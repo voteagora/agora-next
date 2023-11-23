@@ -19,7 +19,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
   const [meta, setMeta] = React.useState(initialProposals.meta);
 
   const loadMore = async (page) => {
-    if (!fetching.current && page <= meta.total_pages) {
+    if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
 
       const data = await fetchProposals(page);
@@ -45,7 +45,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
       <VStack className={styles.proposals_table_container}>
         <div className={styles.proposals_table}>
           <InfiniteScroll
-            hasMore={pages.length < meta.total_pages}
+            hasMore={meta.hasNextPage}
             pageStart={0}
             loadMore={loadMore}
             loader={
