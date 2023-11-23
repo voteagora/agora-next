@@ -4,6 +4,7 @@ import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { isAddress } from "viem";
 import { VotesSort, VotesSortOrder } from "./vote";
+import prisma from "@/app/lib/prisma";
 
 export async function getVotesForDelegate({
   addressOrENSName,
