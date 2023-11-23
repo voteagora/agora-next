@@ -10,6 +10,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -20,11 +21,7 @@ async function fetchDelegate(addressOrENSName) {
 async function getDelegateVotes(addressOrENSName, page = 1) {
   "use server";
 
-  const api = new AgoraAPI();
-  const data = await api.get(
-    `/delegates/${addressOrENSName}/votes?page=${page}`
-  );
-  return { votes: data.votes, meta: data.meta };
+  return getVotesForDelegate({ addressOrENSName, page });
 }
 
 async function getDelegateStatement(addressOrENSName) {
@@ -65,7 +62,7 @@ export default async function Page({ params: { addressOrENSName } }) {
           <DelegateStatement statement={statement.delegateStatement} />
         )}
 
-        {delegateVotes && delegateVotes.votes.lenght > 0 && (
+        {delegateVotes && (
           <DelegateVotes
             initialVotes={delegateVotes}
             fetchDelegateVotes={async (page) => {
