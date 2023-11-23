@@ -8,6 +8,7 @@ import {
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
+import { Vote } from "@/app/api/votes/vote";
 
 /**
  * Vote primitives
@@ -80,28 +81,12 @@ export function parseParams(
 /**
  * Parse votes into votes response
  */
-export type SortOrder = "asc" | "desc";
-export type Sort = "weight" | "block_number";
-
-export type VotesResponse = {
-  transactionHash: string;
-  address: string;
-  proposal_id: string;
-  support: Support;
-  weight: string;
-  reason: string | null;
-  params: ParsedParams[ProposalType]["kind"];
-  proposalValue: bigint;
-  proposalTitle: string;
-  proposalType: ProposalType;
-  timestamp: Date | null;
-};
 
 export function parseVote(
   vote: Prisma.VotesGetPayload<true>,
   proposalData: ParsedProposalData[ProposalType],
   latestBlock: Block | null
-): VotesResponse {
+): Vote {
   return {
     transactionHash: vote.transaction_hash,
     address: vote.voter,
