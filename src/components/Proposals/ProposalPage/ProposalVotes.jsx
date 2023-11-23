@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import AgoraAPI from "@/app/lib/agoraAPI";
 import HumanAddress from "@/components/shared/HumanAddress";
 import HumanVote from "@/components/shared/HumanVote";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
+import { getVotesForProposal } from "@/app/api/votes/getVotes";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -13,9 +13,7 @@ function classNames(...classes) {
 
 // A function to fetch votes
 async function fetchVotesForProposal(proposal_id, page = 1) {
-  const api = new AgoraAPI();
-  const data = await api.get(`/proposals/${proposal_id}/votes?page=${page}`);
-  return data;
+  return getVotesForProposal({ proposal_id, page });
 }
 
 // ProposalVotes Component

@@ -48,3 +48,42 @@ export async function getVotesForDelegate({
     }),
   };
 }
+
+export async function getVotesForProposal({
+  proposal_id,
+  page = 1,
+  sort = "block_number",
+  sortOrder = "desc",
+}: {
+  proposal_id: string;
+  page: number;
+  sort: VotesSort;
+  sortOrder: VotesSortOrder;
+}) {
+  const pageSize = 25;
+
+  const { meta, data: votes } = await paginatePrismaResult(
+    (skip: number, take: number) =>
+      prisma.votes.findMany({
+        where: { proposal_id },
+        take,
+        skip,
+        orderBy: {
+          [sort]: sortOrder,
+        },
+      }),
+    page,
+    pageSize
+  );
+
+  const latestBlock = await provider.getBlock("latest");
+  const proposalData = parseProposalData(
+    JSON.stringify(votes[0].proposal_data || {}),
+    votes[0].proposal_type
+  );
+
+  return {
+    meta,
+    votes: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
+  };
+}
