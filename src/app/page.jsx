@@ -5,17 +5,13 @@ import styles from "@/styles/homepage.module.scss";
 import Hero from "@/components/Hero/Hero";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
+import { getProposals } from "./api/proposals/getProposals";
 
 async function fetchProposals(page = 1) {
   "use server";
 
-  try {
-    const api = new AgoraAPI();
-    const data = await api.get(`/proposals?page=${page}`);
-    return { proposals: data.proposals, meta: data.meta };
-  } catch (error) {
-    throw error;
-  }
+  const proposals = getProposals(page);
+  return proposals;
 }
 
 async function fetchDaoMetrics() {
