@@ -46,9 +46,11 @@ export default async function Page({ params: { addressOrENSName } }) {
       justifyContent="justify-between"
       gap={6}
     >
-      <VStack className={styles.left_container}>
-        <DelegateCard delegate={delegate} />
-      </VStack>
+      {delegate && (
+        <VStack className={styles.left_container}>
+          <DelegateCard delegate={delegate} />
+        </VStack>
+      )}
 
       <VStack className={styles.right_container}>
         {!statement && !statement?.delegateStatement && (
@@ -63,14 +65,16 @@ export default async function Page({ params: { addressOrENSName } }) {
           <DelegateStatement statement={statement.delegateStatement} />
         )}
 
-        <DelegateVotes
-          initialVotes={delegateVotes}
-          fetchDelegateVotes={async (page) => {
-            "use server";
+        {votes && votes.length === 0 && (
+          <DelegateVotes
+            initialVotes={delegateVotes}
+            fetchDelegateVotes={async (page) => {
+              "use server";
 
-            return getDelegateVotes(addressOrENSName, page);
-          }}
-        />
+              return getDelegateVotes(addressOrENSName, page);
+            }}
+          />
+        )}
       </VStack>
     </HStack>
   );

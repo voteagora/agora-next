@@ -15,7 +15,7 @@ import Proposal from "../Proposal/Proposal";
 export default function ProposalsList({ initialProposals, fetchProposals }) {
   const router = useRouter();
   const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialProposals]);
+  const [pages, setPages] = React.useState([initialProposals] || []);
   const [meta, setMeta] = React.useState(initialProposals.meta);
 
   const loadMore = async (page) => {
