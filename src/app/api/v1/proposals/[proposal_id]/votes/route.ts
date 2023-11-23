@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { paginatePrismaResult } from "@/app/lib/pagination";
-import { Sort, SortOrder, parseVote } from "@/lib/voteUtils";
+import { parseVote } from "@/lib/voteUtils";
 import { parseProposalData } from "@/lib/proposalUtils";
+import { VotesSort, VotesSortOrder } from "@/app/api/votes/vote";
 
 export async function GET(
   request: NextRequest,
@@ -14,11 +15,11 @@ export async function GET(
     page = 1;
   }
 
-  const sort: Sort =
+  const sort: VotesSort =
     request.nextUrl.searchParams.get("sort") === "weight"
       ? "weight"
       : "block_number";
-  const sortOrder: SortOrder =
+  const sortOrder: VotesSortOrder =
     request.nextUrl.searchParams.get("sort_order") === "asc" ? "asc" : "desc";
   const pageSize = 25;
 
