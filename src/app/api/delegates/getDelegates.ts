@@ -3,6 +3,10 @@ import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 
 import "server-only";
+import { isAddress } from "viem";
+import { resolveENSName } from "@/app/lib/utils";
+import { getCurrentQuorum } from "@/lib/governorUtils";
+import { Delegate } from "./delegate";
 
 export async function getDelegates({
   page = 1,
@@ -57,5 +61,47 @@ export async function getDelegates({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(),
     })),
+  };
+}
+
+export async function getDelegate({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}): Promise<Delegate> {
+  const address = isAddress(addressOrENSName)
+    ? addressOrENSName.toLowerCase()
+    : await resolveENSName(addressOrENSName);
+
+  const voterStats = await prisma.voterStats.findFirst({
+    where: { voter: address },
+  });
+  const votingPower = await prisma.votingPower.findFirst({
+    where: { delegate: address },
+  });
+  const numOfDelegators = await prisma.numberOfDelegators.findFirst({
+    where: { delegate: address },
+  });
+
+  const quorum = await getCurrentQuorum("OPTIMISM");
+
+  // Build out delegate JSON response
+  return {
+    address: address,
+    votingPower: votingPower?.voting_power || "0",
+    votingPowerRelativeToVotableSupply:
+      Number(votingPower?.relative_voting_power) || 0,
+    votingPowerRelativeToQuorum:
+      Number(
+        (BigInt(votingPower?.voting_power || 0) * 10000n) / (quorum || 0n)
+      ) / 10000,
+    proposalsCreated: voterStats?.proposals_created || 0n,
+    proposalsVotedOn: voterStats?.proposals_voted || 0n,
+    votedFor: voterStats?.for?.toFixed() || "0",
+    votedAgainst: voterStats?.against?.toFixed() || "0",
+    votedAbstain: voterStats?.abstain?.toFixed() || "0",
+    votingParticipation: voterStats?.participation_rate || 0,
+    lastTenProps: voterStats?.last_10_props?.toFixed() || "0",
+    numOfDelegators: numOfDelegators?.num_for_delegators || 0n,
   };
 }
