@@ -1,14 +1,11 @@
-import AgoraAPI from "@/app/lib/agoraAPI";
 import React from "react";
-
+import { getDelegates } from "../api/delegates/getDelegates";
 import DelegateCardList from "../../components/Delegates/DelegateCardList";
 
 async function fetchDelegates(page = 1) {
   "use server";
 
-  const api = new AgoraAPI();
-  const data = await api.get(`/delegates?page=${page}`);
-  return { delegates: data.delegates, meta: data.meta };
+  return getDelegates({ page });
 }
 
 export default async function Page() {
