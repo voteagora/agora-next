@@ -45,8 +45,6 @@ export default function DAOMetricsHeader({ metrics }) {
     };
   }, [metrics]);
 
-  console.log(metrics);
-
   return (
     <HStack justifyContent="justify-between" gap={10}>
       <MetricContainer
