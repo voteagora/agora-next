@@ -3,7 +3,6 @@
  * Takes in the delegate address as a parameter
  */
 
-import AgoraAPI from "@/app/lib/agoraAPI";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -11,6 +10,7 @@ import styles from "./styles.module.scss";
 import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
+import { getStatment } from "@/app/api/statements/getStatements";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -27,9 +27,7 @@ async function getDelegateVotes(addressOrENSName, page = 1) {
 async function getDelegateStatement(addressOrENSName) {
   "use server";
 
-  const api = new AgoraAPI();
-  const data = await api.get(`/delegates/${addressOrENSName}/statement`);
-  return data.statement;
+  return getStatment({ addressOrENSName });
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
