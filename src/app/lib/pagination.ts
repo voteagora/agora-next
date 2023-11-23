@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 type PaginatedResult<T> = {
   meta: {
     currentPage: number;
@@ -16,6 +18,10 @@ export async function paginatePrismaResult<T extends Array<any>>(
   const take = pageSize + 1;
 
   const data = await result(skip, take);
+
+  if (!data || data.length === 0) {
+    return notFound();
+  }
 
   const hasNextPage = data.length > pageSize;
   const theData = data.slice(0, pageSize) as T;
