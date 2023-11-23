@@ -1,12 +1,12 @@
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-
-import "server-only";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import { getCurrentQuorum } from "@/lib/governorUtils";
 import { Delegate } from "./delegate";
+
+import "server-only";
 
 export async function getDelegates({
   page = 1,

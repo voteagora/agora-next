@@ -5,6 +5,8 @@ import { parseVote } from "@/lib/voteUtils";
 import { isAddress } from "viem";
 import { VotesSort, VotesSortOrder } from "./vote";
 
+import "server-only";
+
 export async function getVotesForDelegate({
   addressOrENSName,
   page = 1,
