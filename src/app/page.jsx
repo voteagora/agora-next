@@ -10,8 +10,7 @@ import { getProposals } from "./api/proposals/getProposals";
 async function fetchProposals(page = 1) {
   "use server";
 
-  const proposals = getProposals(page);
-  return proposals;
+  return getProposals({ page });
 }
 
 async function fetchDaoMetrics() {

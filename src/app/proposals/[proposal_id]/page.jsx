@@ -4,13 +4,14 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "@/components/Proposals/ProposalPage/ProposalDescription/ProposalDescription";
 import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
+import { getProposal } from "@/app/api/proposals/getProposals";
 
 async function fetchProposal(proposal_id) {
   "use server";
 
-  const api = new AgoraAPI();
-  const data = await api.get(`/proposals/${proposal_id}`);
-  return { proposal: data.proposal };
+  return {
+    proposal: await getProposal({ proposal_id }),
+  };
 }
 
 export default async function Page({ params: { proposal_id } }) {
