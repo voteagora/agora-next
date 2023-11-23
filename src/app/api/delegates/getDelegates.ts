@@ -10,7 +10,7 @@ import "server-only";
 
 export async function getDelegates({
   page = 1,
-  sort = "weighted_random",
+  sort = "weigted_random",
   seed = Math.random(),
 }: {
   page: number;
