@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
-import { ethers } from "ethers";
+import { BigNumberish, formatUnits } from "ethers";
 import { twMerge } from "tailwind-merge";
+import { useMemo } from "react";
 
 const secondsPerBlock = 12;
 
@@ -31,4 +32,44 @@ export function pluralizeAddresses(count: number) {
   } else {
     return `${format.format(count).toLowerCase()} addresses`;
   }
+}
+
+export function pluralize(word: string, count: number) {
+  if (count === 1) {
+    return `1 ${word}`;
+  }
+  let pluralWord = word;
+  pluralWord += "s";
+  if (word[0] === word[0].toUpperCase()) {
+    pluralWord = pluralWord.charAt(0).toUpperCase() + pluralWord.slice(1);
+  }
+  return `${count} ${pluralWord}`;
+}
+
+export function formatNumber(
+  amount: string | BigNumberish,
+  decimals: number,
+  maximumSignificantDigits = 4
+) {
+  const standardUnitAmount = Number(formatUnits(amount, decimals));
+
+  const numberFormat = new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: maximumSignificantDigits,
+  });
+
+  return numberFormat.format(standardUnitAmount);
+}
+
+export function TokenAmountDisplay(
+  amount: string | BigNumberish,
+  decimals: number,
+  currency: string,
+  maximumSignificantDigits = 2
+) {
+  const formattedNumber = useMemo(() => {
+    return formatNumber(amount, decimals, maximumSignificantDigits);
+  }, [amount, decimals, maximumSignificantDigits]);
+
+  return `${formattedNumber} ${currency}`;
 }
