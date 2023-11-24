@@ -8,7 +8,7 @@ export type Proposal = {
   start_time: Date | null;
   end_time: Date | null;
   markdowntitle: string;
-  proposaData: ParsedProposalData[ProposalType]["kind"];
+  proposalData: ParsedProposalData[ProposalType]["kind"];
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
   status: ProposalStatus | null;

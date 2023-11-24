@@ -61,9 +61,9 @@ type ParsedParams = {
 
 export function parseParams(
   params: string | null,
-  proposaData: ParsedProposalData[ProposalType]
+  proposalData: ParsedProposalData[ProposalType]
 ): ParsedParams[ProposalType]["kind"] {
-  if (params === null || proposaData.key !== "APPROVAL") {
+  if (params === null || proposalData.key !== "APPROVAL") {
     return null;
   }
 
@@ -71,7 +71,7 @@ export function parseParams(
     const parsedParams = JSON.parse(params);
     return parsedParams[0].map((param: string) => {
       const idx = Number(param);
-      return proposaData.kind.options[idx].description;
+      return proposalData.kind.options[idx].description;
     });
   } catch (e) {
     return null;
