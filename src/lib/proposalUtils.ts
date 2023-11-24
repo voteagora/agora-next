@@ -86,7 +86,7 @@ export async function parseProposal(
         )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
-    proposaData: proposalData.kind,
+    proposalData: proposalData.kind,
     proposalResults: proposalResutsls.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock

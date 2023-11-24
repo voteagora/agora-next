@@ -21,7 +21,6 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-
       const data = await fetchProposals(page);
       const existingIds = new Set(proposals.map((p) => p.id));
       const uniqueProposals = data.proposals.filter(
@@ -29,7 +28,6 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
       );
       setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
       setMeta(data.meta);
-
       fetching.current = false;
     }
   };
