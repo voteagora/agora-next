@@ -41,9 +41,35 @@ function Stack({
 }
 
 export function VStack(props: Props) {
-  return <Stack {...props} className={`flex-col ${props.className}`} />;
+  const { className, gap, alignItems, justifyContent, children } = props;
+
+  const classes = [
+    "flex",
+    "flex-col",
+    justifyContent,
+    alignItems,
+    gap ? `gap-${gap}` : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return <div className={classes}>{children}</div>;
 }
 
 export function HStack(props: Props) {
-  return <Stack {...props} className={`flex-row ${props.className || ""}`} />;
+  const { className, gap, alignItems, justifyContent, children } = props;
+
+  const classes = [
+    "flex",
+    "flex-row",
+    justifyContent,
+    alignItems,
+    gap ? `gap-${gap}` : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return <div className={classes}>{children}</div>;
 }
