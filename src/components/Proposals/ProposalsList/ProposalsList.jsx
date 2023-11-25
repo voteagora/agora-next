@@ -11,6 +11,7 @@ import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import Link from "next/link";
 import Image from "next/image";
 import Proposal from "../Proposal/Proposal";
+import Loader from "@/components/Layout/Loader";
 
 export default function ProposalsList({ initialProposals, fetchProposals }) {
   const router = useRouter();
@@ -46,17 +47,7 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
             hasMore={meta.hasNextPage}
             pageStart={0}
             loadMore={loadMore}
-            loader={
-              <div key="loader">
-                Loading... <br />
-                <Image
-                  src="/images/blink.gif"
-                  alt="Blinking Agora Logo"
-                  width={50}
-                  height={20}
-                />
-              </div>
-            }
+            loader={<Loader />}
             element="main"
           >
             {proposals.map((proposal) => (
