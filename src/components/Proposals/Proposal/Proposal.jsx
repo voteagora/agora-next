@@ -3,6 +3,9 @@ import styles from "./proposal.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
 import { TokenAmountDisplay, pluralize } from "@/lib/utils";
+import OPStandardProposalStatus from "./OPStandardProposalStatus";
+import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
+import ProposalTimeStatus from "./ProposalTimeStatus";
 
 export default function Proposal({ proposal }) {
   return (
@@ -35,38 +38,19 @@ export default function Proposal({ proposal }) {
           </div>
         </VStack>
         <VStack className={styles.cell_content} alignItems="items-end">
-          {/* <div className={styles.cell_content_title}>
-            {proposal.end_time ? proposal.end_time.toLocaleString() : "N/A"}
-          </div> */}
+          <div className={styles.cell_content_title}>
+            <ProposalTimeStatus
+              proposalStatus={proposal.status}
+              proposalEndTime={proposal.end_time}
+            />
+          </div>
           <div className={styles.cell_content_body}>
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
-                <div>
-                  <HStack gap="1">
-                    <span>
-                      {TokenAmountDisplay(
-                        proposal.proposalResults.for,
-                        18,
-                        "OP"
-                      )}{" "}
-                      For
-                    </span>
-                    <span>-</span>
-                    <span>
-                      {TokenAmountDisplay(
-                        proposal.proposalResults.against,
-                        18,
-                        "OP"
-                      )}{" "}
-                      Against
-                    </span>
-                  </HStack>
-                </div>
+                <OPStandardProposalStatus proposal={proposal} />
               )}
-            {proposal.proposalType === "APPROVAL" && (
-              <div>
-                {pluralize("Choice", proposal.proposalData.options.length)}
-              </div>
+            {proposal.proposalType === "APPROVAL" && proposal.proposalData && (
+              <OPApprovalProposalStatus proposal={proposal} />
             )}
           </div>
         </VStack>
