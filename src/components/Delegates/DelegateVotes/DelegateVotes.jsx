@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { HStack, VStack } from "../Layout/Stack";
+import { HStack, VStack } from "../../Layout/Stack";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
 import { colorForSupportType } from "@/lib/voteUtils";
@@ -10,6 +10,10 @@ import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
+import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
+import VoteReason from "./DelegateVotesReason";
+import StandardVoteContainer from "./StandardVoteContainer";
+import ApprovalVoteContainer from "./ApprovalVoteContainer";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -142,119 +146,5 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
         )}
       </InfiniteScroll>
     </VStack>
-  );
-}
-
-function VoteDetailsContainer({ children }) {
-  return (
-    <VStack
-      gap="3"
-      className={css`
-        border-radius: ${theme.borderRadius.lg};
-        border-width: ${theme.spacing.px};
-        border-color: ${theme.colors.gray.eb};
-        background: ${theme.colors.white};
-        box-shadow: ${theme.shadow};
-        max-height: 15rem;
-      `}
-    >
-      {children}
-    </VStack>
-  );
-}
-
-function StandardVoteContainer({ support, weight }) {
-  return (
-    <span
-      className={css`
-        color: ${colorForSupportType(support)};
-        font-size: ${theme.fontSize.xs};
-        font-weight: ${theme.fontWeight.medium};
-      `}
-    >
-      <span
-        className={css`
-          text-transform: capitalize;
-        `}
-      >
-        {support.toLowerCase()}
-      </span>{" "}
-      with {pluralizeVote(weight, "optimism")}
-    </span>
-  );
-}
-
-function ApprovalVoteContainer({ params, support, weight }) {
-  return (
-    <div
-      className={css`
-        font-size: ${theme.fontSize.xs};
-        font-weight: ${theme.fontWeight.medium};
-        color: #66676b;
-      `}
-    >
-      {params?.length > 1 && "Voted: "}
-      {params?.map((option, i) => (
-        <>
-          {option}
-          {/* add a coma here if not last option */}
-          {i !== params.length - 1 && ", "}
-        </>
-      ))}
-      {(!params || params?.length === 0) && "Abstain"}
-      <span
-        className={css`
-          color: ${colorForSupportType(support)};
-          font-size: ${theme.fontSize.xs};
-          font-weight: ${theme.fontWeight.medium};
-        `}
-      >
-        {" "}
-        with {pluralizeVote(weight, "optimism")}
-      </span>
-    </div>
-  );
-}
-
-function VoteReason({ reason }) {
-  return (
-    <>
-      <div
-        className={css`
-          width: ${theme.spacing.px};
-          background: #ebebeb;
-
-          @media (max-width: ${theme.maxWidth["2xl"]}) {
-            display: none;
-          }
-        `}
-      />
-
-      <VStack
-        className={css`
-          overflow-y: scroll;
-          overflow-x: scroll;
-          padding: ${theme.spacing["4"]} ${theme.spacing["6"]};
-
-          @media (max-width: ${theme.maxWidth["2xl"]}) {
-            padding-top: 0;
-            height: fit-content;
-          }
-        `}
-      >
-        <pre
-          className={css`
-            font-family: ${theme.fontFamily.sans};
-            font-size: ${theme.fontSize.xs};
-            font-weight: ${theme.fontWeight.medium};
-            white-space: pre-wrap;
-            color: #66676b;
-            width: fit-content;
-          `}
-        >
-          {reason}
-        </pre>
-      </VStack>
-    </>
   );
 }
