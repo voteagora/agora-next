@@ -1,6 +1,7 @@
-import React from 'react';
+import React from "react";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
+import { VStack } from "@/components/Layout/Stack";
 
 function VoteDetailsContainer({ children }) {
   return (

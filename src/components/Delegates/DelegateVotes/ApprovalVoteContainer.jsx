@@ -1,7 +1,8 @@
-import React from 'react';
+import React from "react";
 import { css } from "@emotion/css";
-import { colorForSupportType, pluralizeVote } from "@/lib/voteUtils";
+import { colorForSupportType } from "@/lib/voteUtils";
 import * as theme from "@/styles/theme";
+import { pluralizeVote } from "@/lib/tokenUtils";
 
 function ApprovalVoteContainer({ params, support, weight }) {
   return (

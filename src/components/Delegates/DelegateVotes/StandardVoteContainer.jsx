@@ -1,7 +1,8 @@
-import React from 'react';
+import React from "react";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
-import { colorForSupportType, pluralizeVote } from "@/lib/voteUtils";
+import { colorForSupportType } from "@/lib/voteUtils";
+import { pluralizeVote } from "@/lib/tokenUtils";
 
 function StandardVoteContainer({ support, weight }) {
   return (
