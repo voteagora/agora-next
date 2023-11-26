@@ -10,6 +10,8 @@ import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
+import VoteDetailsContainer from "./DelegateVotes/DelegateVotesDetailsContainer";
+import VoteReason from "./DelegateVotes/DelegateVotesReason";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
