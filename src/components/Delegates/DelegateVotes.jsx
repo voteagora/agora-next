@@ -12,6 +12,8 @@ import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
 import VoteDetailsContainer from "./DelegateVotes/DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotes/DelegateVotesReason";
+import StandardVoteContainer from "./DelegateVotes/StandardVoteContainer";
+import ApprovalVoteContainer from "./DelegateVotes/ApprovalVoteContainer";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -166,28 +168,6 @@ function VoteDetailsContainer({ children }) {
 }
 
 function StandardVoteContainer({ support, weight }) {
-  return (
-    <span
-      className={css`
-        color: ${colorForSupportType(support)};
-        font-size: ${theme.fontSize.xs};
-        font-weight: ${theme.fontWeight.medium};
-      `}
-    >
-      <span
-        className={css`
-          text-transform: capitalize;
-        `}
-      >
-        {support.toLowerCase()}
-      </span>{" "}
-      with {pluralizeVote(weight, "optimism")}
-    </span>
-  );
-}
-
-function ApprovalVoteContainer({ params, support, weight }) {
-  return (
     <div
       className={css`
         font-size: ${theme.fontSize.xs};
