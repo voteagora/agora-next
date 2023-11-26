@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { HStack, VStack } from "../Layout/Stack";
+import { HStack, VStack } from "../../Layout/Stack";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
 import { colorForSupportType } from "@/lib/voteUtils";
@@ -10,10 +10,10 @@ import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
-import VoteDetailsContainer from "./DelegateVotes/DelegateVotesDetailsContainer";
-import VoteReason from "./DelegateVotes/DelegateVotesReason";
-import StandardVoteContainer from "./DelegateVotes/StandardVoteContainer";
-import ApprovalVoteContainer from "./DelegateVotes/ApprovalVoteContainer";
+import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
+import VoteReason from "./DelegateVotesReason";
+import StandardVoteContainer from "./StandardVoteContainer";
+import ApprovalVoteContainer from "./ApprovalVoteContainer";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
