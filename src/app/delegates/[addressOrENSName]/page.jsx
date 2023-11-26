@@ -4,7 +4,7 @@
  */
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
-import DelegateVotes from "@/components/Delegates/DelegateVotes";
+import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
