@@ -26,7 +26,7 @@ export default function ProposalDescription({ proposal }) {
     ? proposal.description.split("\\n ")[1]
     : proposal.description;
 
-  const title = getTitleFromProposalDescription(patchedDescription);
+  const title = proposal.markdowntitle;
 
   const shortTitle = proposalsWithBadFormatting.includes(proposal.id)
     ? title.split("-")[0].split("(")[0]

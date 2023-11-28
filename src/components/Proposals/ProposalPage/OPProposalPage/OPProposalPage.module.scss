@@ -1,0 +1,9 @@
+@import "@/styles/variables.scss";
+
+.proposal_actions_panel {
+  min-height: 0;
+  flex-shrink: 1;
+  padding-left: $spacing-4;
+  padding-right: $spacing-4;
+  overflow-y: scroll;
+}
