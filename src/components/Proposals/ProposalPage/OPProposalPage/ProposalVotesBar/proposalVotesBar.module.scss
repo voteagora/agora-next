@@ -1,0 +1,22 @@
+@import "@/styles/variables.scss";
+
+.vote_bar_ticks {
+  .for {
+    background: $color-green-700;
+    border-radius: $border-radius-full;
+    width: 2px;
+    height: 12px;
+  }
+  .against {
+    background: $red-600;
+    border-radius: $border-radius-full;
+    width: 2px;
+    height: 12px;
+  }
+  .abstain {
+    background: $gray-af;
+    border-radius: $border-radius-full;
+    width: 2px;
+    height: 12px;
+  }
+}
