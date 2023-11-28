@@ -73,3 +73,53 @@ export function TokenAmountDisplay(
 
   return `${formattedNumber} ${currency}`;
 }
+
+export function* generateBarsForVote(
+  forVotes: bigint,
+  abstainVotes: bigint,
+  againstVotes: bigint
+) {
+  const sections = [
+    {
+      amount: forVotes,
+      value: "for" as const,
+    },
+    {
+      amount: abstainVotes,
+      value: "abstain" as const,
+    },
+    {
+      amount: againstVotes,
+      value: "against" as const,
+    },
+  ];
+
+  const defaultSectionIndex = 1;
+
+  const bars = 57;
+
+  // Sum of all votes using BigInt
+  const totalVotes = sections.reduce(
+    (acc, section) => acc + section.amount,
+    BigInt(0)
+  );
+
+  for (let index = 0; index < bars; index++) {
+    if (totalVotes === BigInt(0)) {
+      yield sections[defaultSectionIndex].value;
+    } else {
+      const value = (totalVotes * BigInt(index)) / BigInt(bars);
+
+      let lastSectionValue = BigInt(0);
+      for (const section of sections) {
+        const sectionAmount = section.amount;
+        if (value < lastSectionValue + sectionAmount) {
+          yield section.value;
+          break;
+        }
+
+        lastSectionValue += sectionAmount;
+      }
+    }
+  }
+}

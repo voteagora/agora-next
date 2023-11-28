@@ -1,6 +1,8 @@
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./proposalVotesSummary.module.scss";
 import { TokenAmountDisplay } from "@/lib/utils";
+import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
+import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 
 export default function ProposalVotesSummary({ proposal }) {
   return (
@@ -14,9 +16,13 @@ export default function ProposalVotesSummary({ proposal }) {
           {TokenAmountDisplay(proposal.proposalResults.against, 18, "OP")}
         </div>
       </HStack>
+      <ProposalVotesBar proposal={proposal} />
       <HStack justifyContent="justify-between" className="text-gray-4f">
         <div>QUORUM {TokenAmountDisplay(proposal.quorum, 18, "OP")}</div>
-        {/* <VoteTime fragmentRef={propVotesSummaryRef} /> */}
+        <ProposalTimeStatus
+          proposalStatus={proposal.status}
+          proposalEndTime={proposal.end_time}
+        />
       </HStack>
     </VStack>
   );
