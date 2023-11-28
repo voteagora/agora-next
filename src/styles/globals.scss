@@ -59,3 +59,17 @@
   background-image: radial-gradient(rgba(0, 0, 0, 10%) 0.5px, transparent 0);
   background-size: 8px 8px;
 }
+
+//////////////////////////
+// Proposal FOR, AGAINST, ABSTAIN Styles
+//////////////////////////
+
+.gl_votes_for {
+  color: $color-green-700;
+}
+.gl_votes_abstain {
+  color: $gray-700;
+}
+.gl_votes_against {
+  color: $red-700;
+}

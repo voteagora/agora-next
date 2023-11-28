@@ -86,6 +86,8 @@ export async function parseProposal(
         )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
+    description: proposal.description,
+    quorum: await getQuorumForProposal(proposal),
     proposalData: proposalData.kind,
     proposalResults: proposalResutsls.kind,
     proposalType: proposal.proposal_type as ProposalType,
