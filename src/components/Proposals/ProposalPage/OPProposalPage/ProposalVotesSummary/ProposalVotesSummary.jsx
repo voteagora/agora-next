@@ -23,7 +23,7 @@ export default function ProposalVotesSummary({ proposal }) {
           proposalStatus={proposal.status}
           proposalEndTime={proposal.end_time}
         />
-      </HStack>
+      </HStack>    
     </VStack>
   );
 }
