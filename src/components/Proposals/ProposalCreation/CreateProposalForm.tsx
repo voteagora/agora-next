@@ -11,6 +11,7 @@ import { useRef } from "react";
 import styles from "./styles.module.scss";
 import { UseForm, useForm } from "@/app/lib/hooks/useForm";
 import { HStack, VStack } from "@/components/Layout/Stack";
+import ProposalTypeRow from "./ProposalTypeRow";
 
 type FormValues = {
   proposalType: "Basic" | "Approval";
@@ -52,7 +53,7 @@ const initialFormValues: FormValues = {
 
 export type Form = UseForm<FormValues>;
 
-export function CreateProposalForm() {
+export default function CreateProposalForm() {
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
 
@@ -68,8 +69,8 @@ export function CreateProposalForm() {
               Please describe your proposal, and remember to proofread as
               proposals cannot be edited once published onchain.
             </p>
-            {/* <ProposalTypeRow form={form} />
-            <TitleDescriptionRow form={form} /> */}
+            <ProposalTypeRow form={form} />
+            {/* <TitleDescriptionRow form={form} /> */}
           </div>
           {form.state.proposalType === "Approval" && (
             <>
