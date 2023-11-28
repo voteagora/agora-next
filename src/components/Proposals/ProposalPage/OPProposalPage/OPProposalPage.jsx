@@ -1,8 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-import ProposalResults from "../ProposalResults";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import { ProposalVotes } from "../ProposalVotes";
 import styles from "./OPProposalPage.module.scss";
+import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 
 export default function OPProposalPage({ proposal }) {
   return (
@@ -17,7 +16,9 @@ export default function OPProposalPage({ proposal }) {
         justifyContent="space-between"
         className={styles.proposal_votes_container}
       >
-        Standard VOTES
+        <VStack gap={4} className={styles.proposal_actions_panel}>
+          <ProposalVotesSummary proposal={proposal} />
+        </VStack>
       </VStack>
     </HStack>
   );
