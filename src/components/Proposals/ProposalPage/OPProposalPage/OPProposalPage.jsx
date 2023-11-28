@@ -2,8 +2,17 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalPage.module.scss";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import { getVotesForProposal } from "@/app/api/votes/getVotes";
 
-export default function OPProposalPage({ proposal }) {
+async function fetchProposalVotes(proposal_id, page = 1) {
+  "use server";
+
+  return getVotesForProposal({ proposal_id, page });
+}
+
+export default async function OPProposalPage({ proposal }) {
+  const proposalVotes = await fetchProposalVotes(proposal.id);
   return (
     <HStack
       gap={16}
@@ -18,6 +27,11 @@ export default function OPProposalPage({ proposal }) {
       >
         <VStack gap={4} className={styles.proposal_actions_panel}>
           <ProposalVotesSummary proposal={proposal} />
+          <ProposalVotesList
+            initialProposalVotes={proposalVotes}
+            fetchVotesForProposal={fetchProposalVotes}
+            proposal_id={proposal.id}
+          />
         </VStack>
       </VStack>
     </HStack>
