@@ -1,7 +1,7 @@
 import { HStack } from "@/components/Layout/Stack";
 import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
 import styles from "./styles.module.scss";
-import { CreateProposalForm } from "@/components/Proposals/ProposalCreation/CreateProposalForm";
+import CreateProposalForm from "@/components/Proposals/ProposalCreation/CreateProposalForm";
 
 export default function CreateProposalPage() {
   return (
