@@ -1,6 +1,4 @@
 import { VStack } from "@/components/Layout/Stack";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 import styles from "./styles.module.scss";
 
 export default function InfoPanel() {
