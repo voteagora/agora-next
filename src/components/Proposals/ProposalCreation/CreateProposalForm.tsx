@@ -8,6 +8,7 @@ import ProposalTypeRow from "./ProposalTypeRow";
 import TitleDescriptionRow from "./TitleDescriptionRow";
 import ApprovalCriteriaRow from "./ApprovalCriteriaRow";
 import ApprovalOptionsRow from "./ApprovalOptionsRow";
+import StandardForm from "./StandardForm";
 
 type FormValues = {
   proposalType: "Basic" | "Approval";
@@ -80,7 +81,7 @@ export default function CreateProposalForm() {
           )}
           {form.state.proposalType === "Basic" && (
             <div className={styles.create_prop_form__box}>
-              {/* <StandardForm form={form} /> */}
+              <StandardForm form={form} />
             </div>
           )}
           <HStack
