@@ -1,14 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/app/lib/prisma";
-import { parseProposal } from "@/lib/proposalUtils";
-import provider from "@/app/lib/provider";
+import { notFound } from "next/navigation";
 import { paginatePrismaResult } from "@/app/lib/pagination";
+import { parseProposal } from "@/lib/proposalUtils";
+import prisma from "@/app/lib/prisma";
+import provider from "@/app/lib/provider";
 
-export async function GET(request: NextRequest) {
-  let page = parseInt(request.nextUrl.searchParams.get("page") ?? "0", 10);
-  if (isNaN(page) || page < 1) {
-    page = 1;
-  }
+import "server-only";
+
+export async function getProposals({ page = 1 }: { page: number }) {
   const pageSize = 4;
 
   const { meta, data: proposals } = await paginatePrismaResult(
@@ -30,11 +28,21 @@ export async function GET(request: NextRequest) {
     proposals.map((proposal) => parseProposal(proposal, latestBlock))
   );
 
-  // Build out proposal response
-  const response = {
+  return {
     meta,
     proposals: await resolvedProposals,
   };
+}
 
-  return NextResponse.json(response);
+export async function getProposal({ proposal_id }: { proposal_id: string }) {
+  const proposal = await prisma.proposals.findFirst({
+    where: { proposal_id },
+  });
+
+  if (!proposal) {
+    return notFound();
+  }
+
+  const latestBlock = await provider.getBlock("latest");
+  return parseProposal(proposal, latestBlock);
 }
