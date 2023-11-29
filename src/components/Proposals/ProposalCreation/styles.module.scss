@@ -57,4 +57,11 @@
     font-weight: 500;
     width: 60%;
   }
+
+  &__label {
+    color: $gray-4f;
+    font-weight: 600;
+    margin-bottom: $spacing-1;
+    font-size: $font-size-xs;
+  }
 }

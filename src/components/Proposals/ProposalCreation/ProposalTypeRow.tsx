@@ -6,7 +6,7 @@ import * as theme from "@/styles/theme";
 import { Form } from "./CreateProposalForm";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
-import { Switch } from "@/components/Switch";
+import { Switch } from "@/components/shared/Switch";
 
 function ProposalTypeRow({ form }: { form: Form }) {
   const { proposalType } = form.state;
