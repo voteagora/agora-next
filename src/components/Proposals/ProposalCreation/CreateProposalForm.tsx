@@ -6,6 +6,8 @@ import { UseForm, useForm } from "@/app/lib/hooks/useForm";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTypeRow from "./ProposalTypeRow";
 import TitleDescriptionRow from "./TitleDescriptionRow";
+import ApprovalCriteriaRow from "./ApprovalCriteriaRow";
+import ApprovalOptionsRow from "./ApprovalOptionsRow";
 
 type FormValues = {
   proposalType: "Basic" | "Approval";
@@ -69,10 +71,10 @@ export default function CreateProposalForm() {
           {form.state.proposalType === "Approval" && (
             <>
               <div className={styles.create_prop_form__box}>
-                {/* <ApprovalCriteriaRow form={form} /> */}
+                <ApprovalCriteriaRow form={form} />
               </div>
               <div className={styles.create_prop_form__box}>
-                {/* <ApprovalOptionsRow form={form} /> */}
+                <ApprovalOptionsRow form={form} />
               </div>
             </>
           )}
