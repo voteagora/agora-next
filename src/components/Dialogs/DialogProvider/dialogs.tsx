@@ -1,17 +1,27 @@
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
+import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
 
-export type DialogType = DelegateDialogType;
+export type DialogType = DelegateDialogType | CastProposalDialogType;
 // | CastVoteDialogType
 // | ApprovalCastVoteDialogType
 // | FaqDialogType
-// | CastProposalDialogType;
 
 export type DelegateDialogType = {
   type: "DELEGATE";
   params: {
     target: string;
     votingPower: string;
+  };
+};
+
+export type CastProposalDialogType = {
+  type: "CAST_PROPOSAL";
+  params: {
+    isLoading: boolean;
+    isError: boolean;
+    isSuccess: boolean;
+    txHash?: string;
   };
 };
 
@@ -39,16 +49,6 @@ export type DelegateDialogType = {
 //   };
 // };
 
-// export type CastProposalDialogType = {
-//   type: "CAST_PROPOSAL";
-//   params: {
-//     isLoading: boolean;
-//     isError: boolean;
-//     isSuccess: boolean;
-//     txHash?: string;
-//   };
-// };
-
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: ({ target, votingPower }, closeDialog) => {
     return (
@@ -56,6 +56,17 @@ export const dialogs: DialogDefinitions<DialogType> = {
         target={target}
         votingPower={votingPower}
         completeDelegation={closeDialog}
+      />
+    );
+  },
+  CAST_PROPOSAL: ({ isError, isLoading, isSuccess, txHash }, closeDialog) => {
+    return (
+      <CastProposalDialog
+        isError={isError}
+        isLoading={isLoading}
+        isSuccess={isSuccess}
+        txHash={txHash}
+        closeDialog={closeDialog}
       />
     );
   },
@@ -67,8 +78,5 @@ export const dialogs: DialogDefinitions<DialogType> = {
   // },
   // FAQ: () => {
   //   return <FaqDialog />;
-  // },
-  // CAST_PROPOSAL: ({ ...props }, closeDialog) => {
-  //   return <CastProposalDialog {...props} closeDialog={closeDialog} />;
   // },
 };
