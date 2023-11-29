@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
-import { BigNumberish, ethers } from "ethers";
+import { ethers } from "ethers";
 import { icons } from "../../icons/icons";
 import Image from "next/image";
 import { Button } from "../ui/button";
@@ -18,7 +18,7 @@ export default function SimulateTransaction({
   calldata,
 }: {
   target: string;
-  value: BigNumberish;
+  value: BigInt;
   calldata: string;
 }) {
   const [status, setStatus] = useState<Status>("Unconfirmed");

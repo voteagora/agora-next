@@ -9,6 +9,7 @@ import TitleDescriptionRow from "./TitleDescriptionRow";
 import ApprovalCriteriaRow from "./ApprovalCriteriaRow";
 import ApprovalOptionsRow from "./ApprovalOptionsRow";
 import StandardForm from "./StandardForm";
+import SubmitButton from "./SubmitButton";
 
 type FormValues = {
   proposalType: "Basic" | "Approval";
@@ -93,7 +94,7 @@ export default function CreateProposalForm() {
               Only the Optimism Foundation manager address can create proposals
               for the time being.
             </p>
-            {/* <SubmitButton formTarget={formTarget} form={form} /> */}
+            <SubmitButton formTarget={formTarget} form={form} />
           </HStack>
         </VStack>
       </form>
