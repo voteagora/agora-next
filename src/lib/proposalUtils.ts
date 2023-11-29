@@ -2,6 +2,7 @@ import { getQuorumForProposal } from "./governorUtils";
 import { Prisma, ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
+import { Proposal } from "@/app/api/proposals/proposal";
 
 /**
  * Proposal title extraction
@@ -48,23 +49,10 @@ export function getTitleFromProposalDescription(description: string = "") {
  * Parse proposal into proposal response
  */
 
-export type ProposalResponse = {
-  id: string;
-  proposer: string;
-  created_time: Date | null;
-  start_time: Date | null;
-  end_time: Date | null;
-  markdowntitle: string;
-  proposaData: ParsedProposalData[ProposalType]["kind"];
-  proposalResults: ParsedProposalResults[ProposalType]["kind"];
-  proposalType: ProposalType | null;
-  status: ProposalStatus | null;
-};
-
 export async function parseProposal(
   proposal: Prisma.ProposalsGetPayload<true>,
   latestBlock: Block | null
-): Promise<ProposalResponse> {
+): Promise<Proposal> {
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposal.proposal_type as ProposalType
@@ -98,7 +86,9 @@ export async function parseProposal(
         )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
-    proposaData: proposalData.kind,
+    description: proposal.description,
+    quorum: await getQuorumForProposal(proposal),
+    proposalData: proposalData.kind,
     proposalResults: proposalResutsls.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock

@@ -8,6 +8,7 @@ import {
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
+import { Vote } from "@/app/api/votes/vote";
 
 /**
  * Vote primitives
@@ -60,9 +61,9 @@ type ParsedParams = {
 
 export function parseParams(
   params: string | null,
-  proposaData: ParsedProposalData[ProposalType]
+  proposalData: ParsedProposalData[ProposalType]
 ): ParsedParams[ProposalType]["kind"] {
-  if (params === null || proposaData.key !== "APPROVAL") {
+  if (params === null || proposalData.key !== "APPROVAL") {
     return null;
   }
 
@@ -70,7 +71,7 @@ export function parseParams(
     const parsedParams = JSON.parse(params);
     return parsedParams[0].map((param: string) => {
       const idx = Number(param);
-      return proposaData.kind.options[idx].description;
+      return proposalData.kind.options[idx].description;
     });
   } catch (e) {
     return null;
@@ -80,28 +81,12 @@ export function parseParams(
 /**
  * Parse votes into votes response
  */
-export type SortOrder = "asc" | "desc";
-export type Sort = "weight" | "block_number";
-
-export type VotesResponse = {
-  transactionHash: string;
-  address: string;
-  proposal_id: string;
-  support: Support;
-  weight: string;
-  reason: string | null;
-  params: ParsedParams[ProposalType]["kind"];
-  proposalValue: bigint;
-  proposalTitle: string;
-  proposalType: ProposalType;
-  timestamp: Date | null;
-};
 
 export function parseVote(
   vote: Prisma.VotesGetPayload<true>,
   proposalData: ParsedProposalData[ProposalType],
   latestBlock: Block | null
-): VotesResponse {
+): Vote {
   return {
     transactionHash: vote.transaction_hash,
     address: vote.voter,
