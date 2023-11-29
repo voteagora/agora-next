@@ -11,7 +11,7 @@ export default function CreateProposalPage() {
       className={styles.create_prop_container}
     >
       <CreateProposalForm />
-      <div className={styles.create_prop_container_right}>
+      <div className={styles.create_prop_right_box}>
         <InfoPanel />
       </div>
     </HStack>
