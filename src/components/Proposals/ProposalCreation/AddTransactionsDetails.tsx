@@ -10,6 +10,7 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import InputBox from "@/components/shared/InputBox";
 import styles from "./styles.module.scss";
 import { MultiButtons } from "@/components/shared/MultiButtons";
+import SimulateTransaction from "@/components/shared/SimulateTransaction";
 
 export default function AddTransactionsDetails({
   form,
@@ -227,13 +228,13 @@ export default function AddTransactionsDetails({
                     `}
                   >
                     <label className={labelStyle}>Transaction Validity</label>
-                    {/* <SimulateTransaction
+                    <SimulateTransaction
                       target={transaction.target}
                       value={ethers.parseEther(
                         transaction.value.toString() || "0"
                       )}
                       calldata={transaction.calldata}
-                    /> */}
+                    />
                   </VStack>
                 </HStack>
               </>

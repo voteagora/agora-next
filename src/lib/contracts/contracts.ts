@@ -27,6 +27,11 @@ export const OptimismContracts = {
   },
 };
 
+export const opAdminAddress = "0x2501c477D0A35545a387Aa4A3EEe4292A9a8B3F0";
+
+export const approvalModuleAddress =
+  "0x54A8fCBBf05ac14bEf782a2060A8C752C7CC13a5";
+
 export const NounsContracts = {
   governor: {
     contract: NounsGovernor__factory.connect(
