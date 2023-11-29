@@ -1,17 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-// import ProposalTypeRow from "./ProposalTypeRow";
-// import TitleDescriptionRow from "./TitleDescriptionRow";
-// import StandardForm from "./StandardForm";
-// import ApprovalCriteriaRow from "./ApprovalCriteriaRow";
-// import ApprovalOptionsRow from "./ApprovalOptionsRow";
-// import SubmitButton from "./SubmitButton";
-// import { UseForm, useForm } from "@/app/lib/hooks/useForm";
 import styles from "./styles.module.scss";
 import { UseForm, useForm } from "@/app/lib/hooks/useForm";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTypeRow from "./ProposalTypeRow";
+import TitleDescriptionRow from "./TitleDescriptionRow";
 
 type FormValues = {
   proposalType: "Basic" | "Approval";
@@ -70,7 +64,7 @@ export default function CreateProposalForm() {
               proposals cannot be edited once published onchain.
             </p>
             <ProposalTypeRow form={form} />
-            {/* <TitleDescriptionRow form={form} /> */}
+            <TitleDescriptionRow form={form} />
           </div>
           {form.state.proposalType === "Approval" && (
             <>
