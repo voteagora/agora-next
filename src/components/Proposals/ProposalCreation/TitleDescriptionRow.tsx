@@ -7,7 +7,7 @@ import { css, cx } from "@emotion/css";
 import { Tab } from "@headlessui/react";
 import { useState } from "react";
 import styles from "./styles.module.scss";
-import InputBox from "@/components/InputBox";
+import InputBox from "@/components/shared/InputBox";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
 export const tipTextStyle = css`

@@ -2,7 +2,7 @@
 
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
-import { HStack } from "./Layout/Stack";
+import { HStack } from "../Layout/Stack";
 
 type Props = {
   onSelectionChanged: (newSelection: any) => void;
