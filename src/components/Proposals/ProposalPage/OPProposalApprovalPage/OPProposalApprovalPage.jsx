@@ -5,7 +5,7 @@ import { ProposalVotes } from "../ProposalVotes";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 
-export default function OPProposalApprovalPage({ proposal, proposalResults }) {
+export default function OPProposalApprovalPage({ proposal }) {
   return (
     <HStack
       gap={16}
@@ -18,10 +18,7 @@ export default function OPProposalApprovalPage({ proposal, proposalResults }) {
         justifyContent="space-between"
         className={styles.proposal_votes_container}
       >
-        <ApprovalVotesPanel
-          proposal={proposal}
-          proposalResults={proposalResults}
-        />
+        <ApprovalVotesPanel proposal={proposal} />
       </VStack>
     </HStack>
   );

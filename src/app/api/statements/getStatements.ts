@@ -1,13 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { notFound } from "next/navigation";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
-import { GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
+import { isAddress } from "viem";
 
-export async function GET(
-  request: NextRequest,
-  { params: { addressOrENSName } }: { params: { addressOrENSName: string } }
-) {
+import "server-only";
+
+export async function getStatment({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) {
   let address: string = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -34,31 +36,19 @@ export async function GET(
 
       const delegateStatementObject = JSON.parse(signedPayload as string);
 
-      // Build out proposal response
-      const response = {
-        statement: {
-          address: address, // assuming 'address' is a variable containing the address
-          delegateStatement: delegateStatementObject.delegateStatement,
-          openToSponsoringProposals:
-            delegateStatementObject.openToSponsoringProposals,
-          twitter: delegateStatementObject.twitter,
-          discord: delegateStatementObject.discord,
-        },
+      return {
+        address: address, // assuming 'address' is a variable containing the address
+        delegateStatement: delegateStatementObject.delegateStatement,
+        openToSponsoringProposals:
+          delegateStatementObject.openToSponsoringProposals,
+        twitter: delegateStatementObject.twitter,
+        discord: delegateStatementObject.discord,
       };
-
-      return NextResponse.json(response);
     } else {
-      const response = {
-        error: "Statement not found",
-      };
-
-      return NextResponse.json(response);
+      return notFound();
     }
   } catch (error) {
-    const response = {
-      error: error,
-    };
-
-    return NextResponse.json(response);
+    console.error(error);
+    return notFound();
   }
 }
