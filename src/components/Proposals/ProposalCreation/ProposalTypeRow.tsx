@@ -8,8 +8,21 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import { Switch } from "@/components/shared/Switch";
 import InputBox from "@/components/shared/InputBox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-function ProposalTypeRow({ form }: { form: Form }) {
+function ProposalTypeRow({
+  form,
+  proposalSettingsList,
+}: {
+  form: Form;
+  proposalSettingsList: string[];
+}) {
   const { proposalType, proposalSettings } = form.state;
   const infoText =
     proposalType === "Basic"
@@ -65,13 +78,28 @@ function ProposalTypeRow({ form }: { form: Form }) {
           `}
         >
           <h4 className={styles.create_prop_form__heading}>Proposal type</h4>
-          <InputBox
+          {/* <InputBox
             label="Proposal settings"
             type="text"
             value={proposalSettings}
             onChange={form.onChange.proposalSettings}
             placeholder="Governance fund"
-          />
+          /> */}
+          <Select
+            onValueChange={form.onChange.proposalSettings}
+            defaultValue={proposalSettingsList[0]}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={proposalSettingsList[0]} />
+            </SelectTrigger>
+            <SelectContent>
+              {proposalSettingsList.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </HStack>
     </VStack>

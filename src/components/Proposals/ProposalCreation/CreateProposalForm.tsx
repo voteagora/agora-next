@@ -11,11 +11,9 @@ import ApprovalOptionsRow from "./ApprovalOptionsRow";
 import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
 
-type ProposalSettings = "Governance fund";
-
 type FormValues = {
   proposalType: "Basic" | "Approval";
-  proposalSettings: ProposalSettings;
+  proposalSettings: string;
   title: string;
   description: string;
   budget: number;
@@ -40,22 +38,25 @@ export type Transaction = {
   transferTo: string;
 };
 
-const initialFormValues: FormValues = {
-  proposalType: "Basic",
-  proposalSettings: "Governance fund",
-  title: "",
-  description: "",
-  budget: 0,
-  maxOptions: 1,
-  criteriaType: "Threshold",
-  threshold: 0,
-  topChoices: 1,
-  options: [{ title: "", transactions: [] }],
-};
-
 export type Form = UseForm<FormValues>;
 
-export default function CreateProposalForm() {
+export default function CreateProposalForm({
+  proposalSettingsList,
+}: {
+  proposalSettingsList: string[];
+}) {
+  const initialFormValues: FormValues = {
+    proposalType: "Basic",
+    proposalSettings: proposalSettingsList[0],
+    title: "",
+    description: "",
+    budget: 0,
+    maxOptions: 1,
+    criteriaType: "Threshold",
+    threshold: 0,
+    topChoices: 1,
+    options: [{ title: "", transactions: [] }],
+  };
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
 
@@ -71,7 +72,10 @@ export default function CreateProposalForm() {
               Please describe your proposal, and remember to proofread as
               proposals cannot be edited once published onchain.
             </p>
-            <ProposalTypeRow form={form} />
+            <ProposalTypeRow
+              form={form}
+              proposalSettingsList={proposalSettingsList}
+            />
             <TitleDescriptionRow form={form} />
           </div>
           {form.state.proposalType === "Approval" && (
