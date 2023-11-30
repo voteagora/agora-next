@@ -78,13 +78,6 @@ function ProposalTypeRow({
           `}
         >
           <h4 className={styles.create_prop_form__heading}>Proposal type</h4>
-          {/* <InputBox
-            label="Proposal settings"
-            type="text"
-            value={proposalSettings}
-            onChange={form.onChange.proposalSettings}
-            placeholder="Governance fund"
-          /> */}
           <Select
             onValueChange={form.onChange.proposalSettings}
             defaultValue={proposalSettingsList[0]}

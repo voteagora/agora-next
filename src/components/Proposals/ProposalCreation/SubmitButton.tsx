@@ -114,6 +114,7 @@ function getInputData(form: Form): {
   let targets: string[] = [];
   let values: BigInt[] = [];
   let calldatas: string[] = [];
+  let proposalSettings: string = form.state.proposalSettings; // index as uint8 as last argument on propose and proposeWithModule
   let inputData: InputData = [targets, values, calldatas, description];
 
   try {

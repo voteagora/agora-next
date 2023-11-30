@@ -69,8 +69,9 @@ export default function CreateProposalForm({
               Create proposal
             </h1>
             <p className={styles.create_prop_form__subheading}>
-              Please describe your proposal, and remember to proofread as
-              proposals cannot be edited once published onchain.
+              Select the type of vote and proposal you want to create, and
+              describe its intent to voters. Remember to proofread as proposals
+              cannot be edited once published.
             </p>
             <ProposalTypeRow
               form={form}

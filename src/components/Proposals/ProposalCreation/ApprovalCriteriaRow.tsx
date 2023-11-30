@@ -8,6 +8,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
 import { Switch } from "@/components/shared/Switch";
 import InfoPop from "@/components/shared/InfoPop";
+import LabelWithInfo from "./LabelWithInfo";
 
 export default function ApprovalCriteriaRow({ form }: { form: Form }) {
   return (
@@ -135,27 +136,5 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
         )}
       </HStack>
     </>
-  );
-}
-
-function LabelWithInfo({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label
-      className={cx(
-        styles.create_prop_form__label,
-        css`
-          display: flex;
-          align-items: center;
-        `
-      )}
-    >
-      {label} <InfoPop>{children}</InfoPop>
-    </label>
   );
 }
