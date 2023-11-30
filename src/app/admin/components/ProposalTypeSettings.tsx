@@ -6,7 +6,7 @@ import { Fragment, useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const mockProposalTypes = [
+export const mockProposalTypes = [
   { quorum: 1000, approvalThreshold: 1000, name: "Default" },
   { quorum: 2000, approvalThreshold: 2000, name: "Alt" }
 ]
