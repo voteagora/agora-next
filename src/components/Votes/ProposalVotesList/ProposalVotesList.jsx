@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./ProposalVotesList.module.scss";
+import styles from "./proposalVotesList.module.scss";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
@@ -41,22 +41,26 @@ export default function ProposalVotesList({
       loader={<Loader />}
     >
       {proposalVotes.map((vote) => (
-        <VStack key={vote.id} gap={1}>
+        <VStack key={vote.id} gap={1} className={styles.vote_row}>
           <VStack>
-            <HStack justifyContent="justify-between">
+            <HStack justifyContent="justify-between" className={styles.voter}>
               <HStack gap={1} alignItems="items-center">
                 <HumanAddress address={vote.address} />
               </HStack>
-              <HStack gap={1} alignItems="items-center">
+              <HStack
+                gap={1}
+                alignItems="items-center"
+                className={styles.vote_weight}
+              >
                 <TokenAmountDisplay
                   amount={vote.weight}
                   decimals={18}
                   currency="OP"
                 />
-                <p>{vote.reason}</p>
               </HStack>
             </HStack>
           </VStack>
+          <pre className={styles.vote_reason}>{vote.reason}</pre>
         </VStack>
       ))}
     </InfiniteScroll>
