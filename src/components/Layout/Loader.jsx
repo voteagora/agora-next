@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Loader() {
   return (
-    <div key="loader" className="gl_loader">
+    <div key={0} className="gl_loader">
       Loading... <br />
       <Image
         src="/images/blink.gif"
