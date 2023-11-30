@@ -22,4 +22,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = "Input"
 
-export { Input }
+const InputDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <p className={cn("text-sm text-muted-foreground", className)} {...props} />
+  )
+})
+InputDescription.displayName = "InputDescription"
+
+export { Input, InputDescription }
