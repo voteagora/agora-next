@@ -279,3 +279,7 @@ $rotate-continuous: rotation 60s infinite linear;
       transform: rotate(360deg);
   }
 }
+/// VOTES ///
+$votes-for: $color-green-700;
+$votes-abstain: $gray-700;
+$votes-against: $red-700;
