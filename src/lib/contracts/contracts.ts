@@ -8,10 +8,15 @@ import provider from "@/app/lib/provider";
 export const OptimismContracts = {
   governor: {
     contract: OptimismGovernor__factory.connect(
-      "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10",
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+        : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
       provider
     ),
-    address: "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10",
+    address:
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+        : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
     chainId: 10,
     abi: OptimismGovernor__factory.abi,
   },
@@ -30,7 +35,9 @@ export const OptimismContracts = {
 export const opAdminAddress = "0x2501c477D0A35545a387Aa4A3EEe4292A9a8B3F0";
 
 export const approvalModuleAddress =
-  "0x54A8fCBBf05ac14bEf782a2060A8C752C7CC13a5";
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+    ? "0x54A8fCBBf05ac14bEf782a2060A8C752C7CC13a5"
+    : "0xdd0229D72a414DC821DEc66f3Cc4eF6dB2C7b7df";
 
 export const NounsContracts = {
   governor: {
