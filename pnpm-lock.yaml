@@ -17,6 +17,9 @@ dependencies:
   '@heroicons/react':
     specifier: ^2.0.18
     version: 2.0.18(react@18.2.0)
+  '@hookform/resolvers':
+    specifier: ^3.3.2
+    version: 3.3.2(react-hook-form@7.48.2)
   '@prisma/client':
     specifier: 4.16.2
     version: 4.16.2(prisma@4.16.2)
@@ -29,6 +32,9 @@ dependencies:
   '@radix-ui/react-popover':
     specifier: ^1.0.6
     version: 1.0.7(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0)
+  '@radix-ui/react-separator':
+    specifier: ^1.0.3
+    version: 1.0.3(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-slot':
     specifier: ^1.0.2
     version: 1.0.2(@types/react@18.2.6)(react@18.2.0)
@@ -136,10 +142,13 @@ dependencies:
     version: 6.0.3
   viem:
     specifier: ^1.19.3
-    version: 1.19.3(bufferutil@4.0.8)(typescript@5.0.4)(utf-8-validate@6.0.3)
+    version: 1.19.3(bufferutil@4.0.8)(typescript@5.0.4)(utf-8-validate@6.0.3)(zod@3.22.4)
   wagmi:
     specifier: ^1.4.7
-    version: 1.4.7(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)
+    version: 1.4.7(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)(zod@3.22.4)
+  zod:
+    specifier: ^3.22.4
+    version: 3.22.4
 
 devDependencies:
   '@tailwindcss/forms':
@@ -1812,6 +1821,27 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /@radix-ui/react-separator@1.0.3(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-itYmTy/kokS21aiV5+Z56MZB54KrhPgn6eHDKkFeOLR34HMN2s8PaN47qZZAGnvupcjxHaFZnW4pQEh0BvvVuw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0)
+      '@types/react': 18.2.6
+      '@types/react-dom': 18.2.4
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /@radix-ui/react-slot@1.0.2(@types/react@18.2.6)(react@18.2.0):
     resolution: {integrity: sha512-YeTpuq4deV+6DusvVUW4ivBgnkHwECUu0BiN43L5UCDFgdhsRUWAghhTF5MbvNTPzmiFOx90asDSUjWuCNapwg==}
     peerDependencies:
@@ -3094,7 +3124,7 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@wagmi/connectors@3.1.5(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3):
+  /@wagmi/connectors@3.1.5(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)(zod@3.22.4):
     resolution: {integrity: sha512-aE4rWZbivqWa9HqjiLDPtwROH2b1Az+lBVMeZ3o/aFxGNGNEkdrSAMOUG15/UFy3VnN6HqGOtTobOBZ10JhfNQ==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -3741,13 +3771,13 @@ packages:
       vue:
         optional: true
     dependencies:
-      '@wagmi/core': 1.4.7(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)
+      '@wagmi/core': 1.4.7(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)(zod@3.22.4)
       '@web3modal/polyfills': 3.4.0
       '@web3modal/scaffold': 3.4.0(@types/react@18.2.6)(react@18.2.0)
       '@web3modal/scaffold-react': 3.4.0(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0)
       '@web3modal/scaffold-utils': 3.4.0(@types/react@18.2.6)(react@18.2.0)
       '@web3modal/scaffold-vue': 3.4.0(@types/react@18.2.6)(react@18.2.0)(vue@3.3.9)
-      viem: 1.19.3(bufferutil@4.0.8)(typescript@5.0.4)(utf-8-validate@6.0.3)
+      viem: 1.19.3(bufferutil@4.0.8)(typescript@5.0.4)(utf-8-validate@6.0.3)(zod@3.22.4)
     optionalDependencies:
       '@web3modal/siwe': 3.4.0(@types/react@18.2.6)(typescript@5.0.4)
       react: 18.2.0
@@ -8999,7 +9029,7 @@ packages:
       typescript: 5.0.4
     dev: false
 
-  /wagmi@1.4.7(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3):
+  /wagmi@1.4.7(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)(zod@3.22.4):
     resolution: {integrity: sha512-/k8gA9S6RnwU6Qroxs630jAFvRIx+DSKpCP1owgAEGWc7D2bAJHljwRSCRTGENz48HyJ4V3R7KYV1yImxPvM3A==}
     peerDependencies:
       react: '>=17.0.0'

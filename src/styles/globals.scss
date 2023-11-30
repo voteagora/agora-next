@@ -75,6 +75,18 @@
 }
 
 //////////////////////////
+// Containers
+//////////////////////////
+///
+.gl_box {
+  @apply border p-4 border-gray-eo shadow-newDefault rounded-xl;
+
+  &_secondary {
+    @apply bg-gray-fa;
+  }
+}
+
+//////////////////////////
 // Remove spinner for html elements with input number
 //////////////////////////
 
