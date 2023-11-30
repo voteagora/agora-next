@@ -1,0 +1,63 @@
+@import "@/styles/variables";
+@import "@/styles/mixins";
+
+.cast_vote_container {
+  border: 1px solid #e0e0e0;
+  border-radius: $border-radius-lg;
+  flex-shrink: 0;
+  margin-left: $spacing-4;
+  margin-right: $spacing-4;
+  .textarea {
+    padding: $spacing-4;
+    resize: none;
+    border-radius: $border-radius-lg;
+    :focus {
+      outline: 0px;
+    }
+  }
+  .vote_actions {
+    padding-top: $spacing-1;
+    padding-bottom: $spacing-3;
+    padding-left: $spacing-3;
+    padding-right: $spacing-3;
+  }
+}
+
+@mixin voteButton {
+  height: $spacing-8;
+  text-transform: capitalize;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: $border-radius-md;
+}
+
+.vote_button_for {
+  @include buttonStyles;
+  @include voteButton;
+  color: $votes-for;
+}
+
+.vote_button_against {
+  @include buttonStyles;
+  @include voteButton;
+  color: $votes-against;
+}
+
+.vote_button_abstain {
+  @include buttonStyles;
+  @include voteButton;
+  color: $votes-abstain;
+}
+
+.vote_button_disabled {
+  @include buttonStyles;
+  @include voteButton;
+  box-shadow: none;
+  width: 100%;
+}
+
+.vote_button_connect {
+  box-shadow: none;
+  width: 100%;
+}
