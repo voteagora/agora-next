@@ -266,3 +266,8 @@ $font-family-code: "IBM Plex Mono";
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/// VOTES ///
+$votes-for: $color-green-700;
+$votes-abstain: $gray-700;
+$votes-against: $red-700;
