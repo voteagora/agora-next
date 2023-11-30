@@ -7,9 +7,10 @@ import { Form } from "./CreateProposalForm";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import { Switch } from "@/components/shared/Switch";
+import InputBox from "@/components/shared/InputBox";
 
 function ProposalTypeRow({ form }: { form: Form }) {
-  const { proposalType } = form.state;
+  const { proposalType, proposalSettings } = form.state;
   const infoText =
     proposalType === "Basic"
       ? "This default proposal type lets delegates vote either yes or no"
@@ -20,7 +21,6 @@ function ProposalTypeRow({ form }: { form: Form }) {
         margin-top: ${theme.spacing["4"]};
       `}
     >
-      <h4 className={styles.create_prop_form__heading}>Proposal type</h4>
       <HStack
         className={css`
           @media (max-width: ${theme.maxWidth["4xl"]}) {
@@ -36,27 +36,43 @@ function ProposalTypeRow({ form }: { form: Form }) {
             }
           `}
         >
+          <h4 className={styles.create_prop_form__heading}>Vote type</h4>
           <Switch
             options={["Basic", "Approval"]}
             selection={proposalType}
             onSelectionChanged={form.onChange.proposalType}
           />
+          <p
+            className={css`
+              font-size: ${theme.fontSize.base};
+              color: ${theme.colors.gray["4f"]};
+              @media (max-width: ${theme.maxWidth["4xl"]}) {
+                width: 100%;
+                margin-top: ${theme.spacing["2"]};
+                margin-left: 0;
+              }
+            `}
+          >
+            {infoText}
+          </p>
         </div>
-        <p
+        <div
           className={css`
-            font-size: ${theme.fontSize.base};
-            color: ${theme.colors.gray["4f"]};
-            margin-left: ${theme.spacing["8"]};
             width: 50%;
             @media (max-width: ${theme.maxWidth["4xl"]}) {
               width: 100%;
-              margin-top: ${theme.spacing["2"]};
-              margin-left: 0;
             }
           `}
         >
-          {infoText}
-        </p>
+          <h4 className={styles.create_prop_form__heading}>Proposal type</h4>
+          <InputBox
+            label="Proposal settings"
+            type="text"
+            value={proposalSettings}
+            onChange={form.onChange.proposalSettings}
+            placeholder="Governance fund"
+          />
+        </div>
       </HStack>
     </VStack>
   );

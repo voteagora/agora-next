@@ -11,8 +11,11 @@ import ApprovalOptionsRow from "./ApprovalOptionsRow";
 import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
 
+type ProposalSettings = "Governance fund";
+
 type FormValues = {
   proposalType: "Basic" | "Approval";
+  proposalSettings: ProposalSettings;
   title: string;
   description: string;
   budget: number;
@@ -39,6 +42,7 @@ export type Transaction = {
 
 const initialFormValues: FormValues = {
   proposalType: "Basic",
+  proposalSettings: "Governance fund",
   title: "",
   description: "",
   budget: 0,
