@@ -83,14 +83,14 @@ export default function GovernorSettings() {
   //   isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction
 
   return (
-    <div className="p-4 border-black border">
+    <div className="gl_box">
       <section>
         <h1>Governor settings</h1>
         <p>Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
         <div className="flex justify-between gap-4">
-          <div className="flex-grow">
+          <div className="flex-1">
             <Label>Voting period</Label>
             <div className="relative flex items-center">
               <Input
@@ -103,23 +103,20 @@ export default function GovernorSettings() {
                 Hours
               </p>
               <Button
-                variant="secondary"
+                variant="outline"
                 size="sm"
-                className="absolute right-[6px] rounded-sm"
+                className="absolute right-[6px] rounded-sm bg-white"
+                loading={isDisabledSetVotingPeriod}
                 disabled={isDisabledSetVotingPeriod}
                 onClick={() => {
                   writeSetVotingPeriod?.()
                 }}
               >
-                {isDisabledSetVotingPeriod ? (
-                  <LoaderIcon className="animate-spin w-5 h-5" />
-                ) : (
-                  "Update"
-                )}
+                Update
               </Button>
             </div>
           </div>
-          <div className="flex-grow">
+          <div className="flex-1">
             <Label>Voting delay</Label>
             <div className="relative flex items-center">
               <Input
@@ -133,18 +130,15 @@ export default function GovernorSettings() {
               </p>
               <Button
                 className="absolute right-[6px] rounded-sm"
-                variant="secondary"
+                variant="outline"
                 size="sm"
+                loading={isDisabledSetVotingDelay}
                 disabled={isDisabledSetVotingDelay}
                 onClick={() => {
                   writeSetVotingDelay?.()
                 }}
               >
-                {isDisabledSetVotingDelay ? (
-                  <LoaderIcon className="animate-spin w-5 h-5" />
-                ) : (
-                  "Update"
-                )}
+                Update
               </Button>
             </div>
           </div>
@@ -162,7 +156,7 @@ export default function GovernorSettings() {
             )}
             <Button
               className="absolute top-0 right-0"
-              variant="secondary"
+              variant="outline"
               size='sm'
               disabled={!isManager}
             >

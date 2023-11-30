@@ -1,5 +1,3 @@
-"use client"
-
 // import { useAccount } from "wagmi"
 import AdminForm from "./components/AdminForm"
 // import { useAgoraContext } from "../AgoraContext"
