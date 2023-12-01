@@ -44,5 +44,6 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
   }
 
   const latestBlock = await provider.getBlock("latest");
+
   return parseProposal(proposal, latestBlock);
 }
