@@ -26,24 +26,32 @@ import type {
 export interface OptimismGovernorInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "ALLIGATOR"
       | "BALLOT_TYPEHASH"
       | "COUNTING_MODE"
       | "EXTENDED_BALLOT_TYPEHASH"
+      | "PERCENT_DIVISOR"
+      | "PROPOSAL_TYPES_CONFIGURATOR"
+      | "VERSION"
+      | "VOTABLE_SUPPLY_ORACLE"
+      | "approvedModules"
       | "cancel"
       | "cancelWithModule"
       | "castVote"
       | "castVoteBySig"
+      | "castVoteFromAlligator"
       | "castVoteWithReason"
       | "castVoteWithReasonAndParams"
       | "castVoteWithReasonAndParamsBySig"
+      | "editProposalType"
       | "execute"
       | "executeWithModule"
       | "getVotes"
       | "getVotesWithParams"
       | "hasVoted"
       | "hashProposal"
-      | "hashProposalWithData"
-      | "initialize"
+      | "hashProposalWithModule"
+      | "increaseWeightCast"
       | "manager"
       | "name"
       | "onERC1155BatchReceived"
@@ -53,13 +61,16 @@ export interface OptimismGovernorInterface extends Interface {
       | "proposalSnapshot"
       | "proposalThreshold"
       | "proposalVotes"
-      | "propose"
-      | "proposeWithModule"
+      | "propose(address[],uint256[],bytes[],string)"
+      | "propose(address[],uint256[],bytes[],string,uint8)"
+      | "proposeWithModule(address,bytes,string)"
+      | "proposeWithModule(address,bytes,string,uint8)"
       | "quorum"
       | "quorumDenominator"
       | "quorumNumerator(uint256)"
       | "quorumNumerator()"
       | "relay"
+      | "setModuleApproval"
       | "setProposalDeadline"
       | "setProposalThreshold"
       | "setVotingDelay"
@@ -67,21 +78,28 @@ export interface OptimismGovernorInterface extends Interface {
       | "state"
       | "supportsInterface"
       | "token"
+      | "token_unused"
       | "updateQuorumNumerator"
       | "version"
+      | "votableSupply()"
+      | "votableSupply(uint256)"
       | "votingDelay"
       | "votingPeriod"
+      | "weightCast"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
       | "Initialized"
       | "ProposalCanceled"
+      | "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string,uint8)"
+      | "ProposalCreated(uint256,address,address,bytes,uint256,uint256,string,uint8)"
       | "ProposalCreated(uint256,address,address,bytes,uint256,uint256,string)"
       | "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)"
       | "ProposalDeadlineUpdated"
       | "ProposalExecuted"
       | "ProposalThresholdSet"
+      | "ProposalTypeUpdated"
       | "QuorumNumeratorUpdated"
       | "VoteCast"
       | "VoteCastWithParams"
@@ -89,6 +107,7 @@ export interface OptimismGovernorInterface extends Interface {
       | "VotingPeriodSet"
   ): EventFragment;
 
+  encodeFunctionData(functionFragment: "ALLIGATOR", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "BALLOT_TYPEHASH",
     values?: undefined
@@ -100,6 +119,23 @@ export interface OptimismGovernorInterface extends Interface {
   encodeFunctionData(
     functionFragment: "EXTENDED_BALLOT_TYPEHASH",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PERCENT_DIVISOR",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PROPOSAL_TYPES_CONFIGURATOR",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "VOTABLE_SUPPLY_ORACLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "approvedModules",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "cancel",
@@ -116,6 +152,17 @@ export interface OptimismGovernorInterface extends Interface {
   encodeFunctionData(
     functionFragment: "castVoteBySig",
     values: [BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "castVoteFromAlligator",
+    values: [
+      BigNumberish,
+      AddressLike,
+      BigNumberish,
+      string,
+      BigNumberish,
+      BytesLike
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "castVoteWithReason",
@@ -136,6 +183,10 @@ export interface OptimismGovernorInterface extends Interface {
       BytesLike,
       BytesLike
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "editProposalType",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "execute",
@@ -162,12 +213,12 @@ export interface OptimismGovernorInterface extends Interface {
     values: [AddressLike[], BigNumberish[], BytesLike[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "hashProposalWithData",
+    functionFragment: "hashProposalWithModule",
     values: [AddressLike, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
-    values: [AddressLike, AddressLike]
+    functionFragment: "increaseWeightCast",
+    values: [BigNumberish, AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "manager", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
@@ -206,12 +257,20 @@ export interface OptimismGovernorInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "propose",
+    functionFragment: "propose(address[],uint256[],bytes[],string)",
     values: [AddressLike[], BigNumberish[], BytesLike[], string]
   ): string;
   encodeFunctionData(
-    functionFragment: "proposeWithModule",
+    functionFragment: "propose(address[],uint256[],bytes[],string,uint8)",
+    values: [AddressLike[], BigNumberish[], BytesLike[], string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposeWithModule(address,bytes,string)",
     values: [AddressLike, BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposeWithModule(address,bytes,string,uint8)",
+    values: [AddressLike, BytesLike, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "quorum",
@@ -232,6 +291,10 @@ export interface OptimismGovernorInterface extends Interface {
   encodeFunctionData(
     functionFragment: "relay",
     values: [AddressLike, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setModuleApproval",
+    values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "setProposalDeadline",
@@ -256,10 +319,22 @@ export interface OptimismGovernorInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "token_unused",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "updateQuorumNumerator",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "votableSupply()",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "votableSupply(uint256)",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "votingDelay",
     values?: undefined
@@ -268,7 +343,12 @@ export interface OptimismGovernorInterface extends Interface {
     functionFragment: "votingPeriod",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "weightCast",
+    values: [BigNumberish, AddressLike]
+  ): string;
 
+  decodeFunctionResult(functionFragment: "ALLIGATOR", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "BALLOT_TYPEHASH",
     data: BytesLike
@@ -279,6 +359,23 @@ export interface OptimismGovernorInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "EXTENDED_BALLOT_TYPEHASH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PERCENT_DIVISOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PROPOSAL_TYPES_CONFIGURATOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "VOTABLE_SUPPLY_ORACLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "approvedModules",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
@@ -292,6 +389,10 @@ export interface OptimismGovernorInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "castVoteFromAlligator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "castVoteWithReason",
     data: BytesLike
   ): Result;
@@ -301,6 +402,10 @@ export interface OptimismGovernorInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "castVoteWithReasonAndParamsBySig",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "editProposalType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
@@ -319,10 +424,13 @@ export interface OptimismGovernorInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "hashProposalWithData",
+    functionFragment: "hashProposalWithModule",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "increaseWeightCast",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "manager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
@@ -353,9 +461,20 @@ export interface OptimismGovernorInterface extends Interface {
     functionFragment: "proposalVotes",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "propose", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "proposeWithModule",
+    functionFragment: "propose(address[],uint256[],bytes[],string)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "propose(address[],uint256[],bytes[],string,uint8)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "proposeWithModule(address,bytes,string)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "proposeWithModule(address,bytes,string,uint8)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "quorum", data: BytesLike): Result;
@@ -372,6 +491,10 @@ export interface OptimismGovernorInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "relay", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setModuleApproval",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setProposalDeadline",
     data: BytesLike
@@ -395,10 +518,22 @@ export interface OptimismGovernorInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "token_unused",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "updateQuorumNumerator",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "votableSupply()",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "votableSupply(uint256)",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "votingDelay",
     data: BytesLike
@@ -407,6 +542,7 @@ export interface OptimismGovernorInterface extends Interface {
     functionFragment: "votingPeriod",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "weightCast", data: BytesLike): Result;
 }
 
 export namespace InitializedEvent {
@@ -426,6 +562,86 @@ export namespace ProposalCanceledEvent {
   export type OutputTuple = [proposalId: bigint];
   export interface OutputObject {
     proposalId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event {
+  export type InputTuple = [
+    proposalId: BigNumberish,
+    proposer: AddressLike,
+    targets: AddressLike[],
+    values: BigNumberish[],
+    signatures: string[],
+    calldatas: BytesLike[],
+    startBlock: BigNumberish,
+    endBlock: BigNumberish,
+    description: string,
+    proposalType: BigNumberish
+  ];
+  export type OutputTuple = [
+    proposalId: bigint,
+    proposer: string,
+    targets: string[],
+    values: bigint[],
+    signatures: string[],
+    calldatas: string[],
+    startBlock: bigint,
+    endBlock: bigint,
+    description: string,
+    proposalType: bigint
+  ];
+  export interface OutputObject {
+    proposalId: bigint;
+    proposer: string;
+    targets: string[];
+    values: bigint[];
+    signatures: string[];
+    calldatas: string[];
+    startBlock: bigint;
+    endBlock: bigint;
+    description: string;
+    proposalType: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event {
+  export type InputTuple = [
+    proposalId: BigNumberish,
+    proposer: AddressLike,
+    votingModule: AddressLike,
+    proposalData: BytesLike,
+    startBlock: BigNumberish,
+    endBlock: BigNumberish,
+    description: string,
+    proposalType: BigNumberish
+  ];
+  export type OutputTuple = [
+    proposalId: bigint,
+    proposer: string,
+    votingModule: string,
+    proposalData: string,
+    startBlock: bigint,
+    endBlock: bigint,
+    description: string,
+    proposalType: bigint
+  ];
+  export interface OutputObject {
+    proposalId: bigint;
+    proposer: string;
+    votingModule: string;
+    proposalData: string;
+    startBlock: bigint;
+    endBlock: bigint;
+    description: string;
+    proposalType: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -544,6 +760,22 @@ export namespace ProposalThresholdSetEvent {
   export interface OutputObject {
     oldProposalThreshold: bigint;
     newProposalThreshold: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ProposalTypeUpdatedEvent {
+  export type InputTuple = [
+    proposalId: BigNumberish,
+    proposalType: BigNumberish
+  ];
+  export type OutputTuple = [proposalId: bigint, proposalType: bigint];
+  export interface OutputObject {
+    proposalId: bigint;
+    proposalType: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -704,11 +936,27 @@ export interface OptimismGovernor extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  ALLIGATOR: TypedContractMethod<[], [string], "view">;
+
   BALLOT_TYPEHASH: TypedContractMethod<[], [string], "view">;
 
   COUNTING_MODE: TypedContractMethod<[], [string], "view">;
 
   EXTENDED_BALLOT_TYPEHASH: TypedContractMethod<[], [string], "view">;
+
+  PERCENT_DIVISOR: TypedContractMethod<[], [bigint], "view">;
+
+  PROPOSAL_TYPES_CONFIGURATOR: TypedContractMethod<[], [string], "view">;
+
+  VERSION: TypedContractMethod<[], [bigint], "view">;
+
+  VOTABLE_SUPPLY_ORACLE: TypedContractMethod<[], [string], "view">;
+
+  approvedModules: TypedContractMethod<
+    [module: AddressLike],
+    [boolean],
+    "view"
+  >;
 
   cancel: TypedContractMethod<
     [
@@ -745,6 +993,19 @@ export interface OptimismGovernor extends BaseContract {
     "nonpayable"
   >;
 
+  castVoteFromAlligator: TypedContractMethod<
+    [
+      proposalId: BigNumberish,
+      voter: AddressLike,
+      support: BigNumberish,
+      reason: string,
+      votes: BigNumberish,
+      params: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+
   castVoteWithReason: TypedContractMethod<
     [proposalId: BigNumberish, support: BigNumberish, reason: string],
     [bigint],
@@ -773,6 +1034,12 @@ export interface OptimismGovernor extends BaseContract {
       s: BytesLike
     ],
     [bigint],
+    "nonpayable"
+  >;
+
+  editProposalType: TypedContractMethod<
+    [proposalId: BigNumberish, proposalType: BigNumberish],
+    [void],
     "nonpayable"
   >;
 
@@ -822,14 +1089,19 @@ export interface OptimismGovernor extends BaseContract {
     "view"
   >;
 
-  hashProposalWithData: TypedContractMethod<
+  hashProposalWithModule: TypedContractMethod<
     [module: AddressLike, proposalData: BytesLike, descriptionHash: BytesLike],
     [bigint],
     "view"
   >;
 
-  initialize: TypedContractMethod<
-    [_votingToken: AddressLike, _manager: AddressLike],
+  increaseWeightCast: TypedContractMethod<
+    [
+      proposalId: BigNumberish,
+      account: AddressLike,
+      votes: BigNumberish,
+      accountVotes: BigNumberish
+    ],
     [void],
     "nonpayable"
   >;
@@ -894,7 +1166,7 @@ export interface OptimismGovernor extends BaseContract {
     "view"
   >;
 
-  propose: TypedContractMethod<
+  "propose(address[],uint256[],bytes[],string)": TypedContractMethod<
     [
       targets: AddressLike[],
       values: BigNumberish[],
@@ -905,13 +1177,36 @@ export interface OptimismGovernor extends BaseContract {
     "nonpayable"
   >;
 
-  proposeWithModule: TypedContractMethod<
+  "propose(address[],uint256[],bytes[],string,uint8)": TypedContractMethod<
+    [
+      targets: AddressLike[],
+      values: BigNumberish[],
+      calldatas: BytesLike[],
+      description: string,
+      proposalType: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
+
+  "proposeWithModule(address,bytes,string)": TypedContractMethod<
     [module: AddressLike, proposalData: BytesLike, description: string],
     [bigint],
     "nonpayable"
   >;
 
-  quorum: TypedContractMethod<[blockNumber: BigNumberish], [bigint], "view">;
+  "proposeWithModule(address,bytes,string,uint8)": TypedContractMethod<
+    [
+      module: AddressLike,
+      proposalData: BytesLike,
+      description: string,
+      proposalType: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
+
+  quorum: TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
 
   quorumDenominator: TypedContractMethod<[], [bigint], "view">;
 
@@ -927,6 +1222,12 @@ export interface OptimismGovernor extends BaseContract {
     [target: AddressLike, value: BigNumberish, data: BytesLike],
     [void],
     "payable"
+  >;
+
+  setModuleApproval: TypedContractMethod<
+    [module: AddressLike, approved: boolean],
+    [void],
+    "nonpayable"
   >;
 
   setProposalDeadline: TypedContractMethod<
@@ -963,6 +1264,8 @@ export interface OptimismGovernor extends BaseContract {
 
   token: TypedContractMethod<[], [string], "view">;
 
+  token_unused: TypedContractMethod<[], [string], "view">;
+
   updateQuorumNumerator: TypedContractMethod<
     [newQuorumNumerator: BigNumberish],
     [void],
@@ -971,14 +1274,31 @@ export interface OptimismGovernor extends BaseContract {
 
   version: TypedContractMethod<[], [string], "view">;
 
+  "votableSupply()": TypedContractMethod<[], [bigint], "view">;
+
+  "votableSupply(uint256)": TypedContractMethod<
+    [blockNumber: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   votingDelay: TypedContractMethod<[], [bigint], "view">;
 
   votingPeriod: TypedContractMethod<[], [bigint], "view">;
+
+  weightCast: TypedContractMethod<
+    [proposalId: BigNumberish, account: AddressLike],
+    [bigint],
+    "view"
+  >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "ALLIGATOR"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "BALLOT_TYPEHASH"
   ): TypedContractMethod<[], [string], "view">;
@@ -988,6 +1308,21 @@ export interface OptimismGovernor extends BaseContract {
   getFunction(
     nameOrSignature: "EXTENDED_BALLOT_TYPEHASH"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "PERCENT_DIVISOR"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "PROPOSAL_TYPES_CONFIGURATOR"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "VERSION"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "VOTABLE_SUPPLY_ORACLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "approvedModules"
+  ): TypedContractMethod<[module: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "cancel"
   ): TypedContractMethod<
@@ -1028,6 +1363,20 @@ export interface OptimismGovernor extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "castVoteFromAlligator"
+  ): TypedContractMethod<
+    [
+      proposalId: BigNumberish,
+      voter: AddressLike,
+      support: BigNumberish,
+      reason: string,
+      votes: BigNumberish,
+      params: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "castVoteWithReason"
   ): TypedContractMethod<
     [proposalId: BigNumberish, support: BigNumberish, reason: string],
@@ -1059,6 +1408,13 @@ export interface OptimismGovernor extends BaseContract {
       s: BytesLike
     ],
     [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "editProposalType"
+  ): TypedContractMethod<
+    [proposalId: BigNumberish, proposalType: BigNumberish],
+    [void],
     "nonpayable"
   >;
   getFunction(
@@ -1114,16 +1470,21 @@ export interface OptimismGovernor extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "hashProposalWithData"
+    nameOrSignature: "hashProposalWithModule"
   ): TypedContractMethod<
     [module: AddressLike, proposalData: BytesLike, descriptionHash: BytesLike],
     [bigint],
     "view"
   >;
   getFunction(
-    nameOrSignature: "initialize"
+    nameOrSignature: "increaseWeightCast"
   ): TypedContractMethod<
-    [_votingToken: AddressLike, _manager: AddressLike],
+    [
+      proposalId: BigNumberish,
+      account: AddressLike,
+      votes: BigNumberish,
+      accountVotes: BigNumberish
+    ],
     [void],
     "nonpayable"
   >;
@@ -1189,7 +1550,7 @@ export interface OptimismGovernor extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "propose"
+    nameOrSignature: "propose(address[],uint256[],bytes[],string)"
   ): TypedContractMethod<
     [
       targets: AddressLike[],
@@ -1201,15 +1562,40 @@ export interface OptimismGovernor extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "proposeWithModule"
+    nameOrSignature: "propose(address[],uint256[],bytes[],string,uint8)"
+  ): TypedContractMethod<
+    [
+      targets: AddressLike[],
+      values: BigNumberish[],
+      calldatas: BytesLike[],
+      description: string,
+      proposalType: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "proposeWithModule(address,bytes,string)"
   ): TypedContractMethod<
     [module: AddressLike, proposalData: BytesLike, description: string],
     [bigint],
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "proposeWithModule(address,bytes,string,uint8)"
+  ): TypedContractMethod<
+    [
+      module: AddressLike,
+      proposalData: BytesLike,
+      description: string,
+      proposalType: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "quorum"
-  ): TypedContractMethod<[blockNumber: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "quorumDenominator"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -1225,6 +1611,13 @@ export interface OptimismGovernor extends BaseContract {
     [target: AddressLike, value: BigNumberish, data: BytesLike],
     [void],
     "payable"
+  >;
+  getFunction(
+    nameOrSignature: "setModuleApproval"
+  ): TypedContractMethod<
+    [module: AddressLike, approved: boolean],
+    [void],
+    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "setProposalDeadline"
@@ -1256,6 +1649,9 @@ export interface OptimismGovernor extends BaseContract {
     nameOrSignature: "token"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "token_unused"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "updateQuorumNumerator"
   ): TypedContractMethod<
     [newQuorumNumerator: BigNumberish],
@@ -1266,11 +1662,24 @@ export interface OptimismGovernor extends BaseContract {
     nameOrSignature: "version"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "votableSupply()"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "votableSupply(uint256)"
+  ): TypedContractMethod<[blockNumber: BigNumberish], [bigint], "view">;
+  getFunction(
     nameOrSignature: "votingDelay"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "votingPeriod"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "weightCast"
+  ): TypedContractMethod<
+    [proposalId: BigNumberish, account: AddressLike],
+    [bigint],
+    "view"
+  >;
 
   getEvent(
     key: "Initialized"
@@ -1285,6 +1694,20 @@ export interface OptimismGovernor extends BaseContract {
     ProposalCanceledEvent.InputTuple,
     ProposalCanceledEvent.OutputTuple,
     ProposalCanceledEvent.OutputObject
+  >;
+  getEvent(
+    key: "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string,uint8)"
+  ): TypedContractEvent<
+    ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event.InputTuple,
+    ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event.OutputTuple,
+    ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event.OutputObject
+  >;
+  getEvent(
+    key: "ProposalCreated(uint256,address,address,bytes,uint256,uint256,string,uint8)"
+  ): TypedContractEvent<
+    ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event.InputTuple,
+    ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event.OutputTuple,
+    ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event.OutputObject
   >;
   getEvent(
     key: "ProposalCreated(uint256,address,address,bytes,uint256,uint256,string)"
@@ -1320,6 +1743,13 @@ export interface OptimismGovernor extends BaseContract {
     ProposalThresholdSetEvent.InputTuple,
     ProposalThresholdSetEvent.OutputTuple,
     ProposalThresholdSetEvent.OutputObject
+  >;
+  getEvent(
+    key: "ProposalTypeUpdated"
+  ): TypedContractEvent<
+    ProposalTypeUpdatedEvent.InputTuple,
+    ProposalTypeUpdatedEvent.OutputTuple,
+    ProposalTypeUpdatedEvent.OutputObject
   >;
   getEvent(
     key: "QuorumNumeratorUpdated"
@@ -1380,6 +1810,16 @@ export interface OptimismGovernor extends BaseContract {
       ProposalCanceledEvent.OutputObject
     >;
 
+    "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string,uint8)": TypedContractEvent<
+      ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event.InputTuple,
+      ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event.OutputTuple,
+      ProposalCreated_uint256_address_address_array_uint256_array_string_array_bytes_array_uint256_uint256_string_uint8_Event.OutputObject
+    >;
+    "ProposalCreated(uint256,address,address,bytes,uint256,uint256,string,uint8)": TypedContractEvent<
+      ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event.InputTuple,
+      ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event.OutputTuple,
+      ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_uint8_Event.OutputObject
+    >;
     "ProposalCreated(uint256,address,address,bytes,uint256,uint256,string)": TypedContractEvent<
       ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_Event.InputTuple,
       ProposalCreated_uint256_address_address_bytes_uint256_uint256_string_Event.OutputTuple,
@@ -1422,6 +1862,17 @@ export interface OptimismGovernor extends BaseContract {
       ProposalThresholdSetEvent.InputTuple,
       ProposalThresholdSetEvent.OutputTuple,
       ProposalThresholdSetEvent.OutputObject
+    >;
+
+    "ProposalTypeUpdated(uint256,uint8)": TypedContractEvent<
+      ProposalTypeUpdatedEvent.InputTuple,
+      ProposalTypeUpdatedEvent.OutputTuple,
+      ProposalTypeUpdatedEvent.OutputObject
+    >;
+    ProposalTypeUpdated: TypedContractEvent<
+      ProposalTypeUpdatedEvent.InputTuple,
+      ProposalTypeUpdatedEvent.OutputTuple,
+      ProposalTypeUpdatedEvent.OutputObject
     >;
 
     "QuorumNumeratorUpdated(uint256,uint256)": TypedContractEvent<
