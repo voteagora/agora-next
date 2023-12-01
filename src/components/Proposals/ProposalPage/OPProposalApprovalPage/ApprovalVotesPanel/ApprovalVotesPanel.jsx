@@ -5,9 +5,14 @@ import { motion } from "framer-motion";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./approvalVotesPanel.module.scss";
 import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
-import VotesListPanel from "../VotesListPanel/VotesListPanel";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 
-export default function ApprovalVotesPanel({ proposal }) {
+export default function ApprovalVotesPanel({
+  proposal,
+  initialProposalVotes,
+  fetchVotesForProposal,
+}) {
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
   function handleTabsChange(index) {
@@ -36,13 +41,15 @@ export default function ApprovalVotesPanel({ proposal }) {
         {activeTab === 1 ? (
           <OptionsResultsPanel proposal={proposal} />
         ) : (
-          <VotesListPanel proposal={proposal} />
+          <ProposalVotesList
+            initialProposalVotes={initialProposalVotes}
+            fetchVotesForProposal={fetchVotesForProposal}
+            proposal_id={proposal.id}
+          />
         )}
-        {/* <ApprovalProposalCriteria
-          fragmentRef={criteriaFragmentRef}
-          proposalRef={proposalRef}
-        />
-        <div
+        <ApprovalProposalCriteria proposal={proposal} />
+
+        {/* <div
           className={css`
             padding: 0 ${theme.spacing["4"]} ${theme.spacing["6"]}
               ${theme.spacing["4"]};
