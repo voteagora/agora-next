@@ -56,6 +56,14 @@ export default function DAOMetricsHeader({ metrics }) {
           "https://calendar.google.com/calendar/u/0/r?cid=Y19mbm10Z3VoNm5vbzZxZ2JuaTJncGVyaWQ0a0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t"
         }
       />
+      <MetricContainer
+        icon="pedestrian"
+        title="Learn more"
+        body={<>Delegation FAQ</>}
+        link={
+          "https://calendar.google.com/calendar/u/0/r?cid=Y19mbm10Z3VoNm5vbzZxZ2JuaTJncGVyaWQ0a0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t"
+        }
+      />
     </HStack>
   );
 }

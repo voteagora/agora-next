@@ -39,7 +39,7 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
         loadMore={loadMore}
         loader={
           <div key="loader">
-            Loading... <br />
+            Loading...
             <Image
               src="/images/blink.gif"
               alt="Blinking Agora Logo"

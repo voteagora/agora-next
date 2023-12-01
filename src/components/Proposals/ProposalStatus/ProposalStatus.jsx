@@ -1,4 +1,5 @@
 import styles from "./proposalStatus.module.scss";
+import { cn } from "@/lib/utils"
 
 export default function ProposalStatus({ proposal }) {
   const testProposals = [
@@ -8,22 +9,20 @@ export default function ProposalStatus({ proposal }) {
     "28601282374834906210319879956567232553560898502158891728063939287236508034960",
   ];
 
-  const carlosHack = [
-    "25353629475948605098820168047140307200589226219380649297323431722674892706917",
-  ];
 
   let statusClass = `status-${proposal.status
     .toLowerCase()
     .replace(/\s+/g, "-")}`;
   let statusText = proposal.status;
+  console.log(statusText);
 
-  if (testProposals.includes(proposal.number)) {
+  if (testProposals.includes(proposal.id)) {
     statusClass = "status-test"; // Assuming you have a CSS class for this
-    statusText = `TEST PROP: ${proposal.status}`;
-  } else if (carlosHack.includes(proposal.number)) {
-    statusClass = "status-defeated"; // Use the defeated class for the Carlos hack
-    statusText = "DEFEATED";
+    statusText = `TEST: ${proposal.status}`;
+  }
+  else if (statusText === "SUCCEEDED") {
+    statusClass = "status-succeeded";
   }
 
-  return <div className={styles.statusClass}>{statusText}</div>;
+  return <div className={styles[statusClass]}>{statusText}</div>;
 }
