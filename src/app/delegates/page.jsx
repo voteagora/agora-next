@@ -1,6 +1,6 @@
 import React from "react";
 import { getDelegates } from "../api/delegates/getDelegates";
-import DelegateCardList from "../../components/Delegates/DelegateCardList";
+import DelegateCardList from "../../components/Delegates/DelegateCardList/DelegateCardList";
 
 async function fetchDelegates(page = 1, seed) {
   "use server";
