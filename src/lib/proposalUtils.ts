@@ -57,10 +57,11 @@ export async function parseProposal(
     JSON.stringify(proposal.proposal_data || {}),
     proposal.proposal_type as ProposalType
   );
-  const proposalResutsls = parseProposalResults(
+  const proposalResuts = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
     proposalData
   );
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -89,12 +90,12 @@ export async function parseProposal(
     description: proposal.description,
     quorum: await getQuorumForProposal(proposal),
     proposalData: proposalData.kind,
-    proposalResults: proposalResutsls.kind,
+    proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
           proposal,
-          proposalResutsls,
+          proposalResuts,
           Number(latestBlock.number)
         )
       : null,
@@ -170,6 +171,7 @@ export function parseProposalData(
           values: JSON.parse(parsedProposalData.values),
           signatures: JSON.parse(parsedProposalData.signatures),
           calldatas: JSON.parse(parsedProposalData.calldatas),
+          // TODO: add functionArgs
         },
       };
     }
@@ -190,6 +192,7 @@ export function parseProposalData(
               values: option[1],
               calldatas: option[2],
               description: option[3],
+              // TODO: add functionArgs
             };
           }),
           proposalSettings: {
