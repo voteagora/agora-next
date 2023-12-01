@@ -1,0 +1,67 @@
+@import "@/styles/variables";
+
+.info_panel {
+  background-color: $gray-fa;
+  border-radius: $spacing-3;
+  border-width: $spacing-px;
+  border-color: $gray-eb;
+  box-shadow: $box-shadow-default;
+  padding: $spacing-6;
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-4;
+  }
+
+  &__description {
+    font-size: $font-size-sm;
+    color: $gray-4f;
+    font-weight: $font-weight-normal;
+    & > p {
+      &:not(:last-child) {
+        margin-bottom: $spacing-4;
+      }
+    }
+  }
+}
+
+.create_prop_form {
+  background-color: $white;
+  border-radius: $spacing-3;
+  border-width: $spacing-px;
+  border-color: $gray-300;
+  box-shadow: $box-shadow-newDefault;
+
+  &__box {
+    padding: $spacing-8;
+    border-bottom: 1px solid $gray-300;
+  }
+
+  &__heading {
+    font-size: $font-size-2xl;
+    font-weight: bold;
+    padding-bottom: $spacing-1;
+  }
+
+  &__subheading {
+    color: $gray-4f;
+  }
+
+  &__submit_container {
+    padding: $spacing-8;
+  }
+
+  &__submit_text {
+    color: $gray-4f;
+    font-weight: 500;
+    width: 60%;
+  }
+
+  &__label {
+    color: $gray-4f;
+    font-weight: 600;
+    margin-bottom: $spacing-1;
+    font-size: $font-size-xs;
+  }
+}
