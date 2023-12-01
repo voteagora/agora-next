@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 export async function POST(request: Request) {
   const body = await request.json();
   const user = process.env.TENDERLY_USER;
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
     );
     const res = await response.json();
 
-    return Response.json({ response: res });
+    return NextResponse.json({ response: res }, { status: 200 });
   } catch (e: any) {
     return {
       error: e?.response?.data?.error?.message || e?.message || e,

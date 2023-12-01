@@ -21,7 +21,7 @@ function ProposalTypeRow({
   proposalSettingsList,
 }: {
   form: Form;
-  proposalSettingsList: string[];
+  proposalSettingsList: any[];
 }) {
   const { proposalType, proposalSettings } = form.state;
   const infoText =
@@ -80,15 +80,15 @@ function ProposalTypeRow({
           <h4 className={styles.create_prop_form__heading}>Proposal type</h4>
           <Select
             onValueChange={form.onChange.proposalSettings}
-            defaultValue={proposalSettingsList[0]}
+            defaultValue={"0"}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={proposalSettingsList[0]} />
+              <SelectValue placeholder={proposalSettingsList[0].name} />
             </SelectTrigger>
             <SelectContent>
-              {proposalSettingsList.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
+              {proposalSettingsList.map((item, index) => (
+                <SelectItem key={index} value={index.toString()}>
+                  {item.name}
                 </SelectItem>
               ))}
             </SelectContent>

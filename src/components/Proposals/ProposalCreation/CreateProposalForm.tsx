@@ -43,11 +43,11 @@ export type Form = UseForm<FormValues>;
 export default function CreateProposalForm({
   proposalSettingsList,
 }: {
-  proposalSettingsList: string[];
+  proposalSettingsList: any[];
 }) {
   const initialFormValues: FormValues = {
     proposalType: "Basic",
-    proposalSettings: proposalSettingsList[0],
+    proposalSettings: "0",
     title: "",
     description: "",
     budget: 0,
