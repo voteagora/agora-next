@@ -42,6 +42,3 @@ next-env.d.ts
 
 # Sentry Config File
 .sentryclirc
-
-# Local prettier config
-.prettierrc
