@@ -40,7 +40,7 @@ export const DialogProvider: FC<Props> = ({ children }) => {
 
   const renderedDialog =
     currentDialog &&
-    dialogs[currentDialog.type](currentDialog.params, () =>
+    dialogs[currentDialog.type](currentDialog.params as any, () =>
       setCurrentDialog(null)
     );
 
