@@ -6,18 +6,13 @@ import { TokenAmountDisplay, pluralize } from "@/lib/utils";
 import OPStandardProposalStatus from "./OPStandardProposalStatus";
 import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
+import { cn } from "@/lib/utils";
 
 export default function Proposal({ proposal }) {
   return (
     <Link href={`/proposals/${proposal.id}`}>
-      <HStack
-        justifyContent="justify-between"
-        alignItems="items-start"
-        className="p-4 border-b-2"
-      >
-        <VStack
-          className={styles.cell_content_primary}
-          alignItems="items-start"
+      <HStack alignItems="center" className={styles.proposal_row}>
+        <VStack className={cn(styles.cell_content, styles.cell_title)}
         >
           <div className={styles.cell_content_title}>
             <>
@@ -31,13 +26,13 @@ export default function Proposal({ proposal }) {
               : proposal.markdowntitle}
           </div>
         </VStack>
-        <VStack className={styles.cell_content} alignItems="items-center">
-          <div className={styles.cell_content_title}>Title</div>
+        <VStack className={cn(styles.cell_content, styles.cell_status)}>
+          <div className={styles.cell_content_title}>Status</div>
           <div className={styles.cell_content_body}>
             <ProposalStatus proposal={proposal} />
           </div>
         </VStack>
-        <VStack className={styles.cell_content} alignItems="items-end">
+        <VStack className={cn(styles.cell_content, styles.cell_result)}>
           <div className={styles.cell_content_title}>
             <ProposalTimeStatus
               proposalStatus={proposal.status}

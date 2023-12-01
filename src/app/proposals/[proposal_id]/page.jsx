@@ -15,7 +15,6 @@ async function fetchProposal(proposal_id) {
 export default async function Page({ params: { proposal_id } }) {
   const { proposal } = await fetchProposal(proposal_id);
 
-  // Figure out which style of proposal to show here
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
@@ -25,7 +24,8 @@ export default async function Page({ params: { proposal_id } }) {
       RenderComponent = OPProposalApprovalPage;
       break;
     default:
-      RenderComponent = null; // Or some default component
+      // TODO: Fix this but We shouldn't get here
+      RenderComponent = null;
   }
 
   return (

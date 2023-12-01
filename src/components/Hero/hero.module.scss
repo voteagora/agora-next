@@ -1,10 +1,9 @@
 @import "@/styles/variables";
 
 .hero_container {
-  margin-top: $spacing-8;
-  margin-bottom: -44px;
+  margin-top: $spacing-12;
+  margin-bottom: $spacing-12;
   width: $max-width-6xl;
-  padding: 0 $spacing-4;
   @media (max-width: $max-width-md) {
     flex-direction: column;
     text-align: center;
@@ -13,7 +12,6 @@
   }
   .content_container {
     max-width: $max-width-xl;
-    margin-top: $spacing-8;
     @media (max-width: $max-width-md) {
       margin-top: 0;
       margin-bottom: $spacing-8;
@@ -21,22 +19,40 @@
     h1 {
       font-weight: $font-weight-extrabold;
       font-size: $font-size-2xl;
-      margin-bottom: $spacing-2;
+      margin-bottom: $spacing-2;  
       span {
-        font-size: $font-size-lg;
-        padding: $spacing-2 $spacing-3;
+        font-size: $font-size-base;
+        padding: $spacing-1 $spacing-2;
         background-color: $daos-optimism;
         color: $white;
         border-radius: $border-radius-full;
-        font-family: $font-family-serif;
         text-transform: uppercase;
         font-style: italic;
-        letter-spacing: $letter-spacing-tight;
+        letter-spacing: $letter-spacing-wider;
+        position: relative;
+        top: -2px;
       }
     }
     p {
       color: $gray-700;
       font-size: $font-size-base;
+    }
+  }
+  .partner_image_container {
+    position: relative;
+    background-color: red;
+    height: 100%;
+    width: 100%;
+    .sunny_bg {
+      position: absolute;
+      top: 0px;
+      right:0px;
+      animation: $rotate-continuous;
+    }
+    .sunny_face {
+      position: absolute;
+      top: 0px;
+      right:0px;
     }
   }
 }

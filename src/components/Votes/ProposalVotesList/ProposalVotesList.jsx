@@ -6,7 +6,7 @@ import styles from "./proposalVotesList.module.scss";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import Loader from "@/components/Layout/Loader";
+import Image from "next/image";
 
 export default function ProposalVotesList({
   initialProposalVotes,
@@ -38,10 +38,19 @@ export default function ProposalVotesList({
       hasMore={meta.hasNextPage}
       pageStart={0}
       loadMore={loadMore}
-      loader={<Loader />}
+      loader={
+        <div className="loader" key={0}>
+          <Image
+            src="/images/blink.gif"
+            alt="Blinking Agora Logo"
+            width={50}
+            height={20}
+          />
+        </div>
+      }
     >
-      {proposalVotes.map((vote) => (
-        <VStack key={vote.id} gap={1} className={styles.vote_row}>
+      {proposalVotes.map((vote, i) => (
+        <VStack key={`vote_${i}`} gap={1} className={styles.vote_row}>
           <VStack>
             <HStack justifyContent="justify-between" className={styles.voter}>
               <HStack gap={1} alignItems="items-center">
