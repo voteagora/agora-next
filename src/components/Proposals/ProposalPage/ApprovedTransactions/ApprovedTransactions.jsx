@@ -42,6 +42,7 @@ export default function ApprovedTransactions({proposalData}) {
                     target={option.targets[0]}
                     calldata={option.calldatas[0]}
                     valueETH={valueETH}
+                    // TODO: make this work with standard approvals
                     // TODO: decode this, zerohex would send function after speaking with Stepan
                     functionName='transfer'
                     functionArgs={['0x0000000000000000000000000000000000000000', '0']}
