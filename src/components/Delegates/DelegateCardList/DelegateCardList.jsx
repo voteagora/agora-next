@@ -58,7 +58,7 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
               className={styles.link}
             >
               <VStack className={styles.link_container}>
-                <VStack gap="4" className={styles.height_100}>
+                <VStack gap="4" className="h-full">
                   <VStack justifyContent="center">
                     <DelegateProfileImage
                       address={delegate.address}
@@ -72,7 +72,7 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
                     alias aut doloremque quibusdam exercitationem explicabo
                     praesentium!
                   </p>
-                  <div className={styles.flex_1} />
+                  <div className="flex-grow" />
                   <DelegateActions
                     address={delegate.address}
                     votingPower={delegate.votingPower}

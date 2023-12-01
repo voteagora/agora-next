@@ -27,9 +27,6 @@
       border-color: $gray-300;
       box-shadow: $box-shadow-newDefault;
       cursor: pointer;
-      .height_100 {
-        height: 100%;
-      }
       .summary {
         display: -webkit-box;
         word-break: break-word;
@@ -41,9 +38,6 @@
         -webkit-box-orient: vertical;
         font-size: $font-size-base;
         line-height: $line-height-normal;
-      }
-      .flex_1 {
-        flex: 1;
       }
     }
   }
