@@ -6,6 +6,7 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./approvalVotesPanel.module.scss";
 import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 
 export default function ApprovalVotesPanel({
   proposal,
@@ -15,7 +16,6 @@ export default function ApprovalVotesPanel({
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
   function handleTabsChange(index) {
-    console.log("Yo");
     startTransition(() => {
       setActiveTab(index);
     });
@@ -47,11 +47,9 @@ export default function ApprovalVotesPanel({
             proposal_id={proposal.id}
           />
         )}
-        {/* <ApprovalProposalCriteria
-          fragmentRef={criteriaFragmentRef}
-          proposalRef={proposalRef}
-        />
-        <div
+        <ApprovalProposalCriteria proposal={proposal} />
+
+        {/* <div
           className={css`
             padding: 0 ${theme.spacing["4"]} ${theme.spacing["6"]}
               ${theme.spacing["4"]};

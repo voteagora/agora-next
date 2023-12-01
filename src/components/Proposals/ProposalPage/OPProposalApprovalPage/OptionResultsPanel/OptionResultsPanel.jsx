@@ -1,54 +1,45 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 
 export default function OptionsResultsPanel({ proposal }) {
   const status = proposal.status;
+  const proposalData = proposal.proposalData;
+  const proposalResults = proposal.proposalResults;
+  const proposalSettings = proposalData.proposalSettings;
 
   const totalVotingPower =
-    BigInt(proposal.proposalResults.for) +
-    BigInt(proposal.proposalResults.abstain);
+    BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
 
   let thresholdPosition = 0;
 
-  if (proposal.proposalResults.criteria === "THRESHOLD") {
-    const threshold = BigInt(proposal.proposalResults.criteriaValue);
-    if (totalVotingPower.lt(threshold.mul(15).div(10))) {
+  if (proposalSettings.criteria === "THRESHOLD") {
+    const threshold = BigInt(proposalSettings.criteriaValue);
+    if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
       thresholdPosition = 66;
     } else {
       // calculate threshold position, min 5% max 66%
-      thresholdPosition = Math.max(
-        threshold.mul(100).div(totalVotingPower).toNumber(),
-        5
+      thresholdPosition = BigInt(
+        Math.max((threshold * BigInt(100)) / totalVotingPower, BigInt(5))
       );
     }
   }
 
-  let availableBudget = BigInt(
-    proposal.proposalData.proposalSettings.budgetAmount
-  );
+  let availableBudget = BigInt(proposalSettings.budgetAmount);
 
   return (
     <VStack className={styles.approval_choices_container}>
       {proposal.proposalResults.options.map((option, index) => {
-        console.log(option);
         let isApproved = false;
         const votesAmountBN = BigInt(option.votes.votes);
-        const optionBudget = BigInt(
-          proposal.proposalData.proposalSettings.budgetAmount
-        );
-        if (proposal.proposalData.proposalSettings.criteria === "TOP_CHOICES") {
+        const optionBudget = BigInt(0);
+        if (proposalSettings === "TOP_CHOICES") {
+          isApproved = index < proposalSettings.maxApprovals;
+        } else if (proposalSettings.criteria === "THRESHOLD") {
+          const threshold = BigInt(proposalSettings.criteriaValue);
           isApproved =
-            index < proposal.proposalData.proposalSettings.maxApprovals;
-        } else if (
-          proposal.proposalData.proposalSettings.criteria === "THRESHOLD"
-        ) {
-          const threshold = BigInt(settings.criteria.threshold.amount);
-          isApproved =
-            votesAmountBN.gte(threshold) && availableBudget.gte(optionBudget);
-          if (isApproved) availableBudget = availableBudget.sub(optionBudget);
+            votesAmountBN >= threshold && availableBudget >= optionBudget;
+          if (isApproved) availableBudget = availableBudget - optionBudget;
         }
         return (
           <SingleOption
@@ -58,7 +49,7 @@ export default function OptionsResultsPanel({ proposal }) {
             votesAmountBN={votesAmountBN}
             totalVotingPower={totalVotingPower}
             status={status}
-            proposalSettings={proposal.proposalData.proposalSettings}
+            proposalSettings={proposalSettings}
             thresholdPosition={thresholdPosition}
             isApproved={isApproved}
           />
@@ -97,36 +88,20 @@ function SingleOption({
   }
 
   return (
-    <div>
+    <VStack gap="1">
+      {" "}
       <HStack
-        className={css`
-          justify-content: space-between;
-          font-weight: ${theme.fontWeight.medium};
-          font-size: ${theme.fontSize.sm};
-          margin-bottom: ${theme.spacing["1"]};
-        `}
+        justifyContent="justify-between"
+        className={styles.singleOptionHStack}
       >
-        <div
-          className={css`
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            max-width: ${theme.spacing["48"]};
-          `}
-        >
-          {description}
-        </div>
-        <div
-          className={css`
-            color: ${theme.colors.gray[700]};
-          `}
-        >
-          {votes.votes}
-          <span
-            className={css`
-              margin-left: ${theme.spacing["1"]};
-            `}
-          >
+        <div className={styles.descriptionText}>{description}</div>
+        <div className={styles.votesText}>
+          <TokenAmountDisplay
+            amount={votes.votes}
+            decimals={18}
+            currency="OP"
+          />
+          <span className={styles.votesMargin}>
             {percentage === 0n
               ? "(0%)"
               : "(" + Math.round(Number(percentage) / 100).toString() + "%)"}
@@ -139,7 +114,7 @@ function SingleOption({
         isApproved={isApproved}
         thresholdPosition={thresholdPosition}
       />
-    </div>
+    </VStack>
   );
 }
 
@@ -149,49 +124,30 @@ export function ProgressBar({
   isApproved,
   thresholdPosition,
 }) {
+  const progressBarWidth =
+    Math.max(
+      Number(barPercentage) / 100,
+      Number(barPercentage) !== 0 ? 1 : 0
+    ).toFixed(2) + "%";
+
+  const progressBarColor = isApproved
+    ? status === "EXECUTED" || status === "SUCCEEDED"
+      ? "green-positive"
+      : "green-positive"
+    : "gray-4f";
+
   return (
     <HStack>
-      <div
-        className={css`
-          width: 100%;
-          height: 6px;
-          border-radius: 10px;
-          background-color: ${theme.colors.gray.eo};
-          position: relative;
-          margin-bottom: ${theme.spacing["3"]};
-        `}
-      >
+      {" "}
+      <div className={`${styles.progressBarContainer}`}>
         <div
-          className={css`
-            width: ${Math.max(
-              Number(barPercentage) / 100,
-              Number(barPercentage) !== 0 ? 1 : 0
-            )
-              .toFixed(2)
-              .toString()}%;
-            height: 6px;
-            background-color: ${isApproved
-              ? status === "EXECUTED" || status === "SUCCEEDED"
-                ? theme.colors.green.positive
-                : theme.colors.green.positive
-              : theme.colors.gray["4f"]};
-            position: absolute;
-            border-radius: 10px;
-            top: 0;
-            right: 0;
-          `}
+          className={`${styles.progressBar} bg-${progressBarColor}`}
+          style={{ width: progressBarWidth }}
         ></div>
         {!!thresholdPosition && (
           <div
-            className={css`
-              width: 2px;
-              height: 6px;
-              background-color: ${theme.colors.gray["4f"]};
-              position: absolute;
-              border-radius: 10px;
-              top: 0;
-              right: ${thresholdPosition}%;
-            `}
+            className={`${styles.thresholdIndicator} bg-gray-4f`}
+            style={{ right: `${thresholdPosition}%` }}
           ></div>
         )}
       </div>
