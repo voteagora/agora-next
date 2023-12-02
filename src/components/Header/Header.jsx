@@ -2,7 +2,7 @@
 import Navbar from "./Navbar";
 import { HStack } from "../Layout/Stack";
 import LogoLink from "./LogoLink";
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import styles from "./header.module.scss";
 
 export default function Header() {
@@ -16,9 +16,9 @@ export default function Header() {
 }
 
 function ConnectButton() {
-  const { open } = useWeb3Modal()
+  const { open } = useWeb3Modal();
 
-  return <w3m-button />
+  return <w3m-button />;
   // return (
   //     <button className={styles.connect_button} onClick={() => open()}>Connect Wallet</button>
   // )

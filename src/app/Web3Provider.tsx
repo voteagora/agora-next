@@ -9,6 +9,7 @@ import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
+import AgoraProvider from "./AgoraContext";
 
 const chains = [mainnet, optimism];
 const metadata = {
@@ -36,9 +37,10 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={wagmiConfig}>
     <body className={cn(rubik.variable, inter.variable)}>
       <noscript>You need to enable JavaScript to run this app.</noscript>
+
       <PageContainer>
         <Header />
-        {children}
+        <AgoraProvider>{children}</AgoraProvider>
       </PageContainer>
       <Footer />
     </body>
