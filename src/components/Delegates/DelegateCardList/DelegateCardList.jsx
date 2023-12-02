@@ -31,58 +31,59 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
   const delegates = pages.reduce((all, page) => all.concat(page.delegates), []);
 
   return (
-    <div>
-      <InfiniteScroll
-        className={styles.infinite_scroll}
-        hasMore={meta.hasNextPage}
-        pageStart={0}
-        loadMore={loadMore}
-        loader={
-          <div key="loader">
-            Loading...
-            <Image
-              src="/images/blink.gif"
-              alt="Blinking Agora Logo"
-              width={50}
-              height={20}
-            />
-          </div>
+    <InfiniteScroll
+      className={styles.infinite_scroll}
+      hasMore={meta.hasNextPage}
+      pageStart={0}
+      loadMore={loadMore}
+      loader={
+        <div key="loader">
+          Loading...
+          <Image
+            src="/images/blink.gif"
+            alt="Blinking Agora Logo"
+            width={50}
+            height={20}
+          />
+        </div>
+      }
+      element="div"
+    >
+      {delegates.map((delegate, i) => {
+        let truncatedStatement = "";
+
+        if (delegate.statement && delegate.statement.delegateStatement) {
+          truncatedStatement = delegate.statement.delegateStatement.slice(
+            0,
+            120
+          );
         }
-        element="main"
-      >
-        {delegates.map((delegate) => {
-          return (
-            <Link
-              key={delegate.address}
-              href={`/delegates/${delegate.address}`}
-              className={styles.link}
-            >
-              <VStack className={styles.link_container}>
-                <VStack gap="4" className="h-full">
-                  <VStack justifyContent="center">
-                    <DelegateProfileImage
-                      address={delegate.address}
-                      votingPower={delegate.votingPower}
-                    />
-                  </VStack>
-                  <p className={styles.summary}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Reiciendis ipsa dolor obcaecati, nisi beatae asperiores
-                    autem incidunt animi amet perspiciatis inventore enim fuga
-                    alias aut doloremque quibusdam exercitationem explicabo
-                    praesentium!
-                  </p>
-                  <div className="flex-grow" />
-                  <DelegateActions
+
+        return (
+          <Link
+            key={i}
+            href={`/delegates/${delegate.address}`}
+            className={styles.link}
+          >
+            <VStack className={styles.link_container}>
+              <VStack gap="4" className="h-full">
+                <VStack justifyContent="center">
+                  <DelegateProfileImage
                     address={delegate.address}
                     votingPower={delegate.votingPower}
                   />
                 </VStack>
+                <p className={styles.summary}>{truncatedStatement}</p>
+                <div className="flex-grow" />
+                <DelegateActions
+                  address={delegate.address}
+                  votingPower={delegate.votingPower}
+                />
               </VStack>
-            </Link>
-          );
-        })}
-      </InfiniteScroll>
-    </div>
+            </VStack>
+          </Link>
+        );
+      })}
+    </InfiniteScroll>
   );
 }

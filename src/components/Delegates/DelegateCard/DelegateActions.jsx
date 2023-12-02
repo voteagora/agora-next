@@ -10,8 +10,7 @@ const statement = {
 export function DelegateActions({ className, address, votingPower }) {
   return (
     <HStack
-      justifyContent="space-between"
-      alignItems="stretch"
+      alignItems="items-stretch"
       className={className ? className + "justify-between" : "justify-between"}
     >
       <DelegateSocialLinks
