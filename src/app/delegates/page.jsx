@@ -1,6 +1,7 @@
 import React from "react";
 import { getDelegates } from "../api/delegates/getDelegates";
 import DelegateCardList from "../../components/Delegates/DelegateCardList/DelegateCardList";
+import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 
 async function fetchDelegates(page = 1, seed) {
   "use server";
@@ -14,7 +15,7 @@ export default async function Page() {
 
   return (
     <section>
-      <h1 className="text-xl">Delegates</h1>
+      <PageHeader headerText="All Delegates" />
       <DelegateCardList
         initialDelegates={delegates}
         fetchDelegates={async (page) => {

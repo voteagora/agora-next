@@ -1,3 +1,11 @@
+export type DelegateStatement = {
+  address: string;
+  delegateStatement: string;
+  openToSponsoringProposals: string;
+  twitter: string;
+  discord: string;
+};
+
 export type Delegate = {
   address: string;
   votingPower: string;
@@ -11,4 +19,5 @@ export type Delegate = {
   votingParticipation: number;
   lastTenProps: string;
   numOfDelegators: bigint;
+  statement: DelegateStatement | null;
 };
