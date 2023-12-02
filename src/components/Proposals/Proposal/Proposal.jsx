@@ -12,8 +12,7 @@ export default function Proposal({ proposal }) {
   return (
     <Link href={`/proposals/${proposal.id}`}>
       <HStack alignItems="center" className={styles.proposal_row}>
-        <VStack className={cn(styles.cell_content, styles.cell_title)}
-        >
+        <VStack className={cn(styles.cell_content, styles.cell_title)}>
           <div className={styles.cell_content_title}>
             <>
               Proposal by {proposal.proposer}
