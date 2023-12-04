@@ -5,6 +5,7 @@ import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import { getCurrentQuorum } from "@/lib/governorUtils";
 import { Delegate } from "./delegate";
+import { getStatment } from "../statements/getStatements";
 
 import "server-only";
 
@@ -55,11 +56,18 @@ export async function getDelegates({
     pageSize
   );
 
+  const statements = await Promise.all(
+    delegates.map((delegate) =>
+      getStatment({ addressOrENSName: delegate.delegate })
+    )
+  );
+
   return {
     meta,
-    delegates: delegates.map((delegate) => ({
+    delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(),
+      statement: statements[index],
     })),
   };
 }
@@ -83,6 +91,8 @@ export async function getDelegate({
     where: { delegate: address },
   });
 
+  const delegateStatement = await getStatment({ addressOrENSName });
+
   const quorum = await getCurrentQuorum("OPTIMISM");
 
   // Build out delegate JSON response
@@ -103,5 +113,6 @@ export async function getDelegate({
     votingParticipation: voterStats?.participation_rate || 0,
     lastTenProps: voterStats?.last_10_props?.toFixed() || "0",
     numOfDelegators: numOfDelegators?.num_for_delegators || 0n,
+    statement: delegateStatement,
   };
 }

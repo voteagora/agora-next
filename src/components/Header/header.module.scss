@@ -23,3 +23,10 @@
   background-color: $gray-fa;
   color: inherit;
 }
+
+.connect_button{
+  background-color: $gray-fa;
+  padding: $spacing-1 $spacing-4;
+  border: 1px solid $gray-eb;
+  border-radius: $border-radius-full;
+}

@@ -43,11 +43,11 @@ export type Form = UseForm<FormValues>;
 export default function CreateProposalForm({
   proposalSettingsList,
 }: {
-  proposalSettingsList: string[];
+  proposalSettingsList: any[];
 }) {
   const initialFormValues: FormValues = {
     proposalType: "Basic",
-    proposalSettings: proposalSettingsList[0],
+    proposalSettings: "0",
     title: "",
     description: "",
     budget: 0,
@@ -69,8 +69,9 @@ export default function CreateProposalForm({
               Create proposal
             </h1>
             <p className={styles.create_prop_form__subheading}>
-              Please describe your proposal, and remember to proofread as
-              proposals cannot be edited once published onchain.
+              Select the type of vote and proposal you want to create, and
+              describe its intent to voters. Remember to proofread as proposals
+              cannot be edited once published.
             </p>
             <ProposalTypeRow
               form={form}
