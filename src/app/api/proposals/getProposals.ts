@@ -5,9 +5,14 @@ import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 
 import "server-only";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export async function getProposals({ page = 1 }: { page: number }) {
   const pageSize = 4;
+
+  const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
+    contract: OptimismContracts.governor.address.toLowerCase(),
+  };
 
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) =>
@@ -16,6 +21,9 @@ export async function getProposals({ page = 1 }: { page: number }) {
         skip,
         orderBy: {
           ordinal: "desc",
+        },
+        where: {
+          ...(prodDataOnly || {}),
         },
       }),
     page,
@@ -44,5 +52,6 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
   }
 
   const latestBlock = await provider.getBlock("latest");
+
   return parseProposal(proposal, latestBlock);
 }

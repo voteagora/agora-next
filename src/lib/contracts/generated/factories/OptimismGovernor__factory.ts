@@ -11,12 +11,23 @@ import type {
 const _abi = [
   {
     inputs: [],
-    stateMutability: "nonpayable",
-    type: "constructor",
+    name: "Empty",
+    type: "error",
   },
   {
     inputs: [],
-    name: "Empty",
+    name: "InvalidProposalId",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "InvalidProposalType",
     type: "error",
   },
   {
@@ -43,6 +54,128 @@ const _abi = [
       },
     ],
     name: "ProposalCanceled",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "proposer",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address[]",
+        name: "targets",
+        type: "address[]",
+      },
+      {
+        indexed: false,
+        internalType: "uint256[]",
+        name: "values",
+        type: "uint256[]",
+      },
+      {
+        indexed: false,
+        internalType: "string[]",
+        name: "signatures",
+        type: "string[]",
+      },
+      {
+        indexed: false,
+        internalType: "bytes[]",
+        name: "calldatas",
+        type: "bytes[]",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "startBlock",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "endBlock",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "description",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "ProposalCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "proposer",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "votingModule",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bytes",
+        name: "proposalData",
+        type: "bytes",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "startBlock",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "endBlock",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "description",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "ProposalCreated",
     type: "event",
   },
   {
@@ -210,6 +343,25 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "ProposalTypeUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: false,
         internalType: "uint256",
         name: "oldQuorumNumerator",
@@ -345,6 +497,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "ALLIGATOR",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "BALLOT_TYPEHASH",
     outputs: [
       {
@@ -377,6 +542,77 @@ const _abi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "PERCENT_DIVISOR",
+    outputs: [
+      {
+        internalType: "uint16",
+        name: "",
+        type: "uint16",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "PROPOSAL_TYPES_CONFIGURATOR",
+    outputs: [
+      {
+        internalType: "contract IProposalTypesConfigurator",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "VERSION",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "VOTABLE_SUPPLY_ORACLE",
+    outputs: [
+      {
+        internalType: "contract IVotableSupplyOracle",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "module",
+        type: "address",
+      },
+    ],
+    name: "approvedModules",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "approved",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -419,7 +655,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
+        internalType: "contract VotingModule",
         name: "module",
         type: "address",
       },
@@ -505,6 +741,44 @@ const _abi = [
         type: "uint256",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "voter",
+        type: "address",
+      },
+      {
+        internalType: "uint8",
+        name: "support",
+        type: "uint8",
+      },
+      {
+        internalType: "string",
+        name: "reason",
+        type: "string",
+      },
+      {
+        internalType: "uint256",
+        name: "votes",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "params",
+        type: "bytes",
+      },
+    ],
+    name: "castVoteFromAlligator",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -617,6 +891,24 @@ const _abi = [
         type: "uint256",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "editProposalType",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -812,7 +1104,7 @@ const _abi = [
         type: "bytes32",
       },
     ],
-    name: "hashProposalWithData",
+    name: "hashProposalWithModule",
     outputs: [
       {
         internalType: "uint256",
@@ -826,17 +1118,27 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IVotesUpgradeable",
-        name: "_votingToken",
-        type: "address",
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
       },
       {
         internalType: "address",
-        name: "_manager",
+        name: "account",
         type: "address",
       },
+      {
+        internalType: "uint256",
+        name: "votes",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "accountVotes",
+        type: "uint256",
+      },
     ],
-    name: "initialize",
+    name: "increaseWeightCast",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -1096,6 +1398,45 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address[]",
+        name: "targets",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "values",
+        type: "uint256[]",
+      },
+      {
+        internalType: "bytes[]",
+        name: "calldatas",
+        type: "bytes[]",
+      },
+      {
+        internalType: "string",
+        name: "description",
+        type: "string",
+      },
+      {
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "propose",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "contract VotingModule",
         name: "module",
         type: "address",
@@ -1125,8 +1466,42 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "contract VotingModule",
+        name: "module",
+        type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "proposalData",
+        type: "bytes",
+      },
+      {
+        internalType: "string",
+        name: "description",
+        type: "string",
+      },
+      {
+        internalType: "uint8",
+        name: "proposalType",
+        type: "uint8",
+      },
+    ],
+    name: "proposeWithModule",
+    outputs: [
+      {
         internalType: "uint256",
-        name: "blockNumber",
+        name: "proposalId",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "proposalId",
         type: "uint256",
       },
     ],
@@ -1207,6 +1582,24 @@ const _abi = [
     name: "relay",
     outputs: [],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "module",
+        type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "approved",
+        type: "bool",
+      },
+    ],
+    name: "setModuleApproval",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -1318,6 +1711,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "token_unused",
+    outputs: [
+      {
+        internalType: "contract IVotesUpgradeable",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -1345,6 +1751,38 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "votableSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "blockNumber",
+        type: "uint256",
+      },
+    ],
+    name: "votableSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "votingDelay",
     outputs: [
       {
@@ -1363,6 +1801,30 @@ const _abi = [
       {
         internalType: "uint256",
         name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "proposalId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "weightCast",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "votes",
         type: "uint256",
       },
     ],

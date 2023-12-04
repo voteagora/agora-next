@@ -1,0 +1,13 @@
+@keyframes shimmer {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.loading_container {
+  min-height: 100vh;
+  animation: shimmer 0.5s alternate-reverse infinite ease-in-out;
+}

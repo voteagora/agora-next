@@ -2,11 +2,13 @@ import { HStack } from "@/components/Layout/Stack";
 import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
 import styles from "./styles.module.scss";
 import CreateProposalForm from "@/components/Proposals/ProposalCreation/CreateProposalForm";
+import { mockProposalTypes } from "@/app/admin/components/ProposalTypeSettings";
 
 async function getProposalSettingsList() {
   "use server";
 
-  return ["Governance fund", "Community fund", "Marketing fund"];
+  return mockProposalTypes;
+  // return ["Governance fund", "Community fund", "Marketing fund"];
 }
 
 export default async function CreateProposalPage() {

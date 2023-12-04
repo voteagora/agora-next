@@ -13,6 +13,28 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You will find a mix of different styles at work in this repo. We are a small team and will be settling on standards in the coming months as we move more and more of the multi-tennant / instance style of Agora, into one codebase.
 
+### Data and data access paterns
+
+The entire data model for this application is based on Postgres and Prisma. All data access should happen through the `/api` endpoints which will use Prisma to interact with the database.
+
+We will be building a publicly accessible API soon, but for now, to keep things performant, we are using the NextJS pattern of keeping our backend, data fetching code in the `api` directory where you can see the methods that fetch the main objects in our Database: 
+
+* Proposals
+* Votes
+* Deletgates (users)
+* Proposal transactions etc.
+
+Most of this data comes in the form as views, or materialized views in our Postgres database that we call via Prisma and then fethc the results to the page and cascade that state down to the components. 
+
+NextJS has some peculiar data access patterns given the mix of server-side and client-side components, that we are still getting used to. When in doubt, have a look at the `<ProposalsList />` component the `src/app/page.jsx` to see the fetching model in action. The general rule in NextJS is that you primary "server" component should do the fetching to keep it fast and use the cache in the best way possible, and then your client components can recieve that data from server components to add any interactivity you want.
+
+You will want to have a Database / SQL Viewer so that you can explore the data. Most of us use:
+* TablePlus: https://tableplus.com/
+
+Ping the Discord to get access to the database.
+
+You can also explore the queries here: `https://github.com/voteagora/queries`
+
 ### Typescript vs. Javascript
 
 You will see a mix of JS and TS. Don't be alarmed. TS was meant to bolster the productivity of Javascript engineers but sometimes, it can get in the way when you are doing something simple. As a general rule, we will want backend API code written in TypeScript and will eventually move the whole app over, but if some views start as JSX files, don't complain or hammer Discord. Learn to love the chaos.

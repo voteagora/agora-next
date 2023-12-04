@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { Separator } from "@/components/ui/separator"
-import ProposalType from "./ProposalType"
-import { Fragment, useState } from "react"
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator";
+import ProposalType from "./ProposalType";
+import { Fragment, useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const mockProposalTypes = [
   { quorum: 1000, approvalThreshold: 1000, name: "Default" },
-  { quorum: 2000, approvalThreshold: 2000, name: "Alt" }
-]
+  { quorum: 2000, approvalThreshold: 2000, name: "Alt" },
+];
 
 // TODO: Take init values from the chain
 export default function ProposalTypeSettings() {
@@ -17,9 +17,9 @@ export default function ProposalTypeSettings() {
     mockProposalTypes.map(({ quorum, approvalThreshold, name }) => ({
       name,
       quorum: quorum / 100,
-      approvalThreshold: approvalThreshold / 100
+      approvalThreshold: approvalThreshold / 100,
     }))
-  )
+  );
 
   return (
     <section className="gl_box">
@@ -36,13 +36,13 @@ export default function ProposalTypeSettings() {
         onClick={() => {
           setProposalTypes((prev) => [
             ...prev,
-            { quorum: 50, approvalThreshold: 50, name: "" }
-          ])
+            { quorum: 50, approvalThreshold: 50, name: "" },
+          ]);
         }}
       >
         <Button
           size="icon"
-          className="rounded-full w-8 h-8"
+          className="w-8 h-8 rounded-full"
           variant="secondary"
         >
           <Plus className="w-3.5 h-3.5" />
@@ -50,5 +50,5 @@ export default function ProposalTypeSettings() {
         <p className="text-sm">Add another proposal type</p>
       </div>
     </section>
-  )
+  );
 }

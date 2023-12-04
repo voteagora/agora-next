@@ -30,7 +30,7 @@ export async function getStatment({
     const data = await dynamoDBClient.query(params);
 
     // If the item exists, return the payload
-    if (data.Items) {
+    if (data.Items && data.Items.length > 0) {
       // Extract the signedPayload attribute from the Item object
       const signedPayload = data.Items[0].signedPayload.S;
 
@@ -45,10 +45,10 @@ export async function getStatment({
         discord: delegateStatementObject.discord,
       };
     } else {
-      return notFound();
+      return null;
     }
   } catch (error) {
     console.error(error);
-    return notFound();
+    return null;
   }
 }
