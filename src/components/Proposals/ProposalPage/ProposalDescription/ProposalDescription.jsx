@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
+import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 
 export default function ProposalDescription({ proposal }) {
   const proposalsWithBadDescription = [
@@ -45,6 +46,7 @@ export default function ProposalDescription({ proposal }) {
     <VStack gap={4} className={styles.proposal_description}>
       <ProposalTitle title={shortTitle} proposerAddress={proposal.proposer} />
       <VStack gap={2}>
+        <ApprovedTransactions proposalData={proposal.proposalData}/>
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}
         >
