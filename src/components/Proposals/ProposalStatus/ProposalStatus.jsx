@@ -14,7 +14,6 @@ export default function ProposalStatus({ proposal }) {
     .toLowerCase()
     .replace(/\s+/g, "-")}`;
   let statusText = proposal.status;
-  console.log(statusText);
 
   if (testProposals.includes(proposal.id)) {
     statusClass = "status-test"; // Assuming you have a CSS class for this

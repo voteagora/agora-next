@@ -3,6 +3,122 @@ import { Prisma, ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
+import { Abi, decodeFunctionData } from 'viem';
+
+const knownAbis: Record<string, Abi> = {
+  "0x5ef2c7f0": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_node", type: "bytes32" },
+        { name: "_label", type: "bytes32" },
+        { name: "_owner", type: "address" },
+        { name: "_resolver", type: "address" },
+        { name: "_ttl", type: "uint64" }
+      ],
+      name: "setSubnodeRecord",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ],
+  "0x10f13a8c": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_node", type: "bytes32" },
+        { name: "_key", type: "string" },
+        { name: "_value", type: "string" }
+      ],
+      name: "setText",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ],
+  "0xb4720477": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_child", type: "address" },
+        { name: "_message", type: "bytes" }
+      ],
+      name: "sendMessageToChild",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ],
+  "0xa9059cbb": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_to", type: "address" },
+        { name: "_value", type: "uint256" }
+      ],
+      name: "transfer",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ],
+  "0x095ea7b3": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_spender", type: "address" },
+        { name: "_value", type: "uint256" }
+      ],
+      name: "approve",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ],
+  "0x7b1837de": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_to", type: "address" },
+        { name: "_amount", type: "uint256" }
+      ],
+      name: "fund",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ],
+  "0x23b872dd": [
+    {
+      constant: false,
+      inputs: [
+        { name: "_from", type: "address" },
+        { name: "_to", type: "address" },
+        { name: "_value", type: "uint256" }
+      ],
+      name: "transferFrom",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+    }
+  ]
+};
+
+const decodeCalldata = (calldatas: `0x${string}`[]) => {
+  const abi = knownAbis[calldatas[0].slice(0, 10)];
+  let functionName = 'unknown';
+  let functionArgs = [] as string[];
+  if (abi) {
+    const decodedData = decodeFunctionData({
+      abi: abi,
+      data: calldatas[0],
+    });
+    functionName = decodedData.functionName;
+    functionArgs = decodedData.args as string[];
+  }
+
+  return { functionName, functionArgs };
+};
 
 /**
  * Proposal title extraction
@@ -57,46 +173,47 @@ export async function parseProposal(
     JSON.stringify(proposal.proposal_data || {}),
     proposal.proposal_type as ProposalType
   );
-  const proposalResutsls = parseProposalResults(
+  const proposalResuts = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
     proposalData
   );
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     created_time: latestBlock
       ? getHumanBlockTime(
-          proposal.created_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+        proposal.created_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      )
       : null,
     start_time: latestBlock
       ? getHumanBlockTime(
-          proposal.start_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+        proposal.start_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      )
       : null,
     end_time: latestBlock
       ? getHumanBlockTime(
-          proposal.end_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+        proposal.end_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum: await getQuorumForProposal(proposal),
     proposalData: proposalData.kind,
-    proposalResults: proposalResutsls.kind,
+    proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-          proposal,
-          proposalResutsls,
-          Number(latestBlock.number)
-        )
+        proposal,
+        proposalResuts,
+        Number(latestBlock.number)
+      )
       : null,
   };
 }
@@ -104,14 +221,18 @@ export async function parseProposal(
 /**
  * Extract proposal total value
  */
-
 export function getProposalTotalValue(
   proposalData: ParsedProposalData[ProposalType]
 ) {
   switch (proposalData.key) {
     case "STANDARD": {
-      return proposalData.kind.values.reduce((acc, val) => {
-        return acc + BigInt(val);
+      // TODO: frh -> check this value
+      return proposalData.kind.options.reduce((acc, option) => {
+        return (
+          option.values.reduce((sum, val) => {
+            return BigInt(val) + sum;
+          }, 0n) + acc
+        );
       }, 0n);
     }
     case "APPROVAL": {
@@ -130,10 +251,14 @@ export type ParsedProposalData = {
   STANDARD: {
     key: "STANDARD";
     kind: {
-      targets: string[];
-      values: string[];
-      signatures: string[];
-      calldatas: string[];
+      options: {
+        targets: string[];
+        values: string[];
+        signatures: string[];
+        calldatas: string[];
+        functionName: string;
+        functionArgs: string[];
+      }[]
     };
   };
   APPROVAL: {
@@ -144,6 +269,8 @@ export type ParsedProposalData = {
         values: string[];
         calldatas: string[];
         description: string;
+        functionName: string;
+        functionArgs: string[];
       }[];
       proposalSettings: {
         maxApprovals: number;
@@ -163,13 +290,19 @@ export function parseProposalData(
   switch (proposalType) {
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
+      const calldatas = JSON.parse(parsedProposalData.calldatas);
+      const { functionArgs, functionName } = decodeCalldata(calldatas);
       return {
         key: "STANDARD",
         kind: {
-          targets: JSON.parse(parsedProposalData.targets),
-          values: JSON.parse(parsedProposalData.values),
-          signatures: JSON.parse(parsedProposalData.signatures),
-          calldatas: JSON.parse(parsedProposalData.calldatas),
+          options: [{
+            targets: JSON.parse(parsedProposalData.targets),
+            values: JSON.parse(parsedProposalData.values),
+            signatures: JSON.parse(parsedProposalData.signatures),
+            calldatas: calldatas,
+            functionName,
+            functionArgs
+          }]
         },
       };
     }
@@ -185,11 +318,15 @@ export function parseProposalData(
               [string[], string[], string[], string]
             >
           ).map((option) => {
+            const { functionArgs, functionName } = decodeCalldata(option[2] as `0x${string}`[]);
+
             return {
               targets: option[0],
               values: option[1],
               calldatas: option[2],
               description: option[3],
+              functionName,
+              functionArgs
             };
           }),
           proposalSettings: {
