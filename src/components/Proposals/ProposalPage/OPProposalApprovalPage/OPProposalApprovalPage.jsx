@@ -4,8 +4,6 @@ import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { getVotesForProposal } from "@/app/api/votes/getVotes";
-import { useAccount } from "wagmi";
-import { useMemo } from "react";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 

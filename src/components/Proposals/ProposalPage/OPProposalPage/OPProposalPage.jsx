@@ -6,6 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import { getVotesForProposal } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
