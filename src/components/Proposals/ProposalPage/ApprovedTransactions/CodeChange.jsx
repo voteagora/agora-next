@@ -29,7 +29,7 @@ export default function CodeChange({
       {valueETH}(
       <br />
       <span className="ml-2">
-      {functionArgs.length !== 0 ? (
+        {functionArgs.length !== 0 ? (
           functionArgs.map((arg, index) => (
             <span key={arg}>
               {arg}
@@ -43,10 +43,7 @@ export default function CodeChange({
               .substring(2)
               .match(/.{1,64}/g)
               ?.map((data) => (
-                <span
-                  key={data}
-                  className={index !== 0 ? 'ml-6' : undefined}
-                >
+                <span key={data}>
                   {data}
                   <br />
                 </span>
