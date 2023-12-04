@@ -5,6 +5,7 @@ import { BigNumberish } from "ethers";
 export type Proposal = {
   id: string;
   proposer: string;
+  snapshotBlockNumber: number;
   created_time: Date | null;
   start_time: Date | null;
   end_time: Date | null;

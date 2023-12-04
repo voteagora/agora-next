@@ -1,10 +1,27 @@
 "use client";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAccount } from "wagmi";
 
-export default function CastVoteInput({ proposal }) {
+export default function CastVoteInput({ proposal, fetchVotingPower }) {
   const [reason, setReason] = useState("");
+  const [votingPower, setVotingPower] = useState("0");
+
+  const { address } = useAccount();
+
+  useEffect(() => {
+    if (address && proposal.snapshotBlockNumber) {
+      fetchVotingPower(address, proposal.snapshotBlockNumber).then(
+        ({ votingPower }) => {
+          setVotingPower(votingPower);
+        }
+      );
+    }
+  }, [address, proposal.snapshotBlockNumber, fetchVotingPower]);
+
+  console.log("votingPower", votingPower);
+
   return (
     <VStack className={styles.cast_vote_container}>
       <textarea

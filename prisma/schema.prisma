@@ -197,6 +197,26 @@ view Proposals {
   @@schema("center")
 }
 
+view AdvancedVotingPower {
+  delegate     String  @unique
+  vp_allowance Decimal @db.Decimal
+  delegated_vp Decimal @db.Decimal
+  advanced_vp  Decimal @db.Decimal
+
+  @@map("advanced_voting_power")
+  @@schema("center")
+}
+
+view VotingPowerSnaps {
+  id           String @unique
+  delegate     String?
+  balance      String?
+  block_number BigInt?
+
+  @@map("voting_power_snaps")
+  @@schema("center")
+}
+
 enum ProposalType {
   STANDARD
   APPROVAL

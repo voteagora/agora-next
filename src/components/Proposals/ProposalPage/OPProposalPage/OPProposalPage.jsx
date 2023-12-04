@@ -5,6 +5,7 @@ import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import { getVotesForProposal } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
+import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -12,8 +13,20 @@ async function fetchProposalVotes(proposal_id, page = 1) {
   return getVotesForProposal({ proposal_id, page });
 }
 
+async function fetchVotingPower(address, blockNumber) {
+  "use server";
+
+  console.log("fetchVotingPower", { address, blockNumber });
+
+  return {
+    votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
+      .totalVP,
+  };
+}
+
 export default async function OPProposalPage({ proposal }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
+
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
     <HStack
@@ -38,7 +51,10 @@ export default async function OPProposalPage({ proposal }) {
             proposal_id={proposal.id}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput proposal={proposal} />
+          <CastVoteInput
+            proposal={proposal}
+            fetchVotingPower={fetchVotingPower}
+          />
         </VStack>
       </VStack>
     </HStack>
