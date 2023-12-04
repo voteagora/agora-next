@@ -84,6 +84,8 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
                 <DelegateActions
                   address={delegate.address}
                   votingPower={delegate.votingPower}
+                  discord={delegate?.statement?.discord}
+                  twitter={delegate?.statement?.twitter}
                 />
               </VStack>
             </VStack>
