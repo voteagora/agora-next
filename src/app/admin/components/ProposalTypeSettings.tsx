@@ -23,7 +23,7 @@ export default function ProposalTypeSettings() {
 
   return (
     <section className="gl_box">
-      <h1>Proposal type settings</h1>
+      <h1 className="font-extrabold text-2xl">Proposal type settings</h1>
       <p>Create and manage different types of proposals</p>
       {proposalTypes.map((proposalType, key) => (
         <Fragment key={key}>
