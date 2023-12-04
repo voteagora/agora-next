@@ -1,12 +1,17 @@
 "use client";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-export default function CastVoteInput({ proposal, fetchVotingPower }) {
+export default function CastVoteInput({
+  proposal,
+  fetchVotingPower,
+  fetchAuthorityChains,
+}) {
   const [reason, setReason] = useState("");
   const [votingPower, setVotingPower] = useState("0");
+  const [chains, setChains] = useState([]);
 
   const { address } = useAccount();
 
@@ -17,10 +22,19 @@ export default function CastVoteInput({ proposal, fetchVotingPower }) {
           setVotingPower(votingPower);
         }
       );
-    }
-  }, [address, proposal.snapshotBlockNumber, fetchVotingPower]);
 
-  console.log("votingPower", votingPower);
+      fetchAuthorityChains(address, proposal.snapshotBlockNumber).then(
+        ({ chains }) => {
+          setChains(chains);
+        }
+      );
+    }
+  }, [
+    address,
+    proposal.snapshotBlockNumber,
+    fetchVotingPower,
+    fetchAuthorityChains,
+  ]);
 
   return (
     <VStack className={styles.cast_vote_container}>

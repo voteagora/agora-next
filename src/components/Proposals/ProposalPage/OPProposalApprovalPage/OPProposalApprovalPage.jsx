@@ -7,6 +7,7 @@ import { getVotesForProposal } from "@/app/api/votes/getVotes";
 import { useAccount } from "wagmi";
 import { useMemo } from "react";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -20,6 +21,14 @@ async function fetchVotingPower(address, blockNumber) {
   return {
     votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
       .totalVP,
+  };
+}
+
+async function fetchAuthorityChains(address, blockNumber) {
+  "use server";
+
+  return {
+    chains: await getAuthorityChains({ blockNumber, address }),
   };
 }
 
@@ -51,6 +60,7 @@ export default async function OPProposalApprovalPage({ proposal }) {
           <CastVoteInput
             proposal={proposal}
             fetchVotingPower={fetchVotingPower}
+            fetchAuthorityChains={fetchAuthorityChains}
           />
         </VStack>
       </VStack>

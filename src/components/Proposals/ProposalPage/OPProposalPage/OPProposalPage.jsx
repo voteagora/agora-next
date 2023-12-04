@@ -24,6 +24,14 @@ async function fetchVotingPower(address, blockNumber) {
   };
 }
 
+async function fetchAuthorityChains(address, blockNumber) {
+  "use server";
+
+  return {
+    chains: await getAuthorityChains({ blockNumber, address }),
+  };
+}
+
 export default async function OPProposalPage({ proposal }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
 
@@ -54,6 +62,7 @@ export default async function OPProposalPage({ proposal }) {
           <CastVoteInput
             proposal={proposal}
             fetchVotingPower={fetchVotingPower}
+            fetchAuthorityChains={fetchAuthorityChains}
           />
         </VStack>
       </VStack>
