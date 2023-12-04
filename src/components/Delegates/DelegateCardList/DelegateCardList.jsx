@@ -3,16 +3,22 @@
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
-import Link from "next/link";
 import { VStack } from "../../Layout/Stack";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
+import { useRouter } from "next/navigation";
 
 export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
+  const router = useRouter();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialDelegates] || []);
   const [meta, setMeta] = React.useState(initialDelegates.meta);
+
+  const handleClick = (e, href) => {
+    e.preventDefault();
+    router.push(href);
+  };
 
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
@@ -60,9 +66,9 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
         }
 
         return (
-          <Link
+          <div
             key={i}
-            href={`/delegates/${delegate.address}`}
+            onClick={(e) => handleClick(e, `/delegates/${delegate.address}`)}
             className={styles.link}
           >
             <VStack className={styles.link_container}>
@@ -78,10 +84,12 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
                 <DelegateActions
                   address={delegate.address}
                   votingPower={delegate.votingPower}
+                  discord={delegate?.statement?.discord}
+                  twitter={delegate?.statement?.twitter}
                 />
               </VStack>
             </VStack>
-          </Link>
+          </div>
         );
       })}
     </InfiniteScroll>
