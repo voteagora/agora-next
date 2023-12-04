@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 import AgoraProvider from "./AgoraContext";
+import { Toaster } from "react-hot-toast";
 
 const chains = [mainnet, optimism];
 const metadata = {
@@ -39,6 +40,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
       <noscript>You need to enable JavaScript to run this app.</noscript>
 
       <PageContainer>
+        <Toaster />
         <Header />
         <AgoraProvider>{children}</AgoraProvider>
       </PageContainer>
