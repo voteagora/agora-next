@@ -25,34 +25,36 @@ export default function ApprovedTransactions({ proposalData }) {
         Proposed Transactions - only approved options will execute
       </p>
       <VStack className="px-4">
-        {proposalData.options.slice(0, displayedOptions).map((option) => {
-          const value = parseFloat(
-            formatUnits(option.values[0], 18)
-          ).toLocaleString("en-US");
-          const valueETH =
-            option.values[0] > 0
-              ? `{ value: ${formatEther(option.values[0])} ETH }`
-              : undefined;
+        {proposalData.options
+          .slice(0, displayedOptions)
+          .map((option, index) => {
+            const value = parseFloat(
+              formatUnits(option.values[0], 18)
+            ).toLocaleString("en-US");
+            const valueETH =
+              option.values[0] > 0
+                ? `{ value: ${formatEther(option.values[0])} ETH }`
+                : undefined;
 
-          return (
-            <div key={option.description}>
-              <p className="text-xs font-mono font-medium text-gray-af leading-4">
-                <OptionDescription
-                  description={option.description}
-                  value={value}
+            return (
+              <div key={index}>
+                <p className="text-xs font-mono font-medium text-gray-af leading-4">
+                  <OptionDescription
+                    description={option.description}
+                    value={value}
+                    target={option.targets[0]}
+                  />
+                </p>
+                <CodeChange
                   target={option.targets[0]}
+                  calldata={option.calldatas[0]}
+                  valueETH={valueETH}
+                  functionName={option.functionName}
+                  functionArgs={option.functionArgs}
                 />
-              </p>
-              <CodeChange
-                target={option.targets[0]}
-                calldata={option.calldatas[0]}
-                valueETH={valueETH}
-                functionName={option.functionName}
-                functionArgs={option.functionArgs}
-              />
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
       </VStack>
       {proposalData.options.length > 1 && (
         <div
