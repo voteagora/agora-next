@@ -18,7 +18,7 @@ export function DelegateProfileImage({ address, votingPower }) {
   });
 
   return (
-    <HStack gap="4">
+    <HStack className="gap-4">
       <div
         className={css`
           position: relative;

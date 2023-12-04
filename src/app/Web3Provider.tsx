@@ -1,15 +1,15 @@
 "use client"
 
-import { FC, PropsWithChildren } from "react"
-import { WagmiConfig } from "wagmi"
-import Header from "@/components/Header/Header"
-import { inter, rubik } from "@/styles/fonts"
-import { cn } from "@/lib/utils"
-import { mainnet, optimism } from "wagmi/chains"
-import Footer from "@/components/Footer"
-import { PageContainer } from "@/components/Layout/PageContainer"
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react"
-import AgoraProvider from "./AgoraContext"
+import { FC, PropsWithChildren } from "react";
+import { WagmiConfig } from "wagmi";
+import Header from "@/components/Header/Header";
+import { inter, rubik } from "@/styles/fonts";
+import { cn } from "@/lib/utils";
+import { mainnet, optimism } from "wagmi/chains";
+import Footer from "@/components/Footer";
+import { PageContainer } from "@/components/Layout/PageContainer";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
+import AgoraProvider from "./AgoraContext";
 
 const chains = [mainnet, optimism]
 const metadata = {

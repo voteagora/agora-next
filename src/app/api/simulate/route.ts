@@ -32,10 +32,17 @@ export async function POST(request: Request) {
     );
     const res = await response.json();
 
-    return Response.json({ response: res });
+    return new Response(JSON.stringify({ response: res }), {
+      status: 200,
+    });
   } catch (e: any) {
-    return {
-      error: e?.response?.data?.error?.message || e?.message || e,
-    };
+    return new Response(
+      JSON.stringify({
+        error: e?.response?.data?.error?.message || e?.message || e,
+      }),
+      {
+        status: 500,
+      }
+    );
   }
 }
