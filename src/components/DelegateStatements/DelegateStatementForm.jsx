@@ -94,14 +94,11 @@ export default function DelegateStatementForm(address) {
     };
 
     const response = await api.post("/statements", fullFormData);
-    console.log(response);
 
     if (!response.ok) {
       // Handle error response here
-      console.log("There was an error submitting the form");
     } else {
       // Handle successful response here
-      console.log("Form submitted successfully");
       setFormData({ title: "", content: "" });
     }
   };
