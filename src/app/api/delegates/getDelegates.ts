@@ -101,10 +101,9 @@ export async function getDelegate({
     votingPower: votingPower?.voting_power || "0",
     votingPowerRelativeToVotableSupply:
       Number(votingPower?.relative_voting_power) || 0,
-    votingPowerRelativeToQuorum:
-      Number(
-        (BigInt(votingPower?.voting_power || 0) * 10000n) / (quorum || 0n)
-      ) / 10000,
+    votingPowerRelativeToQuorum: quorum !== 0n && quorum
+      ? Number((BigInt(votingPower?.voting_power || 0) * 10000n) / quorum) / 10000
+      : 0,
     proposalsCreated: voterStats?.proposals_created || 0n,
     proposalsVotedOn: voterStats?.proposals_voted || 0n,
     votedFor: voterStats?.for?.toFixed() || "0",
