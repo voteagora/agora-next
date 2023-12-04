@@ -1,50 +1,50 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { XCircle } from "lucide-react"
-import { formatNumber } from "@/lib/utils"
-import ProposalTypesConfiguratorAbi from "@/lib/contracts/abis/ProposalTypesConfigurator.json"
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { XCircle } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
 import {
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction
-} from "wagmi"
+  useWaitForTransaction,
+} from "wagmi";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 type Props = {
-  proposalType: ProposalType
-  index: number
-}
+  proposalType: ProposalType;
+  index: number;
+};
 
 type ProposalType = {
-  quorum: number
-  approvalThreshold: number
-  name: string
-}
+  quorum: number;
+  approvalThreshold: number;
+  name: string;
+};
 
 const proposalTypeSchema = z.object({
   name: z.string(),
   description: z.string(),
-  approvalThreshold: z.number().lte(100),
-  quorum: z.number().lte(100)
-})
+  approvalThreshold: z.coerce.number().lte(100),
+  quorum: z.coerce.number().lte(100),
+});
 
-const mockVotableSupply = 500000000
+const mockVotableSupply = 500000000;
 
 export default function ProposalType({
   proposalType: { quorum, approvalThreshold, name },
-  index
+  index,
 }: Props) {
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
@@ -52,55 +52,55 @@ export default function ProposalType({
       quorum,
       approvalThreshold,
       name,
-      description: ""
-    }
-  })
+      description: "",
+    },
+  });
 
   const { config: deleteProposalTypeConfig } = usePrepareContractWrite({
-    address: "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
-    abi: ProposalTypesConfiguratorAbi,
+    address: OptimismContracts.proposalTypesConfigurator.address,
+    abi: OptimismContracts.proposalTypesConfigurator.abi,
     functionName: "setProposalType",
-    args: [index, 0, 0, ""]
-  })
+    args: [BigInt(index), 0, 0, ""],
+  });
   const {
     data: resultDeleteProposalType,
     write: writeDeleteProposalType,
-    isLoading: isLoadingDeleteProposalType
-  } = useContractWrite(deleteProposalTypeConfig)
+    isLoading: isLoadingDeleteProposalType,
+  } = useContractWrite(deleteProposalTypeConfig);
   const { isLoading: isLoadingDeleteProposalTypeTransaction } =
     useWaitForTransaction({
-      hash: resultDeleteProposalType?.hash
-    })
+      hash: resultDeleteProposalType?.hash,
+    });
 
-  const formValues = form.getValues()
+  const formValues = form.getValues();
   const { config: setProposalTypeConfig } = usePrepareContractWrite({
-    address: "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
-    abi: ProposalTypesConfiguratorAbi,
+    address: OptimismContracts.proposalTypesConfigurator.address,
+    abi: OptimismContracts.proposalTypesConfigurator.abi,
     functionName: "setProposalType",
     args: [
-      index,
-      formValues.quorum,
-      formValues.approvalThreshold,
-      formValues.name
-    ]
-  })
+      BigInt(index),
+      formValues.quorum * 100,
+      formValues.approvalThreshold * 100,
+      formValues.name,
+    ],
+  });
   const {
     data: resultSetProposalType,
     write: writeSetProposalType,
-    isLoading: isLoadingSetProposalType
-  } = useContractWrite(setProposalTypeConfig)
+    isLoading: isLoadingSetProposalType,
+  } = useContractWrite(setProposalTypeConfig);
   const { isLoading: isLoadingSetProposalTypeTransaction } =
     useWaitForTransaction({
-      hash: resultSetProposalType?.hash
-    })
+      hash: resultSetProposalType?.hash,
+    });
   const isDisabled =
     isLoadingDeleteProposalType ||
     isLoadingDeleteProposalTypeTransaction ||
     isLoadingSetProposalType ||
-    isLoadingSetProposalTypeTransaction
+    isLoadingSetProposalTypeTransaction;
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
-    writeSetProposalType?.()
+    writeSetProposalType?.();
   }
 
   return (
@@ -115,7 +115,7 @@ export default function ProposalType({
               className="hover:bg-destructive/10 group w-9 h-9"
               disabled={isDisabled}
               onClick={() => {
-                writeDeleteProposalType?.()
+                writeDeleteProposalType?.();
               }}
               type="button"
             >
@@ -213,9 +213,9 @@ export default function ProposalType({
           loading={isDisabled}
           disabled={isDisabled}
         >
-          Update proposal type
+          Set proposal type
         </Button>
       </form>
     </Form>
-  )
+  );
 }
