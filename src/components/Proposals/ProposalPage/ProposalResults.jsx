@@ -13,7 +13,6 @@ export default function ProposalResults({ proposal_id }) {
   const [results, setResults] = useState("Loading...");
 
   useEffect(() => {
-    console.log("Fetching proposal results");
     getProposalResults(proposal_id)
       .then((results) => {
         setResults(results);
