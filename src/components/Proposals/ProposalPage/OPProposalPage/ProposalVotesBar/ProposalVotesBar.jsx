@@ -10,7 +10,7 @@ import { TokenAmountDisplay, generateBarsForVote } from "@/lib/utils";
 
 export default function ProposalVotesBar({ proposal }) {
   return (
-    <div className="my-4">
+    <div className="my-2">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>

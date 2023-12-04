@@ -1,6 +1,7 @@
 @import "@/styles/variables.scss";
 
 .proposal_votes_summary_container {
+  padding: 0 $spacing-4;
   font-weight: $font-weight-semibold;
   flex-shrink: 0;
 }

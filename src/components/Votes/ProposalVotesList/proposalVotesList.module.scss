@@ -16,3 +16,8 @@
     width: fit-content;
   }
 }
+
+.vote_container {
+  padding: 0 $spacing-4;
+  overflow-y: scroll;
+}
