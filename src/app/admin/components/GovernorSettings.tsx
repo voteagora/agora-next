@@ -19,6 +19,7 @@ const secondsPerBlock = 2;
 const governorContract = {
   address: OptimismContracts.governor.address,
   abi: OptimismContracts.governor.abi,
+  chainId: 10,
 };
 
 // TODO: Take init state values from the chain
@@ -28,17 +29,14 @@ export default function GovernorSettings() {
       {
         ...governorContract,
         functionName: "votingPeriod",
-        chainId: 10,
       },
       {
         ...governorContract,
         functionName: "votingDelay",
-        chainId: 10,
       },
       {
         ...governorContract,
         functionName: "manager",
-        chainId: 10,
       },
     ],
   });
