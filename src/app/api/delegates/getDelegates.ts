@@ -11,7 +11,7 @@ import "server-only";
 
 export async function getDelegates({
   page = 1,
-  sort = "weigted_random",
+  sort = "weighted_random",
   seed = Math.random(),
 }: {
   page: number;
@@ -31,7 +31,7 @@ export async function getDelegates({
               num_for_delegators: "desc",
             },
           });
-        case "weigted_random":
+        case "weighted_random":
           return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
             Prisma.sql`
             SELECT *, setseed(${seed})::Text

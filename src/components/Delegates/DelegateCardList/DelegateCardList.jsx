@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
 import { VStack } from "../../Layout/Stack";
@@ -14,6 +15,11 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialDelegates] || []);
   const [meta, setMeta] = React.useState(initialDelegates.meta);
+
+  useEffect(() => {
+    setPages([initialDelegates]);
+    setMeta(initialDelegates.meta);
+  }, [initialDelegates]);
 
   const handleClick = (e, href) => {
     e.preventDefault();
@@ -67,7 +73,7 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
 
         return (
           <div
-            key={i}
+            key={delegate.address}
             onClick={(e) => handleClick(e, `/delegates/${delegate.address}`)}
             className={styles.link}
           >
