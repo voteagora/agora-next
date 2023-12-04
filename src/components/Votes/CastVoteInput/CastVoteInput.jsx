@@ -70,7 +70,7 @@ function VoteButtons({ onClick, proposalStatus }) {
   //   }
 
   return (
-    <HStack gap={2}>
+    <HStack gap={2} className="pt-1">
       {["FOR", "AGAINST", "ABSTAIN"].map((supportType) => (
         <VoteButton
           key={supportType}
