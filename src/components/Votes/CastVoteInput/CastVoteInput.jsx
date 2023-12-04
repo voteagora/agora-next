@@ -3,6 +3,9 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { useAgoraContext } from "@/app/AgoraContext";
+import { Button } from "@/components/ui/button";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 export default function CastVoteInput({
   proposal,
@@ -56,14 +59,23 @@ export default function CastVoteInput({
     </VStack>
   );
 }
+
 function VoteButtons({ onClick, proposalStatus }) {
+  const { isConnected } = useAgoraContext();
+  const { open } = useWeb3Modal();
+
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
   }
 
-  //   if (!delegate) {
-  //     return <ConnectWalletButton reason="Connect wallet to vote" />;
-  //   }
+  if (!isConnected) {
+    return (
+      <Button variant={"outline"} onClick={() => open()}>
+        Connect wallet to vote
+      </Button>
+    );
+  }
+
   //   const hasVoted = !!delegate.votes.find((it) => it.proposal.id === result.id);
   //   if (hasVoted) {
   //     return <DisabledVoteButton reason="Already voted" />;
