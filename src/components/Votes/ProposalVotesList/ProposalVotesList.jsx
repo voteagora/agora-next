@@ -7,6 +7,7 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
+import VoteText from "../VoteText/VoteText";
 
 export default function ProposalVotesList({
   initialProposalVotes,
@@ -51,11 +52,12 @@ export default function ProposalVotesList({
         }
       >
         {proposalVotes.map((vote, i) => (
-          <VStack key={`vote_${i}`} gap={1} className={styles.vote_row}>
+          <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
             <VStack>
               <HStack justifyContent="justify-between" className={styles.voter}>
                 <HStack gap={1} alignItems="items-center">
                   <HumanAddress address={vote.address} />
+                  <VoteText support={vote.support} />
                 </HStack>
                 <HStack
                   gap={1}

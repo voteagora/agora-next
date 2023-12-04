@@ -2,6 +2,7 @@
 
 .proposal_votes_summary_container {
   padding: 0 $spacing-4;
-  font-weight: $font-weight-semibold;
+  font-weight: $font-weight-bold;
   flex-shrink: 0;
+  font-size: $font-size-xs;
 }
