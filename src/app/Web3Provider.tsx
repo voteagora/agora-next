@@ -41,7 +41,7 @@ const config = createConfig(
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
-    <ConnectKitProvider>
+    <ConnectKitProvider options={{ walletConnectCTA: "both" }}>
       <body className={cn(rubik.variable, inter.variable)}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
 

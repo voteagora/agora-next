@@ -2,10 +2,11 @@
 
 import * as theme from "@/styles/theme";
 import { css } from "@emotion/css";
-import { HStack, VStack } from "@/components/Layout/Stack";
+import { VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import { DelegateActions } from "./DelegateActions";
+import { PanelRow } from "@/components/shared/PanelRow/PanelRow";
 
 export default function DelegateCard({ delegate }) {
   if (!delegate) {
@@ -122,27 +123,3 @@ export default function DelegateCard({ delegate }) {
     </VStack>
   );
 }
-
-const PanelRow = ({ title, detail }) => {
-  return (
-    <HStack gap="2" justifyContent="justify-between" alignItems="baseline">
-      <span
-        className={css`
-          white-space: nowrap;
-        `}
-      >
-        {title}
-      </span>
-
-      <span
-        className={css`
-          font-size: ${theme.fontSize.sm};
-          color: #4f4f4f;
-          text-align: right;
-        `}
-      >
-        {detail}
-      </span>
-    </HStack>
-  );
-};
