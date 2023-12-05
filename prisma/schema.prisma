@@ -197,22 +197,23 @@ view Proposals {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view advanced_delegatees {
-  from             String?
-  to               String?
-  delegated_amount Decimal? @db.Decimal
-  delegated_share  Decimal? @db.Decimal
+view AdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
 
-  @@ignore
+  @@map("advanced_delegatees")
   @@schema("center")
 }
 
 view AdvancedVotingPower {
-  delegate     String   @unique
-  vp_allowance Decimal  @db.Decimal
-  delegated_vp Decimal  @db.Decimal
-  advanced_vp  Decimal  @db.Decimal
+  delegate     String  @unique
+  vp_allowance Decimal @db.Decimal
+  delegated_vp Decimal @db.Decimal
+  advanced_vp  Decimal @db.Decimal
 
   @@map("advanced_voting_power")
   @@schema("center")
@@ -316,6 +317,16 @@ view voting_power_snaps {
   block_number BigInt?
 
   @@ignore
+  @@schema("center")
+}
+
+view Delegatees {
+  delegator    String   @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal  @db.Decimal
+
+  @@map("delegatees")
   @@schema("center")
 }
 
