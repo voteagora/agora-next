@@ -6,6 +6,7 @@ import ENSName from "@/components/shared/ENSName";
 import { DelegationDisplayAmount } from "./DelegationDisplayAmount";
 import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
+import { ConnectKitButton } from "connectkit";
 
 export function DelegateDialog({
   target,
@@ -79,7 +80,7 @@ export function DelegateDialog({
             <DelegationDisplayAmount amount={votingPower} />
           </VStack>
         </VStack>
-        {!accountAddress && <w3m-button />}
+        {!accountAddress && <ConnectKitButton />}
         {isLoading && (
           <Button href={null} disabled={false}>
             Submitting your delegation...
