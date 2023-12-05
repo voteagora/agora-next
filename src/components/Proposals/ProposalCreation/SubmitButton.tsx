@@ -182,8 +182,6 @@ function getInputData(form: Form): {
           }
         });
 
-        console.log(formattedOption);
-
         options.push(formattedOption);
       });
 

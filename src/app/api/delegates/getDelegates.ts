@@ -11,7 +11,7 @@ import "server-only";
 
 export async function getDelegates({
   page = 1,
-  sort = "weigted_random",
+  sort = "weighted_random",
   seed = Math.random(),
 }: {
   page: number;
@@ -31,7 +31,7 @@ export async function getDelegates({
               num_for_delegators: "desc",
             },
           });
-        case "weigted_random":
+        case "weighted_random":
           return prisma.$queryRaw(
             Prisma.sql`
             SELECT *, setseed(${seed})::Text
@@ -101,11 +101,9 @@ export async function getDelegate({
     votingPower: votingPower?.voting_power || "0",
     votingPowerRelativeToVotableSupply:
       Number(votingPower?.relative_voting_power) || 0,
-    votingPowerRelativeToQuorum:
-      quorum !== 0n && quorum
-        ? Number((BigInt(votingPower?.voting_power || 0) * 10000n) / quorum) /
-          10000
-        : 0,
+    votingPowerRelativeToQuorum: quorum !== 0n && quorum
+      ? Number((BigInt(votingPower?.voting_power || 0) * 10000n) / quorum) / 10000
+      : 0,
     proposalsCreated: voterStats?.proposals_created || 0n,
     proposalsVotedOn: voterStats?.proposals_voted || 0n,
     votedFor: voterStats?.for?.toFixed() || "0",
