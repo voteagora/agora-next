@@ -12,7 +12,7 @@ import {
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useModal } from "connectkit";
 
 const abiCoder = new AbiCoder();
 const governorTokenContract = OptimismContracts.governor;
@@ -27,7 +27,7 @@ export default function SubmitButton({
 }) {
   const { governorFunction, inputData } = getInputData(form);
   const { isConnected } = useAccount();
-  const { open } = useWeb3Modal();
+  const { setOpen } = useModal();
   const [isClient, setIsClient] = useState(false);
 
   const { config, isError: onPrepareError } = usePrepareContractWrite({
@@ -93,7 +93,7 @@ export default function SubmitButton({
       onClick={(e) => {
         e.preventDefault();
         if (!isConnected) {
-          open();
+          setOpen(true);
           return;
         }
         if (formTarget.current?.checkValidity() && !onPrepareError) {
