@@ -32,7 +32,7 @@ export async function getDelegates({
             },
           });
         case "weighted_random":
-          return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
+          return prisma.$queryRaw(
             Prisma.sql`
             SELECT *, setseed(${seed})::Text
             FROM center.delegates
