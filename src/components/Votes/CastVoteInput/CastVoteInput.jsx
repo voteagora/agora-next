@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/app/AgoraContext";
 import { Button } from "@/components/ui/button";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useModal } from "connectkit";
 
 export default function CastVoteInput({
   proposal,
@@ -62,7 +62,7 @@ export default function CastVoteInput({
 
 function VoteButtons({ onClick, proposalStatus }) {
   const { isConnected } = useAgoraContext();
-  const { open } = useWeb3Modal();
+  const { setOpen } = useModal();
 
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
@@ -70,7 +70,7 @@ function VoteButtons({ onClick, proposalStatus }) {
 
   if (!isConnected) {
     return (
-      <Button variant={"outline"} onClick={() => open()}>
+      <Button variant={"outline"} onClick={() => setOpen(true)}>
         Connect wallet to vote
       </Button>
     );
