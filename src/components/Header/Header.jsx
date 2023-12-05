@@ -4,9 +4,9 @@
 import Navbar from "./Navbar";
 import { HStack } from "../Layout/Stack";
 import LogoLink from "./LogoLink";
-import styles from "./header.module.scss";
-import { ConnectKitButton } from "connectkit";
 import { useAccount } from "wagmi";
+import { MobileConnectButton } from "../ConnectButton/MobileConnectButton";
+import { DesktopConnectButton } from "../ConnectButton/DesktopConnectButton";
 
 export default function Header() {
   const { address } = useAccount();
@@ -15,7 +15,15 @@ export default function Header() {
     <HStack className="main_header" justifyContent="justify-between">
       <LogoLink instance_name="Optimism" />
       <Navbar />
-      <ConnectKitButton />
+
+      <HStack alignItems="center" gap="3" className="h-6">
+        <HStack justifyContent="center" className="hidden md:block">
+          <DesktopConnectButton />
+        </HStack>
+        <HStack justifyContent="center" className="block md:hidden">
+          <MobileConnectButton />
+        </HStack>
+      </HStack>
     </HStack>
   );
 }
