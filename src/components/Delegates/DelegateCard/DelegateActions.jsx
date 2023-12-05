@@ -2,23 +2,21 @@ import { HStack } from "@/components/Layout/Stack";
 import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
 
-// TODO: add twitter and discord links (from delegate statement)
-const statement = {
-  discord: "agora",
-  twitter: "agora",
-};
-export function DelegateActions({ className, address, votingPower }) {
+export function DelegateActions({
+  address,
+  className,
+  discord,
+  twitter,
+  votingPower,
+}) {
   return (
     <HStack
       alignItems="items-stretch"
       className={className ? className + "justify-between" : "justify-between"}
     >
-      <DelegateSocialLinks
-        discord={statement?.twitter}
-        twitter={statement?.discord}
-      />
+      <DelegateSocialLinks discord={discord} twitter={twitter} />
       <DelegateButton
-        full={!statement || (!statement?.twitter && !statement?.discord)}
+        full={!twitter && !discord}
         address={address}
         votingPower={votingPower}
       />

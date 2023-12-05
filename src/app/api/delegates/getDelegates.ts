@@ -32,7 +32,7 @@ export async function getDelegates({
             },
           });
         case "weigted_random":
-          return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
+          return prisma.$queryRaw(
             Prisma.sql`
             SELECT *, setseed(${seed})::Text
             FROM center.delegates
@@ -102,9 +102,10 @@ export async function getDelegate({
     votingPowerRelativeToVotableSupply:
       Number(votingPower?.relative_voting_power) || 0,
     votingPowerRelativeToQuorum:
-      Number(
-        (BigInt(votingPower?.voting_power || 0) * 10000n) / (quorum || 0n)
-      ) / 10000,
+      quorum !== 0n && quorum
+        ? Number((BigInt(votingPower?.voting_power || 0) * 10000n) / quorum) /
+          10000
+        : 0,
     proposalsCreated: voterStats?.proposals_created || 0n,
     proposalsVotedOn: voterStats?.proposals_voted || 0n,
     votedFor: voterStats?.for?.toFixed() || "0",
