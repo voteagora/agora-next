@@ -1,4 +1,3 @@
-import badge from "./badge.svg";
 import ballot from "./ballot.svg";
 import community from "./community.svg";
 import measure from "./measure.svg";
@@ -21,7 +20,6 @@ import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
 
 export const icons = {
-  badge,
   contractVoter,
   expand,
   anonNoun,
