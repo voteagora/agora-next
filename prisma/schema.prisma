@@ -191,6 +191,7 @@ view Proposals {
   executed_block   BigInt?
   proposal_data    Json?
   proposal_type    String
+  proposal_type_id String?
   proposal_results Json?
 
   @@map("proposals")
@@ -219,10 +220,12 @@ view VotingPowerSnaps {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_delegatees {
+  pair             String?
   from             String?
   to               String?
   delegated_amount Decimal? @db.Decimal
   delegated_share  Decimal? @db.Decimal
+  block_number     BigInt?
 
   @@ignore
   @@schema("center")
@@ -313,6 +316,17 @@ view subdelegations_snaps {
   block_number         BigInt?
   balance              String?
   balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view delegatees {
+  delegator    String?
+  delegatee    String?
+  block_number BigInt?
+  balance      Decimal? @db.Decimal
 
   @@ignore
   @@schema("center")
