@@ -1,35 +1,35 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { createContext, useContext, useEffect, useState } from "react"
+import { useAccount } from "wagmi"
 
 type AgoraContextType = {
-  isConnected: boolean;
-};
+  isConnected: boolean
+}
 
 const AgoraContext = createContext<AgoraContextType>({
-  isConnected: false,
-});
+  isConnected: false
+})
 
 export function useAgoraContext() {
-  return useContext(AgoraContext);
+  return useContext(AgoraContext)
 }
 
 const AgoraProvider = ({ children }: { children: React.ReactNode }) => {
-  const { address: account } = useAccount();
-  const [isConnected, setIsConnected] = useState(false);
+  const { address: account } = useAccount()
+  const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    setIsConnected(!!account);
-  }, [account]);
+    setIsConnected(!!account)
+  }, [account])
 
   return (
     <AgoraContext.Provider
       value={{
-        isConnected,
+        isConnected
       }}
     >
       {children}
     </AgoraContext.Provider>
-  );
-};
+  )
+}
 
-export default AgoraProvider;
+export default AgoraProvider
