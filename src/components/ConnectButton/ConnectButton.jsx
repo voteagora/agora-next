@@ -36,19 +36,20 @@ export const ConnectButton = () => {
       {({ isConnected, show, address, ensName }) => (
         <>
           <div className="hidden md:block bg-gray-fa rounded-full cursor-pointer hover:bg-gray-200">
-            {!isConnected && (
+            {!isConnected ? (
               <div className="py-2 px-5" onClick={show}>
                 Connect Wallet
               </div>
+            ) : (
+              <ProfileDropDown
+                address={address}
+                ensName={ensName}
+                delegate={delegate}
+              />
             )}
-            <ProfileDropDown
-              address={address}
-              ensName={ensName}
-              delegate={delegate}
-            />
           </div>
           <div className="block md:hidden">
-            {!isConnected && (
+            {!isConnected ? (
               <div onClick={show}>
                 <Image
                   src={icons.wallet}
@@ -58,8 +59,7 @@ export const ConnectButton = () => {
                   width="24"
                 />
               </div>
-            )}
-            {isConnected && delegate && (
+            ) : (
               <ProfileDropDown address={address} delegate={delegate} />
             )}
           </div>
