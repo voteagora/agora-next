@@ -24,5 +24,5 @@ export async function getAuthorityChains({
     `
   );
 
-  return chains.map((chain: any) => chain.chain);
+  return chains.map((chain: any) => chain.chain.reverse().push(chain.delegate));
 }
