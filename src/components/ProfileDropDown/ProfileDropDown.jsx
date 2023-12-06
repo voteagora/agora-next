@@ -8,7 +8,7 @@ import { Popover } from "@headlessui/react";
 import ENSAvatar from "../shared/ENSAvatar";
 import { PanelRow } from "../shared/PanelRow/PanelRow";
 import { useDisconnect } from "wagmi";
-import { NounResolvedName } from "../shared/NounResolvedName/NounResolvedName";
+import HumanAddress from "../shared/HumanAddress";
 import { AnimatePresence, motion } from "framer-motion";
 import { isAddressEqual } from "viem";
 import { useSIWE } from "connectkit";
@@ -170,14 +170,15 @@ export const ProfileDropDown = ({
                       detail={
                         <ValueWrapper>
                           {isAddressEqual(
-                            address,
+                            delegate.delegatingTo.address.resolvedName.address,
                             "0x0000000000000000000000000000000000000000"
                           ) ? (
                             "N/A"
                           ) : (
-                            <NounResolvedName
-                              resolvedName={
+                            <HumanAddress
+                              address={
                                 delegate.delegatingTo.address.resolvedName
+                                  .address
                               }
                             />
                           )}
