@@ -1,6 +1,6 @@
+"use client";
+
 import { usePathname } from "next/navigation";
-import * as theme from "@/styles/theme";
-import { css } from "@emotion/css";
 import { HStack } from "../Layout/Stack";
 import { HeaderLink } from "./HeaderLink";
 import styles from "./header.module.scss";

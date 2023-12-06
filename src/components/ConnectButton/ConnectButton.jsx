@@ -1,3 +1,6 @@
+// NOTE: Do not remove this use client, it is needed for ConnectKitButton
+"use client";
+
 // TODO: replace mock data with real data from backend
 const delegate = {
   address: {

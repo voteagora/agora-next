@@ -1,5 +1,3 @@
-"use client";
-
 // Header component
 import Navbar from "./Navbar";
 import { HStack } from "../Layout/Stack";

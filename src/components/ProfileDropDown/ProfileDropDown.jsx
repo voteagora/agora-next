@@ -1,3 +1,5 @@
+"use client";
+
 import { HStack, VStack } from "../Layout/Stack";
 import { useEffect, useState } from "react";
 import { TokenAmountDisplay } from "@/lib/utils";
