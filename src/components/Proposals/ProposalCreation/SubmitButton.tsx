@@ -27,11 +27,8 @@ export default function SubmitButton({
 }) {
   const { governorFunction, inputData } = getInputData(form);
   const { isConnected } = useAccount();
-
-  const [isClient, setIsClient] = useState(false);
-  // TODO: refactor setOpen and showModal
   const { setOpen } = useModal();
-  const [showModal, setShowModal] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   const { config, isError: onPrepareError } = usePrepareContractWrite({
     address: governorTokenContract.address as any,
@@ -78,10 +75,6 @@ export default function SubmitButton({
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    setOpen(showModal);
-  }, [showModal, setOpen]);
-
   return (
     <Button
       type="submit"
@@ -100,7 +93,6 @@ export default function SubmitButton({
       onClick={(e) => {
         e.preventDefault();
         if (!isConnected) {
-          setShowModal(true);
           setOpen(true);
           return;
         }
