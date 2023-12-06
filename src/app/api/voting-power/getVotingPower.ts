@@ -21,7 +21,9 @@ export async function getVotingPowerAtSnapshot({
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPower = await prisma.$queryRaw(
+  const advancedVotingPower = await prisma.$queryRaw<
+    Prisma.AdvancedVotingPowerGetPayload<true>[]
+  >(
     Prisma.sql`
     SELECT
       delegate,
