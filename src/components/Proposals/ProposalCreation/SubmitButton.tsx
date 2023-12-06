@@ -27,7 +27,9 @@ export default function SubmitButton({
 }) {
   const { governorFunction, inputData } = getInputData(form);
   const { isConnected } = useAccount();
+
   const [isClient, setIsClient] = useState(false);
+  // TODO: refactor setOpen and showModal
   const { setOpen } = useModal();
   const [showModal, setShowModal] = useState(false);
 
@@ -99,6 +101,7 @@ export default function SubmitButton({
         e.preventDefault();
         if (!isConnected) {
           setShowModal(true);
+          setOpen(true);
           return;
         }
         if (formTarget.current?.checkValidity() && !onPrepareError) {
@@ -186,8 +189,6 @@ function getInputData(form: Form): {
             formattedOption[3].push(t.calldata);
           }
         });
-
-        console.log(formattedOption);
 
         options.push(formattedOption);
       });

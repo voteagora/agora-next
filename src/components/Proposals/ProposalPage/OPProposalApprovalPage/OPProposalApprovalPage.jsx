@@ -4,6 +4,8 @@ import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { getVotesForProposal } from "@/app/api/votes/getVotes";
+import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -11,8 +13,26 @@ async function fetchProposalVotes(proposal_id, page = 1) {
   return getVotesForProposal({ proposal_id, page });
 }
 
+async function fetchVotingPower(address, blockNumber) {
+  "use server";
+
+  return {
+    votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
+      .totalVP,
+  };
+}
+
+async function fetchAuthorityChains(address, blockNumber) {
+  "use server";
+
+  return {
+    chains: await getAuthorityChains({ blockNumber, address }),
+  };
+}
+
 export default async function OPProposalApprovalPage({ proposal }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
+
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
     <HStack
@@ -35,7 +55,11 @@ export default async function OPProposalApprovalPage({ proposal }) {
             fetchVotesForProposal={fetchProposalVotes}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput proposal={proposal} />
+          <CastVoteInput
+            proposal={proposal}
+            fetchVotingPower={fetchVotingPower}
+            fetchAuthorityChains={fetchAuthorityChains}
+          />
         </VStack>
       </VStack>
     </HStack>

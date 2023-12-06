@@ -197,6 +197,127 @@ view Proposals {
   @@schema("center")
 }
 
+view AdvancedVotingPower {
+  delegate     String  @unique
+  vp_allowance Decimal @db.Decimal
+  delegated_vp Decimal @db.Decimal
+  advanced_vp  Decimal @db.Decimal
+
+  @@map("advanced_voting_power")
+  @@schema("center")
+}
+
+view VotingPowerSnaps {
+  id           String  @unique
+  delegate     String?
+  balance      String?
+  block_number BigInt?
+
+  @@map("voting_power_snaps")
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view advanced_delegatees {
+  from             String?
+  to               String?
+  delegated_amount Decimal? @db.Decimal
+  delegated_share  Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view advanced_voting_power_raw_snaps {
+  chain_str          String?
+  delegate           String?
+  chain              String[]
+  rules              Json[]
+  allowance          Decimal? @db.Decimal
+  subdelegated_share Decimal? @db.Decimal
+  block_number       BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view authority_chains {
+  delegate  String?
+  rules     Json[]
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view AuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  balance              Decimal  @db.Decimal
+  balance_block_number BigInt
+  allowance            Decimal  @db.Decimal
+
+  @@map("authority_chains_snaps")
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view proxies {
+  address      String?
+  proxy        String?
+  new_balance  String?
+  block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view proxies_snaps {
+  address      String?
+  proxy        String?
+  new_balance  String?
+  block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view subdelegations {
+  to                   String?
+  from                 String?
+  from_proxy           String?
+  subdelegation_rules  String?
+  block_number         BigInt?
+  balance              String?
+  balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view subdelegations_snaps {
+  to                   String?
+  from                 String?
+  from_proxy           String?
+  subdelegation_rules  String?
+  block_number         BigInt?
+  balance              String?
+  balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
 enum ProposalType {
   STANDARD
   APPROVAL

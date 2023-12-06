@@ -186,6 +186,7 @@ export async function parseProposal(
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
+    snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
       ? getHumanBlockTime(
           proposal.created_block,

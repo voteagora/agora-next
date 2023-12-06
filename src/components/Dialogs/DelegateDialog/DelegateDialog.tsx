@@ -6,6 +6,8 @@ import ENSName from "@/components/shared/ENSName";
 import { DelegationDisplayAmount } from "./DelegationDisplayAmount";
 import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
+import { useModal } from "connectkit";
+import { Button as ShadcnButton } from "@/components/ui/button";
 
 export function DelegateDialog({
   target,
@@ -17,6 +19,7 @@ export function DelegateDialog({
   completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
+  const { setOpen } = useModal();
   const { data: balance } = useBalance({
     address: accountAddress,
     token: OptimismContracts.token.address as any,
@@ -79,7 +82,11 @@ export function DelegateDialog({
             <DelegationDisplayAmount amount={votingPower} />
           </VStack>
         </VStack>
-        {!accountAddress && <w3m-button />}
+        {!accountAddress && (
+          <ShadcnButton variant="outline" onClick={() => setOpen(true)}>
+            Connect wallet to vote
+          </ShadcnButton>
+        )}
         {isLoading && (
           <Button href={null} disabled={false}>
             Submitting your delegation...
