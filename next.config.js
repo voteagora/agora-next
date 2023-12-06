@@ -16,10 +16,6 @@ const nextConfig = {
       },
     ],
   },
-  /**
-   * NOTE: Needed for ConnectKit and WalletConnect 
-   * @see{https://docs.family.co/connectkit/getting-started#getting-started-nextjs}
-   */
   webpack: (config) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     return config;
