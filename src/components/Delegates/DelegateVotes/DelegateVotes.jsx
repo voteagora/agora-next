@@ -72,6 +72,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
           </div>
         }
         element="main"
+        className="gap-4 flex flex-col"
       >
         {delegateVotes.map(
           (vote) =>
@@ -95,14 +96,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                       padding: ${theme.spacing["4"]} ${theme.spacing["6"]};
                     `}
                   >
-                    <HStack
-                      gap="1"
-                      className={css`
-                        font-size: ${theme.fontSize.xs};
-                        font-weight: ${theme.fontWeight.medium};
-                        color: #66676b;
-                      `}
-                    >
+                    <HStack className="text-xs font-medium text-[#66676b] gap-4">
                       <a
                         href={`/proposals/${vote.proposal_id}`}
                         title={`Prop ${vote.proposal_id}`}
@@ -120,14 +114,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                         </div>
                       )}
                     </HStack>
-                    <h2
-                      className={css`
-                        font-size: ${theme.fontSize.base};
-                        padding: ${theme.spacing[1]} 0;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                      `}
-                    >
+                    <h2 className="text-black text-base py-1 px-0 overflow-hidden text-ellipsis">
                       <a href={`/proposals/${vote.proposal_id}`}>
                         {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                       </a>
