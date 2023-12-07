@@ -1,11 +1,9 @@
 "use client";
 
 import { UserIcon } from "@heroicons/react/20/solid";
-import { css } from "@emotion/css";
 import { ReactNode } from "react";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import * as theme from "@/styles/theme";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
@@ -31,15 +29,7 @@ export type SupportTextProps = {
 export function CastVoteDialog(props: Props) {
   return (
     <VStack alignItems="items-center">
-      <div
-        className={css`
-          width: 100%;
-          background: ${theme.colors.white};
-          border-radius: ${theme.spacing["3"]};
-          padding: ${theme.spacing["6"]};
-          min-width: ${theme.maxWidth.sm};
-        `}
-      >
+      <div className={styles.container}>
         <CastVoteDialogContents {...props} />
       </div>
     </VStack>
@@ -73,25 +63,10 @@ function CastVoteDialogContents({
   }
 
   return (
-    <VStack
-      gap={6}
-      className={css`
-        font-size: ${theme.fontSize["xs"]};
-      `}
-    >
+    <VStack gap={6} className={styles.font_size}>
       <VStack gap={2}>
-        <HStack
-          justifyContent="justify-between"
-          className={css`
-            font-weight: ${theme.fontWeight.semibold};
-            line-height: ${theme.lineHeight.none};
-          `}
-        >
-          <HStack
-            className={css`
-              color: ${theme.colors.black};
-            `}
-          >
+        <HStack justifyContent="justify-between" className={styles.sub}>
+          <HStack className={styles.text_container}>
             {delegate.address ? (
               <HumanAddress address={delegate.address} />
             ) : (
@@ -101,11 +76,7 @@ function CastVoteDialogContents({
               &nbsp;voting {supportType.toLowerCase()}
             </div>
           </HStack>
-          <HStack
-            className={css`
-              color: #66676b;
-            `}
-          >
+          <HStack className={styles.token_amount}>
             <div>
               <TokenAmountDisplay
                 amount={votingPower}
@@ -113,21 +84,12 @@ function CastVoteDialogContents({
                 currency="OP"
               />
             </div>
-            <div
-              className={css`
-                width: ${theme.spacing["4"]};
-                height: ${theme.spacing["4"]};
-              `}
-            >
+            <div className={styles.user_icon}>
               <UserIcon />
             </div>
           </HStack>
         </HStack>
-        <div
-          className={css`
-            color: ${theme.colors.gray["4f"]};
-          `}
-        >
+        <div className={styles.reason}>
           {reason ? reason : "No reason provided"}
         </div>
       </VStack>
@@ -137,23 +99,12 @@ function CastVoteDialogContents({
         <div>
           {delegate.statement ? (
             <HStack
-              className={css`
-                width: 100%;
-                z-index: 1;
-                position: relative;
-                padding: ${theme.spacing["4"]};
-                border-radius: ${theme.spacing["2"]};
-                border: 1px solid ${theme.colors.gray.eb};
-              `}
+              className={styles.statement}
               justifyContent="justify-between"
               alignItems="items-center"
             >
               <VStack>
-                <div
-                  className={css`
-                    font-weight: ${theme.fontWeight.semibold};
-                  `}
-                >
+                <div className={styles.statement_text}>
                   Using{" "}
                   <TokenAmountDisplay
                     amount={votingPower}
@@ -161,14 +112,7 @@ function CastVoteDialogContents({
                     currency="OP"
                   />
                 </div>
-                <div
-                  className={css`
-                    font-weight: ${theme.fontWeight.medium};
-                    color: ${theme.colors.gray[700]};
-                  `}
-                >
-                  Delegated to you
-                </div>
+                <div className={styles.delegate_text}>Delegated to you</div>
               </VStack>
               <VoteButton onClick={write}>Vote</VoteButton>
             </HStack>
@@ -192,26 +136,8 @@ const VoteButton = ({
   return (
     <div
       onClick={onClick}
-      className={css`
-        text-align: center;
-        border-radius: ${theme.spacing["2"]};
-        border: 1px solid ${theme.colors.gray.eb};
-        font-weight: ${theme.fontWeight.semibold};
-        font-size: ${theme.fontSize.xs};
-        color: ${theme.colors.black};
-        padding: ${theme.spacing["2"]} ${theme.spacing["6"]};
-        cursor: pointer;
-
-        ${!onClick &&
-        css`
-          background: ${theme.colors.gray.eb};
-          color: ${theme.colors.gray["700"]};
-          cursor: not-allowed;
-        `}
-
-        :hover {
-          background: ${theme.colors.gray.eb};
-        }
+      className={`${styles.vote_container}${" "}
+        ${!onClick && styles.disabled}
       `}
     >
       {children}
@@ -224,30 +150,13 @@ export function SuccessMessage() {
     <HStack
       justifyContent="justify-between"
       alignItems="items-center"
-      className={css`
-        width: 100%;
-        z-index: 1;
-        position: relative;
-        padding: ${theme.spacing["4"]};
-        border-radius: ${theme.spacing["2"]};
-        border: 1px solid ${theme.colors.gray.eb};
-      `}
+      className={styles.success}
     >
-      <div
-        className={css`
-          font-weight: ${theme.fontWeight.medium};
-        `}
-      >
+      <div className={styles.font_weight}>
         Success! Your vote has been cast. It will appear once the transaction is
         confirmed.
       </div>
-      <Image
-        src={icons.ballot}
-        alt={icons.ballot}
-        className={css`
-          height: 20px;
-        `}
-      />
+      <Image src={icons.ballot} alt={icons.ballot} className="h-5" />
     </HStack>
   );
 }
@@ -257,22 +166,9 @@ export function LoadingVote() {
     <HStack
       justifyContent="justify-between"
       alignItems="items-center"
-      className={css`
-        width: 100%;
-        z-index: 1;
-        position: relative;
-        padding: ${theme.spacing["4"]};
-        border-radius: ${theme.spacing["2"]};
-        border: 1px solid ${theme.colors.gray.eb};
-      `}
+      className={styles.loading_vote}
     >
-      <div
-        className={css`
-          font-weight: ${theme.fontWeight.medium};
-        `}
-      >
-        Writing your vote to the chain
-      </div>
+      <div className={styles.font_weight}>Writing your vote to the chain</div>
       <Image src={icons.spinner} alt={"spinner"} />
     </HStack>
   );
@@ -280,23 +176,9 @@ export function LoadingVote() {
 
 export function NoStatementView() {
   return (
-    <VStack
-      className={css`
-        width: 100%;
-        z-index: 1;
-        position: relative;
-        padding: ${theme.spacing["4"]};
-        border-radius: ${theme.spacing["2"]};
-        border: 1px solid ${theme.colors.gray.eb};
-      `}
-    >
+    <VStack className={styles.no_statement}>
       You do not have a delegate statement.{" "}
-      <Link
-        href={"/statements/create"}
-        className={css`
-          text-decoration: underline;
-        `}
-      >
+      <Link href={"/statements/create"} className="underline">
         Please set one up in order to vote.
       </Link>
     </VStack>
