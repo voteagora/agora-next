@@ -15,7 +15,7 @@ import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useModal } from "connectkit";
 
 const abiCoder = new AbiCoder();
-const governorTokenContract = OptimismContracts.governor;
+const governorContract = OptimismContracts.governor;
 const governanceTokenContract = OptimismContracts.token;
 
 export default function SubmitButton({
@@ -31,8 +31,8 @@ export default function SubmitButton({
   const [isClient, setIsClient] = useState(false);
 
   const { config, isError: onPrepareError } = usePrepareContractWrite({
-    address: governorTokenContract.address as any,
-    abi: governorTokenContract.abi,
+    address: governorContract.address as any,
+    abi: governorContract.abi,
     functionName: governorFunction,
     args: inputData as any,
   });
