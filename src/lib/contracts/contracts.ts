@@ -1,4 +1,5 @@
 import {
+  AlligatorOPV5__factory,
   NounsGovernor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
@@ -29,6 +30,16 @@ export const OptimismContracts = {
     address: "0x4200000000000000000000000000000000000042",
     chainId: 10,
     abi: OptimismToken__factory.abi,
+  },
+
+  alligator: {
+    contract: AlligatorOPV5__factory.connect(
+      "0xD89eb37D3e643aab97258C62BcF704CD00761af6",
+      provider
+    ),
+    address: "0xD89eb37D3e643aab97258C62BcF704CD00761af6",
+    chainId: 10,
+    abi: AlligatorOPV5__factory.abi,
   },
 };
 
