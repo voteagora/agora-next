@@ -321,12 +321,46 @@ view subdelegations_snaps {
 }
 
 view Delegatees {
-  delegator    String   @unique
+  delegator    String  @unique
   delegatee    String
   block_number BigInt
-  balance      Decimal  @db.Decimal
+  balance      Decimal @db.Decimal
 
   @@map("delegatees")
+  @@schema("center")
+}
+
+view DelegateChangedEvents {
+  sighash           String?                 @db.VarChar(66)
+  address           String?                 @db.VarChar(42)
+  block_number      BigInt?
+  block_hash        String?                 @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String                  @unique @db.VarChar(66)
+  delegator         String?
+  from_delegate     String?
+  to_delegate       String?
+  inputs            Json?
+
+  @@map("delegate_changed_events")
+  @@schema("center")
+}
+
+view TransferEvents {
+  sighash           String?                 @db.VarChar(66)
+  address           String?                 @db.VarChar(42)
+  block_number      BigInt?
+  block_hash        String?                 @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String                  @unique @db.VarChar(66)
+  from              String?
+  to                String?
+  value             String?
+  inputs            Json?
+
+  @@map("transfer_events")
   @@schema("center")
 }
 

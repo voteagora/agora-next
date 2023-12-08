@@ -11,7 +11,10 @@ import DelegateStatement from "@/components/Delegates/DelegateStatement/Delegate
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { getStatment } from "@/app/api/statements/getStatements";
-import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
+import {
+  getCurrentDelegatees,
+  getCurrentDelegators,
+} from "@/app/api/delegations/getDelegations";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 
 async function fetchDelegate(addressOrENSName) {
@@ -38,11 +41,18 @@ async function getDelegatees(addressOrENSName) {
   return getCurrentDelegatees({ addressOrENSName });
 }
 
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
 export default async function Page({ params: { addressOrENSName } }) {
   const delegate = await fetchDelegate(addressOrENSName);
   const delegateVotes = await getDelegateVotes(addressOrENSName);
   const statement = await getDelegateStatement(addressOrENSName);
   const delegatees = await getDelegatees(addressOrENSName);
+  const delegators = await getDelegators(addressOrENSName);
 
   return (
     <HStack
@@ -80,7 +90,10 @@ export default async function Page({ params: { addressOrENSName } }) {
           />
         )}
         {delegatees && (
-          <DelegationsContainer delegatees={delegatees} delegators={[]} />
+          <DelegationsContainer
+            delegatees={delegatees}
+            delegators={delegators}
+          />
         )}
       </VStack>
     </HStack>
