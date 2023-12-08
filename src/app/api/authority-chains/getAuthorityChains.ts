@@ -8,7 +8,9 @@ export async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const chains = await prisma.$queryRaw(
+  const chains = await prisma.$queryRaw<
+    Prisma.AuthorityChainsSnapsGetPayload<true>[]
+  >(
     Prisma.sql`
     SELECT
       distinct(chain),
@@ -22,5 +24,5 @@ export async function getAuthorityChains({
     `
   );
 
-  return chains.map((chain: any) => chain.chain);
+  return chains.map((chain: any) => chain.chain.reverse().push(chain.delegate));
 }
