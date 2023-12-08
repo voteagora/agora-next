@@ -14,12 +14,7 @@ export function DelegateButton({ full, address, votingPower }) {
           params: { target: address, votingPower: votingPower },
         });
       }}
-      className={
-        full &&
-        css`
-          width: 100%;
-        `
-      }
+      className={full ? "w-full" : undefined}
     >
       Delegate
     </Button>

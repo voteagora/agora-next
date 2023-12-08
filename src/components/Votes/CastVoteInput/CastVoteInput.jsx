@@ -1,10 +1,44 @@
 "use client";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import { useAgoraContext } from "@/app/AgoraContext";
+import { Button } from "@/components/ui/button";
+import { useModal } from "connectkit";
 
-export default function CastVoteInput({ proposal }) {
+export default function CastVoteInput({
+  proposal,
+  fetchVotingPower,
+  fetchAuthorityChains,
+}) {
   const [reason, setReason] = useState("");
+  const [votingPower, setVotingPower] = useState("0");
+  const [chains, setChains] = useState([]);
+
+  const { address } = useAccount();
+
+  useEffect(() => {
+    if (address && proposal.snapshotBlockNumber) {
+      fetchVotingPower(address, proposal.snapshotBlockNumber).then(
+        ({ votingPower }) => {
+          setVotingPower(votingPower);
+        }
+      );
+
+      fetchAuthorityChains(address, proposal.snapshotBlockNumber).then(
+        ({ chains }) => {
+          setChains(chains);
+        }
+      );
+    }
+  }, [
+    address,
+    proposal.snapshotBlockNumber,
+    fetchVotingPower,
+    fetchAuthorityChains,
+  ]);
+
   return (
     <VStack className={styles.cast_vote_container}>
       <textarea
@@ -25,21 +59,30 @@ export default function CastVoteInput({ proposal }) {
     </VStack>
   );
 }
+
 function VoteButtons({ onClick, proposalStatus }) {
+  const { isConnected } = useAgoraContext();
+  const { setOpen } = useModal();
+
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
   }
 
-  //   if (!delegate) {
-  //     return <ConnectWalletButton reason="Connect wallet to vote" />;
-  //   }
+  if (!isConnected) {
+    return (
+      <Button variant={"outline"} onClick={() => setOpen(true)}>
+        Connect wallet to vote
+      </Button>
+    );
+  }
+
   //   const hasVoted = !!delegate.votes.find((it) => it.proposal.id === result.id);
   //   if (hasVoted) {
   //     return <DisabledVoteButton reason="Already voted" />;
   //   }
 
   return (
-    <HStack gap={2}>
+    <HStack gap={2} className="pt-1">
       {["FOR", "AGAINST", "ABSTAIN"].map((supportType) => (
         <VoteButton
           key={supportType}

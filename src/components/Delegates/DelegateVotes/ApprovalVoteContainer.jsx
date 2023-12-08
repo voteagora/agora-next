@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { css } from "@emotion/css";
 import { colorForSupportType } from "@/lib/voteUtils";
 import * as theme from "@/styles/theme";
@@ -15,11 +15,11 @@ function ApprovalVoteContainer({ params, support, weight }) {
     >
       {params?.length > 1 && "Voted: "}
       {params?.map((option, i) => (
-        <>
+        <Fragment key={option}>
           {option}
           {/* add a coma here if not last option */}
           {i !== params.length - 1 && ", "}
-        </>
+        </Fragment>
       ))}
       {(!params || params?.length === 0) && "Abstain"}
       <span
