@@ -256,17 +256,16 @@ view authority_chains {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view authority_chains_snaps {
-  id                   String?
-  delegate             String?
+view AuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
   rules                Json[]
   chain                String[]
-  balance              Decimal? @db.Decimal
-  balance_block_number BigInt?
-  allowance            Decimal? @db.Decimal
+  balance              Decimal  @db.Decimal
+  balance_block_number BigInt
+  allowance            Decimal  @db.Decimal
 
-  @@ignore
+  @@map("authority_chains_snaps")
   @@schema("center")
 }
 
