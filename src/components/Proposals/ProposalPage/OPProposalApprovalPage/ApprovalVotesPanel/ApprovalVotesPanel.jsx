@@ -49,18 +49,13 @@ export default function ApprovalVotesPanel({
         )}
         <ApprovalProposalCriteria proposal={proposal} />
 
-        {/* <div
-          className={css`
-            padding: 0 ${theme.spacing["4"]} ${theme.spacing["6"]}
-              ${theme.spacing["4"]};
-          `}
-        >
-          <ApprovalCastVoteButton
+        <div className={styles.button_container}>
+          {/* <ApprovalCastVoteButton
             castVoteFragmentRef={castVoteFragmentRef}
             buttonFragmentRef={buttonFragmentRef}
             delegateFragmentRef={delegateFragmentRef}
-          />
-        </div> */}
+          /> */}
+        </div>
       </VStack>
     </motion.div>
   );

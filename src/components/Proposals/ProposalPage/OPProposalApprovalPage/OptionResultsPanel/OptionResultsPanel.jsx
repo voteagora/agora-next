@@ -7,6 +7,7 @@ export default function OptionsResultsPanel({ proposal }) {
   const proposalData = proposal.proposalData;
   const proposalResults = proposal.proposalResults;
   const proposalSettings = proposalData.proposalSettings;
+  const options = proposalResults.options;
 
   const totalVotingPower =
     BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
@@ -27,20 +28,43 @@ export default function OptionsResultsPanel({ proposal }) {
 
   let availableBudget = BigInt(proposalSettings.budgetAmount);
 
+  const mutableOptions = [...options];
+  const sortedOptions = mutableOptions.sort((a, b) => {
+    return BigInt(b.votes.votes) > BigInt(a.votes.votes)
+      ? 1
+      : BigInt(b.votes.votes) < BigInt(a.votes.votes)
+      ? -1
+      : 0;
+  });
+
+  if (proposalSettings.criteria === "THRESHOLD") {
+    const threshold = BigInt(settings.criteria.criteriaValue);
+    if (totalVotingPower < (threshold * 15) / 10) {
+      thresholdPosition = 66;
+    } else {
+      // calculate threshold position, min 5% max 66%
+      thresholdPosition = Math.max(
+        Number((threshold * 100) / totalVotingPower),
+        5
+      );
+    }
+  }
+
   return (
     <VStack className={styles.approval_choices_container}>
-      {proposal.proposalResults.options.map((option, index) => {
+      {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option.votes.votes);
         const optionBudget = BigInt(0);
-        if (proposalSettings === "TOP_CHOICES") {
-          isApproved = index < proposalSettings.maxApprovals;
+        if (proposalSettings.criteria === "TOP_CHOICES") {
+          isApproved = index < Number(proposalSettings.criteriaValue);
         } else if (proposalSettings.criteria === "THRESHOLD") {
           const threshold = BigInt(proposalSettings.criteriaValue);
           isApproved =
             votesAmountBN >= threshold && availableBudget >= optionBudget;
           if (isApproved) availableBudget = availableBudget - optionBudget;
         }
+
         return (
           <SingleOption
             key={index}
@@ -70,6 +94,8 @@ function SingleOption({
   isApproved,
 }) {
   let barPercentage = BigInt(0);
+  console.log("votesAmountBN", votesAmountBN);
+  console.log("totalVotingPower", totalVotingPower);
   const percentage =
     totalVotingPower === 0n
       ? BigInt(0)
@@ -130,18 +156,14 @@ export function ProgressBar({
       Number(barPercentage) !== 0 ? 1 : 0
     ).toFixed(2) + "%";
 
-  const progressBarColor = isApproved
-    ? status === "EXECUTED" || status === "SUCCEEDED"
-      ? "green-positive"
-      : "green-positive"
-    : "gray-4f";
+  const progressBarColor = isApproved ? "bg-green-positive" : "bg-gray-4f";
 
   return (
     <HStack>
       {" "}
       <div className={`${styles.progressBarContainer}`}>
         <div
-          className={`${styles.progressBar} bg-${progressBarColor}`}
+          className={`${styles.progressBar} ${progressBarColor}`}
           style={{ width: progressBarWidth }}
         ></div>
         {!!thresholdPosition && (
