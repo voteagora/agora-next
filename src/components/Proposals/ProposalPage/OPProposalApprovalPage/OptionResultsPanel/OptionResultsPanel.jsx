@@ -30,9 +30,9 @@ export default function OptionsResultsPanel({ proposal }) {
 
   const mutableOptions = [...options];
   const sortedOptions = mutableOptions.sort((a, b) => {
-    return BigInt(b.votes.votes) > BigInt(a.votes.votes)
+    return BigInt(b.votes?.votes || 0) > BigInt(a.votes?.votes || 0)
       ? 1
-      : BigInt(b.votes.votes) < BigInt(a.votes.votes)
+      : BigInt(b.votes?.votes || 0) < BigInt(a.votes?.votes || 0)
       ? -1
       : 0;
   });
@@ -54,7 +54,7 @@ export default function OptionsResultsPanel({ proposal }) {
     <VStack className={styles.approval_choices_container}>
       {sortedOptions.map((option, index) => {
         let isApproved = false;
-        const votesAmountBN = BigInt(option.votes.votes);
+        const votesAmountBN = BigInt(option?.votes?.votes || 0);
         const optionBudget = BigInt(0);
         if (proposalSettings.criteria === "TOP_CHOICES") {
           isApproved = index < Number(proposalSettings.criteriaValue);
@@ -94,8 +94,6 @@ function SingleOption({
   isApproved,
 }) {
   let barPercentage = BigInt(0);
-  console.log("votesAmountBN", votesAmountBN);
-  console.log("totalVotingPower", totalVotingPower);
   const percentage =
     totalVotingPower === 0n
       ? BigInt(0)
