@@ -1,21 +1,22 @@
-import { resolveENSName } from "@/app/lib/utils";
-import { isAddress } from "viem";
 import { Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
+import { addressOrEnsNameWrap } from "../utils/ensName";
 
-export async function getCurrentDelegatees({
+export const getCurrentDelegatees = ({
   addressOrENSName,
 }: {
   addressOrENSName: string;
-}): Promise<Delegation[]> {
-  const address = isAddress(addressOrENSName)
-    ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+}) => addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName);
 
+async function getCurrentDelegateesForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<Delegation[]> {
   const advancedDelegatees = await prisma.advancedDelegatees.findMany({
     where: { from: address.toLowerCase() },
   });
@@ -103,15 +104,17 @@ export async function getCurrentDelegatees({
   ] as Delegation[];
 }
 
-export async function getCurrentDelegators({
+export const getCurrentDelegators = ({
   addressOrENSName,
 }: {
   addressOrENSName: string;
-}) {
-  const address = isAddress(addressOrENSName)
-    ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+}) => addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName);
 
+async function getCurrentDelegatorsForAddress({
+  address,
+}: {
+  address: string;
+}) {
   const advancedDelegators = prisma.advancedDelegatees.findMany({
     where: { to: address.toLowerCase() },
   });
