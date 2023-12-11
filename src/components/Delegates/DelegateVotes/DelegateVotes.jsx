@@ -2,8 +2,6 @@
 
 import { useRef } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 import { formatNumber } from "@/lib/tokenUtils";
 import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -15,6 +13,7 @@ import StandardVoteContainer from "./StandardVoteContainer";
 import ApprovalVoteContainer from "./ApprovalVoteContainer";
 import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
 import { delegatesVotesSortOptions } from "@/lib/constants";
+import styles from "./delegateVotes.module.scss";
 
 function shortPropTitle(title, proosalId) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -58,7 +57,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
   };
 
   return (
-    <VStack gap="4">
+    <VStack gap={4}>
       <InfiniteScroll
         hasMore={meta.hasNextPage}
         pageStart={0}
@@ -81,25 +80,9 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
           (vote) =>
             vote && (
               <VoteDetailsContainer key={vote.transactionHash}>
-                <div
-                  className={css`
-                    display: grid;
-                    overflow-y: hidden;
-                    grid-template-columns: 1fr 1px 1fr;
-
-                    @media (max-width: ${theme.maxWidth["2xl"]}) {
-                      grid-template-rows: 1fr;
-                      grid-template-columns: none;
-                      overflow-y: scroll;
-                    }
-                  `}
-                >
-                  <VStack
-                    className={css`
-                      padding: ${theme.spacing["4"]} ${theme.spacing["6"]};
-                    `}
-                  >
-                    <HStack className="text-xs font-medium text-[#66676b] gap-4">
+                <div className={styles.details_container}>
+                  <VStack className={styles.details_sub}>
+                    <HStack gap={1} className={styles.vote_type}>
                       <a
                         href={`/proposals/${vote.proposal_id}`}
                         title={`Prop ${vote.proposal_id}`}

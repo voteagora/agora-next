@@ -37,6 +37,13 @@ export async function getVotesForDelegate({
     pageSize
   );
 
+  if (!votes || votes.length === 0) {
+    return {
+      meta,
+      votes: [],
+    };
+  }
+
   const latestBlock = await provider.getBlock("latest");
 
   return {
@@ -78,14 +85,49 @@ export async function getVotesForProposal({
     pageSize
   );
 
+  if (!votes || votes.length === 0) {
+    return {
+      meta,
+      votes: [],
+    };
+  }
+
   const latestBlock = await provider.getBlock("latest");
   const proposalData = parseProposalData(
-    JSON.stringify(votes[0].proposal_data || {}),
-    votes[0].proposal_type
+    JSON.stringify(votes[0]?.proposal_data || {}),
+    votes[0]?.proposal_type
   );
 
   return {
     meta,
     votes: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
+  };
+}
+
+export async function getVoteForProposalAndDelegate({
+  proposal_id,
+  address,
+}: {
+  proposal_id: string;
+  address: string;
+}) {
+  const vote = await prisma.votes.findFirst({
+    where: { proposal_id, voter: address?.toLowerCase() },
+  });
+
+  if (!vote) {
+    return {
+      vote: undefined,
+    };
+  }
+
+  const latestBlock = await provider.getBlock("latest");
+  const proposalData = parseProposalData(
+    JSON.stringify(vote.proposal_data || {}),
+    vote.proposal_type
+  );
+
+  return {
+    vote: parseVote(vote, proposalData, latestBlock),
   };
 }

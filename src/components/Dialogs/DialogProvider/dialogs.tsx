@@ -1,9 +1,15 @@
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
 import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
+import {
+  CastVoteDialog,
+  SupportTextProps,
+} from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 
-export type DialogType = DelegateDialogType | CastProposalDialogType;
-// | CastVoteDialogType
+export type DialogType =
+  | DelegateDialogType
+  | CastProposalDialogType
+  | CastVoteDialogType;
 // | ApprovalCastVoteDialogType
 // | FaqDialogType
 
@@ -30,14 +36,16 @@ export type CastProposalDialogType = {
 //   params: {};
 // };
 
-// export type CastVoteDialogType = {
-//   type: "CAST_VOTE";
-//   params: {
-//     proposalId: string;
-//     reason: string;
-//     supportType: SupportTextProps["supportType"];
-//   };
-// };
+export type CastVoteDialogType = {
+  type: "CAST_VOTE";
+  params: {
+    proposalId: string;
+    reason: string;
+    supportType: SupportTextProps["supportType"];
+    delegate: any;
+    votingPower: string;
+  };
+};
 
 // export type ApprovalCastVoteDialogType = {
 //   type: "APPROVAL_CAST_VOTE";
@@ -70,9 +78,21 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  // CAST_VOTE: ({ ...props }, closeDialog) => {
-  //   return <CastVoteDialog {...props} closeDialog={closeDialog} />;
-  // },
+  CAST_VOTE: (
+    { proposalId, reason, supportType, delegate, votingPower },
+    closeDialog
+  ) => {
+    return (
+      <CastVoteDialog
+        proposalId={proposalId}
+        reason={reason}
+        supportType={supportType}
+        closeDialog={closeDialog}
+        delegate={delegate}
+        votingPower={votingPower}
+      />
+    );
+  },
   // APPROVAL_CAST_VOTE: ({ ...props }, closeDialog) => {
   //   return <ApprovalCastVoteDialog {...props} closeDialog={closeDialog} />;
   // },
