@@ -1,6 +1,14 @@
 import prisma from "@/app/lib/prisma";
+import { getProxyAddress } from "@/lib/alligatorUtils";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 import { Prisma } from "@prisma/client";
 
+/**
+ * Voting Power at a given block number
+ * @param address
+ * @param blockNumber
+ * @returns {directVP, advancedVP, totalVP}
+ */
 export async function getVotingPowerAtSnapshot({
   address,
   blockNumber,
@@ -59,10 +67,120 @@ export async function getVotingPowerAtSnapshot({
 
   return {
     directVP: votingPower?.balance ?? "0",
-    advancedVP: advancedVotingPower[0]?.advanced_vp.toFixed() ?? "0",
+    advancedVP: advancedVotingPower[0]?.advanced_vp.toFixed(0) ?? "0",
     totalVP: (
       BigInt(votingPower?.balance ?? "0") +
-      BigInt(advancedVotingPower[0]?.advanced_vp.toFixed() ?? "0")
+      BigInt(advancedVotingPower[0]?.advanced_vp.toFixed(0) ?? "0")
     ).toString(),
   };
+}
+
+/**
+ * Voting Power
+ * @param address
+ * @returns {directVP, advancedVP, totalVP}
+ */
+export async function getCurrentVotingPower({
+  address,
+}: {
+  address: string;
+}): Promise<{
+  directVP: string;
+  advancedVP: string;
+  totalVP: string;
+}> {
+  const votingPower = await prisma.votingPower.findFirst({
+    where: {
+      delegate: address,
+    },
+  });
+
+  // This query pulls only partially delegated voting power
+  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+    where: {
+      delegate: address,
+    },
+  });
+
+  return {
+    directVP: votingPower?.voting_power ?? "0",
+    advancedVP: advancedVotingPower?.advanced_vp.toFixed(0) ?? "0",
+    totalVP: (
+      BigInt(votingPower?.voting_power ?? "0") +
+      BigInt(advancedVotingPower?.advanced_vp.toFixed(0) ?? "0")
+    ).toString(),
+  };
+}
+
+/**
+ * Voting Power available for subdelegation
+ * Includes subdelegated balances & undelegated balance
+ * @param address
+ * @returns {votingPower}
+ */
+export async function getVotingPowerAvailableForSubdelegation({
+  address,
+}: {
+  address: string;
+}): Promise<string> {
+  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+    where: {
+      delegate: address,
+    },
+  });
+
+  const undelegatedVotingPower = (async () => {
+    const [isBalanceAccountedFor, balance] = await Promise.all([
+      isDelegatingToProxy({ address }),
+      OptimismContracts.token.contract.balanceOf(address),
+    ]);
+    return isBalanceAccountedFor ? 0n : balance;
+  })();
+
+  return (
+    BigInt(advancedVotingPower?.advanced_vp.toFixed() ?? "0") +
+    (await undelegatedVotingPower)
+  ).toString();
+}
+
+/**
+ * Voting Power available for direct delegation:
+ * Represents the balance of the user's account
+ * @param address
+ * @returns {votingPower}
+ */
+export async function getVotingPowerAvailableForDirectDelegation({
+  address,
+}: {
+  address: string;
+}): Promise<bigint> {
+  return OptimismContracts.token.contract.balanceOf(address);
+}
+
+/**
+ * Checks if a user has delegated to its proxy
+ * @param address
+ * @returns {boolean}
+ */
+export async function isDelegatingToProxy({
+  address,
+}: {
+  address: string;
+}): Promise<boolean> {
+  const [proxyAddress, delegatee] = await Promise.all([
+    getProxyAddress(address),
+    prisma.delegatees.findFirst({
+      where: { delegator: address.toLowerCase() },
+    }),
+  ]);
+
+  if (
+    proxyAddress &&
+    delegatee &&
+    delegatee.delegatee === proxyAddress.toLowerCase()
+  ) {
+    return true;
+  }
+
+  return false;
 }
