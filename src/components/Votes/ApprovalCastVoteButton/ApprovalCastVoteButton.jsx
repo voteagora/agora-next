@@ -4,10 +4,10 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./approvalCastVoteButton.module.scss";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { useAgoraContext } from "@/app/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export default function ApprovalCastVoteButton({
   proposal,

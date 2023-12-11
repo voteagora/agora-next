@@ -24,3 +24,28 @@
   overflow-y: scroll;
   max-height: calc(100vh - 437px);
 }
+
+.single_vote {
+  color: $black;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-xs;
+  margin-bottom: $spacing-5;
+  border-radius: $border-radius-md;
+  border: 1px solid $gray-eb;
+
+  &__content {
+    color: $gray-700;
+    gap: $spacing-1;
+    font-weight: $font-weight-medium;
+    padding: 0 $spacing-3 $spacing-3 $spacing-3;
+  }
+
+  &__reason {
+    margin-top: $spacing-1;
+    color: $gray-700;
+    font-weight: $font-weight-medium;
+    white-space: pre-wrap;
+    padding: $spacing-3;
+    border-top: 1px solid $gray-300;
+  }
+}

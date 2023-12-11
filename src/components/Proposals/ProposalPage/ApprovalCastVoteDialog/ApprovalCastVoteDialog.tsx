@@ -1,8 +1,6 @@
 import { VStack } from "@/components/Layout/Stack";
-import { css } from "@emotion/css";
 import { AbiCoder, ethers } from "ethers";
 import { useMemo, useState } from "react";
-import * as theme from "@/styles/theme";
 import {
   LoadingVote,
   NoStatementView,
@@ -15,6 +13,7 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import { ProposalType } from "@prisma/client";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { useContractWrite } from "wagmi";
+import styles from "./approvalCastVoteDialog.module.scss";
 
 const abiCoder = new AbiCoder();
 export function ApprovalCastVoteDialog({
@@ -79,64 +78,31 @@ export function ApprovalCastVoteDialog({
   }, [selectedOptions, abstain]);
 
   return (
-    <VStack
-      alignItems="items-center"
-      className={css`
-        padding: ${theme.spacing["8"]};
-      `}
-    >
-      <div
-        className={css`
-          width: 100%;
-          max-width: ${theme.maxWidth.lg};
-          background: ${theme.colors.white};
-          border-radius: ${theme.spacing["3"]};
-          padding: ${theme.spacing["6"]};
-        `}
-      >
+    <VStack alignItems="items-center" className={styles.container}>
+      <div className={styles.sub_container}>
         {hasStatement && isLoading && <LoadingVote />}
         {hasStatement && isSuccess && <SuccessMessage />}
         {hasStatement && isError && <p>Something went wrong</p>}
         {!hasStatement && <NoStatementView />}
         {hasStatement && !isLoading && !isSuccess && (
           <VStack>
-            <VStack
-              className={css`
-                margin-bottom: ${theme.spacing["4"]};
-              `}
-            >
-              <p
-                className={css`
-                  font-size: ${theme.fontSize["xl"]};
-                  font-weight: ${theme.fontWeight.bold};
-                `}
-              >
+            <VStack className={styles.title_box}>
+              <p className={styles.title}>
                 Select up to {maxChecked} option{maxChecked > 1 && "s"}
               </p>
-              <p
-                className={css`
-                  font-size: ${theme.fontSize["xs"]};
-                  color: ${theme.colors.gray[700]};
-                  font-weight: ${theme.fontWeight.medium};
-                  margin-top: ${theme.spacing["1"]};
-                `}
-              >
+              <p className={styles.notes}>
                 Note: onchain votes are final and cannot be edited once
                 submitted.
               </p>
             </VStack>
-            <VStack
-              className={css`
-                max-height: 46vh;
-                overflow-y: scroll;
-              `}
-            >
+            <VStack className={styles.options_list}>
               {proposalData.options.map((option, index) => (
                 <CheckCard
                   key={index}
                   title={option.description}
                   description={
                     <p>
+                      {/* TODO: add token transfer request | commented because data not indexed correctly */}
                       {/* {BigInt(
                         option.budgetTokensSpent.amount
                       ) === 0n ? (
@@ -195,23 +161,9 @@ function CastVoteWithReason({
   abstain: boolean;
 }) {
   return (
-    <VStack
-      className={css`
-        border: 1px solid ${theme.colors.gray[300]};
-        border-radius: ${theme.borderRadius.lg};
-        margin-top: ${theme.spacing["4"]};
-      `}
-    >
+    <VStack className={styles.cast_vote_box}>
       <textarea
-        className={css`
-          padding: ${theme.spacing["4"]};
-          resize: none;
-          border-radius: ${theme.borderRadius.lg};
-          background-color: ${theme.colors.gray.fa};
-          :focus {
-            outline: 0px;
-          }
-        `}
+        className={styles.reason_input}
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
@@ -219,15 +171,7 @@ function CastVoteWithReason({
       <VStack
         justifyContent="justify-between"
         alignItems="items-stretch"
-        className={css`
-          padding-top: ${theme.spacing["1"]};
-          padding-bottom: ${theme.spacing["3"]};
-          padding-left: ${theme.spacing["3"]};
-          padding-right: ${theme.spacing["3"]};
-          background-color: ${theme.colors.gray.fa};
-          border-bottom-left-radius: ${theme.borderRadius.lg};
-          border-bottom-right-radius: ${theme.borderRadius.lg};
-        `}
+        className={styles.vote_button_box}
       >
         {!abstain && numberOfOptions > 0 && (
           <button onClick={() => onVoteClick()}>
@@ -266,61 +210,11 @@ function CheckCard({
   abstain: boolean;
 }) {
   return (
-    <div
-      className={css`
-        padding: ${theme.spacing["2"]} 0;
-        cursor: pointer;
-        position: relative;
-        padding-right: ${theme.spacing["12"]};
-      `}
-      onClick={onClick}
-    >
-      <p
-        className={css`
-          font-weight: ${theme.fontWeight.medium};
-        `}
-      >
-        {title}
-      </p>
-      <div
-        className={css`
-          font-size: ${theme.fontSize.xs};
-          font-weight: ${theme.fontWeight.medium};
-          color: ${theme.colors.gray["700"]};
-        `}
-      >
-        {description}
-      </div>
-      <div
-        className={css`
-          position: absolute;
-          right: ${theme.spacing["4"]};
-          top: 50%;
-          transform: translateY(-50%);
-          width: ${theme.spacing["8"]};
-          height: ${theme.spacing["8"]};
-          border-radius: ${theme.borderRadius.md};
-          border: 1px solid ${theme.colors.gray.eb};
-          background-color: ${theme.colors.gray.fa};
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
-        {checked && (
-          <CheckIcon
-            className={css`
-              width: ${theme.spacing["5"]};
-              height: ${theme.spacing["5"]};
-              color: ${theme.colors.black};
-
-              & > path {
-                stroke-width: 2px;
-                stroke: ${theme.colors.black};
-              }
-            `}
-          />
-        )}
+    <div className={styles.option_card} onClick={onClick}>
+      <p className={styles.card_title}>{title}</p>
+      <div className={styles.card_description}>{description}</div>
+      <div className={styles.card_check_container}>
+        {checked && <CheckIcon className={styles.card_check} />}
       </div>
     </div>
   );

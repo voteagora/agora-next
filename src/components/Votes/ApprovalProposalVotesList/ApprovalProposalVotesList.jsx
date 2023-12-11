@@ -9,8 +9,6 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
 import VoteText from "../VoteText/VoteText";
 import { useAccount } from "wagmi";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 
 export default function ApprovalProposalVotesList({
   initialProposalVotes,
@@ -67,16 +65,7 @@ function SingleVote({ vote }) {
   const { address: voterAddress, params, support, reason, weight } = vote;
 
   return (
-    <VStack
-      className={css`
-        color: ${theme.colors.black};
-        font-weight: ${theme.fontWeight.semibold};
-        font-size: ${theme.fontSize.xs};
-        margin-bottom: ${theme.spacing["5"]};
-        border-radius: ${theme.borderRadius.md};
-        border: 1px solid ${theme.colors.gray["eb"]};
-      `}
-    >
+    <VStack className={styles.single_vote}>
       <HStack
         alignItems="items-center"
         justifyContent="justify-between"
@@ -97,24 +86,11 @@ function SingleVote({ vote }) {
           <TokenAmountDisplay amount={weight} decimals={18} currency="OP" />
         </div>
       </HStack>
-      <VStack
-        className={css`
-          margin-bottom: ${reason ? theme.spacing["1"] : "0"};
-          color: ${theme.colors.gray[700]};
-          gap: ${theme.spacing["1"]};
-          font-weight: ${theme.fontWeight.medium};
-          padding: 0 ${theme.spacing["3"]} ${theme.spacing["3"]}
-            ${theme.spacing["3"]};
-        `}
-      >
+      <VStack className={styles.single_vote__content}>
         {params?.map((option, index) => (
           <p
             key={index}
-            className={css`
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              overflow: hidden;
-            `}
+            className={"whitespace-nowrap text-ellipsis overflow-hidden"}
           >
             {++index}. {option}
           </p>
@@ -123,18 +99,7 @@ function SingleVote({ vote }) {
       </VStack>
       {reason && (
         <div>
-          <p
-            className={css`
-              margin-top: ${theme.spacing["1"]};
-              color: ${theme.colors.gray[700]};
-              font-weight: ${theme.fontWeight.medium};
-              white-space: pre-wrap;
-              padding: ${theme.spacing["3"]};
-              border-top: 1px solid ${theme.colors.gray["300"]};
-            `}
-          >
-            {reason}
-          </p>
+          <p className={styles.single_vote__reason}>{reason}</p>
         </div>
       )}
     </VStack>
