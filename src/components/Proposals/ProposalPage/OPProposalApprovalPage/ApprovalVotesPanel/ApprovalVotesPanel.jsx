@@ -5,13 +5,18 @@ import { motion } from "framer-motion";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./approvalVotesPanel.module.scss";
 import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
+import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 
 export default function ApprovalVotesPanel({
   proposal,
   initialProposalVotes,
   fetchVotesForProposal,
+  fetchVotingPower,
+  fetchAuthorityChains,
+  fetchDelegate,
+  fetchVoteForProposalAndDelegate,
 }) {
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
@@ -41,7 +46,7 @@ export default function ApprovalVotesPanel({
         {activeTab === 1 ? (
           <OptionsResultsPanel proposal={proposal} />
         ) : (
-          <ProposalVotesList
+          <ApprovalProposalVotesList
             initialProposalVotes={initialProposalVotes}
             fetchVotesForProposal={fetchVotesForProposal}
             proposal_id={proposal.id}
@@ -50,11 +55,13 @@ export default function ApprovalVotesPanel({
         <ApprovalProposalCriteria proposal={proposal} />
 
         <div className={styles.button_container}>
-          {/* <ApprovalCastVoteButton
-            castVoteFragmentRef={castVoteFragmentRef}
-            buttonFragmentRef={buttonFragmentRef}
-            delegateFragmentRef={delegateFragmentRef}
-          /> */}
+          <ApprovalCastVoteButton
+            proposal={proposal}
+            fetchVotingPower={fetchVotingPower}
+            fetchAuthorityChains={fetchAuthorityChains}
+            fetchDelegate={fetchDelegate}
+            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
+          />
         </div>
       </VStack>
     </motion.div>
