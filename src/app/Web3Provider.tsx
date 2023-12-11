@@ -12,7 +12,7 @@ import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
 import { Toaster } from "react-hot-toast";
 
-const chains = [optimism];
+const chains = [optimism, mainnet];
 const metadata = {
   name: "Agora Next",
   description: "The on-chain governance company",

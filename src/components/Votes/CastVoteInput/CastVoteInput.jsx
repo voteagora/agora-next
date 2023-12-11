@@ -1,43 +1,65 @@
 "use client";
+
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 export default function CastVoteInput({
   proposal,
   fetchVotingPower,
   fetchAuthorityChains,
+  fetchDelegate,
+  fetchVoteForProposalAndDelegate,
 }) {
   const [reason, setReason] = useState("");
   const [votingPower, setVotingPower] = useState("0");
+  const [delegate, setDelegate] = useState({});
   const [chains, setChains] = useState([]);
+  const [vote, setVote] = useState({});
+  const [isReady, setIsReady] = useState(false);
+  const openDialog = useOpenDialog();
 
   const { address } = useAccount();
 
-  useEffect(() => {
-    if (address && proposal.snapshotBlockNumber) {
-      fetchVotingPower(address, proposal.snapshotBlockNumber).then(
-        ({ votingPower }) => {
-          setVotingPower(votingPower);
-        }
-      );
+  const fetchData = useCallback(async () => {
+    try {
+      const promises = [
+        fetchVotingPower(address, proposal.snapshotBlockNumber),
+        fetchDelegate(address),
+        fetchAuthorityChains(address, proposal.snapshotBlockNumber),
+        fetchVoteForProposalAndDelegate(proposal.id, address),
+      ];
 
-      fetchAuthorityChains(address, proposal.snapshotBlockNumber).then(
-        ({ chains }) => {
-          setChains(chains);
-        }
-      );
+      const [votingPowerResult, delegateResult, chainsResult, voteResult] =
+        await Promise.all(promises);
+
+      setVotingPower(votingPowerResult.votingPower);
+      setDelegate(delegateResult);
+      setChains(chainsResult.chains);
+      setVote(voteResult.vote);
+      setIsReady(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   }, [
-    address,
-    proposal.snapshotBlockNumber,
     fetchVotingPower,
+    fetchDelegate,
     fetchAuthorityChains,
+    address,
+    proposal,
+    fetchVoteForProposalAndDelegate,
   ]);
+
+  useEffect(() => {
+    if (address && proposal.snapshotBlockNumber) {
+      fetchData();
+    }
+  }, [fetchData, address, proposal.snapshotBlockNumber]);
 
   return (
     <VStack className={styles.cast_vote_container}>
@@ -52,15 +74,28 @@ export default function CastVoteInput({
         className={styles.vote_actions}
       >
         <VoteButtons
-          onClick={(supportType) => onVoteClick(supportType, reason)}
+          onClick={(supportType) =>
+            openDialog({
+              type: "CAST_VOTE",
+              params: {
+                reason,
+                supportType,
+                proposalId: proposal.id,
+                delegate,
+                votingPower,
+              },
+            })
+          }
           proposalStatus={proposal.status}
+          delegateVote={vote}
+          isReady={isReady}
         />
       </VStack>
     </VStack>
   );
 }
 
-function VoteButtons({ onClick, proposalStatus }) {
+function VoteButtons({ onClick, proposalStatus, delegateVote, isReady }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
@@ -76,10 +111,15 @@ function VoteButtons({ onClick, proposalStatus }) {
     );
   }
 
-  //   const hasVoted = !!delegate.votes.find((it) => it.proposal.id === result.id);
-  //   if (hasVoted) {
-  //     return <DisabledVoteButton reason="Already voted" />;
-  //   }
+  if (!isReady) {
+    return <DisabledVoteButton reason="Loading..." />;
+  }
+
+  const hasVoted = !!delegateVote?.transactionHash;
+
+  if (hasVoted) {
+    return <DisabledVoteButton reason="Already voted" />;
+  }
 
   return (
     <HStack gap={2} className="pt-1">
@@ -113,16 +153,3 @@ function DisabledVoteButton({ reason }) {
     </button>
   );
 }
-
-// export function ConnectWalletButton({ reason }) {
-//   return (
-//     <button
-//     <ConnectKitButton.Custom>
-//       {({ show }) => (
-//         <div className={styles.vote_button_connect} onClick={show}>
-//           {reason}
-//         </div>
-//       )}
-//     </ConnectKitButton.Custom>
-//   );
-// }

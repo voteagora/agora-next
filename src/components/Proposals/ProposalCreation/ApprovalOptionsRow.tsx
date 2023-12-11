@@ -1,8 +1,6 @@
 "use client";
 
-import { css } from "@emotion/css";
 import { Form } from "./CreateProposalForm";
-import * as theme from "@/styles/theme";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import styles from "./styles.module.scss";
 import { VStack } from "@/components/Layout/Stack";
@@ -42,39 +40,14 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
   return (
     <>
       <h4 className={styles.create_prop_form__heading}>Proposed Options</h4>
-      <p
-        className={css`
-          font-size: ${theme.fontSize.base};
-          color: ${theme.colors.gray["4f"]};
-          margin-bottom: ${theme.spacing["4"]};
-        `}
-      >
+      <p className={styles.approval__option_row_text}>
         Proposed transactions will execute if your proposal passes. If you skip
         this step no transactions will be added.
       </p>
       {form.state.options.map((_option, index) => (
-        <VStack
-          gap={4}
-          key={index}
-          className={css`
-            position: relative;
-          `}
-        >
-          <p
-            className={css`
-              font-weight: 600;
-            `}
-          >
-            Option {index + 1}
-          </p>
-          <VStack
-            className={css`
-              width: 100%;
-              padding-left: ${theme.spacing["5"]};
-              margin-bottom: ${theme.spacing["8"]};
-              border-left: 1px solid ${theme.colors.gray.eb};
-            `}
-          >
+        <VStack gap={4} key={index} className="relative">
+          <p className="font-semibold">Option {index + 1}</p>
+          <VStack className={styles.approval__option_row}>
             <label className={styles.create_prop_form__label}>Title</label>
             <InputBox
               placeholder={"My option title"}
@@ -86,19 +59,7 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
           </VStack>
           {form.state.options.length > 1 && (
             <XCircleIcon
-              className={css`
-                width: 20px;
-                height: 20px;
-                position: absolute;
-                top: 2px;
-                right: 0;
-                cursor: pointer;
-                color: ${theme.colors.gray.eb};
-
-                &:hover {
-                  color: ${theme.colors.gray["4f"]};
-                }
-              `}
+              className={styles.transaction_details_option__remove}
               onClick={() => remove(index)}
             />
           )}
