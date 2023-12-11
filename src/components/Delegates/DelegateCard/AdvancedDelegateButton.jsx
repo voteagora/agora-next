@@ -36,22 +36,29 @@ export function AdvancedDelegateButton({
   ]);
 
   return (
-    <Button
-      onClick={(e) => {
-        e.preventDefault();
-        openDialog({
-          type: "ADVANCED_DELEGATE",
-          params: {
-            target: delegate,
-            availableBalance,
-            isDelegatingToProxy,
-            proxyAddress: proxyAddress,
-            delegatees,
-          },
-        });
-      }}
-    >
-      Delegate
-    </Button>
+    <>
+      {availableBalance !== null &&
+        isDelegatingToProxy !== null &&
+        delegatees !== null &&
+        proxyAddress !== null && (
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              openDialog({
+                type: "ADVANCED_DELEGATE",
+                params: {
+                  target: delegate,
+                  availableBalance,
+                  isDelegatingToProxy,
+                  proxyAddress: proxyAddress,
+                  delegatees,
+                },
+              });
+            }}
+          >
+            Delegate
+          </Button>
+        )}
+    </>
   );
 }
