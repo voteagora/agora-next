@@ -9,7 +9,6 @@ import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVo
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
 import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { getStatment } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
@@ -18,12 +17,6 @@ import {
   getCurrentDelegators,
 } from "@/app/api/delegations/getDelegations";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
-
-async function fetchDelegate(addressOrENSName) {
-  "use server";
-
-  return getDelegate({ addressOrENSName });
-}
 
 async function getDelegateVotes(addressOrENSName, page = 1, sortOrder) {
   "use server";
@@ -50,7 +43,6 @@ async function getDelegators(addressOrENSName) {
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
-  const delegate = await fetchDelegate(addressOrENSName);
   const delegateVotes = await getDelegateVotes(addressOrENSName);
   const statement = await getDelegateStatement(addressOrENSName);
   const delegatees = await getDelegatees(addressOrENSName);
@@ -59,11 +51,9 @@ export default async function Page({ params: { addressOrENSName } }) {
   return (
     <DelegateVotesProvider initialVotes={delegateVotes}>
       <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-8 xl:m-8 xl:px-4 w-full max-w-6xl">
-        {delegate && (
-          <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
-            <DelegateCard delegate={delegate} />
-          </VStack>
-        )}
+        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+          <DelegateCard addressOrENSName={addressOrENSName} />
+        </VStack>
 
         <VStack className="xl:ml-12 min-w-0 flex-1">
           {!statement && !statement?.delegateStatement && (

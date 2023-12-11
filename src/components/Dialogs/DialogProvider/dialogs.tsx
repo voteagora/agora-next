@@ -5,11 +5,13 @@ import {
   CastVoteDialog,
   SupportTextProps,
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
+import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 
 export type DialogType =
   | DelegateDialogType
   | CastProposalDialogType
-  | CastVoteDialogType;
+  | CastVoteDialogType
+  | AdvancedDelegateDialogType;
 // | ApprovalCastVoteDialogType
 // | FaqDialogType
 
@@ -18,6 +20,16 @@ export type DelegateDialogType = {
   params: {
     target: string;
     votingPower: string;
+  };
+};
+
+export type AdvancedDelegateDialogType = {
+  type: "ADVANCED_DELEGATE";
+  params: {
+    target: string;
+    availableBalance: string;
+    isDelegatingToProxy: boolean;
+    delegatees: any;
   };
 };
 
@@ -63,6 +75,20 @@ export const dialogs: DialogDefinitions<DialogType> = {
       <DelegateDialog
         target={target}
         votingPower={votingPower}
+        completeDelegation={closeDialog}
+      />
+    );
+  },
+  ADVANCED_DELEGATE: (
+    { target, availableBalance, isDelegatingToProxy, delegatees },
+    closeDialog
+  ) => {
+    return (
+      <AdvancedDelegateDialog
+        target={target}
+        availableBalance={availableBalance}
+        isDelegatingToProxy={isDelegatingToProxy}
+        delegatees={delegatees}
         completeDelegation={closeDialog}
       />
     );
