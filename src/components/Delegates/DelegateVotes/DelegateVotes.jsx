@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useRef } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
 import { formatNumber } from "@/lib/tokenUtils";
 import { shortAddress } from "@/lib/utils";
@@ -11,6 +11,8 @@ import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
 import StandardVoteContainer from "./StandardVoteContainer";
 import ApprovalVoteContainer from "./ApprovalVoteContainer";
+import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
+import { delegatesVotesSortOptions } from "@/lib/constants";
 import styles from "./delegateVotes.module.scss";
 
 function shortPropTitle(title, proosalId) {
@@ -27,26 +29,32 @@ function shortPropTitle(title, proosalId) {
     : title;
 }
 
-export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialVotes]);
-  const [meta, setMeta] = React.useState(initialVotes.meta);
+const getUniqueDelegateVotes = (delegateVotes) => {
+  return delegateVotes
+    .map((e) => JSON.stringify(e))
+    .filter((e, i, a) => a.indexOf(e) === i)
+    .map((e) => JSON.parse(e));
+};
+
+export default function DelegateVotes({ fetchDelegateVotes }) {
+  const { delegatesVotesSort, delegateVotes, setDelegateVotes, meta, setMeta } =
+    useDelegateVotesContext();
+
+  const sortOrder = delegatesVotesSortOptions[delegatesVotesSort].sortOrder;
+
+  const fetching = useRef(false);
 
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-      const data = await fetchDelegateVotes(page);
-      const existingIds = new Set(delegateVotes.map((d) => d.transactionHash));
-      const uniqueVotes = data.votes.filter(
-        (d) => !existingIds.has(d.transactionHash)
-      );
-      setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
+      const data = await fetchDelegateVotes(page, sortOrder);
       setMeta(data.meta);
+      setDelegateVotes((prev) =>
+        getUniqueDelegateVotes(prev.concat(data.votes))
+      );
       fetching.current = false;
     }
   };
-
-  const delegateVotes = pages.reduce((all, page) => all.concat(page.votes), []);
 
   return (
     <VStack gap={4}>
@@ -66,6 +74,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
           </div>
         }
         element="main"
+        className="gap-4 flex flex-col"
       >
         {delegateVotes.map(
           (vote) =>
@@ -91,7 +100,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                         </div>
                       )}
                     </HStack>
-                    <h2 className={styles.vote_title}>
+                    <h2 className="text-black text-base py-1 px-0 overflow-hidden text-ellipsis">
                       <a href={`/proposals/${vote.proposal_id}`}>
                         {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                       </a>
