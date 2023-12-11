@@ -9,8 +9,6 @@ import useAdvancedDelegation from "./useAdvancedDelegation";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-// TODO: This dialog uses regular delegation layout and needs to be updated
-
 export function AdvancedDelegateDialog({
   target,
   availableBalance,
@@ -31,7 +29,9 @@ export function AdvancedDelegateDialog({
   const { write, isLoading, isError, isSuccess } = useAdvancedDelegation({
     isDelegatingToProxy,
     proxyAddress,
+    // target can be a string or an array of strings
     target,
+    // alowance can be a number or an array of numbers
     allocation: allowance, // (value / 100000) 100% = 100000
   });
 
