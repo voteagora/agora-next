@@ -20,15 +20,51 @@ export async function getCurrentDelegatees({
     where: { from: address.toLowerCase() },
   });
 
-  const directDelegatee = await prisma.delegatees.findFirst({
-    where: { delegator: address.toLowerCase() },
-  });
+  const directDelegatee = await (async () => {
+    const [proxyAddress, delegatee] = await Promise.all([
+      getProxyAddress(address),
+      prisma.delegatees.findFirst({
+        where: { delegator: address.toLowerCase() },
+      }),
+    ]);
+
+    if (
+      proxyAddress &&
+      delegatee &&
+      delegatee.delegatee === proxyAddress.toLowerCase()
+    ) {
+      return null;
+    }
+
+    return delegatee;
+  })();
 
   const latestBlock = await provider.getBlock("latest");
+
+  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+    where: {
+      delegate: address.toLowerCase(),
+    },
+  });
 
   // TODO: These needs to be ordered by timestamp
 
   return [
+    ...(advancedVotingPower
+      ? [
+          {
+            from: address,
+            to: address,
+            allowance: advancedVotingPower.advanced_vp.toFixed(0),
+            timestamp: null,
+            type: "ADVANCED",
+            amount:
+              BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
+                ? "PARTIAL"
+                : "FULL",
+          },
+        ]
+      : []),
     ...(directDelegatee
       ? [
           {
@@ -100,7 +136,7 @@ export async function getCurrentDelegators({
             block_number,
             ROW_NUMBER() OVER (PARTITION BY delegator ORDER BY block_number DESC, log_index DESC, transaction_index DESC) as rn
         FROM center.delegate_changed_events
-        WHERE to_delegate=${proxyAddress.toLowerCase()}
+        WHERE to_delegate=${address.toLowerCase()}
       ) t1
       WHERE rn=1
       ) t2

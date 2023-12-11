@@ -13,6 +13,11 @@ import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { getStatment } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
+import {
+  getCurrentDelegatees,
+  getCurrentDelegators,
+} from "@/app/api/delegations/getDelegations";
+import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -101,6 +106,11 @@ export default async function Page({ params: { addressOrENSName } }) {
               />
             </div>
           )}
+
+          <DelegationsContainer
+            delegatees={delegatees}
+            delegators={delegators}
+          />
         </VStack>
       </div>
     </DelegateVotesProvider>
