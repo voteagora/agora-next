@@ -12,3 +12,14 @@ export const delegatesFilterOptions = {
     value: "Most delegators",
   },
 };
+
+export const delegatesVotesSortOptions = {
+  newest: {
+    sortOrder: "desc",
+    value: "Newest",
+  },
+  oldest: {
+    sortOrder: "asc",
+    value: "Oldest",
+  },
+};

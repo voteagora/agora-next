@@ -3,7 +3,7 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { useAgoraContext } from "@/app/AgoraContext";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 
