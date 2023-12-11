@@ -15,7 +15,7 @@ type Props = {
 export function PageContainer({ children }: Props) {
   return (
     <DialogProvider>
-      <div className="container my-4 mx-auto sm:px-6 lg:px-8">
+      <div className="container my-4 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-dotted-pattern" />
         <div className="bg-radial-gradient" />
         {children}
