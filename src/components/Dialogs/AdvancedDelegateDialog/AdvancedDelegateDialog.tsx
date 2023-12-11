@@ -1,15 +1,13 @@
-import { useAccount, useBalance, useContractWrite } from "wagmi";
-import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { VStack } from "@/components/Layout/Stack";
-import { OptimismContracts } from "@/lib/contracts/contracts";
-import ENSName from "@/components/shared/ENSName";
 import { Button } from "@/components/Button";
 import styles from "./advancedDelegateDialog.module.scss";
-import { Button as ShadcnButton } from "@/components/ui/button";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import HumanAddress from "@/components/shared/HumanAddress";
+import useAdvancedDelegation from "./useAdvancedDelegation";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 // TODO: This dialog uses regular delegation layout and needs to be updated
 
@@ -17,21 +15,26 @@ export function AdvancedDelegateDialog({
   target,
   availableBalance,
   isDelegatingToProxy,
+  proxyAddress,
   delegatees,
   completeDelegation,
 }: {
   target: string;
   availableBalance: string;
   isDelegatingToProxy: boolean;
+  proxyAddress: string;
   delegatees: Delegation[];
   completeDelegation: () => void;
 }) {
-  const { isLoading, isSuccess, isError, write } = useContractWrite({
-    address: OptimismContracts.token.address as any,
-    abi: OptimismContracts.token.abi,
-    functionName: "delegate",
-    args: [target as any],
+  const [allowance, setAllowance] = useState(0);
+
+  const { write, isLoading, isError, isSuccess } = useAdvancedDelegation({
+    isDelegatingToProxy,
+    proxyAddress,
+    target,
+    allocation: allowance, // (value / 100000) 100% = 100000
   });
+
   return (
     <VStack alignItems="items-center" className={styles.dialog_container}>
       <VStack gap={6} alignItems="items-stretch">
@@ -66,6 +69,11 @@ export function AdvancedDelegateDialog({
           className={styles.details_container}
         >
           <HumanAddress address={target} />
+          <Input
+            value={allowance}
+            onChange={(e) => setAllowance(parseInt(e.target.value))}
+            type="number"
+          />
         </VStack>
         {isLoading && (
           <Button href={null} disabled={false}>

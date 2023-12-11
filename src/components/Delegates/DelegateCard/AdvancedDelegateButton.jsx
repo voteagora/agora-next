@@ -7,11 +7,13 @@ export function AdvancedDelegateButton({
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
+  getProxyAddress,
 }) {
   const openDialog = useOpenDialog();
   const [availableBalance, setAvailableBalance] = useState(null);
   const [isDelegatingToProxy, setIsDelegatingToProxy] = useState(null);
   const [delegatees, setDelegatees] = useState(null);
+  const [proxyAddress, setProxyAddress] = useState(null);
 
   useEffect(() => {
     fetchVotingPowerForSubdelegation().then((balance) => {
@@ -23,10 +25,14 @@ export function AdvancedDelegateButton({
     fetchCurrentDelegatees().then((delegatees) => {
       setDelegatees(delegatees);
     });
+    getProxyAddress().then((proxyAddress) => {
+      setProxyAddress(proxyAddress);
+    });
   }, [
     fetchVotingPowerForSubdelegation,
     checkIfDelegatingToProxy,
     fetchCurrentDelegatees,
+    getProxyAddress,
   ]);
 
   return (
@@ -39,6 +45,7 @@ export function AdvancedDelegateButton({
             target: delegate,
             availableBalance,
             isDelegatingToProxy,
+            proxyAddress: proxyAddress,
             delegatees,
           },
         });

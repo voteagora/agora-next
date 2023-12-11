@@ -5,6 +5,7 @@ import { DelegateActions } from "./DelegateActions";
 import styles from "./delegateCard.module.scss";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import {
+  getProxy,
   getVotingPowerAvailableForDirectDelegation,
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
@@ -43,6 +44,13 @@ async function fetchCurrentDelegatees(addressOrENSName) {
   "use server";
 
   return getCurrentDelegatees({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
 }
 
 export default async function DelegateCard({ addressOrENSName }) {
@@ -124,6 +132,7 @@ export default async function DelegateCard({ addressOrENSName }) {
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
               fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
+              getProxyAddress={getProxyAddress}
             />
           </VStack>
         </div>

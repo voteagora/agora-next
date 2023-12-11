@@ -228,3 +228,19 @@ async function isAddressDelegatingToProxy({
 
   return false;
 }
+
+/**
+ * Gets the proxy address for a given address
+ * @param address
+ * @returns {string}
+ */
+export const getProxy = ({ addressOrENSName }: { addressOrENSName: string }) =>
+  addressOrEnsNameWrap(getProxyAddressForAddress, addressOrENSName);
+
+async function getProxyAddressForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<string | undefined> {
+  return getProxyAddress(address);
+}

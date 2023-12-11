@@ -29,6 +29,7 @@ export type AdvancedDelegateDialogType = {
     target: string;
     availableBalance: string;
     isDelegatingToProxy: boolean;
+    proxyAddress: string;
     delegatees: any;
   };
 };
@@ -80,7 +81,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   ADVANCED_DELEGATE: (
-    { target, availableBalance, isDelegatingToProxy, delegatees },
+    { target, availableBalance, isDelegatingToProxy, proxyAddress, delegatees },
     closeDialog
   ) => {
     return (
@@ -88,6 +89,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
         target={target}
         availableBalance={availableBalance}
         isDelegatingToProxy={isDelegatingToProxy}
+        proxyAddress={proxyAddress}
         delegatees={delegatees}
         completeDelegation={closeDialog}
       />

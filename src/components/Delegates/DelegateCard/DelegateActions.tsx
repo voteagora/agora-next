@@ -17,6 +17,7 @@ export function DelegateActions({
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
+  getProxyAddress,
 }: {
   delegate: string;
   className?: string;
@@ -30,6 +31,7 @@ export function DelegateActions({
   ) => Promise<string>;
   checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
+  getProxyAddress: (addressOrENSName: string) => Promise<string>;
 }) {
   const { address } = useAccount();
   // TODO: Check if user's balance is above the minimum
@@ -50,6 +52,7 @@ export function DelegateActions({
             }
             checkIfDelegatingToProxy={() => checkIfDelegatingToProxy(address)}
             fetchCurrentDelegatees={() => fetchCurrentDelegatees(address)}
+            getProxyAddress={() => getProxyAddress(address)}
           />
         ) : (
           <DelegateButton
