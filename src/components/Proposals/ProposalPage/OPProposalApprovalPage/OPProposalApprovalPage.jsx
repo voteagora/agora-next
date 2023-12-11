@@ -2,7 +2,6 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { getVotesForProposal } from "@/app/api/votes/getVotes";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
@@ -53,12 +52,6 @@ export default async function OPProposalApprovalPage({ proposal }) {
             proposal={proposal}
             initialProposalVotes={proposalVotes}
             fetchVotesForProposal={fetchProposalVotes}
-          />
-          {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput
-            proposal={proposal}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
           />
         </VStack>
       </VStack>

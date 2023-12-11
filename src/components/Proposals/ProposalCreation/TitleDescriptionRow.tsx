@@ -10,45 +10,19 @@ import styles from "./styles.module.scss";
 import InputBox from "@/components/shared/InputBox";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
-export const tipTextStyle = css`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.colors.gray["800"]};
-`;
+export const tipTextStyle = styles.title_desc_row__tip_text;
 
 type DisplayMode = "write" | "preview";
 
-const displayModeSelectorStyles = css`
-  cursor: pointer;
-  font-size: ${theme.fontSize.sm};
-  font-weight: ${theme.fontWeight.medium};
-  color: ${theme.colors.gray["600"]};
-  padding: ${theme.spacing["1"]} ${theme.spacing["3"]};
-  border-radius: ${theme.borderRadius.full};
+const displayModeSelectorStyles = styles.title_desc_row__display_mode_selector;
 
-  :hover {
-    background: ${theme.colors.gray["100"]};
-    color: ${theme.colors.gray["900"]};
-  }
-`;
-
-const displayModeSelectorSelectedStyles = css`
-  background: ${theme.colors.gray.eb};
-  color: ${theme.colors.gray["900"]};
-  border-radius: ${theme.borderRadius.full};
-
-  :hover {
-    background: ${theme.colors.gray.eb};
-  }
-`;
+const displayModeSelectorSelectedStyles =
+  styles.title_desc_row__display_mode_selector_selected;
 
 export default function TitleDescriptionRow({ form }: { form: Form }) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("write");
   return (
-    <VStack
-      className={css`
-        margin-top: ${theme.spacing["4"]};
-      `}
-    >
+    <VStack className={styles.title_desc_row__mt}>
       <h4 className={styles.create_prop_form__heading}>Title</h4>
       <InputBox
         placeholder={"I'd like to propose..."}
@@ -64,9 +38,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
         <h4
           className={cx(
             styles.create_prop_form__heading,
-            css`
-              margin-top: ${theme.spacing["4"]};
-            `
+            styles.title_desc_row__mt
           )}
         >
           Proposal
@@ -97,15 +69,11 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
         >
           <Tab.List>
             <HStack gap={1}>
-              <Tab
-                className={css`
-                  outline: none;
-                `}
-              >
+              <Tab className="outline-none">
                 {({ selected }) => (
                   <div
-                    className={css`
-                      ${displayModeSelectorStyles}
+                    className={`
+                      ${displayModeSelectorStyles}${" "}
                       ${selected && displayModeSelectorSelectedStyles}
                     `}
                   >
@@ -114,15 +82,11 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
                 )}
               </Tab>
 
-              <Tab
-                className={css`
-                  outline: none;
-                `}
-              >
+              <Tab className="outline-none">
                 {({ selected }) => (
                   <div
-                    className={css`
-                      ${displayModeSelectorStyles}
+                    className={`
+                      ${displayModeSelectorStyles}${" "}
                       ${selected && displayModeSelectorSelectedStyles}
                     `}
                   >
@@ -137,17 +101,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
 
       {displayMode === "write" && (
         <textarea
-          className={css`
-            background: ${theme.colors.gray.fa};
-            padding: ${theme.spacing["4"]};
-            margin-top: ${theme.spacing["2"]};
-            border-radius: ${theme.borderRadius.md};
-            outline: none;
-            width: 100%;
-            min-height: ${theme.spacing["64"]};
-            border-width: ${theme.spacing.px};
-            border-color: ${theme.colors.gray.eb};
-          `}
+          className={styles.title_desc_row__textarea}
           value={form.state.description}
           onChange={(e) => form.onChange.description(e.target.value)}
           placeholder="I’m a proposal body, and I like markdown formatting..."

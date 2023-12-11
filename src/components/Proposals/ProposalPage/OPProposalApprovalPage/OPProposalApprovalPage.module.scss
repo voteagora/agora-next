@@ -1,5 +1,16 @@
 @import "@/styles/variables";
 
+.proposal_container {
+  padding-left: $spacing-4;
+  padding-right: $spacing-4;
+  max-width: $max-width-6xl;
+  @media (max-width: $max-width-2xl) {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+}
+
 .proposal_description_container {
   padding-left: $spacing-4;
   padding-right: $spacing-4;
