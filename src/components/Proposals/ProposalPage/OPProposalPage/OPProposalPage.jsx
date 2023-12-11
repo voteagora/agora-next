@@ -3,10 +3,14 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalPage.module.scss";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import { getVotesForProposal } from "@/app/api/votes/getVotes";
+import {
+  getVoteForProposalAndDelegate,
+  getVotesForProposal,
+} from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -16,8 +20,6 @@ async function fetchProposalVotes(proposal_id, page = 1) {
 
 async function fetchVotingPower(address, blockNumber) {
   "use server";
-
-  console.log("fetchVotingPower", { address, blockNumber });
 
   return {
     votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
@@ -31,6 +33,23 @@ async function fetchAuthorityChains(address, blockNumber) {
   return {
     chains: await getAuthorityChains({ blockNumber, address }),
   };
+}
+
+async function fetchDelegate(addressOrENSName) {
+  "use server";
+
+  return await getDelegate({
+    addressOrENSName,
+  });
+}
+
+async function fetchVoteForProposalAndDelegate(proposal_id, address) {
+  "use server";
+
+  return await getVoteForProposalAndDelegate({
+    proposal_id,
+    address,
+  });
 }
 
 export default async function OPProposalPage({ proposal }) {
@@ -64,6 +83,8 @@ export default async function OPProposalPage({ proposal }) {
             proposal={proposal}
             fetchVotingPower={fetchVotingPower}
             fetchAuthorityChains={fetchAuthorityChains}
+            fetchDelegate={fetchDelegate}
+            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
           />
         </VStack>
       </VStack>

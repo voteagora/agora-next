@@ -20,7 +20,11 @@ export async function paginatePrismaResult<T extends Array<any>>(
   const data = await result(skip, take);
 
   if (!data || data.length === 0) {
-    return notFound();
+    // return notFound();
+    return {
+      meta: { currentPage: 0, pageSize: 0, hasNextPage: false },
+      data: [] as any as T,
+    };
   }
 
   const hasNextPage = data.length > pageSize;

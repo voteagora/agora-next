@@ -9,10 +9,10 @@ import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import AgoraProvider from "./AgoraContext";
+import AgoraProvider from "@/contexts/AgoraContext";
 import { Toaster } from "react-hot-toast";
 
-const chains = [optimism];
+const chains = [optimism, mainnet];
 const metadata = {
   name: "Agora Next",
   description: "The on-chain governance company",

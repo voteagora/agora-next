@@ -13,9 +13,10 @@ import {
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useModal } from "connectkit";
+import styles from "./styles.module.scss";
 
 const abiCoder = new AbiCoder();
-const governorTokenContract = OptimismContracts.governor;
+const governorContract = OptimismContracts.governor;
 const governanceTokenContract = OptimismContracts.token;
 
 export default function SubmitButton({
@@ -31,8 +32,8 @@ export default function SubmitButton({
   const [isClient, setIsClient] = useState(false);
 
   const { config, isError: onPrepareError } = usePrepareContractWrite({
-    address: governorTokenContract.address as any,
-    abi: governorTokenContract.abi,
+    address: governorContract.address as any,
+    abi: governorContract.abi,
     functionName: governorFunction,
     args: inputData as any,
   });
@@ -80,16 +81,7 @@ export default function SubmitButton({
       type="submit"
       variant={"outline"}
       disabled={isLoading || onPrepareError}
-      className={cx([
-        css`
-          width: 40%;
-        `,
-        onPrepareError &&
-          css`
-            background: ${theme.colors.gray.eb} !important;
-            cursor: not-allowed;
-          `,
-      ])}
+      className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
       onClick={(e) => {
         e.preventDefault();
         if (!isConnected) {

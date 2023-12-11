@@ -52,18 +52,7 @@ export default function ENSAvatar({ ensName }) {
       <Image
         loader={imageLoader}
         alt="ENS Avatar"
-        className={css`
-          @keyframes fade-in {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-
-          animation: 0.3s forwards fade-in;
-        `}
+        className={styles.image}
         src={avatar}
         width={44}
         height={44}
