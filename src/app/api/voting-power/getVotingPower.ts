@@ -166,7 +166,7 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
   })();
 
   return (
-    BigInt(advancedVotingPower?.advanced_vp.toFixed(0) ?? "0") +
+    BigInt(advancedVotingPower?.vp_allowance.toFixed(0) ?? "0") +
     (await undelegatedVotingPower)
   ).toString();
 }
