@@ -60,7 +60,6 @@ export default function ProposalVotesList({
                   <VoteText support={vote.support} />
                 </HStack>
                 <HStack
-                  gap={1}
                   alignItems="items-center"
                   className={styles.vote_weight}
                 >
