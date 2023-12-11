@@ -7,7 +7,7 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 
 /**
- * Delegations for a given address
+ * Delegations for a given address (addresses the given address is delegating to)
  * @param addressOrENSName
  * @returns {delegations}
  */
@@ -110,9 +110,9 @@ async function getCurrentDelegateesForAddress({
 }
 
 /**
- * Delegators for a given address
+ * Delegators for a given address (addresses delegating to the given address)
  * @param addressOrENSName
- * @returns {delegators}
+ * @returns {Delegation[]}
  */
 export const getCurrentDelegators = ({
   addressOrENSName,
