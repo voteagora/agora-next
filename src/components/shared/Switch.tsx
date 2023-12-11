@@ -35,3 +35,7 @@ export function Switch({ onSelectionChanged, selection, options }: Props) {
     </HStack>
   );
 }
+
+const optionStyle = styles.switch__option;
+
+const selectedStyle = styles.switch_selected;
