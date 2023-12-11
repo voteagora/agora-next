@@ -2,6 +2,7 @@ import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { Prisma } from "@prisma/client";
+import { addressOrEnsNameWrap } from "../utils/ensName";
 
 /**
  * Voting Power at a given block number
@@ -9,7 +10,18 @@ import { Prisma } from "@prisma/client";
  * @param blockNumber
  * @returns {directVP, advancedVP, totalVP}
  */
-export async function getVotingPowerAtSnapshot({
+export const getVotingPowerAtSnapshot = ({
+  addressOrENSName,
+  blockNumber,
+}: {
+  addressOrENSName: string;
+  blockNumber: number;
+}) =>
+  addressOrEnsNameWrap(getVotingPowerAtSnapshotByAddress, addressOrENSName, {
+    blockNumber,
+  });
+
+async function getVotingPowerAtSnapshotByAddress({
   address,
   blockNumber,
 }: {
@@ -80,7 +92,13 @@ export async function getVotingPowerAtSnapshot({
  * @param address
  * @returns {directVP, advancedVP, totalVP}
  */
-export async function getCurrentVotingPower({
+export const getCurrentVotingPower = ({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) => addressOrEnsNameWrap(getCurrentVotingPowerForAddress, addressOrENSName);
+
+async function getCurrentVotingPowerForAddress({
   address,
 }: {
   address: string;
@@ -118,7 +136,17 @@ export async function getCurrentVotingPower({
  * @param address
  * @returns {votingPower}
  */
-export async function getVotingPowerAvailableForSubdelegation({
+export const getVotingPowerAvailableForSubdelegation = ({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) =>
+  addressOrEnsNameWrap(
+    getVotingPowerAvailableForSubdelegationForAddress,
+    addressOrENSName
+  );
+
+async function getVotingPowerAvailableForSubdelegationForAddress({
   address,
 }: {
   address: string;
@@ -131,14 +159,14 @@ export async function getVotingPowerAvailableForSubdelegation({
 
   const undelegatedVotingPower = (async () => {
     const [isBalanceAccountedFor, balance] = await Promise.all([
-      isDelegatingToProxy({ address }),
+      isAddressDelegatingToProxy({ address }),
       OptimismContracts.token.contract.balanceOf(address),
     ]);
     return isBalanceAccountedFor ? 0n : balance;
   })();
 
   return (
-    BigInt(advancedVotingPower?.advanced_vp.toFixed() ?? "0") +
+    BigInt(advancedVotingPower?.advanced_vp.toFixed(0) ?? "0") +
     (await undelegatedVotingPower)
   ).toString();
 }
@@ -149,7 +177,17 @@ export async function getVotingPowerAvailableForSubdelegation({
  * @param address
  * @returns {votingPower}
  */
-export async function getVotingPowerAvailableForDirectDelegation({
+export const getVotingPowerAvailableForDirectDelegation = ({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) =>
+  addressOrEnsNameWrap(
+    getVotingPowerAvailableForDirectDelegationForAddress,
+    addressOrENSName
+  );
+
+async function getVotingPowerAvailableForDirectDelegationForAddress({
   address,
 }: {
   address: string;
@@ -162,7 +200,13 @@ export async function getVotingPowerAvailableForDirectDelegation({
  * @param address
  * @returns {boolean}
  */
-export async function isDelegatingToProxy({
+export const isDelegatingToProxy = ({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) => addressOrEnsNameWrap(isAddressDelegatingToProxy, addressOrENSName);
+
+async function isAddressDelegatingToProxy({
   address,
 }: {
   address: string;
