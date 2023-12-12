@@ -380,61 +380,11 @@ view direct_chains {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view delegate_changed_events {
-  network           Unsupported("network")?
-  sighash           String?                 @db.VarChar(66)
-  address           String?                 @db.VarChar(42)
-  block_number      BigInt?
-  block_hash        String?                 @db.VarChar(66)
-  log_index         Int?
-  transaction_index Int?
-  transaction_hash  String?                 @db.VarChar(66)
-  delegator         String?
-  from_delegate     String?
-  to_delegate       String?
-  inputs            Json?
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view direct_chains {
-  delegate  String?
-  rules     Json[]
-  chain     String[]
-  balance   Decimal? @db.Decimal
-  allowance Decimal? @db.Decimal
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view transfer_events {
-  network           Unsupported("network")?
-  sighash           String?                 @db.VarChar(66)
-  address           String?                 @db.VarChar(42)
-  block_number      BigInt?
-  block_hash        String?                 @db.VarChar(66)
-  log_index         Int?
-  transaction_index Int?
-  transaction_hash  String?                 @db.VarChar(66)
-  from              String?
-  to                String?
-  value             String?
-  inputs            Json?
-
-  @@ignore
-  @@schema("center")
-}
-
 view ProposalTypes {
-  id                 String  @unique
-  contract           String  @db.VarChar(42)
+  id                 String @unique
+  contract           String @db.VarChar(42)
   block_number       BigInt
-  proposal_type_id   String  
+  proposal_type_id   String
   quorum             String
   approval_threshold String
   name               String
