@@ -20,5 +20,7 @@
 
 .vote_container {
   padding: 0 $spacing-4;
+  padding-bottom: $spacing-4;
   overflow-y: scroll;
+  max-height: calc(100vh - 437px);
 }
