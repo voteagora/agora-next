@@ -155,9 +155,9 @@ async function getCurrentDelegatorsForAddress({
       ) t2
       LEFT JOIN LATERAL (
         SELECT 
-          SUM(
+          COALESCE(SUM(
             CASE WHEN "from"=delegator THEN -"value"::NUMERIC ELSE "value"::NUMERIC END
-          ) AS balance
+          ), 0) AS balance
         FROM center.transfer_events
         WHERE "from"=delegator OR "to"=delegator
       ) t3 ON TRUE
@@ -173,7 +173,7 @@ async function getCurrentDelegatorsForAddress({
     ...(await directDelegators).map((directDelegator) => ({
       from: directDelegator.delegator,
       to: directDelegator.delegatee,
-      allowance: directDelegator.balance.toFixed(),
+      allowance: directDelegator.balance.toFixed(0),
       timestamp: latestBlock
         ? getHumanBlockTime(
             directDelegator.block_number,
