@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./proposalVotesList.module.scss";
+import styles from "./approvalProposalVotesList.module.scss";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
 import VoteText from "../VoteText/VoteText";
+import { useAccount } from "wagmi";
 
-export default function ProposalVotesList({
+export default function ApprovalProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
   proposal_id,
@@ -52,29 +53,55 @@ export default function ProposalVotesList({
         }
       >
         {proposalVotes.map((vote, i) => (
-          <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
-            <VStack>
-              <HStack justifyContent="justify-between" className={styles.voter}>
-                <HStack gap={1} alignItems="items-center">
-                  <HumanAddress address={vote.address} />
-                  <VoteText support={vote.support} />
-                </HStack>
-                <HStack
-                  alignItems="items-center"
-                  className={styles.vote_weight}
-                >
-                  <TokenAmountDisplay
-                    amount={vote.weight}
-                    decimals={18}
-                    currency="OP"
-                  />
-                </HStack>
-              </HStack>
-            </VStack>
-            <pre className={styles.vote_reason}>{vote.reason}</pre>
-          </VStack>
+          <SingleVote key={i} vote={vote} />
         ))}
       </InfiniteScroll>
     </div>
+  );
+}
+
+function SingleVote({ vote }) {
+  const { address } = useAccount();
+  const { address: voterAddress, params, support, reason, weight } = vote;
+
+  return (
+    <VStack className={styles.single_vote}>
+      <HStack
+        alignItems="items-center"
+        justifyContent="justify-between"
+        className={css`
+          padding: ${theme.spacing["3"]};
+        `}
+      >
+        <div>
+          <HumanAddress address={voterAddress} />
+          {address === voterAddress && " (you)"}
+          {" vote for"}
+        </div>
+        <div
+          className={css`
+            color: ${theme.colors.gray["4f"]};
+          `}
+        >
+          <TokenAmountDisplay amount={weight} decimals={18} currency="OP" />
+        </div>
+      </HStack>
+      <VStack className={styles.single_vote__content}>
+        {params?.map((option, index) => (
+          <p
+            key={index}
+            className={"whitespace-nowrap text-ellipsis overflow-hidden"}
+          >
+            {++index}. {option}
+          </p>
+        ))}
+        {support === "ABSTAIN" && "Abstain"}
+      </VStack>
+      {reason && (
+        <div>
+          <p className={styles.single_vote__reason}>{reason}</p>
+        </div>
+      )}
+    </VStack>
   );
 }
