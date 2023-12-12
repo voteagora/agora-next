@@ -9,8 +9,17 @@ import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
 import { useRouter } from "next/navigation";
+import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
-export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
+export default function DelegateCardList({
+  initialDelegates,
+  fetchDelegates,
+  fetchBalanceForDirectDelegation,
+  fetchVotingPowerForSubdelegation,
+  checkIfDelegatingToProxy,
+  fetchCurrentDelegatees,
+  getProxyAddress,
+}) {
   const router = useRouter();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialDelegates] || []);
@@ -43,61 +52,72 @@ export default function DelegateCardList({ initialDelegates, fetchDelegates }) {
   const delegates = pages.reduce((all, page) => all.concat(page.delegates), []);
 
   return (
-    <InfiniteScroll
-      className={styles.infinite_scroll}
-      hasMore={meta.hasNextPage}
-      pageStart={0}
-      loadMore={loadMore}
-      loader={
-        <div key="loader">
-          Loading...
-          <Image
-            src="/images/blink.gif"
-            alt="Blinking Agora Logo"
-            width={50}
-            height={20}
-          />
-        </div>
-      }
-      element="div"
-    >
-      {delegates.map((delegate, i) => {
-        let truncatedStatement = "";
-
-        if (delegate.statement && delegate.statement.delegateStatement) {
-          truncatedStatement = delegate.statement.delegateStatement.slice(
-            0,
-            120
-          );
+    <DialogProvider>
+      <InfiniteScroll
+        className={styles.infinite_scroll}
+        hasMore={meta.hasNextPage}
+        pageStart={0}
+        loadMore={loadMore}
+        loader={
+          <div key="loader">
+            Loading...
+            <Image
+              src="/images/blink.gif"
+              alt="Blinking Agora Logo"
+              width={50}
+              height={20}
+            />
+          </div>
         }
+        element="div"
+      >
+        {delegates.map((delegate, i) => {
+          let truncatedStatement = "";
 
-        return (
-          <div
-            key={delegate.address}
-            onClick={(e) => handleClick(e, `/delegates/${delegate.address}`)}
-            className={styles.link}
-          >
-            <VStack className={styles.link_container}>
-              <VStack gap="4" className="h-full">
-                <VStack justifyContent="center">
-                  <DelegateProfileImage
+          if (delegate.statement && delegate.statement.delegateStatement) {
+            truncatedStatement = delegate.statement.delegateStatement.slice(
+              0,
+              120
+            );
+          }
+
+          return (
+            <div
+              key={delegate.address}
+              onClick={(e) => handleClick(e, `/delegates/${delegate.address}`)}
+              className={styles.link}
+            >
+              <VStack className={styles.link_container}>
+                <VStack gap="4" className="h-full">
+                  <VStack justifyContent="center">
+                    <DelegateProfileImage
+                      address={delegate.address}
+                      votingPower={delegate.votingPower}
+                    />
+                  </VStack>
+                  <p className={styles.summary}>{truncatedStatement}</p>
+                  <div className="flex-grow" />
+                  <DelegateActions
                     address={delegate.address}
                     votingPower={delegate.votingPower}
+                    discord={delegate?.statement?.discord}
+                    twitter={delegate?.statement?.twitter}
+                    fetchBalanceForDirectDelegation={
+                      fetchBalanceForDirectDelegation
+                    }
+                    fetchVotingPowerForSubdelegation={
+                      fetchVotingPowerForSubdelegation
+                    }
+                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+                    fetchCurrentDelegatees={fetchCurrentDelegatees}
+                    getProxyAddress={getProxyAddress}
                   />
                 </VStack>
-                <p className={styles.summary}>{truncatedStatement}</p>
-                <div className="flex-grow" />
-                <DelegateActions
-                  address={delegate.address}
-                  votingPower={delegate.votingPower}
-                  discord={delegate?.statement?.discord}
-                  twitter={delegate?.statement?.twitter}
-                />
               </VStack>
-            </VStack>
-          </div>
-        );
-      })}
-    </InfiniteScroll>
+            </div>
+          );
+        })}
+      </InfiniteScroll>
+    </DialogProvider>
   );
 }
