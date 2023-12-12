@@ -170,39 +170,42 @@ view VotableSupply {
 }
 
 view Delegates {
-  delegate           String   @unique
-  voting_power       Decimal? @db.Decimal
-  num_for_delegators BigInt?
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
 
   @@map("delegates")
   @@schema("center")
 }
 
 view Proposals {
-  proposal_id      String   @unique
-  contract         String?  @db.VarChar(42)
-  proposer         String
-  description      String?
-  ordinal          Decimal? @db.Decimal
-  created_block    BigInt
-  start_block      String
-  end_block        String
-  cancelled_block  BigInt?
-  executed_block   BigInt?
-  proposal_data    Json?
-  proposal_type    String
-  proposal_type_id String?
-  proposal_results Json?
+  proposal_id        String   @unique
+  contract           String?  @db.VarChar(42)
+  proposer           String
+  description        String?
+  ordinal            Decimal? @db.Decimal
+  created_block      BigInt
+  start_block        String
+  end_block          String
+  cancelled_block    BigInt?
+  executed_block     BigInt?
+  proposal_data      Json?
+  proposal_type      String
+  proposal_type_data Json?
+  proposal_results   Json?
 
   @@map("proposals")
   @@schema("center")
 }
 
 view AdvancedVotingPower {
-  delegate     String  @unique
-  vp_allowance Decimal @db.Decimal
-  delegated_vp Decimal @db.Decimal
-  advanced_vp  Decimal @db.Decimal
+  delegate           String   @unique
+  vp_allowance       Decimal  @db.Decimal
+  delegated_vp       Decimal  @db.Decimal
+  advanced_vp        Decimal  @db.Decimal
+  subdelegated_share Decimal? @db.Decimal
 
   @@map("advanced_voting_power")
   @@schema("center")
@@ -327,6 +330,56 @@ view delegatees {
   delegatee    String?
   block_number BigInt?
   balance      Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view delegate_changed_events {
+  network           Unsupported("network")?
+  sighash           String?                 @db.VarChar(66)
+  address           String?                 @db.VarChar(42)
+  block_number      BigInt?
+  block_hash        String?                 @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String?                 @db.VarChar(66)
+  delegator         String?
+  from_delegate     String?
+  to_delegate       String?
+  inputs            Json?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view direct_chains {
+  delegate  String?
+  rules     Json[]
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view transfer_events {
+  network           Unsupported("network")?
+  sighash           String?                 @db.VarChar(66)
+  address           String?                 @db.VarChar(42)
+  block_number      BigInt?
+  block_hash        String?                 @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String?                 @db.VarChar(66)
+  from              String?
+  to                String?
+  value             String?
+  inputs            Json?
 
   @@ignore
   @@schema("center")
