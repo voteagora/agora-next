@@ -2,7 +2,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { Proposal } from "@/app/api/proposals/proposal";
-import { ParsedProposalData } from "@/lib/proposalUtils";
+import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -11,7 +11,8 @@ export default function OptionsResultsPanel({
 }) {
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
-  const proposalResults = proposal.proposalResults;
+  const proposalResults =
+    proposal.proposalResults as ParsedProposalResults["APPROVAL"]["kind"];
   const proposalSettings = proposalData.proposalSettings;
   const options = proposalResults.options;
 
@@ -37,8 +38,6 @@ export default function OptionsResultsPanel({
 
   const mutableOptions = [...options];
   const sortedOptions = mutableOptions.sort((a, b) => {
-    console.log("a", a);
-    console.log("b", b);
     return BigInt(b.votes || 0) > BigInt(a.votes || 0)
       ? 1
       : BigInt(b.votes || 0) < BigInt(a.votes || 0)
@@ -63,7 +62,7 @@ export default function OptionsResultsPanel({
     <VStack className={styles.approval_choices_container}>
       {sortedOptions.map((option, index) => {
         let isApproved = false;
-        const votesAmountBN = BigInt(option?.votes?.votes || 0);
+        const votesAmountBN = BigInt(option?.votes || 0);
         const optionBudget = BigInt(0);
         if (proposalSettings.criteria === "TOP_CHOICES") {
           isApproved = index < Number(proposalSettings.criteriaValue);
