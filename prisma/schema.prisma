@@ -385,6 +385,20 @@ view transfer_events {
   @@schema("center")
 }
 
+view ProposalTypes {
+  id                 String  @unique
+  contract           String  @db.VarChar(42)
+  block_number       BigInt
+  proposal_type_id   String  
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("center")
+}
+
 enum ProposalType {
   STANDARD
   APPROVAL
