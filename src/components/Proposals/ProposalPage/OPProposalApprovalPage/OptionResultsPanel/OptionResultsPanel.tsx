@@ -1,10 +1,16 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import { Proposal } from "@/app/api/proposals/proposal";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
-export default function OptionsResultsPanel({ proposal }) {
-  const status = proposal.status;
-  const proposalData = proposal.proposalData;
+export default function OptionsResultsPanel({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const proposalResults = proposal.proposalResults;
   const proposalSettings = proposalData.proposalSettings;
   const options = proposalResults.options;
@@ -20,8 +26,9 @@ export default function OptionsResultsPanel({ proposal }) {
       thresholdPosition = 66;
     } else {
       // calculate threshold position, min 5% max 66%
-      thresholdPosition = BigInt(
-        Math.max((threshold * BigInt(100)) / totalVotingPower, BigInt(5))
+      thresholdPosition = Math.max(
+        Number((threshold * BigInt(100)) / totalVotingPower),
+        5
       );
     }
   }
@@ -30,21 +37,23 @@ export default function OptionsResultsPanel({ proposal }) {
 
   const mutableOptions = [...options];
   const sortedOptions = mutableOptions.sort((a, b) => {
-    return BigInt(b.votes?.votes || 0) > BigInt(a.votes?.votes || 0)
+    console.log("a", a);
+    console.log("b", b);
+    return BigInt(b.votes || 0) > BigInt(a.votes || 0)
       ? 1
-      : BigInt(b.votes?.votes || 0) < BigInt(a.votes?.votes || 0)
+      : BigInt(b.votes || 0) < BigInt(a.votes || 0)
       ? -1
       : 0;
   });
 
   if (proposalSettings.criteria === "THRESHOLD") {
-    const threshold = BigInt(settings.criteria.criteriaValue);
-    if (totalVotingPower < (threshold * 15) / 10) {
+    const threshold = BigInt(proposalSettings.criteriaValue);
+    if (totalVotingPower < (threshold * 15n) / 10n) {
       thresholdPosition = 66;
     } else {
       // calculate threshold position, min 5% max 66%
       thresholdPosition = Math.max(
-        Number((threshold * 100) / totalVotingPower),
+        Number((threshold * 100n) / totalVotingPower),
         5
       );
     }
@@ -72,7 +81,6 @@ export default function OptionsResultsPanel({ proposal }) {
             votes={option.votes}
             votesAmountBN={votesAmountBN}
             totalVotingPower={totalVotingPower}
-            status={status}
             proposalSettings={proposalSettings}
             thresholdPosition={thresholdPosition}
             isApproved={isApproved}
@@ -88,10 +96,17 @@ function SingleOption({
   votes,
   votesAmountBN,
   totalVotingPower,
-  status,
   proposalSettings,
   thresholdPosition,
   isApproved,
+}: {
+  description: string;
+  votes: bigint;
+  votesAmountBN: bigint;
+  totalVotingPower: bigint;
+  proposalSettings: any;
+  thresholdPosition: number;
+  isApproved: boolean;
 }) {
   let barPercentage = BigInt(0);
   const percentage =
@@ -112,7 +127,7 @@ function SingleOption({
   }
 
   return (
-    <VStack gap="1">
+    <VStack gap={1}>
       {" "}
       <HStack
         justifyContent="justify-between"
@@ -120,11 +135,7 @@ function SingleOption({
       >
         <div className={styles.descriptionText}>{description}</div>
         <div className={styles.votesText}>
-          <TokenAmountDisplay
-            amount={votes.votes}
-            decimals={18}
-            currency="OP"
-          />
+          <TokenAmountDisplay amount={votes} decimals={18} currency="OP" />
           <span className={styles.votesMargin}>
             {percentage === 0n
               ? "(0%)"
@@ -134,7 +145,6 @@ function SingleOption({
       </HStack>
       <ProgressBar
         barPercentage={barPercentage}
-        status={status}
         isApproved={isApproved}
         thresholdPosition={thresholdPosition}
       />
@@ -144,9 +154,12 @@ function SingleOption({
 
 export function ProgressBar({
   barPercentage,
-  status,
   isApproved,
   thresholdPosition,
+}: {
+  barPercentage: bigint;
+  isApproved: boolean;
+  thresholdPosition: number;
 }) {
   const progressBarWidth =
     Math.max(
@@ -180,6 +193,11 @@ function getScaledBarPercentage({
   totalVotingPower,
   votesAmountBN,
   thresholdPosition,
+}: {
+  threshold: bigint;
+  totalVotingPower: bigint;
+  votesAmountBN: bigint;
+  thresholdPosition: number;
 }) {
   let barPercentage = BigInt(0);
 
