@@ -28,7 +28,7 @@ export async function getDelegates({
             skip,
             take,
             orderBy: {
-              num_for_delegators: "desc",
+              num_of_delegators: "desc",
             },
           });
         case "weighted_random":
