@@ -18,6 +18,7 @@ import {
 } from "@/app/api/delegations/getDelegations";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
