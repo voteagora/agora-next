@@ -1,4 +1,8 @@
-import { ParsedProposalData, ProposalStatus } from "@/lib/proposalUtils";
+import {
+  ParsedProposalData,
+  ProposalStatus,
+  ParsedProposalResults,
+} from "@/lib/proposalUtils";
 import { ProposalType } from "@prisma/client";
 import { BigNumberish } from "ethers";
 

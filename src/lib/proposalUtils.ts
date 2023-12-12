@@ -370,7 +370,7 @@ function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
  * Parse proposal results
  */
 
-type ParsedProposalResults = {
+export type ParsedProposalResults = {
   STANDARD: {
     key: "STANDARD";
     kind: {
