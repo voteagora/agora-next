@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
 
 export default function TokenAmountDisplay({
   amount,
@@ -8,7 +8,7 @@ export default function TokenAmountDisplay({
 }) {
   const formattedNumber = useMemo(() => {
     // Convert the string to a BigInt to handle very large numbers
-    const bigIntAmount = BigInt(amount);
+    const bigIntAmount = BigInt(amount || 0);
 
     // Create a BigInt representation of the divisor (10 ** decimals)
     const divisor = BigInt(Math.pow(10, decimals));

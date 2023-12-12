@@ -11,9 +11,9 @@ import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
 import StandardVoteContainer from "./StandardVoteContainer";
 import ApprovalVoteContainer from "./ApprovalVoteContainer";
+import styles from "./delegateVotes.module.scss";
 import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
 import { delegatesVotesSortOptions } from "@/lib/constants";
-import styles from "./delegateVotes.module.scss";
 
 function shortPropTitle(title, proosalId) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -74,7 +74,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
           </div>
         }
         element="main"
-        className="gap-4 flex flex-col"
+        className="flex flex-col gap-4"
       >
         {delegateVotes.map(
           (vote) =>
@@ -100,7 +100,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                         </div>
                       )}
                     </HStack>
-                    <h2 className="text-black text-base py-1 px-0 overflow-hidden text-ellipsis">
+                    <h2 className="px-0 py-1 overflow-hidden text-base text-black text-ellipsis">
                       <a href={`/proposals/${vote.proposal_id}`}>
                         {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                       </a>

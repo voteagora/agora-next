@@ -17,6 +17,13 @@ import {
   getCurrentDelegators,
 } from "@/app/api/delegations/getDelegations";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
+import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
+
+async function fetchDelegate(addressOrENSName) {
+  "use server";
+
+  return getDelegate({ addressOrENSName });
+}
 
 async function getDelegateVotes(addressOrENSName, page = 1, sortOrder) {
   "use server";
@@ -43,10 +50,30 @@ async function getDelegators(addressOrENSName) {
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
-  const delegateVotes = await getDelegateVotes(addressOrENSName);
-  const statement = await getDelegateStatement(addressOrENSName);
-  const delegatees = await getDelegatees(addressOrENSName);
-  const delegators = await getDelegators(addressOrENSName);
+  let delegate;
+  let delegateVotes;
+  let statement;
+  let delegatees;
+  let delegators;
+  try {
+    delegate = await fetchDelegate(addressOrENSName);
+    delegateVotes = await getDelegateVotes(addressOrENSName);
+    statement = await getDelegateStatement(addressOrENSName);
+    delegatees = await getDelegatees(addressOrENSName);
+    delegators = await getDelegators(addressOrENSName);
+  } catch (error) {
+    delegate = null;
+    delegateVotes = null;
+    statement = null;
+    delegatees = null;
+    delegators = null;
+  }
+
+  if (!delegate) {
+    return (
+      <ResourceNotFound message="Hmm... can't find that address or ENS, please check again." />
+    );
+  }
 
   return (
     <DelegateVotesProvider initialVotes={delegateVotes}>

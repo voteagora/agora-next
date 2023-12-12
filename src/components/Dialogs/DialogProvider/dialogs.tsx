@@ -6,13 +6,15 @@ import {
   SupportTextProps,
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
+import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
+import { Proposal } from "@/app/api/proposals/proposal";
 
 export type DialogType =
   | DelegateDialogType
   | CastProposalDialogType
   | CastVoteDialogType
-  | AdvancedDelegateDialogType;
-// | ApprovalCastVoteDialogType
+  | AdvancedDelegateDialogType
+  | ApprovalCastVoteDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -60,15 +62,13 @@ export type CastVoteDialogType = {
   };
 };
 
-// export type ApprovalCastVoteDialogType = {
-//   type: "APPROVAL_CAST_VOTE";
-//   params: {
-//     castVoteFragmentRef: ApprovalCastVoteDialogFragment$key;
-//     proposalId: string;
-//     hasStatement: boolean;
-//     votesRepresentedRef: TokenAmountDisplayFragment$key;
-//   };
-// };
+export type ApprovalCastVoteDialogType = {
+  type: "APPROVAL_CAST_VOTE";
+  params: {
+    proposal: Proposal;
+    hasStatement: boolean;
+  };
+};
 
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: ({ target, votingPower }, closeDialog) => {
@@ -121,9 +121,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  // APPROVAL_CAST_VOTE: ({ ...props }, closeDialog) => {
-  //   return <ApprovalCastVoteDialog {...props} closeDialog={closeDialog} />;
-  // },
+  APPROVAL_CAST_VOTE: ({ proposal, hasStatement }, closeDialog) => {
+    return (
+      <ApprovalCastVoteDialog
+        proposal={proposal}
+        hasStatement={hasStatement}
+        closeDialog={closeDialog}
+      />
+    );
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },
