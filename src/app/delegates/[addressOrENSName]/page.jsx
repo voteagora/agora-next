@@ -9,10 +9,14 @@ import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVo
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
 import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { getStatment } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
+import {
+  getCurrentDelegatees,
+  getCurrentDelegators,
+} from "@/app/api/delegations/getDelegations";
+import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 
 async function fetchDelegate(addressOrENSName) {
@@ -33,18 +37,36 @@ async function getDelegateStatement(addressOrENSName) {
   return getStatment({ addressOrENSName });
 }
 
+async function getDelegatees(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
 export default async function Page({ params: { addressOrENSName } }) {
   let delegate;
   let delegateVotes;
   let statement;
+  let delegatees;
+  let delegators;
   try {
     delegate = await fetchDelegate(addressOrENSName);
     delegateVotes = await getDelegateVotes(addressOrENSName);
     statement = await getDelegateStatement(addressOrENSName);
+    delegatees = await getDelegatees(addressOrENSName);
+    delegators = await getDelegators(addressOrENSName);
   } catch (error) {
     delegate = null;
     delegateVotes = null;
     statement = null;
+    delegatees = null;
+    delegators = null;
   }
 
   if (!delegate) {
@@ -56,11 +78,9 @@ export default async function Page({ params: { addressOrENSName } }) {
   return (
     <DelegateVotesProvider initialVotes={delegateVotes}>
       <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-8 xl:m-8 xl:px-4 w-full max-w-6xl">
-        {delegate && (
-          <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
-            <DelegateCard delegate={delegate} />
-          </VStack>
-        )}
+        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+          <DelegateCard addressOrENSName={addressOrENSName} />
+        </VStack>
 
         <VStack className="xl:ml-12 min-w-0 flex-1">
           {!statement && !statement?.delegateStatement && (
@@ -103,6 +123,11 @@ export default async function Page({ params: { addressOrENSName } }) {
               />
             </div>
           )}
+
+          <DelegationsContainer
+            delegatees={delegatees}
+            delegators={delegators}
+          />
         </VStack>
       </div>
     </DelegateVotesProvider>

@@ -1,3 +1,5 @@
+"use client";
+
 import ENSAvatar from "../../shared/ENSAvatar";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "../../shared/HumanAddress";
