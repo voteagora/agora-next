@@ -394,6 +394,14 @@ type ParsedProposalResults = {
   };
 };
 
+type ProposalResults = {
+  standard: [string, string, string];
+  approval: {
+    param: string;
+    votes: string;
+  }[];
+};
+
 export function parseProposalResults(
   proposalResults: string,
   proposalData: ParsedProposalData[ProposalType]
@@ -412,7 +420,10 @@ export function parseProposalResults(
       };
     }
     case "APPROVAL": {
-      const parsedProposalResults = JSON.parse(proposalResults);
+      const parsedProposalResults = JSON.parse(
+        proposalResults
+      ) as ProposalResults;
+
       return {
         key: "APPROVAL",
         kind: {
@@ -427,7 +438,11 @@ export function parseProposalResults(
           options: proposalData.kind.options.map((option, idx) => {
             return {
               option: option.description,
-              votes: parsedProposalResults.approval?.[idx] ?? 0n,
+              votes: BigInt(
+                parsedProposalResults.approval?.find((res) => {
+                  return res.param === idx.toString();
+                })?.votes ?? 0
+              ),
             };
           }),
           criteria: proposalData.kind.proposalSettings.criteria,
