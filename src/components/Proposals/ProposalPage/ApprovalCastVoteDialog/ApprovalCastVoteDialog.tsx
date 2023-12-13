@@ -1,3 +1,5 @@
+"use client";
+
 import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder, ethers } from "ethers";
 import { useMemo, useState } from "react";
@@ -26,7 +28,7 @@ export function ApprovalCastVoteDialog({
   hasStatement: boolean;
 }) {
   const proposalData =
-    proposal.proposalData as unknown as ParsedProposalData["APPROVAL"]["kind"];
+    proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState<string>("");
   const [abstain, setAbstain] = useState<boolean>(true);
@@ -59,12 +61,13 @@ export function ApprovalCastVoteDialog({
   };
 
   const governorContract = OptimismContracts.governor;
-  // 0 = for, 1 = abstain
+  // TODO: ADD against option if is supported
+  // 0 = against, 1 = for, 2 = abstain
   const { isLoading, isSuccess, write, isError } = useContractWrite({
     address: governorContract.address as any,
     abi: governorContract.abi,
     functionName: "castVoteWithReasonAndParams",
-    args: [BigInt(proposal.id), abstain ? 1 : 0, reason, encodedParams],
+    args: [BigInt(proposal.id), abstain ? 2 : 1, reason, encodedParams],
   });
 
   useMemo(() => {
