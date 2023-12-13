@@ -8,10 +8,13 @@ function truncateAddress(address: string) {
 }
 
 // This component will display the ENS name for a given address
-const ENSName = ({ address }: { address: `0x${string}` }) => {
+const ENSName = ({ address }: { address: string | `0x${string}` }) => {
   const [ensName, setEnsName] = useState(truncateAddress(address || ""));
 
-  const { data } = useEnsName({ chainId: 1, address });
+  const { data } = useEnsName({
+    chainId: 1,
+    address: address as `0x${string}`,
+  });
 
   useEffect(() => {
     if (data) {
