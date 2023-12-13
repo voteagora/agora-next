@@ -62,11 +62,7 @@ export default function ApprovalCastVoteButton({
 
   return (
     <VStack className={styles.cast_vote_container}>
-      <VStack
-        justifyContent="stretch"
-        alignItems="stretch"
-        className={styles.vote_actions}
-      >
+      <VStack alignItems="items-stretch" className={styles.vote_actions}>
         <VoteButton
           onClick={() =>
             openDialog({
@@ -124,10 +120,8 @@ function VoteButton({ onClick, proposalStatus, delegateVote, isReady }) {
 }
 
 function CastButton({ onClick }) {
-  const className = styles.vote_button;
-
   return (
-    <button className={className} onClick={onClick}>
+    <button className={styles.vote_button} onClick={onClick}>
       Cast Vote
     </button>
   );
