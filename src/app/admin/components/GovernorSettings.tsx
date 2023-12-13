@@ -1,64 +1,63 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import { LoaderIcon, Lock } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { LoaderIcon, Lock } from "lucide-react";
 import {
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction
-} from "wagmi"
+  useWaitForTransaction,
+} from "wagmi";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
-import GovernorAbi from "@/lib/contracts/abis/OptimismGovernor.json"
-
-const secondsPerBlock = 2
+const secondsPerBlock = 2;
 
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
-  const [votingPeriod, setVotingPeriod] = useState(7)
+  const [votingPeriod, setVotingPeriod] = useState(7);
   const { config: setVotingPeriodConfig } = usePrepareContractWrite({
-    address: "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-    abi: GovernorAbi,
+    address: OptimismContracts.governor.address as any,
+    abi: OptimismContracts.governor.abi,
     functionName: "setVotingPeriod",
     args: [
-      (BigInt(votingPeriod || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock)
-    ]
-  })
+      (BigInt(votingPeriod || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock),
+    ],
+  });
   const {
     data: resultSetVotingPeriod,
     write: writeSetVotingPeriod,
-    isLoading: isLoadingSetVotingPeriod
-  } = useContractWrite(setVotingPeriodConfig)
+    isLoading: isLoadingSetVotingPeriod,
+  } = useContractWrite(setVotingPeriodConfig);
   const { isLoading: isLoadingSetVotingPeriodTransaction } =
     useWaitForTransaction({
-      hash: resultSetVotingPeriod?.hash
-    })
+      hash: resultSetVotingPeriod?.hash,
+    });
   const isDisabledSetVotingPeriod =
-    isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction
+    isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
-  const [votingDelay, setVotingDelay] = useState(168)
+  const [votingDelay, setVotingDelay] = useState(168);
   const { config: setVotingDelayConfig } = usePrepareContractWrite({
-    address: "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-    abi: GovernorAbi,
+    address: OptimismContracts.governor.address as any,
+    abi: OptimismContracts.governor.abi,
     functionName: "setVotingDelay",
     args: [
-      (BigInt(votingDelay || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock)
-    ]
-  })
+      (BigInt(votingDelay || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock),
+    ],
+  });
   const {
     data: resultSetVotingDelay,
     write: writeSetVotingDelay,
-    isLoading: isLoadingSetVotingDelay
-  } = useContractWrite(setVotingDelayConfig)
+    isLoading: isLoadingSetVotingDelay,
+  } = useContractWrite(setVotingDelayConfig);
   const { isLoading: isLoadingSetVotingDelayTransaction } =
     useWaitForTransaction({
-      hash: resultSetVotingDelay?.hash
-    })
+      hash: resultSetVotingDelay?.hash,
+    });
   const isDisabledSetVotingDelay =
-    isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction
+    isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
 
   // const [managerAddress, setManagerAddress] = useState(currentManager as string)
   // const { config: setManagerAddressConfig } = usePrepareContractWrite({
@@ -109,7 +108,7 @@ export default function GovernorSettings() {
                 loading={isDisabledSetVotingPeriod}
                 disabled={isDisabledSetVotingPeriod}
                 onClick={() => {
-                  writeSetVotingPeriod?.()
+                  writeSetVotingPeriod?.();
                 }}
               >
                 Update
@@ -135,7 +134,7 @@ export default function GovernorSettings() {
                 loading={isDisabledSetVotingDelay}
                 disabled={isDisabledSetVotingDelay}
                 onClick={() => {
-                  writeSetVotingDelay?.()
+                  writeSetVotingDelay?.();
                 }}
               >
                 Update
@@ -166,5 +165,5 @@ export default function GovernorSettings() {
         </div> */}
       </div>
     </div>
-  )
+  );
 }

@@ -3,6 +3,7 @@ import {
   NounsGovernor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
+  ProposalTypesConfigurator__factory,
 } from "./generated";
 import provider from "@/app/lib/provider";
 
@@ -20,6 +21,18 @@ export const OptimismContracts = {
         : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
     chainId: 10,
     abi: OptimismGovernor__factory.abi,
+  },
+
+  proposalTypesConfigurator: {
+    contract: ProposalTypesConfigurator__factory.connect(
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        ? "0x7DdF6dC0D6aF1C7b8d3fAa5f3b2FfA0dE9D7e9b4"
+        : "0x4eCf9B4B3e4FfE1A4Cf8cE0f5BfF7f8E5B7dF5d9",
+      provider
+    ),
+    address: "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
+    chainId: 10,
+    abi: ProposalTypesConfigurator__factory.abi,
   },
 
   token: {
