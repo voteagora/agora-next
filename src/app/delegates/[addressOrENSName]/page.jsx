@@ -96,6 +96,11 @@ export default async function Page({ params: { addressOrENSName } }) {
             <DelegateStatement statement={statement.delegateStatement} />
           )}
 
+          <DelegationsContainer
+            delegatees={delegatees}
+            delegators={delegators}
+          />
+
           {delegateVotes && (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row justify-between gap-2">
@@ -124,11 +129,6 @@ export default async function Page({ params: { addressOrENSName } }) {
               />
             </div>
           )}
-
-          <DelegationsContainer
-            delegatees={delegatees}
-            delegators={delegators}
-          />
         </VStack>
       </div>
     </DelegateVotesProvider>
