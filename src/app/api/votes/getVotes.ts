@@ -1,27 +1,29 @@
 import { paginatePrismaResult } from "@/app/lib/pagination";
-import { resolveENSName } from "@/app/lib/utils";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
-import { isAddress } from "viem";
 import { VotesSort, VotesSortOrder } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
+import { addressOrEnsNameWrap } from "../utils/ensName";
 
-export async function getVotesForDelegate({
+export const getVotesForDelegate = ({
   addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName);
+
+async function getVotesForDelegateForAddress({
+  address,
   page = 1,
   sort = "block_number",
   sortOrder = "desc",
 }: {
-  addressOrENSName: string;
+  address: string;
   page: number;
   sort: VotesSort;
   sortOrder: VotesSortOrder;
 }) {
   const pageSize = 25;
-  const address = isAddress(addressOrENSName)
-    ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
