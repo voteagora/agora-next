@@ -33,6 +33,14 @@
   border-radius: $border-radius-md;
   border: 1px solid $gray-eb;
 
+  &__header {
+    padding: $spacing-3;
+  }
+
+  &__amount {
+    color: $gray-4f;
+  }
+
   &__content {
     color: $gray-700;
     gap: $spacing-1;
