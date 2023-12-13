@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useEnsName } from "wagmi";
 
-function truncateAddress(address) {
+function truncateAddress(address: string) {
   return `${address.substring(0, 4)}...${address.substring(
-    address.length - 4
+    address?.length - 4
   )}`;
 }
 
 // This component will display the ENS name for a given address
-const ENSName = ({ address }) => {
-  const [ensName, setEnsName] = useState(truncateAddress(address));
+const ENSName = ({ address }: { address: `0x${string}` }) => {
+  const [ensName, setEnsName] = useState(truncateAddress(address || ""));
 
   const { data } = useEnsName({ chainId: 1, address });
 
