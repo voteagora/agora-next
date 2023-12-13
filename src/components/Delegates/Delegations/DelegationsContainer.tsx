@@ -42,92 +42,100 @@ function DelegationsContainer({
 }) {
   const [tab, setTab] = useState<"from" | "to">("from");
 
-  console.log({ delegatees, delegators });
+  if (delegatees.length === 0 && delegators.length === 0) {
+    return (
+      <div className="mb-8 p-8 rounded-md bg-gray-100">
+        No advanced delegations found
+      </div>
+    );
+  }
 
   return (
-    <VStack>
-      <Tab.Group
-        manual
-        selectedIndex={(() => {
+    <>
+      <VStack className="my-8">
+        <Tab.Group
+          manual
+          selectedIndex={(() => {
+            switch (tab) {
+              case "from":
+                return 0;
+
+              case "to":
+                return 1;
+            }
+          })()}
+          onChange={(index) => {
+            switch (index) {
+              case 0:
+                setTab("from");
+                return;
+
+              case 1:
+                setTab("to");
+                return;
+            }
+          }}
+        >
+          <Tab.List>
+            <HStack gap={1}>
+              <Tab>
+                {({ selected }) => (
+                  <div
+                    className={css`
+                      ${displayModeSelectorStyles}
+                      ${selected && displayModeSelectorSelectedStyles}
+                    `}
+                  >
+                    Delegated from
+                  </div>
+                )}
+              </Tab>
+
+              <Tab>
+                {({ selected }) => (
+                  <div
+                    className={css`
+                      ${displayModeSelectorStyles}
+                      ${selected && displayModeSelectorSelectedStyles}
+                    `}
+                  >
+                    Delegated to
+                  </div>
+                )}
+              </Tab>
+            </HStack>
+          </Tab.List>
+        </Tab.Group>
+
+        {(() => {
           switch (tab) {
             case "from":
-              return 0;
+              return (
+                <VStack>
+                  {delegators.map((delegation) => (
+                    <DelegationFromRow
+                      key={delegation.from}
+                      delegation={delegation}
+                    />
+                  ))}
+                </VStack>
+              );
 
             case "to":
-              return 1;
+              return (
+                <VStack>
+                  {delegatees.map((delegation) => (
+                    <DelegationToRow
+                      key={delegation.to}
+                      delegation={delegation}
+                    />
+                  ))}
+                </VStack>
+              );
           }
         })()}
-        onChange={(index) => {
-          switch (index) {
-            case 0:
-              setTab("from");
-              return;
-
-            case 1:
-              setTab("to");
-              return;
-          }
-        }}
-      >
-        <Tab.List>
-          <HStack gap={1}>
-            <Tab>
-              {({ selected }) => (
-                <div
-                  className={css`
-                    ${displayModeSelectorStyles}
-                    ${selected && displayModeSelectorSelectedStyles}
-                  `}
-                >
-                  Delegated from
-                </div>
-              )}
-            </Tab>
-
-            <Tab>
-              {({ selected }) => (
-                <div
-                  className={css`
-                    ${displayModeSelectorStyles}
-                    ${selected && displayModeSelectorSelectedStyles}
-                  `}
-                >
-                  Delegated to
-                </div>
-              )}
-            </Tab>
-          </HStack>
-        </Tab.List>
-      </Tab.Group>
-
-      {(() => {
-        switch (tab) {
-          case "from":
-            return (
-              <VStack>
-                {delegators.map((delegation) => (
-                  <DelegationFromRow
-                    key={delegation.from}
-                    delegation={delegation}
-                  />
-                ))}
-              </VStack>
-            );
-
-          case "to":
-            return (
-              <VStack>
-                {delegatees.map((delegation) => (
-                  <DelegationToRow
-                    key={delegation.to}
-                    delegation={delegation}
-                  />
-                ))}
-              </VStack>
-            );
-        }
-      })()}
-    </VStack>
+      </VStack>
+    </>
   );
 }
 
