@@ -45,10 +45,10 @@ export const OptimismContracts = {
 
   alligator: {
     contract: AlligatorOPV5__factory.connect(
-      "0xD89eb37D3e643aab97258C62BcF704CD00761af6",
+      "0x7f08F3095530B67CdF8466B7a923607944136Df0",
       provider
     ),
-    address: "0xD89eb37D3e643aab97258C62BcF704CD00761af6",
+    address: "0x7f08F3095530B67CdF8466B7a923607944136Df0",
     chainId: 10,
     abi: AlligatorOPV5__factory.abi,
   },
