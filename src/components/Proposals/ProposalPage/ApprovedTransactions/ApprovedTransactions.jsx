@@ -21,16 +21,13 @@ export default function ApprovedTransactions({ proposalData }) {
       gap="1"
       className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
     >
-      <p className="text-xs font-mono font-medium text-gray-af leading-4 mb-2 px-4">
+      <p className="px-4 mb-2 font-mono text-xs font-medium leading-4 text-gray-af">
         Proposed Transactions - only approved options will execute
       </p>
       <VStack className="px-4">
         {proposalData.options
           .slice(0, displayedOptions)
           .map((option, index) => {
-            const value = parseFloat(
-              formatUnits(option.values[0], 18)
-            ).toLocaleString("en-US");
             const valueETH =
               option.values[0] > 0
                 ? `{ value: ${formatEther(option.values[0])} ETH }`
@@ -38,10 +35,10 @@ export default function ApprovedTransactions({ proposalData }) {
 
             return (
               <div key={index}>
-                <p className="text-xs font-mono font-medium text-gray-af leading-4">
+                <p className="font-mono text-xs font-medium leading-4 text-gray-af">
                   <OptionDescription
                     description={option.description}
-                    value={value}
+                    value={option.values[0]}
                     target={option.targets[0]}
                   />
                 </p>
