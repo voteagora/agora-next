@@ -15,8 +15,10 @@
   border-radius: $border-radius-md;
   flex: 1;
 }
+
 .vote_button {
   @include buttonStyles;
+  width: 100%;
 }
 
 .vote_button_disabled {
