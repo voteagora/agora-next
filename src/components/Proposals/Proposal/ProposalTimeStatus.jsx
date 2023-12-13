@@ -7,7 +7,7 @@ export default function ProposalTimeStatus({
 }) {
   switch (proposalStatus) {
     case "PENDING":
-      return "Voting";
+      return <HStack gap={1}>Voting</HStack>;
 
     case "ACTIVE":
       return (
