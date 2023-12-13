@@ -129,61 +129,63 @@ async function getCurrentDelegatorsForAddress({
     where: { to: address.toLowerCase() },
   });
 
-  const directDelegators = (async () => {
-    const proxyAddress = await getProxyAddress(address);
-    if (!proxyAddress) {
-      return [];
-    }
-    return prisma.$queryRaw<Prisma.DelegateesGetPayload<true>[]>(
-      Prisma.sql`
-      SELECT *
-      FROM (
-      SELECT 
-        delegator,
-        delegatee,
-        block_number
-      FROM (
-        SELECT 
-            delegator,
-            to_delegate as delegatee,
-            block_number,
-            ROW_NUMBER() OVER (PARTITION BY delegator ORDER BY block_number DESC, log_index DESC, transaction_index DESC) as rn
-        FROM center.delegate_changed_events
-        WHERE to_delegate=${address.toLowerCase()}
-      ) t1
-      WHERE rn=1
-      ) t2
-      LEFT JOIN LATERAL (
-        SELECT 
-          COALESCE(SUM(
-            CASE WHEN "from"=delegator THEN -"value"::NUMERIC ELSE "value"::NUMERIC END
-          ), 0) AS balance
-        FROM center.transfer_events
-        WHERE "from"=delegator OR "to"=delegator
-      ) t3 ON TRUE
-      `
-    );
-  })();
+  // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
+  // const directDelegators = (async () => {
+  //   const proxyAddress = await getProxyAddress(address);
+  //   if (!proxyAddress) {
+  //     return [];
+  //   }
+  //   return prisma.$queryRaw<Prisma.DelegateesGetPayload<true>[]>(
+  //     Prisma.sql`
+  //     SELECT *
+  //     FROM (
+  //     SELECT
+  //       delegator,
+  //       delegatee,
+  //       block_number
+  //     FROM (
+  //       SELECT
+  //           delegator,
+  //           to_delegate as delegatee,
+  //           block_number,
+  //           ROW_NUMBER() OVER (PARTITION BY delegator ORDER BY block_number DESC, log_index DESC, transaction_index DESC) as rn
+  //       FROM center.delegate_changed_events
+  //       WHERE to_delegate=${address.toLowerCase()}
+  //     ) t1
+  //     WHERE rn=1
+  //     ) t2
+  //     LEFT JOIN LATERAL (
+  //       SELECT
+  //         COALESCE(SUM(
+  //           CASE WHEN "from"=delegator THEN -"value"::NUMERIC ELSE "value"::NUMERIC END
+  //         ), 0) AS balance
+  //       FROM center.transfer_events
+  //       WHERE "from"=delegator OR "to"=delegator
+  //     ) t3 ON TRUE
+  //     `
+  //   );
+  // })();
 
   const latestBlock = await provider.getBlock("latest");
 
   // TODO: These needs to be ordered by timestamp
 
   return [
-    ...(await directDelegators).map((directDelegator) => ({
-      from: directDelegator.delegator,
-      to: directDelegator.delegatee,
-      allowance: directDelegator.balance.toFixed(0),
-      timestamp: latestBlock
-        ? getHumanBlockTime(
-            directDelegator.block_number,
-            latestBlock.number,
-            latestBlock.timestamp
-          )
-        : null,
-      type: "DIRECT",
-      amount: "FULL",
-    })),
+    // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
+    // ...(await directDelegators).map((directDelegator) => ({
+    //   from: directDelegator.delegator,
+    //   to: directDelegator.delegatee,
+    //   allowance: directDelegator.balance.toFixed(0),
+    //   timestamp: latestBlock
+    //     ? getHumanBlockTime(
+    //         directDelegator.block_number,
+    //         latestBlock.number,
+    //         latestBlock.timestamp
+    //       )
+    //     : null,
+    //   type: "DIRECT",
+    //   amount: "FULL",
+    // })),
 
     ...(await advancedDelegators).map((advancedDelegator) => ({
       from: advancedDelegator.from,
