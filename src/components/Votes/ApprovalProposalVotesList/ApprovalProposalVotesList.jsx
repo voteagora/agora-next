@@ -69,20 +69,14 @@ function SingleVote({ vote }) {
       <HStack
         alignItems="items-center"
         justifyContent="justify-between"
-        className={css`
-          padding: ${theme.spacing["3"]};
-        `}
+        className={styles.single_vote__header}
       >
         <div>
           <HumanAddress address={voterAddress} />
           {address === voterAddress && " (you)"}
           {" vote for"}
         </div>
-        <div
-          className={css`
-            color: ${theme.colors.gray["4f"]};
-          `}
-        >
+        <div className={styles.single_vote__amount}>
           <TokenAmountDisplay amount={weight} decimals={18} currency="OP" />
         </div>
       </HStack>
