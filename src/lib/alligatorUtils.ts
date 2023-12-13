@@ -1,0 +1,10 @@
+import { DEPLOYMENT_NAME } from "./config";
+import { OptimismContracts } from "./contracts/contracts";
+
+export async function getProxyAddress(address: string) {
+  switch (DEPLOYMENT_NAME) {
+    case "optimism": {
+      return OptimismContracts.alligator.contract.proxyAddress(address);
+    }
+  }
+}

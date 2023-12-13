@@ -1,19 +1,15 @@
-import { notFound } from "next/navigation";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
-import { resolveENSName } from "@/app/lib/utils";
-import { isAddress } from "viem";
 
 import "server-only";
+import { addressOrEnsNameWrap } from "../utils/ensName";
 
-export async function getStatment({
+export const getStatment = ({
   addressOrENSName,
 }: {
   addressOrENSName: string;
-}) {
-  let address: string = isAddress(addressOrENSName)
-    ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+}) => addressOrEnsNameWrap(getStatmentForAddress, addressOrENSName);
 
+async function getStatmentForAddress({ address }: { address: string }) {
   const dynamoDBClient = makeDynamoClient();
 
   const params = {
