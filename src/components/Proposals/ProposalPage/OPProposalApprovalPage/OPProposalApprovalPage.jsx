@@ -20,8 +20,9 @@ async function fetchVotingPower(address, blockNumber) {
   "use server";
 
   return {
-    votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
-      .totalVP,
+    votingPower: (
+      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
+    ).totalVP,
   };
 }
 
