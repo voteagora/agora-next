@@ -55,3 +55,7 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
 
   return parseProposal(proposal, latestBlock);
 }
+
+export async function getProposalTypes() {
+  return prisma.proposalTypes.findMany();
+}

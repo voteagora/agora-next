@@ -5,11 +5,53 @@ import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFil
 import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import { delegatesFilterOptions } from "@/lib/constants";
+import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "../api/voting-power/getVotingPower";
+import { getCurrentDelegatees } from "../api/delegations/getDelegations";
 
 async function fetchDelegates(sort, page = 1, seed) {
   "use server";
 
   return getDelegates({ page, seed, sort });
+}
+
+// Pass address of the connected wallet
+async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function checkIfDelegatingToProxy(addressOrENSName) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchBalanceForDirectDelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchCurrentDelegatees(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
 }
 
 export default async function Page({ searchParams }) {
@@ -34,6 +76,11 @@ export default async function Page({ searchParams }) {
 
           return getDelegates({ page, seed, sort });
         }}
+        fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+        fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+        checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+        fetchCurrentDelegatees={fetchCurrentDelegatees}
+        getProxyAddress={getProxyAddress}
       />
     </section>
   );

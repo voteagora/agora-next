@@ -1,12 +1,61 @@
-"use client";
-
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import { DelegateActions } from "./DelegateActions";
 import styles from "./delegateCard.module.scss";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
+import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/voting-power/getVotingPower";
+import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
 
-export default function DelegateCard({ delegate }) {
+async function fetchDelegate(addressOrENSName) {
+  "use server";
+
+  return getDelegate({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function checkIfDelegatingToProxy(addressOrENSName) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchBalanceForDirectDelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchCurrentDelegatees(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
+}
+
+export default async function DelegateCard({ addressOrENSName }) {
+  const delegate = await fetchDelegate(addressOrENSName);
+
   if (!delegate) {
     return null;
   }
@@ -73,10 +122,17 @@ export default function DelegateCard({ delegate }) {
             />
 
             <DelegateActions
-              address={delegate.address}
+              delegate={delegate.address}
               votingPower={delegate.votingPower}
               discord={delegate?.statement?.discord}
               twitter={delegate?.statement?.twitter}
+              fetchVotingPowerForSubdelegation={
+                fetchVotingPowerForSubdelegation
+              }
+              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+              fetchCurrentDelegatees={fetchCurrentDelegatees}
+              getProxyAddress={getProxyAddress}
             />
           </VStack>
         </div>

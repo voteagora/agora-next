@@ -16,6 +16,7 @@ export type Proposal = {
   markdowntitle: string;
   description: string | null;
   quorum: BigNumberish | null;
+  approvalThreshold: BigNumberish | null;
   proposalData: ParsedProposalData[ProposalType]["kind"];
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
