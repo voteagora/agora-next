@@ -25,9 +25,7 @@ export const OptimismContracts = {
 
   proposalTypesConfigurator: {
     contract: ProposalTypesConfigurator__factory.connect(
-      process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-        ? "0x7DdF6dC0D6aF1C7b8d3fAa5f3b2FfA0dE9D7e9b4"
-        : "0x4eCf9B4B3e4FfE1A4Cf8cE0f5BfF7f8E5B7dF5d9",
+      "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
       provider
     ),
     address: "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
