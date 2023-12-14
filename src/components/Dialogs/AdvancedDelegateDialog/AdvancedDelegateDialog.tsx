@@ -9,12 +9,10 @@ import { Input } from "@/components/ui/input";
 import {
   Dispatch,
   SetStateAction,
-  Suspense,
   useCallback,
   useEffect,
   useState,
 } from "react";
-import { Delegatees } from "@prisma/client";
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { ChevronsRight, DivideIcon, Repeat2 } from "lucide-react";
@@ -98,7 +96,10 @@ export function AdvancedDelegateDialog({
         <Message setShowMessage={setShowMessage} />
       </div>
       <div className={showMessage ? "hidden" : "block"}>
-        {availableBalance !== "" && !!delegatees && proxyAddress !== "" ? (
+        {isReady &&
+        availableBalance !== "" &&
+        !!delegatees &&
+        proxyAddress !== "" ? (
           <VStack alignItems="items-center" className={styles.dialog_container}>
             <VStack gap={6} alignItems="items-stretch">
               <VStack
@@ -111,26 +112,30 @@ export function AdvancedDelegateDialog({
                   alignItems="items-center"
                   gap={3}
                 >
-                  <div>Total delegatable votes</div>
+                  <div>Your total delegatable votes</div>
                   <AdvancedDelegationDisplayAmount amount={availableBalance} />
                 </VStack>
               </VStack>
-              currently delegating to:
               <VStack
                 gap={3}
                 alignItems="items-center"
                 className={styles.details_container}
               >
                 {delegatees.map((delegatee, index) => (
-                  <SubdelegationToRow key={index} delegation={delegatee} />
+                  <>
+                    <SubdelegationToRow
+                      key={index}
+                      to={delegatee.to}
+                      amount={delegatee.allowance}
+                    />
+                    <Input
+                      value={allowance}
+                      onChange={(e) => setAllowance(parseInt(e.target.value))}
+                      type="number"
+                    />
+                  </>
                 ))}
-              </VStack>
-              Delegating to:
-              <VStack
-                gap={3}
-                alignItems="items-center"
-                className={styles.details_container}
-              >
+
                 <HumanAddress address={target} />
                 <Input
                   value={allowance}
@@ -138,6 +143,7 @@ export function AdvancedDelegateDialog({
                   type="number"
                 />
               </VStack>
+
               {isLoading && (
                 <Button disabled={false}>Submitting your delegation...</Button>
               )}
