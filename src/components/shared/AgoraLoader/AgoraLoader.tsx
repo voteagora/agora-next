@@ -14,3 +14,15 @@ export default function AgoraLoader() {
     </VStack>
   );
 }
+
+export function AgoraLoaderSmall() {
+  return (
+    <VStack
+      justifyContent="justify-center"
+      alignItems="items-center"
+      className={styles.loading_container__small}
+    >
+      <Image alt="loading" width={30} height={30} src={logo} />
+    </VStack>
+  );
+}
