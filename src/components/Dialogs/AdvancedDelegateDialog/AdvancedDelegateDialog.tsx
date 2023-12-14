@@ -17,6 +17,7 @@ import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { ChevronsRight, DivideIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import { formatUnits, parseUnits } from "viem";
 
 export function AdvancedDelegateDialog({
   target,
@@ -33,7 +34,7 @@ export function AdvancedDelegateDialog({
   getProxyAddress: (address: string) => Promise<string>;
   completeDelegation: (address: string) => void;
 }) {
-  const [allowance, setAllowance] = useState(0);
+  const [allowance, setAllowance] = useState<number[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [availableBalance, setAvailableBalance] = useState<string>("");
   const [isDelegatingToProxy, setIsDelegatingToProxy] =
@@ -59,6 +60,10 @@ export function AdvancedDelegateDialog({
       setAvailableBalance(balance);
       setIsDelegatingToProxy(isDelegating);
       setDelegatees(delegatees);
+      const initialAllowance = delegatees.map((delegation: Delegation) =>
+        parseInt(formatUnits(BigInt(delegation.allowance), 18))
+      );
+      setAllowance(initialAllowance);
       setProxyAddress(proxyAddress);
 
       setIsReady(true);
@@ -122,26 +127,18 @@ export function AdvancedDelegateDialog({
                 className={styles.details_container}
               >
                 {delegatees.map((delegatee, index) => (
-                  <>
-                    <SubdelegationToRow
-                      key={index}
-                      to={delegatee.to}
-                      amount={delegatee.allowance}
-                    />
-                    <Input
-                      value={allowance}
-                      onChange={(e) => setAllowance(parseInt(e.target.value))}
-                      type="number"
-                    />
-                  </>
+                  <SubdelegationToRow
+                    key={index}
+                    to={delegatee.to}
+                    allowance={allowance[index]}
+                    setAllowance={(value) => {
+                      const newAllowance = [...allowance];
+                      newAllowance[index] = value;
+                      setAllowance(newAllowance);
+                    }}
+                  />
                 ))}
-
-                <HumanAddress address={target} />
-                <Input
-                  value={allowance}
-                  onChange={(e) => setAllowance(parseInt(e.target.value))}
-                  type="number"
-                />
+                {/* <SubdelegationToRow to={target} amount={"0"} /> */}
               </VStack>
 
               {isLoading && (
