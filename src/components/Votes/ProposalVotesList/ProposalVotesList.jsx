@@ -22,6 +22,8 @@ export default function ProposalVotesList({
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchVotesForProposal(proposal_id, page);
+      console.log("DATA");
+      console.log(data);
       const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
       const uniqueVotes = data.votes.filter(
         (v) => !existingIds.has(v.transactionHash)
@@ -31,7 +33,6 @@ export default function ProposalVotesList({
       fetching.current = false;
     }
   };
-
   const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
 
   return (
@@ -40,6 +41,7 @@ export default function ProposalVotesList({
         hasMore={meta.hasNextPage}
         pageStart={0}
         loadMore={loadMore}
+        useWindow={false}
         loader={
           <div className="flex justify-center mt-2" key={0}>
             <Image
