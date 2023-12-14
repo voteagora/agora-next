@@ -38,6 +38,7 @@ interface Props {
   checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
+  completeDelegation: (addressOrENSName: string) => void;
 }
 
 export default function DelegateCardList({
