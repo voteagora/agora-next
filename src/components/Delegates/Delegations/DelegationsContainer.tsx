@@ -52,6 +52,7 @@ function DelegationsContainer({
 
   return (
     <>
+      <h2 className="text-2xl font-bold">Advanced Delegations</h2>
       <VStack className="my-8">
         <Tab.Group
           manual
@@ -86,7 +87,7 @@ function DelegationsContainer({
                       ${selected && displayModeSelectorSelectedStyles}
                     `}
                   >
-                    Delegated from
+                    Delegated from {delegators.length}
                   </div>
                 )}
               </Tab>
@@ -99,7 +100,7 @@ function DelegationsContainer({
                       ${selected && displayModeSelectorSelectedStyles}
                     `}
                   >
-                    Delegated to
+                    Delegated to {delegatees.length}
                   </div>
                 )}
               </Tab>

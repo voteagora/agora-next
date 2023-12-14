@@ -105,7 +105,7 @@ export default async function Page({ params: { addressOrENSName } }) {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row justify-between gap-2">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
-                <div className="flex flex-col md:flex-row justify-between gap-2">
+                {/* <div className="flex flex-col md:flex-row justify-between gap-2">
                   <DelegatesVotesSort
                     fetchDelegateVotes={async (page, sortOrder) => {
                       "use server";
@@ -118,7 +118,7 @@ export default async function Page({ params: { addressOrENSName } }) {
                     }}
                   />
                   <DelegatesVotesType />
-                </div>
+                </div> */}
               </div>
               <DelegateVotes
                 fetchDelegateVotes={async (page, sortOrder) => {
