@@ -20,8 +20,8 @@ export function AdvancedDelegationDisplayAmount({
       className={styles.token_amount_container}
       alignItems="items-center"
     >
+      {formattedNumber}
       <Image src={tokenIcon} alt={TOKEN.symbol} width={32} height={32} />
-      {formattedNumber} {TOKEN.symbol}
     </HStack>
   );
 }
