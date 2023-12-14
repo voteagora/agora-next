@@ -3,11 +3,11 @@ import { HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { TokenAmountDisplay } from "@/lib/utils";
 
-function SubdelegationToRow({ delegation }: { delegation: Delegation }) {
+function SubdelegationToRow({ to, amount }: { to: string; amount: string }) {
   return (
     <HStack gap={2}>
-      <HumanAddress address={delegation.to} />
-      <div>{TokenAmountDisplay(delegation.allowance, 18, "OP", 6)}</div>
+      <HumanAddress address={to} />
+      <div>{TokenAmountDisplay(amount, 18, "OP", 6)}</div>
     </HStack>
   );
 }
