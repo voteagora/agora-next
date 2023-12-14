@@ -1,30 +1,83 @@
 import { VStack } from "@/components/Layout/Stack";
 import { Button } from "@/components/Button";
 import styles from "./advancedDelegateDialog.module.scss";
-import { Delegation } from "@/app/api/delegations/delegation";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import HumanAddress from "@/components/shared/HumanAddress";
 import useAdvancedDelegation from "./useAdvancedDelegation";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import { Delegatees } from "@prisma/client";
+import { useAccount } from "wagmi";
+import { Delegation } from "@/app/api/delegations/delegation";
+import { ChevronsRight, DivideIcon, Repeat2 } from "lucide-react";
+import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 
 export function AdvancedDelegateDialog({
   target,
-  availableBalance,
-  isDelegatingToProxy,
-  proxyAddress,
-  delegatees,
+  fetchVotingPowerForSubdelegation,
+  checkIfDelegatingToProxy,
+  fetchCurrentDelegatees,
+  getProxyAddress,
   completeDelegation,
 }: {
   target: string;
-  availableBalance: string;
-  isDelegatingToProxy: boolean;
-  proxyAddress: string;
-  delegatees: Delegation[];
-  completeDelegation: () => void;
+  fetchVotingPowerForSubdelegation: (address: string) => Promise<string>;
+  checkIfDelegatingToProxy: (address: string) => Promise<boolean>;
+  fetchCurrentDelegatees: (address: string) => Promise<any>;
+  getProxyAddress: (address: string) => Promise<string>;
+  completeDelegation: (address: string) => void;
 }) {
   const [allowance, setAllowance] = useState(0);
+  const [showMessage, setShowMessage] = useState(true);
+  const [availableBalance, setAvailableBalance] = useState<string>("");
+  const [isDelegatingToProxy, setIsDelegatingToProxy] =
+    useState<boolean>(false);
+  const [delegatees, setDelegatees] = useState<Delegation[]>([]);
+  const [proxyAddress, setProxyAddress] = useState<string>("");
+  const [isReady, setIsReady] = useState(false);
+  const { address } = useAccount();
+
+  const fetchData = useCallback(async () => {
+    try {
+      if (!address) return;
+      const promises = [
+        fetchVotingPowerForSubdelegation(address),
+        checkIfDelegatingToProxy(address),
+        fetchCurrentDelegatees(address),
+        getProxyAddress(address),
+      ];
+
+      const [balance, isDelegating, delegatees, proxyAddress] =
+        await Promise.all(promises);
+
+      setAvailableBalance(balance);
+      setIsDelegatingToProxy(isDelegating);
+      setDelegatees(delegatees);
+      setProxyAddress(proxyAddress);
+
+      setIsReady(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [
+    address,
+    fetchVotingPowerForSubdelegation,
+    checkIfDelegatingToProxy,
+    fetchCurrentDelegatees,
+    getProxyAddress,
+  ]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const { write, isLoading, isError, isSuccess } = useAdvancedDelegation({
     isDelegatingToProxy,
