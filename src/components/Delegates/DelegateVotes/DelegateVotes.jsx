@@ -62,7 +62,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         hasMore={meta.hasNextPage}
         pageStart={0}
         loadMore={loadMore}
-        scrollableTarget="vote_container"
+        useWindow={false}
         loader={
           <div key="loader">
             Loading... <br />
