@@ -49,7 +49,7 @@ export function DelegateActions({
           address &&
           (isAdvancedUser ? (
             <AdvancedDelegateButton
-              delegate={delegate.address}
+              delegate={delegate}
               fetchVotingPowerForSubdelegation={() =>
                 fetchVotingPowerForSubdelegation(address)
               }
