@@ -89,66 +89,126 @@ export function AdvancedDelegateDialog({
   });
 
   return (
-    <VStack alignItems="items-center" className={styles.dialog_container}>
-      <VStack gap={6} alignItems="items-stretch">
-        <VStack
-          gap={3}
-          alignItems="items-center"
-          className={styles.details_container}
-        >
-          <VStack
-            className={styles.amount_container}
-            alignItems="items-center"
-            gap={3}
-          >
-            <div>Total delegatable votes</div>
-            <AdvancedDelegationDisplayAmount amount={availableBalance} />
+    <VStack
+      justifyContent="justify-center"
+      alignItems="items-center"
+      className={styles.box}
+    >
+      <div className={showMessage ? "block" : "hidden"}>
+        <Message setShowMessage={setShowMessage} />
+      </div>
+      <div className={showMessage ? "hidden" : "block"}>
+        {availableBalance !== "" && !!delegatees && proxyAddress !== "" ? (
+          <VStack alignItems="items-center" className={styles.dialog_container}>
+            <VStack gap={6} alignItems="items-stretch">
+              <VStack
+                gap={3}
+                alignItems="items-center"
+                className={styles.details_container}
+              >
+                <VStack
+                  className={styles.amount_container}
+                  alignItems="items-center"
+                  gap={3}
+                >
+                  <div>Total delegatable votes</div>
+                  <AdvancedDelegationDisplayAmount amount={availableBalance} />
+                </VStack>
+              </VStack>
+              currently delegating to:
+              <VStack
+                gap={3}
+                alignItems="items-center"
+                className={styles.details_container}
+              >
+                {delegatees.map((delegatee, index) => (
+                  <SubdelegationToRow key={index} delegation={delegatee} />
+                ))}
+              </VStack>
+              Delegating to:
+              <VStack
+                gap={3}
+                alignItems="items-center"
+                className={styles.details_container}
+              >
+                <HumanAddress address={target} />
+                <Input
+                  value={allowance}
+                  onChange={(e) => setAllowance(parseInt(e.target.value))}
+                  type="number"
+                />
+              </VStack>
+              {isLoading && (
+                <Button disabled={false}>Submitting your delegation...</Button>
+              )}
+              {isSuccess && (
+                <Button disabled={false}>Delegation completed!</Button>
+              )}
+              {isError && (
+                <Button disabled={false} onClick={() => write()}>
+                  Delegation failed
+                </Button>
+              )}
+              {!isError && !isSuccess && !isLoading && (
+                <Button disabled={false} onClick={() => write()}>
+                  Delegate your votes
+                </Button>
+              )}
+            </VStack>
           </VStack>
-        </VStack>
-        currently delegating to:
-        <VStack
-          gap={3}
-          alignItems="items-center"
-          className={styles.details_container}
-        >
-          {delegatees.map((delegatee) => (
-            <SubdelegationToRow key={delegatee.to} delegation={delegatee} />
-          ))}
-        </VStack>
-        Delegating to:
-        <VStack
-          gap={3}
-          alignItems="items-center"
-          className={styles.details_container}
-        >
-          <HumanAddress address={target} />
-          <Input
-            value={allowance}
-            onChange={(e) => setAllowance(parseInt(e.target.value))}
-            type="number"
-          />
-        </VStack>
-        {isLoading && (
-          <Button href={null} disabled={false}>
-            Submitting your delegation...
-          </Button>
+        ) : (
+          <VStack
+            className="w-full h-full"
+            alignItems="items-center"
+            justifyContent="justify-center"
+          >
+            <AgoraLoaderSmall />
+          </VStack>
         )}
-        {isSuccess && (
-          <Button href={null} disabled={false}>
-            Delegation completed!
-          </Button>
-        )}
-        {isError && (
-          <Button href={null} disabled={false} onClick={() => write()}>
-            Delegation failed
-          </Button>
-        )}
-        {!isError && !isSuccess && !isLoading && (
-          <Button href={null} disabled={false} onClick={() => write()}>
-            Delegate your votes
-          </Button>
-        )}
-      </VStack>
+      </div>
     </VStack>
+  );
+}
+
+function Message({
+  setShowMessage,
+}: {
+  setShowMessage: Dispatch<SetStateAction<boolean>>;
+}) {
+  return (
+    <div className={styles.dialog_container}>
+      <VStack gap={3}>
+        <div className={styles.title}>Welcome to advanced delegation</div>
+        <div className={styles.subtitle}>
+          {" "}
+          As a large token holder, your account now has access to advanced
+          delegation. This lets you delegate your voting power with more control
+          and flexibility than ever before.{" "}
+        </div>
+
+        <VStack gap={3} className={styles.info_container}>
+          <div className={styles.icon_text}>
+            <DivideIcon size={20} />
+            <p>Split your delegation to multiple people</p>
+          </div>
+          <div className={styles.icon_text}>
+            <Repeat2 size={20} />
+            <p>Let your delegates re-delegate</p>
+          </div>
+          <div className={styles.icon_text}>
+            <ChevronsRight size={20} />
+            <p>Might require two transactions to vote</p>
+          </div>
+        </VStack>
+        <Button
+          className={styles.continue_button}
+          onClick={() => {
+            setShowMessage(false);
+          }}
+        >
+          Continue
+        </Button>
+      </VStack>
+    </div>
   );
 }
