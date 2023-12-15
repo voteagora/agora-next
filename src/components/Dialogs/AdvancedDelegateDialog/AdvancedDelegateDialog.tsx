@@ -63,7 +63,8 @@ export function AdvancedDelegateDialog({
       const initialAllowance = delegatees.map((delegation: Delegation) =>
         parseInt(formatUnits(BigInt(delegation.allowance), 18))
       );
-      setAllowance(initialAllowance);
+      // ADD 0 for the target
+      setAllowance([...initialAllowance, 0]);
       setProxyAddress(proxyAddress);
 
       setIsReady(true);
@@ -138,7 +139,15 @@ export function AdvancedDelegateDialog({
                     }}
                   />
                 ))}
-                {/* <SubdelegationToRow to={target} amount={"0"} /> */}
+                <SubdelegationToRow
+                  to={target}
+                  allowance={allowance[allowance.length - 1]}
+                  setAllowance={(value) => {
+                    const newAllowance = [...allowance];
+                    newAllowance[newAllowance.length - 1] = value;
+                    setAllowance(newAllowance);
+                  }}
+                />
               </VStack>
 
               {isLoading && (
