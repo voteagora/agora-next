@@ -23,7 +23,7 @@ async function getVotesForDelegateForAddress({
   sort: VotesSort;
   sortOrder: VotesSortOrder;
 }) {
-  const pageSize = 25;
+  const pageSize = 50;
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
