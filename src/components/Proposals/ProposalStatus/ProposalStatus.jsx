@@ -1,4 +1,5 @@
 import styles from "./proposalStatus.module.scss";
+import { cn } from "@/lib/utils";
 
 export default function ProposalStatus({ proposal }) {
   const testProposals = [
@@ -20,5 +21,9 @@ export default function ProposalStatus({ proposal }) {
     statusClass = "status-succeeded";
   }
 
-  return <div className={styles[statusClass]}>{statusText}</div>;
+  return (
+    <div className={cn(styles[statusClass], styles.cell_content_status_pill)}>
+      {statusText}
+    </div>
+  );
 }

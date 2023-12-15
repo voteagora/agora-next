@@ -5,21 +5,33 @@
 .status-vetoed,
 .status-expired {
   color: $red-600;
+  // background-color: $red-200;
 }
 
 .status-succeeded,
 .status-executed,
 .status-queued {
   color: $color-green-600;
+  // background-color: $color-green-200;
 }
 
 .status-pending {
-  color: $black;
+  color: $gray-900;
+  // background-color: $gray-200;
 }
 
 .status-active {
   color: $color-blue-600;
+  // background-color: $color-blue-200;
 }
-.status-test{
+.status-test {
   color: $gray-600;
+  // background-color: $gray-200;
+}
+
+.cell_content_status_pill {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  // padding: 2px $spacing-2;
+  border-radius: $border-radius-full;
 }
