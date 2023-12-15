@@ -8,7 +8,7 @@ import "server-only";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export async function getProposals({ page = 1 }: { page: number }) {
-  const pageSize = 4;
+  const pageSize = 10;
 
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: OptimismContracts.governor.address.toLowerCase(),
