@@ -44,7 +44,7 @@ function DelegationsContainer({
 
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
-      <div className="mb-8 p-8 rounded-md bg-gray-100">
+      <div className="mb-8 p-8 align-middle text-center rounded-md bg-gray-100">
         No advanced delegations found
       </div>
     );

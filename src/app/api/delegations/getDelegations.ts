@@ -71,6 +71,7 @@ async function getCurrentDelegateesForAddress({
           },
         ]
       : []),
+    // TODO: Add back in with a more efficient query
     // ...(directDelegatee
     //   ? [
     //       {
