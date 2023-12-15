@@ -1,5 +1,5 @@
 import styles from "./proposalStatus.module.scss";
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 export default function ProposalStatus({ proposal }) {
   const testProposals = [
@@ -9,7 +9,6 @@ export default function ProposalStatus({ proposal }) {
     "28601282374834906210319879956567232553560898502158891728063939287236508034960",
   ];
 
-
   let statusClass = `status-${proposal.status
     .toLowerCase()
     .replace(/\s+/g, "-")}`;
@@ -18,10 +17,13 @@ export default function ProposalStatus({ proposal }) {
   if (testProposals.includes(proposal.id)) {
     statusClass = "status-test"; // Assuming you have a CSS class for this
     statusText = `TEST: ${proposal.status}`;
-  }
-  else if (statusText === "SUCCEEDED") {
+  } else if (statusText === "SUCCEEDED") {
     statusClass = "status-succeeded";
   }
 
-  return <div className={styles[statusClass]}>{statusText}</div>;
+  return (
+    <div className={cn(styles[statusClass], styles.cell_content_status_pill)}>
+      {statusText}
+    </div>
+  );
 }

@@ -14,30 +14,27 @@ export default function Proposal({ proposal }) {
       <HStack alignItems="center" className={styles.proposal_row}>
         <VStack className={cn(styles.cell_content, styles.cell_title)}>
           <div className={styles.cell_content_title}>
-            <>
-              Proposal by {proposal.proposer}
-              <span className={styles.proposal_status}></span>
-            </>
+            {/* Todo: will need to maintain an array of OP Foundation proposals eventually */}
+            Proposal by Optimism Foundation
           </div>
-          <div className={styles.cell_content_body}>
+          <div className={cn(styles.cell_content_body, styles.proposal_title)}>
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`
               : proposal.markdowntitle}
           </div>
         </VStack>
         <VStack className={cn(styles.cell_content, styles.cell_status)}>
-          <div className={styles.cell_content_title}>Status</div>
-          <div className={styles.cell_content_body}>
+          <VStack alignItems="flex-end">
+            <div className={styles.cell_content_title}>
+              <ProposalTimeStatus
+                proposalStatus={proposal.status}
+                proposalEndTime={proposal.end_time}
+              />
+            </div>
             <ProposalStatus proposal={proposal} />
-          </div>
+          </VStack>
         </VStack>
         <VStack className={cn(styles.cell_content, styles.cell_result)}>
-          <div className={styles.cell_content_title}>
-            <ProposalTimeStatus
-              proposalStatus={proposal.status}
-              proposalEndTime={proposal.end_time}
-            />
-          </div>
           <div className={styles.cell_content_body}>
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
