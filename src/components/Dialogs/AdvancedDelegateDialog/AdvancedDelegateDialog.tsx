@@ -1,11 +1,8 @@
-import { VStack } from "@/components/Layout/Stack";
-import { Button } from "@/components/Button";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./advancedDelegateDialog.module.scss";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
-import HumanAddress from "@/components/shared/HumanAddress";
 import useAdvancedDelegation from "./useAdvancedDelegation";
-import { Input } from "@/components/ui/input";
 import {
   Dispatch,
   SetStateAction,
@@ -15,9 +12,10 @@ import {
 } from "react";
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/delegations/delegation";
-import { ChevronsRight, DivideIcon, Repeat2 } from "lucide-react";
+import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
+import { Button } from "@/components/Button";
 
 export function AdvancedDelegateDialog({
   target,
@@ -101,72 +99,56 @@ export function AdvancedDelegateDialog({
       <div className={showMessage ? "block" : "hidden"}>
         <Message setShowMessage={setShowMessage} />
       </div>
-      <div className={showMessage ? "hidden" : "block"}>
+      <div className={showMessage ? "hidden" : "block w-full"}>
         {isReady &&
         availableBalance !== "" &&
         !!delegatees &&
         proxyAddress !== "" ? (
-          <VStack alignItems="items-center" className={styles.dialog_container}>
-            <VStack gap={6} alignItems="items-stretch">
-              <VStack
-                gap={3}
-                alignItems="items-center"
-                className={styles.details_container}
-              >
-                <VStack
-                  className={styles.amount_container}
-                  alignItems="items-center"
-                  gap={3}
-                >
-                  <div>Your total delegatable votes</div>
-                  <AdvancedDelegationDisplayAmount amount={availableBalance} />
-                </VStack>
+          <VStack className={styles.dialog_container} gap={6}>
+            <VStack gap={3} className={styles.amount_container}>
+              <VStack className={styles.amount_container}>
+                <HStack alignItems="items-center" gap={1}>
+                  Your total delegatable votes <InfoIcon size={16} />
+                </HStack>
+                <AdvancedDelegationDisplayAmount amount={availableBalance} />
               </VStack>
-              <VStack
-                gap={3}
-                alignItems="items-center"
-                className={styles.details_container}
-              >
-                {delegatees.map((delegatee, index) => (
-                  <SubdelegationToRow
-                    key={index}
-                    to={delegatee.to}
-                    allowance={allowance[index]}
-                    setAllowance={(value) => {
-                      const newAllowance = [...allowance];
-                      newAllowance[index] = value;
-                      setAllowance(newAllowance);
-                    }}
-                  />
-                ))}
-                <SubdelegationToRow
-                  to={target}
-                  allowance={allowance[allowance.length - 1]}
-                  setAllowance={(value) => {
-                    const newAllowance = [...allowance];
-                    newAllowance[newAllowance.length - 1] = value;
-                    setAllowance(newAllowance);
-                  }}
-                />
-              </VStack>
-
-              {isLoading && (
-                <Button disabled={false}>Submitting your delegation...</Button>
-              )}
-              {isSuccess && (
-                <Button disabled={false}>Delegation completed!</Button>
-              )}
-              {isError && (
-                <Button disabled={false} onClick={() => write()}>
-                  Delegation failed
-                </Button>
-              )}
-              {!isError && !isSuccess && !isLoading && (
-                <Button disabled={false} onClick={() => write()}>
-                  Delegate your votes
-                </Button>
-              )}
             </VStack>
+            <VStack gap={3} className={styles.details_container}>
+              {delegatees.map((delegatee, index) => (
+                <SubdelegationToRow
+                  key={index}
+                  to={delegatee.to}
+                  availableBalance={availableBalance}
+                  setAllowance={setAllowance}
+                  allowances={allowance}
+                  index={index}
+                />
+              ))}
+              <SubdelegationToRow
+                to={target}
+                availableBalance={availableBalance}
+                setAllowance={setAllowance}
+                allowances={allowance}
+                index={allowance.length - 1}
+              />
+            </VStack>
+
+            {isLoading && (
+              <Button disabled={false}>Submitting your delegation...</Button>
+            )}
+            {isSuccess && (
+              <Button disabled={false}>Delegation completed!</Button>
+            )}
+            {isError && (
+              <Button disabled={false} onClick={() => write()}>
+                Delegation failed
+              </Button>
+            )}
+            {!isError && !isSuccess && !isLoading && (
+              <Button disabled={false} onClick={() => write()}>
+                Delegate your votes
+              </Button>
+            )}
           </VStack>
         ) : (
           <VStack
