@@ -35,13 +35,17 @@ export default function ApprovalVotesPanel({
       <VStack gap={1} className={styles.approval_votes_panel}>
         {/* Tabs */}
         <HStack className={styles.approval_vote_tab_container}>
-          {["Results", "Votes"].map((tab, index) => (
-            <div key={index} onClick={() => handleTabsChange(index + 1)}>
-              <span className={activeTab === index + 1 ? "text-black" : ""}>
-                {tab}
-              </span>
-            </div>
-          ))}
+          <div onClick={() => handleTabsChange(1)}>
+            <span className={activeTab === 1 ? "text-black" : ""}>Results</span>
+          </div>
+          {initialProposalVotes.votes &&
+            initialProposalVotes.votes.length > 0 && (
+              <div onClick={() => handleTabsChange(2)}>
+                <span className={activeTab === 2 ? "text-black" : ""}>
+                  Votes
+                </span>
+              </div>
+            )}
         </HStack>
         {activeTab === 1 ? (
           <OptionsResultsPanel proposal={proposal} />
