@@ -71,24 +71,25 @@ async function getCurrentDelegateesForAddress({
           },
         ]
       : []),
-    ...(directDelegatee
-      ? [
-          {
-            from: directDelegatee.delegator,
-            to: directDelegatee.delegatee,
-            allowance: directDelegatee.balance.toFixed(),
-            timestamp: latestBlock
-              ? getHumanBlockTime(
-                  directDelegatee.block_number,
-                  latestBlock.number,
-                  latestBlock.timestamp
-                )
-              : null,
-            type: "DIRECT",
-            amount: "FULL",
-          },
-        ]
-      : []),
+    // TODO: Add back in with a more efficient query
+    // ...(directDelegatee
+    //   ? [
+    //       {
+    //         from: directDelegatee.delegator,
+    //         to: directDelegatee.delegatee,
+    //         allowance: directDelegatee.balance.toFixed(),
+    //         timestamp: latestBlock
+    //           ? getHumanBlockTime(
+    //               directDelegatee.block_number,
+    //               latestBlock.number,
+    //               latestBlock.timestamp
+    //             )
+    //           : null,
+    //         type: "DIRECT",
+    //         amount: "FULL",
+    //       },
+    //     ]
+    //   : []),
     ...advancedDelegatees.map((advancedDelegatee) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,

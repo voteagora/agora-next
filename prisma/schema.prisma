@@ -247,18 +247,6 @@ view advanced_voting_power_raw_snaps {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view authority_chains {
-  delegate  String?
-  rules     Json[]
-  chain     String[]
-  balance   Decimal? @db.Decimal
-  allowance Decimal? @db.Decimal
-
-  @@ignore
-  @@schema("center")
-}
-
 view AuthorityChainsSnaps {
   id                   String   @unique
   delegate             String

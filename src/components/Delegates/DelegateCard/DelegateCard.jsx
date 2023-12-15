@@ -87,7 +87,7 @@ export default async function DelegateCard({ addressOrENSName }) {
               detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
             />
 
-            <PanelRow
+            {/* <PanelRow
               title="Vote Power"
               detail={
                 <>
@@ -100,7 +100,7 @@ export default async function DelegateCard({ addressOrENSName }) {
                   quorum
                 </>
               }
-            />
+            /> */}
 
             <PanelRow
               title="Recent activity"
