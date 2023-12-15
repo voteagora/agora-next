@@ -11,10 +11,6 @@ import styles from "./DelegateCardList.module.scss";
 import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/delegates/delegate";
-import { useAccount, useContractRead } from "wagmi";
-import { useAgoraContext } from "@/contexts/AgoraContext";
-import { OptimismContracts } from "@/lib/contracts/contracts";
-import { parseUnits } from "viem";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -54,25 +50,6 @@ export default function DelegateCardList({
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialDelegates] || []);
   const [meta, setMeta] = React.useState(initialDelegates.meta);
-  const [isAdvancedUser, setIsAdvancedUser] = React.useState(false);
-  const allowList = [] as `0x${string}`[];
-  const { isConnected } = useAgoraContext();
-  const { address } = useAccount();
-
-  useContractRead({
-    address: OptimismContracts.token.address as `0x${string}`,
-    abi: OptimismContracts.token.abi,
-    functionName: "balanceOf",
-    enabled: isConnected && !!address,
-    args: [address!],
-    onSuccess: (balance) => {
-      // TODO: change allowed balance to 10K OP
-      const allowedBalance = parseUnits("1", 18);
-      setIsAdvancedUser(
-        balance >= allowedBalance || allowList.includes(address!)
-      );
-    },
-  });
 
   useEffect(() => {
     setPages([initialDelegates]);
@@ -158,7 +135,6 @@ export default function DelegateCardList({
                   <div className="flex-grow" />
                   <DelegateActions
                     delegate={delegate}
-                    isAdvancedUser={isAdvancedUser}
                     fetchBalanceForDirectDelegation={
                       fetchBalanceForDirectDelegation
                     }
