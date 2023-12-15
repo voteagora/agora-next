@@ -1,11 +1,12 @@
-import * as theme from "@/styles/theme";
+"use client";
+
 import ENSAvatar from "../../shared/ENSAvatar";
-import { css } from "@emotion/css";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "../../shared/HumanAddress";
 import { useEnsName } from "wagmi";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
+import styles from "./delegateCard.module.scss";
 
 export function DelegateProfileImage({ address, votingPower }) {
   const formattedNumber = useMemo(() => {
@@ -19,38 +20,15 @@ export function DelegateProfileImage({ address, votingPower }) {
 
   return (
     <HStack className="gap-4">
-      <div
-        className={css`
-          position: relative;
-          aspect-ratio: 1/1;
-        `}
-      >
-        <ENSAvatar
-          className={css`
-            width: 44px;
-            height: 44px;
-            border-radius: 100%;
-          `}
-          ensName={data}
-        />
+      <div className={styles.profile_image}>
+        <ENSAvatar className={styles.avatar} ensName={data} />
       </div>
 
       <VStack>
-        <div
-          className={css`
-            font-size: ${theme.fontSize.base};
-            font-weight: ${theme.fontWeight.semibold};
-          `}
-        >
+        <div className={styles.address}>
           <HumanAddress address={address} />
         </div>
-        <div
-          className={css`
-            font-size: ${theme.fontSize.xs};
-            font-weight: ${theme.fontWeight.semibold};
-            color: #4f4f4f;
-          `}
-        >
+        <div className={styles.token}>
           {formattedNumber} {TOKEN.symbol}
         </div>
       </VStack>

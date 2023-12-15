@@ -183,9 +183,13 @@ export async function parseProposal(
     proposalData
   );
 
+  const proposalTypeData =
+    proposal.proposal_type_data as ProposalTypeData | null;
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
+    snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
       ? getHumanBlockTime(
           proposal.created_block,
@@ -209,7 +213,10 @@ export async function parseProposal(
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
-    quorum: await getQuorumForProposal(proposal),
+    quorum:
+      (proposalTypeData && proposalTypeData.quorum) ??
+      (await getQuorumForProposal(proposal)),
+    approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
     proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
@@ -276,6 +283,7 @@ export type ParsedProposalData = {
         description: string;
         functionName: string;
         functionArgs: string[];
+        budgetTokensSpent: bigint | null;
       }[];
       proposalSettings: {
         maxApprovals: number;
@@ -320,24 +328,51 @@ export function parseProposalData(
       return {
         key: "APPROVAL",
         kind: {
-          options: (
-            parsedProposalData[0] as Array<
-              [string[], string[], string[], string]
-            >
-          ).map((option) => {
-            const { functionArgs, functionName } = decodeCalldata(
-              option[2] as `0x${string}`[]
-            );
+          options: parsedProposalData[0].map(
+            (option: Array<string | string[]>) => {
+              const [
+                budgetTokensSpent,
+                targets,
+                values,
+                calldatas,
+                description,
+              ] = (() => {
+                if (option.length === 4) {
+                  return [
+                    null,
+                    option[0],
+                    option[1],
+                    option[2],
+                    option[3],
+                  ] as const;
+                } else if (option.length === 5) {
+                  return [
+                    option[0],
+                    option[1],
+                    option[2],
+                    option[3],
+                    option[4],
+                  ] as const;
+                } else {
+                  throw new Error("unknown option length");
+                }
+              })();
 
-            return {
-              targets: option[0],
-              values: option[1],
-              calldatas: option[2],
-              description: option[3],
-              functionName,
-              functionArgs,
-            };
-          }),
+              const { functionArgs, functionName } = decodeCalldata(
+                calldatas as `0x${string}`[]
+              );
+
+              return {
+                targets,
+                values,
+                calldatas,
+                description,
+                functionName,
+                functionArgs,
+                budgetTokensSpent,
+              };
+            }
+          ),
           proposalSettings: {
             maxApprovals: Number(maxApprovals),
             criteria: toApprovalVotingCriteria(Number(criteria)),
@@ -369,7 +404,7 @@ function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
  * Parse proposal results
  */
 
-type ParsedProposalResults = {
+export type ParsedProposalResults = {
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -393,6 +428,14 @@ type ParsedProposalResults = {
   };
 };
 
+type ProposalResults = {
+  standard: [string, string, string];
+  approval: {
+    param: string;
+    votes: string;
+  }[];
+};
+
 export function parseProposalResults(
   proposalResults: string,
   proposalData: ParsedProposalData[ProposalType]
@@ -411,7 +454,10 @@ export function parseProposalResults(
       };
     }
     case "APPROVAL": {
-      const parsedProposalResults = JSON.parse(proposalResults);
+      const parsedProposalResults = JSON.parse(
+        proposalResults
+      ) as ProposalResults;
+
       return {
         key: "APPROVAL",
         kind: {
@@ -426,7 +472,11 @@ export function parseProposalResults(
           options: proposalData.kind.options.map((option, idx) => {
             return {
               option: option.description,
-              votes: parsedProposalResults.approval?.[idx] ?? 0n,
+              votes: BigInt(
+                parsedProposalResults.approval?.find((res) => {
+                  return res.param === idx.toString();
+                })?.votes ?? 0
+              ),
             };
           }),
           criteria: proposalData.kind.proposalSettings.criteria,
@@ -517,3 +567,10 @@ export async function getProposalStatus(
 
   return "QUEUED";
 }
+
+type ProposalTypeData = {
+  proposal_type_id: number;
+  name: string;
+  quorum: bigint;
+  approval_threshold: bigint;
+};

@@ -24,9 +24,18 @@
   color: inherit;
 }
 
-.connect_button{
+.connect_button {
   background-color: $gray-fa;
   padding: $spacing-1 $spacing-4;
   border: 1px solid $gray-eb;
   border-radius: $border-radius-full;
+}
+
+.social_link {
+  & > img {
+    margin-top: 22px;
+    height: $spacing-4;
+    width: $spacing-4;
+    vertical-align: middle;
+  }
 }

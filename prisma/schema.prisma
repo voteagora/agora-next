@@ -170,30 +170,215 @@ view VotableSupply {
 }
 
 view Delegates {
-  delegate           String   @unique
-  voting_power       Decimal? @db.Decimal
-  num_for_delegators BigInt?
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
 
   @@map("delegates")
   @@schema("center")
 }
 
 view Proposals {
-  proposal_id      String   @unique
-  contract         String?  @db.VarChar(42)
-  proposer         String
-  description      String?
-  ordinal          Decimal? @db.Decimal
-  created_block    BigInt
-  start_block      String
-  end_block        String
-  cancelled_block  BigInt?
-  executed_block   BigInt?
-  proposal_data    Json?
-  proposal_type    String
-  proposal_results Json?
+  proposal_id        String   @unique
+  contract           String?  @db.VarChar(42)
+  proposer           String
+  description        String?
+  ordinal            Decimal? @db.Decimal
+  created_block      BigInt
+  start_block        String
+  end_block          String
+  cancelled_block    BigInt?
+  executed_block     BigInt?
+  proposal_data      Json?
+  proposal_type      String
+  proposal_type_data Json?
+  proposal_results   Json?
 
   @@map("proposals")
+  @@schema("center")
+}
+
+view AdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+
+  @@map("advanced_delegatees")
+  @@schema("center")
+}
+
+view AdvancedVotingPower {
+  delegate           String   @unique
+  vp_allowance       Decimal  @db.Decimal
+  delegated_vp       Decimal  @db.Decimal
+  advanced_vp        Decimal  @db.Decimal
+  subdelegated_share Decimal? @db.Decimal
+
+  @@map("advanced_voting_power")
+  @@schema("center")
+}
+
+view VotingPowerSnaps {
+  id           String  @unique
+  delegate     String?
+  balance      String?
+  block_number BigInt?
+
+  @@map("voting_power_snaps")
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view advanced_voting_power_raw_snaps {
+  chain_str          String?
+  delegate           String?
+  chain              String[]
+  rules              Json[]
+  allowance          Decimal? @db.Decimal
+  subdelegated_share Decimal? @db.Decimal
+  block_number       BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+view AuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  balance              Decimal  @db.Decimal
+  balance_block_number BigInt
+  allowance            Decimal  @db.Decimal
+
+  @@map("authority_chains_snaps")
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view proxies {
+  address      String?
+  proxy        String?
+  new_balance  String?
+  block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view proxies_snaps {
+  address      String?
+  proxy        String?
+  new_balance  String?
+  block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view subdelegations {
+  to                   String?
+  from                 String?
+  from_proxy           String?
+  subdelegation_rules  String?
+  block_number         BigInt?
+  balance              String?
+  balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view subdelegations_snaps {
+  to                   String?
+  from                 String?
+  from_proxy           String?
+  subdelegation_rules  String?
+  block_number         BigInt?
+  balance              String?
+  balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+view Delegatees {
+  delegator    String  @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal @db.Decimal
+
+  @@map("delegatees")
+  @@schema("center")
+}
+
+view DelegateChangedEvents {
+  network           Unsupported("network")?
+  sighash           String?                 @db.VarChar(66)
+  address           String?                 @db.VarChar(42)
+  block_number      BigInt?
+  block_hash        String?                 @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String                  @unique @db.VarChar(66)
+  delegator         String?
+  from_delegate     String?
+  to_delegate       String?
+  inputs            Json?
+
+  @@map("delegate_changed_events")
+  @@schema("center")
+}
+
+view TransferEvents {
+  network           Unsupported("network")?
+  sighash           String?                 @db.VarChar(66)
+  address           String?                 @db.VarChar(42)
+  block_number      BigInt?
+  block_hash        String?                 @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String                  @unique @db.VarChar(66)
+  from              String?
+  to                String?
+  value             String?
+  inputs            Json?
+
+  @@map("transfer_events")
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view direct_chains {
+  delegate  String?
+  rules     Json[]
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+view ProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar(42)
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
   @@schema("center")
 }
 

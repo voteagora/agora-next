@@ -1,0 +1,63 @@
+@import "@/styles/variables";
+
+.dialog_container {
+  padding: $spacing-8;
+  overflow-y: scroll;
+  width: 100%;
+  max-width: $max-width-md;
+  background: $white;
+  border-radius: $spacing-3;
+
+  .details_container {
+    padding-top: $spacing-3;
+    padding-bottom: $spacing-3;
+    border-radius: $spacing-2;
+    background: rgba(250, 250, 250, 0.95);
+    border: 1px solid $gray-eb;
+
+    color: #66676b;
+    font-size: $font-size-xs;
+
+    .amount_container {
+      padding: $spacing-4 $spacing-12;
+      @media (max-width: $max-width-md) {
+        padding: $spacing-2 $spacing-4;
+      }
+    }
+
+    .transfer_symbol_container {
+      width: 100%;
+      z-index: 1;
+      position: relative;
+
+      .circle_container {
+        position: absolute;
+        @include inset0;
+        z-index: -1;
+
+        .circle {
+          height: 1px;
+          background: $gray-eb;
+        }
+      }
+
+      .arrow_container {
+        width: $spacing-10;
+        height: $spacing-10;
+        background: $white;
+        border: 1px solid $gray-eb;
+        border-radius: $border-radius-full;
+        padding: $spacing-2;
+        box-shadow: $box-shadow-default;
+      }
+    }
+  }
+
+  .token_amount_container {
+    color: $black;
+    font-size: $font-size-4xl;
+    @media (max-width: $max-width-md) {
+      font-size: $font-size-3xl;
+    }
+  }
+}

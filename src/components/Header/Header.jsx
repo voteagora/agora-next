@@ -1,25 +1,22 @@
 // Header component
 import Navbar from "./Navbar";
-import { HStack } from "../Layout/Stack";
+import { HStack, VStack } from "../Layout/Stack";
 import LogoLink from "./LogoLink";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import styles from "./header.module.scss";
+import { ConnectKitButton } from "connectkit";
 
 export default function Header() {
   return (
-    <HStack className="main_header" justifyContent="justify-between">
-      <LogoLink instance_name="Optimism" />
-      <Navbar />
-      <ConnectButton />
-    </HStack>
+    <VStack>
+      <HStack className="main_header" justifyContent="justify-between">
+        <LogoLink instance_name="Optimism" />
+        <Navbar />
+        <ConnectButton />
+      </HStack>
+    </VStack>
   );
 }
 
 function ConnectButton() {
-  const { open } = useWeb3Modal();
-
-  return <w3m-button />;
-  // return (
-  //     <button className={styles.connect_button} onClick={() => open()}>Connect Wallet</button>
-  // )
+  return <ConnectKitButton />;
 }
