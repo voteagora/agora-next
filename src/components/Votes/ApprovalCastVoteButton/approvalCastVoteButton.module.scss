@@ -1,0 +1,34 @@
+@import "@/styles/variables";
+@import "@/styles/mixins";
+
+.cast_vote_container {
+  flex-shrink: 0;
+  margin-top: $spacing-4;
+}
+
+@mixin voteButton {
+  height: $spacing-8;
+  text-transform: capitalize;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: $border-radius-md;
+  flex: 1;
+}
+
+.vote_button {
+  @include buttonStyles;
+  width: 100%;
+}
+
+.vote_button_disabled {
+  @include buttonStyles;
+  @include voteButton;
+  box-shadow: none;
+  width: 100%;
+}
+
+.vote_button_connect {
+  box-shadow: none;
+  width: 100%;
+}

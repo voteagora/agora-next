@@ -1,0 +1,102 @@
+@import "@/styles/variables";
+
+.container {
+  padding: $spacing-8;
+}
+.sub_container {
+  width: 100%;
+  max-width: $max-width-lg;
+  background: $white;
+  border-radius: $spacing-3;
+  padding: $spacing-6;
+}
+
+.title_box {
+  margin-bottom: $spacing-4;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+}
+
+.note {
+  font-size: $font-size-xs;
+  color: $gray-700;
+  font-weight: $font-weight-medium;
+  margin-top: $spacing-1;
+}
+
+.options_list {
+  max-height: 46vh;
+  overflow-y: scroll;
+}
+
+.cast_vote_box {
+  border: 1px solid $gray-300;
+  border-radius: $border-radius-lg;
+  margin-top: $spacing-4;
+}
+
+.reason_input {
+  padding: $spacing-4;
+  resize: none;
+  border-radius: $border-radius-lg;
+  background-color: $gray-fa;
+  :focus {
+    outline: 0px;
+  }
+}
+
+.vote_button_box {
+  padding-top: $spacing-1;
+  padding-bottom: $spacing-3;
+  padding-left: $spacing-3;
+  padding-right: $spacing-3;
+  background-color: $gray-fa;
+  border-bottom-left-radius: $border-radius-lg;
+  border-bottom-right-radius: $border-radius-lg;
+}
+
+.option_card {
+  padding: $spacing-2 0;
+  cursor: pointer;
+  position: relative;
+  padding-right: $spacing-12;
+}
+
+.card_title {
+  font-weight: $font-weight-medium;
+}
+
+.card_description {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $gray-700;
+}
+
+.card_check_container {
+  position: absolute;
+  right: $spacing-4;
+  top: 50%;
+  transform: translateY(-50%);
+  width: $spacing-8;
+  height: $spacing-8;
+  border-radius: $border-radius-md;
+  border: 1px solid $gray-eb;
+  background-color: $gray-fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card_check {
+  width: $spacing-5;
+  height: $spacing-5;
+  color: $black;
+
+  & > path {
+    stroke-width: 2px;
+    stroke: $black;
+  }
+}

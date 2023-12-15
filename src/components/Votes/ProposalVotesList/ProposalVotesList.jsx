@@ -7,6 +7,7 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
+import VoteText from "../VoteText/VoteText";
 
 export default function ProposalVotesList({
   initialProposalVotes,
@@ -21,6 +22,8 @@ export default function ProposalVotesList({
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchVotesForProposal(proposal_id, page);
+      console.log("DATA");
+      console.log(data);
       const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
       const uniqueVotes = data.votes.filter(
         (v) => !existingIds.has(v.transactionHash)
@@ -30,48 +33,50 @@ export default function ProposalVotesList({
       fetching.current = false;
     }
   };
-
   const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
 
   return (
-    <InfiniteScroll
-      hasMore={meta.hasNextPage}
-      pageStart={0}
-      loadMore={loadMore}
-      loader={
-        <div className="loader" key={0}>
-          <Image
-            src="/images/blink.gif"
-            alt="Blinking Agora Logo"
-            width={50}
-            height={20}
-          />
-        </div>
-      }
-    >
-      {proposalVotes.map((vote, i) => (
-        <VStack key={`vote_${i}`} gap={1} className={styles.vote_row}>
-          <VStack>
-            <HStack justifyContent="justify-between" className={styles.voter}>
-              <HStack gap={1} alignItems="items-center">
-                <HumanAddress address={vote.address} />
+    <div className={styles.vote_container}>
+      <InfiniteScroll
+        hasMore={meta.hasNextPage}
+        pageStart={0}
+        loadMore={loadMore}
+        useWindow={false}
+        loader={
+          <div className="flex justify-center mt-2" key={0}>
+            <Image
+              src="/images/blink.gif"
+              alt="Blinking Agora Logo"
+              width={50}
+              height={20}
+            />
+          </div>
+        }
+      >
+        {proposalVotes.map((vote, i) => (
+          <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
+            <VStack>
+              <HStack justifyContent="justify-between" className={styles.voter}>
+                <HStack gap={1} alignItems="items-center">
+                  <HumanAddress address={vote.address} />
+                  <VoteText support={vote.support} />
+                </HStack>
+                <HStack
+                  alignItems="items-center"
+                  className={styles.vote_weight}
+                >
+                  <TokenAmountDisplay
+                    amount={vote.weight}
+                    decimals={18}
+                    currency="OP"
+                  />
+                </HStack>
               </HStack>
-              <HStack
-                gap={1}
-                alignItems="items-center"
-                className={styles.vote_weight}
-              >
-                <TokenAmountDisplay
-                  amount={vote.weight}
-                  decimals={18}
-                  currency="OP"
-                />
-              </HStack>
-            </HStack>
+            </VStack>
+            <pre className={styles.vote_reason}>{vote.reason}</pre>
           </VStack>
-          <pre className={styles.vote_reason}>{vote.reason}</pre>
-        </VStack>
-      ))}
-    </InfiniteScroll>
+        ))}
+      </InfiniteScroll>
+    </div>
   );
 }

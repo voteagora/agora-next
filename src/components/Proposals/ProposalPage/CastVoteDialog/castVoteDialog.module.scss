@@ -1,0 +1,116 @@
+@import "@/styles/variables";
+
+.vote_for {
+  color: $votes-for;
+}
+
+.vote_against {
+  color: $votes-against;
+}
+
+.vote_abstain {
+  color: $votes-abstain;
+}
+
+.container {
+  width: 100%;
+  background: $white;
+  border-radius: $spacing-3;
+  padding: $spacing-6;
+  min-width: $max-width-sm;
+}
+
+.font_size {
+  font-size: $font-size-xs;
+}
+.sub {
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-none;
+}
+
+.text_container {
+  color: $black;
+}
+
+.token_amount {
+  color: #66676b;
+}
+
+.user_icon {
+  width: $spacing-4;
+  height: $spacing-4;
+}
+
+.reason {
+  color: $gray-4f;
+}
+
+.statement {
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  padding: $spacing-4;
+  border-radius: $spacing-2;
+  border: 1px solid $gray-eb;
+
+  &_text {
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.delegate_text {
+  font-weight: $font-weight-medium;
+  color: $gray-700;
+}
+
+.vote_container {
+  text-align: center;
+  border-radius: $spacing-2;
+  border: 1px solid $gray-eb;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-xs;
+  color: $black;
+  padding: $spacing-2 $spacing-6;
+  cursor: pointer;
+
+  :hover {
+    background: $gray-eb;
+  }
+}
+
+.disabled {
+  background: $gray-eb;
+  color: $gray-700;
+  cursor: not-allowed;
+}
+
+.success {
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  padding: $spacing-4;
+  border-radius: $spacing-2;
+  border: 1px solid $gray-eb;
+}
+
+.font_weight {
+  font-weight: $font-weight-medium;
+}
+
+.loading_vote {
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  padding: $spacing-4;
+  border-radius: $spacing-2;
+  border: 1px solid $gray-eb;
+}
+
+.no_statement {
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  padding: $spacing-4;
+  border-radius: $spacing-2;
+  border: 1px solid $gray-eb;
+}

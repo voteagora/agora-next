@@ -29,7 +29,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
           proposalEndTime={proposal.end_time}
         />
       </HStack>
-      <div className="text-xs pt-2 text-gray-700 font-semibold">
+      <div className="pt-2 text-xs font-semibold text-gray-700">
         {/* {totalVotingPower.toString()} */}
         {proposalSettings.criteria === "TOP_CHOICES" && (
           <p>
@@ -42,7 +42,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
         {proposalSettings.criteria === "THRESHOLD" && (
           <p>
             In this threshold-based approval voting proposal, all options
-            passing the approval threshold of proposalSettings.criteriaValue
+            passing the approval threshold of{" "}
             <TokenAmountDisplay
               amount={proposalSettings.criteriaValue}
               decimals={18}

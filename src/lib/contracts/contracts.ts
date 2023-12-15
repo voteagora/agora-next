@@ -1,7 +1,9 @@
 import {
+  AlligatorOPV5__factory,
   NounsGovernor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
+  ProposalTypesConfigurator__factory,
 } from "./generated";
 import provider from "@/app/lib/provider";
 
@@ -21,6 +23,16 @@ export const OptimismContracts = {
     abi: OptimismGovernor__factory.abi,
   },
 
+  proposalTypesConfigurator: {
+    contract: ProposalTypesConfigurator__factory.connect(
+      "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
+      provider
+    ),
+    address: "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
+    chainId: 10,
+    abi: ProposalTypesConfigurator__factory.abi,
+  },
+
   token: {
     contract: OptimismToken__factory.connect(
       "0x4200000000000000000000000000000000000042",
@@ -29,6 +41,16 @@ export const OptimismContracts = {
     address: "0x4200000000000000000000000000000000000042",
     chainId: 10,
     abi: OptimismToken__factory.abi,
+  },
+
+  alligator: {
+    contract: AlligatorOPV5__factory.connect(
+      "0x7f08F3095530B67CdF8466B7a923607944136Df0",
+      provider
+    ),
+    address: "0x7f08F3095530B67CdF8466B7a923607944136Df0",
+    chainId: 10,
+    abi: AlligatorOPV5__factory.abi,
   },
 };
 
