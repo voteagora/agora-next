@@ -213,9 +213,7 @@ export async function parseProposal(
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
-    quorum:
-      (proposalTypeData && proposalTypeData.quorum) ??
-      (await getQuorumForProposal(proposal)),
+    quorum: await getQuorumForProposal(proposal),
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
     proposalResults: proposalResuts.kind,
