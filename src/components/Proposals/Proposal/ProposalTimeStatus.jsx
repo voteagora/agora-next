@@ -1,5 +1,5 @@
 import { HStack } from "@/components/Layout/Stack";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 
 export default function ProposalTimeStatus({
   proposalStatus,
@@ -12,14 +12,14 @@ export default function ProposalTimeStatus({
     case "ACTIVE":
       return (
         <HStack gap={1}>
-          Voting ends in {formatDistanceToNow(proposalEndTime)}
+          Ends in {formatDistanceToNowStrict(proposalEndTime)}
         </HStack>
       );
 
     default:
       return (
         <HStack gap={1}>
-          Voting ended {formatDistanceToNow(proposalEndTime)} ago
+          Ended {formatDistanceToNowStrict(proposalEndTime)} ago
         </HStack>
       );
   }
