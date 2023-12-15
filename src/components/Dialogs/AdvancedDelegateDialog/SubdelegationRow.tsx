@@ -1,8 +1,6 @@
-import { Delegation } from "@/app/api/delegations/delegation";
 import { HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { Input } from "@/components/ui/input";
-import { TokenAmountDisplay } from "@/lib/utils";
 
 function SubdelegationToRow({
   to,
