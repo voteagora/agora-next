@@ -93,7 +93,7 @@ export function DelegateDialog({
         {isSuccess && <Button disabled={false}>Delegation completed!</Button>}
         {isError && (
           <Button disabled={false} onClick={() => write()}>
-            Delegation failed
+            Delegation failed - try again
           </Button>
         )}
         {!isError && !isSuccess && !isLoading && accountAddress && (
