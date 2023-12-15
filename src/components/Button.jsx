@@ -1,10 +1,16 @@
 import Link from "next/link";
 import styles from "./styles.module.scss";
 
-export function Button({ href = "", ...props }) {
+export function Button({ href = "", className = "", ...props }) {
   return (
-    <div className={`${styles.button} ${props.className || ""}`}>
-      {href ? <Link href={href} {...props} /> : <button {...props} />}
-    </div>
+    <>
+      {href ? (
+        <div className={`${styles.button} ${className}`}>
+          <Link href={href} {...props} />{" "}
+        </div>
+      ) : (
+        <button className={`${styles.button} ${className}`} {...props} />
+      )}
+    </>
   );
 }
