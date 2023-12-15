@@ -62,6 +62,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         hasMore={meta.hasNextPage}
         pageStart={0}
         loadMore={loadMore}
+        useWindow={false}
         loader={
           <div key="loader">
             Loading... <br />

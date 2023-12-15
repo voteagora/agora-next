@@ -11,6 +11,7 @@ import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
 import { Toaster } from "react-hot-toast";
+import BetaBanner from "@/components/Header/BetaBanner";
 
 const chains = [optimism, mainnet];
 const metadata = {
@@ -44,7 +45,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
     <ConnectKitProvider>
       <body className={cn(rubik.variable, inter.variable)}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-
+        <BetaBanner />
         <PageContainer>
           <Toaster />
           <Header />
