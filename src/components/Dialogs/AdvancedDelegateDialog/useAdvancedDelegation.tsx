@@ -86,21 +86,19 @@ const useAdvancedDelegation = ({
   return { isLoading, isError, isSuccess, write };
 };
 
-export default useAdvancedDelegation;
-
 function buildRules(allocation: number | number[]) {
   if (Array.isArray(allocation)) {
     return allocation.map((amount) => {
       return {
         ...baseRules,
-        allowance: formatEther(BigInt(amount)),
+        allowance: formatEther(BigInt(amount || 0)),
       };
     });
   }
 
   return {
     ...baseRules,
-    allowance: formatEther(BigInt(allocation)),
+    allowance: formatEther(BigInt(allocation || 0)),
   };
 }
 
@@ -114,3 +112,5 @@ const baseRules = {
   allowanceType: 1, // 1 - relative; 0 - absolute
   allowance: 0n,
 };
+
+export default useAdvancedDelegation;
