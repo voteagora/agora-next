@@ -9,10 +9,10 @@ import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 
 export function DelegateActions({
   delegate,
-  isAdvancedUser,
   className,
   fetchBalanceForDirectDelegation,
   fetchVotingPowerForSubdelegation,
@@ -21,7 +21,6 @@ export function DelegateActions({
   getProxyAddress,
 }: {
   delegate: DelegateChunk;
-  isAdvancedUser: boolean;
   className?: string;
   fetchBalanceForDirectDelegation: (
     addressOrENSName: string
@@ -37,6 +36,7 @@ export function DelegateActions({
   const { address } = useAccount();
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
+  const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <HStack
