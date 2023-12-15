@@ -1,11 +1,8 @@
 "use client";
 
-import * as React from "react";
+import { useRef } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
-import { colorForSupportType } from "@/lib/voteUtils";
-import { formatNumber, pluralizeVote } from "@/lib/tokenUtils";
+import { formatNumber } from "@/lib/tokenUtils";
 import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
@@ -14,10 +11,9 @@ import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
 import StandardVoteContainer from "./StandardVoteContainer";
 import ApprovalVoteContainer from "./ApprovalVoteContainer";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import styles from "./delegateVotes.module.scss";
+import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
+import { delegatesVotesSortOptions } from "@/lib/constants";
 
 function shortPropTitle(title, proosalId) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -33,33 +29,40 @@ function shortPropTitle(title, proosalId) {
     : title;
 }
 
-export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialVotes]);
-  const [meta, setMeta] = React.useState(initialVotes.meta);
+const getUniqueDelegateVotes = (delegateVotes) => {
+  return delegateVotes
+    .map((e) => JSON.stringify(e))
+    .filter((e, i, a) => a.indexOf(e) === i)
+    .map((e) => JSON.parse(e));
+};
+
+export default function DelegateVotes({ fetchDelegateVotes }) {
+  const { delegatesVotesSort, delegateVotes, setDelegateVotes, meta, setMeta } =
+    useDelegateVotesContext();
+
+  const sortOrder = delegatesVotesSortOptions[delegatesVotesSort].sortOrder;
+
+  const fetching = useRef(false);
 
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-      const data = await fetchDelegateVotes(page);
-      const existingIds = new Set(delegateVotes.map((d) => d.transactionHash));
-      const uniqueVotes = data.votes.filter(
-        (d) => !existingIds.has(d.transactionHash)
-      );
-      setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
+      const data = await fetchDelegateVotes(page, sortOrder);
       setMeta(data.meta);
+      setDelegateVotes((prev) =>
+        getUniqueDelegateVotes(prev.concat(data.votes))
+      );
       fetching.current = false;
     }
   };
 
-  const delegateVotes = pages.reduce((all, page) => all.concat(page.votes), []);
-
   return (
-    <VStack gap="4">
+    <VStack gap={4}>
       <InfiniteScroll
         hasMore={meta.hasNextPage}
         pageStart={0}
         loadMore={loadMore}
+        useWindow={false}
         loader={
           <div key="loader">
             Loading... <br />
@@ -72,37 +75,15 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
           </div>
         }
         element="main"
+        className="flex flex-col gap-4"
       >
         {delegateVotes.map(
           (vote) =>
             vote && (
               <VoteDetailsContainer key={vote.transactionHash}>
-                <div
-                  className={css`
-                    display: grid;
-                    overflow-y: hidden;
-                    grid-template-columns: 1fr 1px 1fr;
-
-                    @media (max-width: ${theme.maxWidth["2xl"]}) {
-                      grid-template-rows: 1fr;
-                      grid-template-columns: none;
-                      overflow-y: scroll;
-                    }
-                  `}
-                >
-                  <VStack
-                    className={css`
-                      padding: ${theme.spacing["4"]} ${theme.spacing["6"]};
-                    `}
-                  >
-                    <HStack
-                      gap="1"
-                      className={css`
-                        font-size: ${theme.fontSize.xs};
-                        font-weight: ${theme.fontWeight.medium};
-                        color: #66676b;
-                      `}
-                    >
+                <div className={styles.details_container}>
+                  <VStack className={styles.details_sub}>
+                    <HStack gap={1} className={styles.vote_type}>
                       <a
                         href={`/proposals/${vote.proposal_id}`}
                         title={`Prop ${vote.proposal_id}`}
@@ -120,14 +101,7 @@ export default function DelegateVotes({ initialVotes, fetchDelegateVotes }) {
                         </div>
                       )}
                     </HStack>
-                    <h2
-                      className={css`
-                        font-size: ${theme.fontSize.base};
-                        padding: ${theme.spacing[1]} 0;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                      `}
-                    >
+                    <h2 className="px-0 py-1 overflow-hidden text-base text-black text-ellipsis">
                       <a href={`/proposals/${vote.proposal_id}`}>
                         {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                       </a>

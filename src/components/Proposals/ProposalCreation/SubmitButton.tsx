@@ -12,10 +12,11 @@ import {
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useModal } from "connectkit";
+import styles from "./styles.module.scss";
 
 const abiCoder = new AbiCoder();
-const governorTokenContract = OptimismContracts.governor;
+const governorContract = OptimismContracts.governor;
 const governanceTokenContract = OptimismContracts.token;
 
 export default function SubmitButton({
@@ -27,12 +28,12 @@ export default function SubmitButton({
 }) {
   const { governorFunction, inputData } = getInputData(form);
   const { isConnected } = useAccount();
-  const { open } = useWeb3Modal();
+  const { setOpen } = useModal();
   const [isClient, setIsClient] = useState(false);
 
   const { config, isError: onPrepareError } = usePrepareContractWrite({
-    address: governorTokenContract.address as any,
-    abi: governorTokenContract.abi,
+    address: governorContract.address as any,
+    abi: governorContract.abi,
     functionName: governorFunction,
     args: inputData as any,
   });
@@ -80,20 +81,11 @@ export default function SubmitButton({
       type="submit"
       variant={"outline"}
       disabled={isLoading || onPrepareError}
-      className={cx([
-        css`
-          width: 40%;
-        `,
-        onPrepareError &&
-          css`
-            background: ${theme.colors.gray.eb} !important;
-            cursor: not-allowed;
-          `,
-      ])}
+      className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
       onClick={(e) => {
         e.preventDefault();
         if (!isConnected) {
-          open();
+          setOpen(true);
           return;
         }
         if (formTarget.current?.checkValidity() && !onPrepareError) {
@@ -181,8 +173,6 @@ function getInputData(form: Form): {
             formattedOption[3].push(t.calldata);
           }
         });
-
-        console.log(formattedOption);
 
         options.push(formattedOption);
       });

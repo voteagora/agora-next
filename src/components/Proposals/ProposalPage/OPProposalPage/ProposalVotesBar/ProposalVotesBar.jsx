@@ -10,12 +10,12 @@ import { TokenAmountDisplay, generateBarsForVote } from "@/lib/utils";
 
 export default function ProposalVotesBar({ proposal }) {
   return (
-    <div className="my-4">
+    <div>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <HStack
-              justifyContent="justify-evenly"
+              justifyContent="justify-around"
               className={styles.vote_bar_ticks}
             >
               {Array.from(
