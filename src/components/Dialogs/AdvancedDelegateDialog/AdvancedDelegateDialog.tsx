@@ -33,6 +33,7 @@ export function AdvancedDelegateDialog({
   completeDelegation: (address: string) => void;
 }) {
   const [allowance, setAllowance] = useState<number[]>([]);
+  const [targets, setTargets] = useState<string[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [availableBalance, setAvailableBalance] = useState<string>("");
   const [isDelegatingToProxy, setIsDelegatingToProxy] =
@@ -61,8 +62,22 @@ export function AdvancedDelegateDialog({
       const initialAllowance = delegatees.map((delegation: Delegation) =>
         parseInt(formatUnits(BigInt(delegation.allowance), 18))
       );
-      // ADD 0 for the target
-      setAllowance([...initialAllowance, 0]);
+      const isTargetDelegated = delegatees.some(
+        (delegation: Delegation) => delegation.to === target
+      );
+
+      const initAllowance = [...initialAllowance];
+      const initTargets = delegatees.map(
+        (delegation: Delegation) => delegation.to
+      );
+      if (!isTargetDelegated) {
+        // ADD 0 for the target
+        initAllowance.push(0);
+        initTargets.push(target);
+      }
+
+      setAllowance(initAllowance);
+      setTargets(initTargets);
       setProxyAddress(proxyAddress);
 
       setIsReady(true);
@@ -75,6 +90,7 @@ export function AdvancedDelegateDialog({
     checkIfDelegatingToProxy,
     fetchCurrentDelegatees,
     getProxyAddress,
+    target,
   ]);
 
   useEffect(() => {
@@ -85,7 +101,7 @@ export function AdvancedDelegateDialog({
     isDelegatingToProxy,
     proxyAddress,
     // target can be a string or an array of strings
-    target,
+    target: targets,
     // alowance can be a number or an array of numbers
     allocation: allowance, // (value / 100000) 100% = 100000
   });

@@ -1,7 +1,7 @@
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
-import { formatEther } from "viem";
+import { parseEther } from "viem";
 import { useContractWrite } from "wagmi";
 
 const useAdvancedDelegation = ({
@@ -91,14 +91,14 @@ function buildRules(allocation: number | number[]) {
     return allocation.map((amount) => {
       return {
         ...baseRules,
-        allowance: formatEther(BigInt(amount || 0)),
+        allowance: parseEther(amount ? amount.toString() : "0"),
       };
     });
   }
 
   return {
     ...baseRules,
-    allowance: formatEther(BigInt(allocation || 0)),
+    allowance: parseEther(allocation ? allocation.toString() : "0"),
   };
 }
 
