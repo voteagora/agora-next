@@ -100,27 +100,27 @@ function VoteButtons({ onClick, proposalStatus, delegateVote, isReady }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
-  if (proposalStatus !== "ACTIVE") {
-    return <DisabledVoteButton reason="Not open to voting" />;
-  }
+  // if (proposalStatus !== "ACTIVE") {
+  //   return <DisabledVoteButton reason="Not open to voting" />;
+  // }
 
-  if (!isConnected) {
-    return (
-      <Button variant={"outline"} onClick={() => setOpen(true)}>
-        Connect wallet to vote
-      </Button>
-    );
-  }
+  // if (!isConnected) {
+  //   return (
+  //     <Button variant={"outline"} onClick={() => setOpen(true)}>
+  //       Connect wallet to vote
+  //     </Button>
+  //   );
+  // }
 
-  if (!isReady) {
-    return <DisabledVoteButton reason="Loading..." />;
-  }
+  // if (!isReady) {
+  //   return <DisabledVoteButton reason="Loading..." />;
+  // }
 
-  const hasVoted = !!delegateVote?.transactionHash;
+  // const hasVoted = !!delegateVote?.transactionHash;
 
-  if (hasVoted) {
-    return <DisabledVoteButton reason="Already voted" />;
-  }
+  // if (hasVoted) {
+  //   return <DisabledVoteButton reason="Already voted" />;
+  // }
 
   return (
     <HStack gap={2} className="pt-1">
