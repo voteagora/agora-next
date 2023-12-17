@@ -47,30 +47,37 @@ async function getCurrentDelegateesForAddress({
 
   const latestBlock = await provider.getBlock("latest");
 
-  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
-    where: {
-      delegate: address.toLowerCase(),
-    },
-  });
+  // const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+  //   where: {
+  //     delegate: address.toLowerCase(),
+  //   },
+  // });
 
-  // TODO: These needs to be ordered by timestamp
+  // // TODO: These needs to be ordered by timestamp
+
+  // console.log(address);
+  // console.log({
+  //   advancedVotingPower,
+  //   advancedDelegatees,
+  //   directDelegatee,
+  // });
 
   return [
-    ...(advancedVotingPower
-      ? [
-          {
-            from: address,
-            to: address,
-            allowance: advancedVotingPower.advanced_vp.toFixed(0),
-            timestamp: null,
-            type: "ADVANCED",
-            amount:
-              BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
-                ? "PARTIAL"
-                : "FULL",
-          },
-        ]
-      : []),
+    // ...(advancedVotingPower
+    //   ? [
+    //       {
+    //         from: address,
+    //         to: address,
+    //         allowance: advancedVotingPower.advanced_vp.toFixed(0),
+    //         timestamp: null,
+    //         type: "ADVANCED",
+    //         amount:
+    //           BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
+    //             ? "PARTIAL"
+    //             : "FULL",
+    //       },
+    //     ]
+    //   : []),
     // TODO: Add back in with a more efficient query
     ...(directDelegatee
       ? [
