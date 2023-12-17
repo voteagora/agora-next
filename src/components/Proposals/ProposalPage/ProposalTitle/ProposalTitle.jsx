@@ -7,8 +7,9 @@ export default function ProposalTitle({ title, proposerAddress }) {
     <VStack className={styles.proposal_title_container}>
       <h2>{title}</h2>
       <div className={styles.proposal_proposer}>
-        by &nbsp;
-        <HumanAddress address={proposerAddress} />
+        {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
+        by Optimism Foundation
+        {/* <HumanAddress address={proposerAddress} /> */}
       </div>
     </VStack>
   );

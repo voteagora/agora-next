@@ -13,10 +13,16 @@ export default function Proposal({ proposal }) {
     <Link href={`/proposals/${proposal.id}`}>
       <HStack alignItems="center" className={styles.proposal_row}>
         <VStack className={cn(styles.cell_content, styles.cell_title)}>
-          <div className={styles.cell_content_title}>
-            {/* Todo: will need to maintain an array of OP Foundation proposals eventually */}
-            Proposal by Optimism Foundation
-          </div>
+          <HStack className={styles.cell_content_title} gap={1}>
+            {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
+            <div>
+              <span className={styles.invisible_on_mobile}>Proposal </span>by
+              Optimism Foundation
+            </div>
+            <div className={styles.mobile_status}>
+              <ProposalStatus proposal={proposal} />
+            </div>
+          </HStack>
           <div className={cn(styles.cell_content_body, styles.proposal_title)}>
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`

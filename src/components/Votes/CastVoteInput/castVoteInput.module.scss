@@ -40,25 +40,25 @@
 }
 
 .vote_button_for {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   color: $votes-for;
 }
 
 .vote_button_against {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   color: $votes-against;
 }
 
 .vote_button_abstain {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   color: $votes-abstain;
 }
 
 .vote_button_disabled {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   box-shadow: none;
   width: 100%;

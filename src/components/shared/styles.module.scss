@@ -4,6 +4,10 @@
   width: 44px;
   height: 44px;
   overflow: hidden;
+  border-radius: $border-radius-full;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @keyframes fade-in {

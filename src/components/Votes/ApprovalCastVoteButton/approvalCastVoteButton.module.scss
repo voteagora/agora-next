@@ -3,7 +3,6 @@
 
 .cast_vote_container {
   flex-shrink: 0;
-  margin-top: $spacing-4;
 }
 
 @mixin voteButton {
@@ -17,12 +16,12 @@
 }
 
 .vote_button {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   width: 100%;
 }
 
 .vote_button_disabled {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   box-shadow: none;
   width: 100%;

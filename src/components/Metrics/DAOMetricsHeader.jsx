@@ -2,6 +2,7 @@ import { HStack } from "../Layout/Stack";
 import MetricContainer from "./MetricContainer";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
+import styles from "./daometrics.module.scss";
 
 const defaultMetrics = {
   votableSupply: 0,
@@ -20,7 +21,7 @@ export default function DAOMetricsHeader({ metrics }) {
   }, [metrics]);
 
   return (
-    <HStack justifyContent="justify-between" gap={10}>
+    <div className={styles.metrics_container}>
       <MetricContainer
         icon="community"
         title="Delegated / Total supply"
@@ -64,6 +65,6 @@ export default function DAOMetricsHeader({ metrics }) {
           "https://calendar.google.com/calendar/u/0/r?cid=Y19mbm10Z3VoNm5vbzZxZ2JuaTJncGVyaWQ0a0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t"
         }
       />
-    </HStack>
+    </div>
   );
 }

@@ -32,7 +32,7 @@ export default function ApprovalVotesPanel({
       animate={{ opacity: isPending ? 0.3 : 1 }}
       transition={{ duration: 0.3, delay: isPending ? 0.3 : 0 }}
     >
-      <VStack gap={1} className={styles.approval_votes_panel}>
+      <VStack className={styles.approval_votes_panel}>
         {/* Tabs */}
         <HStack className={styles.approval_vote_tab_container}>
           <div onClick={() => handleTabsChange(1)}>
