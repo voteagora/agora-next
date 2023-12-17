@@ -70,8 +70,11 @@ export default async function OPProposalPage({ proposal }) {
         className={styles.proposal_votes_container}
       >
         <VStack gap={4} className={styles.proposal_actions_panel}>
-          {/* Show the summar bar with For, Against, Abstain */}
-          <ProposalVotesSummary proposal={proposal} />
+          <div>
+            <div className={styles.proposal_header}>Proposal votes</div>
+            {/* Show the summar bar with For, Against, Abstain */}
+            <ProposalVotesSummary proposal={proposal} />
+          </div>
           {/* Show the scrolling list of votes for the proposal */}
           <ProposalVotesList
             initialProposalVotes={proposalVotes}

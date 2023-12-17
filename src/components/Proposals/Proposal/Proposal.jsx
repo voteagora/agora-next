@@ -14,7 +14,7 @@ export default function Proposal({ proposal }) {
       <HStack alignItems="center" className={styles.proposal_row}>
         <VStack className={cn(styles.cell_content, styles.cell_title)}>
           <div className={styles.cell_content_title}>
-            {/* Todo: will need to maintain an array of OP Foundation proposals eventually */}
+            {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
             Proposal by Optimism Foundation
           </div>
           <div className={cn(styles.cell_content_body, styles.proposal_title)}>

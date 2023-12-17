@@ -1,6 +1,6 @@
 export default function BetaBanner() {
   return (
-    <div className="relative isolate bg-red-600 px-6 py-2.5 sm:px-3.5">
+    <div className="relative isolate bg-stone-800 px-6 py-1 sm:px-3.5">
       <div
         className="absolute left-0 top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl"
         aria-hidden="true"
@@ -14,7 +14,7 @@ export default function BetaBanner() {
         <div className="aspect-[577/310] w-[36.0625rem]" />
       </div>
       <div className="flex justify-center items-center h-full">
-        <p className="text-sm leading-6 text-white">
+        <p className="font-medium text-xs leading-6 text-white">
           <strong className="font-semibold">Agora Beta</strong>
           <svg
             viewBox="0 0 2 2"
@@ -23,8 +23,15 @@ export default function BetaBanner() {
           >
             <circle cx={1} cy={1} r={1} />
           </svg>
-          Some features are still in development. Your feedback helps us
-          improve.
+          Some features are still in development. Please report bugs and
+          feedback{" "}
+          <a
+            href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
+            target="_blank"
+            className="underline"
+          >
+            using this form.
+          </a>
         </p>
       </div>
     </div>
