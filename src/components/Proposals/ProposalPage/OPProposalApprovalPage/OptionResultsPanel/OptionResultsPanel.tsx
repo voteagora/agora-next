@@ -126,7 +126,7 @@ function SingleOption({
   }
 
   return (
-    <VStack gap={1}>
+    <VStack gap={1} className={styles.singleOptionContainer}>
       {" "}
       <HStack
         justifyContent="justify-between"

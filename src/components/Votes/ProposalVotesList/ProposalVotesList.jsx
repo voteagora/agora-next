@@ -43,13 +43,8 @@ export default function ProposalVotesList({
         loadMore={loadMore}
         useWindow={false}
         loader={
-          <div className="flex justify-center mt-2" key={0}>
-            <Image
-              src="/images/blink.gif"
-              alt="Blinking Agora Logo"
-              width={50}
-              height={20}
-            />
+          <div className="flex text-xs font-medium text-stone-500" key={0}>
+            Loading nore votes...
           </div>
         }
       >

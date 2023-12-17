@@ -10,7 +10,7 @@ export default function MetricContainer({ icon, title, body, link = null }) {
         <Image src={icons[icon]} alt={icon} width="24" height="24" />
       </div>
 
-      <VStack className="pr-1">
+      <VStack>
         <div className={styles.header_container}>
           {title}
 

@@ -1,4 +1,8 @@
 import React from "react";
+import Hero from "@/components/Hero/Hero";
+import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
+import { PageDivider } from "@/components/Layout/PageDivider";
+import { getMetrics } from "../api/metrics/getMetrics";
 import { getDelegates } from "../api/delegates/getDelegates";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
@@ -54,14 +58,24 @@ async function getProxyAddress(addressOrENSName) {
   return getProxy({ addressOrENSName });
 }
 
+async function fetchDaoMetrics() {
+  "use server";
+
+  return getMetrics();
+}
+
 export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
   const seed = Math.random();
   const delegates = await fetchDelegates(sort);
+  const metrics = await fetchDaoMetrics();
 
   return (
     <section>
+      <Hero />
+      <DAOMetricsHeader metrics={metrics} />
+      <PageDivider />
       <div className="flex flex-col md:flex-row justify-between items-baseline gap-2">
         <PageHeader headerText="All Delegates" />
         <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">

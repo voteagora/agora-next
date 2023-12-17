@@ -4,14 +4,14 @@
 .status-cancelled,
 .status-vetoed,
 .status-expired {
-  color: $red-600;
+  color: $red-700;
   // background-color: $red-200;
 }
 
 .status-succeeded,
 .status-executed,
 .status-queued {
-  color: $color-green-600;
+  color: $color-green-700;
   // background-color: $color-green-200;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .status-active {
-  color: $color-blue-600;
+  color: $color-blue-700;
   // background-color: $color-blue-200;
 }
 .status-test {
@@ -30,8 +30,9 @@
 }
 
 .cell_content_status_pill {
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-  // padding: 2px $spacing-2;
-  border-radius: $border-radius-full;
+  text-transform: lowercase;
+}
+
+.cell_content_status_pill:first-letter {
+  text-transform: uppercase;
 }

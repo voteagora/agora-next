@@ -13,9 +13,9 @@ export default function OPStandardProposalStatus({ proposal }) {
   const againstLength = formatNumber(proposal.proposalResults.against);
   const abstainLength = formatNumber(proposal.proposalResults.abstain);
   const totalLength = forLength + againstLength + abstainLength;
-
+  console.log(totalLength);
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-1 justify-center">
       <HStack
         className={styles.proposal_status}
         gap={1}
@@ -24,24 +24,28 @@ export default function OPStandardProposalStatus({ proposal }) {
         <div>
           {TokenAmountDisplay(proposal.proposalResults.for, 18, "")} For
         </div>
+        <div>–</div>
         <div>
           {TokenAmountDisplay(proposal.proposalResults.against, 18, "")} Against
         </div>
       </HStack>
-      <div className="flex w-56 h-1 bg-slate-100 rounded-full">
-        <div
-          className=" bg-green-400 h-1 rounded-l-full"
-          style={{ width: `${(forLength / totalLength) * 100}%` }}
-        ></div>
-        <div
-          className=" bg-slate-400 h-1"
-          style={{ width: `${(abstainLength / totalLength) * 100}%` }}
-        ></div>
-        <div
-          className=" bg-red-400 h-1 rounded-r-full"
-          style={{ width: `${(againstLength / totalLength) * 100}%` }}
-        ></div>
-      </div>
+
+      {totalLength > 0 && (
+        <div className="flex w-52 h-1 bg-slate-100 rounded-full">
+          <div
+            className=" bg-green-500 h-1 rounded-l-full"
+            style={{ width: `${(forLength / totalLength) * 100}%` }}
+          ></div>
+          <div
+            className=" bg-slate-500 h-1"
+            style={{ width: `${(abstainLength / totalLength) * 100}%` }}
+          ></div>
+          <div
+            className=" bg-red-500 h-1 rounded-r-full"
+            style={{ width: `${(againstLength / totalLength) * 100}%` }}
+          ></div>
+        </div>
+      )}
     </div>
   );
 }
