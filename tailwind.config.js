@@ -88,7 +88,6 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "Rubik",
           "system-ui",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -113,7 +112,6 @@ module.exports = {
           "monospace",
         ],
         inter: "var(--font-inter), sans-serif",
-        rubik: "var(--font-title), sans-serif",
         // Add any other custom font families you need
       },
       colors: {
