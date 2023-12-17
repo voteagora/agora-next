@@ -23,7 +23,7 @@ async function getCurrentDelegateesForAddress({
   address: string;
 }): Promise<Delegation[]> {
   const advancedDelegatees = await prisma.advancedDelegatees.findMany({
-    where: { from: address.toLowerCase() },
+    where: { from: address.toLowerCase(), delegated_amount: { gt: 0 } },
   });
 
   const directDelegatee = await (async () => {
