@@ -38,7 +38,7 @@ function SubdelegationToRow({
   const percent =
     Number.isNaN(allowance) || allowance === 0
       ? 0
-      : Math.round(((allowance / availableBalanceNumber) * 100_000) / 1000);
+      : Math.round((allowance / availableBalanceNumber) * 100_000) / 1000;
 
   return (
     <div className={styles.sub_row}>
