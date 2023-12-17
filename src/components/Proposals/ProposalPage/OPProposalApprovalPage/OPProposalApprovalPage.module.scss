@@ -31,11 +31,11 @@
   border-radius: $border-radius-xl;
   box-shadow: $box-shadow-newDefault;
   margin-bottom: $spacing-8;
-  margin-left: $spacing-8;
   @media (max-width: $max-width-2xl) {
     align-items: stretch;
     justify-content: flex-end;
     width: 100%;
     height: auto;
+    max-height: none;
   }
 }

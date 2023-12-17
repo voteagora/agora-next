@@ -1,8 +1,6 @@
 @import "variables";
 
 .metrics_container {
-  width: $max-width-6xl;
   @media (max-width: $max-width-lg) {
-    display: none;
   }
 }
