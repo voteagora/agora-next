@@ -20,6 +20,7 @@ export default function ProposalStatus({ proposal }) {
   } else if (statusText === "SUCCEEDED") {
     statusClass = "status-succeeded";
   }
+  console.log(proposal.status);
 
   return (
     <div className={cn(styles[statusClass], styles.cell_content_status_pill)}>

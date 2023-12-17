@@ -1,8 +1,6 @@
 @import "@/styles/variables.scss";
 
 .proposal_container {
-  padding-left: $spacing-4;
-  padding-right: $spacing-4;
   max-width: $max-width-6xl;
   @media (max-width: $max-width-2xl) {
     flex-direction: column;
@@ -14,7 +12,7 @@
 .proposal_votes_container {
   position: sticky;
   top: $spacing-20;
-  max-height: calc(100vh - 148px);
+  max-height: calc(100vh - 188px);
   flex-shrink: 0;
   width: $max-width-sm;
   background-color: $white;
@@ -34,5 +32,10 @@
     flex-shrink: 1;
     padding-top: $spacing-4;
     padding-bottom: $spacing-4;
+  }
+  .proposal_header {
+    padding: 0 $spacing-4;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-2;
   }
 }

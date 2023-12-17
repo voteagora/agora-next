@@ -2,21 +2,28 @@
 
 .metric_card_container {
   background: $white;
-  border-radius: $border-radius-lg;
+  border-radius: $border-radius-xl;
   padding: $spacing-3;
+  padding-right: $spacing-5;
   border-width: $spacing-px;
   border-color: $gray-300;
   box-shadow: $box-shadow-newDefault;
+  @media (max-width: $max-width-lg) {
+    width: 100%;
+    border: 0px;
+    box-shadow: none;
+    padding: $spacing-1 $spacing-3;
+  }
   .icon_container {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: $spacing-2;
+    box-shadow: $box-shadow-newDefault;
+    border-radius: $border-radius-md;
     border-width: $spacing-px;
     border-color: $gray-300;
     flex-shrink: 0;
     padding: $spacing-3;
-    margin-right: $spacing-4;
     background-color: $gray-fa;
   }
   .header_container {
@@ -25,12 +32,19 @@
     color: $gray-700;
     white-space: nowrap;
     text-overflow: ellipsis;
-    a {
-      margin: $spacing-1;
-    }
   }
   .body_container {
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+}
+.metric_card_container:last-child {
+  @media (max-width: $max-width-lg) {
+    padding-bottom: $spacing-3;
+  }
+}
+.metric_card_container:first-child {
+  @media (max-width: $max-width-lg) {
+    padding-top: $spacing-3;
   }
 }
