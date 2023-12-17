@@ -9,9 +9,7 @@ export default function Hero() {
   return (
     <HStack justifyContent="justify-between" className={styles.hero_container}>
       <VStack className={styles.content_container}>
-        <h1>
-          Agora is the home of <span>Optimism</span> voters
-        </h1>
+        <h1>Agora is the home of Optimism voters</h1>
         <p>
           {" "}
           {tab === "delegates"
@@ -22,7 +20,11 @@ export default function Hero() {
         </p>
       </VStack>
       <div className={styles.partner_image_container}>
-        <Image src={sunnyBg} alt="optimism background" className={styles.sunny_bg}/>
+        <Image
+          src={sunnyBg}
+          alt="optimism background"
+          className={styles.sunny_bg}
+        />
         <Image
           src={sunnyFace}
           alt="optimism background"

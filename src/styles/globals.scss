@@ -4,6 +4,33 @@
 @import "@/styles/variables";
 
 //////////////////////////
+// Scrollbar styling
+//////////////////////////
+html {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: $white;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #a7a7a7;
+    border: 4px solid $white;
+    border-radius: 8px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+//////////////////////////
 // Titles
 //////////////////////////
 .gl_section_title {
@@ -31,6 +58,7 @@
   width: 100%;
   height: 1px;
   margin-top: -$spacing-8;
+  margin-bottom: $spacing-8;
   z-index: -1;
 }
 

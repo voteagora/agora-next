@@ -1,8 +1,6 @@
 @import "@/styles/variables";
 
 .proposal_container {
-  padding-left: $spacing-4;
-  padding-right: $spacing-4;
   max-width: $max-width-6xl;
   @media (max-width: $max-width-2xl) {
     flex-direction: column;
@@ -25,7 +23,7 @@
 .proposal_votes_container {
   position: sticky;
   top: $spacing-20;
-  max-height: calc(100vh - 148px);
+  max-height: calc(100vh - 188px);
   flex-shrink: 0;
   width: $max-width-sm;
   background-color: $white;
@@ -33,11 +31,11 @@
   border-radius: $border-radius-xl;
   box-shadow: $box-shadow-newDefault;
   margin-bottom: $spacing-8;
-  margin-left: $spacing-8;
   @media (max-width: $max-width-2xl) {
     align-items: stretch;
     justify-content: flex-end;
     width: 100%;
     height: auto;
+    max-height: none;
   }
 }
