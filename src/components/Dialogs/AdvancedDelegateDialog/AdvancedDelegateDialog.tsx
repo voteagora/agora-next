@@ -16,6 +16,7 @@ import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatUnits } from "viem";
 import { Button } from "@/components/Button";
+import { SuccessView } from "./SuccessView";
 
 export function AdvancedDelegateDialog({
   target,
@@ -30,7 +31,7 @@ export function AdvancedDelegateDialog({
   checkIfDelegatingToProxy: (address: string) => Promise<boolean>;
   fetchCurrentDelegatees: (address: string) => Promise<any>;
   getProxyAddress: (address: string) => Promise<string>;
-  completeDelegation: (address: string) => void;
+  completeDelegation: () => void;
 }) {
   const [allowance, setAllowance] = useState<number[]>([]);
   const [showMessage, setShowMessage] = useState(true);
@@ -122,10 +123,12 @@ export function AdvancedDelegateDialog({
         <Message setShowMessage={setShowMessage} />
       </div>
       <div className={showMessage ? "hidden" : "block w-full"}>
-        {isReady &&
-        availableBalance !== "" &&
-        !!delegatees &&
-        proxyAddress !== "" ? (
+        {isSuccess ? (
+          <SuccessView closeDialog={completeDelegation} />
+        ) : isReady &&
+          availableBalance !== "" &&
+          !!delegatees &&
+          proxyAddress !== "" ? (
           <VStack className={styles.dialog_container} gap={6}>
             <VStack gap={3} className={styles.amount_container}>
               <VStack className={styles.amount_container}>
@@ -151,15 +154,12 @@ export function AdvancedDelegateDialog({
             {isLoading && (
               <Button disabled={false}>Submitting your delegation...</Button>
             )}
-            {isSuccess && (
-              <Button disabled={false}>Delegation completed!</Button>
-            )}
             {isError && (
               <Button disabled={false} onClick={() => write()}>
                 Delegation failed
               </Button>
             )}
-            {!isError && !isSuccess && !isLoading && (
+            {!isError && !isLoading && (
               <Button disabled={false} onClick={() => write()}>
                 Delegate your votes
               </Button>
