@@ -19,6 +19,7 @@ export function DelegateActions({
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
+  isAdvancedUser,
 }: {
   delegate: DelegateChunk;
   className?: string;
@@ -31,12 +32,12 @@ export function DelegateActions({
   checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
+  isAdvancedUser: boolean;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
-  const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <HStack
