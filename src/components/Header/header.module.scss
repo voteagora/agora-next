@@ -45,6 +45,7 @@
   }
   border: 1px solid $gray-eb;
   background-color: $gray-fa;
+  font-weight: $font-weight-medium;
   padding: 0 $spacing-4;
   border-radius: $border-radius-full;
   cursor: pointer;
@@ -57,6 +58,17 @@
     background-color: #f4f4f4;
     box-shadow: $box-shadow-none;
   }
+  .desktop_connect_button_inner {
+    display: flex;
+    gap: $spacing-3;
+    align-items: center;
+  }
+}
+.testing {
+  width: $spacing-6;
+  height: $spacing-6;
+  box-shadow: $box-shadow-newDefault;
+  border-radius: $border-radius-full;
 }
 
 .mobile_connect_button {
