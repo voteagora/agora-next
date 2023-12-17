@@ -103,7 +103,7 @@ async function getCurrentDelegateesForAddress({
         : null,
       type: "ADVANCED",
       amount:
-        Number(advancedDelegatee.delegated_share.toFixed(0)) === 1
+        Number(advancedDelegatee.delegated_share.toFixed(0)) >= 1
           ? "FULL"
           : "PARTIAL",
     })),
