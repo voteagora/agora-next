@@ -8,6 +8,17 @@ import { useState } from "react";
 import DelegationFromRow from "./DelegationFromRow";
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChevronDownIcon } from "lucide-react";
+import Image from "next/image";
 
 const displayModeSelectorStyles = css`
   cursor: pointer;
@@ -52,90 +63,70 @@ function DelegationsContainer({
 
   return (
     <>
-      <h2 className="text-2xl font-bold">Advanced Delegations</h2>
-      <VStack className="my-8">
-        <Tab.Group
-          manual
-          selectedIndex={(() => {
-            switch (tab) {
-              case "from":
-                return 0;
-
-              case "to":
-                return 1;
-            }
-          })()}
-          onChange={(index) => {
-            switch (index) {
-              case 0:
-                setTab("from");
-                return;
-
-              case 1:
-                setTab("to");
-                return;
-            }
-          }}
-        >
-          <Tab.List>
-            <HStack gap={1}>
-              <Tab>
-                {({ selected }) => (
-                  <div
-                    className={css`
-                      ${displayModeSelectorStyles}
-                      ${selected && displayModeSelectorSelectedStyles}
-                    `}
-                  >
-                    Delegated from {delegators.length}
-                  </div>
-                )}
-              </Tab>
-
-              <Tab>
-                {({ selected }) => (
-                  <div
-                    className={css`
-                      ${displayModeSelectorStyles}
-                      ${selected && displayModeSelectorSelectedStyles}
-                    `}
-                  >
-                    Delegated to {delegatees.length}
-                  </div>
-                )}
-              </Tab>
-            </HStack>
-          </Tab.List>
-        </Tab.Group>
-
-        {(() => {
-          switch (tab) {
-            case "from":
-              return (
-                <VStack>
-                  {delegators.map((delegation) => (
-                    <DelegationFromRow
-                      key={delegation.from}
-                      delegation={delegation}
-                    />
-                  ))}
-                </VStack>
-              );
-
-            case "to":
-              return (
-                <VStack>
-                  {delegatees.map((delegation) => (
-                    <DelegationToRow
-                      key={delegation.to}
-                      delegation={delegation}
-                    />
-                  ))}
-                </VStack>
-              );
-          }
-        })()}
-      </VStack>
+      <h2 className="text-2xl font-bold">Advanced Delegations (beta)</h2>
+      <Tabs className="my-8" defaultValue="delegatedFrom">
+        <HStack className="justify-between align-center">
+          <TabsList>
+            <TabsTrigger value="delegatedFrom">Delegated from</TabsTrigger>
+            <TabsTrigger value="delegatedTo">Delegated to</TabsTrigger>
+          </TabsList>
+          {/* <span className="font-medium text-gray-4f">
+          240,120 OP from 80,024 Delegates
+        </span> */}
+        </HStack>
+        <TabsContent value="delegatedFrom">
+          <VStack
+            gap={3}
+            className="rounded-lg border border-gray-eb bg-white shadow"
+          >
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Allowance</TableHead>
+                  <TableHead>Delegated on</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>From</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {delegators.map((delegation) => (
+                  <DelegationFromRow
+                    key={delegation.from}
+                    delegation={delegation}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </VStack>
+        </TabsContent>
+        <TabsContent value="delegatedTo">
+          <VStack
+            gap={3}
+            className="rounded-lg border border-gray-eb bg-white shadow"
+          >
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Allowance</TableHead>
+                  <TableHead>Delegated on</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>From</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {delegatees.map((delegation) => (
+                  <DelegationToRow
+                    key={delegation.to}
+                    delegation={delegation}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </VStack>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }
