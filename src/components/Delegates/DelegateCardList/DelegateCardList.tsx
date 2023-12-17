@@ -11,6 +11,7 @@ import styles from "./DelegateCardList.module.scss";
 import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/delegates/delegate";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -84,6 +85,7 @@ export default function DelegateCardList({
     (all: DelegateChunk[], page) => all.concat(page.delegates),
     []
   );
+  const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <DialogProvider>
@@ -141,6 +143,7 @@ export default function DelegateCardList({
                     checkIfDelegatingToProxy={checkIfDelegatingToProxy}
                     fetchCurrentDelegatees={fetchCurrentDelegatees}
                     getProxyAddress={getProxyAddress}
+                    isAdvancedUser={isAdvancedUser}
                   />
                 </VStack>
               </VStack>

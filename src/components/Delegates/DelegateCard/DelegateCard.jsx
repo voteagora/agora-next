@@ -11,6 +11,7 @@ import {
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
 import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -55,6 +56,7 @@ async function getProxyAddress(addressOrENSName) {
 
 export default async function DelegateCard({ addressOrENSName }) {
   const delegate = await fetchDelegate(addressOrENSName);
+  const { isAdvancedUser } = useIsAdvancedUser();
 
   if (!delegate) {
     return null;
@@ -125,6 +127,7 @@ export default async function DelegateCard({ addressOrENSName }) {
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               getProxyAddress={getProxyAddress}
+              isAdvancedUser={isAdvancedUser}
             />
           </VStack>
         </div>
