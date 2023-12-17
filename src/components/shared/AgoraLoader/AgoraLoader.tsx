@@ -10,7 +10,7 @@ export default function AgoraLoader() {
       alignItems="items-center"
       className={styles.loading_container}
     >
-      <Image alt="loading" width={30} height={30} src={logo} />
+      <Image alt="loading" width={24} height={24} src={logo} />
     </VStack>
   );
 }
