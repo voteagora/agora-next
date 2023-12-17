@@ -3,8 +3,7 @@
 import { FC, PropsWithChildren } from "react";
 import { WagmiConfig, createConfig } from "wagmi";
 import Header from "@/components/Header/Header";
-import { inter, rubik } from "@/styles/fonts";
-import { cn } from "@/lib/utils";
+import { inter } from "@/styles/fonts";
 import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
@@ -43,7 +42,7 @@ const config = createConfig(
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
     <ConnectKitProvider>
-      <body className={cn(rubik.variable, inter.variable)}>
+      <body className={inter.variable}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <BetaBanner />
         <PageContainer>

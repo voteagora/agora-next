@@ -1,4 +1,5 @@
 @import "@/styles/variables";
+@import "@/styles/mixins";
 
 .vote_for {
   color: $votes-for;
@@ -11,63 +12,20 @@
 .vote_abstain {
   color: $votes-abstain;
 }
-
-.font_size {
+.subtitle {
   font-size: $font-size-xs;
-}
-.sub {
-  font-weight: $font-weight-semibold;
-  line-height: $line-height-none;
-}
-
-.text_container {
-  color: $black;
-}
-
-.token_amount {
-  color: #66676b;
-}
-
-.user_icon {
-  width: $spacing-4;
-  height: $spacing-4;
-}
-
-.reason {
-  color: $gray-4f;
-}
-
-.statement {
-  width: 100%;
-  z-index: 1;
-  position: relative;
-  padding: $spacing-4;
-  border-radius: $spacing-2;
-  border: 1px solid $gray-eb;
-
-  &_text {
-    font-weight: $font-weight-semibold;
-  }
-}
-
-.delegate_text {
-  font-weight: $font-weight-medium;
   color: $gray-700;
+  font-weight: $font-weight-medium;
+}
+.title {
+  font-size: $font-size-lg;
+  color: $gray-900;
+  font-weight: $font-weight-extrabold;
 }
 
 .vote_container {
+  @include buttonStyles;
   text-align: center;
-  border-radius: $spacing-2;
-  border: 1px solid $gray-eb;
-  font-weight: $font-weight-semibold;
-  font-size: $font-size-xs;
-  color: $black;
-  padding: $spacing-2 $spacing-6;
-  cursor: pointer;
-
-  :hover {
-    background: $gray-eb;
-  }
 }
 
 .disabled {
@@ -76,33 +34,30 @@
   cursor: not-allowed;
 }
 
-.success {
-  width: 100%;
-  z-index: 1;
-  position: relative;
-  padding: $spacing-4;
-  border-radius: $spacing-2;
-  border: 1px solid $gray-eb;
+.note_to_user {
+  padding: $spacing-2 $spacing-4;
+  z-index: 1099;
+  background-color: $gray-fa;
+  font-size: $font-size-xs;
+  color: $gray-700;
+  border-radius: $border-radius-lg;
 }
 
-.font_weight {
-  font-weight: $font-weight-medium;
+.full_width {
+  width: 100%;
 }
 
-.loading_vote {
+.no_reason {
   width: 100%;
-  z-index: 1;
-  position: relative;
-  padding: $spacing-4;
-  border-radius: $spacing-2;
-  border: 1px solid $gray-eb;
+  padding: $spacing-6 $spacing-4;
+  border-radius: $border-radius-lg;
+  border: 1px dashed $gray-eb;
+  text-align: center;
+  color: $gray-700;
 }
 
-.no_statement {
-  width: 100%;
-  z-index: 1;
-  position: relative;
-  padding: $spacing-4;
-  border-radius: $spacing-2;
-  border: 1px solid $gray-eb;
+.has_reason {
+  max-height: 40vh;
+  overflow-y: scroll;
+  color: $gray-700;
 }
