@@ -1,21 +1,27 @@
 "use client";
 
 import { Delegation } from "@/app/api/delegations/delegation";
-import { HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { format } from "date-fns";
 
-function DelegationToRow({ delegation }: { delegation: Delegation }) {
+export default function DelegationToRow({
+  delegation,
+}: {
+  delegation: Delegation;
+}) {
   return (
-    <HStack gap={2}>
-      <div>{TokenAmountDisplay(delegation.allowance, 18, "OP", 6)}</div>
-      <div>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</div>
-      <div>{delegation.type}</div>
-      <div>{delegation.amount}</div>
-      <HumanAddress address={delegation.to} />
-    </HStack>
+    <TableRow>
+      <TableCell>
+        {TokenAmountDisplay(delegation.allowance, 18, "OP", 6)}
+      </TableCell>
+      <TableCell>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</TableCell>
+      <TableCell>{delegation.type}</TableCell>
+      <TableCell>{delegation.amount}</TableCell>
+      <TableCell>
+        <HumanAddress address={delegation.to} />
+      </TableCell>
+    </TableRow>
   );
 }
-
-export default DelegationToRow;
