@@ -1,7 +1,7 @@
 @import "@/styles/variables";
 
 .page_header_container {
-  margin-top: $spacing-16;
+  margin-top: $spacing-12;
   margin-bottom: $spacing-4;
   @media (max-width: $max-width-lg) {
     max-width: 100%;

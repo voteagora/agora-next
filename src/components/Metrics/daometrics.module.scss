@@ -1,0 +1,14 @@
+@import "@/styles/variables";
+
+.metrics_container {
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: $max-width-lg) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid $gray-300;
+    border-radius: $border-radius-xl;
+    box-shadow: $box-shadow-newDefault;
+  }
+}

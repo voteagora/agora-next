@@ -26,14 +26,11 @@
 }
 .cell_status {
   width: 15%;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
-  .cell_content_body {
-    font-size: $font-size-xs;
-    font-weight: $font-weight-semibold;
-  }
 }
 .cell_result {
   width: 30%;
   align-items: flex-end;
+  justify-content: center;
 }

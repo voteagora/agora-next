@@ -67,6 +67,7 @@ export default function CastVoteInput({
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
+        className="text-sm"
       />
       <VStack
         justifyContent="stretch"
