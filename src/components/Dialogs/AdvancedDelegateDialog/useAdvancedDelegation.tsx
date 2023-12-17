@@ -1,15 +1,19 @@
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
-import { parseEther } from "viem";
+import { formatUnits } from "viem";
 import { useContractWrite } from "wagmi";
 
+const allowanceType = 1; // 1 - relative; 0 - absolute
+
 const useAdvancedDelegation = ({
+  availableBalance,
   isDelegatingToProxy,
   proxyAddress,
   target,
   allocation,
 }: {
+  availableBalance: string;
   isDelegatingToProxy: boolean;
   proxyAddress: string;
   target: string | string[];
@@ -18,6 +22,10 @@ const useAdvancedDelegation = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const availableBalanceNumber = parseInt(
+    formatUnits(BigInt(availableBalance), 18)
+  );
 
   const {
     write: subdelegate,
@@ -28,7 +36,10 @@ const useAdvancedDelegation = ({
     address: OptimismContracts.alligator.address as any,
     abi: OptimismContracts.alligator.abi,
     functionName: Array.isArray(target) ? "subdelegateBatched" : "subdelegate",
-    args: [target as any, buildRules(allocation) as any],
+    args: [
+      target as any,
+      buildRules(allocation, availableBalanceNumber) as any,
+    ],
   });
 
   const {
@@ -86,19 +97,30 @@ const useAdvancedDelegation = ({
   return { isLoading, isError, isSuccess, write };
 };
 
-function buildRules(allocation: number | number[]) {
+function buildRules(
+  allocation: number | number[],
+  availableBalanceNumber: number
+) {
   if (Array.isArray(allocation)) {
     return allocation.map((amount) => {
       return {
         ...baseRules,
-        allowance: parseEther(amount ? amount.toString() : "0"),
+        allowance: amount
+          ? allowanceType == 1
+            ? Math.round((amount / availableBalanceNumber) * 100_000).toString()
+            : amount.toString()
+          : "0",
       };
     });
   }
 
   return {
     ...baseRules,
-    allowance: parseEther(allocation ? allocation.toString() : "0"),
+    allowance: allocation
+      ? allowanceType == 1
+        ? Math.round((allocation / availableBalanceNumber) * 100_000).toString()
+        : allocation.toString()
+      : "0",
   };
 }
 
@@ -109,7 +131,7 @@ const baseRules = {
   notValidBefore: 0,
   maxRedelegations: 0xff, // 255
   blocksBeforeVoteCloses: 0,
-  allowanceType: 1, // 1 - relative; 0 - absolute
+  allowanceType,
   allowance: 0n,
 };
 

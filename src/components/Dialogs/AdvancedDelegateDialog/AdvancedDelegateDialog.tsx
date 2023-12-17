@@ -63,7 +63,7 @@ export function AdvancedDelegateDialog({
         parseInt(formatUnits(BigInt(delegation.allowance), 18))
       );
       const isTargetDelegated = delegatees.some(
-        (delegation: Delegation) => delegation.to === target
+        (delegation: Delegation) => delegation.to === target.toLowerCase()
       );
 
       const initAllowance = [...initialAllowance];
@@ -98,6 +98,7 @@ export function AdvancedDelegateDialog({
   }, [fetchData]);
 
   const { write, isLoading, isError, isSuccess } = useAdvancedDelegation({
+    availableBalance,
     isDelegatingToProxy,
     proxyAddress,
     // target can be a string or an array of strings
