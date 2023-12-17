@@ -93,14 +93,11 @@ export default function DelegateCardList({
         pageStart={0}
         loadMore={loadMore}
         loader={
-          <div key="loader">
+          <div
+            className="w-full h-full min-h-[140px] bg-slate-50 rounded-xl text-slate-300 flex items-center justify-center"
+            key="loader"
+          >
             Loading...
-            <Image
-              src="/images/blink.gif"
-              alt="Blinking Agora Logo"
-              width={50}
-              height={20}
-            />
           </div>
         }
         element="div"

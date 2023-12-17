@@ -5,7 +5,7 @@ export default function Loader() {
   return (
     <HStack
       key="loader"
-      className="gl_loader justify-center py-4 text-sm text-stone-500"
+      className="gl_loader justify-center py-6 text-sm text-stone-500"
     >
       {/* <Image
         src="/images/blink.gif"
@@ -13,7 +13,7 @@ export default function Loader() {
         width={32}
         height={8}
       /> */}
-      Loading more items
+      Loading...
     </HStack>
   );
 }
