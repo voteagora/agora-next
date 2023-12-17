@@ -33,7 +33,6 @@ export function AdvancedDelegateDialog({
   completeDelegation: (address: string) => void;
 }) {
   const [allowance, setAllowance] = useState<number[]>([]);
-  const [targets, setTargets] = useState<string[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [availableBalance, setAvailableBalance] = useState<string>("");
   const [isDelegatingToProxy, setIsDelegatingToProxy] =
@@ -58,26 +57,32 @@ export function AdvancedDelegateDialog({
 
       setAvailableBalance(balance);
       setIsDelegatingToProxy(isDelegating);
-      setDelegatees(delegatees);
-      const initialAllowance = delegatees.map((delegation: Delegation) =>
-        parseInt(formatUnits(BigInt(delegation.allowance), 18))
-      );
-      const isTargetDelegated = delegatees.some(
-        (delegation: Delegation) => delegation.to === target.toLowerCase()
-      );
+      let isTargetDelegated = false;
+
+      const initialAllowance = delegatees.map((delegation: Delegation) => {
+        if (!isTargetDelegated) {
+          isTargetDelegated = delegation.to === target.toLowerCase();
+        }
+
+        return parseInt(formatUnits(BigInt(delegation.allowance), 18));
+      });
 
       const initAllowance = [...initialAllowance];
-      const initTargets = delegatees.map(
-        (delegation: Delegation) => delegation.to
-      );
       if (!isTargetDelegated) {
         // ADD 0 for the target
         initAllowance.push(0);
-        initTargets.push(target);
+        delegatees.push({
+          from: address,
+          to: target,
+          allowance: 0,
+          timestamp: null,
+          type: "ADVANCED",
+          amount: "PARTIAL",
+        });
       }
 
       setAllowance(initAllowance);
-      setTargets(initTargets);
+      setDelegatees(delegatees);
       setProxyAddress(proxyAddress);
 
       setIsReady(true);
@@ -102,7 +107,7 @@ export function AdvancedDelegateDialog({
     isDelegatingToProxy,
     proxyAddress,
     // target can be a string or an array of strings
-    target: targets,
+    target: delegatees.map((delegation: Delegation) => delegation.to),
     // alowance can be a number or an array of numbers
     allocation: allowance, // (value / 100000) 100% = 100000
   });
@@ -141,13 +146,6 @@ export function AdvancedDelegateDialog({
                   index={index}
                 />
               ))}
-              <SubdelegationToRow
-                to={target}
-                availableBalance={availableBalance}
-                setAllowance={setAllowance}
-                allowances={allowance}
-                index={allowance.length - 1}
-              />
             </VStack>
 
             {isLoading && (
