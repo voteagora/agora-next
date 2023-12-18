@@ -25,7 +25,7 @@ function SubdelegationToRow({
     chainId: 1,
     address: to as `0x${string}`,
   });
-  const availableBalanceNumber = parseInt(
+  const availableBalanceNumber = Number(
     formatUnits(BigInt(availableBalance), 18)
   );
 
@@ -58,7 +58,8 @@ function SubdelegationToRow({
           value={allowance}
           className={styles.sub_row_input}
           onChange={(e) => {
-            let newAllowanceValue = parseInt(e.target.value, 10);
+            let newAllowanceValue =
+              Math.round(Number(e.target.value) * 100) / 100;
             if (newAllowanceValue > amountToAllocate) {
               newAllowanceValue = amountToAllocate;
             }
@@ -69,6 +70,7 @@ function SubdelegationToRow({
           type="number"
           min={0}
           max={amountToAllocate}
+          step={0.01}
         />
 
         <div className={styles.sub_row_percent}>
