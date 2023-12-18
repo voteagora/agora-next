@@ -18,8 +18,8 @@ export default function BetaBanner() {
           Follow the{" "}
           <Link className="underline" href="/changelog">
             changelog
-          </Link>
-          .
+          </Link>{" "}
+          for updates.
         </p>
       </div>
     </div>

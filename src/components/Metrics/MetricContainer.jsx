@@ -5,33 +5,50 @@ import styles from "./metrics.module.scss";
 
 export default function MetricContainer({ icon, title, body, link = null }) {
   return (
-    <HStack gap={3} className={styles.metric_card_container}>
-      <div className={styles.icon_container}>
-        <Image src={icons[icon]} alt={icon} width="24" height="24" />
-      </div>
+    <>
+      {link ? (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.metric_card_container_link}
+        >
+          <HStack gap={3} className={styles.metric_card_container}>
+            <div className={styles.icon_container}>
+              <Image src={icons[icon]} alt={icon} width="24" height="24" />
+            </div>
+            <VStack>
+              <div className={styles.header_container}>
+                <HStack gap={1}>
+                  {title}
+                  <Image
+                    cls
+                    src={icons["link"]}
+                    alt={icons["link"]}
+                    width="12"
+                    height="12"
+                  />
+                </HStack>
+              </div>
 
-      <VStack>
-        <div className={styles.header_container}>
-          {link ? (
-            <a href={link} target="_blank" rel="noopener noreferrer">
-              <HStack gap={1}>
-                {title}
-                <Image
-                  cls
-                  src={icons["link"]}
-                  alt={icons["link"]}
-                  width="12"
-                  height="12"
-                />
-              </HStack>
-            </a>
-          ) : (
-            title
-          )}
+              <div className={styles.body_container}>{body}</div>
+            </VStack>
+          </HStack>
+        </a>
+      ) : (
+        <div className={styles.metric_card_container_link}>
+          <HStack gap={3} className={styles.metric_card_container}>
+            <div className={styles.icon_container}>
+              <Image src={icons[icon]} alt={icon} width="24" height="24" />
+            </div>
+            <VStack>
+              <div className={styles.header_container}>{title}</div>
+
+              <div className={styles.body_container}>{body}</div>
+            </VStack>
+          </HStack>
         </div>
-
-        <div className={styles.body_container}>{body}</div>
-      </VStack>
-    </HStack>
+      )}
+    </>
   );
 }
