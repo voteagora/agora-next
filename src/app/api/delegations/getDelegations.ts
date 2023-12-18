@@ -23,7 +23,7 @@ async function getCurrentDelegateesForAddress({
   address: string;
 }): Promise<Delegation[]> {
   const advancedDelegatees = await prisma.advancedDelegatees.findMany({
-    where: { from: address.toLowerCase() },
+    where: { from: address.toLowerCase(), delegated_amount: { gt: 0 } },
   });
 
   const directDelegatee = await (async () => {
@@ -47,49 +47,56 @@ async function getCurrentDelegateesForAddress({
 
   const latestBlock = await provider.getBlock("latest");
 
-  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
-    where: {
-      delegate: address.toLowerCase(),
-    },
-  });
+  // const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+  //   where: {
+  //     delegate: address.toLowerCase(),
+  //   },
+  // });
 
-  // TODO: These needs to be ordered by timestamp
+  // // TODO: These needs to be ordered by timestamp
+
+  // console.log(address);
+  // console.log({
+  //   advancedVotingPower,
+  //   advancedDelegatees,
+  //   directDelegatee,
+  // });
 
   return [
-    ...(advancedVotingPower
-      ? [
-          {
-            from: address,
-            to: address,
-            allowance: advancedVotingPower.advanced_vp.toFixed(0),
-            timestamp: null,
-            type: "ADVANCED",
-            amount:
-              BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
-                ? "PARTIAL"
-                : "FULL",
-          },
-        ]
-      : []),
-    // TODO: Add back in with a more efficient query
-    // ...(directDelegatee
+    // ...(advancedVotingPower
     //   ? [
     //       {
-    //         from: directDelegatee.delegator,
-    //         to: directDelegatee.delegatee,
-    //         allowance: directDelegatee.balance.toFixed(),
-    //         timestamp: latestBlock
-    //           ? getHumanBlockTime(
-    //               directDelegatee.block_number,
-    //               latestBlock.number,
-    //               latestBlock.timestamp
-    //             )
-    //           : null,
-    //         type: "DIRECT",
-    //         amount: "FULL",
+    //         from: address,
+    //         to: address,
+    //         allowance: advancedVotingPower.advanced_vp.toFixed(0),
+    //         timestamp: null,
+    //         type: "ADVANCED",
+    //         amount:
+    //           BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
+    //             ? "PARTIAL"
+    //             : "FULL",
     //       },
     //     ]
     //   : []),
+    // TODO: Add back in with a more efficient query
+    ...(directDelegatee
+      ? [
+          {
+            from: directDelegatee.delegator,
+            to: directDelegatee.delegatee,
+            allowance: directDelegatee.balance.toFixed(),
+            timestamp: latestBlock
+              ? getHumanBlockTime(
+                  directDelegatee.block_number,
+                  latestBlock.number,
+                  latestBlock.timestamp
+                )
+              : null,
+            type: "DIRECT",
+            amount: "FULL",
+          },
+        ]
+      : []),
     ...advancedDelegatees.map((advancedDelegatee) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
@@ -103,7 +110,7 @@ async function getCurrentDelegateesForAddress({
         : null,
       type: "ADVANCED",
       amount:
-        Number(advancedDelegatee.delegated_share.toFixed(0)) === 1
+        Number(advancedDelegatee.delegated_share.toFixed(0)) >= 1
           ? "FULL"
           : "PARTIAL",
     })),

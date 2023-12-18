@@ -29,10 +29,10 @@ export type AdvancedDelegateDialogType = {
   type: "ADVANCED_DELEGATE";
   params: {
     target: string;
-    availableBalance: string;
-    isDelegatingToProxy: boolean;
-    proxyAddress: string;
-    delegatees: any;
+    fetchVotingPowerForSubdelegation: (address: string) => Promise<string>;
+    checkIfDelegatingToProxy: (address: string) => Promise<boolean>;
+    fetchCurrentDelegatees: (address: string) => Promise<any>;
+    getProxyAddress: (address: string) => Promise<string>;
   };
 };
 
@@ -81,16 +81,22 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   ADVANCED_DELEGATE: (
-    { target, availableBalance, isDelegatingToProxy, proxyAddress, delegatees },
+    {
+      target,
+      fetchVotingPowerForSubdelegation,
+      checkIfDelegatingToProxy,
+      fetchCurrentDelegatees,
+      getProxyAddress,
+    },
     closeDialog
   ) => {
     return (
       <AdvancedDelegateDialog
         target={target}
-        availableBalance={availableBalance}
-        isDelegatingToProxy={isDelegatingToProxy}
-        proxyAddress={proxyAddress}
-        delegatees={delegatees}
+        fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+        checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+        fetchCurrentDelegatees={fetchCurrentDelegatees}
+        getProxyAddress={getProxyAddress}
         completeDelegation={closeDialog}
       />
     );

@@ -22,7 +22,7 @@ export async function getQuorumForProposal(
       if (!proposal?.start_block) {
         return null;
       }
-      return OptimismContracts.governor.contract.quorum(proposal.start_block);
+      return OptimismContracts.governor.contract.quorum(proposal.proposal_id);
     }
   }
 }

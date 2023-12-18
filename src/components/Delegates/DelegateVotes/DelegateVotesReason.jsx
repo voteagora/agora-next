@@ -7,9 +7,7 @@ function VoteReason({ reason }) {
     <>
       <div className={styles.vote_reason} />
 
-      <VStack className={styles.vote_reason_container}>
-        <pre>{reason}</pre>
-      </VStack>
+      <VStack className={styles.vote_reason_container}>{reason}</VStack>
     </>
   );
 }
