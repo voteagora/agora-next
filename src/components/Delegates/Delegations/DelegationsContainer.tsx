@@ -62,40 +62,47 @@ function DelegationsContainer({
   }
 
   return (
-    <>
-      <h2 className="text-2xl font-bold">Advanced Delegations (beta)</h2>
-      <Tabs className="my-8" defaultValue="delegatedFrom">
-        <HStack className="justify-between align-center">
+    <div className="max-w-full">
+      <Tabs className="mb-8 max-w-full" defaultValue="delegatedFrom">
+        <HStack className="justify-between items-center">
           <TabsList>
-            <TabsTrigger value="delegatedFrom">Delegated from</TabsTrigger>
-            <TabsTrigger value="delegatedTo">Delegated to</TabsTrigger>
+            <TabsTrigger className="text-2xl" value="delegatedFrom">
+              Delegated from
+            </TabsTrigger>
+            <TabsTrigger className="text-2xl" value="delegatedTo">
+              Delegated to
+            </TabsTrigger>
           </TabsList>
-          {/* <span className="font-medium text-gray-4f">
-          240,120 OP from 80,024 Delegates
-        </span> */}
+          <div className="text-slate-700 text-xs px-3 py-1 font-medium bg-slate-100 rounded-full lg:block hidden">
+            Advanced delegation beta
+          </div>
         </HStack>
-        <TabsContent value="delegatedFrom">
+        <TabsContent value="delegatedFrom" className="max-w-full">
           <VStack
             gap={3}
-            className="rounded-lg border border-gray-eb bg-white shadow"
+            className="rounded-xl border border-gray-eb shadow-sm"
           >
             <Table>
-              <TableHeader>
+              <TableHeader className="text-xs text-slate-700">
                 <TableRow>
-                  <TableHead>Allowance</TableHead>
-                  <TableHead>Delegated on</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>From</TableHead>
+                  <TableHead className="h-10">Allowance</TableHead>
+                  <TableHead className="h-10">Delegated on</TableHead>
+                  <TableHead className="h-10">Type</TableHead>
+                  <TableHead className="h-10">Amount</TableHead>
+                  <TableHead className="h-10">From</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {delegators.map((delegation) => (
-                  <DelegationFromRow
-                    key={delegation.from}
-                    delegation={delegation}
-                  />
-                ))}
+                {delegators.length === 0 ? (
+                  <div className="w-full p-4">None found</div>
+                ) : (
+                  delegators.map((delegation) => (
+                    <DelegationFromRow
+                      key={delegation.from}
+                      delegation={delegation}
+                    />
+                  ))
+                )}
               </TableBody>
             </Table>
           </VStack>
@@ -103,31 +110,35 @@ function DelegationsContainer({
         <TabsContent value="delegatedTo">
           <VStack
             gap={3}
-            className="rounded-lg border border-gray-eb bg-white shadow"
+            className="rounded-xl border border-gray-eb shadow-sm"
           >
             <Table>
-              <TableHeader>
+              <TableHeader className="text-xs text-slate-700">
                 <TableRow>
-                  <TableHead>Allowance</TableHead>
-                  <TableHead>Delegated on</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>From</TableHead>
+                  <TableHead className="h-10">Allowance</TableHead>
+                  <TableHead className="h-10">Delegated on</TableHead>
+                  <TableHead className="h-10">Type</TableHead>
+                  <TableHead className="h-10">Amount</TableHead>
+                  <TableHead className="h-10">From</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {delegatees.map((delegation) => (
-                  <DelegationToRow
-                    key={delegation.to}
-                    delegation={delegation}
-                  />
-                ))}
+                {delegatees.length === 0 ? (
+                  <div className="w-full p-4">None found</div>
+                ) : (
+                  delegatees.map((delegation) => (
+                    <DelegationFromRow
+                      key={delegation.to}
+                      delegation={delegation}
+                    />
+                  ))
+                )}
               </TableBody>
             </Table>
           </VStack>
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 }
 
