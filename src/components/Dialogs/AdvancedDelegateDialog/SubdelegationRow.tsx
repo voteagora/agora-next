@@ -1,14 +1,82 @@
-import { Delegation } from "@/app/api/delegations/delegation";
-import { HStack } from "@/components/Layout/Stack";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import ENSAvatar from "@/components/shared/ENSAvatar";
 import HumanAddress from "@/components/shared/HumanAddress";
-import { TokenAmountDisplay } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import styles from "./advancedDelegateDialog.module.scss";
+import { useEnsName } from "wagmi";
+import { formatUnits } from "viem";
+import { Dispatch, SetStateAction } from "react";
 
-function SubdelegationToRow({ delegation }: { delegation: Delegation }) {
+function SubdelegationToRow({
+  to,
+  setAllowance,
+  availableBalance,
+  allowances,
+  index,
+}: {
+  to: string;
+  setAllowance: Dispatch<SetStateAction<number[]>>;
+  availableBalance: string;
+  allowances: number[];
+  index: number;
+}) {
+  const allowance = allowances[index];
+  const { data } = useEnsName({
+    chainId: 1,
+    address: to as `0x${string}`,
+  });
+  const availableBalanceNumber = parseInt(
+    formatUnits(BigInt(availableBalance), 18)
+  );
+
+  const sumOtherAllowances = allowances.reduce((sum, current, idx) => {
+    return idx === index ? sum : sum + current;
+  }, 0);
+
+  const amountToAllocate = availableBalanceNumber - sumOtherAllowances;
+
+  const percent =
+    Number.isNaN(allowance) || allowance === 0
+      ? 0
+      : Math.round((allowance / availableBalanceNumber) * 100_000) / 1000;
+
   return (
-    <HStack gap={2}>
-      <HumanAddress address={delegation.to} />
-      <div>{TokenAmountDisplay(delegation.allowance, 18, "OP", 6)}</div>
-    </HStack>
+    <div className={styles.sub_row}>
+      <HStack gap={3}>
+        <div className={styles.avatar}>
+          <ENSAvatar ensName={data} />
+        </div>
+        <VStack>
+          <p className={styles.subtitle}>Delegated to</p>
+          <div className={styles.address_to}>
+            <HumanAddress address={to} />
+          </div>
+        </VStack>
+      </HStack>
+      <div className="relative">
+        <Input
+          value={allowance}
+          className={styles.sub_row_input}
+          onChange={(e) => {
+            let newAllowanceValue = parseInt(e.target.value, 10);
+            if (newAllowanceValue > amountToAllocate) {
+              newAllowanceValue = amountToAllocate;
+            }
+            const newAllowances = [...allowances];
+            newAllowances[index] = newAllowanceValue;
+            setAllowance(newAllowances);
+          }}
+          type="number"
+          min={0}
+          max={amountToAllocate}
+        />
+
+        <div className={styles.sub_row_percent}>
+          <p>OP</p>
+          <div></div> <p>{percent}%</p>
+        </div>
+      </div>
+    </div>
   );
 }
 

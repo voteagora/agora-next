@@ -11,6 +11,7 @@ import {
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
 import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
+import DelegateCardClient from "./DelegateCardClient";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -59,6 +60,7 @@ export default async function DelegateCard({ addressOrENSName }) {
   if (!delegate) {
     return null;
   }
+
   return (
     <VStack className={styles.container}>
       <VStack className={styles.card}>
@@ -81,12 +83,10 @@ export default async function DelegateCard({ addressOrENSName }) {
                     )})`
               }
             />
-
             <PanelRow
               title="For / Against / Abstain"
               detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
             />
-
             {/* <PanelRow
               title="Vote Power"
               detail={
@@ -101,7 +101,6 @@ export default async function DelegateCard({ addressOrENSName }) {
                 </>
               }
             /> */}
-
             <PanelRow
               title="Recent activity"
               detail={
@@ -110,27 +109,22 @@ export default async function DelegateCard({ addressOrENSName }) {
                   : "N/A"
               }
             />
-
             <PanelRow
               title="Proposals created"
               detail={`${delegate.proposalsCreated}`}
             />
-
             <PanelRow
               title="Delegated from"
               detail={pluralizeAddresses(delegate.numOfDelegators)}
             />
 
-            <DelegateActions
-              delegate={delegate.address}
-              votingPower={delegate.votingPower}
-              discord={delegate?.statement?.discord}
-              twitter={delegate?.statement?.twitter}
+            <DelegateCardClient
+              delegate={delegate}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
               fetchVotingPowerForSubdelegation={
                 fetchVotingPowerForSubdelegation
               }
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               getProxyAddress={getProxyAddress}
             />
