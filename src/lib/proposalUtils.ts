@@ -186,6 +186,18 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
+  const getQuorum = async () => {
+    let quorum = await getQuorumForProposal(proposal);
+
+    if (!quorum) {
+      const votableSupply = await prisma.votableSupply.findFirst({});
+
+      quorum = (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
+    }
+
+    return quorum;
+  };
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -213,7 +225,7 @@ export async function parseProposal(
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
-    quorum: await getQuorumForProposal(proposal),
+    quorum: await getQuorum(),
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
     proposalResults: proposalResuts.kind,
