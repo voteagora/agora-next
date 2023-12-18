@@ -23,7 +23,7 @@ const useAdvancedDelegation = ({
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const availableBalanceNumber = parseInt(
+  const availableBalanceNumber = Number(
     formatUnits(BigInt(availableBalance), 18)
   );
 
