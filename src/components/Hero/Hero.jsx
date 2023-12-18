@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { HStack, VStack } from "../Layout/Stack";
-import sunnyFace from "@/assets/optimism/sunny-face.svg";
-import sunnyBg from "@/assets/optimism/sunny-bg.svg";
+import sunnyFace from "@/assets/optimism/sunny-face-sticker.svg";
+import sunnyBg from "@/assets/optimism/sunny-bg-sticker.svg";
+import agora from "@/assets/optimism/agora-sticker.svg";
+import spark1 from "@/assets/optimism/spark1-sticker.svg";
+import spark2 from "@/assets/optimism/spark2-sticker.svg";
+import opToken from "@/assets/optimism/op-token-sticker.svg";
+import thumb from "@/assets/optimism/thumb-sticker.svg";
 import styles from "./hero.module.scss";
 
 export default function Hero() {
@@ -20,6 +25,23 @@ export default function Hero() {
         </p>
       </VStack>
       <div className={styles.partner_image_container}>
+        <Image
+          src={spark1}
+          alt="optimism background"
+          className={styles.spark1}
+        />
+        <Image
+          src={spark2}
+          alt="optimism background"
+          className={styles.spark2}
+        />
+        <Image src={agora} alt="optimism background" className={styles.agora} />
+        <Image
+          src={opToken}
+          alt="optimism background"
+          className={styles.opToken}
+        />
+        <Image src={thumb} alt="optimism background" className={styles.thumb} />
         <Image
           src={sunnyBg}
           alt="optimism background"
