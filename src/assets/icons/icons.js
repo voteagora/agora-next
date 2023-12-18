@@ -19,6 +19,11 @@ import power from "./power.svg";
 import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
 import link from "./link.svg";
+import calendar from "./calendar.svg";
+import file from "./file.svg";
+import users from "./users.svg";
+import flag from "./flag.svg";
+import lightbulb from "./lightbulb.svg";
 
 export const icons = {
   contractVoter,
@@ -42,4 +47,9 @@ export const icons = {
   power,
   info,
   link,
+  calendar,
+  file,
+  users,
+  flag,
+  lightbulb,
 };

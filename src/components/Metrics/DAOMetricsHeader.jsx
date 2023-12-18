@@ -23,7 +23,7 @@ export default function DAOMetricsHeader({ metrics }) {
   return (
     <div className={styles.metrics_container}>
       <MetricContainer
-        icon="community"
+        icon="users"
         title="Delegated / Total supply"
         body={
           <>
@@ -33,7 +33,7 @@ export default function DAOMetricsHeader({ metrics }) {
         }
       />
       <MetricContainer
-        icon="ballot"
+        icon="flag"
         title="Quorum"
         body={
           <>
@@ -42,7 +42,7 @@ export default function DAOMetricsHeader({ metrics }) {
         }
       />
       <MetricContainer
-        icon="pedestrian"
+        icon="file"
         title="Learn more"
         body={<>Operating Manual</>}
         link={
@@ -50,7 +50,7 @@ export default function DAOMetricsHeader({ metrics }) {
         }
       />
       <MetricContainer
-        icon="pedestrian"
+        icon="calendar"
         title="Learn more"
         body={<>Governance Calendar</>}
         link={
@@ -58,11 +58,11 @@ export default function DAOMetricsHeader({ metrics }) {
         }
       />
       <MetricContainer
-        icon="pedestrian"
+        icon="lightbulb"
         title="Learn more"
         body={<>Delegation FAQ</>}
         link={
-          "https://calendar.google.com/calendar/u/0/r?cid=Y19mbm10Z3VoNm5vbzZxZ2JuaTJncGVyaWQ0a0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t"
+          "https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
         }
       />
     </div>
