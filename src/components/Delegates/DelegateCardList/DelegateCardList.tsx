@@ -89,6 +89,7 @@ export default function DelegateCardList({
 
   return (
     <DialogProvider>
+      {/* @ts-ignore */}
       <InfiniteScroll
         className={styles.infinite_scroll}
         hasMore={meta.hasNextPage}
