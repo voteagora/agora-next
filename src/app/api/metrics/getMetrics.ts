@@ -12,6 +12,6 @@ export async function getMetrics() {
   return {
     votableSupply: votableSupply?.votable_supply || "0",
     totalSupply: totalSupply.toString(),
-    quorum: quorum?.toString() || "0",
+    quorum: (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n,
   };
 }
