@@ -129,16 +129,14 @@ export function AdvancedDelegateDialog({
           availableBalance !== "" &&
           !!delegatees &&
           proxyAddress !== "" ? (
-          <VStack className={styles.dialog_container} gap={6}>
-            <VStack gap={3} className={styles.amount_container}>
-              <VStack className={styles.amount_container}>
-                <HStack alignItems="items-center" gap={1}>
-                  Your total delegatable votes <InfoIcon size={16} />
-                </HStack>
-                <AdvancedDelegationDisplayAmount amount={availableBalance} />
-              </VStack>
+          <VStack className={styles.dialog_container} gap={1}>
+            <VStack className={styles.amount_container}>
+              <HStack alignItems="items-center" gap={1}>
+                Your total delegatable votes <InfoIcon size={16} />
+              </HStack>
+              <AdvancedDelegationDisplayAmount amount={availableBalance} />
             </VStack>
-            <VStack gap={3} className={styles.details_container}>
+            <VStack className={styles.details_container}>
               {delegatees.map((delegatee, index) => (
                 <SubdelegationToRow
                   key={index}
