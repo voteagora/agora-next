@@ -27,13 +27,7 @@ export type SupportTextProps = {
 
 // TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: Props) {
-  return (
-    <VStack alignItems="items-center">
-      <div className={styles.container}>
-        <CastVoteDialogContents {...props} />
-      </div>
-    </VStack>
-  );
+  return <CastVoteDialogContents {...props} />;
 }
 
 function CastVoteDialogContents({
@@ -63,59 +57,49 @@ function CastVoteDialogContents({
   }
 
   return (
-    <VStack gap={6} className={styles.font_size}>
-      <VStack gap={2}>
-        <HStack justifyContent="justify-between" className={styles.sub}>
-          <HStack className={styles.text_container}>
-            {delegate.address ? (
+    <VStack gap={4} className={styles.full_width}>
+      <HStack justifyContent="justify-between">
+        <VStack>
+          {delegate.address ? (
+            <div className={styles.subtitle}>
               <HumanAddress address={delegate.address} />
-            ) : (
-              "anonymous"
-            )}
-            <div className={`${styles["vote_" + supportType.toLowerCase()]}`}>
-              &nbsp;voting {supportType.toLowerCase()}
             </div>
-          </HStack>
-          <HStack className={styles.token_amount}>
-            <div>
-              <TokenAmountDisplay
-                amount={votingPower}
-                decimals={18}
-                currency="OP"
-              />
-            </div>
-            <div className={styles.user_icon}>
-              <UserIcon />
-            </div>
-          </HStack>
-        </HStack>
-        <div className={styles.reason}>
-          {reason ? reason : "No reason provided"}
-        </div>
-      </VStack>
+          ) : (
+            <div className={styles.subtitle}>Anonymous</div>
+          )}
+          <div className={styles.title}>
+            Casting vote&nbsp;{supportType.toLowerCase()}
+          </div>
+        </VStack>
+        <VStack alignItems="items-end">
+          <div className={styles.subtitle}>with</div>
+          <TokenAmountDisplay
+            amount={votingPower}
+            decimals={18}
+            currency="OP"
+          />
+        </VStack>
+      </HStack>
+      <div className={styles.reason_box}>
+        {reason ? (
+          <div className={styles.has_reason}>reason</div>
+        ) : (
+          <div className={styles.no_reason}>No voting reason provided</div>
+        )}
+      </div>
       {isLoading && <LoadingVote />}
       {isSuccess && <SuccessMessage />}
       {!isLoading && !isSuccess && (
         <div>
           {delegate.statement ? (
-            <HStack
-              className={styles.statement}
-              justifyContent="justify-between"
-              alignItems="items-center"
-            >
-              <VStack>
-                <div className={styles.statement_text}>
-                  Using{" "}
-                  <TokenAmountDisplay
-                    amount={votingPower}
-                    decimals={18}
-                    currency="OP"
-                  />
-                </div>
-                <div className={styles.delegate_text}>Delegated to you</div>
-              </VStack>
-              <VoteButton onClick={write}>Vote</VoteButton>
-            </HStack>
+            <VoteButton onClick={write}>
+              Vote {supportType.toLowerCase()} with{" "}
+              <TokenAmountDisplay
+                amount={votingPower}
+                decimals={18}
+                currency="OP"
+              />
+            </VoteButton>
           ) : (
             <NoStatementView />
           )}
@@ -147,12 +131,8 @@ const VoteButton = ({
 
 export function SuccessMessage() {
   return (
-    <HStack
-      justifyContent="justify-between"
-      alignItems="items-center"
-      className={styles.success}
-    >
-      <div className={styles.font_weight}>
+    <HStack justifyContent="justify-between" alignItems="items-center">
+      <div>
         Success! Your vote has been cast. It will appear once the transaction is
         confirmed.
       </div>
@@ -163,12 +143,8 @@ export function SuccessMessage() {
 
 export function LoadingVote() {
   return (
-    <HStack
-      justifyContent="justify-between"
-      alignItems="items-center"
-      className={styles.loading_vote}
-    >
-      <div className={styles.font_weight}>Writing your vote to the chain</div>
+    <HStack justifyContent="justify-between" alignItems="items-center">
+      <div>Writing your vote to the chain</div>
       <Image src={icons.spinner} alt={"spinner"} />
     </HStack>
   );
@@ -176,11 +152,11 @@ export function LoadingVote() {
 
 export function NoStatementView() {
   return (
-    <VStack className={styles.no_statement}>
+    <div className={styles.note_to_user}>
       You do not have a delegate statement.{" "}
       <Link href={"/statements/create"} className="underline">
-        Please set one up in order to vote.
+        Please set one up to vote.
       </Link>
-    </VStack>
+    </div>
   );
 }
