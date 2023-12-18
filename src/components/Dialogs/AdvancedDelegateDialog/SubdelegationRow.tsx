@@ -48,7 +48,7 @@ function SubdelegationToRow({
         </div>
         <VStack>
           <p className={styles.subtitle}>Delegated to</p>
-          <div className={styles.medium}>
+          <div className={styles.address_to}>
             <HumanAddress address={to} />
           </div>
         </VStack>
@@ -71,9 +71,10 @@ function SubdelegationToRow({
           max={amountToAllocate}
         />
 
-        <p className={styles.sub_row_percent}>
-          OP | <span>{percent}%</span>
-        </p>
+        <div className={styles.sub_row_percent}>
+          <p>OP</p>
+          <div></div> <p>{percent}%</p>
+        </div>
       </div>
     </div>
   );
