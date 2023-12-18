@@ -2,6 +2,7 @@
 
 import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder, ethers } from "ethers";
+import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import {
   LoadingVote,
@@ -81,32 +82,30 @@ export function ApprovalCastVoteDialog({
   }, [selectedOptions, abstain]);
 
   return (
-    <VStack alignItems="items-center" className={styles.container}>
-      <div className={styles.sub_container}>
-        {hasStatement && isLoading && <LoadingVote />}
-        {hasStatement && isSuccess && <SuccessMessage />}
-        {hasStatement && isError && <p>Something went wrong</p>}
-        {!hasStatement && <NoStatementView />}
-        {hasStatement && !isLoading && !isSuccess && (
-          <VStack>
-            <VStack className={styles.title_box}>
-              <p className={styles.title}>
-                Select up to {maxChecked} option{maxChecked > 1 && "s"}
-              </p>
-              <p className={styles.notes}>
-                Note: onchain votes are final and cannot be edited once
-                submitted.
-              </p>
-            </VStack>
-            <VStack className={styles.options_list}>
-              {proposalData.options.map((option, index) => (
-                <CheckCard
-                  key={index}
-                  title={option.description}
-                  description={
-                    <p>
-                      {/* TODO: add token transfer request | commented because data not indexed correctly */}
-                      {/* {BigInt(
+    <div className={styles.container}>
+      {hasStatement && isLoading && <LoadingVote />}
+      {hasStatement && isSuccess && <SuccessMessage />}
+      {hasStatement && isError && <p>Something went wrong</p>}
+      {!hasStatement && <NoStatementView />}
+      {hasStatement && !isLoading && !isSuccess && (
+        <VStack gap={3}>
+          <VStack className={styles.title_box}>
+            <p className={styles.title}>
+              Select up to {maxChecked} option{maxChecked > 1 && "s"}
+            </p>
+            <p className={styles.notes}>
+              Your vote is final and cannot be edited once submitted.
+            </p>
+          </VStack>
+          <VStack className={styles.options_list}>
+            {proposalData.options.map((option, index) => (
+              <CheckCard
+                key={index}
+                title={option.description}
+                description={
+                  <p>
+                    {/* TODO: add token transfer request | commented because data not indexed correctly */}
+                    {/* {BigInt(
                         option.budgetTokensSpent.amount
                       ) === 0n ? (
                         "No token transfer request"
@@ -118,35 +117,34 @@ export function ApprovalCastVoteDialog({
                           />
                         </>
                       )} */}
-                    </p>
-                  }
-                  checked={selectedOptions.includes(index)}
-                  checkedOptions={selectedOptions.length}
-                  onClick={() => handleOnChange(index)}
-                  abstain={abstain}
-                />
-              ))}
-              <CheckCard
-                key={proposalData.options.length}
-                title={"Abstain"}
-                description={"Vote for no options"}
-                checked={!!abstain}
+                  </p>
+                }
+                checked={selectedOptions.includes(index)}
                 checkedOptions={selectedOptions.length}
-                onClick={() => handleOnChange(abstainOptionId)}
+                onClick={() => handleOnChange(index)}
                 abstain={abstain}
               />
-            </VStack>
-            <CastVoteWithReason
-              onVoteClick={write}
-              reason={reason}
-              setReason={setReason}
-              numberOfOptions={selectedOptions.length}
+            ))}
+            <CheckCard
+              key={proposalData.options.length}
+              title={"Abstain: vote for no options"}
+              description={""}
+              checked={!!abstain}
+              checkedOptions={selectedOptions.length}
+              onClick={() => handleOnChange(abstainOptionId)}
               abstain={abstain}
             />
           </VStack>
-        )}
-      </div>
-    </VStack>
+          <CastVoteWithReason
+            onVoteClick={write}
+            reason={reason}
+            setReason={setReason}
+            numberOfOptions={selectedOptions.length}
+            abstain={abstain}
+          />
+        </VStack>
+      )}
+    </div>
   );
 }
 
@@ -164,7 +162,7 @@ function CastVoteWithReason({
   abstain: boolean;
 }) {
   return (
-    <VStack className={styles.cast_vote_box}>
+    <VStack className={styles.cast_vote_box} gap={4}>
       <textarea
         className={styles.reason_input}
         placeholder="I believe..."
@@ -214,9 +212,27 @@ function CheckCard({
 }) {
   return (
     <div className={styles.option_card} onClick={onClick}>
-      <p className={styles.card_title}>{title}</p>
+      <p
+        className={
+          checked
+            ? cn(styles.card_title_checked, styles.card_title)
+            : styles.card_title
+        }
+      >
+        {title}
+      </p>
       <div className={styles.card_description}>{description}</div>
-      <div className={styles.card_check_container}>
+
+      <div
+        className={
+          checked
+            ? cn(
+                styles.card_check_container_checked,
+                styles.card_check_container
+              )
+            : styles.card_check_container
+        }
+      >
         {checked && <CheckIcon className={styles.card_check} />}
       </div>
     </div>

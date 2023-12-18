@@ -28,6 +28,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.80.1",
     "@vercel/analytics": "^1.0.1",
+    "@vercel/speed-insights": "^1.0.2",
     "autoprefixer": "10.4.14",
     "bufferutil": "^4.0.7",
     "class-variance-authority": "^0.6.1",

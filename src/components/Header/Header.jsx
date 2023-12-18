@@ -6,6 +6,8 @@ import styles from "./header.module.scss";
 import { ConnectKitButton } from "connectkit";
 import walletIcon from "@/icons/wallet.svg";
 import Image from "next/image";
+import HumanAddress from "../shared/HumanAddress";
+import ENSAvatar from "../shared/ENSAvatar";
 
 export default function Header() {
   return (
@@ -21,8 +23,6 @@ export default function Header() {
 
 function ConnectButton() {
   return (
-    // if mobile return mobile button
-    // if desktop return desktop button
     <>
       <MobileConnectButton />
       <DesktopConnectButton />
@@ -37,7 +37,9 @@ function MobileConnectButton() {
         return (
           <button onClick={show} className={styles.mobile_connect_button}>
             {isConnected ? (
-              address
+              <div className={styles.testing}>
+                <ENSAvatar ensName={ensName} />
+              </div>
             ) : (
               <Image
                 height={walletIcon.height}
@@ -59,7 +61,17 @@ function DesktopConnectButton() {
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
         return (
           <button onClick={show} className={styles.desktop_connect_button}>
-            {isConnected ? address : "Connect Wallet"}
+            {isConnected ? (
+              <div className={styles.desktop_connect_button_inner}>
+                <div className={styles.testing}>
+                  <ENSAvatar ensName={ensName} />
+                </div>
+
+                <HumanAddress address={address} />
+              </div>
+            ) : (
+              "Connect Wallet"
+            )}
           </button>
         );
       }}
