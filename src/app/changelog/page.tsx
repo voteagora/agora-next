@@ -1,18 +1,19 @@
 import { formatFullDate } from "@/lib/utils";
 import styles from "./changelog.module.scss";
+import { cn } from "@/lib/utils";
 
 export default function Page() {
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-7xl py-20 sm:pt-32 lg:px-8 lg:py-20">
-        <div className="flex flex-col lg:flex-row lg:gap-8">
-          <div className="lg:flex-1 lg:basis-1/3">
-            <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">
-              Agora&apos;s Beta Changelog
+      <div className="mx-auto max-w-full py-20 sm:pt-32 lg:py-12">
+        <div className="flex flex-col lg:flex-row lg:gap-32 ">
+          <div className="lg:flex-1 lg:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
+            <h2 className="mt-1 font-semibold text-stone-900">
+              Agora Changelog
             </h2>
-            <p className="mt-4 text-base leading-7 text-gray-600">
-              Stay up to date with the latest changes as this beta client is in
-              flux. Please report bugs and feedback{" "}
+            <p className="mt-1 text-base leading-7 text-stone-600">
+              Stay up to date with the latest changes with Agora&apos;s
+              development. Please report bugs and feedback{" "}
               <a
                 href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
                 className="font-semibold text-indigo-600 hover:text-indigo-500"
@@ -22,8 +23,13 @@ export default function Page() {
               .
             </p>
           </div>
-          <div className="lg:flex-1 lg:basis-2/3 mt-10 lg:mt-0">
-            <div className="space-y-10">
+          <div
+            className={cn(
+              styles.changelogContainer,
+              "lg:flex-1 lg:basis-2/3 mt-10 lg:mt-0 border-l pl-8 relative"
+            )}
+          >
+            <div className="space-y-12">
               <div className={styles.changelogItem}>
                 <p className={styles.changelogDate}>
                   {formatFullDate(new Date(2023, 11, 18))}

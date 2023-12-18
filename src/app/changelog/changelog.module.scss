@@ -4,21 +4,27 @@
 
 .changelogItem {
   .changelogDate {
-    @apply text-gray-600 mb-2;
+    @apply text-stone-600 mb-2;
   }
   .changelogTitle {
-    @apply text-2xl font-semibold leading-7 text-gray-900;
+    @apply text-2xl font-semibold leading-7 text-stone-900;
   }
   p {
-    @apply mt-2 text-base leading-7 text-gray-600;
+    @apply mt-2 text-base leading-7 text-stone-600;
     a {
       @apply underline;
     }
   }
   p.changelogSubtitle {
-    @apply mt-2 text-base font-semibold leading-7 text-gray-600;
+    @apply mt-2 text-base font-semibold leading-7 text-stone-600;
   }
   ul {
-    @apply list-disc list-outside ml-4 text-gray-600;
+    @apply list-disc list-outside ml-4 text-stone-600;
+  }
+}
+.changelogContainer {
+  ::before {
+    @apply absolute h-2 w-2 rounded-full bg-gray-300 -top-1 -left-1 text-sm z-10;
+    content: "";
   }
 }
