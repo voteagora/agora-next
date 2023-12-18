@@ -78,12 +78,12 @@ export default async function Page({ params: { addressOrENSName } }) {
 
   return (
     <DelegateVotesProvider initialVotes={delegateVotes}>
-      <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full">
+      <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
         <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
           <DelegateCard addressOrENSName={addressOrENSName} />
         </VStack>
 
-        <VStack className="xl:ml-12 min-w-0 flex-1">
+        <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full">
           {!statement && !statement?.delegateStatement && (
             <p>
               This voter has not submitted a statement. Is this you? Connect
