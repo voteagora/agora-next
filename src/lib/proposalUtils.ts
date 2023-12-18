@@ -189,7 +189,7 @@ export async function parseProposal(
   const getQuorum = async () => {
     let quorum = await getQuorumForProposal(proposal);
 
-    if (process.env.NEXT_PUBLIC_AGORA_ENV !== "prod" && !quorum) {
+    if (!quorum) {
       const votableSupply = await prisma.votableSupply.findFirst({});
 
       quorum = (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
