@@ -21,7 +21,7 @@ export function AdvancedDelegationDisplayAmount({
       alignItems="items-center"
     >
       {formattedNumber}
-      <Image src={tokenIcon} alt={TOKEN.symbol} width={32} height={32} />
+      <Image src={tokenIcon} alt={TOKEN.symbol} width={36} height={36} />
     </HStack>
   );
 }
