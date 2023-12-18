@@ -8,10 +8,8 @@ import { format } from "date-fns";
 
 export default function DelegationFromRow({
   delegation,
-  relationship,
 }: {
   delegation: Delegation;
-  relationship: "from" | "to";
 }) {
   return (
     <TableRow>
@@ -22,7 +20,7 @@ export default function DelegationFromRow({
       <TableCell>{delegation.type}</TableCell>
       <TableCell>{delegation.amount}</TableCell>
       <TableCell>
-        <HumanAddress address={delegation[relationship]} />
+        <HumanAddress address={delegation.from} />
       </TableCell>
     </TableRow>
   );
