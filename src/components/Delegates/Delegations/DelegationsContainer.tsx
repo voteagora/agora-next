@@ -119,7 +119,7 @@ function DelegationsContainer({
                   <TableHead className="h-10">Delegated on</TableHead>
                   <TableHead className="h-10">Type</TableHead>
                   <TableHead className="h-10">Amount</TableHead>
-                  <TableHead className="h-10">From</TableHead>
+                  <TableHead className="h-10">To</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -127,7 +127,7 @@ function DelegationsContainer({
                   <div className="w-full p-4">None found</div>
                 ) : (
                   delegatees.map((delegation) => (
-                    <DelegationFromRow
+                    <DelegationToRow
                       key={delegation.to}
                       delegation={delegation}
                     />
