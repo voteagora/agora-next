@@ -12,17 +12,21 @@ export default function MetricContainer({ icon, title, body, link = null }) {
 
       <VStack>
         <div className={styles.header_container}>
-          {title}
-
-          {link && (
+          {link ? (
             <a href={link} target="_blank" rel="noopener noreferrer">
-              <Image
-                src={icons["link"]}
-                alt={icons["link"]}
-                width="12"
-                height="12"
-              />
+              <HStack gap={1}>
+                {title}
+                <Image
+                  cls
+                  src={icons["link"]}
+                  alt={icons["link"]}
+                  width="12"
+                  height="12"
+                />
+              </HStack>
             </a>
+          ) : (
+            title
           )}
         </div>
 
