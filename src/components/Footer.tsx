@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
       </a>
       <div className="text-stone-300">/</div>
       <a
-        href="voteagora.com"
+        href="https://voteagora.com"
         className="hover:text-stone-700 transition"
         target="_blank"
       >
