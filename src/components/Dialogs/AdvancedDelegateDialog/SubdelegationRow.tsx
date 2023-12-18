@@ -25,7 +25,7 @@ function SubdelegationToRow({
     chainId: 1,
     address: to as `0x${string}`,
   });
-  const availableBalanceNumber = parseInt(
+  const availableBalanceNumber = Number(
     formatUnits(BigInt(availableBalance), 18)
   );
 
