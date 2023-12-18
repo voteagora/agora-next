@@ -1,0 +1,24 @@
+@tailwind components;
+@tailwind utilities;
+@import "@/styles/variables";
+
+.changelogItem {
+  .changelogDate {
+    @apply text-gray-600 mb-2;
+  }
+  .changelogTitle {
+    @apply text-2xl font-semibold leading-7 text-gray-900;
+  }
+  p {
+    @apply mt-2 text-base leading-7 text-gray-600;
+    a {
+      @apply underline;
+    }
+  }
+  p.changelogSubtitle {
+    @apply mt-2 text-base font-semibold leading-7 text-gray-600;
+  }
+  ul {
+    @apply list-disc list-outside ml-4 text-gray-600;
+  }
+}
