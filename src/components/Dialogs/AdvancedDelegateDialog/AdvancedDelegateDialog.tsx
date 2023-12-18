@@ -132,7 +132,8 @@ export function AdvancedDelegateDialog({
           <VStack className={styles.dialog_container} gap={1}>
             <VStack className={styles.amount_container}>
               <HStack alignItems="items-center" gap={1}>
-                Your total delegatable votes <InfoIcon size={16} />
+                Your total delegatable votes{" "}
+                <InfoIcon size={12} className="opacity-50" />
               </HStack>
               <AdvancedDelegationDisplayAmount amount={availableBalance} />
             </VStack>
@@ -165,7 +166,7 @@ export function AdvancedDelegateDialog({
           </VStack>
         ) : (
           <VStack
-            className="w-full h-full"
+            className="w-full h-[318px]"
             alignItems="items-center"
             justifyContent="justify-center"
           >
@@ -184,14 +185,15 @@ function Message({
 }) {
   return (
     <div className={styles.dialog_container}>
-      <VStack gap={3}>
-        <div className={styles.title}>Welcome to advanced delegation</div>
-        <div className={styles.subtitle}>
-          {" "}
-          As a large token holder, your account now has access to advanced
-          delegation. This lets you delegate your voting power with more control
-          and flexibility than ever before.{" "}
-        </div>
+      <VStack gap={4}>
+        <VStack gap={1}>
+          <div className={styles.title}>Welcome to advanced delegation</div>
+          <div className={styles.gray}>
+            As a large token holder, you now have access to advanced delegation,
+            which lets you manage your voting power with more control and
+            flexibility.
+          </div>
+        </VStack>
 
         <VStack gap={3} className={styles.info_container}>
           <div className={styles.icon_text}>

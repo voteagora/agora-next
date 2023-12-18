@@ -73,9 +73,9 @@
 
 .info_container {
   border: 1px solid $gray-eb;
-  border-radius: $spacing-2;
-  box-shadow: $box-shadow-default;
-  padding: $spacing-4 $spacing-2;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow-newDefault;
+  padding: $spacing-4;
 }
 
 .continue_button {
@@ -97,14 +97,24 @@
   color: $gray-700;
 }
 
+.gray {
+  color: $gray-700;
+}
 .avatar {
   > div {
     width: $spacing-10;
     height: $spacing-10;
   }
 }
-.medium {
+.address_to {
   font-weight: $font-weight-medium;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: $spacing-32;
+  @media (max-width: $max-width-lg) {
+    max-width: $spacing-24;
+  }
 }
 
 .sub_row {
@@ -119,24 +129,41 @@
     border-bottom: none;
   }
 
-  @media (max-width: $max-width-xl) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   &_input {
     width: 12rem;
     padding-right: 6rem;
     text-align: right;
     font-size: $font-size-base;
+    @media (max-width: $max-width-lg) {
+      width: 7rem;
+      padding-right: 5rem;
+    }
   }
 
   &_percent {
+    display: flex;
+    gap: $spacing-2;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 6.5rem;
-    width: fit-content;
+
+    left: 6.4rem;
+    @media (max-width: $max-width-lg) {
+      left: 5rem;
+    }
     color: $gray-700;
+    > div {
+      width: 1px;
+      background-color: $gray-300;
+      height: 24px;
+      @media (max-width: $max-width-lg) {
+        display: none;
+      }
+    }
+    > p:last-child {
+      @media (max-width: $max-width-lg) {
+        display: none;
+      }
+    }
   }
 }
