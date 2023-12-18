@@ -11,6 +11,7 @@ import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
 import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const chains = [optimism, mainnet];
 const metadata = {
@@ -51,6 +52,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
           <AgoraProvider>{children}</AgoraProvider>
         </PageContainer>
         <Footer />
+        <SpeedInsights />
       </body>
     </ConnectKitProvider>
   </WagmiConfig>
