@@ -7,22 +7,22 @@ import { useAccount } from "wagmi";
 import { useState } from "react";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { Delegation } from "@/app/api/delegations/delegation";
+import { useAgoraContext } from "@/contexts/AgoraContext";
+import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 
 export function DelegateActions({
   delegate,
   className,
-  discord,
-  twitter,
   fetchBalanceForDirectDelegation,
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
+  isAdvancedUser,
 }: {
-  delegate: string;
+  delegate: DelegateChunk;
   className?: string;
-  discord?: string;
-  twitter?: string;
   fetchBalanceForDirectDelegation: (
     addressOrENSName: string
   ) => Promise<string>;
@@ -32,10 +32,12 @@ export function DelegateActions({
   checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
+  isAdvancedUser: boolean;
 }) {
+  const { isConnected } = useAgoraContext();
   const { address } = useAccount();
-  // TODO: Check if user's balance is above the minimum
-  const [isPowerUser, setIsPowerUser] = useState(true);
+  const twitter = delegate?.statement?.twitter;
+  const discord = delegate?.statement?.discord;
 
   return (
     <HStack
@@ -43,26 +45,29 @@ export function DelegateActions({
       className={className ? className + "justify-between" : "justify-between"}
     >
       <DelegateSocialLinks discord={discord} twitter={twitter} />
-      {address &&
-        (isPowerUser ? (
-          <AdvancedDelegateButton
-            delegate={delegate}
-            fetchVotingPowerForSubdelegation={() =>
-              fetchVotingPowerForSubdelegation(address)
-            }
-            checkIfDelegatingToProxy={() => checkIfDelegatingToProxy(address)}
-            fetchCurrentDelegatees={() => fetchCurrentDelegatees(address)}
-            getProxyAddress={() => getProxyAddress(address)}
-          />
-        ) : (
-          <DelegateButton
-            full={!twitter && !discord}
-            delegate={delegate}
-            fetchBalanceForDirectDelegation={() =>
-              fetchBalanceForDirectDelegation(address)
-            }
-          />
-        ))}
+      <div>
+        {isConnected &&
+          address &&
+          (isAdvancedUser ? (
+            <AdvancedDelegateButton
+              delegate={delegate}
+              fetchVotingPowerForSubdelegation={() =>
+                fetchVotingPowerForSubdelegation(address)
+              }
+              checkIfDelegatingToProxy={() => checkIfDelegatingToProxy(address)}
+              fetchCurrentDelegatees={() => fetchCurrentDelegatees(address)}
+              getProxyAddress={() => getProxyAddress(address)}
+            />
+          ) : (
+            <DelegateButton
+              full={!twitter && !discord}
+              delegate={delegate.address}
+              fetchBalanceForDirectDelegation={() =>
+                fetchBalanceForDirectDelegation(address)
+              }
+            />
+          ))}
+      </div>
     </HStack>
   );
 }

@@ -88,22 +88,16 @@ export function DelegateDialog({
           </ShadcnButton>
         )}
         {isLoading && (
-          <Button href={null} disabled={false}>
-            Submitting your delegation...
-          </Button>
+          <Button disabled={false}>Submitting your delegation...</Button>
         )}
-        {isSuccess && (
-          <Button href={null} disabled={false}>
-            Delegation completed!
-          </Button>
-        )}
+        {isSuccess && <Button disabled={false}>Delegation completed!</Button>}
         {isError && (
-          <Button href={null} disabled={false} onClick={() => write()}>
-            Delegation failed
+          <Button disabled={false} onClick={() => write()}>
+            Delegation failed - try again
           </Button>
         )}
         {!isError && !isSuccess && !isLoading && accountAddress && (
-          <Button href={null} disabled={false} onClick={() => write()}>
+          <Button disabled={false} onClick={() => write()}>
             Delegate your votes
           </Button>
         )}
