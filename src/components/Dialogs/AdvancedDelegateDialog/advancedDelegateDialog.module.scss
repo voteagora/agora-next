@@ -131,7 +131,7 @@
 
   &_input {
     width: 12rem;
-    padding-right: 6rem;
+    padding-right: 7rem;
     text-align: right;
     font-size: $font-size-base;
     @media (max-width: $max-width-lg) {
@@ -147,7 +147,7 @@
     top: 50%;
     transform: translateY(-50%);
 
-    left: 6.4rem;
+    left: 5.4rem;
     @media (max-width: $max-width-lg) {
       left: 5rem;
     }
