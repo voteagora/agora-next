@@ -11,11 +11,12 @@
   transition: all 200ms;
 
   &:hover {
-    background: $gray-100;
+    box-shadow: $box-shadow-newHover;
   }
 
   &:active {
     box-shadow: $box-shadow-none;
+    background-color: $gray-fa;
   }
 
   &:disabled {
