@@ -157,24 +157,13 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
     },
   });
 
-  // Theoretically we should fetch all the delegated vp of the proxy ...
-  // const delegatedProxyVotingPower = await prisma.votingPower.findFirst({
-  //   where: {
-  //     delegate: (await getProxyAddress(address))!.toLowerCase(),
-  //   },
-  // });
-
-  // ... but since only delegator is delegating to its proxy, we can just infer the balance from here
-  const undelegatedVotingPower =
-    OptimismContracts.token.contract.balanceOf(address);
-
-  // const undelegatedVotingPower = (async () => {
-  //   const [isBalanceAccountedFor, balance] = await Promise.all([
-  //     isAddressDelegatingToProxy({ address }),
-  //     OptimismContracts.token.contract.balanceOf(address),
-  //   ]);
-  //   return isBalanceAccountedFor ? 0n : balance;
-  // })();
+  const undelegatedVotingPower = (async () => {
+    const [isBalanceAccountedFor, balance] = await Promise.all([
+      isAddressDelegatingToProxy({ address }),
+      OptimismContracts.token.contract.balanceOf(address),
+    ]);
+    return isBalanceAccountedFor ? 0n : balance;
+  })();
 
   return (
     BigInt(advancedVotingPower?.vp_allowance.toFixed(0) ?? "0") +
