@@ -8,7 +8,6 @@ import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
-import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { getStatment } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
@@ -19,6 +18,7 @@ import {
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -84,24 +84,16 @@ export default async function Page({ params: { addressOrENSName } }) {
         </VStack>
 
         <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full">
-          {!statement && !statement?.delegateStatement && (
-            <p>
-              This voter has not submitted a statement. Is this you? Connect
-              your wallet to verify your address, and tell your community what
-              you’d like to see.
-            </p>
-          )}
-
-          {statement && statement.delegateStatement && (
-            <DelegateStatement statement={statement.delegateStatement} />
-          )}
-
+          <DelegateStatementContainer
+            addressOrENSName={addressOrENSName}
+            statement={statement}
+          />
           <DelegationsContainer
             delegatees={delegatees}
             delegators={delegators}
           />
 
-          {delegateVotes && (
+          {delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row justify-between gap-2">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
@@ -127,6 +119,10 @@ export default async function Page({ params: { addressOrENSName } }) {
                   return getDelegateVotes(addressOrENSName, page, sortOrder);
                 }}
               />
+            </div>
+          ) : (
+            <div className="default-message-class">
+              <p>No past votes available.</p>
             </div>
           )}
         </VStack>

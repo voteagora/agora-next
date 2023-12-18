@@ -65,7 +65,11 @@ export function AdvancedDelegateDialog({
           isTargetDelegated = delegation.to === target.toLowerCase();
         }
 
-        return parseInt(formatUnits(BigInt(delegation.allowance), 18));
+        return (
+          Math.round(
+            Number(formatUnits(BigInt(delegation.allowance), 18)) * 100
+          ) / 100
+        );
       });
 
       const initAllowance = [...initialAllowance];
