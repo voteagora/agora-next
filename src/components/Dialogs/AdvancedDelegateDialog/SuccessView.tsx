@@ -16,20 +16,20 @@ export function SuccessView({ closeDialog }: { closeDialog: () => void }) {
       </div>
 
       <h1 className="font-extrabold text-2xl mt-4 mb-2">
-        Your delegation has been submitted!
+        You&apos;ve delegated your votes!
       </h1>
       <p className="text-gray-700">
         It might take up to a minute for the changes to be reflected. Actual
-        amount of tokens delegated can sometimes be slightly different due to
-        rounding in calculation.{" "}
+        amount of tokens delegated can be slightly different due to{" "}
         <a
           className="underline"
-          href=""
+          href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c?pvs=4"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn more
-        </a>
+          rounding
+        </a>{" "}
+        in calculation.
       </p>
       <Button className="w-full mt-6" onClick={() => closeDialog()}>
         Got it
