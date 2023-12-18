@@ -15,6 +15,7 @@
   .dialog_content {
     background: white;
     padding: $spacing-4;
+    width: $max-width-md;
     border-radius: 4px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     margin: auto;

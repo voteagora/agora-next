@@ -42,14 +42,16 @@ function SubdelegationToRow({
 
   return (
     <div className={styles.sub_row}>
-      <HStack>
-        <div className={styles.profile_image}>
+      <HStack gap={3}>
+        <div className={styles.avatar}>
           <ENSAvatar ensName={data} />
         </div>
-        <div>
-          <p>Delegated to</p>
-          <HumanAddress address={to} />
-        </div>
+        <VStack>
+          <p className={styles.subtitle}>Delegated to</p>
+          <div className={styles.medium}>
+            <HumanAddress address={to} />
+          </div>
+        </VStack>
       </HStack>
       <div className="relative">
         <Input
