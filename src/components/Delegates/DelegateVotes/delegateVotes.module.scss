@@ -53,11 +53,10 @@
 }
 
 .vote_details_container {
-  border-radius: $border-radius-lg;
-  border-width: $spacing-px;
-  border-color: $gray-eb;
+  border-radius: $border-radius-xl;
+  border: 1px solid $gray-300;
   background: $white;
-  box-shadow: $box-shadow-default;
+  box-shadow: $box-shadow-newDefault;
   max-height: 15rem;
 }
 
@@ -74,19 +73,15 @@
   overflow-y: scroll;
   overflow-x: scroll;
   padding: $spacing-4 $spacing-6;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: pre-wrap;
+  color: #66676b;
+  width: fit-content;
 
   @media (max-width: $max-width-2xl) {
     padding-top: 0;
     height: fit-content;
-  }
-
-  & > pre {
-    font-family: $font-family-sans;
-    font-size: $font-size-xs;
-    font-weight: $font-weight-medium;
-    white-space: pre-wrap;
-    color: #66676b;
-    width: fit-content;
   }
 }
 
