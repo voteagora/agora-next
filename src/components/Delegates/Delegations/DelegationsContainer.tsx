@@ -128,7 +128,7 @@ function DelegationsContainer({
                   <div className="w-full p-4">None found</div>
                 ) : (
                   delegatees.map((delegation) => (
-                    <DelegationFromRow
+                    <DelegationToRow
                       key={delegation.to}
                       delegation={delegation}
                       relationship="to"

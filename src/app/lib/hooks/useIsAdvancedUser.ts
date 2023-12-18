@@ -12,6 +12,7 @@ const useIsAdvancedUser = () => {
   const [isAdvancedUser, setIsAdvancedUser] = useState(false);
   const allowList = [
     "0x4D5d7d63989BBE6358a3352A2449d59Aa5A08267",
+    "0xd0f23E5ea6c8088eD0FFf294F3fC29e719EE6B8b",
   ] as `0x${string}`[];
 
   useContractRead({
