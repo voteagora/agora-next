@@ -100,7 +100,6 @@ function DelegationsContainer({
                     <DelegationFromRow
                       key={delegation.from}
                       delegation={delegation}
-                      relationship="from"
                     />
                   ))
                 )}
@@ -131,7 +130,6 @@ function DelegationsContainer({
                     <DelegationToRow
                       key={delegation.to}
                       delegation={delegation}
-                      relationship="to"
                     />
                   ))
                 )}
