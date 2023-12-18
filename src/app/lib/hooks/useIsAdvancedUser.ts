@@ -21,10 +21,17 @@ const useIsAdvancedUser = () => {
     functionName: "balanceOf",
     enabled: isConnected && !!address,
     args: [address!],
+    /**
+     * @dev Checks if the user is an advanced user
+     * PROD: only allowlist
+     * TEST: more than 1 token or allowlist
+     */
     onSuccess: (balance) => {
       const allowedBalance = parseUnits("1", 18);
       setIsAdvancedUser(
-        balance >= allowedBalance || allowList.includes(address!)
+        process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+          ? allowList.includes(address!)
+          : balance >= allowedBalance || allowList.includes(address!)
       );
     },
   });
