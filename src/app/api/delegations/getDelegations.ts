@@ -26,24 +26,24 @@ async function getCurrentDelegateesForAddress({
     where: { from: address.toLowerCase(), delegated_amount: { gt: 0 } },
   });
 
-  const directDelegatee = await (async () => {
-    const [proxyAddress, delegatee] = await Promise.all([
-      getProxyAddress(address),
-      prisma.delegatees.findFirst({
-        where: { delegator: address.toLowerCase() },
-      }),
-    ]);
+  // const directDelegatee = await (async () => {
+  //   const [proxyAddress, delegatee] = await Promise.all([
+  //     getProxyAddress(address),
+  //     prisma.delegatees.findFirst({
+  //       where: { delegator: address.toLowerCase() },
+  //     }),
+  //   ]);
 
-    if (
-      proxyAddress &&
-      delegatee &&
-      delegatee.delegatee === proxyAddress.toLowerCase()
-    ) {
-      return null;
-    }
+  //   if (
+  //     proxyAddress &&
+  //     delegatee &&
+  //     delegatee.delegatee === proxyAddress.toLowerCase()
+  //   ) {
+  //     return null;
+  //   }
 
-    return delegatee;
-  })();
+  //   return delegatee;
+  // })();
 
   const latestBlock = await provider.getBlock("latest");
 
@@ -78,25 +78,24 @@ async function getCurrentDelegateesForAddress({
     //       },
     //     ]
     //   : []),
-    // TODO: Add back in with a more efficient query
-    ...(directDelegatee
-      ? [
-          {
-            from: directDelegatee.delegator,
-            to: directDelegatee.delegatee,
-            allowance: directDelegatee.balance.toFixed(),
-            timestamp: latestBlock
-              ? getHumanBlockTime(
-                  directDelegatee.block_number,
-                  latestBlock.number,
-                  latestBlock.timestamp
-                )
-              : null,
-            type: "DIRECT",
-            amount: "FULL",
-          },
-        ]
-      : []),
+    // ...(directDelegatee
+    //   ? [
+    //       {
+    //         from: directDelegatee.delegator,
+    //         to: directDelegatee.delegatee,
+    //         allowance: directDelegatee.balance.toFixed(),
+    //         timestamp: latestBlock
+    //           ? getHumanBlockTime(
+    //               directDelegatee.block_number,
+    //               latestBlock.number,
+    //               latestBlock.timestamp
+    //             )
+    //           : null,
+    //         type: "DIRECT",
+    //         amount: "FULL",
+    //       },
+    //     ]
+    //   : []),
     ...advancedDelegatees.map((advancedDelegatee) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
@@ -134,7 +133,7 @@ async function getCurrentDelegatorsForAddress({
   address: string;
 }) {
   const advancedDelegators = prisma.advancedDelegatees.findMany({
-    where: { to: address.toLowerCase() },
+    where: { to: address.toLowerCase(), delegated_amount: { gt: 0 } },
   });
 
   // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
