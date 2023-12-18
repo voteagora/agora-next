@@ -26,23 +26,61 @@
     }
   }
   .partner_image_container {
+    background-color: blue;
     position: relative;
-    background-color: red;
     height: 100%;
     width: 100%;
     @media (max-width: $max-width-xl) {
       display: none;
     }
+    .spark1 {
+      position: absolute;
+      top: 8px;
+      left: 45%;
+      transform: rotate(8deg);
+      filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.15));
+    }
+    .agora {
+      position: absolute;
+      top: 64px;
+      left: 52%;
+      transform: rotate(-6deg);
+      filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.15));
+    }
+    .spark2 {
+      position: absolute;
+      top: 0px;
+      right: 15%;
+      transform: rotate(12deg);
+      filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.15));
+    }
+    .thumb {
+      position: absolute;
+      top: 72px;
+      right: 12%;
+      transform: rotate(-8deg);
+      filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.15));
+    }
+
+    .opToken {
+      position: absolute;
+      top: 24px;
+      right: 5%;
+      animation: $rotate-continuous;
+      transform: rotate(8deg);
+      filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.15));
+    }
     .sunny_bg {
       position: absolute;
       top: 0px;
-      right: 0px;
+      right: 20%;
       animation: $rotate-continuous;
+      filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.15));
     }
     .sunny_face {
       position: absolute;
       top: 0px;
-      right: 0px;
+      right: 20%;
     }
   }
 }
