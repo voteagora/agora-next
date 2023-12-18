@@ -1,24 +1,6 @@
 @import "@/styles/variables";
 .box {
-  padding: $spacing-4 0;
-  overflow-y: scroll;
   width: 100%;
-  max-width: $max-width-lg;
-  min-width: $max-width-xs;
-  min-height: $max-width-xs;
-  background: $white;
-}
-
-.details_container {
-  border: 1px solid $gray-eb;
-  border-radius: $border-radius-md;
-  padding: $spacing-4;
-  color: #66676b;
-  font-size: $font-size-xs;
-
-  & > div:not(:last-child) {
-    margin-bottom: $spacing-2;
-  }
 }
 
 .transfer_symbol_container {
@@ -28,8 +10,12 @@
 }
 
 .amount_container {
-  color: #66676b;
   font-size: $font-size-xs;
+  border: 1px solid $gray-300;
+  border-radius: $border-radius-lg;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-8 $spacing-2;
 }
 
 .circle_container {
@@ -55,7 +41,9 @@
 
 .token_amount_container {
   color: $black;
-  font-size: $font-size-6xl;
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-none;
   @media (max-width: $max-width-md) {
     font-size: $font-size-4xl;
   }
@@ -65,17 +53,6 @@
   border: 1px solid $gray-eb;
   border-radius: $spacing-2;
   box-shadow: $box-shadow-default;
-}
-
-.profile_image {
-  position: relative;
-  margin-right: $spacing-2;
-
-  & > div {
-    border-radius: $border-radius-full;
-    width: 36px;
-    height: 36px;
-  }
 }
 
 .title {
@@ -114,26 +91,44 @@
   }
 }
 
+.subtitle {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $gray-700;
+}
+
+.avatar {
+  > div {
+    width: $spacing-10;
+    height: $spacing-10;
+  }
+}
+.medium {
+  font-weight: $font-weight-medium;
+}
+
 .sub_row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px dashed $gray-300;
+  padding: $spacing-4 0;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   @media (max-width: $max-width-xl) {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  & > div:not(:last-child) {
-    margin-right: $spacing-4;
-    margin-bottom: $spacing-2;
-  }
-
   &_input {
     width: 12rem;
     padding-right: 6rem;
     text-align: right;
+    font-size: $font-size-base;
   }
 
   &_percent {
@@ -142,5 +137,6 @@
     transform: translateY(-50%);
     left: 6.5rem;
     width: fit-content;
+    color: $gray-700;
   }
 }
