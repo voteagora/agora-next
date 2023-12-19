@@ -1,4 +1,4 @@
-import { getQuorumForProposal } from "./governorUtils";
+import { getQuorum, getQuorumForProposal } from "./governorUtils";
 import { Prisma, ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
@@ -187,17 +187,7 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
-  const getQuorum = async () => {
-    let quorum = await getQuorumForProposal(proposal);
-
-    if (!quorum) {
-      const votableSupply = await prisma.votableSupply.findFirst({});
-
-      quorum = (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
-    }
-
-    return quorum;
-  };
+  const quorum = await getQuorum(proposal);
 
   return {
     id: proposal.proposal_id,
@@ -226,7 +216,7 @@ export async function parseProposal(
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
-    quorum: await getQuorum(),
+    quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
     proposalResults: proposalResuts.kind,
