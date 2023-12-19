@@ -2,6 +2,7 @@ import { HStack, VStack } from "../Layout/Stack";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import styles from "./metrics.module.scss";
+import { cn } from "@/lib/utils";
 
 export default function MetricContainer({ icon, title, body, link = null }) {
   return (
@@ -13,7 +14,10 @@ export default function MetricContainer({ icon, title, body, link = null }) {
           rel="noopener noreferrer"
           className={styles.metric_card_container_link}
         >
-          <HStack gap={3} className={styles.metric_card_container}>
+          <HStack
+            gap={3}
+            className={cn(styles.metric_card_container, styles.hover)}
+          >
             <div className={styles.icon_container}>
               <Image src={icons[icon]} alt={icon} width="24" height="24" />
             </div>
