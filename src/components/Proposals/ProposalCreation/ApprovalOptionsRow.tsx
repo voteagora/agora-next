@@ -5,7 +5,6 @@ import { XCircleIcon } from "@heroicons/react/20/solid";
 import styles from "./styles.module.scss";
 import { VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
-import { Button } from "@/components/ui/button";
 import AddTransactionsDetails from "./AddTransactionsDetails";
 
 export default function ApprovalOptionsRow({ form }: { form: Form }) {
@@ -39,15 +38,17 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
 
   return (
     <>
-      <h4 className={styles.create_prop_form__heading}>Proposed Options</h4>
+      <h4 className={styles.create_prop_form__title}>Proposed Options</h4>
       <p className={styles.approval__option_row_text}>
         Proposed transactions will execute if your proposal passes. If you skip
         this step no transactions will be added.
       </p>
       {form.state.options.map((_option, index) => (
-        <VStack gap={4} key={index} className="relative">
-          <p className="font-semibold">Option {index + 1}</p>
-          <VStack className={styles.approval__option_row}>
+        <VStack gap={4} key={index} className={styles.approval__option_row}>
+          <div className={styles.approval__option_title}>
+            Option {index + 1}
+          </div>
+          <VStack>
             <label className={styles.create_prop_form__label}>Title</label>
             <InputBox
               placeholder={"My option title"}
@@ -65,9 +66,10 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
           )}
         </VStack>
       ))}
-      <Button variant="outline" type="button" onClick={addOption}>
-        Add option
-      </Button>
+      <div onClick={addOption} className={styles.option_button}>
+        <div className={styles.option_button__add}>+</div>
+        <div className={styles.option_button__copy}>Add option</div>
+      </div>
     </>
   );
 }
