@@ -8,7 +8,11 @@ export function MultiButtons({
   buttonsProps: [string, () => void][];
 }) {
   return (
-    <HStack className={styles.multi_buttons} gap={4}>
+    <HStack
+      className={styles.multi_buttons}
+      gap={4}
+      justifyContent="justify-between"
+    >
       {buttonsProps.map((buttonProps, index) => {
         return (
           <Button
@@ -16,6 +20,7 @@ export function MultiButtons({
             variant="outline"
             type="button"
             onClick={buttonProps[1]}
+            className="flex-1"
           >
             {buttonProps[0]}
           </Button>
