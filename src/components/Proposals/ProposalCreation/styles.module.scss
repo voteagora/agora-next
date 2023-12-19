@@ -2,22 +2,25 @@
 
 .info_panel {
   background-color: $gray-fa;
-  border-radius: $spacing-3;
+  border-radius: $border-radius-xl;
   border-width: $spacing-px;
-  border-color: $gray-eb;
-  box-shadow: $box-shadow-default;
+  border-color: $gray-300;
   padding: $spacing-6;
 
   &__title {
     font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
+    font-weight: $font-weight-extrabold;
     margin-bottom: $spacing-4;
   }
 
   &__description {
-    font-size: $font-size-sm;
-    color: $gray-4f;
-    font-weight: $font-weight-normal;
+    p {
+      color: $gray-700;
+    }
+
+    p > span {
+      color: $gray-900;
+    }
     & > p {
       &:not(:last-child) {
         margin-bottom: $spacing-4;
@@ -28,7 +31,7 @@
 
 .create_prop_form {
   background-color: $white;
-  border-radius: $spacing-3;
+  border-radius: $border-radius-xl;
   border-width: $spacing-px;
   border-color: $gray-300;
   box-shadow: $box-shadow-newDefault;
@@ -40,12 +43,16 @@
 
   &__heading {
     font-size: $font-size-2xl;
-    font-weight: bold;
+    font-weight: $font-weight-extrabold;
+    padding-bottom: $spacing-1;
+  }
+  &__title {
+    font-weight: $font-weight-semibold;
     padding-bottom: $spacing-1;
   }
 
   &__subheading {
-    color: $gray-4f;
+    color: $gray-700;
   }
 
   &__submit_container {
@@ -53,8 +60,7 @@
   }
 
   &__submit_text {
-    color: $gray-4f;
-    font-weight: 500;
+    color: $gray-700;
     width: 60%;
   }
 
@@ -179,6 +185,7 @@
 
 .type_row {
   margin-top: $spacing-4;
+  padding-bottom: $spacing-4;
 
   &__inner {
     @media (max-width: $max-width-4xl) {
@@ -195,8 +202,8 @@
   }
 
   &__text {
-    font-size: $font-size-base;
-    color: $gray-4f;
+    margin-top: $spacing-1;
+    color: $gray-700;
     @media (max-width: $max-width-4xl) {
       width: 100%;
       margin-top: $spacing-2;
@@ -270,4 +277,11 @@
     border-width: $spacing-px;
     border-color: $gray-eb;
   }
+}
+
+.input_heading {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-1;
+  color: $gray-700;
 }

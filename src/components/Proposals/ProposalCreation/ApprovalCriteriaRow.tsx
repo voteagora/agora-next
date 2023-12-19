@@ -13,7 +13,7 @@ import LabelWithInfo from "./LabelWithInfo";
 export default function ApprovalCriteriaRow({ form }: { form: Form }) {
   return (
     <>
-      <h4 className={styles.create_prop_form__heading}>Approval parameters</h4>
+      <h4 className={styles.create_prop_form__title}>Approval parameters</h4>
       <p className={styles.approval__info}>
         Use the following settings to set the parameters of this vote as well as
         the methodology for determining which options can be executed.
