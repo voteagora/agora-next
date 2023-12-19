@@ -22,7 +22,12 @@ export async function getQuorumForProposal(
       if (!proposal?.start_block) {
         return null;
       }
-      return OptimismContracts.governor.contract.quorum(proposal.proposal_id);
+      return OptimismContracts.governor.contract.quorum(
+        // TODO: Remove after governor update
+        process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+          ? proposal.start_block
+          : proposal.proposal_id
+      );
     }
   }
 }

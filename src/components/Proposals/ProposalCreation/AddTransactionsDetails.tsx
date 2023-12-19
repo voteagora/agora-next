@@ -199,8 +199,8 @@ export default function AddTransactionsDetails({
       )}
       {form.state.options[optionIndex].transactions.length !== 0 && (
         <VStack className={styles.transaction_details_option__add}>
-          <p className={cx(styles.create_prop_form__heading, "mb-0")}>
-            Add another transaction
+          <p className={cx(styles.create_prop_form__title, "mb-0")}>
+            Add another transaction to this option
           </p>
           <MultiButtons
             buttonsProps={[

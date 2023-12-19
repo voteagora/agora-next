@@ -61,7 +61,7 @@ function SubdelegationToRow({
             let newAllowanceValue =
               Math.round(Number(e.target.value) * 100) / 100;
             if (newAllowanceValue > amountToAllocate) {
-              newAllowanceValue = amountToAllocate;
+              newAllowanceValue = Math.round(amountToAllocate * 100) / 100;
             }
             const newAllowances = [...allowances];
             newAllowances[index] = newAllowanceValue;
