@@ -12,10 +12,10 @@ export default function ResourceNotFound({ message }: ResourceNotFoundProps) {
         className="my-4"
         src="/images/blink.gif"
         alt="Blinking Agora Logo"
-        width={48}
+        width={40}
         height={12}
       />
-      <p className="text-md text-gray-600">{message || defaultMessage}</p>
+      <p className="text-md text-stone-600">{message || defaultMessage}</p>
     </div>
   );
 }

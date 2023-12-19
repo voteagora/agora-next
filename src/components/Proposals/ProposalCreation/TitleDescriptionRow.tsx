@@ -23,7 +23,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("write");
   return (
     <VStack className={styles.title_desc_row__mt}>
-      <h4 className={styles.create_prop_form__heading}>Title</h4>
+      <h4 className={styles.input_heading}>Title</h4>
       <InputBox
         placeholder={"I'd like to propose..."}
         value={form.state.title}
@@ -35,12 +35,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
         justifyContent="justify-between"
         gap={4}
       >
-        <h4
-          className={cx(
-            styles.create_prop_form__heading,
-            styles.title_desc_row__mt
-          )}
-        >
+        <h4 className={cx(styles.input_heading, styles.title_desc_row__mt)}>
           Proposal
         </h4>
 

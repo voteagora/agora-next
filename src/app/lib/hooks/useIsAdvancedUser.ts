@@ -27,7 +27,7 @@ const useIsAdvancedUser = () => {
      * TEST: more than 1 token or allowlist
      */
     onSuccess: (balance) => {
-      const allowedBalance = parseUnits("1", 18);
+      const allowedBalance = parseUnits("100000", 18);
       setIsAdvancedUser(
         process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
           ? allowList.includes(address!)
