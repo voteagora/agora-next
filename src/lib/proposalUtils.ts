@@ -4,6 +4,7 @@ import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
+import prisma from "@/app/lib/prisma";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
