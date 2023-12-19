@@ -59,9 +59,9 @@
     padding-top: $spacing-3;
   }
 }
-.metric_card_container:hover {
+.hover:hover {
   box-shadow: $box-shadow-newHover;
 }
-.metric_card_container:active {
+.hover:active {
   box-shadow: $box-shadow-none;
 }
