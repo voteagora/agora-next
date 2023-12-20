@@ -29,6 +29,8 @@ const useIsAdvancedUser = () => {
     "0xb5c2A415Ad256f641605C757C3c79e59d4c77782", // Kent Test 1
     "0xd0f23E5ea6c8088eD0FFf294F3fC29e719EE6B8b", // Kent Test 2
     "0x603F5A389d893624A648424aD58a33205F8fC59c", // Kent Test 3
+    "0xdF40cED4E9B256BC6b237F27C0001265f0d0BdA8", // Kent Test 4
+    "0xC323Ee1d28D2508667f4BEbfC26F93c60aBdD203", // kentf.eth
   ] as `0x${string}`[];
 
   useContractRead({
