@@ -4,6 +4,7 @@ import { Delegate } from "@/app/api/delegates/delegate";
 import { MobileConnectButton } from "./MobileConnectButton";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { DesktopConnectButton } from "./DesktopConnectButton";
 
 type Props = {
   fetchDelegate: (address: string) => Promise<Delegate>;
@@ -27,7 +28,7 @@ export function ConnectButton({ fetchDelegate }: Props) {
   return (
     <>
       <MobileConnectButton delegate={delegate} />
-      {/* <DesktopConnectButton fetchDelegate={fetchDelegate} /> */}
+      <DesktopConnectButton delegate={delegate} />
     </>
   );
 }
