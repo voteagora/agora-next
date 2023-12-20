@@ -26,6 +26,9 @@ const useIsAdvancedUser = () => {
     "0x5d36a202687fD6Bd0f670545334bF0B4827Cc1E2", //launamu
     "0xa142aB9eab9264807A41F0E5cbDab877D204E233", //Krzys from L2Beat personal
     "0x7fC80faD32Ec41fd5CfcC14EeE9C31953b6B4a8B", //Brichis
+    "0xb5c2A415Ad256f641605C757C3c79e59d4c77782", // Kent Test 1
+    "0xd0f23E5ea6c8088eD0FFf294F3fC29e719EE6B8b", // Kent Test 2
+    "0x603F5A389d893624A648424aD58a33205F8fC59c", // Kent Test 3
   ] as `0x${string}`[];
 
   useContractRead({
