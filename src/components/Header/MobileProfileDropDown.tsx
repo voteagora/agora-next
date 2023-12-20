@@ -187,23 +187,19 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                       }
                     />
 
-                    {/* <PanelRow
+                    <PanelRow
                       title="Delegated to"
                       detail={
                         <MobileValueWrapper>
-                          {delegate.delegatingTo.address.resolvedName
-                            .address === ethers.constants.AddressZero ? (
-                            "N/A"
-                          ) : (
-                            <HumanAddress
-                              resolvedName={
-                                delegate.delegatingTo.address.resolvedName
-                              }
-                            />
-                          )}
+                          <Link
+                            href={`/delegate/${delegate?.address}`}
+                            className="underline"
+                          >
+                            View more
+                          </Link>
                         </MobileValueWrapper>
                       }
-                    /> */}
+                    />
 
                     <PanelRow
                       title="My voting power"
