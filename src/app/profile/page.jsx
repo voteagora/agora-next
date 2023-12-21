@@ -28,11 +28,11 @@ export default async function Page() {
       {isAuthenticated && delegateStatement != {} ? (
         <>
           <p>Delegate statement goes here</p>
-          <Link href="/profile/edit">Edit your delegate statement</Link>
+          <Link href="/delegates/edit">Edit your delegate statement</Link>
         </>
       ) : (
         <div>
-          <Link href="/profile/create">Create a delegate statement</Link>
+          <Link href="/delegates/create">Create a delegate statement</Link>
         </div>
       )}
     </>
