@@ -6,6 +6,7 @@ import TopIssuesFormSection from "./TopIssuesFormSection";
 import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
 // TODO: frh -> this useForm or the other one
+// TODO: frh -> typescript
 import { useForm } from "@/app/lib/hooks/useForm";
 
 export default function DelegateStatementForm() {

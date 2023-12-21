@@ -1,4 +1,5 @@
 import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
+import DelegateStatementBoolSelector from "./DelegateStatementBoolSelector";
 
 export default function OtherInfoFormSection({ form }) {
   return (
@@ -25,11 +26,12 @@ export default function OtherInfoFormSection({ form }) {
           onChange={form.onChange.email}
         />
 
-        {/* TODO: shadcnui tabs */}
+        {/* TODO: form */}
         {/* <YesNoSelector
           selection={form.state.openToSponsoringProposals}
           onSelectionChanged={form.onChange.openToSponsoringProposals}
         /> */}
+        <DelegateStatementBoolSelector />
       </div>
     </div>
   );
