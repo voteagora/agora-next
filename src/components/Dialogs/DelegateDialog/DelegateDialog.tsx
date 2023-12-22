@@ -11,6 +11,8 @@ import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { useCallback, useEffect, useState } from "react";
 import { Delegatees } from "@prisma/client";
+import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import HumanAddress from "@/components/shared/HumanAddress";
 
 export function DelegateDialog({
   delegate,
@@ -28,7 +30,8 @@ export function DelegateDialog({
   const { address: accountAddress } = useAccount();
   const { setOpen } = useModal();
   const [votingPower, setVotingPower] = useState<string>("");
-  const [delegatees, setDelegatees] = useState<Delegatees | null>(null);
+  const [delegatee, setDelegatee] = useState<Delegatees | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   const { isLoading, isSuccess, isError, write } = useContractWrite({
     address: OptimismContracts.token.address as any,
@@ -38,70 +41,96 @@ export function DelegateDialog({
   });
 
   const fetchData = useCallback(async () => {
+    setIsReady(false);
     if (!accountAddress) return;
 
     const vp = await fetchBalanceForDirectDelegation(accountAddress);
     setVotingPower(vp);
 
     const direct = await fetchDirectDelegatee(accountAddress);
-    setDelegatees(direct);
+    setDelegatee(direct);
+    setIsReady(true);
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  if (!isReady) {
+    return (
+      <VStack
+        className="w-full h-[318px]"
+        alignItems="items-center"
+        justifyContent="justify-center"
+      >
+        <AgoraLoaderSmall />
+      </VStack>
+    );
+  }
+
   return (
     <VStack alignItems="items-center" className={styles.dialog_container}>
-      <VStack gap={6} alignItems="items-stretch">
-        <VStack
-          gap={3}
-          alignItems="items-center"
-          className={styles.details_container}
-        >
+      <VStack gap={6} className="min-h-[318px] w-full">
+        {delegatee ? (
           <VStack
-            className={styles.amount_container}
-            alignItems="items-center"
             gap={3}
-          >
-            {(() => {
-              if (!votingPower) {
-                return <div>{`You don't have any tokens to delegate`}</div>;
-              }
-              return (
-                <>
-                  <div>Delegating your</div>
-
-                  <DelegationDisplayAmount amount={votingPower} />
-                </>
-              );
-            })()}
-          </VStack>
-
-          <VStack
-            className={styles.transfer_symbol_container}
             alignItems="items-center"
+            className={styles.details_container}
           >
             <VStack
-              justifyContent="justify-center"
-              className={styles.circle_container}
+              className={styles.amount_container}
+              alignItems="items-center"
+              gap={3}
             >
-              <div className={styles.circle} />
+              {(() => {
+                if (!votingPower) {
+                  return <div>{`You don't have any tokens to delegate`}</div>;
+                }
+                return (
+                  <>
+                    <div>Delegating your</div>
+
+                    <DelegationDisplayAmount amount={votingPower} />
+                  </>
+                );
+              })()}
             </VStack>
 
-            <VStack className={styles.arrow_container}>
-              <ArrowDownIcon className="text-black" />
+            <VStack
+              className={styles.transfer_symbol_container}
+              alignItems="items-center"
+            >
+              <VStack
+                justifyContent="justify-center"
+                className={styles.circle_container}
+              >
+                <div className={styles.circle} />
+              </VStack>
+
+              <VStack className={styles.arrow_container}>
+                <ArrowDownIcon className="text-black" />
+              </VStack>
+            </VStack>
+
+            <VStack className={styles.amount_container}>
+              <div className="text-center">
+                To <ENSName address={delegate.address} /> who represents
+              </div>
+
+              {/* <DelegationDisplayAmount amount={votingPower} /> */}
             </VStack>
           </VStack>
-
-          <VStack className={styles.amount_container}>
-            <div className="text-center">
-              To <ENSName address={delegate.address} /> who represents
+        ) : (
+          <div>
+            <p className="text-xl font-bold text-left">
+              Set <ENSName address={delegate.address} /> as your delegate
+            </p>
+            <div className="text-gray-700">
+              <ENSName address={delegate.address} /> will be able to vote with
+              any token owned by your address
             </div>
-
-            {/* <DelegationDisplayAmount amount={votingPower} /> */}
-          </VStack>
-        </VStack>
+          </div>
+        )}
         {!accountAddress && (
           <ShadcnButton variant="outline" onClick={() => setOpen(true)}>
             Connect wallet to vote
