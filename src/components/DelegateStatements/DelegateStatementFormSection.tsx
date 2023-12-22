@@ -1,8 +1,18 @@
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FormField } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { useWatch, UseFormReturn } from "react-hook-form";
+import { FormValues } from "./DelegateStatementForm";
 
-export default function DelegateStatementFormSection({ form }) {
+export default function DelegateStatementFormSection({
+  form,
+}: {
+  form: UseFormReturn<FormValues>;
+}) {
+  const delegateStatement = useWatch({ name: "delegateStatement" });
+
   return (
     <VStack className="py-8 px-6 border-b border-gray-300">
       <Tabs defaultValue="write">
@@ -27,17 +37,20 @@ export default function DelegateStatementFormSection({ form }) {
           </TabsList>
         </HStack>
         <TabsContent value="write">
-          <textarea
-            className="bg-gray-100 p-4 mt-2 rounded-md outline-none w-full min-h-[16rem] border border-gray-300"
-            // value={form.state.delegateStatement}
-            // onChange={(e) => form.onChange.delegateStatement(e.target.value)}
-            placeholder="I believe that..."
+          <FormField
+            control={form.control}
+            name="delegateStatement"
+            render={({ field }) => (
+              <Textarea
+                className="mt-2 min-h-[16rem]"
+                placeholder="I believe that..."
+                {...field}
+              />
+            )}
           />
         </TabsContent>
         <TabsContent value="preview">
-          {/* TODO: frh -> this with form */}
-          {/* <Markdown content={form.state.delegateStatement} /> */}
-          <Markdown content="hi pluto" />
+          <Markdown content={delegateStatement} />
         </TabsContent>
       </Tabs>
     </VStack>

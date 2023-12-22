@@ -1,7 +1,13 @@
 import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
 import DelegateStatementBoolSelector from "./DelegateStatementBoolSelector";
+import { FormValues } from "./DelegateStatementForm";
+import { UseFormReturn } from "react-hook-form";
 
-export default function OtherInfoFormSection({ form }) {
+export default function OtherInfoFormSection({
+  form,
+}: {
+  form: UseFormReturn<FormValues>;
+}) {
   return (
     <div className="py-8 px-6 border-b border-gray-300">
       <h3 className="font-bold">Other info</h3>
@@ -10,28 +16,22 @@ export default function OtherInfoFormSection({ form }) {
         <DelegateStatementInputGroup
           title="Twitter"
           placeholder="@yourname"
-          value={form.state.twitter}
-          onChange={form.onChange.twitter}
+          name="twitter"
+          form={form}
         />
         <DelegateStatementInputGroup
           title="Discord"
           placeholder="yourname#2142"
-          value={form.state.discord}
-          onChange={form.onChange.discord}
+          name="discord"
+          form={form}
         />
         <DelegateStatementInputGroup
           title="Email (will not be public)"
           placeholder="you@gmail.com"
-          value={form.state.email}
-          onChange={form.onChange.email}
+          name="email"
+          form={form}
         />
-
-        {/* TODO: form */}
-        {/* <YesNoSelector
-          selection={form.state.openToSponsoringProposals}
-          onSelectionChanged={form.onChange.openToSponsoringProposals}
-        /> */}
-        <DelegateStatementBoolSelector />
+        <DelegateStatementBoolSelector form={form} />
       </div>
     </div>
   );

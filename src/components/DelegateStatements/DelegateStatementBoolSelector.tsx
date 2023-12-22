@@ -1,16 +1,13 @@
 import { VStack } from "@/components/Layout/Stack";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FormValues } from "./DelegateStatementForm";
+import { UseFormReturn } from "react-hook-form";
 
-type Props = {
-  onSelectionChanged: (newSelection: "yes" | "no") => void;
-  selection: "yes" | "no" | undefined;
-};
-
-// TODO: frh -> ts
 export default function DelegateStatementBoolSelector({
-  onSelectionChanged,
-  selection,
-}: Props) {
+  form,
+}: {
+  form: UseFormReturn<FormValues>;
+}) {
   return (
     <VStack>
       <h4 className="font-bold text-xs mb-2">
@@ -21,10 +18,18 @@ export default function DelegateStatementBoolSelector({
       </h4>
       <Tabs>
         <TabsList variant="bool">
-          <TabsTrigger variant="bool" value="yes">
+          <TabsTrigger
+            variant="bool"
+            value="yes"
+            onClick={() => form.setValue("agreeCodeConduct", true)}
+          >
             Yes
           </TabsTrigger>
-          <TabsTrigger variant="bool" value="no">
+          <TabsTrigger
+            variant="bool"
+            value="no"
+            onClick={() => form.setValue("agreeCodeConduct", false)}
+          >
             No
           </TabsTrigger>
         </TabsList>
