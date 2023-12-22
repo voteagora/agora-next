@@ -2,50 +2,8 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import styles from "./delegateCard.module.scss";
-import {
-  getProxy,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
-} from "@/app/api/voting-power/getVotingPower";
-import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
 import DelegateCardClient from "./DelegateCardClient";
 import { Delegate } from "@/app/api/delegates/delegate";
-
-// Pass address of the connected wallet
-async function fetchVotingPowerForSubdelegation(addressOrENSName: string) {
-  "use server";
-
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function checkIfDelegatingToProxy(addressOrENSName: string) {
-  "use server";
-
-  return isDelegatingToProxy({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function fetchBalanceForDirectDelegation(addressOrENSName: string) {
-  "use server";
-
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function fetchCurrentDelegatees(addressOrENSName: string) {
-  "use server";
-
-  return getCurrentDelegatees({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function getProxyAddress(addressOrENSName: string) {
-  "use server";
-
-  return getProxy({ addressOrENSName });
-}
 
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
@@ -105,16 +63,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
               detail={pluralizeAddresses(Number(delegate.numOfDelegators))}
             />
 
-            <DelegateCardClient
-              delegate={delegate}
-              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-              fetchVotingPowerForSubdelegation={
-                fetchVotingPowerForSubdelegation
-              }
-              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-              fetchCurrentDelegatees={fetchCurrentDelegatees}
-              getProxyAddress={getProxyAddress}
-            />
+            <DelegateCardClient delegate={delegate} />
           </VStack>
         </div>
       </VStack>

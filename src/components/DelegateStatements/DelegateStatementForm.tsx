@@ -12,9 +12,9 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { initialTopIssues } from "./TopIssuesFormSection";
 import { useAccount } from "wagmi";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { useEffect, useState } from "react";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
@@ -53,9 +53,7 @@ export default function DelegateStatementForm() {
 
   useEffect(() => {
     async function _getDelegate() {
-      const _delegate = await getDelegate({
-        addressOrENSName: address as `0x${string}`,
-      });
+      const _delegate = await fetchDelegate(address as string);
       setDelegate(_delegate);
     }
     if (address) {
@@ -64,7 +62,12 @@ export default function DelegateStatementForm() {
   }, [address]);
 
   return (
-    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">
+      {delegate && (
+        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+          <DelegateCard delegate={delegate} />
+        </VStack>
+      )}
       <VStack className="w-full">
         <VStack className="bg-white border radius-xl border-gray-300 shadow-newDefault">
           <Form {...form}>
@@ -96,11 +99,6 @@ export default function DelegateStatementForm() {
           </Form>
         </VStack>
       </VStack>
-      {delegate && (
-        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
-          <DelegateCard delegate={delegate} />
-        </VStack>
-      )}
     </div>
   );
 }

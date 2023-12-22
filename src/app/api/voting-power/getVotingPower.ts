@@ -241,6 +241,6 @@ async function getProxyAddressForAddress({
   address,
 }: {
   address: string;
-}): Promise<string | undefined> {
+}): Promise<string> {
   return getProxyAddress(address);
 }

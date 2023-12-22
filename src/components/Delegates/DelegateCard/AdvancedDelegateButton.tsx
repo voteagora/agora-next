@@ -1,23 +1,19 @@
 import { Button } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { useCallback, useEffect, useState } from "react";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-
-export function AdvancedDelegateButton({
-  delegate,
+import {
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
+} from "@/app/delegates/actions";
+
+export function AdvancedDelegateButton({
+  delegate,
 }: {
   delegate: DelegateChunk;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
 }) {
+  const { address } = delegate;
   const openDialog = useOpenDialog();
 
   return (
@@ -28,11 +24,12 @@ export function AdvancedDelegateButton({
           openDialog({
             type: "ADVANCED_DELEGATE",
             params: {
-              target: delegate.address,
-              fetchVotingPowerForSubdelegation,
-              checkIfDelegatingToProxy,
-              fetchCurrentDelegatees,
-              getProxyAddress,
+              target: address,
+              fetchVotingPowerForSubdelegation: () =>
+                fetchVotingPowerForSubdelegation(address),
+              checkIfDelegatingToProxy: () => checkIfDelegatingToProxy(address),
+              fetchCurrentDelegatees: () => fetchCurrentDelegatees(address),
+              getProxyAddress: () => getProxyAddress(address),
             },
           });
         }}
