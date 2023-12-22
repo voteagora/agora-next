@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import DelegateStatementForm from "../../../components/DelegateStatements/DelegateStatementForm";
+import DelegateStatementForm from "../../../components/DelegateStatement/DelegateStatementForm";
 
 export default function Page() {
   return (
@@ -11,4 +11,4 @@ export default function Page() {
       <DelegateStatementForm />
     </div>
   );
-};
+}

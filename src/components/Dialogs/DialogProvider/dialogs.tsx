@@ -1,5 +1,6 @@
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
+import { DelegateStatementDialog } from "../DelegateStatementDialog/DelegateStatementDialog";
 import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
 import {
   CastVoteDialog,
@@ -11,11 +12,17 @@ import { Proposal } from "@/app/api/proposals/proposal";
 
 export type DialogType =
   | DelegateDialogType
+  | DelegateStatementDialogType
   | CastProposalDialogType
   | CastVoteDialogType
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType;
 // | FaqDialogType
+
+export type DelegateStatementDialogType = {
+  type: "DELEGATE_STATEMENT";
+  params: {};
+};
 
 export type DelegateDialogType = {
   type: "DELEGATE";
@@ -71,6 +78,9 @@ export type ApprovalCastVoteDialogType = {
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
+  DELEGATE_STATEMENT: () => {
+    return <DelegateStatementDialog />;
+  },
   DELEGATE: ({ target, votingPower }, closeDialog) => {
     return (
       <DelegateDialog

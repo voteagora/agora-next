@@ -1,6 +1,6 @@
 "use client";
 
-import DelegateStatementForm from "@/components/DelegateStatements/DelegateStatementForm";
+import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 import { useAccount } from "wagmi";
 
 export default async function Page() {

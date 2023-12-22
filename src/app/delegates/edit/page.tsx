@@ -1,4 +1,4 @@
-import DelegateStatementForm from "@/components/DelegateStatements/DelegateStatementForm";
+import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 
 export default async function Page() {
   return (

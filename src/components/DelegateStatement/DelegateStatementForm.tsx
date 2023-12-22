@@ -16,6 +16,7 @@ import { Delegate } from "@/app/api/delegates/delegate";
 import { useEffect, useState } from "react";
 import { fetchDelegate } from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
@@ -52,10 +53,15 @@ export default function DelegateStatementForm() {
     control: form.control,
     name: "agreeCodeConduct",
   });
+  const openDialog = useOpenDialog();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (agreeCodeConduct) {
       console.log("values", values);
+      openDialog({
+        type: "DELEGATE_STATEMENT",
+        params: {},
+      });
     }
   }
 
