@@ -1,7 +1,5 @@
 import { ConnectKitButton } from "connectkit";
 import styles from "./header.module.scss";
-import ENSAvatar from "../shared/ENSAvatar";
-import HumanAddress from "../shared/HumanAddress";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { DesktopProfileDropDown } from "./DesktopProfileDropDown";
 

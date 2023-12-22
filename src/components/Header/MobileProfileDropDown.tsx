@@ -57,12 +57,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button
-            className={css`
-              margin-top: ${theme.spacing[1]};
-              outline: none;
-            `}
-          >
+          <Popover.Button className="mt-1 outline-none">
             <div className={styles.testing}>
               <ENSAvatar ensName={ensName} />
             </div>
@@ -74,15 +69,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.2 }}
                 exit={{ opacity: 0 }}
-                className={css`
-                  z-index: 10;
-                  background: black;
-                  position: fixed;
-                  top: 0;
-                  left: 0;
-                  right: 0;
-                  bottom: 0;
-                `}
+                className={"z-10 bg-black fixed top-0 left-0 right-0 bottom-0"}
               />
             </AnimatePresence>
           )}
@@ -91,72 +78,31 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
             <Popover.Panel>
               {({ close }) => (
                 <motion.div
-                  className={css`
-                    background-color: ${theme.colors.white};
-                    padding: ${theme.spacing[8]} ${theme.spacing[6]};
-                    border-top-left-radius: ${theme.spacing[4]};
-                    border-top-right-radius: ${theme.spacing[4]};
-                    width: 100vw;
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                  `}
+                  className={styles.mobile__container}
                   initial="hidden"
                   animate="show"
                   exit="exit"
                   variants={variants}
                   transition={{ duration: 0.2 }}
                 >
-                  <VStack
-                    className={css`
-                      gap: ${theme.spacing[3]};
-                    `}
-                  >
-                    <HStack
-                      className={css`
-                        align-items: center;
-                        gap: ${theme.spacing[2]};
-                        margin-bottom: ${theme.spacing[1]};
-                      `}
-                    >
-                      <div
-                        className={css`
-                          position: relative;
-                          aspect-ratio: 1/1;
-                        `}
-                      >
+                  <VStack gap={3}>
+                    <HStack gap={2} alignItems="items-center" className="mb-1">
+                      <div className={"relative aspect-square"}>
                         <ENSAvatar ensName={ensName} />
                       </div>
-                      <VStack
-                        className={css`
-                          flex: 1;
-                        `}
-                      >
+                      <VStack className={"flex-1"}>
                         {ensName ? (
                           <>
-                            <span
-                              className={css`
-                                font-size: ${theme.fontSize.base};
-                              `}
-                            >
+                            <span className={styles.mobile__ens}>
                               {ensName}
                             </span>
-                            <span
-                              className={css`
-                                font-size: ${theme.fontSize.xs};
-                                color: #4f4f4f;
-                              `}
-                            >
+                            <span className={styles.mobile__address}>
                               {shortAddress(address!)}
                             </span>
                           </>
                         ) : (
                           <>
-                            <span
-                              className={css`
-                                font-size: ${theme.fontSize.base};
-                              `}
-                            >
+                            <span className={styles.mobile__ens}>
                               {shortAddress(address!)}
                             </span>
                           </>
@@ -166,11 +112,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                         src={icons.power}
                         onClick={() => disconnect()}
                         alt="Disconnect Wallet"
-                        className={css`
-                          width: 32px;
-                          height: 32px;
-                          margin-right: 5px;
-                        `}
+                        className={styles.mobile__wallet}
                       />
                     </HStack>
 
@@ -227,19 +169,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
 
                     <Link
                       href={`/statements/create`}
-                      className={css`
-                        border-radius: ${theme.borderRadius.lg};
-                        border-width: ${theme.spacing.px};
-                        padding: ${theme.spacing["3"]} ${theme.spacing["2"]};
-                        color: ${theme.colors.gray["200"]};
-                        background: ${theme.colors.black};
-                        display: flex;
-                        justify-content: center;
-                        margin-top: ${theme.spacing[1]};
-                        :hover {
-                          background: ${theme.colors.gray["800"]};
-                        }
-                      `}
+                      className={styles.mobile__statement}
                     >
                       <div>
                         {hasStatement
@@ -251,20 +181,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                     {hasStatement && (
                       <Link
                         href={`/delegate/${ensName ?? address}`}
-                        className={css`
-                          border-radius: ${theme.borderRadius.lg};
-                          border-width: ${theme.spacing.px};
-                          padding: ${theme.spacing["3"]} ${theme.spacing["2"]};
-                          color: ${theme.colors.black};
-                          background: ${theme.colors.white};
-                          margin-top: ${theme.spacing[1]};
-                          display: flex;
-                          justify-content: center;
-                          :hover {
-                            background: ${theme.colors.gray["800"]};
-                            color: ${theme.colors.white};
-                          }
-                        `}
+                        className={styles.mobile__profile}
                       >
                         <div>View my profile</div>
                       </Link>
