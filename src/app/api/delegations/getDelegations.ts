@@ -214,7 +214,11 @@ async function getCurrentDelegatorsForAddress({
   ] as Delegation[];
 }
 
-const getDirectDelegateeForAddress = async (address: string) => {
+const getDirectDelegateeForAddress = async ({
+  address,
+}: {
+  address: string;
+}) => {
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
     prisma.delegatees.findFirst({

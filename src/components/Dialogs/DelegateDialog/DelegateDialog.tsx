@@ -28,7 +28,7 @@ export function DelegateDialog({
   const { address: accountAddress } = useAccount();
   const { setOpen } = useModal();
   const [votingPower, setVotingPower] = useState<string>("");
-  const [delegatees, setDelegatees] = useState<Delegatees>();
+  const [delegatees, setDelegatees] = useState<Delegatees | null>(null);
 
   const { isLoading, isSuccess, isError, write } = useContractWrite({
     address: OptimismContracts.token.address as any,
