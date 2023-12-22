@@ -7,8 +7,6 @@ import { getCurrentQuorum } from "@/lib/governorUtils";
 import { Delegate } from "./delegate";
 import { getStatment } from "../statements/getStatements";
 
-import "server-only";
-
 export async function getDelegates({
   page = 1,
   sort = "weighted_random",

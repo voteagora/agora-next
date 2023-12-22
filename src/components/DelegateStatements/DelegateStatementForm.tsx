@@ -1,6 +1,7 @@
 "use client";
 
 import { VStack } from "@/components/Layout/Stack";
+import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateStatementFormSection from "./DelegateStatementFormSection";
 import TopIssuesFormSection from "./TopIssuesFormSection";
 import OtherInfoFormSection from "./OtherInfoFormSection";
@@ -10,6 +11,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { initialTopIssues } from "./TopIssuesFormSection";
+import { useAccount } from "wagmi";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { Delegate } from "@/app/api/delegates/delegate";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
@@ -28,7 +33,9 @@ const formSchema = z.object({
 export type FormValues = z.infer<typeof formSchema>;
 
 export default function DelegateStatementForm() {
-  // TODO: frh wallet connection and gnosis connection
+  // TODO: frh gnosis connection and what if no address
+  const { address } = useAccount();
+  const [delegate, setDelegate] = useState<Delegate | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,37 +51,57 @@ export default function DelegateStatementForm() {
     console.log("values", values);
   }
 
+  useEffect(() => {
+    async function _getDelegate() {
+      const _delegate = await getDelegate({
+        addressOrENSName: address as `0x${string}`,
+      });
+      setDelegate(_delegate);
+    }
+    if (address) {
+      _getDelegate();
+    }
+  }, [address]);
+
   return (
-    <VStack className="w-full">
-      <VStack className="bg-white border radius-xl border-gray-300 shadow-newDefault">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DelegateStatementFormSection form={form} />
-            <TopIssuesFormSection form={form} />
-            <OtherInfoFormSection form={form} />
+    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <VStack className="w-full">
+        <VStack className="bg-white border radius-xl border-gray-300 shadow-newDefault">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <DelegateStatementFormSection form={form} />
+              <TopIssuesFormSection form={form} />
+              <OtherInfoFormSection form={form} />
 
-            <div className="flex flex-col lg:flex-row justify-end lg:justify-between items-stretch lg:items-center gap-4 py-8 px-6 flex-wrap">
-              <span className="text-sm text-gray-800">
-                Tip: you can always come back and edit your profile at any time.
-              </span>
+              <div className="flex flex-col lg:flex-row justify-end lg:justify-between items-stretch lg:items-center gap-4 py-8 px-6 flex-wrap">
+                <span className="text-sm text-gray-800">
+                  Tip: you can always come back and edit your profile at any
+                  time.
+                </span>
 
-              <Button
-                variant="elevatedOutline"
-                className="py-3 px-4"
-                // TODO: frh -> canSubmit
-                // disabled={!canSubmit}
-                type="submit"
-              >
-                Submit delegate profile
-              </Button>
-              {/* {lastErrorMessage && (
+                <Button
+                  variant="elevatedOutline"
+                  className="py-3 px-4"
+                  // TODO: frh -> canSubmit
+                  // disabled={!canSubmit}
+                  type="submit"
+                >
+                  Submit delegate profile
+                </Button>
+                {/* {lastErrorMessage && (
             <span className="text-sm text-red-700">{lastErrorMessage}</span>
           )} */}
-            </div>
-          </form>
-        </Form>
+              </div>
+            </form>
+          </Form>
+        </VStack>
       </VStack>
-    </VStack>
+      {delegate && (
+        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+          <DelegateCard delegate={delegate} />
+        </VStack>
+      )}
+    </div>
   );
 }
 

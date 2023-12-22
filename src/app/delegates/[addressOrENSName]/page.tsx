@@ -9,6 +9,7 @@ import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVo
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
+import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
 import { getStatment } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import {
@@ -18,44 +19,57 @@ import {
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 
-async function fetchDelegate(addressOrENSName) {
+async function fetchDelegate(addressOrENSName: string) {
   "use server";
 
   return getDelegate({ addressOrENSName });
 }
 
-async function getDelegateVotes(addressOrENSName, page = 1, sortOrder) {
+async function getDelegateVotes(
+  addressOrENSName: string,
+  page = 1,
+  sortOrder?: VotesSortOrder
+) {
   "use server";
 
   return getVotesForDelegate({ addressOrENSName, page, sortOrder });
 }
 
-async function getDelegateStatement(addressOrENSName) {
+async function getDelegateStatement(addressOrENSName: string) {
   "use server";
 
   return getStatment({ addressOrENSName });
 }
 
-async function getDelegatees(addressOrENSName) {
+async function getDelegatees(addressOrENSName: string) {
   "use server";
 
   return getCurrentDelegatees({ addressOrENSName });
 }
 
-async function getDelegators(addressOrENSName) {
+async function getDelegators(addressOrENSName: string) {
   "use server";
 
   return getCurrentDelegators({ addressOrENSName });
 }
 
-export default async function Page({ params: { addressOrENSName } }) {
+export default async function Page({
+  params: { addressOrENSName },
+}: {
+  params: { addressOrENSName: string };
+}) {
   let delegate;
-  let delegateVotes;
+  let delegateVotes: {
+    meta: { currentPage: number; pageSize: number; hasNextPage: boolean };
+    votes: Vote[];
+  } | null;
   let statement;
-  let delegatees;
-  let delegators;
+  let delegatees: Delegation[];
+  let delegators: Delegation[];
   try {
     delegate = await fetchDelegate(addressOrENSName);
     delegateVotes = await getDelegateVotes(addressOrENSName);
@@ -66,8 +80,8 @@ export default async function Page({ params: { addressOrENSName } }) {
     delegate = null;
     delegateVotes = null;
     statement = null;
-    delegatees = null;
-    delegators = null;
+    delegatees = [];
+    delegators = [];
   }
 
   if (!delegate) {
@@ -80,7 +94,7 @@ export default async function Page({ params: { addressOrENSName } }) {
     <DelegateVotesProvider initialVotes={delegateVotes}>
       <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
         <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
-          <DelegateCard addressOrENSName={addressOrENSName} />
+          <DelegateCard delegate={delegate} />
         </VStack>
 
         <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full">
@@ -93,7 +107,7 @@ export default async function Page({ params: { addressOrENSName } }) {
             delegators={delegators}
           />
 
-          {delegateVotes.votes.length > 0 ? (
+          {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row justify-between gap-2">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
@@ -113,7 +127,10 @@ export default async function Page({ params: { addressOrENSName } }) {
                 </div> */}
               </div>
               <DelegateVotes
-                fetchDelegateVotes={async (page, sortOrder) => {
+                fetchDelegateVotes={async (
+                  page: number,
+                  sortOrder: VotesSortOrder
+                ) => {
                   "use server";
 
                   return getDelegateVotes(addressOrENSName, page, sortOrder);

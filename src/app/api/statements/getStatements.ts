@@ -1,6 +1,4 @@
 import { makeDynamoClient } from "@/app/lib/dynamodb";
-
-import "server-only";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 
 export const getStatment = ({

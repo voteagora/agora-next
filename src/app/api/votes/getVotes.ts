@@ -8,8 +8,12 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 
 export const getVotesForDelegate = ({
   addressOrENSName,
+  page = 1,
+  sortOrder
 }: {
   addressOrENSName: string;
+  page: number;
+  sortOrder?: VotesSortOrder;
 }) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName);
 
 async function getVotesForDelegateForAddress({

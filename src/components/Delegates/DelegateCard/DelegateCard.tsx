@@ -1,9 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
-import { DelegateActions } from "./DelegateActions";
 import styles from "./delegateCard.module.scss";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import {
   getProxy,
   getVotingPowerAvailableForDirectDelegation,
@@ -12,59 +10,48 @@ import {
 } from "@/app/api/voting-power/getVotingPower";
 import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
 import DelegateCardClient from "./DelegateCardClient";
-
-async function fetchDelegate(addressOrENSName) {
-  "use server";
-
-  return getDelegate({ addressOrENSName });
-}
+import { Delegate } from "@/app/api/delegates/delegate";
 
 // Pass address of the connected wallet
-async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+async function fetchVotingPowerForSubdelegation(addressOrENSName: string) {
   "use server";
 
   return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
 }
 
 // Pass address of the connected wallet
-async function checkIfDelegatingToProxy(addressOrENSName) {
+async function checkIfDelegatingToProxy(addressOrENSName: string) {
   "use server";
 
   return isDelegatingToProxy({ addressOrENSName });
 }
 
 // Pass address of the connected wallet
-async function fetchBalanceForDirectDelegation(addressOrENSName) {
+async function fetchBalanceForDirectDelegation(addressOrENSName: string) {
   "use server";
 
   return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
 }
 
 // Pass address of the connected wallet
-async function fetchCurrentDelegatees(addressOrENSName) {
+async function fetchCurrentDelegatees(addressOrENSName: string) {
   "use server";
 
   return getCurrentDelegatees({ addressOrENSName });
 }
 
 // Pass address of the connected wallet
-async function getProxyAddress(addressOrENSName) {
+async function getProxyAddress(addressOrENSName: string) {
   "use server";
 
   return getProxy({ addressOrENSName });
 }
 
-export default async function DelegateCard({ addressOrENSName }) {
-  const delegate = await fetchDelegate(addressOrENSName);
-
-  if (!delegate) {
-    return null;
-  }
-
+export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
     <VStack className={styles.container}>
       <VStack className={styles.card}>
-        <VStack alignItems="stretch" className={styles.image}>
+        <VStack alignItems="items-stretch" className={styles.image}>
           <DelegateProfileImage
             address={delegate.address}
             votingPower={delegate.votingPower}
@@ -115,7 +102,7 @@ export default async function DelegateCard({ addressOrENSName }) {
             />
             <PanelRow
               title="Delegated from"
-              detail={pluralizeAddresses(delegate.numOfDelegators)}
+              detail={pluralizeAddresses(Number(delegate.numOfDelegators))}
             />
 
             <DelegateCardClient
@@ -135,9 +122,13 @@ export default async function DelegateCard({ addressOrENSName }) {
   );
 }
 
-const PanelRow = ({ title, detail }) => {
+const PanelRow = ({ title, detail }: { title: string; detail: string }) => {
   return (
-    <HStack gap="2" justifyContent="justify-between" alignItems="baseline">
+    <HStack
+      gap={2}
+      justifyContent="justify-between"
+      alignItems="items-baseline"
+    >
       <span className="whitespace-nowrap">{title}</span>
 
       <span className={styles.row}>{detail}</span>
