@@ -8,29 +8,49 @@ import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
 import { useModal } from "connectkit";
 import { Button as ShadcnButton } from "@/components/ui/button";
+import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
+import { useCallback, useEffect, useState } from "react";
+import { Delegatees } from "@prisma/client";
 
 export function DelegateDialog({
-  target,
-  votingPower,
+  delegate,
+  fetchBalanceForDirectDelegation,
+  fetchDirectDelegatee,
   completeDelegation,
 }: {
-  target: string;
-  votingPower: string;
+  delegate: DelegateChunk;
+  fetchBalanceForDirectDelegation: (
+    addressOrENSName: string
+  ) => Promise<string>;
+  fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
   const { setOpen } = useModal();
-  const { data: balance } = useBalance({
-    address: accountAddress,
-    token: OptimismContracts.token.address as any,
-  });
+  const [votingPower, setVotingPower] = useState<string>("");
+  const [delegatees, setDelegatees] = useState<Delegatees>();
 
   const { isLoading, isSuccess, isError, write } = useContractWrite({
     address: OptimismContracts.token.address as any,
     abi: OptimismContracts.token.abi,
     functionName: "delegate",
-    args: [target as any],
+    args: [delegate.address as any],
   });
+
+  const fetchData = useCallback(async () => {
+    if (!accountAddress) return;
+
+    const vp = await fetchBalanceForDirectDelegation(accountAddress);
+    setVotingPower(vp);
+
+    const direct = await fetchDirectDelegatee(accountAddress);
+    setDelegatees(direct);
+  }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   return (
     <VStack alignItems="items-center" className={styles.dialog_container}>
       <VStack gap={6} alignItems="items-stretch">
@@ -45,14 +65,14 @@ export function DelegateDialog({
             gap={3}
           >
             {(() => {
-              if (!balance) {
+              if (!votingPower) {
                 return <div>{`You don't have any tokens to delegate`}</div>;
               }
               return (
                 <>
                   <div>Delegating your</div>
 
-                  <DelegationDisplayAmount amount={balance.value} />
+                  <DelegationDisplayAmount amount={votingPower} />
                 </>
               );
             })()}
@@ -76,10 +96,10 @@ export function DelegateDialog({
 
           <VStack className={styles.amount_container}>
             <div className="text-center">
-              To <ENSName address={target} /> who represents
+              To <ENSName address={delegate.address} /> who represents
             </div>
 
-            <DelegationDisplayAmount amount={votingPower} />
+            {/* <DelegationDisplayAmount amount={votingPower} /> */}
           </VStack>
         </VStack>
         {!accountAddress && (
