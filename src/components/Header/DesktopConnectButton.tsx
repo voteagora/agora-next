@@ -12,7 +12,10 @@ export function DesktopConnectButton({
     <ConnectKitButton.Custom>
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
         return (
-          <button className={styles.desktop_connect_button}>
+          <button
+            onClick={!isConnected ? () => show?.() : undefined}
+            className={styles.desktop_connect_button}
+          >
             {isConnected ? (
               <DesktopProfileDropDown ensName={ensName} delegate={delegate} />
             ) : (
