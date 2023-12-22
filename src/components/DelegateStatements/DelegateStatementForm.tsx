@@ -8,13 +8,14 @@ import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useWatch, useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { initialTopIssues } from "./TopIssuesFormSection";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { useEffect, useState } from "react";
 import { fetchDelegate } from "@/app/delegates/actions";
+import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 
 const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
@@ -33,12 +34,13 @@ const formSchema = z.object({
 export type FormValues = z.infer<typeof formSchema>;
 
 export default function DelegateStatementForm() {
-  // TODO: frh gnosis connection and what if no address
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const walletClient = useWalletClient();
   const [delegate, setDelegate] = useState<Delegate | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      agreeCodeConduct: false,
       discord: "",
       delegateStatement: "",
       email: "",
@@ -46,9 +48,15 @@ export default function DelegateStatementForm() {
       topIssues: initialTopIssues(),
     },
   });
+  const agreeCodeConduct = useWatch({
+    control: form.control,
+    name: "agreeCodeConduct",
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("values", values);
+    if (agreeCodeConduct) {
+      console.log("values", values);
+    }
   }
 
   useEffect(() => {
@@ -60,6 +68,17 @@ export default function DelegateStatementForm() {
       _getDelegate();
     }
   }, [address]);
+
+  if (!isConnected) {
+    return <ResourceNotFound message="Oops! Nothing's here" />;
+  }
+
+  const canSubmit =
+    !!walletClient &&
+    // TODO: pending when backend ready
+    // !isMutationInFlight &&
+    // !submitMutation.isLoading &&
+    form.formState.isDirty;
 
   return (
     <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">
@@ -85,55 +104,39 @@ export default function DelegateStatementForm() {
                 <Button
                   variant="elevatedOutline"
                   className="py-3 px-4"
-                  // TODO: frh -> canSubmit
-                  // disabled={!canSubmit}
+                  disabled={!canSubmit}
                   type="submit"
                 >
                   Submit delegate profile
                 </Button>
-                {/* {lastErrorMessage && (
-            <span className="text-sm text-red-700">{lastErrorMessage}</span>
-          )} */}
+                {form.formState.isSubmitted && !agreeCodeConduct && (
+                  <span className="text-red-700 text-sm">
+                    You must agree with the code of conduct to continue
+                  </span>
+                )}
               </div>
             </form>
           </Form>
         </VStack>
+        {/* TODO: see how to get if an address is a Safe Wallet */}
+        {/* {delegate?.address?.isContract && (
+          <VStack className="my-6 mx-0 py-8 px-6 bg-white rounded-xl border border-gray-300 shadow-newDefault">
+            <span className="text-sm">
+              Instructions to sign with a Gnosis Safe wallet
+            </span>
+            <VStack className="text-[#66676b] text-xs">
+              <span>1. Submit a delegate statement</span>
+              <span>
+                2. Wait for all required signers to approve the Safe transaction
+              </span>
+              <span>
+                3. Resubmit the delegate statement. It will confirm without
+                requiring approvals since it has already been signed.
+              </span>
+            </VStack>
+          </VStack>
+        )} */}
       </VStack>
     </div>
   );
 }
-
-// TODO: gnosis connection and check older file
-// {data?.delegate?.address?.isContract && (
-//   <VStack
-//     className={css`
-//       margin: ${theme.spacing["6"]} 0;
-//       padding: ${theme.spacing["8"]} ${theme.spacing["6"]};
-
-//       ${containerStyle};
-//     `}
-//   >
-//     <span
-//       className={css`
-//         font-size: ${theme.fontSize.sm};
-//       `}
-//     >
-//       Instructions to sign with a Gnosis Safe wallet
-//     </span>
-//     <VStack
-//       className={css`
-//         color: #66676b;
-//         font-size: ${theme.fontSize.xs};
-//       `}
-//     >
-//       <span>1. Submit a delegate statement</span>
-//       <span>
-//         2. Wait for all required signers to approve the Safe transaction
-//       </span>
-//       <span>
-//         3. Resubmit the delegate statement. It will confirm without
-//         requiring approvals since it has already been signed.
-//       </span>
-//     </VStack>
-//   </VStack>
-// )}

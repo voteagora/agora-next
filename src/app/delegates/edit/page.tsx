@@ -1,4 +1,10 @@
-// TODO: frh -> this page
+import DelegateStatementForm from "@/components/DelegateStatements/DelegateStatementForm";
+
 export default async function Page() {
-  return <div>Edit Page</div>;
+  return (
+    <>
+      <h1>Edit Delegate Statement</h1>
+      <DelegateStatementForm />
+    </>
+  );
 }
