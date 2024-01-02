@@ -6,7 +6,23 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["center"]
+  schemas  = ["center", "user_data"]
+}
+
+model DelegateStatements {
+  address   String
+  dao_slug  DaoSlug
+  signature String
+  payload   String
+  twitter   String?
+  discord   String?
+  email     String?
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @default(now()) @db.Date
+
+  @@id([address, dao_slug])
+  @@map("delegate_statements")
+  @@schema("user_data")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -382,10 +398,58 @@ view ProposalTypes {
   @@schema("center")
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view authority_chains {
+  delegate  String?
+  rules     Json[]
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view subdelegation_union {
+  from                String?
+  to                  String?
+  subdelegation_rules String?
+  block_number        BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view subdelegations_kent {
+  to                   String?
+  from                 String?
+  from_proxy           String?
+  subdelegation_rules  String?
+  block_number         BigInt?
+  balance              String?
+  balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
 enum ProposalType {
   STANDARD
   APPROVAL
 
   @@map("proposal_type")
   @@schema("center")
+}
+
+enum DaoSlug {
+  OP
+  ENS
+  UNI
+  NOUNS
+  LYRA
+
+  @@map("dao_slug")
+  @@schema("user_data")
 }
