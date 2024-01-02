@@ -7,10 +7,13 @@ import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 
 export const getVotesForDelegate = ({
-  addressOrENSName,
+  addressOrENSName, page, sort, sortOrder
 }: {
   addressOrENSName: string;
-}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName);
+  page: number;
+  sort: VotesSort;
+  sortOrder: VotesSortOrder;
+}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, { page, sort, sortOrder });
 
 async function getVotesForDelegateForAddress({
   address,
@@ -23,7 +26,7 @@ async function getVotesForDelegateForAddress({
   sort: VotesSort;
   sortOrder: VotesSortOrder;
 }) {
-  const pageSize = 50;
+  const pageSize = 10;
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
