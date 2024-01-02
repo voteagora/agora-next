@@ -13,7 +13,7 @@ model DelegateStatements {
   address   String
   dao_slug  DaoSlug
   signature String
-  payload   String
+  payload   Json
   twitter   String?
   discord   String?
   email     String?
@@ -21,6 +21,7 @@ model DelegateStatements {
   updatedAt DateTime @default(now()) @db.Date
 
   @@id([address, dao_slug])
+  @@index([email], map: "idx_delegate_statements_email")
   @@map("delegate_statements")
   @@schema("user_data")
 }
