@@ -4,12 +4,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useWatch, UseFormReturn } from "react-hook-form";
-import { FormValues } from "./DelegateStatementForm";
+import { DelegateStatementFormValues } from "./DelegateStatementForm";
 
 export default function DelegateStatementFormSection({
   form,
 }: {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const delegateStatement = useWatch({ name: "delegateStatement" });
 

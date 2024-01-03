@@ -11,15 +11,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useWatch, useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { initialTopIssues } from "./TopIssuesFormSection";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, useSignMessage } from "wagmi";
 import { Delegate } from "@/app/api/delegates/delegate";
+import { DaoSlug } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { fetchDelegate } from "@/app/delegates/actions";
+import {
+  fetchDelegate,
+  submitDelegateStatement,
+} from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
+const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
+if (!(daoSlug && daoSlug in DaoSlug)) {
+  throw new Error("Can't find Agora Instance token");
+}
+
 const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
+  daoSlug: z.string(),
   discord: z.string(),
   delegateStatement: z.string(),
   email: z.string(),
@@ -30,23 +40,34 @@ const formSchema = z.object({
       value: z.string(),
     })
   ),
+  openToSponsoringProposals: z.boolean().nullable(),
+  mostValuableProposals: z.array(z.unknown()),
+  leastValuableProposals: z.array(z.unknown()),
 });
 
-export type FormValues = z.infer<typeof formSchema>;
+export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 
+// TODO: frh -> on create and edit fill with current data from dynamodb or postgresql if it exists
+// TODO: frh -> what if delegateStatement is empty check postgresql and check required fields
 export default function DelegateStatementForm() {
   const { address, isConnected } = useAccount();
   const walletClient = useWalletClient();
+  const messageSigner = useSignMessage();
   const [delegate, setDelegate] = useState<Delegate | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       agreeCodeConduct: false,
+      daoSlug,
       discord: "",
       delegateStatement: "",
       email: "",
       twitter: "",
       topIssues: initialTopIssues(),
+      openToSponsoringProposals: null,
+      mostValuableProposals: [],
+      leastValuableProposals: [],
     },
   });
   const agreeCodeConduct = useWatch({
@@ -54,16 +75,6 @@ export default function DelegateStatementForm() {
     name: "agreeCodeConduct",
   });
   const openDialog = useOpenDialog();
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (agreeCodeConduct) {
-      console.log("values", values);
-      openDialog({
-        type: "DELEGATE_STATEMENT",
-        params: {},
-      });
-    }
-  }
 
   useEffect(() => {
     async function _getDelegate() {
@@ -77,6 +88,37 @@ export default function DelegateStatementForm() {
 
   if (!isConnected) {
     return <ResourceNotFound message="Oops! Nothing's here" />;
+  }
+
+  async function onSubmit(values: DelegateStatementFormValues) {
+    if (!agreeCodeConduct) {
+      return;
+    }
+    if (!walletClient) {
+      throw new Error("signer not available");
+    }
+
+    const serializedBody = JSON.stringify(values, undefined, "\t");
+    const signature = await messageSigner.signMessageAsync({
+      message: serializedBody,
+    });
+
+    if (signature) {
+      // TODO: what should content of dialog be
+      submitDelegateStatement(address as string, values, signature)
+        .then(() => {
+          openDialog({
+            type: "DELEGATE_STATEMENT",
+            params: {},
+          });
+        })
+        .catch((error) => {
+          if (error.message) {
+            setSubmissionError(error.message);
+            return;
+          }
+        });
+    }
   }
 
   const canSubmit =
@@ -118,6 +160,11 @@ export default function DelegateStatementForm() {
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">
                     You must agree with the code of conduct to continue
+                  </span>
+                )}
+                {submissionError && (
+                  <span className="text-red-700 text-sm">
+                    {submissionError}
                   </span>
                 )}
               </div>

@@ -1,12 +1,12 @@
 import { VStack } from "@/components/Layout/Stack";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FormValues } from "./DelegateStatementForm";
+import { DelegateStatementFormValues } from "./DelegateStatementForm";
 import { UseFormReturn } from "react-hook-form";
 
 export default function DelegateStatementBoolSelector({
   form,
 }: {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   return (
     <VStack>

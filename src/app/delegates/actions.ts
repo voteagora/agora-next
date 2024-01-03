@@ -8,6 +8,8 @@ import {
 } from "@/app/api/voting-power/getVotingPower";
 import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
+import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(addressOrENSName: string) {
@@ -38,4 +40,10 @@ export async function fetchDelegate(addressOrENSName: string) {
     "use server";
 
     return getDelegate({ addressOrENSName });
+}
+
+export async function submitDelegateStatement(address: string, values: DelegateStatementFormValues, signature: string) {
+    "use server";
+
+    return createDelegateStatement(address, values, signature);
 }

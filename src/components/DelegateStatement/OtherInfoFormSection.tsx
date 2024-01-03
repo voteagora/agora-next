@@ -1,12 +1,12 @@
 import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
 import DelegateStatementBoolSelector from "./DelegateStatementBoolSelector";
-import { FormValues } from "./DelegateStatementForm";
+import { DelegateStatementFormValues } from "./DelegateStatementForm";
 import { UseFormReturn } from "react-hook-form";
 
 export default function OtherInfoFormSection({
   form,
 }: {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   return (
     <div className="py-8 px-6 border-b border-gray-300">

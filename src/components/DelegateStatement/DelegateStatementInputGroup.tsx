@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormValues } from "./DelegateStatementForm";
+import { DelegateStatementFormValues } from "./DelegateStatementForm";
 import { UseFormReturn } from "react-hook-form";
 import { FormField } from "@/components/ui/form";
 
@@ -10,7 +10,7 @@ export default function DelegateStatementInputGroup({
   placeholder,
   title,
 }: {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<DelegateStatementFormValues>;
   name: "discord" | "twitter" | "email";
   placeholder: string;
   title: string;

@@ -3,7 +3,7 @@ import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { useWatch, UseFormReturn } from "react-hook-form";
-import { FormValues } from "./DelegateStatementForm";
+import { DelegateStatementFormValues } from "./DelegateStatementForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +56,7 @@ export function initialTopIssues(): IssueState[] {
 export default function TopIssuesFormSection({
   form,
 }: {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const topIssues = useWatch({ name: "topIssues" });
 
