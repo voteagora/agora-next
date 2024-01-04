@@ -34,6 +34,13 @@ const useIsAdvancedUser = () => {
     "0xdF40cED4E9B256BC6b237F27C0001265f0d0BdA8", // Kent Test 4
     "0xC323Ee1d28D2508667f4BEbfC26F93c60aBdD203", // kentf.eth
     "0x4817B42Ec28851EF581a74855A89D2b8c45A33DD", // Kent Test 5
+    "0xA18D0226043A76683950f3BAabf0a87Cfb32E1Cb", // stepandel.eth
+    "0xEA64B234316728f1BFd3b7cDCc1EAf0066D8E055", // Stepan Test 2
+    "0x924A0468961f09aB3c3A457382C9D06f48cff6aA", // Stepan Test 4
+    "0xd2c6730b06925090243c2D50df7c47a0B220D433", // Stepan Test 5
+    "0xb979C87c6502D745ef8A438ccBD8cc9b27502991", // Stepan Test 6
+    "0x97301D575F517A70E66Bd1A92886F7c7D2e3959B", // Stepan Test 7
+    "0xeCbdDA9c9Fa136389ab212EdB5e7295b266f7277", // Stepan Test 8
   ] as `0x${string}`[];
 
   useContractRead({
