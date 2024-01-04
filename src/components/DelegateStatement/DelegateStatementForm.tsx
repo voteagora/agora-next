@@ -20,7 +20,7 @@ import {
 } from "@/app/delegates/actions";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect, useState } from "react";
-import { DelegateStatements } from "@prisma/client";
+import { type DelegateStatementWithDynamoDB } from "@/app/api/delegateStatement/delegateStatement";
 
 const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
 if (!(daoSlug && daoSlug in DaoSlug)) {
@@ -50,7 +50,7 @@ export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 export default function DelegateStatementForm({
   delegateStatement,
 }: {
-  delegateStatement: DelegateStatements | null;
+  delegateStatement: DelegateStatementWithDynamoDB | null;
 }) {
   const { address } = useAccount();
   const walletClient = useWalletClient();
@@ -208,7 +208,16 @@ export default function DelegateStatementForm({
               </span>
             </VStack>
           </VStack>
-        )} */}
+        )} 
+        remember this in graphql query:
+              address {
+        isContract
+        resolvedName {
+          address
+          name
+        }
+      }
+        */}
       </VStack>
     </div>
   );
