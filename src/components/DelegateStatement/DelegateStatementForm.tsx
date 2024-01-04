@@ -14,13 +14,13 @@ import { initialTopIssues } from "./TopIssuesFormSection";
 import { useAccount, useWalletClient, useSignMessage } from "wagmi";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { DaoSlug } from "@prisma/client";
-import { useEffect, useState } from "react";
 import {
   fetchDelegate,
   submitDelegateStatement,
 } from "@/app/delegates/actions";
-import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useEffect, useState } from "react";
+import { DelegateStatements } from "@prisma/client";
 
 const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
 if (!(daoSlug && daoSlug in DaoSlug)) {
@@ -47,26 +47,48 @@ const formSchema = z.object({
 
 export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 
-// TODO: frh -> on create and edit fill with current data from dynamodb or postgresql if it exists
-export default function DelegateStatementForm() {
-  const { address, isConnected } = useAccount();
+export default function DelegateStatementForm({
+  delegateStatement,
+}: {
+  delegateStatement: DelegateStatements | null;
+}) {
+  const { address } = useAccount();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
-  const [delegate, setDelegate] = useState<Delegate | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [delegate, setDelegate] = useState<Delegate | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       agreeCodeConduct: false,
       daoSlug,
-      discord: "",
-      delegateStatement: "",
-      email: "",
-      twitter: "",
-      topIssues: initialTopIssues(),
-      openToSponsoringProposals: null,
-      mostValuableProposals: [],
-      leastValuableProposals: [],
+      discord: delegateStatement?.discord || "",
+      delegateStatement:
+        (delegateStatement?.payload as { delegateStatement?: string })
+          ?.delegateStatement || "",
+      email: delegateStatement?.email || "",
+      twitter: delegateStatement?.twitter || "",
+      topIssues:
+        (
+          delegateStatement?.payload as {
+            topIssues: {
+              value: string;
+              type: string;
+            }[];
+          }
+        )?.topIssues || initialTopIssues(),
+      openToSponsoringProposals:
+        (
+          delegateStatement?.payload as {
+            openToSponsoringProposals?: boolean | null;
+          }
+        )?.openToSponsoringProposals || null,
+      mostValuableProposals:
+        (delegateStatement?.payload as { mostValuableProposals?: object[] })
+          ?.mostValuableProposals || [],
+      leastValuableProposals:
+        (delegateStatement?.payload as { leastValuableProposals?: object[] })
+          ?.leastValuableProposals || [],
     },
   });
   const agreeCodeConduct = useWatch({
@@ -84,10 +106,6 @@ export default function DelegateStatementForm() {
       _getDelegate();
     }
   }, [address]);
-
-  if (!isConnected) {
-    return <ResourceNotFound message="Oops! Nothing's here" />;
-  }
 
   async function onSubmit(values: DelegateStatementFormValues) {
     if (!agreeCodeConduct) {
@@ -128,8 +146,7 @@ export default function DelegateStatementForm() {
     });
   }
 
-  const canSubmit =
-    !!walletClient && !form.formState.isSubmitting && form.formState.isDirty;
+  const canSubmit = !!walletClient && !form.formState.isSubmitting;
 
   return (
     <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">
