@@ -48,7 +48,6 @@ const formSchema = z.object({
 export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 
 // TODO: frh -> on create and edit fill with current data from dynamodb or postgresql if it exists
-// TODO: frh -> what if delegateStatement is empty check postgresql and check required fields
 export default function DelegateStatementForm() {
   const { address, isConnected } = useAccount();
   const walletClient = useWalletClient();
@@ -99,34 +98,38 @@ export default function DelegateStatementForm() {
     }
 
     const serializedBody = JSON.stringify(values, undefined, "\t");
-    const signature = await messageSigner.signMessageAsync({
-      message: serializedBody,
-    });
+    const signature = await messageSigner
+      .signMessageAsync({
+        message: serializedBody,
+      })
+      .catch((error) => console.error(error));
 
-    if (signature) {
-      // TODO: what should content of dialog be
-      submitDelegateStatement(address as string, values, signature)
-        .then(() => {
-          openDialog({
-            type: "DELEGATE_STATEMENT",
-            params: {},
-          });
-        })
-        .catch((error) => {
-          if (error.message) {
-            setSubmissionError(error.message);
-            return;
-          }
-        });
+    if (!signature) {
+      setSubmissionError("Signature failed, please try again");
+      return;
     }
+
+    const response = await submitDelegateStatement(
+      address as string,
+      values,
+      signature
+    ).catch((error) => console.error(error));
+
+    if (!response) {
+      setSubmissionError(
+        "There was an error submitting your form, please try again"
+      );
+      return;
+    }
+
+    openDialog({
+      type: "DELEGATE_STATEMENT",
+      params: {},
+    });
   }
 
   const canSubmit =
-    !!walletClient &&
-    // TODO: pending when backend ready
-    // !isMutationInFlight &&
-    // !submitMutation.isLoading &&
-    form.formState.isDirty;
+    !!walletClient && !form.formState.isSubmitting && form.formState.isDirty;
 
   return (
     <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">
