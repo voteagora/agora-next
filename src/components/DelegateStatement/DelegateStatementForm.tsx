@@ -18,9 +18,9 @@ import {
   fetchDelegate,
   submitDelegateStatement,
 } from "@/app/delegates/actions";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect, useState } from "react";
 import { type DelegateStatementWithDynamoDB } from "@/app/api/delegateStatement/delegateStatement";
+import { useRouter } from "next/navigation";
 
 const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
 if (!(daoSlug && daoSlug in DaoSlug)) {
@@ -52,6 +52,7 @@ export default function DelegateStatementForm({
 }: {
   delegateStatement: DelegateStatementWithDynamoDB | null;
 }) {
+  const router = useRouter();
   const { address } = useAccount();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
@@ -95,7 +96,6 @@ export default function DelegateStatementForm({
     control: form.control,
     name: "agreeCodeConduct",
   });
-  const openDialog = useOpenDialog();
 
   useEffect(() => {
     async function _getDelegate() {
@@ -140,10 +140,7 @@ export default function DelegateStatementForm({
       return;
     }
 
-    openDialog({
-      type: "DELEGATE_STATEMENT",
-      params: {},
-    });
+    router.push(`/delegates/${address}`);
   }
 
   const canSubmit = !!walletClient && !form.formState.isSubmitting;
