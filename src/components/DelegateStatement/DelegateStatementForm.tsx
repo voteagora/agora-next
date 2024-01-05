@@ -153,7 +153,7 @@ export default function DelegateStatementForm({
         </VStack>
       )}
       <VStack className="w-full">
-        <VStack className="bg-white border radius-xl border-gray-300 shadow-newDefault">
+        <VStack className="bg-white border rounded-xl border-gray-300 shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DelegateStatementFormSection form={form} />

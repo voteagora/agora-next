@@ -87,7 +87,6 @@ export default function CurrentDelegateStatement() {
 
           setDelegateStatement({
             address: address as string,
-            // TODO: frh -> get email from cloudflare
             email: null,
             payload: {
               leastValuableProposals,
