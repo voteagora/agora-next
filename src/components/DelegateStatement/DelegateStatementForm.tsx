@@ -188,33 +188,6 @@ export default function DelegateStatementForm({
             </form>
           </Form>
         </VStack>
-        {/* TODO: see how to get if an address is a Safe Wallet */}
-        {/* {delegate?.address?.isContract && (
-          <VStack className="my-6 mx-0 py-8 px-6 bg-white rounded-xl border border-gray-300 shadow-newDefault">
-            <span className="text-sm">
-              Instructions to sign with a Gnosis Safe wallet
-            </span>
-            <VStack className="text-[#66676b] text-xs">
-              <span>1. Submit a delegate statement</span>
-              <span>
-                2. Wait for all required signers to approve the Safe transaction
-              </span>
-              <span>
-                3. Resubmit the delegate statement. It will confirm without
-                requiring approvals since it has already been signed.
-              </span>
-            </VStack>
-          </VStack>
-        )} 
-        remember this in graphql query:
-              address {
-        isContract
-        resolvedName {
-          address
-          name
-        }
-      }
-        */}
       </VStack>
     </div>
   );

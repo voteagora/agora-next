@@ -5,7 +5,7 @@ import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import { getCurrentQuorum } from "@/lib/governorUtils";
 import { Delegate } from "./delegate";
-import { getStatment } from "../statements/getStatements";
+import { getStatement } from "../statements/getStatements";
 
 import "server-only";
 
@@ -58,7 +58,7 @@ export async function getDelegates({
 
   const statements = await Promise.all(
     delegates.map((delegate) =>
-      getStatment({ addressOrENSName: delegate.delegate })
+      getStatement({ addressOrENSName: delegate.delegate })
     )
   );
 
@@ -102,7 +102,7 @@ export async function getDelegate({
     where: { delegate: address },
   });
 
-  const delegateStatement = await getStatment({ addressOrENSName });
+  const delegateStatement = await getStatement({ addressOrENSName });
 
   const quorum = await getCurrentQuorum("OPTIMISM");
 

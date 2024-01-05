@@ -10,7 +10,7 @@ import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVo
 import { VStack } from "@/components/Layout/Stack";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
-import { getStatment } from "@/app/api/statements/getStatements";
+import { getStatement } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import {
   getCurrentDelegatees,
@@ -42,7 +42,7 @@ async function getDelegateVotes(
 async function getDelegateStatement(addressOrENSName: string) {
   "use server";
 
-  return getStatment({ addressOrENSName });
+  return getStatement({ addressOrENSName });
 }
 
 async function getDelegatees(addressOrENSName: string) {

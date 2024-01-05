@@ -3,7 +3,7 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 
 import "server-only";
 
-export const getStatment = ({
+export const getStatement = ({
   addressOrENSName,
 }: {
   addressOrENSName: string;
