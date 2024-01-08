@@ -11,8 +11,8 @@ export const getVotesForDelegate = ({
 }: {
   addressOrENSName: string;
   page: number;
-  sort: VotesSort;
-  sortOrder: VotesSortOrder;
+  sort: VotesSort | undefined;
+  sortOrder: VotesSortOrder | undefined;
 }) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, { page, sort, sortOrder });
 
 async function getVotesForDelegateForAddress({
@@ -23,8 +23,8 @@ async function getVotesForDelegateForAddress({
 }: {
   address: string;
   page: number;
-  sort: VotesSort;
-  sortOrder: VotesSortOrder;
+  sort: VotesSort | undefined;
+  sortOrder: VotesSortOrder | undefined;
 }) {
   const pageSize = 10;
 

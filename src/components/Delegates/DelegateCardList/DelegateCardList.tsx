@@ -108,11 +108,11 @@ export default function DelegateCardList({
         {delegates.map((delegate, i) => {
           let truncatedStatement = "";
 
-          if (delegate.statement && delegate.statement.delegateStatement) {
-            truncatedStatement = delegate.statement.delegateStatement.slice(
-              0,
-              120
-            );
+          if (delegate?.statement?.payload) {
+            const delegateStatement = (
+              delegate?.statement?.payload as { delegateStatement: string }
+            ).delegateStatement;
+            truncatedStatement = delegateStatement.slice(0, 120);
           }
 
           return (

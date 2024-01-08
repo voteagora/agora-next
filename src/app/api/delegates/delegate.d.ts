@@ -1,10 +1,4 @@
-export type DelegateStatement = {
-  address: string;
-  delegateStatement: string;
-  openToSponsoringProposals: string;
-  twitter: string;
-  discord: string;
-};
+import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 
 export type Delegate = {
   address: string;

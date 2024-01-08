@@ -8,55 +8,19 @@ import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
-import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
-import { getStatement } from "@/app/api/statements/getStatements";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
-import {
-  getCurrentDelegatees,
-  getCurrentDelegators,
-} from "@/app/api/delegations/getDelegations";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { Delegate } from "@/app/api/delegates/delegate";
 import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
-
-async function fetchDelegate(addressOrENSName: string) {
-  "use server";
-
-  return getDelegate({ addressOrENSName });
-}
-
-async function getDelegateVotes(
-  addressOrENSName: string,
-  page = 1,
-  sortOrder?: VotesSortOrder
-) {
-  "use server";
-
-  return getVotesForDelegate({ addressOrENSName, page, sortOrder });
-}
-
-// TODO: frh -> refactor this with postgre and dynamodb
-async function getDelegateStatement(addressOrENSName: string) {
-  "use server";
-
-  return getStatement({ addressOrENSName });
-}
-
-async function getDelegatees(addressOrENSName: string) {
-  "use server";
-
-  return getCurrentDelegatees({ addressOrENSName });
-}
-
-async function getDelegators(addressOrENSName: string) {
-  "use server";
-
-  return getCurrentDelegators({ addressOrENSName });
-}
+import {
+  fetchDelegateStatement,
+  fetchDelegate,
+  fetchVotesForDelegate,
+  fetchCurrentDelegatees,
+  fetchCurrentDelegators,
+} from "@/app/delegates/actions";
 
 export default async function Page({
   params: { addressOrENSName },
@@ -73,10 +37,10 @@ export default async function Page({
   let delegators: Delegation[];
   try {
     delegate = await fetchDelegate(addressOrENSName);
-    delegateVotes = await getDelegateVotes(addressOrENSName);
-    statement = await getDelegateStatement(addressOrENSName);
-    delegatees = await getDelegatees(addressOrENSName);
-    delegators = await getDelegators(addressOrENSName);
+    delegateVotes = await fetchVotesForDelegate(addressOrENSName);
+    statement = await fetchDelegateStatement(addressOrENSName);
+    delegatees = await fetchCurrentDelegatees(addressOrENSName);
+    delegators = await fetchCurrentDelegators(addressOrENSName);
   } catch (error) {
     delegate = null;
     delegateVotes = null;
@@ -134,7 +98,11 @@ export default async function Page({
                 ) => {
                   "use server";
 
-                  return getDelegateVotes(addressOrENSName, page, sortOrder);
+                  return fetchVotesForDelegate(
+                    addressOrENSName,
+                    page,
+                    sortOrder
+                  );
                 }}
               />
             </div>

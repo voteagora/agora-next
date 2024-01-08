@@ -19,7 +19,7 @@ import {
   submitDelegateStatement,
 } from "@/app/delegates/actions";
 import { useEffect, useState } from "react";
-import { type DelegateStatementWithDynamoDB } from "@/app/api/delegateStatement/delegateStatement";
+import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { useRouter } from "next/navigation";
 
 const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
@@ -35,14 +35,32 @@ const formSchema = z.object({
   email: z.string(),
   twitter: z.string(),
   topIssues: z.array(
-    z.object({
-      type: z.string(),
-      value: z.string(),
-    })
+    z
+      .object({
+        type: z.string(),
+        value: z.string(),
+      })
+      .strict()
   ),
-  openToSponsoringProposals: z.boolean().nullable(),
-  mostValuableProposals: z.array(z.unknown()),
-  leastValuableProposals: z.array(z.unknown()),
+  openToSponsoringProposals: z.union([
+    z.literal("yes"),
+    z.literal("no"),
+    z.null(),
+  ]),
+  mostValuableProposals: z.array(
+    z
+      .object({
+        number: z.string(),
+      })
+      .strict()
+  ),
+  leastValuableProposals: z.array(
+    z
+      .object({
+        number: z.string(),
+      })
+      .strict()
+  ),
 });
 
 export type DelegateStatementFormValues = z.infer<typeof formSchema>;
@@ -50,7 +68,7 @@ export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 export default function DelegateStatementForm({
   delegateStatement,
 }: {
-  delegateStatement: DelegateStatementWithDynamoDB | null;
+  delegateStatement: DelegateStatement | null;
 }) {
   const router = useRouter();
   const { address } = useAccount();
@@ -81,7 +99,7 @@ export default function DelegateStatementForm({
       openToSponsoringProposals:
         (
           delegateStatement?.payload as {
-            openToSponsoringProposals?: boolean | null;
+            openToSponsoringProposals?: "yes" | "no" | null;
           }
         )?.openToSponsoringProposals || null,
       mostValuableProposals:
@@ -143,7 +161,8 @@ export default function DelegateStatementForm({
     router.push(`/delegates/${address}`);
   }
 
-  const canSubmit = !!walletClient && !form.formState.isSubmitting;
+  const canSubmit =
+    !!walletClient && !form.formState.isSubmitting && !!form.formState.isValid;
 
   return (
     <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">

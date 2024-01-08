@@ -1,22 +1,27 @@
 "use client";
+
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import DelegateStatement from "./DelegateStatement";
-import { Button } from "@/components/Button";
+import { type DelegateStatement as DelegateStatementType } from "@/app/api/delegateStatement/delegateStatement";
 
 export default function DelegateStatementContainer({
   addressOrENSName,
   statement,
 }: {
   addressOrENSName: string;
-  statement: any;
+  statement: DelegateStatementType | null;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
 
+  const delegateStatement = (
+    statement?.payload as { delegateStatement: string }
+  ).delegateStatement;
+
   return (
     <>
-      {!statement && !statement?.delegateStatement && (
+      {!delegateStatement && (
         <div className="mb-8 p-8 align-middle text-center rounded-md bg-gray-100">
           <p>No delegate statement for {addressOrENSName}.</p>
           {isConnected && address === addressOrENSName && (
@@ -34,9 +39,7 @@ export default function DelegateStatementContainer({
         </div>
       )}
 
-      {statement && statement.delegateStatement && (
-        <DelegateStatement statement={statement.delegateStatement} />
-      )}
+      {delegateStatement && <DelegateStatement statement={delegateStatement} />}
     </>
   );
 }

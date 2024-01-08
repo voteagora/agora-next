@@ -1,3 +1,5 @@
+import "server-only";
+
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
@@ -5,9 +7,7 @@ import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
 import { getCurrentQuorum } from "@/lib/governorUtils";
 import { Delegate } from "./delegate";
-import { getStatement } from "../statements/getStatements";
-
-import "server-only";
+import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
 
 export async function getDelegates({
   page = 1,
@@ -58,7 +58,7 @@ export async function getDelegates({
 
   const statements = await Promise.all(
     delegates.map((delegate) =>
-      getStatement({ addressOrENSName: delegate.delegate })
+      getDelegateStatement({ addressOrENSName: delegate.delegate })
     )
   );
 
@@ -102,8 +102,7 @@ export async function getDelegate({
     where: { delegate: address },
   });
 
-  // TODO: frh -> pending to refactor when will be getting data from postgreqsql first
-  const delegateStatement = await getStatement({ addressOrENSName });
+  const delegateStatement = await getDelegateStatement({ addressOrENSName });
 
   const quorum = await getCurrentQuorum("OPTIMISM");
 

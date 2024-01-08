@@ -1,13 +1,13 @@
+import "server-only";
+
 import prisma from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
 import { DaoSlug, type Prisma } from "@prisma/client";
 
-import "server-only";
-
 export function createDelegateStatement(address: string, delegateStatement: DelegateStatementFormValues, signature: string) {
   const { daoSlug, twitter, discord, email } = delegateStatement;
   const data = {
-    address,
+    address: address.toLowerCase(),
     dao_slug: daoSlug as DaoSlug,
     signature,
     payload: delegateStatement as Prisma.InputJsonValue,
@@ -19,7 +19,7 @@ export function createDelegateStatement(address: string, delegateStatement: Dele
   return prisma.delegateStatements.upsert({
     where: {
       address_dao_slug: {
-        address,
+        address: address.toLowerCase(),
         dao_slug: daoSlug as DaoSlug,
       },
     },
