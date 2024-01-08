@@ -39,6 +39,7 @@ async function getDelegateVotes(
   return getVotesForDelegate({ addressOrENSName, page, sortOrder });
 }
 
+// TODO: frh -> refactor this with postgre and dynamodb
 async function getDelegateStatement(addressOrENSName: string) {
   "use server";
 

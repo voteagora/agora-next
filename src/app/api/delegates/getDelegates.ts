@@ -102,6 +102,7 @@ export async function getDelegate({
     where: { delegate: address },
   });
 
+  // TODO: frh -> pending to refactor when will be getting data from postgreqsql first
   const delegateStatement = await getStatement({ addressOrENSName });
 
   const quorum = await getCurrentQuorum("OPTIMISM");

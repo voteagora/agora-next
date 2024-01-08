@@ -11,6 +11,7 @@ import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
+import { getStatement } from "@/app/api/statements/getStatements";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(addressOrENSName: string) {
@@ -45,6 +46,12 @@ export async function submitDelegateStatement(address: string, values: DelegateS
     return createDelegateStatement(address, values, signature);
 }
 
+// TODO: frh -> refactor this in one fetchDelegateStatement
 export async function fetchDelegateStatement(address: string) {
     return getDelegateStatement(address);
+}
+
+// TODO: frh -> refactor this in one fetchDelegateStatement
+export async function fetchDelegateStatementDynamoDB(addressOrENSName: string) {
+    return getStatement({ addressOrENSName });
 }

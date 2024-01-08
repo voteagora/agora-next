@@ -3,13 +3,14 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 
 import "server-only";
 
+// TODO: frh -> refactor this and getDelegateStatement(postgresql)
 export const getStatement = ({
   addressOrENSName,
 }: {
   addressOrENSName: string;
-}) => addressOrEnsNameWrap(getStatmentForAddress, addressOrENSName);
+}) => addressOrEnsNameWrap(getStatementForAddress, addressOrENSName);
 
-async function getStatmentForAddress({ address }: { address: string }) {
+async function getStatementForAddress({ address }: { address: string }) {
   const dynamoDBClient = makeDynamoClient();
 
   const params = {
@@ -33,10 +34,19 @@ async function getStatmentForAddress({ address }: { address: string }) {
       const delegateStatementObject = JSON.parse(signedPayload as string);
 
       return {
-        address: address, // assuming 'address' is a variable containing the address
+        address, // assuming 'address' is a variable containing the address
+        email: null,
+        // TODO: pending to refactor when delegates/[addressOrEnsName]/page will be getting data from postgreqsql first
         delegateStatement: delegateStatementObject.delegateStatement,
         openToSponsoringProposals:
           delegateStatementObject.openToSponsoringProposals,
+        payload: {
+          leastValuableProposals: delegateStatementObject.leastValuableProposals,
+          mostValuableProposals: delegateStatementObject.mostValuableProposals,
+          openToSponsoringProposals: delegateStatementObject.openToSponsoringProposals,
+          delegateStatement: delegateStatementObject.delegateStatement,
+          topIssues: delegateStatementObject.topIssues
+        },
         twitter: delegateStatementObject.twitter,
         discord: delegateStatementObject.discord,
       };
