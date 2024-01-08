@@ -1,7 +1,6 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
-import { DelegateActions } from "./DelegateActions";
 import styles from "./delegateCard.module.scss";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import {
@@ -10,7 +9,10 @@ import {
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
-import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
+import {
+  getCurrentDelegatees,
+  getDirectDelegatee,
+} from "@/app/api/delegations/getDelegations";
 import DelegateCardClient from "./DelegateCardClient";
 
 async function fetchDelegate(addressOrENSName) {
@@ -52,6 +54,12 @@ async function getProxyAddress(addressOrENSName) {
   "use server";
 
   return getProxy({ addressOrENSName });
+}
+
+async function fetchDirectDelegatee(addressOrENSName) {
+  "use server";
+
+  return getDirectDelegatee({ addressOrENSName });
 }
 
 export default async function DelegateCard({ addressOrENSName }) {
@@ -127,6 +135,7 @@ export default async function DelegateCard({ addressOrENSName }) {
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               getProxyAddress={getProxyAddress}
+              fetchDirectDelegatee={fetchDirectDelegatee}
             />
           </VStack>
         </div>
