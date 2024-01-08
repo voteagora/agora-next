@@ -226,11 +226,7 @@ const getDirectDelegateeForAddress = async ({
     }),
   ]);
 
-  if (
-    proxyAddress &&
-    delegatee &&
-    delegatee.delegatee === proxyAddress.toLowerCase()
-  ) {
+  if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
     return null;
   }
 
