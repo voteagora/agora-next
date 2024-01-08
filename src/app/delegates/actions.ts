@@ -8,7 +8,7 @@ import {
 } from "@/app/api/voting-power/getVotingPower";
 import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
+import { type DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 
@@ -38,19 +38,13 @@ export async function getProxyAddress(addressOrENSName: string) {
 }
 
 export async function fetchDelegate(addressOrENSName: string) {
-    "use server";
-
     return getDelegate({ addressOrENSName });
 }
 
 export async function submitDelegateStatement(address: string, values: DelegateStatementFormValues, signature: string) {
-    "use server";
-
     return createDelegateStatement(address, values, signature);
 }
 
 export async function fetchDelegateStatement(address: string) {
-    "use server";
-
     return getDelegateStatement(address);
 }
