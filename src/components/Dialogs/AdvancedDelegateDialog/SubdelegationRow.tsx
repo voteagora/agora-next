@@ -38,7 +38,7 @@ function SubdelegationToRow({
   const percent =
     Number.isNaN(allowance) || allowance === 0
       ? 0
-      : Math.round((allowance / availableBalanceNumber) * 100_000) / 1000;
+      : Math.round((allowance / availableBalanceNumber) * 100_00) / 100;
 
   return (
     <div className={styles.sub_row}>
@@ -55,17 +55,28 @@ function SubdelegationToRow({
       </HStack>
       <div className="relative">
         <Input
-          value={allowance}
+          value={allowance.toString()}
           className={styles.sub_row_input}
           onChange={(e) => {
-            let newAllowanceValue =
-              Math.round(Number(e.target.value) * 100) / 100;
-            if (newAllowanceValue > amountToAllocate) {
-              newAllowanceValue = Math.round(amountToAllocate * 100) / 100;
+            function formatNumber(value: number) {
+              return Math.floor(Math.round(value * 1000) / 10) / 100;
             }
-            const newAllowances = [...allowances];
-            newAllowances[index] = newAllowanceValue;
-            setAllowance(newAllowances);
+
+            const newAllowanceValue = parseFloat(
+              e.target.value.replace(/,/g, "")
+            );
+            if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
+              const newAllowances = [...allowances];
+              newAllowances[index] =
+                newAllowanceValue > amountToAllocate
+                  ? formatNumber(amountToAllocate)
+                  : formatNumber(newAllowanceValue);
+              setAllowance(newAllowances);
+            } else {
+              const newAllowances = [...allowances];
+              newAllowances[index] = 0;
+              setAllowance(newAllowances);
+            }
           }}
           type="number"
           min={0}
