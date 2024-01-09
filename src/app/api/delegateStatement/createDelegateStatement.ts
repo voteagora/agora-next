@@ -2,10 +2,28 @@ import "server-only";
 
 import prisma from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
-import { DaoSlug, type Prisma } from "@prisma/client";
+import { type DaoSlug, Prisma } from "@prisma/client";
+import verifyMessage from "@/lib/serverVerifyMessage";
 
-export function createDelegateStatement(address: string, delegateStatement: DelegateStatementFormValues, signature: string) {
+export async function createDelegateStatement({ address, delegateStatement, signature, message }: {
+  address: `0x${string}`,
+  delegateStatement: DelegateStatementFormValues,
+  signature: `0x${string}`,
+  message: string
+}) {
   const { daoSlug, twitter, discord, email } = delegateStatement;
+
+  const valid = await verifyMessage({
+    address,
+    message,
+    signature,
+    daoSlug: daoSlug as DaoSlug
+  });
+
+  if (!valid) {
+    throw new Error("Invalid signature");
+  }
+
   const data = {
     address: address.toLowerCase(),
     dao_slug: daoSlug as DaoSlug,

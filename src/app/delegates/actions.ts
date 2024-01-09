@@ -38,8 +38,13 @@ export async function fetchDelegate(addressOrENSName: string) {
     return getDelegate({ addressOrENSName });
 }
 
-export async function submitDelegateStatement(address: string, values: DelegateStatementFormValues, signature: string) {
-    return createDelegateStatement(address, values, signature);
+export async function submitDelegateStatement({ address, delegateStatement, signature, message }: {
+    address: `0x${string}`,
+    delegateStatement: DelegateStatementFormValues,
+    signature: `0x${string}`,
+    message: string
+}) {
+    return createDelegateStatement({ address, delegateStatement, signature, message });
 }
 
 export async function fetchDelegateStatement(addressOrENSName: string) {

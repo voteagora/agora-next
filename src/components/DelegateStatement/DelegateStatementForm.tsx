@@ -145,11 +145,12 @@ export default function DelegateStatementForm({
       return;
     }
 
-    const response = await submitDelegateStatement(
-      address as string,
-      values,
-      signature
-    ).catch((error) => console.error(error));
+    const response = await submitDelegateStatement({
+      address: address as `0x${string}`,
+      delegateStatement: values,
+      signature,
+      message: serializedBody,
+    }).catch((error) => console.error(error));
 
     if (!response) {
       setSubmissionError(
