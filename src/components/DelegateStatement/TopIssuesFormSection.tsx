@@ -12,30 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { CloseIcon } from "@/components/shared/CloseIcon";
-
-type IssueTypeDefinition = {
-  key: string;
-  title: string;
-  icon: keyof typeof icons;
-};
-
-export const issueDefinitions: IssueTypeDefinition[] = [
-  {
-    title: "Treasury management",
-    key: "treasury",
-    icon: "piggyBank",
-  },
-  {
-    title: "Grant funding",
-    key: "funding",
-    icon: "measure",
-  },
-  {
-    title: "Public goods",
-    key: "publicGoods",
-    icon: "ballot",
-  },
-];
+import { issueDefinitions } from "@/lib/issueDefinitions";
 
 export type IssueState = {
   type: string;

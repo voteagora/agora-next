@@ -14,6 +14,7 @@ import DelegationsContainer from "@/components/Delegates/Delegations/Delegations
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
+import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
   fetchDelegateStatement,
   fetchDelegate,
@@ -62,11 +63,12 @@ export default async function Page({
           <DelegateCard delegate={delegate} />
         </VStack>
 
-        <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full">
+        <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full gap-8">
           <DelegateStatementContainer
             addressOrENSName={addressOrENSName}
             statement={statement}
           />
+          {statement && <TopIssues statement={statement} />}
           <DelegationsContainer
             delegatees={delegatees}
             delegators={delegators}
