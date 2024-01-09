@@ -46,18 +46,8 @@ export default function VoterCard({
 
   const fetchDelegateAndSet = async (addressOrENSName: string) => {
     const delegate = await fetchDelegate(addressOrENSName);
-    console.log('delegate', delegate);
     setLoading(false);
     setDelegate(delegate);
-
-    let truncatedStatement = "";
-
-          if (delegate.statement && delegate.statement.delegateStatement) {
-            truncatedStatement = delegate.statement.delegateStatement.slice(
-              0,
-              120
-            );
-          }
   }
 
   useEffect(() => {
