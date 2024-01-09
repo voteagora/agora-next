@@ -134,7 +134,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                       detail={
                         <MobileValueWrapper>
                           <Link
-                            href={`/delegate/${delegate?.address}`}
+                            href={`/delegates/${delegate?.address}`}
                             className="underline"
                           >
                             View more

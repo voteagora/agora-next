@@ -133,7 +133,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                       detail={
                         <ValueWrapper>
                           <Link
-                            href={`/delegate/${delegate?.address}`}
+                            href={`/delegates/${delegate?.address}`}
                             className="underline"
                           >
                             View more
