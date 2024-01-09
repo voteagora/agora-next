@@ -16,6 +16,7 @@ import vote from "./vote.svg";
 import liquid from "./liquid.svg";
 import spinner from "./spinner.svg";
 import power from "./power.svg";
+import profile from "./profile.svg";
 import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
 
@@ -39,5 +40,6 @@ export const icons = {
   liquid,
   spinner,
   power,
+  profile,
   info,
 };

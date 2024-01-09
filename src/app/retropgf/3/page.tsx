@@ -1,19 +1,22 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import RetroPGFResults from "@/components/RetroPGF/RetroPGFResults";
 import { VStack } from "@/components/Layout/Stack";
 
-// TODO: frh -> filters
+/**
+ * TODO:
+ * - Get exact fields from query, where is image coming from
+ * - Text-ellipsis if project text is too long?
+ * - Get filters on query
+ * - Get mobile design
+ * - Check if url is prod or not
+ * - Infinite scroll?
+ * - Where is this conversion of these impactCategories [ 'DEVELOPER_ECOSYSTEM', 'END_USER_EXPERIENCE_AND_ADOPTION' ] into "Tooling and utilities", "End UX & Adoption"
+ */
+// TODO: frh -> investigate apollo for infinite scroll
 export async function getRetroPGFResults() {
   const query = `
     query {
       retroPGF {
-        projects(first: 10) {
+        projects(first: 5) {
           edges {
             node {
               id
@@ -27,7 +30,6 @@ export async function getRetroPGFResults() {
     }
   `;
 
-  // TODO: frh -> url
   const url = "https://optimism-agora-dev.agora-dev.workers.dev/graphql";
   const options = {
     method: "POST",
@@ -46,51 +48,10 @@ export async function getRetroPGFResults() {
 
 export default async function Page() {
   const results = await getRetroPGFResults();
-  console.log("results: ", results);
+
   return (
     <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
-      <Table>
-        <TableHeader className="border-none">
-          <TableRow className="border-none">
-            <TableHead className="text-xs" variant="gray">
-              Project
-            </TableHead>
-            <TableHead className="text-xs" variant="gray">
-              Submitted by
-            </TableHead>
-            <TableHead className="text-xs" variant="gray">
-              Categories
-            </TableHead>
-            <TableHead className="text-xs text-right" variant="gray">
-              In ballots
-            </TableHead>
-            <TableHead className="text-xs text-right" variant="gray">
-              In lists
-            </TableHead>
-            <TableHead className="text-xs text-right" variant="gray">
-              Amount received
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow className="border-none">
-            <TableCell>Allowance</TableCell>
-            <TableCell>Allowance</TableCell>
-            <TableCell>Allowance</TableCell>
-            <TableCell className="text-right">Allowance</TableCell>
-            <TableCell className="text-right">Allowance</TableCell>
-            <TableCell className="text-right">Allowance</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Allowance</TableCell>
-            <TableCell>Allowance</TableCell>
-            <TableCell>Allowance</TableCell>
-            <TableCell className="text-right">Allowance</TableCell>
-            <TableCell className="text-right">Allowance</TableCell>
-            <TableCell className="text-right">Allowance</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <RetroPGFResults results={results} />
     </VStack>
   );
 }
