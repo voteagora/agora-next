@@ -52,6 +52,33 @@ async function fetchVoteForProposalAndDelegate(proposal_id, address) {
   });
 }
 
+async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function checkIfDelegatingToProxy(addressOrENSName) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchCurrentDelegatees(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
+}
+
 export default async function OPProposalPage({ proposal }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
 
@@ -79,6 +106,12 @@ export default async function OPProposalPage({ proposal }) {
           <ProposalVotesList
             initialProposalVotes={proposalVotes}
             fetchVotesForProposal={fetchProposalVotes}
+            fetchDelegate={fetchDelegate}
+            fetchBalanceForDirectDelegation={fetchVotingPower}
+            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+            fetchCurrentDelegatees={fetchCurrentDelegatees}
+            getProxyAddress={getProxyAddress}
             proposal_id={proposal.id}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}

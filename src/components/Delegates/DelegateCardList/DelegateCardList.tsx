@@ -3,15 +3,12 @@
 import * as React from "react";
 import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import Image from "next/image";
-import { VStack } from "../../Layout/Stack";
-import { DelegateActions } from "../DelegateCard/DelegateActions";
-import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
 import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import DelegatePreviewCard from "../DelegateCard/DeletegatePreviewCard";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -56,14 +53,6 @@ export default function DelegateCardList({
     setPages([initialDelegates]);
     setMeta(initialDelegates.meta);
   }, [initialDelegates]);
-
-  const handleClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    href: string
-  ) => {
-    e.preventDefault();
-    router.push(href);
-  };
 
   const loadMore = async (page: any) => {
     if (!fetching.current && meta.hasNextPage) {
@@ -117,37 +106,20 @@ export default function DelegateCardList({
 
           return (
             <div key={delegate.address} className={styles.link}>
-              <VStack className={styles.link_container}>
-                <VStack gap={4} className="h-full">
-                  <div
-                    onClick={(e) =>
-                      handleClick(e, `/delegates/${delegate.address}`)
-                    }
-                  >
-                    <VStack gap={4} justifyContent="justify-center">
-                      <DelegateProfileImage
-                        address={delegate.address}
-                        votingPower={delegate.votingPower}
-                      />
-                      <p className={styles.summary}>{truncatedStatement}</p>
-                    </VStack>
-                  </div>
-                  <div className="flex-grow" />
-                  <DelegateActions
-                    delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchVotingPowerForSubdelegation={
-                      fetchVotingPowerForSubdelegation
-                    }
-                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-                    fetchCurrentDelegatees={fetchCurrentDelegatees}
-                    getProxyAddress={getProxyAddress}
-                    isAdvancedUser={isAdvancedUser}
-                  />
-                </VStack>
-              </VStack>
+              <DelegatePreviewCard
+                delegate={delegate}
+                truncatedStatement={truncatedStatement}
+                fetchBalanceForDirectDelegation={
+                  fetchBalanceForDirectDelegation
+                }
+                fetchVotingPowerForSubdelegation={
+                  fetchVotingPowerForSubdelegation
+                }
+                checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+                fetchCurrentDelegatees={fetchCurrentDelegatees}
+                getProxyAddress={getProxyAddress}
+                isAdvancedUser={isAdvancedUser}
+                />
             </div>
           );
         })}
