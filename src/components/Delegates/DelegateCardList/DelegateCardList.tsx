@@ -135,15 +135,6 @@ export default function DelegateCardList({
                   <div className="flex-grow" />
                   <DelegateActions
                     delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchVotingPowerForSubdelegation={
-                      fetchVotingPowerForSubdelegation
-                    }
-                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-                    fetchCurrentDelegatees={fetchCurrentDelegatees}
-                    getProxyAddress={getProxyAddress}
                     isAdvancedUser={isAdvancedUser}
                   />
                 </VStack>

@@ -64,9 +64,6 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
     return getCurrentDelegatees({ addressOrENSName });
 }
 
-
 export async function fetchCurrentDelegators(addressOrENSName: string) {
-    "use server";
-
     return getCurrentDelegators({ addressOrENSName });
 }
