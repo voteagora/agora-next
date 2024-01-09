@@ -6,15 +6,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import profile from "@/icons/profile.svg";
+import profileIcon from "@/icons/profile.svg";
 import Image from "next/image";
 
 export type Results = {
   node: {
+    applicant: {
+      address: {
+        address: string;
+        resolvedName: {
+          address: string;
+          name: string | null;
+        };
+      };
+    };
+    awarded: string;
+    displayName: string;
     id: string;
     impactCategory: string[];
-    displayName: string;
     includedInBallots: number;
+    profile: {
+      name: string;
+      profileImageUrl: string | null;
+    };
   };
 }[];
 
@@ -45,16 +59,29 @@ export default function RetroPGFResults({ results }: { results: Results }) {
       </TableHeader>
       <TableBody className="text-gray-4f font-medium text-base">
         {results.map((result) => {
-          const { id, displayName, includedInBallots, impactCategory } =
-            result.node;
+          const {
+            displayName,
+            id,
+            impactCategory,
+            includedInBallots,
+            profile,
+          } = result.node;
           const _profile = "solidity.lang.eth";
           return (
             <TableRow className="border-none" key={id}>
-              <TableCell className="font-semibold text-black">
-                {displayName}
+              <TableCell>
+                {/* {profile?.profileImageUrl && (
+                  <Image
+                    src={profile.profileImageUrl}
+                    alt={displayName}
+                    width="32"
+                    height="32"
+                  />
+                )} */}
+                <span className="font-semibold text-black">{displayName}</span>
               </TableCell>
               <TableCell className="flex gap-2 items-center">
-                <Image src={profile} alt={_profile} className="h-5" />
+                <Image src={profileIcon} alt={_profile} />
                 <span>{_profile}</span>
               </TableCell>
               <TableCell>

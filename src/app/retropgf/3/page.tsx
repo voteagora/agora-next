@@ -1,17 +1,6 @@
 import RetroPGFResults from "@/components/RetroPGF/RetroPGFResults";
 import { VStack } from "@/components/Layout/Stack";
 
-/**
- * TODO:
- * - Get exact fields from query, where is image coming from
- * - Text-ellipsis if project text is too long?
- * - Get filters on query
- * - Get mobile design
- * - Check if url is prod or not
- * - Infinite scroll?
- * - Where is this conversion of these impactCategories [ 'DEVELOPER_ECOSYSTEM', 'END_USER_EXPERIENCE_AND_ADOPTION' ] into "Tooling and utilities", "End UX & Adoption"
- */
-// TODO: frh -> investigate apollo for infinite scroll
 export async function getRetroPGFResults() {
   const query = `
     query {
@@ -19,10 +8,27 @@ export async function getRetroPGFResults() {
         projects(first: 5) {
           edges {
             node {
+              applicant {
+                address {
+                  address
+                  resolvedName {
+                    address
+                    name
+                  }
+                }
+              }
+              awarded
+              displayName
               id
               impactCategory
-              displayName
               includedInBallots
+              lists {
+                id
+              }
+              profile {
+                profileImageUrl
+                name
+              }
             }
           }
         }
