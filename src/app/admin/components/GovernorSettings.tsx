@@ -3,28 +3,64 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { LoaderIcon, Lock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Lock } from "lucide-react";
 import {
-  useAccount,
+  useContractReads,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
+import { Separator } from "@/components/ui/separator";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 
 const secondsPerBlock = 2;
 
+const governorContract = {
+  address: OptimismContracts.governor.address,
+  abi: OptimismContracts.governor.abi,
+  chainId: 10,
+};
+
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
-  const [votingPeriod, setVotingPeriod] = useState(7);
-  const { config: setVotingPeriodConfig } = usePrepareContractWrite({
-    address: OptimismContracts.governor.address as any,
-    abi: OptimismContracts.governor.abi,
-    functionName: "setVotingPeriod",
-    args: [
-      (BigInt(votingPeriod || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock),
+  const { data, isLoading: isInitializing } = useContractReads({
+    contracts: [
+      {
+        ...governorContract,
+        functionName: "votingPeriod",
+      },
+      {
+        ...governorContract,
+        functionName: "votingDelay",
+      },
+      {
+        ...governorContract,
+        functionName: "manager",
+      },
     ],
+  });
+
+  const [initVotingPeriod, initVotingDelay, initManager] = data || [];
+
+  useEffect(() => {
+    if (data) {
+      setVotingPeriod(
+        (Number(initVotingPeriod!.result) * secondsPerBlock) / 3600
+      );
+      setVotingDelay(
+        (Number(initVotingDelay!.result) * secondsPerBlock) / 3600
+      );
+      setManager(String(initManager!.result));
+    }
+  }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const [manager, setManager] = useState("0x...");
+  const [votingPeriod, setVotingPeriod] = useState<number>();
+  const { config: setVotingPeriodConfig } = usePrepareContractWrite({
+    ...governorContract,
+    functionName: "setVotingPeriod",
+    args: [(BigInt(votingPeriod || 0) * 3600n) / BigInt(secondsPerBlock)],
   });
   const {
     data: resultSetVotingPeriod,
@@ -38,14 +74,11 @@ export default function GovernorSettings() {
   const isDisabledSetVotingPeriod =
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
-  const [votingDelay, setVotingDelay] = useState(168);
+  const [votingDelay, setVotingDelay] = useState<number>();
   const { config: setVotingDelayConfig } = usePrepareContractWrite({
-    address: OptimismContracts.governor.address as any,
-    abi: OptimismContracts.governor.abi,
+    ...governorContract,
     functionName: "setVotingDelay",
-    args: [
-      (BigInt(votingDelay || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock),
-    ],
+    args: [(BigInt(votingDelay || 0) * 3600n) / BigInt(secondsPerBlock)],
   });
   const {
     data: resultSetVotingDelay,
@@ -61,11 +94,10 @@ export default function GovernorSettings() {
 
   // const [managerAddress, setManagerAddress] = useState(currentManager as string)
   // const { config: setManagerAddressConfig } = usePrepareContractWrite({
-  //   address: "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-  //   abi: GovernorAbi,
+  //   ...governorContract,
   //   functionName: "setManagerAddress",
   //   args: [
-  //     (BigInt(managerAddress || 0) * 60n * 60n * 24n) / BigInt(secondsPerBlock)
+  //     (BigInt(managerAddress || 0) * 3600n) / BigInt(secondsPerBlock)
   //   ]
   // })
   // const {
@@ -84,7 +116,7 @@ export default function GovernorSettings() {
   return (
     <div className="gl_box">
       <section>
-        <h1>Governor settings</h1>
+        <h1 className="font-extrabold text-2xl">Governor settings</h1>
         <p>Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
@@ -95,7 +127,7 @@ export default function GovernorSettings() {
               <Input
                 value={votingPeriod}
                 onChange={(e) => setVotingPeriod(parseInt(e.target.value))}
-                disabled={isDisabledSetVotingPeriod}
+                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -106,7 +138,7 @@ export default function GovernorSettings() {
                 size="sm"
                 className="absolute right-[6px] rounded-sm bg-white"
                 loading={isDisabledSetVotingPeriod}
-                disabled={isDisabledSetVotingPeriod}
+                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
                 onClick={() => {
                   writeSetVotingPeriod?.();
                 }}
@@ -121,7 +153,7 @@ export default function GovernorSettings() {
               <Input
                 value={votingDelay}
                 onChange={(e) => setVotingDelay(parseInt(e.target.value))}
-                disabled={isDisabledSetVotingDelay}
+                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -132,7 +164,7 @@ export default function GovernorSettings() {
                 variant="outline"
                 size="sm"
                 loading={isDisabledSetVotingDelay}
-                disabled={isDisabledSetVotingDelay}
+                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
                 onClick={() => {
                   writeSetVotingDelay?.();
                 }}
@@ -141,6 +173,14 @@ export default function GovernorSettings() {
               </Button>
             </div>
           </div>
+        </div>
+        <Separator className="my-8" />
+        <div className="text-sm flex justify-between items-center sm:px-2">
+          <div className="flex items-center gap-2">
+            <p className="text-gray-4f">Manager Address</p>
+            <Lock className="w-4 h-4 text-gray-af" />
+          </div>
+          <p className="text-gray-4f">{manager}</p>
         </div>
         {/* <div className={!isManager ? "opacity-70" : ""}>
           <Label>ManagerAddress</Label>

@@ -1,33 +1,39 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import ProposalType from "./ProposalType";
 import { Fragment, useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export const mockProposalTypes = [
-  { quorum: 1000, approvalThreshold: 1000, name: "Default" },
-  { quorum: 2000, approvalThreshold: 2000, name: "Alt" },
-];
+import { ProposalTypes } from "@prisma/client";
+import ProposalType from "./ProposalType";
 
 // TODO: Take init values from the chain
-export default function ProposalTypeSettings() {
+export default function ProposalTypeSettings({
+  initProposalTypes,
+  votableSupply,
+}: {
+  initProposalTypes: ProposalTypes[];
+  votableSupply: string;
+}) {
   const [proposalTypes, setProposalTypes] = useState(
-    mockProposalTypes.map(({ quorum, approvalThreshold, name }) => ({
+    initProposalTypes.map(({ quorum, approval_threshold, name }) => ({
       name,
-      quorum: quorum / 100,
-      approvalThreshold: approvalThreshold / 100,
+      quorum: Number(quorum) / 100,
+      approval_threshold: Number(approval_threshold) / 100,
     }))
   );
 
   return (
     <section className="gl_box">
-      <h1>Proposal type settings</h1>
+      <h1 className="font-extrabold text-2xl">Proposal type settings</h1>
       <p>Create and manage different types of proposals</p>
       {proposalTypes.map((proposalType, key) => (
         <Fragment key={key}>
-          <ProposalType proposalType={proposalType} index={key} />
+          <ProposalType
+            votableSupply={votableSupply}
+            proposalType={proposalType}
+            index={key}
+          />
           <Separator className="my-8" />
         </Fragment>
       ))}
@@ -36,7 +42,7 @@ export default function ProposalTypeSettings() {
         onClick={() => {
           setProposalTypes((prev) => [
             ...prev,
-            { quorum: 50, approvalThreshold: 50, name: "" },
+            { quorum: 50, approval_threshold: 50, name: "" },
           ]);
         }}
       >
