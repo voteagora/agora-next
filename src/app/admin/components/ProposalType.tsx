@@ -29,7 +29,7 @@ type Props = {
 
 type ProposalType = {
   quorum: number;
-  approvalThreshold: number;
+  approval_threshold: number;
   name: string;
 };
 
@@ -43,14 +43,14 @@ const proposalTypeSchema = z.object({
 const mockVotableSupply = 500000000;
 
 export default function ProposalType({
-  proposalType: { quorum, approvalThreshold, name },
+  proposalType: { quorum, approval_threshold, name },
   index,
 }: Props) {
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
     defaultValues: {
       quorum,
-      approvalThreshold,
+      approval_threshold,
       name,
       description: "",
     },
@@ -172,7 +172,7 @@ export default function ProposalType({
           />
           <FormField
             control={form.control}
-            name="approvalThreshold"
+            name="approval_threshold"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>Approval threshold</FormLabel>
@@ -191,7 +191,7 @@ export default function ProposalType({
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
                           (mockVotableSupply *
-                            form.getValues("approvalThreshold")) /
+                            form.getValues("approval_threshold")) /
                             100,
                           0,
                           1
