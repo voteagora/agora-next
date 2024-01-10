@@ -10,8 +10,10 @@ import ProposalType from "./ProposalType";
 // TODO: Take init values from the chain
 export default function ProposalTypeSettings({
   initProposalTypes,
+  votableSupply,
 }: {
   initProposalTypes: ProposalTypes[];
+  votableSupply: string;
 }) {
   const [proposalTypes, setProposalTypes] = useState(
     initProposalTypes.map(({ quorum, approval_threshold, name }) => ({
@@ -27,7 +29,11 @@ export default function ProposalTypeSettings({
       <p>Create and manage different types of proposals</p>
       {proposalTypes.map((proposalType, key) => (
         <Fragment key={key}>
-          <ProposalType proposalType={proposalType} index={key} />
+          <ProposalType
+            votableSupply={votableSupply}
+            proposalType={proposalType}
+            index={key}
+          />
           <Separator className="my-8" />
         </Fragment>
       ))}
