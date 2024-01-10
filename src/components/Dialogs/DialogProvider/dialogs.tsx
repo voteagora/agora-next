@@ -1,10 +1,20 @@
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
 import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
+import {
+  CastVoteDialog,
+  SupportTextProps,
+} from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
+import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
+import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
+import { Proposal } from "@/app/api/proposals/proposal";
 
-export type DialogType = DelegateDialogType | CastProposalDialogType;
-// | CastVoteDialogType
-// | ApprovalCastVoteDialogType
+export type DialogType =
+  | DelegateDialogType
+  | CastProposalDialogType
+  | CastVoteDialogType
+  | AdvancedDelegateDialogType
+  | ApprovalCastVoteDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -12,6 +22,17 @@ export type DelegateDialogType = {
   params: {
     target: string;
     votingPower: string;
+  };
+};
+
+export type AdvancedDelegateDialogType = {
+  type: "ADVANCED_DELEGATE";
+  params: {
+    target: string;
+    fetchVotingPowerForSubdelegation: (address: string) => Promise<string>;
+    checkIfDelegatingToProxy: (address: string) => Promise<boolean>;
+    fetchCurrentDelegatees: (address: string) => Promise<any>;
+    getProxyAddress: (address: string) => Promise<string>;
   };
 };
 
@@ -30,24 +51,24 @@ export type CastProposalDialogType = {
 //   params: {};
 // };
 
-// export type CastVoteDialogType = {
-//   type: "CAST_VOTE";
-//   params: {
-//     proposalId: string;
-//     reason: string;
-//     supportType: SupportTextProps["supportType"];
-//   };
-// };
+export type CastVoteDialogType = {
+  type: "CAST_VOTE";
+  params: {
+    proposalId: string;
+    reason: string;
+    supportType: SupportTextProps["supportType"];
+    delegate: any;
+    votingPower: string;
+  };
+};
 
-// export type ApprovalCastVoteDialogType = {
-//   type: "APPROVAL_CAST_VOTE";
-//   params: {
-//     castVoteFragmentRef: ApprovalCastVoteDialogFragment$key;
-//     proposalId: string;
-//     hasStatement: boolean;
-//     votesRepresentedRef: TokenAmountDisplayFragment$key;
-//   };
-// };
+export type ApprovalCastVoteDialogType = {
+  type: "APPROVAL_CAST_VOTE";
+  params: {
+    proposal: Proposal;
+    hasStatement: boolean;
+  };
+};
 
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: ({ target, votingPower }, closeDialog) => {
@@ -55,6 +76,27 @@ export const dialogs: DialogDefinitions<DialogType> = {
       <DelegateDialog
         target={target}
         votingPower={votingPower}
+        completeDelegation={closeDialog}
+      />
+    );
+  },
+  ADVANCED_DELEGATE: (
+    {
+      target,
+      fetchVotingPowerForSubdelegation,
+      checkIfDelegatingToProxy,
+      fetchCurrentDelegatees,
+      getProxyAddress,
+    },
+    closeDialog
+  ) => {
+    return (
+      <AdvancedDelegateDialog
+        target={target}
+        fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+        checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+        fetchCurrentDelegatees={fetchCurrentDelegatees}
+        getProxyAddress={getProxyAddress}
         completeDelegation={closeDialog}
       />
     );
@@ -70,12 +112,30 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  // CAST_VOTE: ({ ...props }, closeDialog) => {
-  //   return <CastVoteDialog {...props} closeDialog={closeDialog} />;
-  // },
-  // APPROVAL_CAST_VOTE: ({ ...props }, closeDialog) => {
-  //   return <ApprovalCastVoteDialog {...props} closeDialog={closeDialog} />;
-  // },
+  CAST_VOTE: (
+    { proposalId, reason, supportType, delegate, votingPower },
+    closeDialog
+  ) => {
+    return (
+      <CastVoteDialog
+        proposalId={proposalId}
+        reason={reason}
+        supportType={supportType}
+        closeDialog={closeDialog}
+        delegate={delegate}
+        votingPower={votingPower}
+      />
+    );
+  },
+  APPROVAL_CAST_VOTE: ({ proposal, hasStatement }, closeDialog) => {
+    return (
+      <ApprovalCastVoteDialog
+        proposal={proposal}
+        hasStatement={hasStatement}
+        closeDialog={closeDialog}
+      />
+    );
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

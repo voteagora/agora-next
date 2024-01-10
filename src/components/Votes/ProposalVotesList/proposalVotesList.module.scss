@@ -3,8 +3,9 @@
 .vote_row {
   font-size: $font-size-xs;
   color: #66676b;
+
   .voter {
-    color: $gray-400;
+    color: $gray-4f;
     font-weight: $font-weight-semibold;
   }
   .vote_reason {
@@ -15,4 +16,11 @@
     color: #66676b;
     width: fit-content;
   }
+}
+
+.vote_container {
+  padding: 0 $spacing-4;
+  padding-bottom: $spacing-4;
+  overflow-y: scroll;
+  max-height: calc(100vh - 437px);
 }

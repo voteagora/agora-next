@@ -5,12 +5,26 @@
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "./styles.module.scss";
-import DelegateStatement from "@/components/Delegates/DelegateStatement/DelegateStatement";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
+import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
+import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
+import { VStack } from "@/components/Layout/Stack";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { getStatment } from "@/app/api/statements/getStatements";
+import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
+import {
+  getCurrentDelegatees,
+  getCurrentDelegators,
+} from "@/app/api/delegations/getDelegations";
+import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
+import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
+import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
+import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/voting-power/getVotingPower";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -18,10 +32,10 @@ async function fetchDelegate(addressOrENSName) {
   return getDelegate({ addressOrENSName });
 }
 
-async function getDelegateVotes(addressOrENSName, page = 1) {
+async function getDelegateVotes(addressOrENSName, page = 1, sortOrder) {
   "use server";
 
-  return getVotesForDelegate({ addressOrENSName, page });
+  return getVotesForDelegate({ addressOrENSName, page, sortOrder });
 }
 
 async function getDelegateStatement(addressOrENSName) {
@@ -30,47 +44,127 @@ async function getDelegateStatement(addressOrENSName) {
   return getStatment({ addressOrENSName });
 }
 
+async function getDelegatees(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
+async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+async function checkIfDelegatingToProxy(addressOrENSName) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+async function fetchBalanceForDirectDelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+}
+
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
+}
+
 export default async function Page({ params: { addressOrENSName } }) {
-  const delegate = await fetchDelegate(addressOrENSName);
-  const delegateVotes = await getDelegateVotes(addressOrENSName);
-  const statement = await getDelegateStatement(addressOrENSName);
+  let delegate;
+  let delegateVotes;
+  let statement;
+  let delegatees;
+  let delegators;
+  try {
+    delegate = await fetchDelegate(addressOrENSName);
+    delegateVotes = await getDelegateVotes(addressOrENSName);
+    statement = await getDelegateStatement(addressOrENSName);
+    delegatees = await getDelegatees(addressOrENSName);
+    delegators = await getDelegators(addressOrENSName);
+  } catch (error) {
+    delegate = null;
+    delegateVotes = null;
+    statement = null;
+    delegatees = null;
+    delegators = null;
+  }
+
+  if (!delegate) {
+    return (
+      <ResourceNotFound message="Hmm... can't find that address or ENS, please check again." />
+    );
+  }
 
   return (
-    <HStack
-      className={styles.delegate_container}
-      justifyContent="justify-between"
-      gap={6}
-    >
-      {delegate && (
-        <VStack className={styles.left_container}>
-          <DelegateCard delegate={delegate} />
-        </VStack>
-      )}
-
-      <VStack className={styles.right_container}>
-        {!statement && !statement?.delegateStatement && (
-          <p>
-            This voter has not submitted a statement. Is this you? Connect your
-            wallet to verify your address, and tell your community what you’d
-            like to see.
-          </p>
-        )}
-
-        {statement && statement.delegateStatement && (
-          <DelegateStatement statement={statement.delegateStatement} />
-        )}
-
-        {delegateVotes && (
-          <DelegateVotes
-            initialVotes={delegateVotes}
-            fetchDelegateVotes={async (page) => {
-              "use server";
-
-              return getDelegateVotes(addressOrENSName, page);
-            }}
+    <DelegateVotesProvider initialVotes={delegateVotes}>
+      <div className="flex flex-col items-center justify-between w-full max-w-full gap-6 mt-12 xl:flex-row xl:items-start">
+        <VStack className="static w-full xl:sticky top-16 shrink-0 xl:max-w-xs">
+          <DelegateCard
+            fetchDelegate={fetchDelegate}
+            addressOrENSName={addressOrENSName}
+            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+            getProxyAddress={getProxyAddress}
+            fetchCurrentDelegatees={getDelegatees}
           />
-        )}
-      </VStack>
-    </HStack>
+        </VStack>
+
+        <VStack className="flex-1 max-w-full min-w-0 xl:ml-12">
+          <DelegateStatementContainer
+            addressOrENSName={addressOrENSName}
+            statement={statement}
+          />
+          <DelegationsContainer
+            delegatees={delegatees}
+            delegators={delegators}
+          />
+
+          {delegateVotes.votes.length > 0 ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col justify-between gap-2 md:flex-row">
+                <h2 className="text-2xl font-bold">Past Votes</h2>
+                {/* <div className="flex flex-col justify-between gap-2 md:flex-row">
+                  <DelegatesVotesSort
+                    fetchDelegateVotes={async (page, sortOrder) => {
+                      "use server";
+
+                      return getDelegateVotes(
+                        addressOrENSName,
+                        page,
+                        sortOrder
+                      );
+                    }}
+                  />
+                  <DelegatesVotesType />
+                </div> */}
+              </div>
+              <DelegateVotes
+                fetchDelegateVotes={async (page, sortOrder) => {
+                  "use server";
+
+                  return getDelegateVotes(addressOrENSName, page, sortOrder);
+                }}
+              />
+            </div>
+          ) : (
+            <div className="default-message-class">
+              <p>No past votes available.</p>
+            </div>
+          )}
+        </VStack>
+      </div>
+    </DelegateVotesProvider>
   );
 }

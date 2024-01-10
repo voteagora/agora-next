@@ -1,7 +1,7 @@
 @import "@/styles/variables";
 
 .approval_choices_container {
-  max-height: calc(100vh - 437px);
+  max-height: calc(100vh - 452px);
   overflow-y: scroll;
   flex-shrink: 1;
   padding-left: $spacing-4;
@@ -38,6 +38,9 @@
   font-weight: $font-weight-semibold;
   font-size: $font-size-sm;
   margin-bottom: $spacing-1;
+}
+.singleOptionContainer:last-child {
+  margin-bottom: $spacing-2;
 }
 
 .descriptionText {
