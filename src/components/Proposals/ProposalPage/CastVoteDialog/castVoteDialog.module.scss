@@ -1,0 +1,63 @@
+@import "@/styles/variables";
+@import "@/styles/mixins";
+
+.vote_for {
+  color: $votes-for;
+}
+
+.vote_against {
+  color: $votes-against;
+}
+
+.vote_abstain {
+  color: $votes-abstain;
+}
+.subtitle {
+  font-size: $font-size-xs;
+  color: $gray-700;
+  font-weight: $font-weight-medium;
+}
+.title {
+  font-size: $font-size-lg;
+  color: $gray-900;
+  font-weight: $font-weight-extrabold;
+}
+
+.vote_container {
+  @include buttonStyles;
+  text-align: center;
+}
+
+.disabled {
+  background: $gray-eb;
+  color: $gray-700;
+  cursor: not-allowed;
+}
+
+.note_to_user {
+  padding: $spacing-2 $spacing-4;
+  z-index: 1099;
+  background-color: $gray-fa;
+  font-size: $font-size-xs;
+  color: $gray-700;
+  border-radius: $border-radius-lg;
+}
+
+.full_width {
+  width: 100%;
+}
+
+.no_reason {
+  width: 100%;
+  padding: $spacing-6 $spacing-4;
+  border-radius: $border-radius-lg;
+  border: 1px dashed $gray-eb;
+  text-align: center;
+  color: $gray-700;
+}
+
+.has_reason {
+  max-height: 40vh;
+  overflow-y: scroll;
+  color: $gray-700;
+}

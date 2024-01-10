@@ -1,5 +1,6 @@
 import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
+import Header from "@/components/Header/Header";
 
 declare global {
   interface BigInt {
@@ -26,7 +27,10 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <ClientLayout>{children}</ClientLayout>
+      <ClientLayout>
+        <Header />
+        {children}
+      </ClientLayout>
     </html>
   );
 }

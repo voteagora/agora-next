@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 import { ethers } from "ethers";
 import { icons } from "../../icons/icons";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
 import { opAdminAddress } from "@/lib/contracts/contracts";
+import styles from "./styles.module.scss";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";
 
@@ -66,35 +65,21 @@ export default function SimulateTransaction({
   }
 
   return (
-    <HStack
-      alignItems="items-center"
-      className={css`
-        height: 100%;
-        border: ${theme.spacing.px} solid ${theme.colors.gray.eb};
-        border-radius: ${theme.borderRadius.md};
-      `}
-    >
+    <HStack alignItems="items-center" className={styles.simulate}>
       <p
-        className={css`
-          width: 70%;
-          margin-left: ${theme.spacing["4"]};
-          font-weight: 600;
-          color: ${status === "Valid"
-            ? theme.colors.green[500]
+        className={
+          status === "Valid"
+            ? styles.valid
             : status === "Invalid"
-            ? theme.colors.red[500]
-            : theme.colors.gray["4f"]};
-        `}
+            ? styles.invalid
+            : styles.else_color
+        }
       >
         {status}
       </p>
       <Button
         variant="outline"
-        className={css`
-          width: 30%;
-          padding: ${theme.spacing["1"]};
-          margin-right: ${theme.spacing["2"]};
-        `}
+        className={styles.simulate__button}
         onClick={() => {
           !isLoading && simulate();
         }}
@@ -104,9 +89,7 @@ export default function SimulateTransaction({
           <Image
             src={icons.spinner}
             alt={icons.spinner}
-            className={css`
-              margin: 0 auto;
-            `}
+            className={styles.simulate__image}
           />
         ) : (
           "Simulate"

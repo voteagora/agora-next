@@ -3,6 +3,18 @@ import { NounsContracts, OptimismContracts } from "./contracts/contracts";
 import { Prisma } from "@prisma/client";
 import { DEPLOYMENT_NAME } from "./config";
 
+export const getQuorum = async (proposal: Prisma.ProposalsGetPayload<true>) => {
+  let quorum = await getQuorumForProposal(proposal);
+
+  if (!quorum) {
+    const votableSupply = await prisma.votableSupply.findFirst({});
+
+    quorum = (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
+  }
+
+  return quorum;
+};
+
 /**
  *
  *
@@ -22,7 +34,12 @@ export async function getQuorumForProposal(
       if (!proposal?.start_block) {
         return null;
       }
-      return OptimismContracts.governor.contract.quorum(proposal.start_block);
+      return OptimismContracts.governor.contract.quorum(
+        // TODO: Remove after governor update
+        process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+          ? proposal.start_block
+          : proposal.proposal_id
+      );
     }
   }
 }

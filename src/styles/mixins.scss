@@ -11,6 +11,32 @@
   transition: all 200ms;
 
   &:hover {
+    box-shadow: $box-shadow-newHover;
+  }
+
+  &:active {
+    box-shadow: $box-shadow-none;
+    background-color: $gray-fa;
+  }
+
+  &:disabled {
+    background: $gray-eb;
+    color: $gray-700;
+  }
+}
+
+@mixin buttonStylesSmall {
+  border-radius: $spacing-2;
+  border-width: $spacing-px;
+  border-color: $gray-eb;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  box-shadow: $box-shadow-newDefault;
+  cursor: pointer;
+  padding: $spacing-2 $spacing-3;
+  transition: all 200ms;
+
+  &:hover {
     background: $gray-100;
   }
 

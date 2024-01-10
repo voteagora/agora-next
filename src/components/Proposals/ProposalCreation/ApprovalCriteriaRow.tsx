@@ -13,29 +13,13 @@ import LabelWithInfo from "./LabelWithInfo";
 export default function ApprovalCriteriaRow({ form }: { form: Form }) {
   return (
     <>
-      <h4 className={styles.create_prop_form__heading}>Approval parameters</h4>
-      <p
-        className={css`
-          font-size: ${theme.fontSize.base};
-          color: ${theme.colors.gray["4f"]};
-          margin-bottom: ${theme.spacing["4"]};
-        `}
-      >
+      <h4 className={styles.create_prop_form__title}>Approval parameters</h4>
+      <p className={styles.approval__info}>
         Use the following settings to set the parameters of this vote as well as
         the methodology for determining which options can be executed.
       </p>
-      <HStack
-        className={css`
-          width: 100%;
-          margin-bottom: ${theme.spacing["4"]};
-        `}
-        gap={4}
-      >
-        <VStack
-          className={css`
-            width: 100%;
-          `}
-        >
+      <HStack className={styles.approval__section} gap={4}>
+        <VStack className="w-full">
           <LabelWithInfo label="Budget (OP)">
             This is the maximum number of tokens that can be transferred from
             all the options in this proposal.
@@ -49,11 +33,7 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
             min={0}
           />
         </VStack>
-        <VStack
-          className={css`
-            width: 100%;
-          `}
-        >
+        <VStack className="w-full">
           <LabelWithInfo label="Max options">
             Determines up to how many options each voter may select
           </LabelWithInfo>
@@ -67,18 +47,8 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
           />
         </VStack>
       </HStack>
-      <HStack
-        className={css`
-          width: 100%;
-          margin-bottom: ${theme.spacing["4"]};
-        `}
-        gap={4}
-      >
-        <VStack
-          className={css`
-            width: 100%;
-          `}
-        >
+      <HStack className={styles.approval__section} gap={4}>
+        <VStack className="w-full">
           <LabelWithInfo label="Criteria">
             There are two ways to determine the winners of an approval vote.
             <br />
@@ -97,11 +67,7 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
           />
         </VStack>
         {form.state.criteriaType === "Threshold" ? (
-          <VStack
-            className={css`
-              width: 100%;
-            `}
-          >
+          <VStack className="w-full">
             <LabelWithInfo label="Threshold">
               Selects how many votes an option must have to be considered a
               winner
@@ -116,11 +82,7 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
             />
           </VStack>
         ) : (
-          <VStack
-            className={css`
-              width: 100%;
-            `}
-          >
+          <VStack className="w-full">
             <LabelWithInfo label="Top choices">
               Selects how many of the most voted for options win.
             </LabelWithInfo>

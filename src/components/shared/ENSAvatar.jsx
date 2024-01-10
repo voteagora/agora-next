@@ -19,7 +19,7 @@ const imageLoader = ({ src }) => {
 };
 
 // TODO: Might be better to load the avatar on the server
-export default function ENSAvatar({ ensName }) {
+export default function ENSAvatar({ ensName, className = "" }) {
   const { data } = useEnsAvatar({
     chainId: 1,
     name: ensName,
@@ -48,22 +48,11 @@ export default function ENSAvatar({ ensName }) {
   }, [data]);
 
   return (
-    <div className={styles.ens_avatar}>
+    <div className={`${styles.ens_avatar} ${className}`}>
       <Image
         loader={imageLoader}
         alt="ENS Avatar"
-        className={css`
-          @keyframes fade-in {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-
-          animation: 0.3s forwards fade-in;
-        `}
+        className={styles.image}
         src={avatar}
         width={44}
         height={44}

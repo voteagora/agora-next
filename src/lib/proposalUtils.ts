@@ -1,9 +1,9 @@
-import { getQuorumForProposal } from "./governorUtils";
+import { getQuorum, getQuorumForProposal } from "./governorUtils";
 import { Prisma, ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
-import { Abi, decodeFunctionData } from 'viem';
+import { Abi, decodeFunctionData } from "viem";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -14,13 +14,13 @@ const knownAbis: Record<string, Abi> = {
         { name: "_label", type: "bytes32" },
         { name: "_owner", type: "address" },
         { name: "_resolver", type: "address" },
-        { name: "_ttl", type: "uint64" }
+        { name: "_ttl", type: "uint64" },
       ],
       name: "setSubnodeRecord",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ],
   "0x10f13a8c": [
     {
@@ -28,65 +28,65 @@ const knownAbis: Record<string, Abi> = {
       inputs: [
         { name: "_node", type: "bytes32" },
         { name: "_key", type: "string" },
-        { name: "_value", type: "string" }
+        { name: "_value", type: "string" },
       ],
       name: "setText",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ],
   "0xb4720477": [
     {
       constant: false,
       inputs: [
         { name: "_child", type: "address" },
-        { name: "_message", type: "bytes" }
+        { name: "_message", type: "bytes" },
       ],
       name: "sendMessageToChild",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ],
   "0xa9059cbb": [
     {
       constant: false,
       inputs: [
         { name: "_to", type: "address" },
-        { name: "_value", type: "uint256" }
+        { name: "_value", type: "uint256" },
       ],
       name: "transfer",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ],
   "0x095ea7b3": [
     {
       constant: false,
       inputs: [
         { name: "_spender", type: "address" },
-        { name: "_value", type: "uint256" }
+        { name: "_value", type: "uint256" },
       ],
       name: "approve",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ],
   "0x7b1837de": [
     {
       constant: false,
       inputs: [
         { name: "_to", type: "address" },
-        { name: "_amount", type: "uint256" }
+        { name: "_amount", type: "uint256" },
       ],
       name: "fund",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ],
   "0x23b872dd": [
     {
@@ -94,20 +94,25 @@ const knownAbis: Record<string, Abi> = {
       inputs: [
         { name: "_from", type: "address" },
         { name: "_to", type: "address" },
-        { name: "_value", type: "uint256" }
+        { name: "_value", type: "uint256" },
       ],
       name: "transferFrom",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
-  ]
+      type: "function",
+    },
+  ],
 };
 
 const decodeCalldata = (calldatas: `0x${string}`[]) => {
+  if (!calldatas || calldatas.length === 0 || !calldatas[0]) {
+    return { functionName: "unknown", functionArgs: [] as string[] };
+  }
+
   const abi = knownAbis[calldatas[0].slice(0, 10)];
-  let functionName = 'unknown';
+  let functionName = "unknown";
   let functionArgs = [] as string[];
+
   if (abi) {
     const decodedData = decodeFunctionData({
       abi: abi,
@@ -178,42 +183,49 @@ export async function parseProposal(
     proposalData
   );
 
+  const proposalTypeData =
+    proposal.proposal_type_data as ProposalTypeData | null;
+
+  const quorum = await getQuorum(proposal);
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
+    snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
       ? getHumanBlockTime(
-        proposal.created_block,
-        latestBlock.number,
-        latestBlock.timestamp
-      )
+          proposal.created_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
       : null,
     start_time: latestBlock
       ? getHumanBlockTime(
-        proposal.start_block,
-        latestBlock.number,
-        latestBlock.timestamp
-      )
+          proposal.start_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
       : null,
     end_time: latestBlock
       ? getHumanBlockTime(
-        proposal.end_block,
-        latestBlock.number,
-        latestBlock.timestamp
-      )
+          proposal.end_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
-    quorum: await getQuorumForProposal(proposal),
+    quorum,
+    approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
     proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-        proposal,
-        proposalResuts,
-        Number(latestBlock.number)
-      )
+          proposal,
+          proposalResuts,
+          Number(latestBlock.number)
+        )
       : null,
   };
 }
@@ -225,7 +237,7 @@ export function getProposalTotalValue(
   proposalData: ParsedProposalData[ProposalType]
 ) {
   switch (proposalData.key) {
-    case "STANDARD": {
+    case "STANDARD" || "OPTIMISTIC": {
       // TODO: frh -> check this value
       return proposalData.kind.options.reduce((acc, option) => {
         return (
@@ -258,7 +270,7 @@ export type ParsedProposalData = {
         calldatas: string[];
         functionName: string;
         functionArgs: string[];
-      }[]
+      }[];
     };
   };
   APPROVAL: {
@@ -271,6 +283,7 @@ export type ParsedProposalData = {
         description: string;
         functionName: string;
         functionArgs: string[];
+        budgetTokensSpent: bigint | null;
       }[];
       proposalSettings: {
         maxApprovals: number;
@@ -280,6 +293,10 @@ export type ParsedProposalData = {
         budgetAmount: bigint;
       };
     };
+  };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: { options: [] };
   };
 };
 
@@ -295,15 +312,23 @@ export function parseProposalData(
       return {
         key: "STANDARD",
         kind: {
-          options: [{
-            targets: JSON.parse(parsedProposalData.targets),
-            values: JSON.parse(parsedProposalData.values),
-            signatures: JSON.parse(parsedProposalData.signatures),
-            calldatas: calldatas,
-            functionName,
-            functionArgs
-          }]
+          options: [
+            {
+              targets: JSON.parse(parsedProposalData.targets),
+              values: JSON.parse(parsedProposalData.values),
+              signatures: JSON.parse(parsedProposalData.signatures),
+              calldatas: calldatas,
+              functionName,
+              functionArgs,
+            },
+          ],
         },
+      };
+    }
+    case "OPTIMISTIC": {
+      return {
+        key: "OPTIMISTIC",
+        kind: { options: [] },
       };
     }
     case "APPROVAL": {
@@ -313,22 +338,51 @@ export function parseProposalData(
       return {
         key: "APPROVAL",
         kind: {
-          options: (
-            parsedProposalData[0] as Array<
-              [string[], string[], string[], string]
-            >
-          ).map((option) => {
-            const { functionArgs, functionName } = decodeCalldata(option[2] as `0x${string}`[]);
+          options: parsedProposalData[0].map(
+            (option: Array<string | string[]>) => {
+              const [
+                budgetTokensSpent,
+                targets,
+                values,
+                calldatas,
+                description,
+              ] = (() => {
+                if (option.length === 4) {
+                  return [
+                    null,
+                    option[0],
+                    option[1],
+                    option[2],
+                    option[3],
+                  ] as const;
+                } else if (option.length === 5) {
+                  return [
+                    option[0],
+                    option[1],
+                    option[2],
+                    option[3],
+                    option[4],
+                  ] as const;
+                } else {
+                  throw new Error("unknown option length");
+                }
+              })();
 
-            return {
-              targets: option[0],
-              values: option[1],
-              calldatas: option[2],
-              description: option[3],
-              functionName,
-              functionArgs
-            };
-          }),
+              const { functionArgs, functionName } = decodeCalldata(
+                calldatas as `0x${string}`[]
+              );
+
+              return {
+                targets,
+                values,
+                calldatas,
+                description,
+                functionName,
+                functionArgs,
+                budgetTokensSpent,
+              };
+            }
+          ),
           proposalSettings: {
             maxApprovals: Number(maxApprovals),
             criteria: toApprovalVotingCriteria(Number(criteria)),
@@ -360,9 +414,17 @@ function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
  * Parse proposal results
  */
 
-type ParsedProposalResults = {
+export type ParsedProposalResults = {
   STANDARD: {
     key: "STANDARD";
+    kind: {
+      for: bigint;
+      against: bigint;
+      abstain: bigint;
+    };
+  };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
     kind: {
       for: bigint;
       against: bigint;
@@ -384,6 +446,14 @@ type ParsedProposalResults = {
   };
 };
 
+type ProposalResults = {
+  standard: [string, string, string];
+  approval: {
+    param: string;
+    votes: string;
+  }[];
+};
+
 export function parseProposalResults(
   proposalResults: string,
   proposalData: ParsedProposalData[ProposalType]
@@ -401,8 +471,23 @@ export function parseProposalResults(
         },
       };
     }
+    case "OPTIMISTIC": {
+      const parsedProposalResults = JSON.parse(proposalResults).optimistic;
+
+      return {
+        key: "OPTIMISTIC",
+        kind: {
+          for: BigInt(parsedProposalResults?.[1] ?? 0),
+          against: BigInt(parsedProposalResults?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults?.[2] ?? 0),
+        },
+      };
+    }
     case "APPROVAL": {
-      const parsedProposalResults = JSON.parse(proposalResults);
+      const parsedProposalResults = JSON.parse(
+        proposalResults
+      ) as ProposalResults;
+
       return {
         key: "APPROVAL",
         kind: {
@@ -417,7 +502,11 @@ export function parseProposalResults(
           options: proposalData.kind.options.map((option, idx) => {
             return {
               option: option.description,
-              votes: parsedProposalResults.approval?.[idx] ?? 0n,
+              votes: BigInt(
+                parsedProposalResults.approval?.find((res) => {
+                  return res.param === idx.toString();
+                })?.votes ?? 0
+              ),
             };
           }),
           criteria: proposalData.kind.proposalSettings.criteria,
@@ -464,6 +553,9 @@ export async function getProposalStatus(
   }
 
   const quorum = await getQuorumForProposal(proposal);
+  // TODO: Fetch votableSupply at the time of proposal creation
+  const votableSupply = (await prisma.votableSupply.findFirst({}))
+    ?.votable_supply;
 
   switch (proposalResults.key) {
     case "STANDARD": {
@@ -483,6 +575,18 @@ export async function getProposalStatus(
       }
 
       break;
+    }
+    case "OPTIMISTIC": {
+      const {
+        for: forVotes,
+        against: againstVotes,
+        abstain: abstainVotes,
+      } = proposalResults.kind;
+
+      // Check against 50% of votable supply
+      if (BigInt(againstVotes) > BigInt(votableSupply!) / 2n) {
+        return "DEFEATED";
+      } else return "SUCCEEDED";
     }
     case "APPROVAL": {
       const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
@@ -508,3 +612,10 @@ export async function getProposalStatus(
 
   return "QUEUED";
 }
+
+type ProposalTypeData = {
+  proposal_type_id: number;
+  name: string;
+  quorum: bigint;
+  approval_threshold: bigint;
+};

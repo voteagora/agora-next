@@ -7,12 +7,18 @@
   flex-shrink: 0;
   margin-left: $spacing-4;
   margin-right: $spacing-4;
-  .textarea {
+
+  & > textarea {
     padding: $spacing-4;
     resize: none;
     border-radius: $border-radius-lg;
-    :focus {
+    border: none;
+
+    &:focus {
       outline: 0px;
+      outline-offset: 0px;
+      inset: 0px;
+      box-shadow: none;
     }
   }
   .vote_actions {
@@ -30,28 +36,29 @@
   justify-content: center;
   align-items: center;
   border-radius: $border-radius-md;
+  flex: 1;
 }
 
 .vote_button_for {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   color: $votes-for;
 }
 
 .vote_button_against {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   color: $votes-against;
 }
 
 .vote_button_abstain {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   color: $votes-abstain;
 }
 
 .vote_button_disabled {
-  @include buttonStyles;
+  @include buttonStylesSmall;
   @include voteButton;
   box-shadow: none;
   width: 100%;
