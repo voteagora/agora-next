@@ -4,7 +4,6 @@ import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
-import prisma from "@/app/lib/prisma";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -238,7 +237,7 @@ export function getProposalTotalValue(
   proposalData: ParsedProposalData[ProposalType]
 ) {
   switch (proposalData.key) {
-    case "STANDARD": {
+    case "STANDARD" || "OPTIMISTIC": {
       // TODO: frh -> check this value
       return proposalData.kind.options.reduce((acc, option) => {
         return (
@@ -295,6 +294,10 @@ export type ParsedProposalData = {
       };
     };
   };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: { options: [] };
+  };
 };
 
 export function parseProposalData(
@@ -320,6 +323,12 @@ export function parseProposalData(
             },
           ],
         },
+      };
+    }
+    case "OPTIMISTIC": {
+      return {
+        key: "OPTIMISTIC",
+        kind: { options: [] },
       };
     }
     case "APPROVAL": {
@@ -414,6 +423,14 @@ export type ParsedProposalResults = {
       abstain: bigint;
     };
   };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: {
+      for: bigint;
+      against: bigint;
+      abstain: bigint;
+    };
+  };
   APPROVAL: {
     key: "APPROVAL";
     kind: {
@@ -447,6 +464,18 @@ export function parseProposalResults(
 
       return {
         key: "STANDARD",
+        kind: {
+          for: BigInt(parsedProposalResults?.[1] ?? 0),
+          against: BigInt(parsedProposalResults?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults?.[2] ?? 0),
+        },
+      };
+    }
+    case "OPTIMISTIC": {
+      const parsedProposalResults = JSON.parse(proposalResults).optimistic;
+
+      return {
+        key: "OPTIMISTIC",
         kind: {
           for: BigInt(parsedProposalResults?.[1] ?? 0),
           against: BigInt(parsedProposalResults?.[0] ?? 0),
@@ -524,6 +553,9 @@ export async function getProposalStatus(
   }
 
   const quorum = await getQuorumForProposal(proposal);
+  // TODO: Fetch votableSupply at the time of proposal creation
+  const votableSupply = (await prisma.votableSupply.findFirst({}))
+    ?.votable_supply;
 
   switch (proposalResults.key) {
     case "STANDARD": {
@@ -543,6 +575,18 @@ export async function getProposalStatus(
       }
 
       break;
+    }
+    case "OPTIMISTIC": {
+      const {
+        for: forVotes,
+        against: againstVotes,
+        abstain: abstainVotes,
+      } = proposalResults.kind;
+
+      // Check against 50% of votable supply
+      if (BigInt(againstVotes) > BigInt(votableSupply!) / 2n) {
+        return "DEFEATED";
+      } else return "SUCCEEDED";
     }
     case "APPROVAL": {
       const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
