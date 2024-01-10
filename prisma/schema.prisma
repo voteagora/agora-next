@@ -439,6 +439,7 @@ view subdelegations_kent {
 enum ProposalType {
   STANDARD
   APPROVAL
+  OPTIMISTIC
 
   @@map("proposal_type")
   @@schema("center")
