@@ -11,7 +11,7 @@ import "server-only";
 
 export async function getDelegates({
   page = 1,
-  sort = "weigted_random",
+  sort = "weighted_random",
   seed = Math.random(),
 }: {
   page: number;
@@ -28,10 +28,10 @@ export async function getDelegates({
             skip,
             take,
             orderBy: {
-              num_for_delegators: "desc",
+              num_of_delegators: "desc",
             },
           });
-        case "weigted_random":
+        case "weighted_random":
           return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
             Prisma.sql`
             SELECT *, setseed(${seed})::Text
@@ -87,6 +87,17 @@ export async function getDelegate({
   const votingPower = await prisma.votingPower.findFirst({
     where: { delegate: address },
   });
+  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+    where: { delegate: address },
+  });
+
+  const totalVotingPower =
+    BigInt(votingPower?.voting_power || 0) +
+    BigInt(advancedVotingPower?.advanced_vp.toFixed(0) || 0);
+
+  const votableSupply =
+    (await prisma.votableSupply.findFirst({}))?.votable_supply || 1n;
+
   const numOfDelegators = await prisma.numberOfDelegators.findFirst({
     where: { delegate: address },
   });
@@ -98,12 +109,14 @@ export async function getDelegate({
   // Build out delegate JSON response
   return {
     address: address,
-    votingPower: votingPower?.voting_power || "0",
-    votingPowerRelativeToVotableSupply:
-      Number(votingPower?.relative_voting_power) || 0,
-    votingPowerRelativeToQuorum: quorum !== 0n && quorum
-      ? Number((BigInt(votingPower?.voting_power || 0) * 10000n) / quorum) / 10000
-      : 0,
+    votingPower: totalVotingPower.toString(),
+    votingPowerRelativeToVotableSupply: Number(
+      totalVotingPower / BigInt(votableSupply)
+    ),
+    votingPowerRelativeToQuorum:
+      quorum && quorum > 0n
+        ? Number((totalVotingPower * 10000n) / quorum) / 10000
+        : 0,
     proposalsCreated: voterStats?.proposals_created || 0n,
     proposalsVotedOn: voterStats?.proposals_voted || 0n,
     votedFor: voterStats?.for?.toFixed() || "0",

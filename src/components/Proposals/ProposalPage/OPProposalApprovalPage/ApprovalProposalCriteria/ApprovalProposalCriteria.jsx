@@ -29,20 +29,20 @@ export default function ApprovalProposalCriteria({ proposal }) {
           proposalEndTime={proposal.end_time}
         />
       </HStack>
-      <div className="text-xs pt-2 text-gray-700 font-semibold">
+      <div className="pt-2 text-xs font-semibold text-gray-700">
         {/* {totalVotingPower.toString()} */}
         {proposalSettings.criteria === "TOP_CHOICES" && (
           <p>
-            In this top-choices style approval voting proposal, the top{" "}
-            {proposalSettings.maxApprovals} options will be executed. Each voter
-            can select up to {proposalSettings.maxApprovals} options to vote
-            for. If the quorum is not met, no options will be executed.
+            In this top-choices style proposal, the top{" "}
+            {proposalSettings.maxApprovals} options will be executed. Voters can
+            select up to {proposalSettings.maxApprovals} options. If the quorum
+            is not met, no options will be executed.
           </p>
         )}
         {proposalSettings.criteria === "THRESHOLD" && (
           <p>
-            In this threshold-based approval voting proposal, all options
-            passing the approval threshold of proposalSettings.criteriaValue
+            In this threshold-based proposal, all options passing the approval
+            threshold of{" "}
             <TokenAmountDisplay
               amount={proposalSettings.criteriaValue}
               decimals={18}
@@ -55,9 +55,8 @@ export default function ApprovalProposalCriteria({ proposal }) {
               decimals={18}
               currency="OP"
             />{" "}
-            runs out. Each voter can select up to{" "}
-            {proposalSettings.maxApprovals} options to vote for. If the quorum
-            is not met, no options will be executed.
+            runs out. Voters can select up to {proposalSettings.maxApprovals}{" "}
+            options. If the quorum is not met, no options will be executed.
           </p>
         )}
       </div>

@@ -1,8 +1,7 @@
 "use client";
 
-import { css, cx } from "@emotion/css";
+import { cx } from "@emotion/css";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import * as theme from "@/styles/theme";
 import { Form, Transaction } from "./CreateProposalForm";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { ethers } from "ethers";
@@ -91,37 +90,15 @@ export default function AddTransactionsDetails({
       )}
       {form.state.options[optionIndex].transactions.map(
         (transaction, index) => (
-          <VStack
-            key={index}
-            className={css`
-              margin-top: ${theme.spacing["4"]};
-              width: 100%;
-              position: relative;
-            `}
-          >
-            <p
-              className={css`
-                font-weight: 600;
-                margin-top: ${theme.spacing["2"]};
-                margin-bottom: ${theme.spacing["4"]};
-              `}
-            >
-              Transaction {index + 1}
-            </p>
+          <VStack key={index} className={styles.transaction_details_option}>
+            <p>Transaction {index + 1}</p>
             {transaction.type === "Transfer" && (
               <>
                 <HStack
-                  className={css`
-                    width: 100%;
-                    margin-bottom: ${theme.spacing["4"]};
-                  `}
+                  className={styles.transaction_details_option__transfer}
                   gap={4}
                 >
-                  <VStack
-                    className={css`
-                      width: 100%;
-                    `}
-                  >
+                  <VStack className="w-full">
                     <label className={labelStyle}>Transfer to</label>
                     <InputBox
                       placeholder={"address (no ENS)"}
@@ -135,11 +112,7 @@ export default function AddTransactionsDetails({
                       pattern="^0x[a-fA-F0-9]{40}$"
                     />
                   </VStack>
-                  <VStack
-                    className={css`
-                      width: 100%;
-                    `}
-                  >
+                  <VStack className="w-full">
                     <label className={labelStyle}>
                       Transfer amount requested (OP)
                     </label>
@@ -162,17 +135,10 @@ export default function AddTransactionsDetails({
             {transaction.type === "Custom" && (
               <>
                 <HStack
-                  className={css`
-                    width: 100%;
-                    margin-bottom: ${theme.spacing["4"]};
-                  `}
+                  className={styles.transaction_details_option__transfer}
                   gap={4}
                 >
-                  <VStack
-                    className={css`
-                      width: 100%;
-                    `}
-                  >
+                  <VStack className="w-full">
                     <label className={labelStyle}>Target</label>
                     <InputBox
                       placeholder={"address"}
@@ -184,11 +150,7 @@ export default function AddTransactionsDetails({
                       pattern="^0x[a-fA-F0-9]{40}$"
                     />
                   </VStack>
-                  <VStack
-                    className={css`
-                      width: 100%;
-                    `}
-                  >
+                  <VStack className="w-full">
                     <label className={labelStyle}>Value</label>
                     <InputBox
                       placeholder={"uint256"}
@@ -202,17 +164,10 @@ export default function AddTransactionsDetails({
                   </VStack>
                 </HStack>
                 <HStack
-                  className={css`
-                    width: 100%;
-                    margin-bottom: ${theme.spacing["4"]};
-                  `}
+                  className={styles.transaction_details_option__transfer}
                   gap={4}
                 >
-                  <VStack
-                    className={css`
-                      width: 100%;
-                    `}
-                  >
+                  <VStack className="w-full">
                     <label className={labelStyle}>Calldata</label>
                     <InputBox
                       placeholder={"bytes"}
@@ -222,11 +177,7 @@ export default function AddTransactionsDetails({
                       }
                     />
                   </VStack>
-                  <VStack
-                    className={css`
-                      width: 100%;
-                    `}
-                  >
+                  <VStack className="w-full">
                     <label className={labelStyle}>Transaction Validity</label>
                     <SimulateTransaction
                       target={transaction.target}
@@ -240,44 +191,16 @@ export default function AddTransactionsDetails({
               </>
             )}
             <XCircleIcon
-              className={css`
-                width: 20px;
-                height: 20px;
-                position: absolute;
-                top: 2px;
-                right: 0;
-                cursor: pointer;
-                color: ${theme.colors.gray.eb};
-
-                &:hover {
-                  color: ${theme.colors.gray["4f"]};
-                }
-              `}
+              className={styles.transaction_details_option__remove}
               onClick={() => remove(index)}
             />
           </VStack>
         )
       )}
       {form.state.options[optionIndex].transactions.length !== 0 && (
-        <VStack
-          className={css`
-            padding: ${theme.spacing["4"]};
-            border: 1px solid ${theme.colors.gray.eb};
-            border-radius: ${theme.borderRadius.md};
-            box-shadow: ${theme.boxShadow.sm};
-            margin-top: ${theme.spacing["4"]};
-            position: relative;
-          `}
-        >
-          <p
-            className={cx(
-              styles.create_prop_form__heading,
-              css`
-                margin-bottom: 0;
-              `
-            )}
-          >
-            Add another transaction
+        <VStack className={styles.transaction_details_option__add}>
+          <p className={cx(styles.create_prop_form__title, "mb-0")}>
+            Add another transaction to this option
           </p>
           <MultiButtons
             buttonsProps={[
@@ -288,25 +211,11 @@ export default function AddTransactionsDetails({
               ["Custom transaction", () => addTransaction("Custom")],
             ]}
           />
-          <PlusIcon
-            className={css`
-              width: ${theme.spacing["5"]};
-              height: ${theme.spacing["5"]};
-              position: absolute;
-              top: ${theme.spacing["4"]};
-              right: ${theme.spacing["4"]};
-              color: ${theme.colors.gray["4f"]};
-            `}
-          />
+          <PlusIcon className={styles.transaction_details_option__plus} />
         </VStack>
       )}
     </>
   );
 }
 
-export const labelStyle = css`
-  color: ${theme.colors.gray["4f"]};
-  font-weight: 600;
-  margin-bottom: ${theme.spacing["1"]};
-  font-size: ${theme.fontSize.xs};
-`;
+export const labelStyle = styles.label;

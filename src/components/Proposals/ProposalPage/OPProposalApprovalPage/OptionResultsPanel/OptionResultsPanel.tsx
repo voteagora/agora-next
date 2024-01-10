@@ -1,12 +1,20 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import { Proposal } from "@/app/api/proposals/proposal";
+import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 
-export default function OptionsResultsPanel({ proposal }) {
-  const status = proposal.status;
-  const proposalData = proposal.proposalData;
-  const proposalResults = proposal.proposalResults;
+export default function OptionsResultsPanel({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
+  const proposalResults =
+    proposal.proposalResults as ParsedProposalResults["APPROVAL"]["kind"];
   const proposalSettings = proposalData.proposalSettings;
+  const options = proposalResults.options;
 
   const totalVotingPower =
     BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
@@ -19,28 +27,52 @@ export default function OptionsResultsPanel({ proposal }) {
       thresholdPosition = 66;
     } else {
       // calculate threshold position, min 5% max 66%
-      thresholdPosition = BigInt(
-        Math.max((threshold * BigInt(100)) / totalVotingPower, BigInt(5))
+      thresholdPosition = Math.max(
+        Number((threshold * BigInt(100)) / totalVotingPower),
+        5
       );
     }
   }
 
   let availableBudget = BigInt(proposalSettings.budgetAmount);
 
+  const mutableOptions = [...options];
+  const sortedOptions = mutableOptions.sort((a, b) => {
+    return BigInt(b.votes || 0) > BigInt(a.votes || 0)
+      ? 1
+      : BigInt(b.votes || 0) < BigInt(a.votes || 0)
+      ? -1
+      : 0;
+  });
+
+  if (proposalSettings.criteria === "THRESHOLD") {
+    const threshold = BigInt(proposalSettings.criteriaValue);
+    if (totalVotingPower < (threshold * 15n) / 10n) {
+      thresholdPosition = 66;
+    } else {
+      // calculate threshold position, min 5% max 66%
+      thresholdPosition = Math.max(
+        Number((threshold * 100n) / totalVotingPower),
+        5
+      );
+    }
+  }
+
   return (
     <VStack className={styles.approval_choices_container}>
-      {proposal.proposalResults.options.map((option, index) => {
+      {sortedOptions.map((option, index) => {
         let isApproved = false;
-        const votesAmountBN = BigInt(option.votes.votes);
+        const votesAmountBN = BigInt(option?.votes || 0);
         const optionBudget = BigInt(0);
-        if (proposalSettings === "TOP_CHOICES") {
-          isApproved = index < proposalSettings.maxApprovals;
+        if (proposalSettings.criteria === "TOP_CHOICES") {
+          isApproved = index < Number(proposalSettings.criteriaValue);
         } else if (proposalSettings.criteria === "THRESHOLD") {
           const threshold = BigInt(proposalSettings.criteriaValue);
           isApproved =
             votesAmountBN >= threshold && availableBudget >= optionBudget;
           if (isApproved) availableBudget = availableBudget - optionBudget;
         }
+
         return (
           <SingleOption
             key={index}
@@ -48,7 +80,6 @@ export default function OptionsResultsPanel({ proposal }) {
             votes={option.votes}
             votesAmountBN={votesAmountBN}
             totalVotingPower={totalVotingPower}
-            status={status}
             proposalSettings={proposalSettings}
             thresholdPosition={thresholdPosition}
             isApproved={isApproved}
@@ -64,10 +95,17 @@ function SingleOption({
   votes,
   votesAmountBN,
   totalVotingPower,
-  status,
   proposalSettings,
   thresholdPosition,
   isApproved,
+}: {
+  description: string;
+  votes: bigint;
+  votesAmountBN: bigint;
+  totalVotingPower: bigint;
+  proposalSettings: any;
+  thresholdPosition: number;
+  isApproved: boolean;
 }) {
   let barPercentage = BigInt(0);
   const percentage =
@@ -88,7 +126,7 @@ function SingleOption({
   }
 
   return (
-    <VStack gap="1">
+    <VStack gap={1} className={styles.singleOptionContainer}>
       {" "}
       <HStack
         justifyContent="justify-between"
@@ -96,11 +134,7 @@ function SingleOption({
       >
         <div className={styles.descriptionText}>{description}</div>
         <div className={styles.votesText}>
-          <TokenAmountDisplay
-            amount={votes.votes}
-            decimals={18}
-            currency="OP"
-          />
+          <TokenAmountDisplay amount={votes} decimals={18} currency="OP" />
           <span className={styles.votesMargin}>
             {percentage === 0n
               ? "(0%)"
@@ -110,7 +144,6 @@ function SingleOption({
       </HStack>
       <ProgressBar
         barPercentage={barPercentage}
-        status={status}
         isApproved={isApproved}
         thresholdPosition={thresholdPosition}
       />
@@ -120,9 +153,12 @@ function SingleOption({
 
 export function ProgressBar({
   barPercentage,
-  status,
   isApproved,
   thresholdPosition,
+}: {
+  barPercentage: bigint;
+  isApproved: boolean;
+  thresholdPosition: number;
 }) {
   const progressBarWidth =
     Math.max(
@@ -130,18 +166,14 @@ export function ProgressBar({
       Number(barPercentage) !== 0 ? 1 : 0
     ).toFixed(2) + "%";
 
-  const progressBarColor = isApproved
-    ? status === "EXECUTED" || status === "SUCCEEDED"
-      ? "green-positive"
-      : "green-positive"
-    : "gray-4f";
+  const progressBarColor = isApproved ? "bg-green-positive" : "bg-gray-4f";
 
   return (
     <HStack>
       {" "}
       <div className={`${styles.progressBarContainer}`}>
         <div
-          className={`${styles.progressBar} bg-${progressBarColor}`}
+          className={`${styles.progressBar} ${progressBarColor}`}
           style={{ width: progressBarWidth }}
         ></div>
         {!!thresholdPosition && (
@@ -160,6 +192,11 @@ function getScaledBarPercentage({
   totalVotingPower,
   votesAmountBN,
   thresholdPosition,
+}: {
+  threshold: bigint;
+  totalVotingPower: bigint;
+  votesAmountBN: bigint;
+  thresholdPosition: number;
 }) {
   let barPercentage = BigInt(0);
 

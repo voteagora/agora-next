@@ -1,49 +1,58 @@
 "use client"
 
 import { FC, PropsWithChildren } from "react";
-import { WagmiConfig } from "wagmi";
-import Header from "@/components/Header/Header";
-import { inter, rubik } from "@/styles/fonts";
-import { cn } from "@/lib/utils";
+import { WagmiConfig, createConfig } from "wagmi";
+import { inter } from "@/styles/fonts";
 import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-import AgoraProvider from "./AgoraContext";
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import AgoraProvider from "@/contexts/AgoraContext";
+import { Toaster } from "react-hot-toast";
+import BetaBanner from "@/components/Header/BetaBanner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const chains = [mainnet, optimism]
+const chains = [optimism, mainnet];
 const metadata = {
   name: "Agora Next",
-  description: "Web3Modal Example",
+  description: "The on-chain governance company",
   url: process.env.NEXT_PUBLIC_AGORA_BASE_URL!,
-  icons: ["https://avatars.githubusercontent.com/u/37784886"]
-}
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!
+  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+};
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
+const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 
-const wagmiConfig = defaultWagmiConfig({
-  chains,
-  projectId,
-  metadata
-})
+// const wagmiConfig = defaultWagmiConfig({
+//   chains,
+//   projectId,
+//   metadata,
+// });
 
-createWeb3Modal({
-  wagmiConfig,
-  projectId,
-  chains,
-  themeMode: "light"
-})
+const config = createConfig(
+  getDefaultConfig({
+    alchemyId: alchemyId,
+    walletConnectProjectId: projectId,
+    chains: chains,
+    appName: metadata.name,
+    appDescription: metadata.description,
+    appUrl: metadata.url,
+  })
+);
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiConfig config={wagmiConfig}>
-    <body className={cn(rubik.variable, inter.variable)}>
-      <noscript>You need to enable JavaScript to run this app.</noscript>
-
-      <PageContainer>
-        <Header />
-        <AgoraProvider>{children}</AgoraProvider>
-      </PageContainer>
-      <Footer />
-    </body>
+  <WagmiConfig config={config}>
+    <ConnectKitProvider>
+      <body className={inter.variable}>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <BetaBanner />
+        <PageContainer>
+          <Toaster />
+          <AgoraProvider>{children}</AgoraProvider>
+        </PageContainer>
+        <Footer />
+        <SpeedInsights />
+      </body>
+    </ConnectKitProvider>
   </WagmiConfig>
 )
 

@@ -8,7 +8,7 @@ import "server-only";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export async function getProposals({ page = 1 }: { page: number }) {
-  const pageSize = 4;
+  const pageSize = 10;
 
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: OptimismContracts.governor.address.toLowerCase(),
@@ -54,4 +54,8 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
   const latestBlock = await provider.getBlock("latest");
 
   return parseProposal(proposal, latestBlock);
+}
+
+export async function getProposalTypes() {
+  return prisma.proposalTypes.findMany();
 }

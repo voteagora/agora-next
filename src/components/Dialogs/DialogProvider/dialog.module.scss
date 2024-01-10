@@ -11,12 +11,15 @@
   align-items: items-center;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  padding: 0 $spacing-4;
 
   .dialog_content {
     background: white;
-    padding: $spacing-4;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    width: $max-width-md;
+    padding: $spacing-6;
+    border-radius: $border-radius-xl;
+    box-shadow: $box-shadow-xl;
     margin: auto;
+    z-index: 1100;
   }
 }

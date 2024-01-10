@@ -1,0 +1,91 @@
+@import "@/styles/variables";
+
+.container {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: #66676b;
+}
+
+.vote_for {
+  color: $votes-for;
+}
+
+.vote_against {
+  color: $votes-against;
+}
+
+.vote_abstain {
+  color: $votes-abstain;
+}
+
+.vote {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.details_container {
+  display: grid;
+  overflow-y: hidden;
+  grid-template-columns: 1fr 1px 1fr;
+
+  @media (max-width: $max-width-2xl) {
+    grid-template-rows: 1fr;
+    grid-template-columns: none;
+    overflow-y: scroll;
+  }
+}
+
+.details_sub {
+  padding: $spacing-4 $spacing-6;
+}
+
+.vote_type {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: #66676b;
+}
+
+.vote_title {
+  font-size: $font-size-base;
+  padding: $spacing-1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vote_details_container {
+  border-radius: $border-radius-xl;
+  border: 1px solid $gray-300;
+  background: $white;
+  box-shadow: $box-shadow-newDefault;
+  max-height: 15rem;
+}
+
+.vote_reason {
+  width: $spacing-px;
+  background: #ebebeb;
+
+  @media (max-width: $max-width-2xl) {
+    display: none;
+  }
+}
+
+.vote_reason_container {
+  overflow-y: scroll;
+  overflow-x: scroll;
+  padding: $spacing-4 $spacing-6;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: pre-wrap;
+  color: #66676b;
+  width: fit-content;
+
+  @media (max-width: $max-width-2xl) {
+    padding-top: 0;
+    height: fit-content;
+  }
+}
+
+.standard_container {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}

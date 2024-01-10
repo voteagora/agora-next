@@ -1,4 +1,5 @@
 import {
+  AlligatorOPV5__factory,
   NounsGovernor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
@@ -24,12 +25,12 @@ export const OptimismContracts = {
   proposalTypesConfigurator: {
     contract: OptimismGovernor__factory.connect(
       process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-        ? ""
+        ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
         : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
       provider
     ),
     address: (process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-      ? ""
+      ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
       : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7") as `0x${string}`,
     chainId: 10,
     abi: ProposalTypesConfigurator__factory.abi,
@@ -44,6 +45,16 @@ export const OptimismContracts = {
     chainId: 10,
     abi: OptimismToken__factory.abi,
   },
+
+  alligator: {
+    contract: AlligatorOPV5__factory.connect(
+      "0x7f08F3095530B67CdF8466B7a923607944136Df0",
+      provider
+    ),
+    address: "0x7f08F3095530B67CdF8466B7a923607944136Df0",
+    chainId: 10,
+    abi: AlligatorOPV5__factory.abi,
+  },
 };
 
 export const opAdminAddress =
@@ -54,6 +65,9 @@ export const approvalModuleAddress = (
     ? "0x54A8fCBBf05ac14bEf782a2060A8C752C7CC13a5"
     : "0xdd0229D72a414DC821DEc66f3Cc4eF6dB2C7b7df"
 ) as `0x${string}`;
+
+export const optimisticModuleAddress =
+  "0x27964c5f4F389B8399036e1076d84c6984576C33";
 
 export const NounsContracts = {
   governor: {

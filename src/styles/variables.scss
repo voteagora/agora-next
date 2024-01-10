@@ -204,6 +204,8 @@ $line-height-10: 2.5rem;
 // Box Shadows
 $box-shadow-newDefault: 0px 4px 12px rgba(0, 0, 0, 0.02),
   0px 2px 2px rgba(0, 0, 0, 0.03);
+$box-shadow-newHover: 0px 6px 16px rgba(0, 0, 0, 0.05),
+  0px 2px 2px rgba(0, 0, 0, 0.03);
 $box-shadow-xs: 0 0 0 1px rgba(0, 0, 0, 0.05);
 $box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 $box-shadow-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
@@ -232,7 +234,6 @@ $max-width-4xl: 56rem;
 $max-width-5xl: 64rem;
 $max-width-6xl: 76rem;
 $max-width-full: 100%;
-
 
 // Font Families
 $font-family-sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
@@ -273,12 +274,13 @@ $rotate-continuous: rotation 60s infinite linear;
 
 @keyframes rotation {
   from {
-      transform: rotate(0deg);
+    transform: rotate(0deg);
   }
   to {
-      transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
+
 /// VOTES ///
 $votes-for: $color-green-700;
 $votes-abstain: $gray-700;

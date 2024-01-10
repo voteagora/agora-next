@@ -1,0 +1,77 @@
+@import "@/styles/variables";
+@import "@/styles/mixins";
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-extrabold;
+}
+
+.notes {
+  color: $gray-700;
+  margin-top: $spacing-1;
+}
+
+.options_list {
+  max-height: 46vh;
+  overflow-y: scroll;
+}
+
+.reason_input {
+  padding: $spacing-4;
+  resize: none;
+  border-radius: $border-radius-lg;
+  background-color: $gray-fa;
+  border: 1px solid $gray-eb;
+  transition: all 0.1s ease-in-out;
+}
+
+.vote_button_box {
+  @include buttonStyles;
+}
+
+.option_card {
+  padding: $spacing-2 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.card_title {
+  color: $gray-700;
+  transition: all 0.1s ease-in-out;
+}
+.card_title_checked {
+  color: $gray-900;
+  font-weight: $font-weight-medium;
+}
+
+.card_description {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $gray-700;
+}
+
+.card_check_container {
+  position: absolute;
+  right: $spacing-0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: $spacing-4;
+  height: $spacing-4;
+  border-radius: $border-radius-sm;
+  border: 1px solid $gray-eb;
+  background-color: $gray-fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.1s ease-in-out;
+}
+.card_check_container_checked {
+  border: 1px solid $gray-900;
+  background-color: $gray-900;
+}
+
+.card_check {
+  width: $spacing-4;
+  height: $spacing-4;
+  color: $white;
+}

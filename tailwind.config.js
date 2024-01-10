@@ -7,7 +7,7 @@ module.exports = {
     "./src/**/*.{ts,tsx,js,jsx}",
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}"
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     container: {
@@ -15,11 +15,11 @@ module.exports = {
       padding: "2rem",
       screens: {
         sm: "640px",
-        md: "768px",
-        lg: "1024px",
+        // md: "768px",
+        // lg: "1024px",
         xl: "1280px",
-        "2xl": "1400px"
-      }
+        // "2xl": "1400px"
+      },
     },
     extend: {
       spacing: {
@@ -42,7 +42,7 @@ module.exports = {
         40: "10rem",
         48: "12rem",
         56: "14rem",
-        64: "16rem"
+        64: "16rem",
       },
       gap: {
         0.5: "0.125rem", // 2px
@@ -61,7 +61,7 @@ module.exports = {
         10: "2.5rem", // 40px
         12: "3rem", // 48px
         14: "3.5rem", // 56px
-        16: "4rem" // 64px
+        16: "4rem", // 64px
       },
       fontSize: {
         xs: "0.75rem", // 12px
@@ -73,7 +73,7 @@ module.exports = {
         "3xl": "1.875rem", // 30px
         "4xl": "2.25rem", // 36px
         "5xl": "3rem", // 48px
-        "6xl": "4rem" // 64px
+        "6xl": "4rem", // 64px
       },
       fontWeight: {
         hairline: "100",
@@ -84,11 +84,10 @@ module.exports = {
         semibold: "600",
         bold: "700",
         extrabold: "800",
-        black: "900"
+        black: "900",
       },
       fontFamily: {
         sans: [
-          "Rubik",
           "system-ui",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -101,7 +100,7 @@ module.exports = {
           "Apple Color Emoji",
           "Segoe UI Emoji",
           "Segoe UI Symbol",
-          "Noto Color Emoji"
+          "Noto Color Emoji",
         ],
         serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
         mono: [
@@ -110,10 +109,9 @@ module.exports = {
           "Consolas",
           "Liberation Mono",
           "Courier New",
-          "monospace"
+          "monospace",
         ],
         inter: "var(--font-inter), sans-serif",
-        rubik: "var(--font-title), sans-serif"
         // Add any other custom font families you need
       },
       colors: {
@@ -136,7 +134,7 @@ module.exports = {
           600: "#718096",
           700: "#4a5568",
           800: "#2d3748",
-          900: "#1a202c"
+          900: "#1a202c",
         },
         red: {
           100: "#fff5f5",
@@ -148,7 +146,7 @@ module.exports = {
           700: "#c53030",
           800: "#9b2c2c",
           900: "#742a2a",
-          negative: "#C15049"
+          negative: "#C15049",
         },
         orange: {
           100: "#fffaf0",
@@ -159,7 +157,7 @@ module.exports = {
           600: "#dd6b20",
           700: "#c05621",
           800: "#9c4221",
-          900: "#7b341e"
+          900: "#7b341e",
         },
         yellow: {
           100: "#fffff0",
@@ -170,7 +168,7 @@ module.exports = {
           600: "#d69e2e",
           700: "#b7791f",
           800: "#975a16",
-          900: "#744210"
+          900: "#744210",
         },
         green: {
           100: "#f0fff4",
@@ -182,7 +180,7 @@ module.exports = {
           700: "#2f855a",
           800: "#276749",
           900: "#22543d",
-          positive: "#23B100"
+          positive: "#23B100",
         },
         teal: {
           100: "#e6fffa",
@@ -193,7 +191,7 @@ module.exports = {
           600: "#319795",
           700: "#2c7a7b",
           800: "#285e61",
-          900: "#234e52"
+          900: "#234e52",
         },
         blue: {
           100: "#ebf8ff",
@@ -204,7 +202,7 @@ module.exports = {
           600: "#3182ce",
           700: "#2b6cb0",
           800: "#2c5282",
-          900: "#2a4365"
+          900: "#2a4365",
         },
         indigo: {
           100: "#ebf4ff",
@@ -215,7 +213,7 @@ module.exports = {
           600: "#5a67d8",
           700: "#4c51bf",
           800: "#434190",
-          900: "#3c366b"
+          900: "#3c366b",
         },
         purple: {
           100: "#faf5ff",
@@ -226,7 +224,7 @@ module.exports = {
           600: "#805ad5",
           700: "#6b46c1",
           800: "#553c9a",
-          900: "#44337a"
+          900: "#44337a",
         },
         pink: {
           100: "#fff5f7",
@@ -237,7 +235,7 @@ module.exports = {
           600: "#d53f8c",
           700: "#b83280",
           800: "#97266d",
-          900: "#702459"
+          900: "#702459",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -246,32 +244,32 @@ module.exports = {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))"
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))"
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))"
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))"
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))"
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))"
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))"
-        }
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       borderRadius: {
         // rounded-{var}
@@ -284,7 +282,7 @@ module.exports = {
         // lg: "0.5rem",
         md: `calc(var(--radius) - 2px)`,
         // md: "0.375rem",
-        sm: "calc(var(--radius) - 4px)"
+        sm: "calc(var(--radius) - 4px)",
         // sm: "0.125rem",
       },
       letterSpacing: {
@@ -295,7 +293,7 @@ module.exports = {
         normal: "0",
         wide: "0.025em",
         wider: "0.05em",
-        widest: "0.1em"
+        widest: "0.1em",
       },
       lineHeight: {
         // leading-{var}
@@ -313,7 +311,7 @@ module.exports = {
         7: "1.75rem",
         8: "2rem",
         9: "2.25rem",
-        10: "2.5rem"
+        10: "2.5rem",
       },
       boxShadow: {
         // shadow-{var}
@@ -330,7 +328,7 @@ module.exports = {
         "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
         inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
         outline: "0 0 0 3px rgba(66, 153, 225, 0.5)",
-        none: "none"
+        none: "none",
       },
       maxWidth: {
         // max-w-{var}
@@ -346,7 +344,7 @@ module.exports = {
         "4xl": "56rem",
         "5xl": "64rem",
         "6xl": "76rem",
-        full: "100%"
+        full: "100%",
       },
       transitionDuration: {
         // duration-{var}
@@ -358,56 +356,56 @@ module.exports = {
         300: "300ms",
         500: "500ms",
         700: "700ms",
-        1000: "1000ms"
+        1000: "1000ms",
       },
       keyframes: {
         "accordion-down": {
           from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" }
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 }
-        }
+          to: { height: 0 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out"
-      }
-    }
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
   },
   safelist: [
     {
       pattern:
         /^(bg-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
-      variants: ["hover", "ui-selected"]
+      variants: ["hover", "ui-selected"],
     },
     {
       pattern:
         /^(text-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
-      variants: ["hover", "ui-selected"]
+      variants: ["hover", "ui-selected"],
     },
     {
       pattern:
         /^(border-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
-      variants: ["hover", "ui-selected"]
+      variants: ["hover", "ui-selected"],
     },
     {
       pattern:
-        /^(ring-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/
+        /^(ring-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
     {
       pattern:
-        /^(stroke-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/
+        /^(stroke-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
     {
       pattern:
-        /^(fill-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/
-    }
+        /^(fill-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
+    },
   ],
   plugins: [
     require("@tailwindcss/typography"),
     require("@tailwindcss/forms"),
-    require("tailwindcss-animate")
-  ]
-}
+    require("tailwindcss-animate"),
+  ],
+};
