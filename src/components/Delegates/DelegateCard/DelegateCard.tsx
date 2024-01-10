@@ -71,7 +71,13 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   );
 }
 
-const PanelRow = ({ title, detail }: { title: string; detail: string }) => {
+export const PanelRow = ({
+  title,
+  detail,
+}: {
+  title: string;
+  detail: string;
+}) => {
   return (
     <HStack
       gap={2}

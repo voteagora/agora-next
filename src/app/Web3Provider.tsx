@@ -2,7 +2,6 @@
 
 import { FC, PropsWithChildren } from "react";
 import { WagmiConfig, createConfig } from "wagmi";
-import Header from "@/components/Header/Header";
 import { inter } from "@/styles/fonts";
 import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
@@ -48,7 +47,6 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
         <BetaBanner />
         <PageContainer>
           <Toaster />
-          <Header />
           <AgoraProvider>{children}</AgoraProvider>
         </PageContainer>
         <Footer />
