@@ -1,6 +1,24 @@
-import AdminForm from "./components/AdminForm";
+import AdminForm from "@/components/Admin/AdminForm";
+import { getProposalTypes } from "../api/proposals/getProposals";
+import { getVotableSupply } from "../api/votableSupply/getVotableSupply";
 
-export default function Page() {
-  /* @ts-expect-error Server Component */
-  return <AdminForm />;
+async function fetchProposalTypes() {
+  "use server";
+
+  return getProposalTypes();
+}
+
+async function fetchVotableSupply() {
+  "use server";
+
+  return getVotableSupply();
+}
+
+export default async function Page() {
+  const proposalTypes = await fetchProposalTypes();
+  const votableSupply = await fetchVotableSupply();
+
+  return (
+    <AdminForm votableSupply={votableSupply} proposalTypes={proposalTypes} />
+  );
 }
