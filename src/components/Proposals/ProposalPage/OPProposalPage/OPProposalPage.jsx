@@ -8,9 +8,15 @@ import {
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import {
+  getProxy,
+  getVotingPowerAtSnapshot,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -58,21 +64,18 @@ async function fetchVotingPowerForSubdelegation(addressOrENSName) {
   return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
 }
 
-// Pass address of the connected wallet
 async function checkIfDelegatingToProxy(addressOrENSName) {
   "use server";
 
   return isDelegatingToProxy({ addressOrENSName });
 }
 
-// Pass address of the connected wallet
 async function fetchCurrentDelegatees(addressOrENSName) {
   "use server";
 
   return getCurrentDelegatees({ addressOrENSName });
 }
 
-// Pass address of the connected wallet
 async function getProxyAddress(addressOrENSName) {
   "use server";
 
