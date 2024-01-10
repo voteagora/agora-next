@@ -2,7 +2,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { shortAddress } from "@/lib/utils";
 
 export default function OptionDescription({ description, value, target }) {
-  console.log(value);
+  console.log({ value });
   return (
     <span>
       {/* TODO: Warning – this dangerously assumes all tokens are OP. For now, ok, but won't always be the case */}
