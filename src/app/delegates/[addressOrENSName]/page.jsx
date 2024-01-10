@@ -19,6 +19,12 @@ import DelegationsContainer from "@/components/Delegates/Delegations/Delegations
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
+import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/voting-power/getVotingPower";
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
@@ -50,6 +56,30 @@ async function getDelegators(addressOrENSName) {
   return getCurrentDelegators({ addressOrENSName });
 }
 
+async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+async function checkIfDelegatingToProxy(addressOrENSName) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+async function fetchBalanceForDirectDelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+}
+
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
+}
+
 export default async function Page({ params: { addressOrENSName } }) {
   let delegate;
   let delegateVotes;
@@ -78,12 +108,20 @@ export default async function Page({ params: { addressOrENSName } }) {
 
   return (
     <DelegateVotesProvider initialVotes={delegateVotes}>
-      <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
-        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
-          <DelegateCard addressOrENSName={addressOrENSName} />
+      <div className="flex flex-col items-center justify-between w-full max-w-full gap-6 mt-12 xl:flex-row xl:items-start">
+        <VStack className="static w-full xl:sticky top-16 shrink-0 xl:max-w-xs">
+          <DelegateCard
+            fetchDelegate={fetchDelegate}
+            addressOrENSName={addressOrENSName}
+            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+            getProxyAddress={getProxyAddress}
+            fetchCurrentDelegatees={getDelegatees}
+          />
         </VStack>
 
-        <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full">
+        <VStack className="flex-1 max-w-full min-w-0 xl:ml-12">
           <DelegateStatementContainer
             addressOrENSName={addressOrENSName}
             statement={statement}
@@ -95,9 +133,9 @@ export default async function Page({ params: { addressOrENSName } }) {
 
           {delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col md:flex-row justify-between gap-2">
+              <div className="flex flex-col justify-between gap-2 md:flex-row">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
-                {/* <div className="flex flex-col md:flex-row justify-between gap-2">
+                {/* <div className="flex flex-col justify-between gap-2 md:flex-row">
                   <DelegatesVotesSort
                     fetchDelegateVotes={async (page, sortOrder) => {
                       "use server";
