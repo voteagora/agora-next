@@ -11,6 +11,7 @@ import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import {
   getProxy,
   getVotingPowerAtSnapshot,
+  getVotingPowerAvailableForDirectDelegation,
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
@@ -31,6 +32,13 @@ async function fetchVotingPower(address, blockNumber) {
     votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
       .totalVP,
   };
+}
+
+// Pass address of the connected wallet
+async function fetchBalanceForDirectDelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
 }
 
 async function fetchAuthorityChains(address, blockNumber) {
@@ -110,7 +118,7 @@ export default async function OPProposalPage({ proposal }) {
             initialProposalVotes={proposalVotes}
             fetchVotesForProposal={fetchProposalVotes}
             fetchDelegate={fetchDelegate}
-            fetchBalanceForDirectDelegation={fetchVotingPower}
+            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
             fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
             checkIfDelegatingToProxy={checkIfDelegatingToProxy}
             fetchCurrentDelegatees={fetchCurrentDelegatees}
