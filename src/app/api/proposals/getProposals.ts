@@ -6,6 +6,8 @@ import provider from "@/app/lib/provider";
 
 import "server-only";
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import { getQuorumForProposal } from "../quorum/getQuorum";
+import { getVotableSupply } from "../votableSupply/getVotableSupply";
 
 export async function getProposals({ page = 1 }: { page: number }) {
   const pageSize = 10;
@@ -31,9 +33,18 @@ export async function getProposals({ page = 1 }: { page: number }) {
   );
 
   const latestBlock = await provider.getBlock("latest");
+  const votableSupply = await getVotableSupply();
 
   const resolvedProposals = Promise.all(
-    proposals.map((proposal) => parseProposal(proposal, latestBlock))
+    proposals.map(async (proposal) => {
+      const quorum = await getQuorumForProposal(proposal);
+      return parseProposal(
+        proposal,
+        latestBlock,
+        quorum,
+        BigInt(votableSupply)
+      );
+    })
   );
 
   return {
@@ -52,8 +63,10 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
   }
 
   const latestBlock = await provider.getBlock("latest");
+  const quorum = await getQuorumForProposal(proposal);
+  const votableSupply = await getVotableSupply();
 
-  return parseProposal(proposal, latestBlock);
+  return parseProposal(proposal, latestBlock, quorum, BigInt(votableSupply));
 }
 
 export async function getProposalTypes() {
