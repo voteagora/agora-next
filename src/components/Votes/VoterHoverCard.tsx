@@ -22,7 +22,7 @@ interface Props {
   isAdvancedUser: boolean;
 }
 
-export default function VoterCard({
+export default function VoterHoverCard({
   address,
   fetchDelegate,
   fetchBalanceForDirectDelegation,

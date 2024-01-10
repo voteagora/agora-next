@@ -8,10 +8,14 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
 import VoteText from "../VoteText/VoteText";
-import VoterCard from "../VoterCard";
+import VoterHoverCard from "../VoterHoverCard";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function ProposalVotesList({
   initialProposalVotes,
@@ -64,7 +68,10 @@ export default function ProposalVotesList({
             <VStack>
               <HoverCard>
                 <HoverCardTrigger>
-                  <HStack justifyContent="justify-between" className={styles.voter}>
+                  <HStack
+                    justifyContent="justify-between"
+                    className={styles.voter}
+                  >
                     <HStack gap={1} alignItems="items-center">
                       <HumanAddress address={vote.address} />
                       <VoteText support={vote.support} />
@@ -82,7 +89,7 @@ export default function ProposalVotesList({
                   </HStack>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-full">
-                  <VoterCard
+                  <VoterHoverCard
                     address={vote.address}
                     fetchDelegate={fetchDelegate}
                     fetchBalanceForDirectDelegation={
