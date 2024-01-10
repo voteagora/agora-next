@@ -25,6 +25,7 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 type Props = {
   proposalType: ProposalType;
   index: number;
+  votableSupply: string;
 };
 
 type ProposalType = {
@@ -36,15 +37,14 @@ type ProposalType = {
 const proposalTypeSchema = z.object({
   name: z.string(),
   description: z.string(),
-  approvalThreshold: z.coerce.number().lte(100),
+  approval_threshold: z.coerce.number().lte(100),
   quorum: z.coerce.number().lte(100),
 });
-
-const mockVotableSupply = 500000000;
 
 export default function ProposalType({
   proposalType: { quorum, approval_threshold, name },
   index,
+  votableSupply,
 }: Props) {
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
@@ -55,6 +55,10 @@ export default function ProposalType({
       description: "",
     },
   });
+
+  const formattedVotableSupply = Number(
+    BigInt(votableSupply) / BigInt(10 ** 18)
+  );
 
   const { config: deleteProposalTypeConfig } = usePrepareContractWrite({
     address: OptimismContracts.proposalTypesConfigurator.address,
@@ -72,7 +76,7 @@ export default function ProposalType({
       hash: resultDeleteProposalType?.hash,
     });
 
-  const formValues = form.getValues();
+  const formValues = form.watch();
   const { config: setProposalTypeConfig } = usePrepareContractWrite({
     address: OptimismContracts.proposalTypesConfigurator.address,
     abi: OptimismContracts.proposalTypesConfigurator.abi,
@@ -80,7 +84,7 @@ export default function ProposalType({
     args: [
       BigInt(index),
       formValues.quorum * 100,
-      formValues.approvalThreshold * 100,
+      formValues.approval_threshold * 100,
       formValues.name,
     ],
   });
@@ -93,11 +97,12 @@ export default function ProposalType({
     useWaitForTransaction({
       hash: resultSetProposalType?.hash,
     });
-  const isDisabled =
+  const isLoading =
     isLoadingDeleteProposalType ||
     isLoadingDeleteProposalTypeTransaction ||
     isLoadingSetProposalType ||
     isLoadingSetProposalTypeTransaction;
+  const isDisabled = isLoading || name == "Optimistic";
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
     writeSetProposalType?.();
@@ -125,6 +130,7 @@ export default function ProposalType({
           <FormField
             control={form.control}
             name="name"
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
@@ -151,13 +157,16 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
+                      disabled={isDisabled}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground grid grid-cols-5 text-center items-center">
                       <p>%</p>
                       <div className="mx-auto w-[1px] bg-muted-foreground/40 h-full" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
-                          (mockVotableSupply * form.getValues("quorum")) / 100,
+                          Math.floor(
+                            (formattedVotableSupply * formValues.quorum) / 100
+                          ),
                           0,
                           1
                         )}{" "}
@@ -184,15 +193,18 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
+                      disabled={isDisabled}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground grid grid-cols-5 text-center items-center">
                       <p>%</p>
                       <div className="mx-auto w-[1px] bg-muted-foreground/40 h-full" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
-                          (mockVotableSupply *
-                            form.getValues("approval_threshold")) /
-                            100,
+                          Math.floor(
+                            (formattedVotableSupply *
+                              formValues.approval_threshold) /
+                              100
+                          ),
                           0,
                           1
                         )}{" "}
@@ -210,7 +222,7 @@ export default function ProposalType({
           type="submit"
           className="w-full"
           variant="outline"
-          loading={isDisabled}
+          loading={isLoading}
           disabled={isDisabled}
         >
           Set proposal type
