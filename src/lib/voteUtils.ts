@@ -57,6 +57,10 @@ type ParsedParams = {
     key: "STANDARD";
     kind: null;
   };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: null;
+  };
 };
 
 export function parseParams(
@@ -95,7 +99,7 @@ export function parseVote(
     weight: vote.weight,
     reason: vote.reason,
     params: parseParams(vote.params, proposalData),
-    proposalValue: getProposalTotalValue(proposalData),
+    proposalValue: getProposalTotalValue(proposalData)!,
     proposalTitle: getTitleFromProposalDescription(vote.description || ""),
     proposalType: vote.proposal_type,
     timestamp: latestBlock

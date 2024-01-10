@@ -2,6 +2,7 @@ import provider from "@/app/lib/provider";
 import { NounsContracts, OptimismContracts } from "./contracts/contracts";
 import { Prisma } from "@prisma/client";
 import { DEPLOYMENT_NAME } from "./config";
+import prisma from "@/app/lib/prisma";
 
 export const getQuorum = async (proposal: Prisma.ProposalsGetPayload<true>) => {
   let quorum = await getQuorumForProposal(proposal);
