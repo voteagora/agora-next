@@ -28,29 +28,32 @@ export default function ApprovedTransactions({ proposalData }) {
         {proposalData.options
           .slice(0, displayedOptions)
           .map((option, index) => {
+            // TODO: Right now this only handles the case with only 1 transaction. Each option can have multiple transactions
             const valueETH =
               option.values[0] > 0
                 ? `{ value: ${formatEther(option.values[0])} ETH }`
                 : undefined;
 
-            return (
-              <div key={index}>
-                <p className="font-mono text-xs font-medium leading-4 text-gray-af">
-                  <OptionDescription
-                    description={option.description}
-                    value={option.values[0]}
+            if (option.values.length > 0) {
+              return (
+                <div key={index}>
+                  <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+                    <OptionDescription
+                      description={option.description}
+                      value={option.values[0]}
+                      target={option.targets[0]}
+                    />
+                  </p>
+                  <CodeChange
                     target={option.targets[0]}
+                    calldata={option.calldatas[0]}
+                    valueETH={valueETH}
+                    functionName={option.functionName}
+                    functionArgs={option.functionArgs}
                   />
-                </p>
-                <CodeChange
-                  target={option.targets[0]}
-                  calldata={option.calldatas[0]}
-                  valueETH={valueETH}
-                  functionName={option.functionName}
-                  functionArgs={option.functionArgs}
-                />
-              </div>
-            );
+                </div>
+              );
+            }
           })}
       </VStack>
       {proposalData.options.length > 1 && (
