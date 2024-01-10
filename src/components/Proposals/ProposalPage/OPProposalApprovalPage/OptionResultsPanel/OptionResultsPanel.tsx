@@ -23,7 +23,9 @@ export default function OptionsResultsPanel({
 
   if (proposalSettings.criteria === "THRESHOLD") {
     const threshold = BigInt(proposalSettings.criteriaValue);
-    if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
+    if (!totalVotingPower) {
+      thresholdPosition = 5;
+    } else if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
       thresholdPosition = 66;
     } else {
       // calculate threshold position, min 5% max 66%
@@ -44,19 +46,6 @@ export default function OptionsResultsPanel({
       ? -1
       : 0;
   });
-
-  if (proposalSettings.criteria === "THRESHOLD") {
-    const threshold = BigInt(proposalSettings.criteriaValue);
-    if (totalVotingPower < (threshold * 15n) / 10n) {
-      thresholdPosition = 66;
-    } else {
-      // calculate threshold position, min 5% max 66%
-      thresholdPosition = Math.max(
-        Number((threshold * 100n) / totalVotingPower),
-        5
-      );
-    }
-  }
 
   return (
     <VStack className={styles.approval_choices_container}>
