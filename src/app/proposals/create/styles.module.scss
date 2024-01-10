@@ -2,7 +2,7 @@
 
 .create_prop {
   &_container {
-    margin-top: $spacing-8;
+    margin-top: $spacing-12;
     margin-bottom: $spacing-8;
     width: 100%;
     max-width: $max-width-6xl;
@@ -15,7 +15,7 @@
 
   &_right_box {
     flex-shrink: 0;
-    width: $max-width-xs;
+    width: $max-width-sm;
 
     @media (max-width: $max-width-4xl) {
       width: 100%;

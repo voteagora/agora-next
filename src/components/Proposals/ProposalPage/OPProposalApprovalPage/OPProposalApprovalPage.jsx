@@ -2,8 +2,13 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { getVotesForProposal } from "@/app/api/votes/getVotes";
+import {
+  getVoteForProposalAndDelegate,
+  getVotesForProposal,
+} from "@/app/api/votes/getVotes";
+import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -11,8 +16,44 @@ async function fetchProposalVotes(proposal_id, page = 1) {
   return getVotesForProposal({ proposal_id, page });
 }
 
+async function fetchVotingPower(address, blockNumber) {
+  "use server";
+
+  return {
+    votingPower: (
+      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
+    ).totalVP,
+  };
+}
+
+async function fetchAuthorityChains(address, blockNumber) {
+  "use server";
+
+  return {
+    chains: await getAuthorityChains({ blockNumber, address }),
+  };
+}
+
+async function fetchDelegate(addressOrENSName) {
+  "use server";
+
+  return await getDelegate({
+    addressOrENSName,
+  });
+}
+
+async function fetchVoteForProposalAndDelegate(proposal_id, address) {
+  "use server";
+
+  return await getVoteForProposalAndDelegate({
+    proposal_id,
+    address,
+  });
+}
+
 export default async function OPProposalApprovalPage({ proposal }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
+
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
     <HStack
@@ -33,9 +74,11 @@ export default async function OPProposalApprovalPage({ proposal }) {
             proposal={proposal}
             initialProposalVotes={proposalVotes}
             fetchVotesForProposal={fetchProposalVotes}
+            fetchVotingPower={fetchVotingPower}
+            fetchAuthorityChains={fetchAuthorityChains}
+            fetchDelegate={fetchDelegate}
+            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
           />
-          {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput proposal={proposal} />
         </VStack>
       </VStack>
     </HStack>

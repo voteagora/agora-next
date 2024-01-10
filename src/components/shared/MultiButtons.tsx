@@ -1,7 +1,6 @@
-import { css } from "@emotion/css";
 import { HStack } from "@/components/Layout/Stack";
-import * as theme from "@/styles/theme";
 import { Button } from "../ui/button";
+import styles from "./styles.module.scss";
 
 export function MultiButtons({
   buttonsProps,
@@ -10,10 +9,9 @@ export function MultiButtons({
 }) {
   return (
     <HStack
-      className={css`
-        margin-top: ${theme.spacing["4"]};
-      `}
+      className={styles.multi_buttons}
       gap={4}
+      justifyContent="justify-between"
     >
       {buttonsProps.map((buttonProps, index) => {
         return (
@@ -22,6 +20,7 @@ export function MultiButtons({
             variant="outline"
             type="button"
             onClick={buttonProps[1]}
+            className="flex-1"
           >
             {buttonProps[0]}
           </Button>

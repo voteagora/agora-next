@@ -12,15 +12,7 @@ export default function LabelWithInfo({
   children: React.ReactNode;
 }) {
   return (
-    <label
-      className={cx(
-        styles.create_prop_form__label,
-        css`
-          display: flex;
-          align-items: center;
-        `
-      )}
-    >
+    <label className={cx(styles.create_prop_form__label, "flex items-center")}>
       {label} <InfoPop>{children}</InfoPop>
     </label>
   );

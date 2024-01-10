@@ -7,12 +7,12 @@
     position: relative;
     min-height: 0;
     height: 100%;
-    font-family: $font-family-sans;
     .approval_vote_tab_container {
       height: $spacing-12;
       padding-top: $spacing-4;
       padding-left: $spacing-4;
       padding-right: $spacing-4;
+      margin-bottom: $spacing-1;
       div {
         font-size: $font-size-base;
         font-weight: $font-weight-semibold;
@@ -23,4 +23,8 @@
       }
     }
   }
+}
+
+.button_container {
+  padding: 0 $spacing-4 $spacing-6 $spacing-4;
 }

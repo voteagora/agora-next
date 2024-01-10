@@ -1,34 +1,20 @@
-import React from "react";
-import { css } from "@emotion/css";
-import { colorForSupportType } from "@/lib/voteUtils";
-import * as theme from "@/styles/theme";
+import React, { Fragment } from "react";
 import { pluralizeVote } from "@/lib/tokenUtils";
+import styles from "./delegateVotes.module.scss";
 
 function ApprovalVoteContainer({ params, support, weight }) {
   return (
-    <div
-      className={css`
-        font-size: ${theme.fontSize.xs};
-        font-weight: ${theme.fontWeight.medium};
-        color: #66676b;
-      `}
-    >
+    <div className={styles.container}>
       {params?.length > 1 && "Voted: "}
       {params?.map((option, i) => (
-        <>
+        <Fragment key={option}>
           {option}
           {/* add a coma here if not last option */}
           {i !== params.length - 1 && ", "}
-        </>
+        </Fragment>
       ))}
       {(!params || params?.length === 0) && "Abstain"}
-      <span
-        className={css`
-          color: ${colorForSupportType(support)};
-          font-size: ${theme.fontSize.xs};
-          font-weight: ${theme.fontWeight.medium};
-        `}
-      >
+      <span className={styles.vote + ` vote_${support.toLowerCase()}`}>
         {" "}
         with {pluralizeVote(weight, "optimism")}
       </span>

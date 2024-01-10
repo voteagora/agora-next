@@ -24,7 +24,7 @@ export default function CodeChange({
   functionArgs,
 }) {
   return (
-    <div className="break-words text-xs font-mono font-medium text-gray-4f leading-4 my-2 pl-2 border-l border-gray-eo">
+    <div className="break-all text-xs font-mono font-medium text-gray-4f leading-4 my-2 pl-2 border-l border-gray-eo">
       {linkIfAddress(target)}.{functionName}
       {valueETH}(
       <br />
