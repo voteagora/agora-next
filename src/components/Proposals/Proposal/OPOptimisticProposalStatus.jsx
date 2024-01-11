@@ -14,7 +14,7 @@ export default function OPOptimisticProposalStatus({
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
-  const againstLength = formatNumber(proposal.proposalResults.against);
+  const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
   const againstRelativeAmount =
     (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
   const status = againstRelativeAmount <= 50 ? "approved" : "defeated";
