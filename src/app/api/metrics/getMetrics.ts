@@ -1,6 +1,5 @@
 import prisma from "@/app/lib/prisma";
 import { getTokenSupply } from "@/lib/tokenUtils";
-import { getCurrentQuorum } from "@/lib/governorUtils";
 
 import "server-only";
 
