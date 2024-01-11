@@ -82,7 +82,7 @@ function CastVoteDialogContents({
       </HStack>
       <div className={styles.reason_box}>
         {reason ? (
-          <div className={styles.has_reason}>reason</div>
+          <div className={styles.has_reason}>{reason}</div>
         ) : (
           <div className={styles.no_reason}>No voting reason provided</div>
         )}
