@@ -101,7 +101,7 @@ function CastVoteDialogContents({
               />
             </VoteButton>
           ) : (
-            <NoStatementView />
+            <NoStatementView closeDialog={closeDialog} />
           )}
         </div>
       )}
@@ -150,11 +150,15 @@ export function LoadingVote() {
   );
 }
 
-export function NoStatementView() {
+export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
   return (
     <div className={styles.note_to_user}>
       You do not have a delegate statement.{" "}
-      <Link href={"/statements/create"} className="underline">
+      <Link
+        href={"/statements/create"}
+        className="underline"
+        onClick={closeDialog}
+      >
         Please set one up to vote.
       </Link>
     </div>
