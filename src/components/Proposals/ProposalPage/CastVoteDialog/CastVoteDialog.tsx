@@ -1,6 +1,5 @@
 "use client";
 
-import { UserIcon } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
