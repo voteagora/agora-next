@@ -5,9 +5,9 @@ import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
-import { getCurrentQuorum } from "@/lib/governorUtils";
 import { Delegate } from "./delegate";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
+import { getCurrentQuorum } from "../quorum/getQuorum";
 
 export async function getDelegates({
   page = 1,
@@ -104,7 +104,7 @@ export async function getDelegate({
 
   const delegateStatement = await getDelegateStatement({ addressOrENSName });
 
-  const quorum = await getCurrentQuorum("OPTIMISM");
+  const quorum = await getCurrentQuorum();
 
   // Build out delegate JSON response
   return {

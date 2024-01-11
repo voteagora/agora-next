@@ -1,5 +1,4 @@
-import { getQuorum, getQuorumForProposal } from "./governorUtils";
-import { Prisma, ProposalType } from "@prisma/client";
+import { ProposalType, Proposals } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
@@ -171,8 +170,10 @@ export function getTitleFromProposalDescription(description: string = "") {
  */
 
 export async function parseProposal(
-  proposal: Prisma.ProposalsGetPayload<true>,
-  latestBlock: Block | null
+  proposal: Proposals,
+  latestBlock: Block | null,
+  quorum: bigint | null,
+  votableSupply: bigint
 ): Promise<Proposal> {
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
@@ -185,8 +186,6 @@ export async function parseProposal(
 
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
-
-  const quorum = await getQuorum(proposal);
 
   return {
     id: proposal.proposal_id,
@@ -224,7 +223,9 @@ export async function parseProposal(
       ? await getProposalStatus(
         proposal,
         proposalResuts,
-        Number(latestBlock.number)
+        Number(latestBlock.number),
+        quorum,
+        votableSupply
       )
       : null,
   };
@@ -530,9 +531,11 @@ export type ProposalStatus =
   | "EXECUTED";
 
 export async function getProposalStatus(
-  proposal: Prisma.ProposalsGetPayload<true>,
+  proposal: Proposals,
   proposalResults: ParsedProposalResults[ProposalType],
-  latestBlock: number
+  latestBlock: number,
+  quorum: bigint | null,
+  votableSupply: bigint
 ): Promise<ProposalStatus> {
   if (proposal.cancelled_block) {
     return "CANCELLED";
@@ -550,11 +553,6 @@ export async function getProposalStatus(
   if (!proposal.end_block || Number(proposal.end_block) > latestBlock) {
     return "ACTIVE";
   }
-
-  const quorum = await getQuorumForProposal(proposal);
-  // TODO: Fetch votableSupply at the time of proposal creation
-  const votableSupply = (await prisma.votableSupply.findFirst({}))
-    ?.votable_supply;
 
   switch (proposalResults.key) {
     case "STANDARD": {
