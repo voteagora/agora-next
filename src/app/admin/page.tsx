@@ -1,22 +1,24 @@
-// import { useAccount } from "wagmi"
-import AdminForm from "./components/AdminForm";
-// import { useAgoraContext } from "../AgoraContext"
+import AdminForm from "@/components/Admin/AdminForm";
+import { getProposalTypes } from "../api/proposals/getProposals";
+import { getVotableSupply } from "../api/votableSupply/getVotableSupply";
 
-// const whitelistedAddresses = ["0x6EF3E0179e669C77C82664D0feDad3a637121Efe"]
+async function fetchProposalTypes() {
+  "use server";
 
-export default function Page() {
-  // const { address, isConnecting, isReconnecting } = useAccount()
-  // const { isConnected } = useAgoraContext()
+  return getProposalTypes();
+}
 
-  // const isAllowed = isConnected && whitelistedAddresses.includes(address!)
+async function fetchVotableSupply() {
+  "use server";
+
+  return getVotableSupply();
+}
+
+export default async function Page() {
+  const proposalTypes = await fetchProposalTypes();
+  const votableSupply = await fetchVotableSupply();
 
   return (
-    <>
-      {/* {isAllowed ? ( */}
-      <AdminForm />
-      {/* ) : isConnecting || isReconnecting ? (
-        <p>Loading</p>
-      ) : null} */}
-    </>
+    <AdminForm votableSupply={votableSupply} proposalTypes={proposalTypes} />
   );
 }

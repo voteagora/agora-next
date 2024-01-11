@@ -56,6 +56,9 @@ dependencies:
   '@vercel/analytics':
     specifier: ^1.0.1
     version: 1.1.1
+  '@vercel/speed-insights':
+    specifier: ^1.0.2
+    version: 1.0.2
   autoprefixer:
     specifier: 10.4.14
     version: 10.4.14(postcss@8.4.23)
@@ -3341,6 +3344,11 @@ packages:
     resolution: {integrity: sha512-+NqgNmSabg3IFfxYhrWCfB/H+RCUOCR5ExRudNG2+pcRehq628DJB5e1u1xqwpLtn4pAYii4D98w7kofORAGQA==}
     dependencies:
       server-only: 0.0.1
+    dev: false
+
+  /@vercel/speed-insights@1.0.2:
+    resolution: {integrity: sha512-y5HWeB6RmlyVYxJAMrjiDEz8qAIy2cit0fhBq+MD78WaUwQvuBnQlX4+5MuwVTWi46bV3klaRMq83u9zUy1KOg==}
+    requiresBuild: true
     dev: false
 
   /@wagmi/connectors@3.1.5(@types/react@18.2.6)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.2.0)(typescript@5.0.4)(utf-8-validate@6.0.3)(viem@1.19.3)(zod@3.22.4):
