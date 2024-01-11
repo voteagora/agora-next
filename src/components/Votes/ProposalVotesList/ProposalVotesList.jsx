@@ -44,7 +44,7 @@ export default function ProposalVotesList({
         useWindow={false}
         loader={
           <div className="flex text-xs font-medium text-stone-500" key={0}>
-            Loading nore votes...
+            Loading more votes...
           </div>
         }
       >
