@@ -198,18 +198,18 @@ view Delegates {
 }
 
 view Proposals {
-  proposal_id        String   @unique
-  contract           String?  @db.VarChar(42)
+  proposal_id        String       @unique
+  contract           String?      @db.VarChar(42)
   proposer           String
   description        String?
-  ordinal            Decimal? @db.Decimal
+  ordinal            Decimal?     @db.Decimal
   created_block      BigInt
   start_block        String
   end_block          String
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
-  proposal_type      String
+  proposal_type      ProposalType
   proposal_type_data Json?
   proposal_results   Json?
 
