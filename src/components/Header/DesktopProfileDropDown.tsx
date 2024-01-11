@@ -168,21 +168,19 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
 
                     <Link
                       href={`/statements/create`}
-                      className={styles.desktop__create_statement}
+                      className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
                     >
-                      <div>
-                        {hasStatement
-                          ? "Edit delegate statement"
-                          : "Create delegate statement"}
-                      </div>
+                      {hasStatement
+                        ? "Edit delegate statement"
+                        : "Create delegate statement"}
                     </Link>
 
                     {hasStatement && (
                       <Link
-                        href={`/delegate/${ensName ?? address}`}
-                        className={styles.desktop__profile}
+                        href={`/delegates/${ensName ?? address}`}
+                        className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
                       >
-                        <div>View my profile</div>
+                        View my profile
                       </Link>
                     )}
                   </VStack>
