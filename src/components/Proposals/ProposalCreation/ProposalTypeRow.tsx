@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect } from "react";
 
 function ProposalTypeRow({
   form,
@@ -20,10 +21,32 @@ function ProposalTypeRow({
   proposalSettingsList: any[];
 }) {
   const { proposalType, proposalSettings } = form.state;
-  const infoText =
-    proposalType === "Basic"
-      ? "A basic proposal is one where voters will be asked to vote for, against, or abstain. The proposal will pass if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold."
-      : "An approval vote is one where voters will be asked to choose among multiple options. If the proposal passes quorum, then options will be approved according to your selected approval criteria.";
+  const optimisticProposalSettingsIndex = proposalSettingsList.findIndex(
+    (item) => item.name === "Optimistic"
+  );
+  const infoText = () => {
+    switch (proposalType) {
+      case "Basic":
+        return "A basic proposal is one where voters will be asked to vote for, against, or abstain. The proposal will pass if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.";
+      case "Optimistic":
+        return "An optimistic vote is one where voters will be asked to vote for, against, or abstain. The proposal will automatically pass unless 50% vote against. Since no transaction can be proposed for optimistic proposals, it can only be used for social signalling.";
+      case "Approval":
+        return "An approval vote is one where voters will be asked to choose among multiple options. If the proposal passes quorum, then options will be approved according to your selected approval criteria.";
+    }
+  };
+
+  useEffect(() => {
+    if (proposalType === "Optimistic") {
+      form.onChange.proposalSettings(
+        optimisticProposalSettingsIndex.toString()
+      );
+    } else if (
+      proposalSettings === optimisticProposalSettingsIndex.toString()
+    ) {
+      form.onChange.proposalSettings("0");
+    }
+  }, [proposalType]);
+
   return (
     <VStack className={styles.type_row}>
       <HStack
@@ -34,7 +57,7 @@ function ProposalTypeRow({
         <div className={styles.type_row__left}>
           <h4 className={styles.input_heading}>Vote type</h4>
           <Switch
-            options={["Basic", "Approval"]}
+            options={["Basic", "Approval", "Optimistic"]}
             selection={proposalType}
             onSelectionChanged={form.onChange.proposalType}
           />
@@ -42,23 +65,32 @@ function ProposalTypeRow({
         <div className={styles.type_row__right}>
           <h4 className={styles.input_heading}>Proposal type</h4>
           <Select
+            value={proposalSettings}
             onValueChange={form.onChange.proposalSettings}
             defaultValue={"0"}
+            disabled={proposalType === "Optimistic"}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={proposalSettingsList[0].name} />
             </SelectTrigger>
             <SelectContent>
-              {proposalSettingsList.map((item, index) => (
-                <SelectItem key={index} value={index.toString()}>
-                  {item.name}
-                </SelectItem>
-              ))}
+              {proposalSettingsList
+                // Show optimistic settings only when optimistic vote type is selected
+                .filter(
+                  (proposalSettings) =>
+                    proposalType === "Optimistic" ||
+                    proposalSettings.name != "Optimistic"
+                )
+                .map((item, index) => (
+                  <SelectItem key={index} value={index.toString()}>
+                    {item.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
       </HStack>
-      <div className={styles.type_row__text}>{infoText}</div>
+      <div className={styles.type_row__text}>{infoText()}</div>
     </VStack>
   );
 }

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   OptimismContracts,
   approvalModuleAddress,
+  optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
@@ -198,6 +199,19 @@ function getInputData(form: Form): {
           ],
           [options, settings]
         ),
+        description,
+        proposalSettings,
+      ];
+    } else if (form.state.proposalType === "Optimistic") {
+      // if OPTIMISTIC proposal, format data for optimistic proposal
+      governorFunction = "proposeWithModule";
+
+      // 50% of votable supply
+      const settings = [5_000, true];
+
+      inputData = [
+        optimisticModuleAddress,
+        abiCoder.encode(["tuple(uint248,bool)"], [settings]),
         description,
         proposalSettings,
       ];
