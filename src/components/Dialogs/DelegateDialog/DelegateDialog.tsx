@@ -83,7 +83,11 @@ export function DelegateDialog({
 
   return (
     <VStack alignItems="items-center" className={styles.dialog_container}>
-      <VStack gap={6} className="min-h-[318px] w-full">
+      <VStack
+        gap={6}
+        justifyContent="justify-center"
+        className="min-h-[318px] w-full"
+      >
         {delegatee ? (
           <VStack
             gap={3}
