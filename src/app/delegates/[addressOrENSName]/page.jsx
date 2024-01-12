@@ -14,6 +14,7 @@ import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import {
   getCurrentDelegatees,
   getCurrentDelegators,
+  getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
@@ -80,6 +81,12 @@ async function getProxyAddress(addressOrENSName) {
   return getProxy({ addressOrENSName });
 }
 
+async function fetchDirectDelegatee(addressOrENSName) {
+  "use server";
+
+  return getDirectDelegatee({ addressOrENSName });
+}
+
 export default async function Page({ params: { addressOrENSName } }) {
   let delegate;
   let delegateVotes;
@@ -118,6 +125,7 @@ export default async function Page({ params: { addressOrENSName } }) {
             fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
             getProxyAddress={getProxyAddress}
             fetchCurrentDelegatees={getDelegatees}
+            fetchDirectDelegatee={fetchDirectDelegatee}
           />
         </VStack>
 

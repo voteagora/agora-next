@@ -8,6 +8,8 @@ import {
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/proposals/proposal";
+import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
+import { Delegatees } from "@prisma/client";
 
 export type DialogType =
   | DelegateDialogType
@@ -20,8 +22,11 @@ export type DialogType =
 export type DelegateDialogType = {
   type: "DELEGATE";
   params: {
-    target: string;
-    votingPower: string;
+    delegate: DelegateChunk;
+    fetchBalanceForDirectDelegation: (
+      addressOrENSName: string
+    ) => Promise<string>;
+    fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   };
 };
 
@@ -71,12 +76,16 @@ export type ApprovalCastVoteDialogType = {
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
-  DELEGATE: ({ target, votingPower }, closeDialog) => {
+  DELEGATE: (
+    { delegate, fetchBalanceForDirectDelegation, fetchDirectDelegatee },
+    closeDialog
+  ) => {
     return (
       <DelegateDialog
-        target={target}
-        votingPower={votingPower}
+        delegate={delegate}
+        fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
         completeDelegation={closeDialog}
+        fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );
   },
