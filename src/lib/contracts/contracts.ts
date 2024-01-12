@@ -20,6 +20,8 @@ export const OptimismContracts = {
       : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f") as `0x${string}`,
     chainId: 10,
     abi: OptimismGovernor__factory.abi,
+    v6UpgradeBlock:
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114615036 : 114615036, // TODO: Update this once prod is upgraded
   },
 
   proposalTypesConfigurator: {
@@ -79,4 +81,8 @@ export const NounsContracts = {
     chainId: 1,
     abi: NounsGovernor__factory.abi,
   },
+};
+
+export const isOldApprovalModule = (block_number: string) => {
+  return Number(block_number) < OptimismContracts.governor.v6UpgradeBlock;
 };

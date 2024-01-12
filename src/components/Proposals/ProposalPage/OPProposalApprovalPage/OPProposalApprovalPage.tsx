@@ -9,32 +9,42 @@ import {
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { Proposal } from "@/app/api/proposals/proposal";
 
-async function fetchProposalVotes(proposal_id, page = 1) {
+async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
 
   return getVotesForProposal({ proposal_id, page });
 }
 
-async function fetchVotingPower(address, blockNumber) {
+async function fetchVotingPower(
+  addressOrENSName: string | `0x${string}`,
+  blockNumber: number
+) {
   "use server";
 
   return {
     votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
+      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName })
     ).totalVP,
   };
 }
 
-async function fetchAuthorityChains(address, blockNumber) {
+async function fetchAuthorityChains(
+  address: string | `0x${string}`,
+  blockNumber: number
+) {
   "use server";
 
   return {
-    chains: await getAuthorityChains({ blockNumber, address }),
+    chains: await getAuthorityChains({
+      blockNumber,
+      address,
+    }),
   };
 }
 
-async function fetchDelegate(addressOrENSName) {
+async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   "use server";
 
   return await getDelegate({
@@ -42,7 +52,10 @@ async function fetchDelegate(addressOrENSName) {
   });
 }
 
-async function fetchVoteForProposalAndDelegate(proposal_id, address) {
+async function fetchVoteForProposalAndDelegate(
+  proposal_id: string,
+  address: string | `0x${string}`
+) {
   "use server";
 
   return await getVoteForProposalAndDelegate({
@@ -51,7 +64,11 @@ async function fetchVoteForProposalAndDelegate(proposal_id, address) {
   });
 }
 
-export default async function OPProposalApprovalPage({ proposal }) {
+export default async function OPProposalApprovalPage({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
 
   return (
