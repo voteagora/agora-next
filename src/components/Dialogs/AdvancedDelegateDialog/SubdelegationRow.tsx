@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
-import { Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 
 function SubdelegationToRow({
   to,
@@ -20,6 +20,8 @@ function SubdelegationToRow({
   allowances: number[];
   index: number;
 }) {
+  const [newAllowanceInput, setNewAllowanceInput] = useState("");
+
   const allowance = allowances[index];
   const { data } = useEnsName({
     chainId: 1,
@@ -55,33 +57,63 @@ function SubdelegationToRow({
       </HStack>
       <div className="relative">
         <Input
-          value={allowance.toString()}
+          value={newAllowanceInput}
+          placeholder="0"
           className={styles.sub_row_input}
           onChange={(e) => {
             function formatNumber(value: number) {
               return Math.floor(Math.round(value * 1000) / 10) / 100;
             }
 
-            const newAllowanceValue = parseFloat(
-              e.target.value.replace(/,/g, "")
-            );
-            if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
-              const newAllowances = [...allowances];
-              newAllowances[index] =
-                newAllowanceValue > amountToAllocate
-                  ? formatNumber(amountToAllocate)
-                  : formatNumber(newAllowanceValue);
-              setAllowance(newAllowances);
-            } else {
+            function getCleanInput(value: string) {
+              let cleanedInput = "";
+
+              // remove commas, eg 100,000,000 becomes 100000000
+              cleanedInput = value.replace(/,/g, "");
+
+              // allow only 3 decimal points
+              const decimalIndex = cleanedInput.indexOf(".");
+              if (decimalIndex !== -1) {
+                cleanedInput = cleanedInput.slice(0, decimalIndex + 4);
+              }
+
+              return cleanedInput;
+            }
+
+            const newAllowanceInputClean = getCleanInput(e.target.value);
+
+            if (newAllowanceInputClean === "") {
+              // handle empty input
+              setNewAllowanceInput("");
               const newAllowances = [...allowances];
               newAllowances[index] = 0;
               setAllowance(newAllowances);
+              return;
+            }
+
+            if (isNaN(Number(newAllowanceInputClean))) {
+              // dont allow non numbers (including using commas for decimals like 10,123)
+              return;
+            }
+
+            const newAllowanceValue = parseFloat(newAllowanceInputClean);
+
+            if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
+              const newAllowances = [...allowances];
+
+              if (newAllowanceValue > amountToAllocate) {
+                newAllowances[index] = formatNumber(amountToAllocate);
+                setNewAllowanceInput(amountToAllocate.toLocaleString("en-US"));
+              } else {
+                newAllowances[index] = formatNumber(newAllowanceValue);
+                setNewAllowanceInput(newAllowanceInputClean);
+              }
+
+              setAllowance(newAllowances);
             }
           }}
-          type="number"
-          min={0}
-          max={amountToAllocate}
-          step={0.01}
+          type="text"
+          inputMode="numeric"
         />
 
         <div className={styles.sub_row_percent}>
