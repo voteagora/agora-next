@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
+import { disapprovalThreshold } from "@/lib/constants";
 
 function ProposalTypeRow({
   form,
@@ -29,7 +30,7 @@ function ProposalTypeRow({
       case "Basic":
         return "A basic proposal is one where voters will be asked to vote for, against, or abstain. The proposal will pass if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.";
       case "Optimistic":
-        return "An optimistic vote is one where voters will be asked to vote for, against, or abstain. The proposal will automatically pass unless 50% vote against. Since no transaction can be proposed for optimistic proposals, it can only be used for social signalling.";
+        return `An optimistic vote is one where voters will be asked to vote for, against, or abstain. The proposal will automatically pass unless ${disapprovalThreshold}% vote against. Since no transaction can be proposed for optimistic proposals, it can only be used for social signalling.`;
       case "Approval":
         return "An approval vote is one where voters will be asked to choose among multiple options. If the proposal passes quorum, then options will be approved according to your selected approval criteria.";
     }
