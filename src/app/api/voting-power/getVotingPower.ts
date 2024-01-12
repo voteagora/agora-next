@@ -3,12 +3,13 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { Prisma } from "@prisma/client";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import { VotingPowerData } from "./votingPower";
 
 /**
  * Voting Power at a given block number
  * @param address
  * @param blockNumber
- * @returns {directVP, advancedVP, totalVP}
+ * @returns VotingPowerData
  */
 export const getVotingPowerAtSnapshot = ({
   addressOrENSName,
@@ -27,7 +28,7 @@ async function getVotingPowerAtSnapshotByAddress({
 }: {
   address: string;
   blockNumber: number;
-}): Promise<{ directVP: string; advancedVP: string; totalVP: string }> {
+}): Promise<VotingPowerData> {
   const votingPower = await prisma.votingPowerSnaps.findFirst({
     where: {
       delegate: address,
@@ -90,7 +91,7 @@ async function getVotingPowerAtSnapshotByAddress({
 /**
  * Voting Power
  * @param address
- * @returns {directVP, advancedVP, totalVP}
+ * @returns VotingPowerData
  */
 export const getCurrentVotingPower = ({
   addressOrENSName,
@@ -102,11 +103,7 @@ async function getCurrentVotingPowerForAddress({
   address,
 }: {
   address: string;
-}): Promise<{
-  directVP: string;
-  advancedVP: string;
-  totalVP: string;
-}> {
+}): Promise<VotingPowerData> {
   const votingPower = await prisma.votingPower.findFirst({
     where: {
       delegate: address,

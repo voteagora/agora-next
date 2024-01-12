@@ -12,13 +12,14 @@ import { Proposal } from "@/app/api/proposals/proposal";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 
 type Props = {
   proposal: Proposal;
   fetchVotingPower: (
     addressOrENSName: string | `0x${string}`,
     blockNumber: number
-  ) => Promise<{ votingPower: string }>;
+  ) => Promise<VotingPowerData>;
   fetchAuthorityChains: (
     address: string | `0x${string}`,
     blockNumber: number
@@ -49,7 +50,11 @@ export default function CastVoteInput({
   isOptimistic = false,
 }: Props) {
   const [reason, setReason] = useState("");
-  const [votingPower, setVotingPower] = useState("0");
+  const [votingPower, setVotingPower] = useState<{
+    directVP: string;
+    advancedVP: string;
+    totalVP: string;
+  }>({ directVP: "0", advancedVP: "0", totalVP: "0" });
   const [delegate, setDelegate] = useState({});
   const [chains, setChains] = useState<string[][]>([]);
   const [vote, setVote] = useState<Vote>();
@@ -58,12 +63,10 @@ export default function CastVoteInput({
 
   const { address } = useAccount();
 
-  console.log("proposal", proposal);
-
   const fetchData = useCallback(async () => {
     try {
       const promises: [
-        Promise<{ votingPower: string }>,
+        Promise<VotingPowerData>,
         Promise<Delegate>,
         Promise<{ chains: string[][] }>,
         Promise<{ vote?: Vote }>
@@ -77,7 +80,7 @@ export default function CastVoteInput({
       const [votingPowerResult, delegateResult, chainsResult, voteResult] =
         await Promise.all(promises);
 
-      setVotingPower(votingPowerResult.votingPower);
+      setVotingPower(votingPowerResult);
       setDelegate(delegateResult);
       setChains(chainsResult.chains);
       setVote(voteResult.vote);
@@ -169,7 +172,7 @@ function VoteButtons({
     return <DisabledVoteButton reason="Loading..." />;
   }
 
-  const hasVoted = false; // !!delegateVote?.transactionHash;
+  const hasVoted = !!delegateVote?.transactionHash;
 
   if (hasVoted) {
     return <DisabledVoteButton reason="Already voted" />;

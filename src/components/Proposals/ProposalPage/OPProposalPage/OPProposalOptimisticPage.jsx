@@ -23,11 +23,10 @@ async function fetchProposalVotes(proposal_id, page = 1) {
 async function fetchVotingPower(address, blockNumber) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({
+    blockNumber,
+    addressOrENSName: address,
+  });
 }
 
 async function fetchAuthorityChains(address, blockNumber) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import HumanAddress from "@/components/shared/HumanAddress";
@@ -9,24 +9,15 @@ import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Link from "next/link";
 import styles from "./castVoteDialog.module.scss";
-import useAdvancedVoting from "./useAdvancedVoting";
-
-type Props = {
-  proposalId: string;
-  reason: string;
-  supportType: SupportTextProps["supportType"];
-  closeDialog: () => void;
-  delegate: any;
-  votingPower: string;
-  authorityChains: string[][];
-};
+import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
+import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
 };
 
 // TODO: Better rendering for users with no voting power
-export function CastVoteDialog(props: Props) {
+export function CastVoteDialog(props: CastVoteDialogProps) {
   return <CastVoteDialogContents {...props} />;
 }
 
@@ -38,13 +29,12 @@ function CastVoteDialogContents({
   votingPower,
   delegate,
   authorityChains,
-}: Props) {
+}: CastVoteDialogProps) {
   const { address: accountAddress } = useAccount();
   const { write, isLoading, isSuccess } = useAdvancedVoting({
     proposalId,
     support: ["FOR", "AGAINST", "ABSTAIN"].indexOf(supportType),
-    // TODO: this is not the correct voting power
-    standardVP: Number(votingPower),
+    standardVP: BigInt(votingPower.directVP),
     authorityChains,
     reason,
   });
@@ -72,7 +62,7 @@ function CastVoteDialogContents({
         <VStack alignItems="items-end">
           <div className={styles.subtitle}>with</div>
           <TokenAmountDisplay
-            amount={votingPower}
+            amount={votingPower.totalVP}
             decimals={18}
             currency="OP"
           />
@@ -93,7 +83,7 @@ function CastVoteDialogContents({
             <VoteButton onClick={write}>
               Vote {supportType.toLowerCase()} with{" "}
               <TokenAmountDisplay
-                amount={votingPower}
+                amount={votingPower.totalVP}
                 decimals={18}
                 currency="OP"
               />

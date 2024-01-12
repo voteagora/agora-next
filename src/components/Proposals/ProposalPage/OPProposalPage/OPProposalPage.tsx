@@ -25,11 +25,7 @@ async function fetchVotingPower(
 ) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
 }
 
 async function fetchAuthorityChains(

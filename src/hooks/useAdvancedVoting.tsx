@@ -12,7 +12,7 @@ const useAdvancedVoting = ({
 }: {
   proposalId: string;
   support: number;
-  standardVP: number;
+  standardVP: BigInt;
   authorityChains: string[][];
   reason?: string;
   params?: `0x${string}`;
@@ -78,15 +78,6 @@ const useAdvancedVoting = ({
 
     vote();
   }, [authorityChains, standardVP, standardVote, advancedVote]);
-
-  console.log(
-    advancedVoteIsLoading,
-    standardVoteIsLoading,
-    advancedVoteIsError,
-    standardVoteIsError,
-    advancedVoteIsSuccess,
-    standardVoteIsSuccess
-  );
 
   useEffect(() => {
     if (advancedVoteIsLoading || standardVoteIsLoading) {
