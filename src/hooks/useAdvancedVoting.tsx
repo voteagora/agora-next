@@ -9,7 +9,7 @@ const useAdvancedVoting = ({
   advancedVP,
   authorityChains,
   reason = "",
-  params = "0x",
+  params,
 }: {
   proposalId: string;
   support: number;
