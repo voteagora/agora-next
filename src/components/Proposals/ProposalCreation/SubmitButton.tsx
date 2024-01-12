@@ -15,11 +15,11 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useModal } from "connectkit";
 import styles from "./styles.module.scss";
+import { disapprovalThreshold } from "@/lib/constants";
 
 const abiCoder = new AbiCoder();
 const governorContract = OptimismContracts.governor;
 const governanceTokenContract = OptimismContracts.token;
-export const disapprovalThreshold = 12;
 
 export default function SubmitButton({
   formTarget,

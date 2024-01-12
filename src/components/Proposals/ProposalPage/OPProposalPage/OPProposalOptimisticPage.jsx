@@ -13,7 +13,7 @@ import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChain
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
 import { cn, formatNumber } from "@/lib/utils";
-import { disapprovalThreshold } from "../../ProposalCreation/SubmitButton";
+import { disapprovalThreshold } from "@/lib/constants";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -72,7 +72,8 @@ export default async function OPProposalPage({ proposal }) {
   const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
   const againstRelativeAmount =
     (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
-  const status = againstRelativeAmount <= 50 ? "approved" : "defeated";
+  const status =
+    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
 
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
