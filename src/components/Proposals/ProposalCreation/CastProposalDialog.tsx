@@ -54,7 +54,7 @@ function Message({ text, image }: { text: string; image?: JSX.Element }) {
 export function SuccessMessage() {
   return (
     <Message
-      text="Success! Proposal has been cast. It will appear once the transaction is
+      text="Success! Proposal has been created. It will appear once the transaction is
     confirmed."
       image={<Image src={icons.ballot} alt={icons.ballot} className="h-5" />}
     />
