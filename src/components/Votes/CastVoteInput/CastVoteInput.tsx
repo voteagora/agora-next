@@ -8,6 +8,36 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { Proposal } from "@/app/api/proposals/proposal";
+import { Delegate } from "@/app/api/delegates/delegate";
+import { Vote } from "@/app/api/votes/vote";
+import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
+
+type Props = {
+  proposal: Proposal;
+  fetchVotingPower: (
+    addressOrENSName: string | `0x${string}`,
+    blockNumber: number
+  ) => Promise<{ votingPower: string }>;
+  fetchAuthorityChains: (
+    address: string | `0x${string}`,
+    blockNumber: number
+  ) => Promise<{ chains: string[][] }>;
+  fetchDelegate: (
+    addressOrENSName: string | `0x${string}`
+  ) => Promise<Delegate>;
+  fetchVoteForProposalAndDelegate: (
+    proposal_id: string,
+    address: string | `0x${string}`
+  ) => Promise<
+    | {
+        vote: undefined;
+      }
+    | {
+        vote: Vote;
+      }
+  >;
+};
 
 export default function CastVoteInput({
   proposal,
@@ -15,12 +45,12 @@ export default function CastVoteInput({
   fetchAuthorityChains,
   fetchDelegate,
   fetchVoteForProposalAndDelegate,
-}) {
+}: Props) {
   const [reason, setReason] = useState("");
   const [votingPower, setVotingPower] = useState("0");
   const [delegate, setDelegate] = useState({});
-  const [chains, setChains] = useState([]);
-  const [vote, setVote] = useState({});
+  const [chains, setChains] = useState<string[][]>([]);
+  const [vote, setVote] = useState<Vote>();
   const [isReady, setIsReady] = useState(false);
   const openDialog = useOpenDialog();
 
@@ -28,11 +58,16 @@ export default function CastVoteInput({
 
   const fetchData = useCallback(async () => {
     try {
-      const promises = [
-        fetchVotingPower(address, proposal.snapshotBlockNumber),
-        fetchDelegate(address),
-        fetchAuthorityChains(address, proposal.snapshotBlockNumber),
-        fetchVoteForProposalAndDelegate(proposal.id, address),
+      const promises: [
+        Promise<{ votingPower: string }>,
+        Promise<Delegate>,
+        Promise<{ chains: string[][] }>,
+        Promise<{ vote?: Vote }>
+      ] = [
+        fetchVotingPower(address!, proposal.snapshotBlockNumber),
+        fetchDelegate(address!),
+        fetchAuthorityChains(address!, proposal.snapshotBlockNumber),
+        fetchVoteForProposalAndDelegate(proposal.id, address!),
       ];
 
       const [votingPowerResult, delegateResult, chainsResult, voteResult] =
@@ -70,12 +105,12 @@ export default function CastVoteInput({
         className="text-sm"
       />
       <VStack
-        justifyContent="stretch"
-        alignItems="stretch"
+        justifyContent="justify-between"
+        alignItems="items-stretch"
         className={styles.vote_actions}
       >
         <VoteButtons
-          onClick={(supportType) =>
+          onClick={(supportType: SupportTextProps["supportType"]) =>
             openDialog({
               type: "CAST_VOTE",
               params: {
@@ -96,40 +131,50 @@ export default function CastVoteInput({
   );
 }
 
-function VoteButtons({ onClick, proposalStatus, delegateVote, isReady }) {
+function VoteButtons({
+  onClick,
+  proposalStatus,
+  delegateVote,
+  isReady,
+}: {
+  onClick: (supportType: SupportTextProps["supportType"]) => void;
+  proposalStatus: Proposal["status"];
+  delegateVote: Vote | undefined;
+  isReady: boolean;
+}) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
-  // if (proposalStatus !== "ACTIVE") {
-  //   return <DisabledVoteButton reason="Not open to voting" />;
-  // }
+  if (proposalStatus !== "ACTIVE") {
+    return <DisabledVoteButton reason="Not open to voting" />;
+  }
 
-  // if (!isConnected) {
-  //   return (
-  //     <Button variant={"outline"} onClick={() => setOpen(true)}>
-  //       Connect wallet to vote
-  //     </Button>
-  //   );
-  // }
+  if (!isConnected) {
+    return (
+      <Button variant={"outline"} onClick={() => setOpen(true)}>
+        Connect wallet to vote
+      </Button>
+    );
+  }
 
-  // if (!isReady) {
-  //   return <DisabledVoteButton reason="Loading..." />;
-  // }
+  if (!isReady) {
+    return <DisabledVoteButton reason="Loading..." />;
+  }
 
-  // const hasVoted = !!delegateVote?.transactionHash;
+  const hasVoted = !!delegateVote?.transactionHash;
 
-  // if (hasVoted) {
-  //   return <DisabledVoteButton reason="Already voted" />;
-  // }
+  if (hasVoted) {
+    return <DisabledVoteButton reason="Already voted" />;
+  }
 
   return (
     <HStack gap={2} className="pt-1">
       {["FOR", "AGAINST", "ABSTAIN"].map((supportType) => (
         <VoteButton
           key={supportType}
-          action={supportType}
+          action={supportType as SupportTextProps["supportType"]}
           onClick={() => {
-            onClick(supportType);
+            onClick(supportType as SupportTextProps["supportType"]);
           }}
         />
       ))}
@@ -137,7 +182,13 @@ function VoteButtons({ onClick, proposalStatus, delegateVote, isReady }) {
   );
 }
 
-function VoteButton({ action, onClick }) {
+function VoteButton({
+  action,
+  onClick,
+}: {
+  action: SupportTextProps["supportType"];
+  onClick: () => void;
+}) {
   const className = `${styles["vote_button_" + action.toLowerCase()]}`;
 
   return (
@@ -147,7 +198,7 @@ function VoteButton({ action, onClick }) {
   );
 }
 
-function DisabledVoteButton({ reason }) {
+function DisabledVoteButton({ reason }: { reason: string }) {
   return (
     <button disabled className={styles.vote_button_disabled}>
       {reason}

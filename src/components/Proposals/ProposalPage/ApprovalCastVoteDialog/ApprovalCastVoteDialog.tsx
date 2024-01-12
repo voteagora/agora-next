@@ -86,7 +86,7 @@ export function ApprovalCastVoteDialog({
       {hasStatement && isLoading && <LoadingVote />}
       {hasStatement && isSuccess && <SuccessMessage />}
       {hasStatement && isError && <p>Something went wrong</p>}
-      {!hasStatement && <NoStatementView />}
+      {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (
         <VStack gap={3}>
           <VStack className={styles.title_box}>
