@@ -26,7 +26,6 @@ export default function MetricContainer({ icon, title, body, link = null }) {
                 <HStack gap={1}>
                   {title}
                   <Image
-                    cls
                     src={icons["link"]}
                     alt={icons["link"]}
                     width="12"
