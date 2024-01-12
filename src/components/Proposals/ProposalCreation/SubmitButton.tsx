@@ -19,6 +19,7 @@ import styles from "./styles.module.scss";
 const abiCoder = new AbiCoder();
 const governorContract = OptimismContracts.governor;
 const governanceTokenContract = OptimismContracts.token;
+export const disapprovalThreshold = 12;
 
 export default function SubmitButton({
   formTarget,
@@ -206,8 +207,7 @@ function getInputData(form: Form): {
       // if OPTIMISTIC proposal, format data for optimistic proposal
       governorFunction = "proposeWithModule";
 
-      // 50% of votable supply
-      const settings = [5_000, true];
+      const settings = [disapprovalThreshold * 100, true];
 
       inputData = [
         optimisticModuleAddress,
