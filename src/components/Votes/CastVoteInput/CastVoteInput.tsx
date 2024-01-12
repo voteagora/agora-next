@@ -13,6 +13,8 @@ import { Delegate } from "@/app/api/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { fetchAndSet, fetchAndSetAll } from "@/lib/utils";
+import { checkIfVoted } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
@@ -27,17 +29,10 @@ type Props = {
   fetchDelegate: (
     addressOrENSName: string | `0x${string}`
   ) => Promise<Delegate>;
-  fetchVoteForProposalAndDelegate: (
+  fetchVotesForProposalAndDelegate: (
     proposal_id: string,
     address: string | `0x${string}`
-  ) => Promise<
-    | {
-        vote: undefined;
-      }
-    | {
-        vote: Vote;
-      }
-  >;
+  ) => Promise<Vote[]>;
   isOptimistic?: boolean;
 };
 
@@ -46,18 +41,18 @@ export default function CastVoteInput({
   fetchVotingPower,
   fetchAuthorityChains,
   fetchDelegate,
-  fetchVoteForProposalAndDelegate,
+  fetchVotesForProposalAndDelegate,
   isOptimistic = false,
 }: Props) {
   const [reason, setReason] = useState("");
-  const [votingPower, setVotingPower] = useState<{
-    directVP: string;
-    advancedVP: string;
-    totalVP: string;
-  }>({ directVP: "0", advancedVP: "0", totalVP: "0" });
+  const [votingPower, setVotingPower] = useState<VotingPowerData>({
+    directVP: "0",
+    advancedVP: "0",
+    totalVP: "0",
+  });
   const [delegate, setDelegate] = useState({});
   const [chains, setChains] = useState<string[][]>([]);
-  const [vote, setVote] = useState<Vote>();
+  const [votes, setVotes] = useState<Vote[]>([]);
   const [isReady, setIsReady] = useState(false);
   const openDialog = useOpenDialog();
 
@@ -65,25 +60,19 @@ export default function CastVoteInput({
 
   const fetchData = useCallback(async () => {
     try {
-      const promises: [
-        Promise<VotingPowerData>,
-        Promise<Delegate>,
-        Promise<{ chains: string[][] }>,
-        Promise<{ vote?: Vote }>
-      ] = [
-        fetchVotingPower(address!, proposal.snapshotBlockNumber),
-        fetchDelegate(address!),
-        fetchAuthorityChains(address!, proposal.snapshotBlockNumber),
-        fetchVoteForProposalAndDelegate(proposal.id, address!),
-      ];
+      await fetchAndSetAll(
+        [
+          () => fetchVotingPower(address!, proposal.snapshotBlockNumber),
+          () => fetchDelegate(address!),
+          async () =>
+            (
+              await fetchAuthorityChains(address!, proposal.snapshotBlockNumber)
+            ).chains,
+          () => fetchVotesForProposalAndDelegate(proposal.id, address!),
+        ],
+        [setVotingPower, setDelegate, setChains, setVotes]
+      );
 
-      const [votingPowerResult, delegateResult, chainsResult, voteResult] =
-        await Promise.all(promises);
-
-      setVotingPower(votingPowerResult);
-      setDelegate(delegateResult);
-      setChains(chainsResult.chains);
-      setVote(voteResult.vote);
       setIsReady(true);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -94,7 +83,7 @@ export default function CastVoteInput({
     fetchAuthorityChains,
     address,
     proposal,
-    fetchVoteForProposalAndDelegate,
+    fetchVotesForProposalAndDelegate,
   ]);
 
   useEffect(() => {
@@ -131,9 +120,10 @@ export default function CastVoteInput({
             })
           }
           proposalStatus={proposal.status}
-          delegateVote={vote}
+          delegateVotes={votes}
           isReady={isReady}
           isOptimistic={isOptimistic}
+          votingPower={votingPower}
         />
       </VStack>
     </VStack>
@@ -143,15 +133,17 @@ export default function CastVoteInput({
 function VoteButtons({
   onClick,
   proposalStatus,
-  delegateVote,
+  delegateVotes,
   isReady,
   isOptimistic,
+  votingPower,
 }: {
   onClick: (supportType: SupportTextProps["supportType"]) => void;
   proposalStatus: Proposal["status"];
-  delegateVote: Vote | undefined;
+  delegateVotes: Vote[];
   isReady: boolean;
   isOptimistic: boolean;
+  votingPower: VotingPowerData;
 }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
@@ -172,7 +164,7 @@ function VoteButtons({
     return <DisabledVoteButton reason="Loading..." />;
   }
 
-  const hasVoted = !!delegateVote?.transactionHash;
+  const hasVoted = checkIfVoted(delegateVotes, votingPower);
 
   if (hasVoted) {
     return <DisabledVoteButton reason="Already voted" />;

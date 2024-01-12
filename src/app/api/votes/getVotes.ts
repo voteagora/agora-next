@@ -7,13 +7,21 @@ import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 
 export const getVotesForDelegate = ({
-  addressOrENSName, page, sort, sortOrder
+  addressOrENSName,
+  page,
+  sort,
+  sortOrder,
 }: {
   addressOrENSName: string;
   page: number;
   sort: VotesSort;
   sortOrder: VotesSortOrder;
-}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, { page, sort, sortOrder });
+}) =>
+  addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
+    page,
+    sort,
+    sortOrder,
+  });
 
 async function getVotesForDelegateForAddress({
   address,
@@ -109,30 +117,27 @@ export async function getVotesForProposal({
   };
 }
 
-export async function getVoteForProposalAndDelegate({
+export async function getVotesForProposalAndDelegate({
   proposal_id,
   address,
 }: {
   proposal_id: string;
   address: string;
 }) {
-  const vote = await prisma.votes.findFirst({
+  const votes = await prisma.votes.findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
-  if (!vote) {
-    return {
-      vote: undefined,
-    };
-  }
-
   const latestBlock = await provider.getBlock("latest");
-  const proposalData = parseProposalData(
-    JSON.stringify(vote.proposal_data || {}),
-    vote.proposal_type
-  );
 
-  return {
-    vote: parseVote(vote, proposalData, latestBlock),
-  };
+  return votes.map((vote) =>
+    parseVote(
+      vote,
+      parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      ),
+      latestBlock
+    )
+  );
 }

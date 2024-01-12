@@ -11,6 +11,7 @@ import { Block } from "ethers";
 import { Vote } from "@/app/api/votes/vote";
 import { isOldApprovalModule } from "./contracts/contracts";
 import { DEPLOYMENT_NAME } from "./config";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 
 /**
  * Vote primitives
@@ -144,4 +145,26 @@ export function parseVote(
         )
       : null,
   };
+}
+
+export function checkIfVoted(
+  votes: Vote[],
+  votingPower: VotingPowerData
+): boolean {
+  if (votes.length === 0) {
+    return false;
+  }
+  if (votes.length > 1) {
+    return true;
+  }
+  return (
+    (BigInt(votingPower.advancedVP) > 0n &&
+      votes.some(
+        (vote) => BigInt(vote.weight) === BigInt(votingPower.advancedVP)
+      )) ||
+    (BigInt(votingPower.directVP) > 0n &&
+      votes.some(
+        (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
+      ))
+  );
 }
