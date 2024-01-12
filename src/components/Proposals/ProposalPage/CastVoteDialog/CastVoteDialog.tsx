@@ -35,6 +35,7 @@ function CastVoteDialogContents({
     proposalId,
     support: ["FOR", "AGAINST", "ABSTAIN"].indexOf(supportType),
     standardVP: BigInt(votingPower.directVP),
+    advancedVP: BigInt(votingPower.advancedVP),
     authorityChains,
     reason,
   });

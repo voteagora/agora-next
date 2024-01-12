@@ -6,13 +6,15 @@ const useAdvancedVoting = ({
   proposalId,
   support,
   standardVP,
+  advancedVP,
   authorityChains,
   reason = "",
   params = "0x",
 }: {
   proposalId: string;
   support: number;
-  standardVP: BigInt;
+  standardVP: bigint;
+  advancedVP: bigint;
   authorityChains: string[][];
   reason?: string;
   params?: `0x${string}`;
@@ -21,7 +23,6 @@ const useAdvancedVoting = ({
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // TODO: Use limitedCastVoteWithReasonAndParamsBatchedBySig instead
   const {
     write: advancedVote,
     isLoading: advancedVoteIsLoading,
@@ -30,8 +31,9 @@ const useAdvancedVoting = ({
   } = useContractWrite({
     address: OptimismContracts.alligator.address as any,
     abi: OptimismContracts.alligator.abi,
-    functionName: "castVoteWithReasonAndParamsBatched",
+    functionName: "limitedCastVoteWithReasonAndParamsBatched",
     args: [
+      advancedVP,
       authorityChains as any,
       BigInt(proposalId),
       support,
