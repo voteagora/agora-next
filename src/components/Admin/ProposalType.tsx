@@ -142,7 +142,7 @@ export default function ProposalType({
             )}
           />
         </div>
-        <div className="flex gap-4">
+        <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4">
           <FormField
             control={form.control}
             name="quorum"
@@ -159,9 +159,9 @@ export default function ProposalType({
                       type="number"
                       disabled={isDisabled}
                     />
-                    <div className="absolute right-[12px] text-sm text-muted-foreground grid grid-cols-5 text-center items-center">
-                      <p>%</p>
-                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-full" />
+                    <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
+                      <p>% of votable supply</p>
+                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
                           Math.floor(
@@ -195,21 +195,8 @@ export default function ProposalType({
                       type="number"
                       disabled={isDisabled}
                     />
-                    <div className="absolute right-[12px] text-sm text-muted-foreground grid grid-cols-5 text-center items-center">
-                      <p>%</p>
-                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-full" />
-                      <p className="text-[0.8rem] col-span-3">
-                        {formatNumber(
-                          Math.floor(
-                            (formattedVotableSupply *
-                              formValues.approval_threshold) /
-                              100
-                          ),
-                          0,
-                          1
-                        )}{" "}
-                        OP
-                      </p>
+                    <div className="absolute right-[12px] text-sm text-muted-foreground">
+                      <p>% of votes for each proposal</p>
                     </div>
                   </div>
                 </FormControl>

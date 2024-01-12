@@ -109,7 +109,8 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                     {vote.proposalType === "APPROVAL" && (
                       <ApprovalVoteContainer {...vote} />
                     )}
-                    {vote.proposalType === "STANDARD" && (
+                    {(vote.proposalType === "STANDARD" ||
+                      vote.proposalType === "OPTIMISTIC") && (
                       <StandardVoteContainer {...vote} />
                     )}
                   </VStack>

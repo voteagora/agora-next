@@ -473,7 +473,7 @@ export function parseProposalResults(
       };
     }
     case "OPTIMISTIC": {
-      const parsedProposalResults = JSON.parse(proposalResults).optimistic;
+      const parsedProposalResults = JSON.parse(proposalResults).standard;
 
       return {
         key: "OPTIMISTIC",
