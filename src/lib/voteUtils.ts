@@ -18,11 +18,39 @@ export type Support = "AGAINST" | "ABSTAIN" | "FOR";
 
 export function parseSupport(
   support: string | null,
+  proposalType: ProposalType,
+  start_block: string | null
+): Support {
+  /**
+   * @dev If start_block number of vote is less than 114615036, then it's a proposal
+   *      from old approval voting module where 0 = for, 1 = against
+   *      new approval voting module is 0 = against, 1 = abstain, 2 = for
+   *      note that block number is indicative but works
+   */
+
+  if (start_block && Number(start_block) < 114615036) {
+    return parseSupportOldModule(support, proposalType);
+  }
+
+  switch (Number(support)) {
+    case 0:
+      return "AGAINST";
+    case 1:
+      return "FOR";
+
+    default:
+      return "ABSTAIN";
+  }
+}
+
+export function parseSupportOldModule(
+  support: string | null,
   proposalType: ProposalType
 ): Support {
   switch (Number(support)) {
     case 0:
       return proposalType === "APPROVAL" ? "FOR" : "AGAINST";
+
     case 1:
       return proposalType === "APPROVAL" ? "ABSTAIN" : "FOR";
 
@@ -95,7 +123,7 @@ export function parseVote(
     transactionHash: vote.transaction_hash,
     address: vote.voter,
     proposal_id: vote.proposal_id,
-    support: parseSupport(vote.support, vote.proposal_type),
+    support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
     weight: vote.weight,
     reason: vote.reason,
     params: parseParams(vote.params, proposalData),
