@@ -492,13 +492,7 @@ export function parseProposalResults(
       return {
         key: "APPROVAL",
         kind: {
-          for:
-            parsedProposalResults.approval?.reduce(
-              (sum: bigint, { votes }: { votes: string }) => {
-                return sum + BigInt(votes);
-              },
-              0n
-            ) ?? 0n,
+          for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
           abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
           options: proposalData.kind.options.map((option, idx) => {
             return {
