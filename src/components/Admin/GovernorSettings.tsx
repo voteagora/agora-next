@@ -57,11 +57,15 @@ export default function GovernorSettings() {
 
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState<number>();
-  const { config: setVotingPeriodConfig } = usePrepareContractWrite({
-    ...governorContract,
-    functionName: "setVotingPeriod",
-    args: [(BigInt(votingPeriod || 0) * 3600n) / BigInt(secondsPerBlock)],
-  });
+  const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
+    usePrepareContractWrite({
+      ...governorContract,
+      functionName: "setVotingPeriod",
+      args: [
+        (BigInt(Math.floor(votingPeriod || 0)) * 3600n) /
+          BigInt(secondsPerBlock),
+      ],
+    });
   const {
     data: resultSetVotingPeriod,
     write: writeSetVotingPeriod,
@@ -75,11 +79,15 @@ export default function GovernorSettings() {
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
   const [votingDelay, setVotingDelay] = useState<number>();
-  const { config: setVotingDelayConfig } = usePrepareContractWrite({
-    ...governorContract,
-    functionName: "setVotingDelay",
-    args: [(BigInt(votingDelay || 0) * 3600n) / BigInt(secondsPerBlock)],
-  });
+  const { config: setVotingDelayConfig, isError: setVotingDelayError } =
+    usePrepareContractWrite({
+      ...governorContract,
+      functionName: "setVotingDelay",
+      args: [
+        (BigInt(Math.floor(votingDelay || 0)) * 3600n) /
+          BigInt(secondsPerBlock),
+      ],
+    });
   const {
     data: resultSetVotingDelay,
     write: writeSetVotingDelay,
@@ -127,7 +135,10 @@ export default function GovernorSettings() {
               <Input
                 value={votingPeriod}
                 onChange={(e) => setVotingPeriod(parseInt(e.target.value))}
-                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingPeriod ||
+                  setVotingPeriodError
+                }
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -138,7 +149,10 @@ export default function GovernorSettings() {
                 size="sm"
                 className="absolute right-[6px] rounded-sm bg-white"
                 loading={isDisabledSetVotingPeriod}
-                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingPeriod ||
+                  setVotingPeriodError
+                }
                 onClick={() => {
                   writeSetVotingPeriod?.();
                 }}
@@ -153,7 +167,10 @@ export default function GovernorSettings() {
               <Input
                 value={votingDelay}
                 onChange={(e) => setVotingDelay(parseInt(e.target.value))}
-                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingDelay ||
+                  setVotingDelayError
+                }
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -164,7 +181,10 @@ export default function GovernorSettings() {
                 variant="outline"
                 size="sm"
                 loading={isDisabledSetVotingDelay}
-                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingDelay ||
+                  setVotingDelayError
+                }
                 onClick={() => {
                   writeSetVotingDelay?.();
                 }}
