@@ -11,7 +11,7 @@ const useIsAdvancedUser = () => {
   const { address } = useAccount();
   const [isAdvancedUser, setIsAdvancedUser] = useState(false);
   const allowList = [
-    "0x4D5d7d63989BBE6358a3352A2449d59Aa5A08267",
+    "0x4D5d7d63989BBE6358a3352A2449d59Aa5A08267", // Dom Test 1
     "0xd0f23E5ea6c8088eD0FFf294F3fC29e719EE6B8b",
     "0xde748c3dd4311A5d6b305E2eeFd6481BCDA1e84B", // Base tester
     "0x85A0779CA390adaD02Aa63075373bF33e7C5a711", // Base tester

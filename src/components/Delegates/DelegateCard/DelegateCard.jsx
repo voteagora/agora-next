@@ -12,6 +12,7 @@ export default async function DelegateCard({
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
+  fetchDirectDelegatee,
 }) {
   const delegate = await fetchDelegate(addressOrENSName);
 
@@ -85,6 +86,7 @@ export default async function DelegateCard({
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               getProxyAddress={getProxyAddress}
+              fetchDirectDelegatee={fetchDirectDelegatee}
             />
           </VStack>
         </div>
