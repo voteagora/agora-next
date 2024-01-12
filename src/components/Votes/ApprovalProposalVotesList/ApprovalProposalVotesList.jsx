@@ -41,19 +41,15 @@ export default function ApprovalProposalVotesList({
         hasMore={meta.hasNextPage}
         pageStart={0}
         loadMore={loadMore}
+        useWindow={false}
         loader={
-          <div className="flex justify-center mt-2" key={0}>
-            <Image
-              src="/images/blink.gif"
-              alt="Blinking Agora Logo"
-              width={50}
-              height={20}
-            />
+          <div className="flex text-xs font-medium text-stone-500" key={0}>
+            Loading more votes...
           </div>
         }
       >
-        {proposalVotes.map((vote, i) => (
-          <SingleVote key={i} vote={vote} />
+        {proposalVotes.map((vote) => (
+          <SingleVote key={vote.transactionHash} vote={vote} />
         ))}
       </InfiniteScroll>
     </div>

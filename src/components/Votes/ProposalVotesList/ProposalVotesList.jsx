@@ -44,12 +44,16 @@ export default function ProposalVotesList({
         useWindow={false}
         loader={
           <div className="flex text-xs font-medium text-stone-500" key={0}>
-            Loading nore votes...
+            Loading more votes...
           </div>
         }
       >
-        {proposalVotes.map((vote, i) => (
-          <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
+        {proposalVotes.map((vote) => (
+          <VStack
+            key={vote.transactionHash}
+            gap={4}
+            className={styles.vote_row}
+          >
             <VStack>
               <HStack justifyContent="justify-between" className={styles.voter}>
                 <HStack gap={1} alignItems="items-center">
