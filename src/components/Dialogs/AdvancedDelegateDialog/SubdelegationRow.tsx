@@ -42,6 +42,59 @@ function SubdelegationToRow({
       ? 0
       : Math.round((allowance / availableBalanceNumber) * 100_00) / 100;
 
+  const handleAllowanceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    function formatNumber(value: number) {
+      return Math.floor(Math.round(value * 1000) / 10) / 100;
+    }
+
+    function getCleanInput(value: string) {
+      let cleanedInput = "";
+
+      // remove commas, eg 100,000,000 becomes 100000000
+      cleanedInput = value.replace(/,/g, "");
+
+      // allow only 3 decimal points
+      const decimalIndex = cleanedInput.indexOf(".");
+      if (decimalIndex !== -1) {
+        cleanedInput = cleanedInput.slice(0, decimalIndex + 4);
+      }
+
+      return cleanedInput;
+    }
+
+    const newAllowanceInputClean = getCleanInput(e.target.value);
+
+    if (newAllowanceInputClean === "") {
+      // handle empty input
+      setNewAllowanceInput("");
+      const newAllowances = [...allowances];
+      newAllowances[index] = 0;
+      setAllowance(newAllowances);
+      return;
+    }
+
+    if (isNaN(Number(newAllowanceInputClean))) {
+      // dont allow non numbers (including using commas for decimals like 10,123)
+      return;
+    }
+
+    const newAllowanceValue = parseFloat(newAllowanceInputClean);
+
+    if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
+      const newAllowances = [...allowances];
+
+      if (newAllowanceValue > amountToAllocate) {
+        newAllowances[index] = formatNumber(amountToAllocate);
+        setNewAllowanceInput(amountToAllocate.toLocaleString("en-US"));
+      } else {
+        newAllowances[index] = formatNumber(newAllowanceValue);
+        setNewAllowanceInput(newAllowanceInputClean);
+      }
+
+      setAllowance(newAllowances);
+    }
+  };
+
   return (
     <div className={styles.sub_row}>
       <HStack gap={3}>
@@ -60,58 +113,7 @@ function SubdelegationToRow({
           value={newAllowanceInput}
           placeholder="0"
           className={styles.sub_row_input}
-          onChange={(e) => {
-            function formatNumber(value: number) {
-              return Math.floor(Math.round(value * 1000) / 10) / 100;
-            }
-
-            function getCleanInput(value: string) {
-              let cleanedInput = "";
-
-              // remove commas, eg 100,000,000 becomes 100000000
-              cleanedInput = value.replace(/,/g, "");
-
-              // allow only 3 decimal points
-              const decimalIndex = cleanedInput.indexOf(".");
-              if (decimalIndex !== -1) {
-                cleanedInput = cleanedInput.slice(0, decimalIndex + 4);
-              }
-
-              return cleanedInput;
-            }
-
-            const newAllowanceInputClean = getCleanInput(e.target.value);
-
-            if (newAllowanceInputClean === "") {
-              // handle empty input
-              setNewAllowanceInput("");
-              const newAllowances = [...allowances];
-              newAllowances[index] = 0;
-              setAllowance(newAllowances);
-              return;
-            }
-
-            if (isNaN(Number(newAllowanceInputClean))) {
-              // dont allow non numbers (including using commas for decimals like 10,123)
-              return;
-            }
-
-            const newAllowanceValue = parseFloat(newAllowanceInputClean);
-
-            if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
-              const newAllowances = [...allowances];
-
-              if (newAllowanceValue > amountToAllocate) {
-                newAllowances[index] = formatNumber(amountToAllocate);
-                setNewAllowanceInput(amountToAllocate.toLocaleString("en-US"));
-              } else {
-                newAllowances[index] = formatNumber(newAllowanceValue);
-                setNewAllowanceInput(newAllowanceInputClean);
-              }
-
-              setAllowance(newAllowances);
-            }
-          }}
+          onChange={(e) => handleAllowanceInput(e)}
           type="text"
           inputMode="numeric"
         />
