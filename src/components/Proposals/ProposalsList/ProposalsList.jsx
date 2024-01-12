@@ -13,7 +13,11 @@ import Image from "next/image";
 import Proposal from "../Proposal/Proposal";
 import Loader from "@/components/Layout/Loader";
 
-export default function ProposalsList({ initialProposals, fetchProposals }) {
+export default function ProposalsList({
+  initialProposals,
+  fetchProposals,
+  votableSupply,
+}) {
   const router = useRouter();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposals] || []);
@@ -51,7 +55,11 @@ export default function ProposalsList({ initialProposals, fetchProposals }) {
             element="main"
           >
             {proposals.map((proposal) => (
-              <Proposal key={proposal.id} proposal={proposal} />
+              <Proposal
+                key={proposal.id}
+                proposal={proposal}
+                votableSupply={votableSupply}
+              />
             ))}
           </InfiniteScroll>
         </div>
