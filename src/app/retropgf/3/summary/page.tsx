@@ -5,9 +5,8 @@ import Image from "next/image";
 
 export default function Page() {
   return (
-    <VStack className="w-full items-stretch max-w-6xl pt-8 pb-16 px-4">
-      {/* TODO: check flex dir here */}
-      <div className="mb-16 justify-between items-center flex-col gap-8 lg:flex-row lg:gap-0">
+    <VStack className="w-full items-stretch max-w-6xl pt-8 pb-16">
+      <div className="mb-16 justify-between items-center flex flex-col gap-8 lg:flex-row lg:gap-0">
         <VStack>
           <h1 className="text-2xl font-extrabold mb-2">
             RetroPGF 3 results in numbers
@@ -17,15 +16,12 @@ export default function Page() {
             logic, or dive into the results data directly in a spreadsheet.
           </div>
         </VStack>
-        {/* TODO: check flex dir here */}
-        <div className="h-auto lg:h-16 w-full lg:w-auto flex-col lg:flex-row items-center rounded-lg border border-gray-300 shadow-newDefault">
+        <div className="h-auto lg:h-16 w-full lg:w-auto flex flex-col lg:flex-row items-center rounded-lg border border-gray-300 shadow-newDefault">
           {" "}
           <a href="https://vote.optimism.io/retropgf/3">
-            {/* TODO: Check border right only lg */}
             <HStack className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
               <Image src={sunny} alt="Github" width="32" />
-              {/* TODO: check max-w-40 */}
-              <div className="max-w-40">View all recipients</div>
+              <div className="max-w-[10rem]">View all recipients</div>
             </HStack>
           </a>
           <a
@@ -33,17 +29,14 @@ export default function Page() {
             target="_blank"
             rel="noreferrer"
           >
-            {/* TODO: Check border right only lg */}
             <HStack className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
-              {/* TODO: frh -> check height */}
               <Image
                 src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png"
                 alt="Github"
                 width="32"
                 height="32"
               />
-              {/* TODO: check max-w-40 */}
-              <div className="max-w-40">Results Calculation</div>
+              <div className="max-w-[10rem]">Results Calculation</div>
             </HStack>
           </a>
           <a
@@ -52,15 +45,13 @@ export default function Page() {
             rel="noreferrer"
           >
             <HStack className="gap-2 items-center p-4 text-gray-700 hover:black transition-colors duration-200">
-              {/* TODO: frh -> check height */}
               <Image
                 src="https://cdn3.iconfinder.com/data/icons/logos-brands-3/24/logo_brand_brands_logos_google_sheets-512.png"
                 alt="Sheets"
                 width="32"
                 height="32"
               />
-              {/* TODO: check max-w-40 */}
-              <div className="max-w-40">Results data</div>
+              <div className="max-w-[10rem]">Results data</div>
             </HStack>
           </a>
         </div>
@@ -72,7 +63,6 @@ export default function Page() {
               How many ballots did projects appear in?
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_2.png"
             alt="RetroPGF 3 results 2"
@@ -87,7 +77,6 @@ export default function Page() {
               Distribution of OP allocation for top 30 projects
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_3.png"
             alt="RetroPGF 3 results 3"
@@ -102,7 +91,6 @@ export default function Page() {
               Individual vs projects comparison
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_4.png"
             alt="RetroPGF 3 results 4"
@@ -117,7 +105,6 @@ export default function Page() {
               Total OP allocated to each category
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_5.png"
             alt="RetroPGF 3 results 5"
@@ -132,7 +119,6 @@ export default function Page() {
               Funding for projects in each category
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_9.png"
             alt="RetroPGF 3 results 9"
@@ -147,7 +133,6 @@ export default function Page() {
               Collective Governance OP distribution
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_6.png"
             alt="RetroPGF 3 results 6"
@@ -162,7 +147,6 @@ export default function Page() {
               Developer Ecosystem OP distribution
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_7.png"
             alt="RetroPGF 3 results 7"
@@ -177,7 +161,6 @@ export default function Page() {
               End UX and adoption OP distribution
             </div>
           </HStack>
-          {/* TODO: frh -> check height and how to avoid this typescript */}
           <Image
             src="/rpgf/infographic_8.png"
             alt="RetroPGF 3 results 8"
@@ -189,11 +172,9 @@ export default function Page() {
       </VStack>
       <a
         href="https://vote.optimism.io/retropgf/3"
-        // TODO:check z index 50
         className="fixed bottom-16 z-50 p-4 bg-white rounded-md shadow-md border border-gray-300"
       >
         <HStack className="gap-2">
-          {/* TODO: frh check badge */}
           <Image src={badge} alt="badge symbol" />
           <span className="font-medium">View all RPGF recipients &#8594;</span>
         </HStack>
