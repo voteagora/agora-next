@@ -48,8 +48,8 @@ export default function ApprovalProposalVotesList({
           </div>
         }
       >
-        {proposalVotes.map((vote, i) => (
-          <SingleVote key={i} vote={vote} />
+        {proposalVotes.map((vote) => (
+          <SingleVote key={vote.transactionHash} vote={vote} />
         ))}
       </InfiniteScroll>
     </div>
