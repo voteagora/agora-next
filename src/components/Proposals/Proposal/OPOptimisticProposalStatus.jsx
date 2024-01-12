@@ -1,7 +1,7 @@
 import { VStack } from "@/components/Layout/Stack";
 import styles from "./proposal.module.scss";
 import { formatUnits } from "ethers";
-import { disapprovalThreshold } from "../ProposalCreation/SubmitButton";
+import { disapprovalThreshold } from "@/lib/constants";
 
 function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
@@ -18,7 +18,8 @@ export default function OPOptimisticProposalStatus({
   const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
   const againstRelativeAmount =
     (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
-  const status = againstRelativeAmount <= 50 ? "approved" : "defeated";
+  const status =
+    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
   return (
     <VStack className="text-right">
       <VStack>
