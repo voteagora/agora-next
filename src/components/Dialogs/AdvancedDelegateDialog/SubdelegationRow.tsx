@@ -54,6 +54,7 @@ function SubdelegationToRow({
         </VStack>
       </HStack>
       <div className="relative flex rounded-md border border-input bg-gray-fa">
+        {/* TODO: improve UX of this Input, what if value is 10,000,000 */}
         <Input
           className="max-w-[4rem] pl-2 pr-1 text-right"
           variant="none"
