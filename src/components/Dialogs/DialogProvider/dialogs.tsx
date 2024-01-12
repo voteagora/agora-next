@@ -77,6 +77,8 @@ export type ApprovalCastVoteDialogType = {
   params: {
     proposal: Proposal;
     hasStatement: boolean;
+    votingPower: VotingPowerData;
+    authorityChains: string[][];
   };
 };
 
@@ -142,12 +144,17 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  APPROVAL_CAST_VOTE: ({ proposal, hasStatement }, closeDialog) => {
+  APPROVAL_CAST_VOTE: (
+    { proposal, hasStatement, votingPower, authorityChains },
+    closeDialog
+  ) => {
     return (
       <ApprovalCastVoteDialog
         proposal={proposal}
         hasStatement={hasStatement}
         closeDialog={closeDialog}
+        votingPower={votingPower}
+        authorityChains={authorityChains}
       />
     );
   },

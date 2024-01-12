@@ -98,6 +98,8 @@ export default function ApprovalCastVoteButton({
               params: {
                 proposal: proposal,
                 hasStatement: !!delegate?.statement,
+                votingPower,
+                authorityChains: chains,
               },
             })
           }

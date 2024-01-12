@@ -14,18 +14,23 @@ import { CheckIcon } from "lucide-react";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { OptimismContracts } from "@/lib/contracts/contracts";
-import { useContractWrite } from "wagmi";
 import styles from "./approvalCastVoteDialog.module.scss";
+import useAdvancedVoting from "@/hooks/useAdvancedVoting";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 
 const abiCoder = new AbiCoder();
 export function ApprovalCastVoteDialog({
   proposal,
   hasStatement,
   closeDialog,
+  votingPower,
+  authorityChains,
 }: {
   proposal: Proposal;
   closeDialog: () => void;
   hasStatement: boolean;
+  votingPower: VotingPowerData;
+  authorityChains: string[][];
 }) {
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
@@ -63,11 +68,14 @@ export function ApprovalCastVoteDialog({
   const governorContract = OptimismContracts.governor;
   // TODO: ADD against option if is supported
   // 0 = against, 1 = for, 2 = abstain
-  const { isLoading, isSuccess, write, isError } = useContractWrite({
-    address: governorContract.address as any,
-    abi: governorContract.abi,
-    functionName: "castVoteWithReasonAndParams",
-    args: [BigInt(proposal.id), abstain ? 2 : 1, reason, encodedParams],
+  const { isLoading, isSuccess, write, isError } = useAdvancedVoting({
+    proposalId: proposal.id,
+    support: abstain ? 2 : 1,
+    standardVP: BigInt(votingPower.directVP),
+    advancedVP: BigInt(votingPower.advancedVP),
+    authorityChains,
+    reason,
+    params: encodedParams,
   });
 
   useMemo(() => {
@@ -140,6 +148,7 @@ export function ApprovalCastVoteDialog({
             setReason={setReason}
             numberOfOptions={selectedOptions.length}
             abstain={abstain}
+            votingPower={votingPower}
           />
         </VStack>
       )}
@@ -153,12 +162,14 @@ function CastVoteWithReason({
   onVoteClick,
   numberOfOptions,
   abstain,
+  votingPower,
 }: {
   onVoteClick: () => void;
   reason: string;
   setReason: React.Dispatch<React.SetStateAction<string>>;
   numberOfOptions: number;
   abstain: boolean;
+  votingPower: VotingPowerData;
 }) {
   return (
     <VStack className={styles.cast_vote_box} gap={4}>
@@ -177,7 +188,13 @@ function CastVoteWithReason({
           <button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"} with{" "}
-            {<TokenAmountDisplay amount={0} decimals={18} currency="OP" />}
+            {
+              <TokenAmountDisplay
+                amount={votingPower.totalVP}
+                decimals={18}
+                currency="OP"
+              />
+            }
           </button>
         )}
         {!abstain && numberOfOptions === 0 && (
@@ -186,7 +203,13 @@ function CastVoteWithReason({
         {abstain && (
           <button onClick={() => onVoteClick()}>
             Vote for no options with{" "}
-            {<TokenAmountDisplay amount={0} decimals={18} currency="OP" />}
+            {
+              <TokenAmountDisplay
+                amount={votingPower.totalVP}
+                decimals={18}
+                currency="OP"
+              />
+            }
           </button>
         )}
       </VStack>
