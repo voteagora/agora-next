@@ -10,6 +10,7 @@ import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Vote } from "@/app/api/votes/vote";
 import { isOldApprovalModule } from "./contracts/contracts";
+import { DEPLOYMENT_NAME } from "./config";
 
 /**
  * Vote primitives
@@ -29,7 +30,11 @@ export function parseSupport(
    *      note that block number is indicative but works
    */
 
-  if (start_block && isOldApprovalModule(start_block)) {
+  if (
+    DEPLOYMENT_NAME === "optimism" &&
+    start_block &&
+    isOldApprovalModule(start_block)
+  ) {
     return parseSupportOldModule(support, proposalType);
   }
 
