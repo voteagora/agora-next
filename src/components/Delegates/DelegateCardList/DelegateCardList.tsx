@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import { Delegatees } from "@prisma/client";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -35,7 +36,8 @@ interface Props {
   checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
-  completeDelegation: (addressOrENSName: string) => void;
+  completeDelegation: () => void;
+  fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
 }
 
 export default function DelegateCardList({
@@ -46,6 +48,7 @@ export default function DelegateCardList({
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
+  fetchDirectDelegatee,
 }: Props) {
   const router = useRouter();
   const fetching = React.useRef(false);
@@ -145,6 +148,7 @@ export default function DelegateCardList({
                     fetchCurrentDelegatees={fetchCurrentDelegatees}
                     getProxyAddress={getProxyAddress}
                     isAdvancedUser={isAdvancedUser}
+                    fetchDirectDelegatee={fetchDirectDelegatee}
                   />
                 </VStack>
               </VStack>

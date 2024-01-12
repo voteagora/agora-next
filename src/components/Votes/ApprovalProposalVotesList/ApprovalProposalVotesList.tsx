@@ -7,19 +7,47 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
-import VoteText from "../VoteText/VoteText";
 import { useAccount } from "wagmi";
+import { Vote } from "@/app/api/votes/vote";
+
+type Props = {
+  initialProposalVotes: {
+    meta: {
+      currentPage: number;
+      pageSize: number;
+      hasNextPage: boolean;
+    };
+    votes: Vote[];
+  };
+  fetchVotesForProposal: (
+    proposal_id: string,
+    page?: number
+  ) => Promise<{
+    meta: {
+      currentPage: number;
+      pageSize: number;
+      hasNextPage: boolean;
+    };
+    votes: Vote[];
+  }>;
+  proposal_id: string;
+};
 
 export default function ApprovalProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
   proposal_id,
-}) {
+}: Props) {
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposalVotes] || []);
   const [meta, setMeta] = React.useState(initialProposalVotes.meta);
 
-  const loadMore = async (page) => {
+  const proposalVotes = pages.reduce(
+    (all: Vote[], page) => all.concat(page.votes),
+    []
+  );
+
+  const loadMore = async (page: number) => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchVotesForProposal(proposal_id, page);
@@ -33,10 +61,9 @@ export default function ApprovalProposalVotesList({
     }
   };
 
-  const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
-
   return (
     <div className={styles.vote_container}>
+      {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={meta.hasNextPage}
         pageStart={0}
@@ -56,7 +83,7 @@ export default function ApprovalProposalVotesList({
   );
 }
 
-function SingleVote({ vote }) {
+function SingleVote({ vote }: { vote: Vote }) {
   const { address } = useAccount();
   const { address: voterAddress, params, support, reason, weight } = vote;
 
@@ -77,7 +104,7 @@ function SingleVote({ vote }) {
         </div>
       </HStack>
       <VStack className={styles.single_vote__content}>
-        {params?.map((option, index) => (
+        {params?.map((option: string, index: number) => (
           <p
             key={index}
             className={"whitespace-nowrap text-ellipsis overflow-hidden"}
