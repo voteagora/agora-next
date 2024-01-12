@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
-import { disapprovalThreshold } from "./SubmitButton";
+import { disapprovalThreshold } from "@/lib/constants";
 
 function ProposalTypeRow({
   form,
