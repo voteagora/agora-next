@@ -15,6 +15,7 @@ export default function CastVoteInput({
   fetchAuthorityChains,
   fetchDelegate,
   fetchVoteForProposalAndDelegate,
+  isOptimistic = false,
 }) {
   const [reason, setReason] = useState("");
   const [votingPower, setVotingPower] = useState("0");
@@ -90,13 +91,20 @@ export default function CastVoteInput({
           proposalStatus={proposal.status}
           delegateVote={vote}
           isReady={isReady}
+          isOptimistic={isOptimistic}
         />
       </VStack>
     </VStack>
   );
 }
 
-function VoteButtons({ onClick, proposalStatus, delegateVote, isReady }) {
+function VoteButtons({
+  onClick,
+  proposalStatus,
+  delegateVote,
+  isReady,
+  isOptimistic,
+}) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
@@ -124,15 +132,17 @@ function VoteButtons({ onClick, proposalStatus, delegateVote, isReady }) {
 
   return (
     <HStack gap={2} className="pt-1">
-      {["FOR", "AGAINST", "ABSTAIN"].map((supportType) => (
-        <VoteButton
-          key={supportType}
-          action={supportType}
-          onClick={() => {
-            onClick(supportType);
-          }}
-        />
-      ))}
+      {(isOptimistic ? ["AGAINST"] : ["FOR", "AGAINST", "ABSTAIN"]).map(
+        (supportType) => (
+          <VoteButton
+            key={supportType}
+            action={supportType}
+            onClick={() => {
+              onClick(supportType);
+            }}
+          />
+        )
+      )}
     </HStack>
   );
 }
