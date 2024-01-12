@@ -18,6 +18,7 @@ interface Props {
   ) => Promise<string>;
   checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
+  fetchDirectDelegatee: (addressOrENSName: string) => Promise<any>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
 }
@@ -29,6 +30,7 @@ export default function VoterHoverCard({
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
+  fetchDirectDelegatee,
   getProxyAddress,
   isAdvancedUser,
 }: Props) {
@@ -94,6 +96,7 @@ export default function VoterHoverCard({
             fetchCurrentDelegatees={fetchCurrentDelegatees}
             getProxyAddress={getProxyAddress}
             isAdvancedUser={isAdvancedUser}
+            fetchDirectDelegatee={fetchDirectDelegatee}
           />
         </VStack>
       )}

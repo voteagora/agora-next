@@ -17,7 +17,10 @@ import {
 } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
+import {
+  getCurrentDelegatees,
+  getDirectDelegatee,
+} from "@/app/api/delegations/getDelegations";
 import { Proposal } from "@/app/api/proposals/proposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
@@ -106,6 +109,12 @@ async function fetchCurrentDelegatees(
   return getCurrentDelegatees({ addressOrENSName });
 }
 
+async function fetchDirectDelegatee(addressOrENSName: string | `0x${string}`) {
+  "use server";
+
+  return getDirectDelegatee({ addressOrENSName });
+}
+
 async function getProxyAddress(addressOrENSName: string | `0x${string}`) {
   "use server";
 
@@ -148,6 +157,7 @@ export default async function OPProposalPage({
             fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
             checkIfDelegatingToProxy={checkIfDelegatingToProxy}
             fetchCurrentDelegatees={fetchCurrentDelegatees}
+            fetchDirectDelegatee={fetchDirectDelegatee}
             getProxyAddress={getProxyAddress}
             proposal_id={proposal.id}
           />

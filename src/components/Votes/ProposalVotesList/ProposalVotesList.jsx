@@ -25,6 +25,7 @@ export default function ProposalVotesList({
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
+  fetchDirectDelegatee,
   getProxyAddress,
   proposal_id,
 }) {
@@ -108,6 +109,7 @@ export default function ProposalVotesList({
                     }
                     checkIfDelegatingToProxy={checkIfDelegatingToProxy}
                     fetchCurrentDelegatees={fetchCurrentDelegatees}
+                    fetchDirectDelegatee={fetchDirectDelegatee}
                     getProxyAddress={getProxyAddress}
                     isAdvancedUser={isAdvancedUser}
                   />
