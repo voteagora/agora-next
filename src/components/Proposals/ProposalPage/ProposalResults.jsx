@@ -23,7 +23,7 @@ export default function ProposalResults({ proposal_id }) {
   }, [proposal_id]);
 
   switch (results.proposalType) {
-    case "STANDARD":
+    case "STANDARD" || "OPTIMISTIC":
       return <div>{JSON.stringify(results.results.standard)}</div>;
     case "APPROVAL":
       return (

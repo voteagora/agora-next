@@ -7,8 +7,9 @@ import OPStandardProposalStatus from "./OPStandardProposalStatus";
 import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
 import { cn } from "@/lib/utils";
+import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
 
-export default function Proposal({ proposal }) {
+export default function Proposal({ proposal, votableSupply }) {
   return (
     <Link href={`/proposals/${proposal.id}`}>
       <HStack alignItems="center" className={styles.proposal_row}>
@@ -45,6 +46,13 @@ export default function Proposal({ proposal }) {
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
                 <OPStandardProposalStatus proposal={proposal} />
+              )}
+            {proposal.proposalType === "OPTIMISTIC" &&
+              proposal.proposalResults && (
+                <OPOptimisticProposalStatus
+                  proposal={proposal}
+                  votableSupply={votableSupply}
+                />
               )}
             {proposal.proposalType === "APPROVAL" && proposal.proposalData && (
               <OPApprovalProposalStatus proposal={proposal} />
