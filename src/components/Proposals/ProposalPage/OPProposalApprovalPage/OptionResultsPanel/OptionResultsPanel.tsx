@@ -19,20 +19,20 @@ export default function OptionsResultsPanel({
   const totalVotingPower =
     BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
 
-  let thresholdPosition = 0;
-
-  if (proposalSettings.criteria === "THRESHOLD") {
-    const threshold = BigInt(proposalSettings.criteriaValue);
-    if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
-      thresholdPosition = 66;
-    } else {
-      // calculate threshold position, min 5% max 66%
-      thresholdPosition = Math.max(
-        Number((threshold * BigInt(100)) / totalVotingPower),
-        5
-      );
+  const thresholdPosition = (() => {
+    if (proposalSettings.criteria === "THRESHOLD") {
+      const threshold = BigInt(proposalSettings.criteriaValue);
+      if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
+        return 66;
+      } else {
+        // calculate threshold position, min 5% max 66%
+        return totalVotingPower
+          ? Math.max(Number((threshold * BigInt(100)) / totalVotingPower), 5)
+          : 5;
+      }
     }
-  }
+    return 0;
+  })();
 
   let availableBudget = BigInt(proposalSettings.budgetAmount);
 
@@ -44,19 +44,6 @@ export default function OptionsResultsPanel({
       ? -1
       : 0;
   });
-
-  if (proposalSettings.criteria === "THRESHOLD") {
-    const threshold = BigInt(proposalSettings.criteriaValue);
-    if (totalVotingPower < (threshold * 15n) / 10n) {
-      thresholdPosition = 66;
-    } else {
-      // calculate threshold position, min 5% max 66%
-      thresholdPosition = Math.max(
-        Number((threshold * 100n) / totalVotingPower),
-        5
-      );
-    }
-  }
 
   return (
     <VStack className={styles.approval_choices_container}>
@@ -198,28 +185,27 @@ function getScaledBarPercentage({
   votesAmountBN: bigint;
   thresholdPosition: number;
 }) {
-  let barPercentage = BigInt(0);
-
-  if (totalVotingPower === 0n) {
-    barPercentage = BigInt(0);
+  if (!totalVotingPower) {
+    return BigInt(0);
   } else if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
     // here thresholdPosition is 66%
-    barPercentage =
-      (votesAmountBN * BigInt(10000)) / ((threshold * BigInt(15)) / BigInt(10));
-  } else if (totalVotingPower >= (threshold * BigInt(15)) / BigInt(10)) {
-    // here thresholdPosition is calculated based on threshold and totalVotingPower, min 5% max 66%
-    barPercentage = (votesAmountBN * BigInt(10000)) / totalVotingPower;
+    return (
+      (votesAmountBN * BigInt(10000)) / ((threshold * BigInt(15)) / BigInt(10))
+    );
+  }
 
-    // handle case where barPercentage is less than thresholdPosition but votesAmountBN is greater than threshold
-    if (votesAmountBN >= threshold) {
-      if (barPercentage / BigInt(100) <= BigInt(thresholdPosition)) {
-        barPercentage = BigInt(thresholdPosition * 100) + BigInt(100);
-      }
-    } else {
-      // handle case where barPercentage is greater than thresholdPosition but votesAmountBN is less than threshold
-      if (barPercentage / BigInt(100) >= BigInt(thresholdPosition)) {
-        barPercentage = BigInt(thresholdPosition * 100) - BigInt(100);
-      }
+  // here thresholdPosition is calculated based on threshold and totalVotingPower, min 5% max 66%
+  const barPercentage = (votesAmountBN * BigInt(10000)) / totalVotingPower;
+
+  // handle case where barPercentage is less than thresholdPosition but votesAmountBN is greater than threshold
+  if (votesAmountBN >= threshold) {
+    if (barPercentage / BigInt(100) <= BigInt(thresholdPosition)) {
+      return BigInt(thresholdPosition * 100) + BigInt(100);
+    }
+  } else {
+    // handle case where barPercentage is greater than thresholdPosition but votesAmountBN is less than threshold
+    if (barPercentage / BigInt(100) >= BigInt(thresholdPosition)) {
+      return BigInt(thresholdPosition * 100) - BigInt(100);
     }
   }
 

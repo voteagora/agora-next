@@ -63,8 +63,12 @@ export default function ProposalVotesList({
           </div>
         }
       >
-        {proposalVotes.map((vote, i) => (
-          <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
+        {proposalVotes.map((vote) => (
+          <VStack
+            key={vote.transactionHash}
+            gap={4}
+            className={styles.vote_row}
+          >
             <VStack>
               <HoverCard openDelay={100} closeDelay={0}>
                 <HoverCardTrigger>

@@ -1,29 +1,17 @@
 @import "@/styles/variables";
 
 .dialog_container {
-  padding: $spacing-8;
-  overflow-y: scroll;
   width: 100%;
   max-width: $max-width-md;
   background: $white;
-  border-radius: $spacing-3;
 
   .details_container {
     padding-top: $spacing-3;
     padding-bottom: $spacing-3;
-    border-radius: $spacing-2;
-    background: rgba(250, 250, 250, 0.95);
-    border: 1px solid $gray-eb;
+    width: 100%;
 
     color: #66676b;
     font-size: $font-size-xs;
-
-    .amount_container {
-      padding: $spacing-4 $spacing-12;
-      @media (max-width: $max-width-md) {
-        padding: $spacing-2 $spacing-4;
-      }
-    }
 
     .transfer_symbol_container {
       width: 100%;
@@ -59,5 +47,37 @@
     @media (max-width: $max-width-md) {
       font-size: $font-size-3xl;
     }
+  }
+}
+
+.avatar {
+  > div {
+    width: $spacing-10;
+    height: $spacing-10;
+  }
+}
+
+.amount_container {
+  font-size: $font-size-xs;
+  border: 1px solid $gray-300;
+  border-radius: $border-radius-lg;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-8 $spacing-2;
+  width: 100%;
+}
+
+.subtitle {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $gray-700;
+}
+
+.address_to {
+  font-weight: $font-weight-medium;
+  color: $black;
+
+  @media (max-width: $max-width-lg) {
+    max-width: $spacing-24;
   }
 }

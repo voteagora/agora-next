@@ -8,16 +8,11 @@ import {
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import {
-  getProxy,
-  getVotingPowerAtSnapshot,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
-} from "@/app/api/voting-power/getVotingPower";
+import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { getCurrentDelegatees } from "@/app/api/delegations/getDelegations";
+import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
+import { formatNumber } from "@/lib/utils";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -29,16 +24,10 @@ async function fetchVotingPower(address, blockNumber) {
   "use server";
 
   return {
-    votingPower: (await getVotingPowerAtSnapshot({ blockNumber, address }))
-      .totalVP,
+    votingPower: (
+      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
+    ).totalVP,
   };
-}
-
-// Pass address of the connected wallet
-async function fetchBalanceForDirectDelegation(addressOrENSName) {
-  "use server";
-
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
 }
 
 async function fetchAuthorityChains(address, blockNumber) {
@@ -66,32 +55,23 @@ async function fetchVoteForProposalAndDelegate(proposal_id, address) {
   });
 }
 
-async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+async function fetchVotableSupply() {
   "use server";
 
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
-}
-
-async function checkIfDelegatingToProxy(addressOrENSName) {
-  "use server";
-
-  return isDelegatingToProxy({ addressOrENSName });
-}
-
-async function fetchCurrentDelegatees(addressOrENSName) {
-  "use server";
-
-  return getCurrentDelegatees({ addressOrENSName });
-}
-
-async function getProxyAddress(addressOrENSName) {
-  "use server";
-
-  return getProxy({ addressOrENSName });
+  return getVotableSupply();
 }
 
 export default async function OPProposalPage({ proposal }) {
+  const votableSupply = await fetchVotableSupply();
   const proposalVotes = await fetchProposalVotes(proposal.id);
+
+  const formattedVotableSupply = Number(
+    BigInt(votableSupply) / BigInt(10 ** 18)
+  );
+  const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
+  const againstRelativeAmount =
+    (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
+  const status = againstRelativeAmount <= 50 ? "approved" : "defeated";
 
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
@@ -110,19 +90,27 @@ export default async function OPProposalPage({ proposal }) {
         <VStack gap={4} className={styles.proposal_actions_panel}>
           <div>
             <div className={styles.proposal_header}>Proposal votes</div>
-            {/* Show the summar bar with For, Against, Abstain */}
-            <ProposalVotesSummary proposal={proposal} />
+            <div className={styles.proposal_votes_summary_container}>
+              <p
+                className={
+                  status === "approved"
+                    ? "text-green-positive"
+                    : "text-red-negative"
+                }
+              >
+                This proposal is optimistically {status}
+              </p>
+              <p className="font-normal mt-1 text-gray-4f">
+                This proposal will automatically pass unless 50% of the votable
+                supply of OP is against. Currently, {againstRelativeAmount}% (
+                {againstLength} OP) is against.
+              </p>
+            </div>
           </div>
           {/* Show the scrolling list of votes for the proposal */}
           <ProposalVotesList
             initialProposalVotes={proposalVotes}
             fetchVotesForProposal={fetchProposalVotes}
-            fetchDelegate={fetchDelegate}
-            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-            fetchCurrentDelegatees={fetchCurrentDelegatees}
-            getProxyAddress={getProxyAddress}
             proposal_id={proposal.id}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}
@@ -132,7 +120,12 @@ export default async function OPProposalPage({ proposal }) {
             fetchAuthorityChains={fetchAuthorityChains}
             fetchDelegate={fetchDelegate}
             fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
+            isOptimistic
           />
+          <p className="text-gray-4f text-xs mx-4">
+            If you agree with this proposal, you don’t need to vote. Only vote
+            against if you oppose this proposal.
+          </p>
         </VStack>
       </VStack>
     </HStack>
