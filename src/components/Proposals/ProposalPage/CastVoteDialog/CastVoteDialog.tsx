@@ -33,7 +33,7 @@ function CastVoteDialogContents({
   const { address: accountAddress } = useAccount();
   const { write, isLoading, isSuccess } = useAdvancedVoting({
     proposalId,
-    support: ["FOR", "AGAINST", "ABSTAIN"].indexOf(supportType),
+    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
     standardVP: BigInt(votingPower.directVP),
     advancedVP: BigInt(votingPower.advancedVP),
     authorityChains,
