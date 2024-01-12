@@ -80,3 +80,7 @@ export const NounsContracts = {
     abi: NounsGovernor__factory.abi,
   },
 };
+
+export const isOldApprovalModule = (block_number: string) => {
+  return Number(block_number) < 114615036;
+};

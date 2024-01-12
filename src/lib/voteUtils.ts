@@ -9,6 +9,7 @@ import {
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Vote } from "@/app/api/votes/vote";
+import { isOldApprovalModule } from "./contracts/contracts";
 
 /**
  * Vote primitives
@@ -28,7 +29,7 @@ export function parseSupport(
    *      note that block number is indicative but works
    */
 
-  if (start_block && Number(start_block) < 114615036) {
+  if (start_block && isOldApprovalModule(start_block)) {
     return parseSupportOldModule(support, proposalType);
   }
 
