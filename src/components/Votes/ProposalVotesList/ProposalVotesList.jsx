@@ -66,7 +66,7 @@ export default function ProposalVotesList({
         {proposalVotes.map((vote, i) => (
           <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
             <VStack>
-              <HoverCard>
+              <HoverCard openDelay={100} closeDelay={0}>
                 <HoverCardTrigger>
                   <HStack
                     justifyContent="justify-between"
@@ -88,7 +88,11 @@ export default function ProposalVotesList({
                     </HStack>
                   </HStack>
                 </HoverCardTrigger>
-                <HoverCardContent className="w-full">
+                <HoverCardContent
+                  className="w-full shadow"
+                  side="left"
+                  sideOffset="3"
+                >
                   <VoterHoverCard
                     address={vote.address}
                     fetchDelegate={fetchDelegate}
