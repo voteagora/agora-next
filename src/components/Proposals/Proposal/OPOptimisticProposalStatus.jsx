@@ -1,6 +1,7 @@
 import { VStack } from "@/components/Layout/Stack";
 import styles from "./proposal.module.scss";
 import { formatUnits } from "ethers";
+import { disapprovalThreshold } from "../ProposalCreation/SubmitButton";
 
 function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
@@ -22,7 +23,10 @@ export default function OPOptimisticProposalStatus({
     <VStack className="text-right">
       <VStack>
         <div className={styles.cell_content_title}>
-          <p>{againstRelativeAmount}% / 50% against needed to defeat</p>
+          <p>
+            {againstRelativeAmount}% / {disapprovalThreshold}% against needed to
+            defeat
+          </p>
         </div>
         <p>Optimistically {status}</p>
       </VStack>
