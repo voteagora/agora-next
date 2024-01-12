@@ -23,3 +23,5 @@ export const delegatesVotesSortOptions = {
     value: "Oldest",
   },
 };
+
+export const disapprovalThreshold = 12;

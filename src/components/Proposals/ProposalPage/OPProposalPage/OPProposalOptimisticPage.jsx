@@ -12,7 +12,8 @@ import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower"
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
-import { formatNumber } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
+import { disapprovalThreshold } from "@/lib/constants";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -71,7 +72,8 @@ export default async function OPProposalPage({ proposal }) {
   const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
   const againstRelativeAmount =
     (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
-  const status = againstRelativeAmount <= 50 ? "approved" : "defeated";
+  const status =
+    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
 
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
@@ -90,7 +92,9 @@ export default async function OPProposalPage({ proposal }) {
         <VStack gap={4} className={styles.proposal_actions_panel}>
           <div>
             <div className={styles.proposal_header}>Proposal votes</div>
-            <div className={styles.proposal_votes_summary_container}>
+            <div
+              className={cn(styles.proposal_votes_summary_container, "!py-4")}
+            >
               <p
                 className={
                   status === "approved"
@@ -101,9 +105,10 @@ export default async function OPProposalPage({ proposal }) {
                 This proposal is optimistically {status}
               </p>
               <p className="font-normal mt-1 text-gray-4f">
-                This proposal will automatically pass unless 50% of the votable
-                supply of OP is against. Currently, {againstRelativeAmount}% (
-                {againstLength} OP) is against.
+                This proposal will automatically pass unless{" "}
+                {disapprovalThreshold}% of the votable supply of OP is against.
+                Currently, {againstRelativeAmount}% ({againstLength} OP) is
+                against.
               </p>
             </div>
           </div>
