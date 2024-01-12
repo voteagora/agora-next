@@ -12,7 +12,7 @@ import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower"
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
-import { formatNumber } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "../../ProposalCreation/SubmitButton";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
@@ -91,7 +91,9 @@ export default async function OPProposalPage({ proposal }) {
         <VStack gap={4} className={styles.proposal_actions_panel}>
           <div>
             <div className={styles.proposal_header}>Proposal votes</div>
-            <div className={styles.proposal_votes_summary_container}>
+            <div
+              className={cn(styles.proposal_votes_summary_container, "!py-4")}
+            >
               <p
                 className={
                   status === "approved"
