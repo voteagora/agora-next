@@ -42,13 +42,6 @@ function SubdelegationToRow({
       ? 0
       : Math.round((allowance / availableBalanceNumber) * 100_00) / 100;
 
-  // alert(
-  //   "allowance is " +
-  //     allowance +
-  //     " and available balance is " +
-  //     availableBalanceNumber
-  // );
-
   const handleAllowanceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     function formatNumber(value: number) {
       return Math.floor(Math.round(value * 10000) / 10) / 1000;
