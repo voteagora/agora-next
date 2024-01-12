@@ -49,7 +49,7 @@ async function fetchDelegate(addressOrENSName) {
 async function fetchVotesForProposalAndDelegate(proposal_id, address) {
   "use server";
 
-  return await getVoteseForProposalAndDelegate({
+  return await getVotesForProposalAndDelegate({
     proposal_id,
     address,
   });
