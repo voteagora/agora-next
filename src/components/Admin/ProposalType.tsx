@@ -77,17 +77,18 @@ export default function ProposalType({
     });
 
   const formValues = form.watch();
-  const { config: setProposalTypeConfig } = usePrepareContractWrite({
-    address: OptimismContracts.proposalTypesConfigurator.address,
-    abi: OptimismContracts.proposalTypesConfigurator.abi,
-    functionName: "setProposalType",
-    args: [
-      BigInt(index),
-      formValues.quorum * 100,
-      formValues.approval_threshold * 100,
-      formValues.name,
-    ],
-  });
+  const { config: setProposalTypeConfig, isError: setProposalTypeError } =
+    usePrepareContractWrite({
+      address: OptimismContracts.proposalTypesConfigurator.address,
+      abi: OptimismContracts.proposalTypesConfigurator.abi,
+      functionName: "setProposalType",
+      args: [
+        BigInt(index),
+        formValues.quorum * 100,
+        formValues.approval_threshold * 100,
+        formValues.name,
+      ],
+    });
   const {
     data: resultSetProposalType,
     write: writeSetProposalType,
@@ -118,7 +119,7 @@ export default function ProposalType({
               size="icon"
               variant="ghost"
               className="hover:bg-destructive/10 group w-9 h-9"
-              disabled={isDisabled}
+              disabled={isDisabled || setProposalTypeError}
               onClick={() => {
                 writeDeleteProposalType?.();
               }}
@@ -157,7 +158,7 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
-                      disabled={isDisabled}
+                      disabled={isDisabled || setProposalTypeError}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
                       <p>% of votable supply</p>
@@ -193,7 +194,7 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
-                      disabled={isDisabled}
+                      disabled={isDisabled || setProposalTypeError}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground">
                       <p>% of votes for each proposal</p>
@@ -210,7 +211,7 @@ export default function ProposalType({
           className="w-full"
           variant="outline"
           loading={isLoading}
-          disabled={isDisabled}
+          disabled={isDisabled || setProposalTypeError}
         >
           Set proposal type
         </Button>
