@@ -13,6 +13,7 @@ import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChain
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
 import { formatNumber } from "@/lib/utils";
+import { disapprovalThreshold } from "../../ProposalCreation/SubmitButton";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -101,9 +102,10 @@ export default async function OPProposalPage({ proposal }) {
                 This proposal is optimistically {status}
               </p>
               <p className="font-normal mt-1 text-gray-4f">
-                This proposal will automatically pass unless 50% of the votable
-                supply of OP is against. Currently, {againstRelativeAmount}% (
-                {againstLength} OP) is against.
+                This proposal will automatically pass unless{" "}
+                {disapprovalThreshold}% of the votable supply of OP is against.
+                Currently, {againstRelativeAmount}% ({againstLength} OP) is
+                against.
               </p>
             </div>
           </div>
