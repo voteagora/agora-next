@@ -58,6 +58,8 @@ export default function CastVoteInput({
 
   const { address } = useAccount();
 
+  console.log("proposal", proposal);
+
   const fetchData = useCallback(async () => {
     try {
       const promises: [
@@ -121,6 +123,7 @@ export default function CastVoteInput({
                 proposalId: proposal.id,
                 delegate,
                 votingPower,
+                authorityChains: chains,
               },
             })
           }
@@ -166,7 +169,7 @@ function VoteButtons({
     return <DisabledVoteButton reason="Loading..." />;
   }
 
-  const hasVoted = !!delegateVote?.transactionHash;
+  const hasVoted = false; // !!delegateVote?.transactionHash;
 
   if (hasVoted) {
     return <DisabledVoteButton reason="Already voted" />;

@@ -8,8 +8,8 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Link from "next/link";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import styles from "./castVoteDialog.module.scss";
+import useAdvancedVoting from "./useAdvancedVoting";
 
 type Props = {
   proposalId: string;
@@ -18,6 +18,7 @@ type Props = {
   closeDialog: () => void;
   delegate: any;
   votingPower: string;
+  authorityChains: string[][];
 };
 
 export type SupportTextProps = {
@@ -36,18 +37,16 @@ function CastVoteDialogContents({
   closeDialog,
   votingPower,
   delegate,
+  authorityChains,
 }: Props) {
   const { address: accountAddress } = useAccount();
-  const governorContract = OptimismContracts.governor;
-  const { isLoading, isSuccess, write } = useContractWrite({
-    address: governorContract.address as any,
-    abi: governorContract.abi,
-    functionName: "castVoteWithReason",
-    args: [
-      BigInt(proposalId),
-      ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-      reason,
-    ],
+  const { write, isLoading, isSuccess } = useAdvancedVoting({
+    proposalId,
+    support: ["FOR", "AGAINST", "ABSTAIN"].indexOf(supportType),
+    // TODO: this is not the correct voting power
+    standardVP: Number(votingPower),
+    authorityChains,
+    reason,
   });
 
   if (!delegate) {

@@ -9,7 +9,7 @@ import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelega
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
-import { Delegatees } from "@prisma/client";
+import { AuthorityChainsSnaps, Delegatees } from "@prisma/client";
 
 export type DialogType =
   | DelegateDialogType
@@ -64,6 +64,7 @@ export type CastVoteDialogType = {
     supportType: SupportTextProps["supportType"];
     delegate: any;
     votingPower: string;
+    authorityChains: string[][];
   };
 };
 
@@ -122,7 +123,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   CAST_VOTE: (
-    { proposalId, reason, supportType, delegate, votingPower },
+    { proposalId, reason, supportType, delegate, votingPower, authorityChains },
     closeDialog
   ) => {
     return (
@@ -133,6 +134,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
         delegate={delegate}
         votingPower={votingPower}
+        authorityChains={authorityChains}
       />
     );
   },
