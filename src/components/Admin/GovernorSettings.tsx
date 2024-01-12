@@ -120,7 +120,7 @@ export default function GovernorSettings() {
         <p>Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
-        <div className="flex justify-between gap-4">
+        <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
           <div className="flex-1">
             <Label>Voting period</Label>
             <div className="relative flex items-center">
@@ -175,12 +175,12 @@ export default function GovernorSettings() {
           </div>
         </div>
         <Separator className="my-8" />
-        <div className="text-sm flex justify-between items-center sm:px-2">
+        <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
           <div className="flex items-center gap-2">
             <p className="text-gray-4f">Manager Address</p>
             <Lock className="w-4 h-4 text-gray-af" />
           </div>
-          <p className="text-gray-4f">{manager}</p>
+          <p className="text-gray-4f truncate">{manager}</p>
         </div>
         {/* <div className={!isManager ? "opacity-70" : ""}>
           <Label>ManagerAddress</Label>
