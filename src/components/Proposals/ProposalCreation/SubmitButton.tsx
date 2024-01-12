@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import {
   OptimismContracts,
   approvalModuleAddress,
+  optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useModal } from "connectkit";
 import styles from "./styles.module.scss";
+import { disapprovalThreshold } from "@/lib/constants";
 
 const abiCoder = new AbiCoder();
 const governorContract = OptimismContracts.governor;
@@ -198,6 +200,18 @@ function getInputData(form: Form): {
           ],
           [options, settings]
         ),
+        description,
+        proposalSettings,
+      ];
+    } else if (form.state.proposalType === "Optimistic") {
+      // if OPTIMISTIC proposal, format data for optimistic proposal
+      governorFunction = "proposeWithModule";
+
+      const settings = [disapprovalThreshold * 100, true];
+
+      inputData = [
+        optimisticModuleAddress,
+        abiCoder.encode(["tuple(uint248,bool)"], [settings]),
         description,
         proposalSettings,
       ];

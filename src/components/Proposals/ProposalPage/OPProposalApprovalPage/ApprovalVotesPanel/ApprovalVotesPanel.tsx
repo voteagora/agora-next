@@ -8,6 +8,54 @@ import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
 import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
+import { Proposal } from "@/app/api/proposals/proposal";
+import { Delegate } from "@/app/api/delegates/delegate";
+import { Vote } from "@/app/api/votes/vote";
+
+type Props = {
+  proposal: Proposal;
+  initialProposalVotes: {
+    meta: {
+      currentPage: number;
+      pageSize: number;
+      hasNextPage: boolean;
+    };
+    votes: Vote[];
+  };
+  fetchVotesForProposal: (
+    proposal_id: string,
+    page?: number
+  ) => Promise<{
+    meta: {
+      currentPage: number;
+      pageSize: number;
+      hasNextPage: boolean;
+    };
+    votes: Vote[];
+  }>;
+  fetchVotingPower: (
+    addressOrENSName: string | `0x${string}`,
+    blockNumber: number
+  ) => Promise<{ votingPower: string }>;
+  fetchAuthorityChains: (
+    address: string | `0x${string}`,
+    blockNumber: number
+  ) => Promise<{ chains: string[][] }>;
+  fetchDelegate: (
+    addressOrENSName: string | `0x${string}`
+  ) => Promise<Delegate>;
+  fetchVoteForProposalAndDelegate: (
+    proposal_id: string,
+    address: string | `0x${string}`
+  ) => Promise<
+    | {
+        vote: undefined;
+      }
+    | {
+        vote: Vote;
+      }
+  >;
+};
 
 export default function ApprovalVotesPanel({
   proposal,
@@ -17,10 +65,10 @@ export default function ApprovalVotesPanel({
   fetchAuthorityChains,
   fetchDelegate,
   fetchVoteForProposalAndDelegate,
-}) {
+}: Props) {
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
-  function handleTabsChange(index) {
+  function handleTabsChange(index: number) {
     startTransition(() => {
       setActiveTab(index);
     });
@@ -32,20 +80,16 @@ export default function ApprovalVotesPanel({
       animate={{ opacity: isPending ? 0.3 : 1 }}
       transition={{ duration: 0.3, delay: isPending ? 0.3 : 0 }}
     >
-      <VStack className={styles.approval_votes_panel}>
+      <VStack gap={1} className={styles.approval_votes_panel}>
         {/* Tabs */}
         <HStack className={styles.approval_vote_tab_container}>
-          <div onClick={() => handleTabsChange(1)}>
-            <span className={activeTab === 1 ? "text-black" : ""}>Results</span>
-          </div>
-          {initialProposalVotes.votes &&
-            initialProposalVotes.votes.length > 0 && (
-              <div onClick={() => handleTabsChange(2)}>
-                <span className={activeTab === 2 ? "text-black" : ""}>
-                  Votes
-                </span>
-              </div>
-            )}
+          {["Results", "Votes"].map((tab, index) => (
+            <div key={index} onClick={() => handleTabsChange(index + 1)}>
+              <span className={activeTab === index + 1 ? "text-black" : ""}>
+                {tab}
+              </span>
+            </div>
+          ))}
         </HStack>
         {activeTab === 1 ? (
           <OptionsResultsPanel proposal={proposal} />
@@ -57,7 +101,6 @@ export default function ApprovalVotesPanel({
           />
         )}
         <ApprovalProposalCriteria proposal={proposal} />
-
         <div className={styles.button_container}>
           <ApprovalCastVoteButton
             proposal={proposal}
