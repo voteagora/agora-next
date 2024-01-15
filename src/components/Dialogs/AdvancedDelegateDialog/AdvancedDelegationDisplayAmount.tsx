@@ -8,7 +8,7 @@ import styles from "./advancedDelegateDialog.module.scss";
 export function AdvancedDelegationDisplayAmount({
   amount,
 }: {
-  amount: bigint | string;
+  amount: string;
 }) {
   const formattedNumber = useMemo(() => {
     return formatNumberForAdvancedDelegation(amount);

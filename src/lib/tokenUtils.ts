@@ -64,7 +64,7 @@ export function formatNumber(
     .join("");
 }
 
-export function formatNumberForAdvancedDelegation(amount: string | BigInt) {
+export function formatNumberForAdvancedDelegation(amount: string) {
   // Advanced delegation needs a precision up to 3 decimal places,
   // which is bit different from the formatNumber function used everywhere else and requires for max 4 significant digits
   const number = Number(
