@@ -136,7 +136,6 @@ export default function ProposalType({
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  {/* TODO: frh -> check these three inputs */}
                   <Input {...field} />
                 </FormControl>
                 <FormMessage />

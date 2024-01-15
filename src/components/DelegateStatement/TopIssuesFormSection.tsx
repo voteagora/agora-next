@@ -104,7 +104,6 @@ export default function TopIssuesFormSection({
                     <CloseIcon className="w-4 h-4 my-[0.8rem] text-muted-foreground" />
                   </Button>
                 </VStack>
-                {/* TODO: frh -> check this input */}
                 <Input
                   className="pr-12"
                   variant="bgGray100"
