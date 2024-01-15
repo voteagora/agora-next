@@ -1,6 +1,5 @@
 "use client";
 
-import { UserIcon } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -82,7 +81,7 @@ function CastVoteDialogContents({
       </HStack>
       <div className={styles.reason_box}>
         {reason ? (
-          <div className={styles.has_reason}>reason</div>
+          <div className={styles.has_reason}>{reason}</div>
         ) : (
           <div className={styles.no_reason}>No voting reason provided</div>
         )}
@@ -101,7 +100,7 @@ function CastVoteDialogContents({
               />
             </VoteButton>
           ) : (
-            <NoStatementView />
+            <NoStatementView closeDialog={closeDialog} />
           )}
         </div>
       )}
@@ -150,11 +149,15 @@ export function LoadingVote() {
   );
 }
 
-export function NoStatementView() {
+export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
   return (
     <div className={styles.note_to_user}>
       You do not have a delegate statement.{" "}
-      <Link href={"/statements/create"} className="underline">
+      <Link
+        href={"/statements/create"}
+        className="underline"
+        onClick={closeDialog}
+      >
         Please set one up to vote.
       </Link>
     </div>

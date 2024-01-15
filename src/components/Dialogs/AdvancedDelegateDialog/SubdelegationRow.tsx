@@ -108,19 +108,21 @@ function SubdelegationToRow({
           </div>
         </VStack>
       </HStack>
-      <div className="relative">
+      <div className="relative flex rounded-md border border-input bg-gray-fa">
+        {/* TODO: improve UX of this Input, what if value is 10,000,000 */}
         <Input
           value={newAllowanceInput}
           placeholder="0"
-          className={styles.sub_row_input}
+          className="max-w-[4rem] pl-2 pr-1 text-right"
+          variant="none"
           onChange={(e) => handleAllowanceInput(e)}
           type="text"
           inputMode="numeric"
         />
-
-        <div className={styles.sub_row_percent}>
+        <div className="flex items-center pr-2 pl-1">
           <p>OP</p>
-          <div></div> <p>{percent}%</p>
+          <div className="bg-input w-[1px] h-6 mx-1"></div>
+          <p>{percent}%</p>
         </div>
       </div>
     </div>

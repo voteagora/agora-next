@@ -1,7 +1,7 @@
 "use client";
 
 import { VStack } from "@/components/Layout/Stack";
-import { AbiCoder, ethers } from "ethers";
+import { AbiCoder } from "ethers";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import {
@@ -13,7 +13,6 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { CheckIcon } from "lucide-react";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { ProposalType } from "@prisma/client";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { useContractWrite } from "wagmi";
 import styles from "./approvalCastVoteDialog.module.scss";
@@ -86,7 +85,7 @@ export function ApprovalCastVoteDialog({
       {hasStatement && isLoading && <LoadingVote />}
       {hasStatement && isSuccess && <SuccessMessage />}
       {hasStatement && isError && <p>Something went wrong</p>}
-      {!hasStatement && <NoStatementView />}
+      {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (
         <VStack gap={3}>
           <VStack className={styles.title_box}>

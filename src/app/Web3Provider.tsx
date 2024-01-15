@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { FC, PropsWithChildren } from "react";
 import { WagmiConfig, createConfig } from "wagmi";
@@ -54,6 +54,6 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
       </body>
     </ConnectKitProvider>
   </WagmiConfig>
-)
+);
 
-export default Web3Provider
+export default Web3Provider;

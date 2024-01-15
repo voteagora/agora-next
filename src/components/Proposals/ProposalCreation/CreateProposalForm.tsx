@@ -12,7 +12,7 @@ import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
 
 type FormValues = {
-  proposalType: "Basic" | "Approval";
+  proposalType: "Basic" | "Approval" | "Optimistic";
   proposalSettings: string;
   title: string;
   description: string;
@@ -60,7 +60,6 @@ export default function CreateProposalForm({
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
 
-  console.log(form.state.proposalType);
   return (
     <VStack className="w-full">
       <form ref={formTarget}>

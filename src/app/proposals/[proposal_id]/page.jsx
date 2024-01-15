@@ -1,6 +1,7 @@
 import React from "react";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
+import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import { getProposal } from "@/app/api/proposals/getProposals";
 
@@ -19,6 +20,9 @@ export default async function Page({ params: { proposal_id } }) {
   switch (proposal.proposalType) {
     case "STANDARD":
       RenderComponent = OPProposalPage;
+      break;
+    case "OPTIMISTIC":
+      RenderComponent = OPProposalOptimisticPage;
       break;
     case "APPROVAL":
       RenderComponent = OPProposalApprovalPage;
