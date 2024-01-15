@@ -42,26 +42,26 @@ function SubdelegationToRow({
       ? 0
       : Math.round((allowance / availableBalanceNumber) * 100_00) / 100;
 
+  function formatNumber(value: number) {
+    return Math.floor(Math.round(value * 10000) / 10) / 1000;
+  }
+
+  function getCleanInput(value: string) {
+    let cleanedInput = "";
+
+    // remove commas, eg 100,000,000 becomes 100000000
+    cleanedInput = value.replace(/,/g, "");
+
+    // allow only 3 decimal points
+    const decimalIndex = cleanedInput.indexOf(".");
+    if (decimalIndex !== -1) {
+      cleanedInput = cleanedInput.slice(0, decimalIndex + 4);
+    }
+
+    return cleanedInput;
+  }
+
   const handleAllowanceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    function formatNumber(value: number) {
-      return Math.floor(Math.round(value * 10000) / 10) / 1000;
-    }
-
-    function getCleanInput(value: string) {
-      let cleanedInput = "";
-
-      // remove commas, eg 100,000,000 becomes 100000000
-      cleanedInput = value.replace(/,/g, "");
-
-      // allow only 3 decimal points
-      const decimalIndex = cleanedInput.indexOf(".");
-      if (decimalIndex !== -1) {
-        cleanedInput = cleanedInput.slice(0, decimalIndex + 4);
-      }
-
-      return cleanedInput;
-    }
-
     const newAllowanceInputClean = getCleanInput(e.target.value);
 
     if (newAllowanceInputClean === "") {
