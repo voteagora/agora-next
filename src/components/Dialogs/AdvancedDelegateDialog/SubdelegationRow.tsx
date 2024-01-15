@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
-import { Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 
 function SubdelegationToRow({
   to,
@@ -20,6 +20,8 @@ function SubdelegationToRow({
   allowances: number[];
   index: number;
 }) {
+  const [newAllowanceInput, setNewAllowanceInput] = useState("");
+
   const allowance = allowances[index];
   const { data } = useEnsName({
     chainId: 1,
@@ -40,6 +42,59 @@ function SubdelegationToRow({
       ? 0
       : Math.round((allowance / availableBalanceNumber) * 100_00) / 100;
 
+  function formatNumber(value: number) {
+    return Math.floor(Math.round(value * 10000) / 10) / 1000;
+  }
+
+  function getCleanInput(value: string) {
+    let cleanedInput = "";
+
+    // remove commas, eg 100,000,000 becomes 100000000
+    cleanedInput = value.replace(/,/g, "");
+
+    // allow only 3 decimal points
+    const decimalIndex = cleanedInput.indexOf(".");
+    if (decimalIndex !== -1) {
+      cleanedInput = cleanedInput.slice(0, decimalIndex + 4);
+    }
+
+    return cleanedInput;
+  }
+
+  const handleAllowanceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAllowanceInputClean = getCleanInput(e.target.value);
+
+    if (newAllowanceInputClean === "") {
+      // handle empty input
+      setNewAllowanceInput("");
+      const newAllowances = [...allowances];
+      newAllowances[index] = 0;
+      setAllowance(newAllowances);
+      return;
+    }
+
+    if (isNaN(Number(newAllowanceInputClean))) {
+      // dont allow non numbers (including using commas for decimals like 10,123)
+      return;
+    }
+
+    const newAllowanceValue = parseFloat(newAllowanceInputClean);
+
+    if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
+      const newAllowances = [...allowances];
+
+      if (newAllowanceValue > amountToAllocate) {
+        newAllowances[index] = formatNumber(amountToAllocate);
+        setNewAllowanceInput(amountToAllocate.toLocaleString("en-US"));
+      } else {
+        newAllowances[index] = formatNumber(newAllowanceValue);
+        setNewAllowanceInput(newAllowanceInputClean);
+      }
+
+      setAllowance(newAllowances);
+    }
+  };
+
   return (
     <div className={styles.sub_row}>
       <HStack gap={3}>
@@ -56,36 +111,15 @@ function SubdelegationToRow({
       <div className="relative flex rounded-md border border-input bg-gray-fa">
         {/* TODO: improve UX of this Input, what if value is 10,000,000 */}
         <Input
-          className="max-w-[4rem] pl-2 pr-1 text-right"
+          value={newAllowanceInput}
+          placeholder="0"
+          className="max-w-[4rem] pl-2 pr-1 text-right focus:outline-none focus:ring-0"
           variant="none"
-          value={allowance.toString()}
-          onChange={(e) => {
-            function formatNumber(value: number) {
-              return Math.floor(Math.round(value * 1000) / 10) / 100;
-            }
-
-            const newAllowanceValue = parseFloat(
-              e.target.value.replace(/,/g, "")
-            );
-            if (!isNaN(newAllowanceValue) && newAllowanceValue >= 0) {
-              const newAllowances = [...allowances];
-              newAllowances[index] =
-                newAllowanceValue > amountToAllocate
-                  ? formatNumber(amountToAllocate)
-                  : formatNumber(newAllowanceValue);
-              setAllowance(newAllowances);
-            } else {
-              const newAllowances = [...allowances];
-              newAllowances[index] = 0;
-              setAllowance(newAllowances);
-            }
-          }}
-          type="number"
-          min={0}
-          max={amountToAllocate}
-          step={0.01}
+          onChange={(e) => handleAllowanceInput(e)}
+          type="text"
+          inputMode="numeric"
         />
-        <div className="flex items-center pr-2 pl-1">
+        <div className="flex items-center pr-2 pl-1 w-[100px]">
           <p>OP</p>
           <div className="bg-input w-[1px] h-6 mx-1"></div>
           <p>{percent}%</p>
