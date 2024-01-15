@@ -21,6 +21,7 @@ export default function ProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
   fetchDelegate,
+  fetchDelegateStatement,
   fetchBalanceForDirectDelegation,
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
@@ -71,7 +72,7 @@ export default function ProposalVotesList({
             className={styles.vote_row}
           >
             <VStack>
-              <HoverCard openDelay={100} closeDelay={0}>
+              <HoverCard openDelay={100} closeDelay={100}>
                 <HoverCardTrigger>
                   <HStack
                     justifyContent="justify-between"
@@ -101,6 +102,7 @@ export default function ProposalVotesList({
                   <VoterHoverCard
                     address={vote.address}
                     fetchDelegate={fetchDelegate}
+                    fetchDelegateStatement={fetchDelegateStatement}
                     fetchBalanceForDirectDelegation={
                       fetchBalanceForDirectDelegation
                     }
