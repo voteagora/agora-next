@@ -23,7 +23,6 @@ export function DelegateButton({
           type: "DELEGATE",
           params: {
             delegate,
-            // TODO: frh -> this type
             fetchBalanceForDirectDelegation,
             fetchDirectDelegatee,
           },

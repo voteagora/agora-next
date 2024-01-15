@@ -166,20 +166,27 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                       }
                     />
 
-                    <Link
-                      href={`/statements/create`}
-                      className={styles.desktop__create_statement}
-                    >
-                      <div>
-                        {hasStatement
-                          ? "Edit delegate statement"
-                          : "Create delegate statement"}
-                      </div>
-                    </Link>
+                    {hasStatement ? (
+                      <Link
+                        href={`/delegates/edit`}
+                        className={styles.desktop__create_statement}
+                        onClick={() => close()}
+                      >
+                        Edit delegate statement
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/delegates/create`}
+                        className={styles.desktop__create_statement}
+                        onClick={() => close()}
+                      >
+                        Create delegate statement
+                      </Link>
+                    )}
 
                     {hasStatement && (
                       <Link
-                        href={`/delegate/${ensName ?? address}`}
+                        href={`/delegates/${ensName ?? address}`}
                         className={styles.desktop__profile}
                       >
                         <div>View my profile</div>
