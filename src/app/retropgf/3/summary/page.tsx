@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function Page() {
   return (
-    <VStack className="w-full items-stretch max-w-6xl pt-8 pb-16">
+    <VStack className="w-full items-stretch max-w-6xl pb-16 mt-12">
       <div className="mb-16 justify-between items-center flex flex-col gap-8 lg:flex-row lg:gap-0">
         <VStack>
           <h1 className="text-2xl font-extrabold mb-2">
