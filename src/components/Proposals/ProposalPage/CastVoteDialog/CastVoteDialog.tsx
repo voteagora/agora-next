@@ -47,7 +47,7 @@ function CastVoteDialogContents({
   }
 
   return (
-    <VStack gap={4} className={styles.full_width}>
+    <VStack gap={4} className={styles.dialog_container}>
       <HStack justifyContent="justify-between">
         <VStack>
           {delegate.address ? (
@@ -95,6 +95,7 @@ function CastVoteDialogContents({
           )}
         </div>
       )}
+      <AdvancedVoteAlert />
     </VStack>
   );
 }
@@ -109,16 +110,19 @@ const VoteButton = ({
 }) => {
   return (
     <Button onClick={onClick} className="w-full">
-      onClick={onClick}
-      className={`${styles.vote_container}${" "}
-        ${!onClick && styles.disabled}
-      `}
-    >
       {children}
     </Button>
-    </div>
   );
 };
+
+export function AdvancedVoteAlert() {
+  return (
+    <div className={styles.alert}>
+      To cast your vote, you will be requested to sign two transactions, both of
+      which are needed to vote with your full balance.
+    </div>
+  );
+}
 
 export function SuccessMessage() {
   return (
