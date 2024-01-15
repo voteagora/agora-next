@@ -57,11 +57,15 @@ export default function GovernorSettings() {
 
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState<number>();
-  const { config: setVotingPeriodConfig } = usePrepareContractWrite({
-    ...governorContract,
-    functionName: "setVotingPeriod",
-    args: [(BigInt(votingPeriod || 0) * 3600n) / BigInt(secondsPerBlock)],
-  });
+  const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
+    usePrepareContractWrite({
+      ...governorContract,
+      functionName: "setVotingPeriod",
+      args: [
+        (BigInt(Math.floor(votingPeriod || 0)) * 3600n) /
+          BigInt(secondsPerBlock),
+      ],
+    });
   const {
     data: resultSetVotingPeriod,
     write: writeSetVotingPeriod,
@@ -75,11 +79,15 @@ export default function GovernorSettings() {
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
   const [votingDelay, setVotingDelay] = useState<number>();
-  const { config: setVotingDelayConfig } = usePrepareContractWrite({
-    ...governorContract,
-    functionName: "setVotingDelay",
-    args: [(BigInt(votingDelay || 0) * 3600n) / BigInt(secondsPerBlock)],
-  });
+  const { config: setVotingDelayConfig, isError: setVotingDelayError } =
+    usePrepareContractWrite({
+      ...governorContract,
+      functionName: "setVotingDelay",
+      args: [
+        (BigInt(Math.floor(votingDelay || 0)) * 3600n) /
+          BigInt(secondsPerBlock),
+      ],
+    });
   const {
     data: resultSetVotingDelay,
     write: writeSetVotingDelay,
@@ -120,14 +128,17 @@ export default function GovernorSettings() {
         <p>Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
-        <div className="flex justify-between gap-4">
+        <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
           <div className="flex-1">
             <Label>Voting period</Label>
             <div className="relative flex items-center">
               <Input
                 value={votingPeriod}
                 onChange={(e) => setVotingPeriod(parseInt(e.target.value))}
-                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingPeriod ||
+                  setVotingPeriodError
+                }
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -138,7 +149,10 @@ export default function GovernorSettings() {
                 size="sm"
                 className="absolute right-[6px] rounded-sm bg-white"
                 loading={isDisabledSetVotingPeriod}
-                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingPeriod ||
+                  setVotingPeriodError
+                }
                 onClick={() => {
                   writeSetVotingPeriod?.();
                 }}
@@ -153,7 +167,10 @@ export default function GovernorSettings() {
               <Input
                 value={votingDelay}
                 onChange={(e) => setVotingDelay(parseInt(e.target.value))}
-                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingDelay ||
+                  setVotingDelayError
+                }
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -164,7 +181,10 @@ export default function GovernorSettings() {
                 variant="outline"
                 size="sm"
                 loading={isDisabledSetVotingDelay}
-                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
+                disabled={
+                  /* isInitializing || */ isDisabledSetVotingDelay ||
+                  setVotingDelayError
+                }
                 onClick={() => {
                   writeSetVotingDelay?.();
                 }}
@@ -175,12 +195,12 @@ export default function GovernorSettings() {
           </div>
         </div>
         <Separator className="my-8" />
-        <div className="text-sm flex justify-between items-center sm:px-2">
+        <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
           <div className="flex items-center gap-2">
             <p className="text-gray-4f">Manager Address</p>
             <Lock className="w-4 h-4 text-gray-af" />
           </div>
-          <p className="text-gray-4f">{manager}</p>
+          <p className="text-gray-4f truncate">{manager}</p>
         </div>
         {/* <div className={!isManager ? "opacity-70" : ""}>
           <Label>ManagerAddress</Label>

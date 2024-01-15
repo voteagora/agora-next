@@ -8,10 +8,26 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
 import VoteText from "../VoteText/VoteText";
+import VoterHoverCard from "../VoterHoverCard";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function ProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchBalanceForDirectDelegation,
+  fetchVotingPowerForSubdelegation,
+  checkIfDelegatingToProxy,
+  fetchCurrentDelegatees,
+  fetchDirectDelegatee,
+  getProxyAddress,
   proposal_id,
 }) {
   const fetching = React.useRef(false);
@@ -34,6 +50,7 @@ export default function ProposalVotesList({
     }
   };
   const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
+  const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <div className={styles.vote_container}>
@@ -44,29 +61,62 @@ export default function ProposalVotesList({
         useWindow={false}
         loader={
           <div className="flex text-xs font-medium text-stone-500" key={0}>
-            Loading nore votes...
+            Loading more votes...
           </div>
         }
       >
-        {proposalVotes.map((vote, i) => (
-          <VStack key={`vote_${i}`} gap={4} className={styles.vote_row}>
+        {proposalVotes.map((vote) => (
+          <VStack
+            key={vote.transactionHash}
+            gap={4}
+            className={styles.vote_row}
+          >
             <VStack>
-              <HStack justifyContent="justify-between" className={styles.voter}>
-                <HStack gap={1} alignItems="items-center">
-                  <HumanAddress address={vote.address} />
-                  <VoteText support={vote.support} />
-                </HStack>
-                <HStack
-                  alignItems="items-center"
-                  className={styles.vote_weight}
+              <HoverCard openDelay={100} closeDelay={100}>
+                <HoverCardTrigger>
+                  <HStack
+                    justifyContent="justify-between"
+                    className={styles.voter}
+                  >
+                    <HStack gap={1} alignItems="items-center">
+                      <HumanAddress address={vote.address} />
+                      <VoteText support={vote.support} />
+                    </HStack>
+                    <HStack
+                      alignItems="items-center"
+                      className={styles.vote_weight}
+                    >
+                      <TokenAmountDisplay
+                        amount={vote.weight}
+                        decimals={18}
+                        currency="OP"
+                      />
+                    </HStack>
+                  </HStack>
+                </HoverCardTrigger>
+                <HoverCardContent
+                  className="w-full shadow"
+                  side="left"
+                  sideOffset="3"
                 >
-                  <TokenAmountDisplay
-                    amount={vote.weight}
-                    decimals={18}
-                    currency="OP"
+                  <VoterHoverCard
+                    address={vote.address}
+                    fetchDelegate={fetchDelegate}
+                    fetchDelegateStatement={fetchDelegateStatement}
+                    fetchBalanceForDirectDelegation={
+                      fetchBalanceForDirectDelegation
+                    }
+                    fetchVotingPowerForSubdelegation={
+                      fetchVotingPowerForSubdelegation
+                    }
+                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+                    fetchCurrentDelegatees={fetchCurrentDelegatees}
+                    fetchDirectDelegatee={fetchDirectDelegatee}
+                    getProxyAddress={getProxyAddress}
+                    isAdvancedUser={isAdvancedUser}
                   />
-                </HStack>
-              </HStack>
+                </HoverCardContent>
+              </HoverCard>
             </VStack>
             <pre className={styles.vote_reason}>{vote.reason}</pre>
           </VStack>

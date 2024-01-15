@@ -1,40 +1,37 @@
 import { Button } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { useEffect, useState } from "react";
-import { fetchBalanceForDirectDelegation } from "@/app/delegates/actions";
+import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import {
+  fetchDirectDelegatee,
+  fetchBalanceForDirectDelegation,
+} from "@/app/delegates/actions";
 
 export function DelegateButton({
   full,
-  delegateAddress,
+  delegate,
 }: {
   full: boolean;
-  delegateAddress: string;
+  delegate: DelegateChunk;
 }) {
   const openDialog = useOpenDialog();
-  const [votingPower, setVotingPower] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchBalanceForDirectDelegation(delegateAddress).then((balance) => {
-      setVotingPower(balance.toString());
-    });
-  }, [delegateAddress]);
 
   return (
-    <>
-      {votingPower && (
-        <Button
-          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.preventDefault();
-            openDialog({
-              type: "DELEGATE",
-              params: { target: delegateAddress, votingPower: votingPower },
-            });
-          }}
-          className={full ? "w-full" : undefined}
-        >
-          Delegate
-        </Button>
-      )}
-    </>
+    <Button
+      onClick={(e: any) => {
+        e.preventDefault();
+        openDialog({
+          type: "DELEGATE",
+          params: {
+            delegate,
+            // TODO: frh -> this type
+            fetchBalanceForDirectDelegation,
+            fetchDirectDelegatee,
+          },
+        });
+      }}
+      className={full ? "w-full" : undefined}
+    >
+      Delegate
+    </Button>
   );
 }

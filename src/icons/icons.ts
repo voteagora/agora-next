@@ -19,6 +19,7 @@ import spinner from "./spinner.svg";
 import power from "./power.svg";
 import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
+import sunny from "./sunny.svg";
 
 export const icons = {
   badge,
@@ -42,4 +43,5 @@ export const icons = {
   spinner,
   power,
   info,
+  sunny
 };

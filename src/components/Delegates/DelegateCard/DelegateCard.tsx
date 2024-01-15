@@ -62,7 +62,6 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
               title="Delegated from"
               detail={pluralizeAddresses(Number(delegate.numOfDelegators))}
             />
-
             <DelegateCardClient delegate={delegate} />
           </VStack>
         </div>

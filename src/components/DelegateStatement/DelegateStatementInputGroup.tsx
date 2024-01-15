@@ -22,6 +22,7 @@ export default function DelegateStatementInputGroup({
       render={({ field }) => (
         <Label variant="black">
           <h4 className="font-bold text-xs mb-2">{title}</h4>
+          {/* TODO: frh -> check this input */}
           <Input
             variant="bgGray100"
             inputSize="md"

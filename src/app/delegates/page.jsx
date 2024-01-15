@@ -13,7 +13,11 @@ import {
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "../api/voting-power/getVotingPower";
-import { getCurrentDelegatees } from "../api/delegations/getDelegations";
+
+import {
+  getCurrentDelegatees,
+  getDirectDelegatee,
+} from "../api/delegations/getDelegations";
 import { TabsContent } from "@/components/ui/tabs";
 
 async function fetchDelegates(sort, page = 1, seed) {
@@ -63,6 +67,12 @@ async function fetchDaoMetrics() {
   return getMetrics();
 }
 
+async function fetchDirectDelegatee(addressOrENSName) {
+  "use server";
+
+  return getDirectDelegatee({ addressOrENSName });
+}
+
 export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
@@ -89,6 +99,7 @@ export default async function Page({ searchParams }) {
             checkIfDelegatingToProxy={checkIfDelegatingToProxy}
             fetchCurrentDelegatees={fetchCurrentDelegatees}
             getProxyAddress={getProxyAddress}
+            fetchDirectDelegatee={fetchDirectDelegatee}
           />
         </TabsContent>
         <TabsContent value="citizens">
@@ -104,6 +115,7 @@ export default async function Page({ searchParams }) {
             checkIfDelegatingToProxy={checkIfDelegatingToProxy}
             fetchCurrentDelegatees={fetchCurrentDelegatees}
             getProxyAddress={getProxyAddress}
+            fetchDirectDelegatee={fetchDirectDelegatee}
           />{" "}
         </TabsContent>
       </DelegateTabs>

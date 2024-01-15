@@ -70,9 +70,9 @@ export async function getVotesForProposal({
   sortOrder = "desc",
 }: {
   proposal_id: string;
-  page: number;
-  sort: VotesSort;
-  sortOrder: VotesSortOrder;
+  page?: number;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 }) {
   const pageSize = 50;
 

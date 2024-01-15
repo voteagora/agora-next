@@ -34,10 +34,7 @@ export function DelegateActions({
           (isAdvancedUser ? (
             <AdvancedDelegateButton delegate={delegate} />
           ) : (
-            <DelegateButton
-              full={!twitter && !discord}
-              delegateAddress={delegate.address}
-            />
+            <DelegateButton full={!twitter && !discord} delegate={delegate} />
           ))}
       </div>
     </HStack>

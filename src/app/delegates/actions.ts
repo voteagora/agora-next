@@ -6,7 +6,7 @@ import {
     getVotingPowerAvailableForSubdelegation,
     isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
-import { getCurrentDelegatees, getCurrentDelegators } from "@/app/api/delegations/getDelegations";
+import { getDirectDelegatee, getCurrentDelegatees, getCurrentDelegators } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
@@ -27,6 +27,12 @@ export async function checkIfDelegatingToProxy(addressOrENSName: string) {
 // Pass address of the connected wallet
 export async function fetchBalanceForDirectDelegation(addressOrENSName: string) {
     return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+}
+
+export async function fetchDirectDelegatee(addressOrENSName: string) {
+    "use server";
+
+    return getDirectDelegatee({ addressOrENSName });
 }
 
 // Pass address of the connected wallet
