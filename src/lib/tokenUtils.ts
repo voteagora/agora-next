@@ -64,6 +64,29 @@ export function formatNumber(
     .join("");
 }
 
+export function formatNumberForAdvancedDelegation(amount: string) {
+  // Advanced delegation needs a precision up to 3 decimal places,
+  // which is bit different from the formatNumber function used everywhere else and requires for max 4 significant digits
+  const number = Number(
+    ethers.formatUnits(amount.toString(), tokens.get(DEPLOYMENT_NAME)!.decimals)
+  );
+
+  const numberFormat = new Intl.NumberFormat("en", {
+    style: "currency",
+    currency: "USD",
+    currencyDisplay: "code",
+    compactDisplay: "short",
+    notation: "compact",
+    maximumFractionDigits: 3,
+  });
+
+  const parts = numberFormat.formatToParts(number);
+  return parts
+    .filter((part) => part.type !== "currency" && part.type !== "literal")
+    .map((part) => part.value)
+    .join("");
+}
+
 /**
  * Contract calls
  *
