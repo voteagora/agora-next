@@ -11,6 +11,7 @@ import Link from "next/link";
 import styles from "./castVoteDialog.module.scss";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
+import { Button } from "@/components/ui/button";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -107,13 +108,14 @@ const VoteButton = ({
   isLoading?: boolean;
 }) => {
   return (
-    <div
+    <Button onClick={onClick} className="w-full">
       onClick={onClick}
       className={`${styles.vote_container}${" "}
         ${!onClick && styles.disabled}
       `}
     >
       {children}
+    </Button>
     </div>
   );
 };
