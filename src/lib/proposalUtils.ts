@@ -1,10 +1,8 @@
-import { getQuorum, getQuorumForProposal } from "./governorUtils";
-import { Prisma, ProposalType } from "@prisma/client";
+import { ProposalType, Proposals } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
-import prisma from "@/app/lib/prisma";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -172,8 +170,10 @@ export function getTitleFromProposalDescription(description: string = "") {
  */
 
 export async function parseProposal(
-  proposal: Prisma.ProposalsGetPayload<true>,
-  latestBlock: Block | null
+  proposal: Proposals,
+  latestBlock: Block | null,
+  quorum: bigint | null,
+  votableSupply: bigint
 ): Promise<Proposal> {
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
@@ -186,8 +186,6 @@ export async function parseProposal(
 
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
-
-  const quorum = await getQuorum(proposal);
 
   return {
     id: proposal.proposal_id,
@@ -225,7 +223,9 @@ export async function parseProposal(
       ? await getProposalStatus(
           proposal,
           proposalResuts,
-          Number(latestBlock.number)
+          Number(latestBlock.number),
+          quorum,
+          votableSupply
         )
       : null,
   };
@@ -238,7 +238,7 @@ export function getProposalTotalValue(
   proposalData: ParsedProposalData[ProposalType]
 ) {
   switch (proposalData.key) {
-    case "STANDARD": {
+    case "STANDARD" || "OPTIMISTIC": {
       // TODO: frh -> check this value
       return proposalData.kind.options.reduce((acc, option) => {
         return (
@@ -295,6 +295,10 @@ export type ParsedProposalData = {
       };
     };
   };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: { options: [] };
+  };
 };
 
 export function parseProposalData(
@@ -320,6 +324,12 @@ export function parseProposalData(
             },
           ],
         },
+      };
+    }
+    case "OPTIMISTIC": {
+      return {
+        key: "OPTIMISTIC",
+        kind: { options: [] },
       };
     }
     case "APPROVAL": {
@@ -414,6 +424,14 @@ export type ParsedProposalResults = {
       abstain: bigint;
     };
   };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: {
+      for: bigint;
+      against: bigint;
+      abstain: bigint;
+    };
+  };
   APPROVAL: {
     key: "APPROVAL";
     kind: {
@@ -454,6 +472,18 @@ export function parseProposalResults(
         },
       };
     }
+    case "OPTIMISTIC": {
+      const parsedProposalResults = JSON.parse(proposalResults).standard;
+
+      return {
+        key: "OPTIMISTIC",
+        kind: {
+          for: BigInt(parsedProposalResults?.[1] ?? 0),
+          against: BigInt(parsedProposalResults?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults?.[2] ?? 0),
+        },
+      };
+    }
     case "APPROVAL": {
       const parsedProposalResults = JSON.parse(
         proposalResults
@@ -462,13 +492,7 @@ export function parseProposalResults(
       return {
         key: "APPROVAL",
         kind: {
-          for:
-            parsedProposalResults.approval?.reduce(
-              (sum: bigint, { votes }: { votes: string }) => {
-                return sum + BigInt(votes);
-              },
-              0n
-            ) ?? 0n,
+          for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
           abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
           options: proposalData.kind.options.map((option, idx) => {
             return {
@@ -502,9 +526,11 @@ export type ProposalStatus =
   | "EXECUTED";
 
 export async function getProposalStatus(
-  proposal: Prisma.ProposalsGetPayload<true>,
+  proposal: Proposals,
   proposalResults: ParsedProposalResults[ProposalType],
-  latestBlock: number
+  latestBlock: number,
+  quorum: bigint | null,
+  votableSupply: bigint
 ): Promise<ProposalStatus> {
   if (proposal.cancelled_block) {
     return "CANCELLED";
@@ -522,8 +548,6 @@ export async function getProposalStatus(
   if (!proposal.end_block || Number(proposal.end_block) > latestBlock) {
     return "ACTIVE";
   }
-
-  const quorum = await getQuorumForProposal(proposal);
 
   switch (proposalResults.key) {
     case "STANDARD": {
@@ -543,6 +567,18 @@ export async function getProposalStatus(
       }
 
       break;
+    }
+    case "OPTIMISTIC": {
+      const {
+        for: forVotes,
+        against: againstVotes,
+        abstain: abstainVotes,
+      } = proposalResults.kind;
+
+      // Check against 50% of votable supply
+      if (BigInt(againstVotes) > BigInt(votableSupply!) / 2n) {
+        return "DEFEATED";
+      } else return "SUCCEEDED";
     }
     case "APPROVAL": {
       const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;

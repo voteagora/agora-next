@@ -4,12 +4,11 @@ import { HStack } from "@/components/Layout/Stack";
 import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
 import { useAccount } from "wagmi";
-import { useState } from "react";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import { Delegatees } from "@prisma/client";
 
 export function DelegateActions({
   delegate,
@@ -20,6 +19,7 @@ export function DelegateActions({
   fetchCurrentDelegatees,
   getProxyAddress,
   isAdvancedUser,
+  fetchDirectDelegatee,
 }: {
   delegate: DelegateChunk;
   className?: string;
@@ -33,6 +33,7 @@ export function DelegateActions({
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
+  fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
@@ -61,10 +62,9 @@ export function DelegateActions({
           ) : (
             <DelegateButton
               full={!twitter && !discord}
-              delegate={delegate.address}
-              fetchBalanceForDirectDelegation={() =>
-                fetchBalanceForDirectDelegation(address)
-              }
+              delegate={delegate}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+              fetchDirectDelegatee={fetchDirectDelegatee}
             />
           ))}
       </div>

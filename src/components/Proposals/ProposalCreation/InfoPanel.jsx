@@ -21,10 +21,10 @@ export default function InfoPanel() {
         </p>
         <p>
           <span className="font-semibold">3. Create your proposal</span>
+          <br />
           Now that the vote and proposal type are set, you can use this form to
           creat your proposal. Proposed transactions are optional, as the Token
           House governor is not executable for now.
-          <br />
         </p>
         <p>
           <span className="font-semibold">4. Get signatures for your SAFE</span>

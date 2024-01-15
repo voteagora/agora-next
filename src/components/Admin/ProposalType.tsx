@@ -25,39 +25,43 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 type Props = {
   proposalType: ProposalType;
   index: number;
+  votableSupply: string;
 };
 
 type ProposalType = {
   quorum: number;
-  approvalThreshold: number;
+  approval_threshold: number;
   name: string;
 };
 
 const proposalTypeSchema = z.object({
   name: z.string(),
   description: z.string(),
-  approvalThreshold: z.number().lte(100),
-  quorum: z.number().lte(100),
+  approval_threshold: z.coerce.number().lte(100),
+  quorum: z.coerce.number().lte(100),
 });
 
-const mockVotableSupply = 500000000;
-
 export default function ProposalType({
-  proposalType: { quorum, approvalThreshold, name },
+  proposalType: { quorum, approval_threshold, name },
   index,
+  votableSupply,
 }: Props) {
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
     defaultValues: {
       quorum,
-      approvalThreshold,
+      approval_threshold,
       name,
       description: "",
     },
   });
 
+  const formattedVotableSupply = Number(
+    BigInt(votableSupply) / BigInt(10 ** 18)
+  );
+
   const { config: deleteProposalTypeConfig } = usePrepareContractWrite({
-    address: OptimismContracts.proposalTypesConfigurator.address as any,
+    address: OptimismContracts.proposalTypesConfigurator.address,
     abi: OptimismContracts.proposalTypesConfigurator.abi,
     functionName: "setProposalType",
     args: [BigInt(index), 0, 0, ""],
@@ -72,18 +76,19 @@ export default function ProposalType({
       hash: resultDeleteProposalType?.hash,
     });
 
-  const formValues = form.getValues();
-  const { config: setProposalTypeConfig } = usePrepareContractWrite({
-    address: OptimismContracts.proposalTypesConfigurator.address as any,
-    abi: OptimismContracts.proposalTypesConfigurator.abi,
-    functionName: "setProposalType",
-    args: [
-      BigInt(index),
-      formValues.quorum,
-      formValues.approvalThreshold,
-      formValues.name,
-    ],
-  });
+  const formValues = form.watch();
+  const { config: setProposalTypeConfig, isError: setProposalTypeError } =
+    usePrepareContractWrite({
+      address: OptimismContracts.proposalTypesConfigurator.address,
+      abi: OptimismContracts.proposalTypesConfigurator.abi,
+      functionName: "setProposalType",
+      args: [
+        BigInt(index),
+        formValues.quorum * 100,
+        formValues.approval_threshold * 100,
+        formValues.name,
+      ],
+    });
   const {
     data: resultSetProposalType,
     write: writeSetProposalType,
@@ -93,11 +98,12 @@ export default function ProposalType({
     useWaitForTransaction({
       hash: resultSetProposalType?.hash,
     });
-  const isDisabled =
+  const isLoading =
     isLoadingDeleteProposalType ||
     isLoadingDeleteProposalTypeTransaction ||
     isLoadingSetProposalType ||
     isLoadingSetProposalTypeTransaction;
+  const isDisabled = isLoading || name == "Optimistic";
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
     writeSetProposalType?.();
@@ -113,7 +119,7 @@ export default function ProposalType({
               size="icon"
               variant="ghost"
               className="hover:bg-destructive/10 group w-9 h-9"
-              disabled={isDisabled}
+              disabled={isDisabled || setProposalTypeError}
               onClick={() => {
                 writeDeleteProposalType?.();
               }}
@@ -125,6 +131,7 @@ export default function ProposalType({
           <FormField
             control={form.control}
             name="name"
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
@@ -136,7 +143,7 @@ export default function ProposalType({
             )}
           />
         </div>
-        <div className="flex gap-4">
+        <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4">
           <FormField
             control={form.control}
             name="quorum"
@@ -151,13 +158,16 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
+                      disabled={isDisabled || setProposalTypeError}
                     />
-                    <div className="absolute right-[12px] text-sm text-muted-foreground grid grid-cols-5 text-center items-center">
-                      <p>%</p>
-                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-full" />
+                    <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
+                      <p>% of votable supply</p>
+                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
-                          (mockVotableSupply * form.getValues("quorum")) / 100,
+                          Math.floor(
+                            (formattedVotableSupply * formValues.quorum) / 100
+                          ),
                           0,
                           1
                         )}{" "}
@@ -172,7 +182,7 @@ export default function ProposalType({
           />
           <FormField
             control={form.control}
-            name="approvalThreshold"
+            name="approval_threshold"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>Approval threshold</FormLabel>
@@ -184,20 +194,10 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
+                      disabled={isDisabled || setProposalTypeError}
                     />
-                    <div className="absolute right-[12px] text-sm text-muted-foreground grid grid-cols-5 text-center items-center">
-                      <p>%</p>
-                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-full" />
-                      <p className="text-[0.8rem] col-span-3">
-                        {formatNumber(
-                          (mockVotableSupply *
-                            form.getValues("approvalThreshold")) /
-                            100,
-                          0,
-                          1
-                        )}{" "}
-                        OP
-                      </p>
+                    <div className="absolute right-[12px] text-sm text-muted-foreground">
+                      <p>% of votes for each proposal</p>
                     </div>
                   </div>
                 </FormControl>
@@ -210,10 +210,10 @@ export default function ProposalType({
           type="submit"
           className="w-full"
           variant="outline"
-          loading={isDisabled}
-          disabled={isDisabled}
+          loading={isLoading}
+          disabled={isDisabled || setProposalTypeError}
         >
-          Update proposal type
+          Set proposal type
         </Button>
       </form>
     </Form>

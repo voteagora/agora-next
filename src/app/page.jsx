@@ -6,6 +6,7 @@ import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
 import { getProposals } from "./api/proposals/getProposals";
 import { getMetrics } from "./api/metrics/getMetrics";
+import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 
 async function fetchProposals(page = 1) {
   "use server";
@@ -19,9 +20,16 @@ async function fetchDaoMetrics() {
   return getMetrics();
 }
 
+async function fetchVotableSupply() {
+  "use server";
+
+  return getVotableSupply();
+}
+
 export default async function Home() {
   const proposals = await fetchProposals();
   const metrics = await fetchDaoMetrics();
+  const votableSupply = await fetchVotableSupply();
 
   return (
     <VStack className={styles.metrics_container}>
@@ -31,6 +39,7 @@ export default async function Home() {
       <ProposalsList
         initialProposals={proposals}
         fetchProposals={fetchProposals}
+        votableSupply={votableSupply}
       />
     </VStack>
   );
