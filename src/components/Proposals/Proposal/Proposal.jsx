@@ -2,14 +2,15 @@ import Link from "next/link";
 import styles from "./proposal.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
-import { TokenAmountDisplay, pluralize } from "@/lib/utils";
 import OPStandardProposalStatus from "./OPStandardProposalStatus";
 import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
-import { cn } from "@/lib/utils";
+import { cn, getProposalTypeText } from "@/lib/utils";
 import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
 
 export default function Proposal({ proposal, votableSupply }) {
+  const proposalText = getProposalTypeText(proposal.proposalType);
+
   return (
     <Link href={`/proposals/${proposal.id}`}>
       <HStack alignItems="center" className={styles.proposal_row}>
@@ -17,8 +18,10 @@ export default function Proposal({ proposal, votableSupply }) {
           <HStack className={styles.cell_content_title} gap={1}>
             {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
             <div>
-              <span className={styles.invisible_on_mobile}>Proposal </span>by
-              Optimism Foundation
+              {proposalText}{" "}
+              <span className={styles.invisible_on_mobile}>
+                by The Optimism Foundation
+              </span>
             </div>
             <div className={styles.mobile_status}>
               <ProposalStatus proposal={proposal} />
