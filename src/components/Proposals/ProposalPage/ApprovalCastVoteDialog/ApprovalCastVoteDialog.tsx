@@ -17,6 +17,7 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 import styles from "./approvalCastVoteDialog.module.scss";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { Button } from "@/components/ui/button";
 
 const abiCoder = new AbiCoder();
 export function ApprovalCastVoteDialog({
@@ -179,13 +180,9 @@ function CastVoteWithReason({
         value={reason}
         onChange={(e) => setReason(e.target.value)}
       />
-      <VStack
-        justifyContent="justify-between"
-        alignItems="items-stretch"
-        className={styles.vote_button_box}
-      >
+      <VStack justifyContent="justify-between" alignItems="items-stretch">
         {!abstain && numberOfOptions > 0 && (
-          <button onClick={() => onVoteClick()}>
+          <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"} with{" "}
             {
@@ -195,13 +192,13 @@ function CastVoteWithReason({
                 currency="OP"
               />
             }
-          </button>
+          </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
-          <button disabled>Select at least one option</button>
+          <Button disabled>Select at least one option</Button>
         )}
         {abstain && (
-          <button onClick={() => onVoteClick()}>
+          <Button onClick={() => onVoteClick()}>
             Vote for no options with{" "}
             {
               <TokenAmountDisplay
@@ -210,7 +207,7 @@ function CastVoteWithReason({
                 currency="OP"
               />
             }
-          </button>
+          </Button>
         )}
       </VStack>
     </VStack>
