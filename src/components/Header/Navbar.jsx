@@ -19,6 +19,12 @@ export default function Navbar() {
       <HeaderLink href="/delegates" isActive={pathname.includes("delegates")}>
         Voters
       </HeaderLink>
+      <HeaderLink
+        href="/retropgf/3/summary"
+        isActive={pathname.includes("retropgf/3/summary")}
+      >
+        RetroPGF
+      </HeaderLink>
     </HStack>
   );
 }
