@@ -113,13 +113,13 @@ function SubdelegationToRow({
         <Input
           value={newAllowanceInput}
           placeholder="0"
-          className="max-w-[4rem] pl-2 pr-1 text-right"
+          className="max-w-[4rem] pl-2 pr-1 text-right focus:outline-none focus:ring-0"
           variant="none"
           onChange={(e) => handleAllowanceInput(e)}
           type="text"
           inputMode="numeric"
         />
-        <div className="flex items-center pr-2 pl-1">
+        <div className="flex items-center pr-2 pl-1 w-[100px]">
           <p>OP</p>
           <div className="bg-input w-[1px] h-6 mx-1"></div>
           <p>{percent}%</p>
