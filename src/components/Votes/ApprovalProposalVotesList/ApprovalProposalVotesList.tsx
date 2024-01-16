@@ -62,7 +62,7 @@ export default function ApprovalProposalVotesList({
   };
 
   return (
-    <div className={styles.vote_container}>
+    <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={meta.hasNextPage}
@@ -70,14 +70,21 @@ export default function ApprovalProposalVotesList({
         loadMore={loadMore}
         useWindow={false}
         loader={
-          <div className="flex text-xs font-medium text-stone-500" key={0}>
+          <div
+            className="flex text-xs font-medium text-stone-500 justify-center pb-2"
+            key={0}
+          >
             Loading more votes...
           </div>
         }
       >
-        {proposalVotes.map((vote) => (
-          <SingleVote key={vote.transactionHash} vote={vote} />
-        ))}
+        <ul className="flex flex-col divide-y">
+          {proposalVotes.map((vote) => (
+            <li key={vote.transactionHash} className="p-4">
+              <SingleVote vote={vote} />
+            </li>
+          ))}
+        </ul>
       </InfiniteScroll>
     </div>
   );
@@ -88,35 +95,43 @@ function SingleVote({ vote }: { vote: Vote }) {
   const { address: voterAddress, params, support, reason, weight } = vote;
 
   return (
-    <VStack className={styles.single_vote}>
+    <VStack className={""}>
       <HStack
         alignItems="items-center"
         justifyContent="justify-between"
-        className={styles.single_vote__header}
+        className={"mb-2 text-xs leading-4"}
       >
-        <div>
+        <div className="text-black font-semibold">
           <HumanAddress address={voterAddress} />
-          {address === voterAddress && " (you)"}
-          {" vote for"}
+          {address?.toLowerCase() === voterAddress && " (you)"}
+          {" voted for"}
         </div>
-        <div className={styles.single_vote__amount}>
+        <div className={"font-semibold text-gray-700"}>
           <TokenAmountDisplay amount={weight} decimals={18} currency="OP" />
         </div>
       </HStack>
-      <VStack className={styles.single_vote__content}>
+      <VStack className={"text-xs leading-4 mb-2"}>
         {params?.map((option: string, index: number) => (
           <p
             key={index}
-            className={"whitespace-nowrap text-ellipsis overflow-hidden"}
+            className={
+              "whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
+            }
           >
             {++index}. {option}
           </p>
         ))}
-        {support === "ABSTAIN" && "Abstain"}
+        {support === "ABSTAIN" && (
+          <p className="pl-3 border-l border-gray-eo text-gray-4f font-medium">
+            {"Abstain"}
+          </p>
+        )}
       </VStack>
       {reason && (
         <div>
-          <p className={styles.single_vote__reason}>{reason}</p>
+          <p className={"text-gray-4f font-medium text-xs leading-4"}>
+            {reason}
+          </p>
         </div>
       )}
     </VStack>
