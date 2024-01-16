@@ -1,7 +1,7 @@
 import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
 import DelegateStatementBoolSelector from "./DelegateStatementBoolSelector";
-import { DelegateStatementFormValues } from "./DelegateStatementForm";
-import { UseFormReturn } from "react-hook-form";
+import { type UseFormReturn } from "react-hook-form";
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 
 export default function OtherInfoFormSection({
   form,

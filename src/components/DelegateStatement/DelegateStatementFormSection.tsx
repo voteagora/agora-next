@@ -3,8 +3,8 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { useWatch, UseFormReturn } from "react-hook-form";
-import { DelegateStatementFormValues } from "./DelegateStatementForm";
+import { useWatch, type UseFormReturn } from "react-hook-form";
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 
 export default function DelegateStatementFormSection({
   form,

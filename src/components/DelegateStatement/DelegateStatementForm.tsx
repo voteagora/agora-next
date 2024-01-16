@@ -6,69 +6,23 @@ import DelegateStatementFormSection from "./DelegateStatementFormSection";
 import TopIssuesFormSection from "./TopIssuesFormSection";
 import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useWatch, useForm } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { initialTopIssues } from "./TopIssuesFormSection";
 import { useAccount, useWalletClient, useSignMessage } from "wagmi";
 import { Delegate } from "@/app/api/delegates/delegate";
-import { DaoSlug } from "@prisma/client";
 import {
   fetchDelegate,
   submitDelegateStatement,
 } from "@/app/delegates/actions";
 import { useEffect, useState } from "react";
-import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { useRouter } from "next/navigation";
-
-const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
-if (!(daoSlug && daoSlug in DaoSlug)) {
-  throw new Error("Can't find Agora Instance token");
-}
-
-const formSchema = z.object({
-  agreeCodeConduct: z.boolean(),
-  daoSlug: z.string(),
-  discord: z.string(),
-  delegateStatement: z.string(),
-  email: z.string(),
-  twitter: z.string(),
-  topIssues: z.array(
-    z
-      .object({
-        type: z.string(),
-        value: z.string(),
-      })
-      .strict()
-  ),
-  openToSponsoringProposals: z.union([
-    z.literal("yes"),
-    z.literal("no"),
-    z.null(),
-  ]),
-  mostValuableProposals: z.array(
-    z
-      .object({
-        number: z.string(),
-      })
-      .strict()
-  ),
-  leastValuableProposals: z.array(
-    z
-      .object({
-        number: z.string(),
-      })
-      .strict()
-  ),
-});
-
-export type DelegateStatementFormValues = z.infer<typeof formSchema>;
+import { type UseFormReturn } from "react-hook-form";
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 
 export default function DelegateStatementForm({
-  delegateStatement,
+  form,
 }: {
-  delegateStatement: DelegateStatement | null;
+  form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const router = useRouter();
   const { address } = useAccount();
@@ -76,40 +30,7 @@ export default function DelegateStatementForm({
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      agreeCodeConduct: false,
-      daoSlug,
-      discord: delegateStatement?.discord || "",
-      delegateStatement:
-        (delegateStatement?.payload as { delegateStatement?: string })
-          ?.delegateStatement || "",
-      email: delegateStatement?.email || "",
-      twitter: delegateStatement?.twitter || "",
-      topIssues:
-        (
-          delegateStatement?.payload as {
-            topIssues: {
-              value: string;
-              type: string;
-            }[];
-          }
-        )?.topIssues || initialTopIssues(),
-      openToSponsoringProposals:
-        (
-          delegateStatement?.payload as {
-            openToSponsoringProposals?: "yes" | "no" | null;
-          }
-        )?.openToSponsoringProposals || null,
-      mostValuableProposals:
-        (delegateStatement?.payload as { mostValuableProposals?: object[] })
-          ?.mostValuableProposals || [],
-      leastValuableProposals:
-        (delegateStatement?.payload as { leastValuableProposals?: object[] })
-          ?.leastValuableProposals || [],
-    },
-  });
+
   const agreeCodeConduct = useWatch({
     control: form.control,
     name: "agreeCodeConduct",

@@ -2,8 +2,8 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
-import { useWatch, UseFormReturn } from "react-hook-form";
-import { DelegateStatementFormValues } from "./DelegateStatementForm";
+import { useWatch, type UseFormReturn } from "react-hook-form";
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import {
   DropdownMenu,
   DropdownMenuContent,

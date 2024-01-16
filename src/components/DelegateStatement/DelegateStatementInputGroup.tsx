@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { DelegateStatementFormValues } from "./DelegateStatementForm";
-import { UseFormReturn } from "react-hook-form";
+import { type UseFormReturn } from "react-hook-form";
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import { FormField } from "@/components/ui/form";
 
 export default function DelegateStatementInputGroup({
