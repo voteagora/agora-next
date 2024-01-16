@@ -96,7 +96,7 @@ function SubdelegationToRow({
   };
 
   useEffect(() => {
-    if (allowance !== 0) {
+    if (allowance !== 0 && newAllowanceInput === "") {
       setNewAllowanceInput(allowance.toLocaleString("en-US"));
     }
   }, [allowance]);
