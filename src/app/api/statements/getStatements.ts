@@ -12,23 +12,20 @@ export const getStatment = ({
 async function getStatmentForAddress({ address }: { address: string }) {
   const dynamoDBClient = makeDynamoClient();
 
-  const params = {
-    TableName: "ApplicationData", // Replace with your actual DynamoDB table name
-    KeyConditionExpression: "PartitionKey = :pk AND SortKey = :sk",
-    ExpressionAttributeValues: {
-      ":pk": { S: "DelegateStatement" }, // 'PartitionKey' should match the actual partition key attribute name
-      ":sk": { S: address }, // Replace with the actual sort key value
-    },
-    ProjectionExpression: "address, signature, signedPayload",
-  };
-
   try {
-    const data = await dynamoDBClient.query(params);
+    const data = await dynamoDBClient.getItem({
+      TableName: "ApplicationData",
+      Key: {
+        PartitionKey: { S: "DelegateStatement" },
+        SortKey: { S: address },
+      },
+      ProjectionExpression: "address, signature, signedPayload",
+    });
 
     // If the item exists, return the payload
-    if (data.Items && data.Items.length > 0) {
+    if (data.Item) {
       // Extract the signedPayload attribute from the Item object
-      const signedPayload = data.Items[0].signedPayload.S;
+      const signedPayload = data.Item.signedPayload.S;
 
       const delegateStatementObject = JSON.parse(signedPayload as string);
 
