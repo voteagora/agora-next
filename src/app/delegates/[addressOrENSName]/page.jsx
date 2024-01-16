@@ -88,24 +88,14 @@ async function fetchDirectDelegatee(addressOrENSName) {
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
-  let delegate;
-  let delegateVotes;
-  let statement;
-  let delegatees;
-  let delegators;
-  try {
-    delegate = await fetchDelegate(addressOrENSName);
-    delegateVotes = await getDelegateVotes(addressOrENSName);
-    statement = await getDelegateStatement(addressOrENSName);
-    delegatees = await getDelegatees(addressOrENSName);
-    delegators = await getDelegators(addressOrENSName);
-  } catch (error) {
-    delegate = null;
-    delegateVotes = null;
-    statement = null;
-    delegatees = null;
-    delegators = null;
-  }
+  const [delegate, delegateVotes, statement, delegatees, delegators] =
+    await Promise.all([
+      fetchDelegate(addressOrENSName),
+      getDelegateVotes(addressOrENSName),
+      getDelegateStatement(addressOrENSName),
+      getDelegatees(addressOrENSName),
+      getDelegators(addressOrENSName),
+    ]);
 
   if (!delegate) {
     return (
@@ -114,12 +104,11 @@ export default async function Page({ params: { addressOrENSName } }) {
   }
 
   return (
-    <DelegateVotesProvider initialVotes={delegateVotes}>
-      <div className="flex flex-col items-center justify-between w-full max-w-full gap-6 mt-12 xl:flex-row xl:items-start">
+    <div className="flex flex-col items-center justify-between w-full max-w-full gap-6 mt-12 xl:flex-row xl:items-start">
+      {delegate && (
         <VStack className="static w-full xl:sticky top-16 shrink-0 xl:max-w-xs">
           <DelegateCard
-            fetchDelegate={fetchDelegate}
-            addressOrENSName={addressOrENSName}
+            delegate={delegate}
             fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
             checkIfDelegatingToProxy={checkIfDelegatingToProxy}
             fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
@@ -128,17 +117,15 @@ export default async function Page({ params: { addressOrENSName } }) {
             fetchDirectDelegatee={fetchDirectDelegatee}
           />
         </VStack>
+      )}
 
-        <VStack className="flex-1 max-w-full min-w-0 xl:ml-12">
-          <DelegateStatementContainer
-            addressOrENSName={addressOrENSName}
-            statement={statement}
-          />
-          <DelegationsContainer
-            delegatees={delegatees}
-            delegators={delegators}
-          />
-
+      <VStack className="flex-1 max-w-full min-w-0 xl:ml-12">
+        <DelegateStatementContainer
+          addressOrENSName={addressOrENSName}
+          statement={statement}
+        />
+        <DelegationsContainer delegatees={delegatees} delegators={delegators} />
+        <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col justify-between gap-2 md:flex-row">
@@ -171,8 +158,8 @@ export default async function Page({ params: { addressOrENSName } }) {
               <p>No past votes available.</p>
             </div>
           )}
-        </VStack>
-      </div>
-    </DelegateVotesProvider>
+        </DelegateVotesProvider>
+      </VStack>
+    </div>
   );
 }

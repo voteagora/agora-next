@@ -1,13 +1,7 @@
-"use client";
-
 import { Delegation } from "@/app/api/delegations/delegation";
 import DelegationToRow from "./DelegationToRow";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import { Tab } from "@headlessui/react";
-import { useState } from "react";
 import DelegationFromRow from "./DelegationFromRow";
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -17,32 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDownIcon } from "lucide-react";
-import Image from "next/image";
-
-const displayModeSelectorStyles = css`
-  cursor: pointer;
-  font-size: ${theme.fontSize.sm};
-  font-weight: ${theme.fontWeight.medium};
-  color: ${theme.colors.gray["600"]};
-  padding: ${theme.spacing["1"]} ${theme.spacing["3"]};
-  border-radius: ${theme.borderRadius.full};
-
-  :hover {
-    background: ${theme.colors.gray["100"]};
-    color: ${theme.colors.gray["900"]};
-  }
-`;
-
-const displayModeSelectorSelectedStyles = css`
-  background: ${theme.colors.gray.eb};
-  color: ${theme.colors.gray["900"]};
-  border-radius: ${theme.borderRadius.full};
-
-  :hover {
-    background: ${theme.colors.gray.eb};
-  }
-`;
 
 function DelegationsContainer({
   delegatees,
@@ -51,8 +19,6 @@ function DelegationsContainer({
   delegatees: Delegation[];
   delegators: Delegation[];
 }) {
-  const [tab, setTab] = useState<"from" | "to">("from");
-
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
       <div className="mb-8 p-8 align-middle text-center rounded-md bg-gray-100">
