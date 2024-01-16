@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 
 function SubdelegationToRow({
   to,
@@ -94,6 +94,12 @@ function SubdelegationToRow({
       setAllowance(newAllowances);
     }
   };
+
+  useEffect(() => {
+    if (allowance !== 0 && newAllowanceInput === "") {
+      setNewAllowanceInput(allowance.toLocaleString("en-US"));
+    }
+  }, [allowance]);
 
   return (
     <div className={styles.sub_row}>
