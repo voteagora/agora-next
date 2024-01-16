@@ -70,7 +70,10 @@ export default function ApprovalProposalVotesList({
         loadMore={loadMore}
         useWindow={false}
         loader={
-          <div className="flex text-xs font-medium text-stone-500" key={0}>
+          <div
+            className="flex text-xs font-medium text-stone-500 justify-center pb-2"
+            key={0}
+          >
             Loading more votes...
           </div>
         }
