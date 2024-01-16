@@ -130,21 +130,22 @@ export default function DelegateCardList({
                     />
                     <p className={styles.summary}>{truncatedStatement}</p>
                   </VStack>
-                  <div className="flex-grow" />
-                  <DelegateActions
-                    delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchVotingPowerForSubdelegation={
-                      fetchVotingPowerForSubdelegation
-                    }
-                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-                    fetchCurrentDelegatees={fetchCurrentDelegatees}
-                    getProxyAddress={getProxyAddress}
-                    isAdvancedUser={isAdvancedUser}
-                    fetchDirectDelegatee={fetchDirectDelegatee}
-                  />
+                  <div className="min-h-[24px]">
+                    <DelegateActions
+                      delegate={delegate}
+                      fetchBalanceForDirectDelegation={
+                        fetchBalanceForDirectDelegation
+                      }
+                      fetchVotingPowerForSubdelegation={
+                        fetchVotingPowerForSubdelegation
+                      }
+                      checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+                      fetchCurrentDelegatees={fetchCurrentDelegatees}
+                      getProxyAddress={getProxyAddress}
+                      isAdvancedUser={isAdvancedUser}
+                      fetchDirectDelegatee={fetchDirectDelegatee}
+                    />
+                  </div>
                 </VStack>
               </Link>
             </div>
