@@ -121,7 +121,7 @@ export function ApprovalCastVoteDialog({
                         "No token transfer request"
                       ) : (
                         <>
-                          Requesting{" "}
+                          Requesting{"\u00A0"}
                           <TokenAmountDisplay
                             fragment={option.budgetTokensSpent}
                           />
@@ -187,7 +187,7 @@ function CastVoteWithReason({
         {!abstain && numberOfOptions > 0 && (
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
-            {numberOfOptions > 1 && "s"} with{" "}
+            {numberOfOptions > 1 && "s"} with{"\u00A0"}
             {
               <TokenAmountDisplay
                 amount={votingPower.totalVP}
@@ -202,14 +202,12 @@ function CastVoteWithReason({
         )}
         {abstain && (
           <Button onClick={() => onVoteClick()}>
-            Vote for no options with{" "}
-            {
-              <TokenAmountDisplay
-                amount={votingPower.totalVP}
-                decimals={18}
-                currency="OP"
-              />
-            }
+            Vote for no options with{"\u00A0"}
+            <TokenAmountDisplay
+              amount={votingPower.totalVP}
+              decimals={18}
+              currency="OP"
+            />
           </Button>
         )}
       </VStack>

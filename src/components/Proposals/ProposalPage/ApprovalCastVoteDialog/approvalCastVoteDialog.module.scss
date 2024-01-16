@@ -1,6 +1,10 @@
 @import "@/styles/variables";
 @import "@/styles/mixins";
 
+.container {
+  transform-style: preserve-3d;
+}
+
 .title {
   font-size: $font-size-xl;
   font-weight: $font-weight-extrabold;
