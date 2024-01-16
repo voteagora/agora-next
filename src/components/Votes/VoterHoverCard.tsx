@@ -11,7 +11,8 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
-import { Delegate, DelegateStatement } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/delegates/delegate";
+import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 
 interface Props {
   address: string;
