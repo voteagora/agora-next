@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
 import { VStack } from "../../Layout/Stack";
@@ -36,9 +35,9 @@ export default function DelegateCardList({
   fetchDirectDelegatee,
 }: Props) {
   const router = useRouter();
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialDelegates] || []);
-  const [meta, setMeta] = React.useState(initialDelegates.meta);
+  const fetching = useRef(false);
+  const [pages, setPages] = useState([initialDelegates] || []);
+  const [meta, setMeta] = useState(initialDelegates.meta);
 
   useEffect(() => {
     setPages([initialDelegates]);

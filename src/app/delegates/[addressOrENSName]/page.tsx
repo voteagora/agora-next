@@ -28,27 +28,14 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  let delegate;
-  let delegateVotes: {
-    meta: { currentPage: number; pageSize: number; hasNextPage: boolean };
-    votes: Vote[];
-  } | null;
-  let statement;
-  let delegatees: Delegation[];
-  let delegators: Delegation[];
-  try {
-    delegate = await fetchDelegate(addressOrENSName);
-    delegateVotes = await fetchVotesForDelegate(addressOrENSName);
-    statement = await fetchDelegateStatement(addressOrENSName);
-    delegatees = await fetchCurrentDelegatees(addressOrENSName);
-    delegators = await fetchCurrentDelegators(addressOrENSName);
-  } catch (error) {
-    delegate = null;
-    delegateVotes = null;
-    statement = null;
-    delegatees = [];
-    delegators = [];
-  }
+  const [delegate, delegateVotes, statement, delegatees, delegators] =
+    await Promise.all([
+      fetchDelegate(addressOrENSName),
+      fetchVotesForDelegate(addressOrENSName),
+      fetchDelegateStatement(addressOrENSName),
+      fetchCurrentDelegatees(addressOrENSName),
+      fetchCurrentDelegators(addressOrENSName),
+    ]);
 
   if (!delegate) {
     return (
@@ -57,23 +44,21 @@ export default async function Page({
   }
 
   return (
-    <DelegateVotesProvider initialVotes={delegateVotes}>
-      <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
-        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
-          <DelegateCard delegate={delegate} />
-        </VStack>
+    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+        <DelegateCard delegate={delegate} />
+      </VStack>
 
-        <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full gap-8">
-          <DelegateStatementContainer
-            addressOrENSName={addressOrENSName}
-            statement={statement}
-          />
-          {statement && <TopIssues statement={statement} />}
-          <DelegationsContainer
-            delegatees={delegatees}
-            delegators={delegators}
-          />
+      <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full gap-8">
+        <DelegateStatementContainer
+          addressOrENSName={addressOrENSName}
+          statement={statement}
+        />
+        {statement && <TopIssues statement={statement} />}
+        <DelegationsContainer delegatees={delegatees} delegators={delegators} />
 
+        {/* TODO: frh -> this could be refactor with revalidatePath */}
+        <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col justify-between gap-2 md:flex-row">
@@ -113,8 +98,8 @@ export default async function Page({
               <p>No past votes available.</p>
             </div>
           )}
-        </VStack>
-      </div>
-    </DelegateVotesProvider>
+        </DelegateVotesProvider>
+      </VStack>
+    </div>
   );
 }
