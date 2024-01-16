@@ -10,6 +10,7 @@ import Image from "next/image";
 import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import { useAccount } from "wagmi";
 
 import {
   HoverCard,
@@ -51,6 +52,7 @@ export default function ProposalVotesList({
   };
   const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
   const { isAdvancedUser } = useIsAdvancedUser();
+  const { address: connectedAddress } = useAccount();
 
   return (
     <div className={styles.vote_container}>
@@ -80,6 +82,9 @@ export default function ProposalVotesList({
                   >
                     <HStack gap={1} alignItems="items-center">
                       <HumanAddress address={vote.address} />
+                      {vote.address === connectedAddress.toLowerCase() && (
+                        <p>(you)</p>
+                      )}
                       <VoteText support={vote.support} />
                     </HStack>
                     <HStack
