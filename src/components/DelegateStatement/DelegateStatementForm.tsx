@@ -103,7 +103,7 @@ export default function DelegateStatementForm({
       return;
     }
 
-    router.push(`/delegates/${address}`);
+    router.push(`/delegates/${address}?dssave=true`);
   }
 
   const canSubmit =
