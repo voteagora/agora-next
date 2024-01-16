@@ -19,6 +19,15 @@ import { useRouter } from "next/navigation";
 import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 
+const cleanTopIssues = (
+  issues: {
+    value: string;
+    type: string;
+  }[]
+) => {
+  return issues.filter((issue) => issue.value !== "");
+};
+
 export default function DelegateStatementForm({
   form,
 }: {
@@ -53,8 +62,22 @@ export default function DelegateStatementForm({
     if (!walletClient) {
       throw new Error("signer not available");
     }
+    values.topIssues = cleanTopIssues(values.topIssues);
+    const { daoSlug, discord, delegateStatement, email, twitter, topIssues } =
+      values;
 
-    const serializedBody = JSON.stringify(values, undefined, "\t");
+    // User will only sign what he is seeing on the frontend
+    const body = {
+      agreeCodeConduct: values.agreeCodeConduct,
+      daoSlug,
+      discord,
+      delegateStatement,
+      email,
+      twitter,
+      topIssues,
+    };
+
+    const serializedBody = JSON.stringify(body, undefined, "\t");
     const signature = await messageSigner
       .signMessageAsync({
         message: serializedBody,
