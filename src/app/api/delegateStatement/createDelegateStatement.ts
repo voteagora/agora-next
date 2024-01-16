@@ -1,7 +1,7 @@
 import "server-only";
 
 import prisma from "@/app/lib/prisma";
-import { DelegateStatementFormValues } from "@/components/DelegateStatement/DelegateStatementForm";
+import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { type DaoSlug, Prisma } from "@prisma/client";
 import verifyMessage from "@/lib/serverVerifyMessage";
 

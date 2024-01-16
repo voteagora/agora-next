@@ -79,7 +79,16 @@ export default function CurrentDelegateStatement() {
               type: string;
             }[];
           }
-        )?.topIssues || initialTopIssues(),
+        )?.topIssues.length > 0
+          ? (
+              delegateStatement?.payload as {
+                topIssues: {
+                  value: string;
+                  type: string;
+                }[];
+              }
+            )?.topIssues
+          : initialTopIssues(),
       openToSponsoringProposals:
         (
           delegateStatement?.payload as {
