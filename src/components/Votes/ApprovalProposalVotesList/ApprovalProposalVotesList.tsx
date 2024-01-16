@@ -118,7 +118,11 @@ function SingleVote({ vote }: { vote: Vote }) {
             {++index}. {option}
           </p>
         ))}
-        {support === "ABSTAIN" && "Abstain"}
+        {support === "ABSTAIN" && (
+          <p className="pl-3 border-l border-gray-eo text-gray-4f font-medium">
+            {"Abstain"}
+          </p>
+        )}
       </VStack>
       {reason && (
         <div>
