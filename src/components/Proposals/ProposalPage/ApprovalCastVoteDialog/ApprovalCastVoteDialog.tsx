@@ -5,6 +5,7 @@ import { AbiCoder } from "ethers";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import {
+  AdvancedVoteAlert,
   LoadingVote,
   NoStatementView,
   SuccessMessage,
@@ -20,6 +21,7 @@ import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { Button } from "@/components/ui/button";
 
 const abiCoder = new AbiCoder();
+
 export function ApprovalCastVoteDialog({
   proposal,
   hasStatement,
@@ -153,6 +155,7 @@ export function ApprovalCastVoteDialog({
           />
         </VStack>
       )}
+      <AdvancedVoteAlert />
     </div>
   );
 }
