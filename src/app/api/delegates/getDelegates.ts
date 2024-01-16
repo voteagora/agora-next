@@ -30,6 +30,11 @@ export async function getDelegates({
             orderBy: {
               num_of_delegators: "desc",
             },
+            where: {
+              num_of_delegators: {
+                not: null,
+              },
+            },
           });
         case "weighted_random":
           return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
