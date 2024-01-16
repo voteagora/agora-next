@@ -137,7 +137,7 @@ export async function getVotesForProposal({
               proposals_mat.proposal_id = ${proposal_id} AND
               proposals_mat.proposal_id = t.proposal_id) p ON TRUE
         ) q
-        ORDER BY ${sort} DESC
+        ORDER BY block_number DESC
         OFFSET ${skip}
         LIMIT ${take};
       `
