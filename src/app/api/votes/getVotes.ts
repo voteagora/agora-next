@@ -5,15 +5,24 @@ import { VotesSort, VotesSortOrder } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import { Prisma } from "@prisma/client";
 
 export const getVotesForDelegate = ({
-  addressOrENSName, page, sort, sortOrder
+  addressOrENSName,
+  page,
+  sort,
+  sortOrder,
 }: {
   addressOrENSName: string;
   page: number;
   sort: VotesSort;
   sortOrder: VotesSortOrder;
-}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, { page, sort, sortOrder });
+}) =>
+  addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
+    page,
+    sort,
+    sortOrder,
+  });
 
 async function getVotesForDelegateForAddress({
   address,
@@ -30,14 +39,37 @@ async function getVotesForDelegateForAddress({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.votes.findMany({
-        where: { voter: address },
-        take,
-        skip,
-        orderBy: {
-          [sort]: sortOrder,
-        },
-      }),
+      prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
+        Prisma.sql`
+        SELECT * FROM (
+          SELECT * FROM (
+            SELECT
+              *
+              FROM center.vote_cast_events
+              WHERE voter = ${address.toLocaleLowerCase()}
+            UNION ALL
+              SELECT
+                *
+              FROM
+                center.vote_cast_with_params_events
+                WHERE voter = ${address.toLocaleLowerCase()}
+          ) t
+          LEFT JOIN LATERAL (
+            SELECT
+              proposals_mat.start_block,
+              proposals_mat.description,
+              proposals_mat.proposal_data,
+              proposals_mat.proposal_type::center.proposal_type AS proposal_type
+            FROM
+              center.proposals_mat
+            WHERE
+              proposals_mat.proposal_id = t.proposal_id) p ON TRUE
+        ) q
+        ORDER BY ${sort} DESC
+        OFFSET ${skip}
+        LIMIT ${take};
+      `
+      ),
     page,
     pageSize
   );
@@ -78,14 +110,38 @@ export async function getVotesForProposal({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.votes.findMany({
-        where: { proposal_id },
-        take,
-        skip,
-        orderBy: {
-          [sort]: sortOrder,
-        },
-      }),
+      prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
+        Prisma.sql`
+        SELECT * FROM (
+          SELECT * FROM (
+            SELECT
+              *
+              FROM center.vote_cast_events
+              WHERE proposal_id = ${proposal_id}
+            UNION ALL
+              SELECT
+                *
+              FROM
+                center.vote_cast_with_params_events
+                WHERE proposal_id = ${proposal_id}
+          ) t
+          LEFT JOIN LATERAL (
+            SELECT
+              proposals_mat.start_block,
+              proposals_mat.description,
+              proposals_mat.proposal_data,
+              proposals_mat.proposal_type::center.proposal_type AS proposal_type
+            FROM
+              center.proposals_mat
+            WHERE
+              proposals_mat.proposal_id = ${proposal_id} AND
+              proposals_mat.proposal_id = t.proposal_id) p ON TRUE
+        ) q
+        ORDER BY ${sort} DESC
+        OFFSET ${skip}
+        LIMIT ${take};
+      `
+      ),
     page,
     pageSize
   );
