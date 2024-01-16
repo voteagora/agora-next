@@ -183,16 +183,6 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                         Create delegate statement
                       </Link>
                     )}
-                    <Link
-                      href="/statements/create"
-                      onClick={() => close()}
-                      className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                    >
-                      {hasStatement
-                        ? "Edit delegate statement"
-                        : "Create delegate statement"}
-                    </Link>
-
                     {hasStatement && (
                       <Link
                         href={`/delegates/${ensName ?? address}`}
