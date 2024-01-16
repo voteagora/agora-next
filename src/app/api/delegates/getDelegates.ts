@@ -109,6 +109,8 @@ export async function getDelegate({
   // Build out delegate JSON response
   return {
     address: address,
+    // TODO: frh -> do query here
+    citizen: false,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply)

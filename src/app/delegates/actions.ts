@@ -31,8 +31,6 @@ export async function fetchBalanceForDirectDelegation(addressOrENSName: string) 
 }
 
 export async function fetchDirectDelegatee(addressOrENSName: string) {
-    "use server";
-
     return getDirectDelegatee({ addressOrENSName });
 }
 

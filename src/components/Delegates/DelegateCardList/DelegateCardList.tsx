@@ -16,7 +16,7 @@ import { Delegatees } from "@prisma/client";
 
 export type DelegateChunk = Pick<
   Delegate,
-  "address" | "votingPower" | "statement"
+  "address" | "votingPower" | "statement" | "citizen"
 >;
 
 interface DelegatePaginated {
@@ -27,27 +27,12 @@ interface DelegatePaginated {
 interface Props {
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number) => Promise<DelegatePaginated>;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
-  completeDelegation: () => void;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
   fetchDirectDelegatee,
 }: Props) {
   const router = useRouter();
@@ -131,6 +116,7 @@ export default function DelegateCardList({
                       <DelegateProfileImage
                         address={delegate.address}
                         votingPower={delegate.votingPower}
+                        citizen={delegate.citizen}
                       />
                       <p className={styles.summary}>{truncatedStatement}</p>
                     </VStack>

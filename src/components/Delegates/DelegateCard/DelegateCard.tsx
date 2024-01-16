@@ -12,6 +12,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
         <VStack alignItems="items-stretch" className={styles.image}>
           <DelegateProfileImage
             address={delegate.address}
+            citizen={delegate.citizen}
             votingPower={delegate.votingPower}
           />
         </VStack>

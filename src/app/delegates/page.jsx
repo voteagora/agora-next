@@ -4,9 +4,10 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { getMetrics } from "../api/metrics/getMetrics";
 import { getDelegates } from "../api/delegates/getDelegates";
+import { getCitizens } from "../api/citizens/getCitizens";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
-import { delegatesFilterOptions } from "@/lib/constants";
+import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import {
   getProxy,
   getVotingPowerAvailableForDirectDelegation,
@@ -19,6 +20,12 @@ import {
   getDirectDelegatee,
 } from "../api/delegations/getDelegations";
 import { TabsContent } from "@/components/ui/tabs";
+
+async function fetchCitizens(sort, page = 1, seed) {
+  "use server";
+
+  return getCitizens({ page, seed, sort });
+}
 
 async function fetchDelegates(sort, page = 1, seed) {
   "use server";
@@ -76,8 +83,11 @@ async function fetchDirectDelegatee(addressOrENSName) {
 export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
+  const citizensSort =
+    citizensFilterOptions[searchParams.citizensOrderBy]?.value || "shuffle";
   const seed = Math.random();
   const delegates = await fetchDelegates(sort);
+  const citizens = await fetchCitizens(citizensSort);
   const metrics = await fetchDaoMetrics();
 
   return (
@@ -104,11 +114,11 @@ export default async function Page({ searchParams }) {
         </TabsContent>
         <TabsContent value="citizens">
           <DelegateCardList
-            initialDelegates={delegates}
+            initialDelegates={citizens}
             fetchDelegates={async (page) => {
               "use server";
 
-              return getDelegates({ page, seed, sort });
+              return getCitizens({ page, seed, sort: citizensSort });
             }}
             fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
             fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}

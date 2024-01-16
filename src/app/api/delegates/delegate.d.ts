@@ -2,6 +2,7 @@ import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStat
 
 export type Delegate = {
   address: string;
+  citizen: boolean;
   votingPower: string;
   votingPowerRelativeToVotableSupply: number;
   votingPowerRelativeToQuorum: number;
