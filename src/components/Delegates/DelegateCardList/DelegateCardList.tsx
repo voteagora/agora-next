@@ -13,6 +13,7 @@ import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvid
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegatees } from "@prisma/client";
+import Link from "next/link";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -120,21 +121,15 @@ export default function DelegateCardList({
 
           return (
             <div key={delegate.address} className={styles.link}>
-              <VStack className={styles.link_container}>
-                <VStack gap={4} className="h-full">
-                  <div
-                    onClick={(e) =>
-                      handleClick(e, `/delegates/${delegate.address}`)
-                    }
-                  >
-                    <VStack gap={4} justifyContent="justify-center">
-                      <DelegateProfileImage
-                        address={delegate.address}
-                        votingPower={delegate.votingPower}
-                      />
-                      <p className={styles.summary}>{truncatedStatement}</p>
-                    </VStack>
-                  </div>
+              <Link href={`/delegates/${delegate.address}`}>
+                <VStack gap={4} className={styles.link_container}>
+                  <VStack gap={4} justifyContent="justify-center">
+                    <DelegateProfileImage
+                      address={delegate.address}
+                      votingPower={delegate.votingPower}
+                    />
+                    <p className={styles.summary}>{truncatedStatement}</p>
+                  </VStack>
                   <div className="flex-grow" />
                   <DelegateActions
                     delegate={delegate}
@@ -151,7 +146,7 @@ export default function DelegateCardList({
                     fetchDirectDelegatee={fetchDirectDelegatee}
                   />
                 </VStack>
-              </VStack>
+              </Link>
             </div>
           );
         })}
