@@ -77,8 +77,8 @@ export default function ApprovalProposalVotesList({
       >
         <ul className="flex flex-col divide-y">
           {proposalVotes.map((vote) => (
-            <li className="p-4">
-              <SingleVote key={vote.transactionHash} vote={vote} />
+            <li key={vote.transactionHash} className="p-4">
+              <SingleVote vote={vote} />
             </li>
           ))}
         </ul>
