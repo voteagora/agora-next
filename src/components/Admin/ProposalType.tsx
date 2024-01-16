@@ -84,8 +84,8 @@ export default function ProposalType({
       functionName: "setProposalType",
       args: [
         BigInt(index),
-        formValues.quorum * 100,
-        formValues.approval_threshold * 100,
+        Math.round(formValues.quorum * 100),
+        Math.round(formValues.approval_threshold * 100),
         formValues.name,
       ],
     });
@@ -158,7 +158,17 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
-                      disabled={isDisabled || setProposalTypeError}
+                      disabled={isDisabled}
+                      onChange={(e) => {
+                        form.setValue(
+                          "quorum",
+                          Number(e.target.value) > 100
+                            ? 100
+                            : Number(e.target.value) < 0
+                            ? 0
+                            : Number(e.target.value)
+                        );
+                      }}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
                       <p>% of votable supply</p>
@@ -194,7 +204,17 @@ export default function ProposalType({
                       max={100}
                       step={0.01}
                       type="number"
-                      disabled={isDisabled || setProposalTypeError}
+                      disabled={isDisabled}
+                      onChange={(e) => {
+                        form.setValue(
+                          "approval_threshold",
+                          Number(e.target.value) > 100
+                            ? 100
+                            : Number(e.target.value) < 0
+                            ? 0
+                            : Number(e.target.value)
+                        );
+                      }}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground">
                       <p>% of votes for each proposal</p>
