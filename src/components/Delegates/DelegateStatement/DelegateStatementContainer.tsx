@@ -32,7 +32,7 @@ export default function DelegateStatementContainer({
           role="alert"
         >
           <p className="font-bold">Statement Saved</p>
-          <p>Nice! Thank you for telling the community what you beleive in.</p>
+          <p>Nice! Thank you for telling the community what you believe in.</p>
         </div>
       )}
       {!delegateStatement && (
