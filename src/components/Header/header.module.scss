@@ -80,7 +80,8 @@
     opacity: 0.6;
   }
   @media (max-width: $max-width-lg) {
-    display: block;
+    display: flex;
+    align-items: center;
   }
 }
 
