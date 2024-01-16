@@ -66,7 +66,7 @@ export async function getDelegates({
     meta,
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
-      votingPower: delegate.voting_power?.toFixed(),
+      votingPower: delegate.voting_power?.toFixed(0),
       statement: statements[index],
     })),
   };

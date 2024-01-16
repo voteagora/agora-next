@@ -135,6 +135,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                         <MobileValueWrapper>
                           <Link
                             href={`/delegates/${delegate?.address}`}
+                            onClick={() => close()}
                             className="underline"
                           >
                             View more
@@ -170,7 +171,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                     {hasStatement ? (
                       <Link
                         href={`/delegates/edit`}
-                        className={styles.mobile__statement}
+                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
                         onClick={() => close()}
                       >
                         Edit delegate statement
@@ -178,7 +179,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                     ) : (
                       <Link
                         href={`/delegates/create`}
-                        className={styles.mobile__statement}
+                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
                         onClick={() => close()}
                       >
                         Create delegate statement
@@ -188,9 +189,10 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                     {hasStatement && (
                       <Link
                         href={`/delegates/${ensName ?? address}`}
-                        className={styles.mobile__profile}
+                        onClick={() => close()}
+                        className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
                       >
-                        <div>View my profile</div>
+                        View my profile
                       </Link>
                     )}
                   </VStack>
