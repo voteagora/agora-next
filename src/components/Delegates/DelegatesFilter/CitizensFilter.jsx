@@ -14,7 +14,7 @@ export default function CitizensFilter() {
   const [selected, setSelected] = useState(orderByParam || "shuffle");
 
   // TODO: frh -> this router.push is super slow but window.history.pushState does not revalidate the query and the
-  // problem using revalidatePath is that it erases searchParams
+  // problem using revalidatePath is that it erases searchParams, another idea to optimize this filter is to prefetch the data
   useEffect(() => {
     const handleChanges = (value) => {
       value === "shuffle"
