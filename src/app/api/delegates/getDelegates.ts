@@ -8,6 +8,7 @@ import { resolveENSName } from "@/app/lib/utils";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../quorum/getQuorum";
+import { isCitizen } from "../citizens/isCitizen";
 
 export async function getDelegates({
   page = 1,
@@ -106,11 +107,13 @@ export async function getDelegate({
 
   const quorum = await getCurrentQuorum();
 
+  const _isCitizen = await isCitizen(address);
+
   // Build out delegate JSON response
   return {
     address: address,
-    // TODO: frh -> do query here
-    citizen: false,
+    // TODO: frh -> check this with real data
+    citizen: _isCitizen.length > 0,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply)

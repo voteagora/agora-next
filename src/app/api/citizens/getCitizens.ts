@@ -3,11 +3,7 @@ import "server-only";
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-import { isAddress } from "viem";
-import { resolveENSName } from "@/app/lib/utils";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
-import { Delegate } from "../delegates/delegate";
-import { getCurrentQuorum } from "../quorum/getQuorum";
 import { getDelegate } from "../delegates/getDelegates";
 
 export async function getCitizens({
