@@ -106,7 +106,7 @@ export async function getVotesForProposal({
   sort?: VotesSort;
   sortOrder?: VotesSortOrder;
 }) {
-  const pageSize = 50;
+  const pageSize = 10;
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
@@ -137,7 +137,7 @@ export async function getVotesForProposal({
               proposals_mat.proposal_id = ${proposal_id} AND
               proposals_mat.proposal_id = t.proposal_id) p ON TRUE
         ) q
-        ORDER BY weight::NUMERIC DESC
+        ORDER BY block_number DESC
         OFFSET ${skip}
         LIMIT ${take};
       `
