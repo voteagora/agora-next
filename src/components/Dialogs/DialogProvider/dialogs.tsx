@@ -25,7 +25,7 @@ export type DelegateDialogType = {
     delegate: DelegateChunk;
     fetchBalanceForDirectDelegation: (
       addressOrENSName: string
-    ) => Promise<string>;
+    ) => Promise<bigint>;
     fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   };
 };
