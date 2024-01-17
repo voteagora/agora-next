@@ -8,9 +8,23 @@ import {
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import {
+  getProxy,
+  getVotingPowerAtSnapshot,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
+import {
+  getDelegate,
+  getDelegateStatement,
+} from "@/app/api/delegates/getDelegates";
+import {
+  getCurrentDelegatees,
+  getCurrentDelegators,
+  getDirectDelegatee,
+} from "@/app/api/delegations/getDelegations";
 import { Proposal } from "@/app/api/proposals/proposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
@@ -26,6 +40,15 @@ async function fetchVotingPower(
   "use server";
 
   return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
+}
+
+// Pass address of the connected wallet
+async function fetchBalanceForDirectDelegation(
+  addressOrENSName: string | `0x${string}`
+) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
 }
 
 async function fetchAuthorityChains(
@@ -50,7 +73,17 @@ async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   });
 }
 
-async function fetchVotesForProposalAndDelegate(
+async function fetchDelegateStatement(
+  addressOrENSName: string | `0x${string}`
+) {
+  "use server";
+
+  return await getDelegateStatement({
+    addressOrENSName,
+  });
+}
+
+async function fetchVoteForProposalAndDelegate(
   proposal_id: string,
   address: string | `0x${string}`
 ) {
@@ -60,6 +93,48 @@ async function fetchVotesForProposalAndDelegate(
     proposal_id,
     address,
   });
+}
+
+async function fetchVotingPowerForSubdelegation(
+  addressOrENSName: string | `0x${string}`
+) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+async function checkIfDelegatingToProxy(
+  addressOrENSName: string | `0x${string}`
+) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+async function fetchCurrentDelegatees(
+  addressOrENSName: string | `0x${string}`
+) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+async function fetchDirectDelegatee(addressOrENSName: string | `0x${string}`) {
+  "use server";
+
+  return getDirectDelegatee({ addressOrENSName });
+}
+
+async function getProxyAddress(addressOrENSName: string | `0x${string}`) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
+}
+
+async function getDelegators(addressOrENSName: string | `0x${string}`) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
 }
 
 export default async function OPProposalPage({
@@ -93,7 +168,16 @@ export default async function OPProposalPage({
           <ProposalVotesList
             initialProposalVotes={proposalVotes}
             fetchVotesForProposal={fetchProposalVotes}
+            fetchDelegate={fetchDelegate}
+            fetchDelegateStatement={fetchDelegateStatement}
+            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+            fetchCurrentDelegatees={fetchCurrentDelegatees}
+            fetchDirectDelegatee={fetchDirectDelegatee}
+            getProxyAddress={getProxyAddress}
             proposal_id={proposal.id}
+            getDelegators={getDelegators}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}
           <CastVoteInput

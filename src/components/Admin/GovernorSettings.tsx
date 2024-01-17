@@ -62,8 +62,9 @@ export default function GovernorSettings() {
       ...governorContract,
       functionName: "setVotingPeriod",
       args: [
-        (BigInt(Math.floor(votingPeriod || 0)) * 3600n) /
-          BigInt(secondsPerBlock),
+        (votingPeriod
+          ? BigInt(Math.floor(votingPeriod)) * 3600n
+          : BigInt(secondsPerBlock)) / BigInt(secondsPerBlock),
       ],
     });
   const {
@@ -133,12 +134,10 @@ export default function GovernorSettings() {
             <Label>Voting period</Label>
             <div className="relative flex items-center">
               <Input
+                min={0}
                 value={votingPeriod}
                 onChange={(e) => setVotingPeriod(parseInt(e.target.value))}
-                disabled={
-                  /* isInitializing || */ isDisabledSetVotingPeriod ||
-                  setVotingPeriodError
-                }
+                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -165,12 +164,10 @@ export default function GovernorSettings() {
             <Label>Voting delay</Label>
             <div className="relative flex items-center">
               <Input
+                min={0}
                 value={votingDelay}
                 onChange={(e) => setVotingDelay(parseInt(e.target.value))}
-                disabled={
-                  /* isInitializing || */ isDisabledSetVotingDelay ||
-                  setVotingDelayError
-                }
+                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">

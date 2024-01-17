@@ -1,5 +1,5 @@
 import { HStack } from "@/components/Layout/Stack";
-import { TOKEN, formatNumber } from "@/lib/tokenUtils";
+import { TOKEN, formatNumberForAdvancedDelegation } from "@/lib/tokenUtils";
 import Image from "next/image";
 import { useMemo } from "react";
 import tokenIcon from "@/icons/tokenIcon.svg";
@@ -8,10 +8,10 @@ import styles from "./advancedDelegateDialog.module.scss";
 export function AdvancedDelegationDisplayAmount({
   amount,
 }: {
-  amount: bigint | string;
+  amount: string;
 }) {
   const formattedNumber = useMemo(() => {
-    return formatNumber(amount);
+    return formatNumberForAdvancedDelegation(amount);
   }, [amount]);
 
   return (

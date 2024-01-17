@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
-import { Delegate } from "./delegate";
+import { Delegate, DelegateStatement } from "./delegate";
 import { getStatment } from "../statements/getStatements";
 
 import "server-only";
@@ -29,6 +29,11 @@ export async function getDelegates({
             take,
             orderBy: {
               num_of_delegators: "desc",
+            },
+            where: {
+              num_of_delegators: {
+                not: null,
+              },
             },
           });
         case "weighted_random":
@@ -66,7 +71,7 @@ export async function getDelegates({
     meta,
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
-      votingPower: delegate.voting_power?.toFixed(),
+      votingPower: delegate.voting_power?.toFixed(0),
       statement: statements[index],
     })),
   };
@@ -127,4 +132,15 @@ export async function getDelegate({
     numOfDelegators: numOfDelegators?.num_for_delegators || 0n,
     statement: delegateStatement,
   };
+}
+
+export async function getDelegateStatement({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}): Promise<DelegateStatement | null> {
+  const delegateStatement = await getStatment({ addressOrENSName });
+
+  // Build out delegate JSON response
+  return delegateStatement;
 }

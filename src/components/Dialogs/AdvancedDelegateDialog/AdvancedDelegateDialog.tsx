@@ -67,8 +67,8 @@ export function AdvancedDelegateDialog({
 
         return (
           Math.round(
-            Number(formatUnits(BigInt(delegation.allowance), 18)) * 100
-          ) / 100
+            Number(formatUnits(BigInt(delegation.allowance), 18)) * 1000
+          ) / 1000
         );
       });
 

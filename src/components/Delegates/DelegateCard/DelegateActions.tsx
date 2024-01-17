@@ -20,6 +20,7 @@ export function DelegateActions({
   getProxyAddress,
   isAdvancedUser,
   fetchDirectDelegatee,
+  delegators,
 }: {
   delegate: DelegateChunk;
   className?: string;
@@ -34,6 +35,7 @@ export function DelegateActions({
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+  delegators: Delegation[] | null;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
@@ -58,6 +60,7 @@ export function DelegateActions({
               checkIfDelegatingToProxy={() => checkIfDelegatingToProxy(address)}
               fetchCurrentDelegatees={() => fetchCurrentDelegatees(address)}
               getProxyAddress={() => getProxyAddress(address)}
+              delegators={delegators}
             />
           ) : (
             <DelegateButton

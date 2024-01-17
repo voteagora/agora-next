@@ -47,6 +47,7 @@ const useIsAdvancedUser = () => {
     "0x97301D575F517A70E66Bd1A92886F7c7D2e3959B", // Stepan Test 7
     "0xeCbdDA9c9Fa136389ab212EdB5e7295b266f7277", // Stepan Test 8
     "0xD753a89450213A8D7f7aCCE3a615d71ebD97366d", // Anika
+    "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd", // Woj Test 1
   ] as `0x${string}`[];
 
   useContractRead({

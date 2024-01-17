@@ -20,6 +20,19 @@ export function bpsToString(bps: number) {
   return `${(Math.round(bps * 100) / 100).toFixed(2)}%`;
 }
 
+export const getProposalTypeText = (proposalType: string) => {
+  switch (proposalType) {
+    case "OPTIMISTIC":
+      return "An Optimistic Proposal";
+    case "STANDARD":
+      return "A Standard Proposal";
+    case "APPROVAL":
+      return "An Approval Vote Proposal";
+    default:
+      return "A Proposal";
+  }
+};
+
 const format = new Intl.NumberFormat("en", {
   style: "decimal",
   maximumSignificantDigits: 3,

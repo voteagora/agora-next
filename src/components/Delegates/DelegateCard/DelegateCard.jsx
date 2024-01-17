@@ -5,21 +5,15 @@ import styles from "./delegateCard.module.scss";
 import DelegateCardClient from "./DelegateCardClient";
 
 export default async function DelegateCard({
-  addressOrENSName,
-  fetchDelegate,
+  delegate,
   fetchBalanceForDirectDelegation,
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
   fetchDirectDelegatee,
+  getDelegators,
 }) {
-  const delegate = await fetchDelegate(addressOrENSName);
-
-  if (!delegate) {
-    return null;
-  }
-
   return (
     <VStack className={styles.container}>
       <VStack className={styles.card}>
@@ -87,6 +81,7 @@ export default async function DelegateCard({
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               getProxyAddress={getProxyAddress}
               fetchDirectDelegatee={fetchDirectDelegatee}
+              getDelegators={getDelegators}
             />
           </VStack>
         </div>
