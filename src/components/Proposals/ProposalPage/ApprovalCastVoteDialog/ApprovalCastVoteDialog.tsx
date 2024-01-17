@@ -16,6 +16,8 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import styles from "./approvalCastVoteDialog.module.scss";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
+import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
+import { getVpToDisplay } from "@/lib/voteUtils";
 
 const abiCoder = new AbiCoder();
 
@@ -70,7 +72,10 @@ export function ApprovalCastVoteDialog({
     authorityChains,
     reason,
     params: encodedParams,
+    missingVote,
   });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   useMemo(() => {
     const encoded = abstain
@@ -142,7 +147,7 @@ export function ApprovalCastVoteDialog({
             setReason={setReason}
             numberOfOptions={selectedOptions.length}
             abstain={abstain}
-            votingPower={votingPower}
+            votingPower={vpToDisplay}
           />
         </VStack>
       )}
@@ -164,7 +169,7 @@ function CastVoteWithReason({
   setReason: React.Dispatch<React.SetStateAction<string>>;
   numberOfOptions: number;
   abstain: boolean;
-  votingPower: VotingPowerData;
+  votingPower: string;
 }) {
   return (
     <VStack className={styles.cast_vote_box} gap={4}>
@@ -181,7 +186,7 @@ function CastVoteWithReason({
             {numberOfOptions > 1 && "s"} with{"\u00A0"}
             {
               <TokenAmountDisplay
-                amount={votingPower.totalVP}
+                amount={votingPower}
                 decimals={18}
                 currency="OP"
               />
@@ -195,7 +200,7 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             Vote for no options with{"\u00A0"}
             <TokenAmountDisplay
-              amount={votingPower.totalVP}
+              amount={votingPower}
               decimals={18}
               currency="OP"
             />

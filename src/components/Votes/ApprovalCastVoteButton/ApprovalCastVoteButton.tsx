@@ -13,7 +13,7 @@ import { Delegate } from "@/app/api/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { fetchAndSetAll } from "@/lib/utils";
-import { checkIfVoted } from "@/lib/voteUtils";
+import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
@@ -92,7 +92,7 @@ export default function ApprovalCastVoteButton({
     <VStack className={styles.cast_vote_container}>
       <VStack alignItems="items-stretch" className={styles.vote_actions}>
         <VoteButton
-          onClick={() =>
+          onClick={(missingVote: MissingVote) =>
             openDialog({
               type: "APPROVAL_CAST_VOTE",
               params: {
@@ -100,6 +100,7 @@ export default function ApprovalCastVoteButton({
                 hasStatement: !!delegate?.statement,
                 votingPower,
                 authorityChains: chains,
+                missingVote,
               },
             })
           }
@@ -120,7 +121,7 @@ function VoteButton({
   isReady,
   votingPower,
 }: {
-  onClick: () => void;
+  onClick: (missingVote: MissingVote) => void;
   proposalStatus: Proposal["status"];
   delegateVotes: Vote[];
   isReady: boolean;
@@ -145,9 +146,9 @@ function VoteButton({
     return <DisabledVoteButton reason="Loading..." />;
   }
 
-  const hasVoted = checkIfVoted(delegateVotes, votingPower);
+  const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
 
-  if (hasVoted) {
+  if (missingVote === "NONE") {
     return <DisabledVoteButton reason="Already voted" />;
   }
 
@@ -155,7 +156,7 @@ function VoteButton({
     <HStack gap={2} className="pt-1">
       <CastButton
         onClick={() => {
-          onClick();
+          onClick(missingVote);
         }}
       />
     </HStack>
