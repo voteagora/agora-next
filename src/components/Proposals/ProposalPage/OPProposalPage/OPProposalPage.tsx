@@ -83,7 +83,7 @@ async function fetchDelegateStatement(
   });
 }
 
-async function fetchVoteForProposalAndDelegate(
+async function fetchVotesForProposalAndDelegate(
   proposal_id: string,
   address: string | `0x${string}`
 ) {
