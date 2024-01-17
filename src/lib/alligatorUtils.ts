@@ -6,5 +6,8 @@ export async function getProxyAddress(address: string) {
     case "optimism": {
       return OptimismContracts.alligator.contract.proxyAddress(address);
     }
+    default: {
+      throw new Error("Can't find Agora Instance token");
+    }
   }
 }

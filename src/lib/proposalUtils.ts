@@ -193,24 +193,24 @@ export async function parseProposal(
     snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
       ? getHumanBlockTime(
-          proposal.created_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+        proposal.created_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      )
       : null,
     start_time: latestBlock
       ? getHumanBlockTime(
-          proposal.start_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+        proposal.start_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      )
       : null,
     end_time: latestBlock
       ? getHumanBlockTime(
-          proposal.end_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+        proposal.end_block,
+        latestBlock.number,
+        latestBlock.timestamp
+      )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
@@ -221,12 +221,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-          proposal,
-          proposalResuts,
-          Number(latestBlock.number),
-          quorum,
-          votableSupply
-        )
+        proposal,
+        proposalResuts,
+        Number(latestBlock.number),
+        quorum,
+        votableSupply
+      )
       : null,
   };
 }
@@ -239,7 +239,6 @@ export function getProposalTotalValue(
 ) {
   switch (proposalData.key) {
     case "STANDARD" || "OPTIMISTIC": {
-      // TODO: frh -> check this value
       return proposalData.kind.options.reduce((acc, option) => {
         return (
           option.values.reduce((sum, val) => {

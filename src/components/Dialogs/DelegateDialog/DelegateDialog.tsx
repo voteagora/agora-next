@@ -25,7 +25,7 @@ export function DelegateDialog({
   delegate: DelegateChunk;
   fetchBalanceForDirectDelegation: (
     addressOrENSName: string
-  ) => Promise<string>;
+  ) => Promise<bigint>;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   completeDelegation: () => void;
 }) {
@@ -57,7 +57,7 @@ export function DelegateDialog({
     if (!accountAddress) return;
 
     const vp = await fetchBalanceForDirectDelegation(accountAddress);
-    setVotingPower(vp);
+    setVotingPower(vp.toString());
 
     const direct = await fetchDirectDelegatee(accountAddress);
     setDelegatee(direct);

@@ -4,7 +4,7 @@ import styles from "./OPProposalPage.module.scss";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import {
-  getVoteForProposalAndDelegate,
+  getVotesForProposalAndDelegate,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -16,10 +16,8 @@ import {
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
-import {
-  getDelegate,
-  getDelegateStatement,
-} from "@/app/api/delegates/getDelegates";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
 import { cn, formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "@/lib/constants";
@@ -38,11 +36,10 @@ async function fetchProposalVotes(proposal_id, page = 1) {
 async function fetchVotingPower(address, blockNumber) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({
+    blockNumber,
+    addressOrENSName: address,
+  });
 }
 
 async function fetchAuthorityChains(address, blockNumber) {
@@ -61,10 +58,10 @@ async function fetchDelegate(addressOrENSName) {
   });
 }
 
-async function fetchVoteForProposalAndDelegate(proposal_id, address) {
+async function fetchVotesForProposalAndDelegate(proposal_id, address) {
   "use server";
 
-  return await getVoteForProposalAndDelegate({
+  return await getVotesForProposalAndDelegate({
     proposal_id,
     address,
   });
@@ -197,7 +194,7 @@ export default async function OPProposalPage({ proposal }) {
             fetchVotingPower={fetchVotingPower}
             fetchAuthorityChains={fetchAuthorityChains}
             fetchDelegate={fetchDelegate}
-            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
+            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
             isOptimistic
           />
           <p className="text-gray-4f text-xs mx-4">

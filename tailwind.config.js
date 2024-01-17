@@ -277,6 +277,7 @@ module.exports = {
         none: "0",
         DEFAULT: "0.25rem",
         xl: "0.75rem",
+        "2xl": "1rem",
         full: "9999px",
         lg: `var(--radius)`,
         // lg: "0.5rem",
