@@ -70,5 +70,10 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
 }
 
 export async function getProposalTypes() {
-  return prisma.proposalTypes.findMany();
+  return prisma.proposalTypes.findMany({
+    where: {
+      contract:
+        OptimismContracts.proposalTypesConfigurator.address.toLowerCase(),
+    },
+  });
 }
