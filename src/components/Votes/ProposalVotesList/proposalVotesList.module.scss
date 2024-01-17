@@ -3,13 +3,14 @@
 .vote_row {
   font-size: $font-size-xs;
   color: #66676b;
+  padding: $spacing-1 0;
 
   .voter {
     color: $gray-4f;
     font-weight: $font-weight-semibold;
   }
   .vote_reason {
-    font-family: $font-family-sans;
+    font-family: inherit;
     font-size: $font-size-xs;
     font-weight: $font-weight-medium;
     white-space: pre-wrap;
