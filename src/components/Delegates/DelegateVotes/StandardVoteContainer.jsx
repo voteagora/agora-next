@@ -5,7 +5,9 @@ import styles from "./delegateVotes.module.scss";
 function StandardVoteContainer({ support, weight }) {
   return (
     <span
-      className={styles.standard_container + ` vote_${support.toLowerCase()}`}
+      className={`text-xs font-medium ${
+        support.toLowerCase() === "for" && "text-[#06AB34]"
+      } ${support.toLowerCase() === "against" && "text-[#D62600]"}`} // todo generalize the colors in tailwind config
     >
       <span className="capitalize">{support.toLowerCase()}</span> with{" "}
       {pluralizeVote(weight, "optimism")}
