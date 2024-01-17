@@ -44,7 +44,7 @@ export default function DelegateStatementContainer({
                 rel="noopener"
                 target="_blank"
                 className="underline"
-                href="https://vote.optimism.io/create"
+                href="/delegates/create"
               >
                 Create your delegate statement
               </a>
