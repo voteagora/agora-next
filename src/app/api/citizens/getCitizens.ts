@@ -50,7 +50,7 @@ export async function getCitizens({
         ...citizen,
         // Mark as citizen to display badge
         citizen: true,
-        votingPower: Number(delegate.votingPower).toFixed(),
+        votingPower: delegate.votingPower,
         statement
       }
     })
