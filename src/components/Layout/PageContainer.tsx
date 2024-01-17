@@ -15,7 +15,8 @@ type Props = {
 export function PageContainer({ children }: Props) {
   return (
     <DialogProvider>
-      <div className="container my-4 mx-auto px-4 sm:px-6 lg:px-8">
+      {/* md:max-w-none to prevent max-width set by container */}
+      <div className="container xl:max-w-[1280px] md:max-w-none my-4 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-dotted-pattern" />
         <div className="bg-radial-gradient" />
         {children}

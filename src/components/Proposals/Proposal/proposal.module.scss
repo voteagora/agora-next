@@ -4,25 +4,23 @@
   border-bottom: 1px solid $gray-300;
 }
 
-.cell_content {
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.cell_content_title {
+  font-size: $font-size-xs;
+  color: $gray-700;
+}
+.cell_content_body {
   overflow: hidden;
-  padding: $spacing-4 $spacing-6;
-  .cell_content_title {
-    font-size: $font-size-xs;
-    color: $gray-700;
-  }
-  .cell_content_body {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .cell_title {
   width: 55%;
   align-items: flex-start;
   justify-content: center;
+  @media (max-width: $max-width-5xl) {
+    width: 47%;
+  }
   @media (max-width: $max-width-lg) {
     width: 100%;
   }
@@ -31,6 +29,9 @@
   width: 15%;
   align-items: flex-start;
   justify-content: center;
+  @media (max-width: $max-width-5xl) {
+    width: 18%;
+  }
   @media (max-width: $max-width-lg) {
     display: none;
   }
@@ -39,6 +40,9 @@
   width: 30%;
   align-items: flex-end;
   justify-content: center;
+  @media (max-width: $max-width-5xl) {
+    width: 35%;
+  }
   @media (max-width: $max-width-lg) {
     display: none;
   }

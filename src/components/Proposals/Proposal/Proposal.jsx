@@ -14,7 +14,12 @@ export default function Proposal({ proposal, votableSupply }) {
   return (
     <Link href={`/proposals/${proposal.id}`}>
       <HStack alignItems="center" className={styles.proposal_row}>
-        <VStack className={cn(styles.cell_content, styles.cell_title)}>
+        <VStack
+          className={cn(
+            "whitespace-nowrap text-ellipsis overflow-hidden py-4 px-6 md:p-4 lg:py-4 lg:px-6",
+            styles.cell_title
+          )}
+        >
           <HStack className={styles.cell_content_title} gap={1}>
             {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
             <div>
@@ -33,7 +38,12 @@ export default function Proposal({ proposal, votableSupply }) {
               : proposal.markdowntitle}
           </div>
         </VStack>
-        <VStack className={cn(styles.cell_content, styles.cell_status)}>
+        <VStack
+          className={cn(
+            "whitespace-nowrap text-ellipsis overflow-hidden py-4 px-6 md:p-4 lg:py-4 lg:px-6",
+            styles.cell_status
+          )}
+        >
           <VStack alignItems="flex-end">
             <div className={styles.cell_content_title}>
               <ProposalTimeStatus
@@ -44,7 +54,12 @@ export default function Proposal({ proposal, votableSupply }) {
             <ProposalStatus proposal={proposal} />
           </VStack>
         </VStack>
-        <VStack className={cn(styles.cell_content, styles.cell_result)}>
+        <VStack
+          className={cn(
+            "whitespace-nowrap text-ellipsis overflow-hidden py-4 px-6 md:p-4 lg:py-4 lg:px-6",
+            styles.cell_result
+          )}
+        >
           <div className={styles.cell_content_body}>
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
