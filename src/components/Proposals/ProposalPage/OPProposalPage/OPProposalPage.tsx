@@ -22,6 +22,7 @@ import {
 } from "@/app/api/delegates/getDelegates";
 import {
   getCurrentDelegatees,
+  getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 import { Proposal } from "@/app/api/proposals/proposal";
@@ -134,6 +135,12 @@ async function getProxyAddress(addressOrENSName: string | `0x${string}`) {
   return getProxy({ addressOrENSName });
 }
 
+async function getDelegators(addressOrENSName: string | `0x${string}`) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
 export default async function OPProposalPage({
   proposal,
 }: {
@@ -174,6 +181,7 @@ export default async function OPProposalPage({
             fetchDirectDelegatee={fetchDirectDelegatee}
             getProxyAddress={getProxyAddress}
             proposal_id={proposal.id}
+            getDelegators={getDelegators}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}
           <CastVoteInput
