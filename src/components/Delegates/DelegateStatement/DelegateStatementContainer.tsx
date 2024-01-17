@@ -18,7 +18,7 @@ export default function DelegateStatementContainer({
 
   const delegateStatement = (
     statement?.payload as { delegateStatement: string }
-  ).delegateStatement;
+  )?.delegateStatement;
 
   const searchParams = useSearchParams();
   const dssave = searchParams ? searchParams.get("dssave") : null;
