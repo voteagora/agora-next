@@ -12,6 +12,7 @@ import styles from "./castVoteDialog.module.scss";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
+import { getVpToDisplay } from "@/lib/voteUtils";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -30,8 +31,8 @@ function CastVoteDialogContents({
   votingPower,
   delegate,
   authorityChains,
+  missingVote,
 }: CastVoteDialogProps) {
-  const { address: accountAddress } = useAccount();
   const { write, isLoading, isSuccess } = useAdvancedVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
@@ -39,7 +40,10 @@ function CastVoteDialogContents({
     advancedVP: BigInt(votingPower.advancedVP),
     authorityChains,
     reason,
+    missingVote,
   });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   if (!delegate) {
     // todo: log
@@ -64,7 +68,7 @@ function CastVoteDialogContents({
         <VStack alignItems="items-end">
           <div className={styles.subtitle}>with</div>
           <TokenAmountDisplay
-            amount={votingPower.totalVP}
+            amount={vpToDisplay}
             decimals={18}
             currency="OP"
           />
@@ -85,7 +89,7 @@ function CastVoteDialogContents({
             <VoteButton onClick={write}>
               Vote {supportType.toLowerCase()} with{" "}
               <TokenAmountDisplay
-                amount={votingPower.totalVP}
+                amount={vpToDisplay}
                 decimals={18}
                 currency="OP"
               />
@@ -95,7 +99,7 @@ function CastVoteDialogContents({
           )}
         </div>
       )}
-      <AdvancedVoteAlert />
+      {missingVote === "BOTH" && <AdvancedVoteAlert />}
     </VStack>
   );
 }

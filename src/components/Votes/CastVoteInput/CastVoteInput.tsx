@@ -13,8 +13,8 @@ import { Delegate } from "@/app/api/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
-import { fetchAndSet, fetchAndSetAll } from "@/lib/utils";
-import { checkIfVoted } from "@/lib/voteUtils";
+import { fetchAndSetAll } from "@/lib/utils";
+import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
@@ -106,7 +106,10 @@ export default function CastVoteInput({
         className={styles.vote_actions}
       >
         <VoteButtons
-          onClick={(supportType: SupportTextProps["supportType"]) =>
+          onClick={(
+            supportType: SupportTextProps["supportType"],
+            missingVote: MissingVote
+          ) =>
             openDialog({
               type: "CAST_VOTE",
               params: {
@@ -116,6 +119,7 @@ export default function CastVoteInput({
                 delegate,
                 votingPower,
                 authorityChains: chains,
+                missingVote,
               },
             })
           }
@@ -138,7 +142,10 @@ function VoteButtons({
   isOptimistic,
   votingPower,
 }: {
-  onClick: (supportType: SupportTextProps["supportType"]) => void;
+  onClick: (
+    supportType: SupportTextProps["supportType"],
+    missingVote: MissingVote
+  ) => void;
   proposalStatus: Proposal["status"];
   delegateVotes: Vote[];
   isReady: boolean;
@@ -164,9 +171,9 @@ function VoteButtons({
     return <DisabledVoteButton reason="Loading..." />;
   }
 
-  const hasVoted = checkIfVoted(delegateVotes, votingPower);
+  const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
 
-  if (hasVoted) {
+  if (missingVote === "NONE") {
     return <DisabledVoteButton reason="Already voted" />;
   }
 
@@ -178,7 +185,10 @@ function VoteButtons({
             key={supportType}
             action={supportType as SupportTextProps["supportType"]}
             onClick={() => {
-              onClick(supportType as SupportTextProps["supportType"]);
+              onClick(
+                supportType as SupportTextProps["supportType"],
+                missingVote
+              );
             }}
           />
         )
