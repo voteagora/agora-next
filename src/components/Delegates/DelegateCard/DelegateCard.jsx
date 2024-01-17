@@ -12,6 +12,7 @@ export default async function DelegateCard({
   fetchCurrentDelegatees,
   getProxyAddress,
   fetchDirectDelegatee,
+  getDelegators,
 }) {
   return (
     <VStack className={styles.container}>
@@ -80,6 +81,7 @@ export default async function DelegateCard({
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               getProxyAddress={getProxyAddress}
               fetchDirectDelegatee={fetchDirectDelegatee}
+              getDelegators={getDelegators}
             />
           </VStack>
         </div>

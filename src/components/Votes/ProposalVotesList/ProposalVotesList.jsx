@@ -30,10 +30,23 @@ export default function ProposalVotesList({
   fetchDirectDelegatee,
   getProxyAddress,
   proposal_id,
+  getDelegators,
 }) {
+  const { address } = useAccount();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposalVotes] || []);
   const [meta, setMeta] = React.useState(initialProposalVotes.meta);
+  const [delegators, setDelegators] = React.useState(null);
+
+  const fetchDelegatorsAndSet = async (addressOrENSName) => {
+    let fetchedDelegators;
+    try {
+      fetchedDelegators = await getDelegators(addressOrENSName);
+    } catch (error) {
+      fetchedDelegators = null;
+    }
+    setDelegators(fetchedDelegators);
+  };
 
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
@@ -53,6 +66,14 @@ export default function ProposalVotesList({
   const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
   const { isAdvancedUser } = useIsAdvancedUser();
   const { address: connectedAddress } = useAccount();
+
+  React.useEffect(() => {
+    if (address) {
+      fetchDelegatorsAndSet(address);
+    } else {
+      setDelegators(null);
+    }
+  }, [address]);
 
   return (
     <div className={styles.vote_container}>
@@ -82,7 +103,7 @@ export default function ProposalVotesList({
                   >
                     <HStack gap={1} alignItems="items-center">
                       <HumanAddress address={vote.address} />
-                      {vote.address === connectedAddress.toLowerCase() && (
+                      {vote.address === connectedAddress?.toLowerCase() && (
                         <p>(you)</p>
                       )}
                       <VoteText support={vote.support} />
@@ -119,6 +140,7 @@ export default function ProposalVotesList({
                     fetchDirectDelegatee={fetchDirectDelegatee}
                     getProxyAddress={getProxyAddress}
                     isAdvancedUser={isAdvancedUser}
+                    delegators={delegators}
                   />
                 </HoverCardContent>
               </HoverCard>
