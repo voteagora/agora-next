@@ -72,14 +72,18 @@ export type CastVoteDialogType = {
   params: Omit<CastVoteDialogProps, "closeDialog">;
 };
 
+export type ApprovalCastVoteDialogProps = {
+  proposal: Proposal;
+  hasStatement: boolean;
+  votingPower: VotingPowerData;
+  authorityChains: string[][];
+  missingVote: MissingVote;
+  closeDialog: () => void;
+};
+
 export type ApprovalCastVoteDialogType = {
   type: "APPROVAL_CAST_VOTE";
-  params: {
-    proposal: Proposal;
-    hasStatement: boolean;
-    votingPower: VotingPowerData;
-    authorityChains: string[][];
-  };
+  params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {

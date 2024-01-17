@@ -25,13 +25,8 @@ export function ApprovalCastVoteDialog({
   closeDialog,
   votingPower,
   authorityChains,
-}: {
-  proposal: Proposal;
-  closeDialog: () => void;
-  hasStatement: boolean;
-  votingPower: VotingPowerData;
-  authorityChains: string[][];
-}) {
+  missingVote,
+}: ApprovalCastVoteDialogProps) {
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
