@@ -1,31 +1,25 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Link from "next/link";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import styles from "./castVoteDialog.module.scss";
-
-type Props = {
-  proposalId: string;
-  reason: string;
-  supportType: SupportTextProps["supportType"];
-  closeDialog: () => void;
-  delegate: any;
-  votingPower: string;
-};
+import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
+import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
+import { Button } from "@/components/ui/button";
+import { getVpToDisplay } from "@/lib/voteUtils";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
 };
 
 // TODO: Better rendering for users with no voting power
-export function CastVoteDialog(props: Props) {
+export function CastVoteDialog(props: CastVoteDialogProps) {
   return <CastVoteDialogContents {...props} />;
 }
 
@@ -36,19 +30,20 @@ function CastVoteDialogContents({
   closeDialog,
   votingPower,
   delegate,
-}: Props) {
-  const { address: accountAddress } = useAccount();
-  const governorContract = OptimismContracts.governor;
-  const { isLoading, isSuccess, write } = useContractWrite({
-    address: governorContract.address as any,
-    abi: governorContract.abi,
-    functionName: "castVoteWithReason",
-    args: [
-      BigInt(proposalId),
-      ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-      reason,
-    ],
+  authorityChains,
+  missingVote,
+}: CastVoteDialogProps) {
+  const { write, isLoading, isSuccess } = useAdvancedVoting({
+    proposalId,
+    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
+    standardVP: BigInt(votingPower.directVP),
+    advancedVP: BigInt(votingPower.advancedVP),
+    authorityChains,
+    reason,
+    missingVote,
   });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   if (!delegate) {
     // todo: log
@@ -56,7 +51,7 @@ function CastVoteDialogContents({
   }
 
   return (
-    <VStack gap={4} className={styles.full_width}>
+    <VStack gap={4} className={styles.dialog_container}>
       <HStack justifyContent="justify-between">
         <VStack>
           {delegate.address ? (
@@ -73,7 +68,7 @@ function CastVoteDialogContents({
         <VStack alignItems="items-end">
           <div className={styles.subtitle}>with</div>
           <TokenAmountDisplay
-            amount={votingPower}
+            amount={vpToDisplay}
             decimals={18}
             currency="OP"
           />
@@ -92,9 +87,9 @@ function CastVoteDialogContents({
         <div>
           {delegate.statement ? (
             <VoteButton onClick={write}>
-              Vote {supportType.toLowerCase()} with{" "}
+              Vote {supportType.toLowerCase()} with{"\u00A0"}
               <TokenAmountDisplay
-                amount={votingPower}
+                amount={vpToDisplay}
                 decimals={18}
                 currency="OP"
               />
@@ -104,6 +99,7 @@ function CastVoteDialogContents({
           )}
         </div>
       )}
+      {missingVote === "BOTH" && <AdvancedVoteAlert />}
     </VStack>
   );
 }
@@ -117,16 +113,20 @@ const VoteButton = ({
   isLoading?: boolean;
 }) => {
   return (
-    <div
-      onClick={onClick}
-      className={`${styles.vote_container}${" "}
-        ${!onClick && styles.disabled}
-      `}
-    >
+    <Button onClick={onClick} className="w-full">
       {children}
-    </div>
+    </Button>
   );
 };
+
+export function AdvancedVoteAlert() {
+  return (
+    <div className={styles.alert}>
+      To cast your vote, you will be requested to sign two transactions, both of
+      which are needed to vote with your full balance.
+    </div>
+  );
+}
 
 export function SuccessMessage() {
   return (

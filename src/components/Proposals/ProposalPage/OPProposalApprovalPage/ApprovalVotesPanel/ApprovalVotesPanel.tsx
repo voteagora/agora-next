@@ -11,6 +11,7 @@ import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/Ap
 import { Proposal } from "@/app/api/proposals/proposal";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 
 type Props = {
   proposal: Proposal;
@@ -36,7 +37,7 @@ type Props = {
   fetchVotingPower: (
     addressOrENSName: string | `0x${string}`,
     blockNumber: number
-  ) => Promise<{ votingPower: string }>;
+  ) => Promise<VotingPowerData>;
   fetchAuthorityChains: (
     address: string | `0x${string}`,
     blockNumber: number
@@ -44,17 +45,10 @@ type Props = {
   fetchDelegate: (
     addressOrENSName: string | `0x${string}`
   ) => Promise<Delegate>;
-  fetchVoteForProposalAndDelegate: (
+  fetchVotesForProposalAndDelegate: (
     proposal_id: string,
     address: string | `0x${string}`
-  ) => Promise<
-    | {
-        vote: undefined;
-      }
-    | {
-        vote: Vote;
-      }
-  >;
+  ) => Promise<Vote[]>;
 };
 
 export default function ApprovalVotesPanel({
@@ -64,7 +58,7 @@ export default function ApprovalVotesPanel({
   fetchVotingPower,
   fetchAuthorityChains,
   fetchDelegate,
-  fetchVoteForProposalAndDelegate,
+  fetchVotesForProposalAndDelegate,
 }: Props) {
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
@@ -107,7 +101,7 @@ export default function ApprovalVotesPanel({
             fetchVotingPower={fetchVotingPower}
             fetchAuthorityChains={fetchAuthorityChains}
             fetchDelegate={fetchDelegate}
-            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
+            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
           />
         </div>
       </VStack>

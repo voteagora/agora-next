@@ -4,7 +4,7 @@ import styles from "./OPProposalPage.module.scss";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import {
-  getVoteForProposalAndDelegate,
+  getVotesForProposalAndDelegate,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -37,11 +37,7 @@ async function fetchVotingPower(
 ) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
 }
 
 // Pass address of the connected wallet
@@ -85,13 +81,13 @@ async function fetchDelegateStatement(
   });
 }
 
-async function fetchVoteForProposalAndDelegate(
+async function fetchVotesForProposalAndDelegate(
   proposal_id: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
-  return await getVoteForProposalAndDelegate({
+  return await getVotesForProposalAndDelegate({
     proposal_id,
     address,
   });
@@ -187,7 +183,7 @@ export default async function OPProposalPage({
             fetchVotingPower={fetchVotingPower}
             fetchAuthorityChains={fetchAuthorityChains}
             fetchDelegate={fetchDelegate}
-            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
+            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
           />
         </VStack>
       </VStack>
