@@ -2,6 +2,14 @@ import { formatFullDate } from "@/lib/utils";
 import styles from "./changelog.module.scss";
 import { cn } from "@/lib/utils";
 
+export async function generateMetadata() {
+  return {
+    title: "Agora - Optimism Changelog",
+    description:
+      "Stay up to date with the latest changes with Agora's development for the Optimism community.",
+  };
+}
+
 export default function Page() {
   return (
     <div className="bg-white">

@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
 import { VStack } from "../../Layout/Stack";
@@ -14,6 +13,8 @@ import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegatees } from "@prisma/client";
 import Link from "next/link";
+import { Delegation } from "@/app/api/delegations/delegation";
+import { useAccount } from "wagmi";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -39,6 +40,7 @@ interface Props {
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   completeDelegation: () => void;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+  getDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateCardList({
@@ -50,11 +52,32 @@ export default function DelegateCardList({
   fetchCurrentDelegatees,
   getProxyAddress,
   fetchDirectDelegatee,
+  getDelegators,
 }: Props) {
   const router = useRouter();
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialDelegates] || []);
-  const [meta, setMeta] = React.useState(initialDelegates.meta);
+  const fetching = useRef(false);
+  const [pages, setPages] = useState([initialDelegates] || []);
+  const [meta, setMeta] = useState(initialDelegates.meta);
+  const { address } = useAccount();
+  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
+
+  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
+    let fetchedDelegators;
+    try {
+      fetchedDelegators = await getDelegators(addressOrENSName);
+    } catch (error) {
+      fetchedDelegators = null;
+    }
+    setDelegators(fetchedDelegators);
+  };
+
+  useEffect(() => {
+    if (address) {
+      fetchDelegatorsAndSet(address);
+    } else {
+      setDelegators(null);
+    }
+  }, [address]);
 
   useEffect(() => {
     setPages([initialDelegates]);
@@ -144,6 +167,7 @@ export default function DelegateCardList({
                       getProxyAddress={getProxyAddress}
                       isAdvancedUser={isAdvancedUser}
                       fetchDirectDelegatee={fetchDirectDelegatee}
+                      delegators={delegators}
                     />
                   </div>
                 </VStack>
