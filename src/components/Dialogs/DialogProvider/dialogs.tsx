@@ -11,6 +11,7 @@ import { Proposal } from "@/app/api/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { Delegatees } from "@prisma/client";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { MissingVote } from "@/lib/voteUtils";
 
 export type DialogType =
   | DelegateDialogType
@@ -65,6 +66,7 @@ export type CastVoteDialogProps = {
   delegate: any;
   votingPower: VotingPowerData;
   authorityChains: string[][];
+  missingVote: MissingVote;
 };
 
 export type CastVoteDialogType = {
@@ -133,7 +135,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   CAST_VOTE: (
-    { proposalId, reason, supportType, delegate, votingPower, authorityChains },
+    {
+      proposalId,
+      reason,
+      supportType,
+      delegate,
+      votingPower,
+      authorityChains,
+      missingVote,
+    },
     closeDialog
   ) => {
     return (
@@ -145,11 +155,12 @@ export const dialogs: DialogDefinitions<DialogType> = {
         delegate={delegate}
         votingPower={votingPower}
         authorityChains={authorityChains}
+        missingVote={missingVote}
       />
     );
   },
   APPROVAL_CAST_VOTE: (
-    { proposal, hasStatement, votingPower, authorityChains },
+    { proposal, hasStatement, votingPower, authorityChains, missingVote },
     closeDialog
   ) => {
     return (
@@ -159,6 +170,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
         votingPower={votingPower}
         authorityChains={authorityChains}
+        missingVote={missingVote}
       />
     );
   },
