@@ -13,7 +13,6 @@ export default function OPStandardProposalStatus({ proposal }) {
   const againstLength = formatNumber(proposal.proposalResults.against);
   const abstainLength = formatNumber(proposal.proposalResults.abstain);
   const totalLength = forLength + againstLength + abstainLength;
-  console.log(totalLength);
   return (
     <div className="flex flex-col items-end gap-1 justify-center">
       <HStack
