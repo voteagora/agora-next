@@ -3,6 +3,14 @@ import badge from "@/icons/badge.svg";
 import sunny from "@/icons/sunny.svg";
 import Image from "next/image";
 
+export async function generateMetadata() {
+  return {
+    title: "Agora - Optimism's RetroPGF Round 3 Summary",
+    description:
+      "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.",
+  };
+}
+
 export default function Page() {
   return (
     <VStack className="w-full items-stretch max-w-6xl pb-16 mt-12">
