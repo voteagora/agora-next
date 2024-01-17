@@ -11,6 +11,7 @@ import { Block } from "ethers";
 import { Vote } from "@/app/api/votes/vote";
 import { isOldApprovalModule } from "./contracts/contracts";
 import { DEPLOYMENT_NAME } from "./config";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 
 /**
  * Vote primitives
@@ -144,4 +145,66 @@ export function parseVote(
         )
       : null,
   };
+}
+
+/**
+ * Check if vote is missing from voting power
+ */
+
+export type MissingVote = "ADVANCED" | "DIRECT" | "BOTH" | "NONE";
+
+export function checkMissingVoteForDelegate(
+  delegateVotes: Vote[],
+  votingPower: VotingPowerData
+): MissingVote {
+  const hasAdvancedVP = BigInt(votingPower.advancedVP) > 0n;
+  const hasDirectVP = BigInt(votingPower.directVP) > 0n;
+  const hasVoted = delegateVotes.length > 0;
+  const hasMultipleVotes = delegateVotes.length > 1;
+  const hasVotedWithDirectVP = delegateVotes.some(
+    (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
+  );
+
+  // Case where delegate voted with both advanced and direct voting power.
+  if (hasMultipleVotes) {
+    return "NONE";
+  }
+
+  // Case where no advanced voting power.
+  // User with 0 VP can cast a Direct Vote.
+  if (!hasAdvancedVP) {
+    return hasVoted ? "NONE" : "DIRECT";
+  }
+
+  // Case where delegate has advanced voting power and not voted at all.
+  if (!hasVoted) {
+    return hasDirectVP ? "BOTH" : "ADVANCED";
+  }
+
+  // Case where delegate can only vote with advanced and has already voted.
+  if (!hasDirectVP) {
+    return "NONE";
+  }
+
+  // Case where delegate has advanced voting power and voted only once.
+  return hasVotedWithDirectVP ? "ADVANCED" : "DIRECT";
+}
+
+export function getVpToDisplay(
+  votingPower: VotingPowerData,
+  missingVote: MissingVote
+): string {
+  if (missingVote === "ADVANCED") {
+    return votingPower.advancedVP;
+  }
+
+  if (missingVote === "DIRECT") {
+    return votingPower.directVP;
+  }
+
+  if (missingVote === "BOTH") {
+    return votingPower.totalVP;
+  }
+
+  return "";
 }
