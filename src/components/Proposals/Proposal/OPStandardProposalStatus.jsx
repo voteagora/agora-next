@@ -45,6 +45,12 @@ export default function OPStandardProposalStatus({ proposal }) {
           ></div>
         </div>
       )}
+
+      {totalLength == 0 && (
+        <div className="flex w-52 h-1 bg-slate-100 rounded-full">
+          <div className=" bg-slate-500 h-1" style={{ width: `100%` }}></div>
+        </div>
+      )}
     </div>
   );
 }
