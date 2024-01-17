@@ -168,15 +168,23 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                       }
                     />
 
-                    <Link
-                      href="/statements/create"
-                      onClick={() => close()}
-                      className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                    >
-                      {hasStatement
-                        ? "Edit delegate statement"
-                        : "Create delegate statement"}
-                    </Link>
+                    {hasStatement ? (
+                      <Link
+                        href={`/delegates/edit`}
+                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                        onClick={() => close()}
+                      >
+                        Edit delegate statement
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/delegates/create`}
+                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                        onClick={() => close()}
+                      >
+                        Create delegate statement
+                      </Link>
+                    )}
 
                     {hasStatement && (
                       <Link

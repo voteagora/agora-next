@@ -3,7 +3,7 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import {
-  getVoteForProposalAndDelegate,
+  getVotesForProposalAndDelegate,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
@@ -23,11 +23,7 @@ async function fetchVotingPower(
 ) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
 }
 
 async function fetchAuthorityChains(
@@ -52,13 +48,13 @@ async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   });
 }
 
-async function fetchVoteForProposalAndDelegate(
+async function fetchVotesForProposalAndDelegate(
   proposal_id: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
-  return await getVoteForProposalAndDelegate({
+  return await getVotesForProposalAndDelegate({
     proposal_id,
     address,
   });
@@ -94,7 +90,7 @@ export default async function OPProposalApprovalPage({
             fetchVotingPower={fetchVotingPower}
             fetchAuthorityChains={fetchAuthorityChains}
             fetchDelegate={fetchDelegate}
-            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
+            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
           />
         </VStack>
       </VStack>

@@ -13,11 +13,13 @@ export default function DelegatesFilter() {
   const orderByParam = searchParams.get("orderBy");
   const [selected, setSelected] = useState(orderByParam || "weightedRandom");
 
+  // TODO: frh -> this router.push is super slow but window.history.pushState does not revalidate the query and the
+  // problem using revalidatePath is that it erases searchParams, another idea to optimize this filter is to prefetch the data
   useEffect(() => {
     const handleChanges = (value) => {
       value === "weightedRandom"
         ? router.push("/delegates")
-        : router.push(`/delegates/?orderBy=${value}`);
+        : router.push(`/delegates?orderBy=${value}`);
     };
 
     handleChanges(selected);
@@ -31,7 +33,7 @@ export default function DelegatesFilter() {
             {delegatesFilterOptions[selected]?.value || "Weighted Random"}
             <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
           </Listbox.Button>
-          <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-[1rem] flex flex-col gap-1">
+          <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1">
             {Object.entries(delegatesFilterOptions).map(([key, option]) => (
               <Listbox.Option key={key} value={key} as={Fragment}>
                 {({ selected }) => {

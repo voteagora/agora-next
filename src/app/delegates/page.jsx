@@ -4,22 +4,29 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { getMetrics } from "../api/metrics/getMetrics";
 import { getDelegates } from "../api/delegates/getDelegates";
+import { getCitizens } from "../api/citizens/getCitizens";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
-import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
-import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
-import PageHeader from "@/components/Layout/PageHeader/PageHeader";
-import { delegatesFilterOptions } from "@/lib/constants";
+import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
+import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import {
   getProxy,
   getVotingPowerAvailableForDirectDelegation,
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "../api/voting-power/getVotingPower";
+
 import {
   getCurrentDelegatees,
   getCurrentDelegators,
   getDirectDelegatee,
 } from "../api/delegations/getDelegations";
+import { TabsContent } from "@/components/ui/tabs";
+
+async function fetchCitizens(sort, page = 1, seed) {
+  "use server";
+
+  return getCitizens({ page, seed, sort });
+}
 
 async function fetchDelegates(sort, page = 1, seed) {
   "use server";
@@ -90,8 +97,11 @@ export async function generateMetadata({}, parent) {
 export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
+  const citizensSort =
+    citizensFilterOptions[searchParams.citizensOrderBy]?.value || "shuffle";
   const seed = Math.random();
   const delegates = await fetchDelegates(sort);
+  const citizens = await fetchCitizens(citizensSort);
   const metrics = await fetchDaoMetrics();
 
   return (
@@ -99,28 +109,40 @@ export default async function Page({ searchParams }) {
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
       <PageDivider />
-      <div className="flex flex-col md:flex-row justify-between items-baseline gap-2">
-        <PageHeader headerText="All Delegates" />
-        <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
-          <DelegatesSearch />
-          <DelegatesFilter />
-        </div>
-      </div>
-      <DelegateCardList
-        initialDelegates={delegates}
-        fetchDelegates={async (page) => {
-          "use server";
+      <DelegateTabs>
+        <TabsContent value="delegates">
+          <DelegateCardList
+            initialDelegates={delegates}
+            fetchDelegates={async (page) => {
+              "use server";
 
-          return getDelegates({ page, seed, sort });
-        }}
-        fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-        fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-        checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-        fetchCurrentDelegatees={fetchCurrentDelegatees}
-        getProxyAddress={getProxyAddress}
-        fetchDirectDelegatee={fetchDirectDelegatee}
-        getDelegators={getDelegators}
-      />
+              return getDelegates({ page, seed, sort });
+            }}
+            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+            fetchCurrentDelegatees={fetchCurrentDelegatees}
+            getProxyAddress={getProxyAddress}
+            fetchDirectDelegatee={fetchDirectDelegatee}
+          />
+        </TabsContent>
+        <TabsContent value="citizens">
+          <DelegateCardList
+            initialDelegates={citizens}
+            fetchDelegates={async (page) => {
+              "use server";
+
+              return getCitizens({ page, seed, sort: citizensSort });
+            }}
+            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
+            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+            fetchCurrentDelegatees={fetchCurrentDelegatees}
+            getProxyAddress={getProxyAddress}
+            fetchDirectDelegatee={fetchDirectDelegatee}
+          />{" "}
+        </TabsContent>
+      </DelegateTabs>
     </section>
   );
 }
