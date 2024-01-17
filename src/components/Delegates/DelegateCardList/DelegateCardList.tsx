@@ -17,7 +17,7 @@ import { useAccount } from "wagmi";
 
 export type DelegateChunk = Pick<
   Delegate,
-  "address" | "votingPower" | "statement"
+  "address" | "votingPower" | "statement" | "citizen"
 >;
 
 interface DelegatePaginated {
@@ -28,16 +28,6 @@ interface DelegatePaginated {
 interface Props {
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number) => Promise<DelegatePaginated>;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
-  completeDelegation: () => void;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   getDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
@@ -45,11 +35,6 @@ interface Props {
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
   fetchDirectDelegatee,
   getDelegators,
 }: Props) {
@@ -134,11 +119,11 @@ export default function DelegateCardList({
         {delegates.map((delegate, i) => {
           let truncatedStatement = "";
 
-          if (delegate.statement && delegate.statement.delegateStatement) {
-            truncatedStatement = delegate.statement.delegateStatement.slice(
-              0,
-              120
-            );
+          if (delegate?.statement?.payload) {
+            const delegateStatement = (
+              delegate?.statement?.payload as { delegateStatement: string }
+            ).delegateStatement;
+            truncatedStatement = delegateStatement.slice(0, 120);
           }
 
           return (
@@ -154,6 +139,7 @@ export default function DelegateCardList({
                       <DelegateProfileImage
                         address={delegate.address}
                         votingPower={delegate.votingPower}
+                        citizen={delegate.citizen}
                       />
                       <p className={styles.summary}>{truncatedStatement}</p>
                     </VStack>
@@ -161,17 +147,7 @@ export default function DelegateCardList({
                   <div className="flex-grow" />
                   <DelegateActions
                     delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchVotingPowerForSubdelegation={
-                      fetchVotingPowerForSubdelegation
-                    }
-                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-                    fetchCurrentDelegatees={fetchCurrentDelegatees}
-                    getProxyAddress={getProxyAddress}
                     isAdvancedUser={isAdvancedUser}
-                    fetchDirectDelegatee={fetchDirectDelegatee}
                     delegators={delegators}
                   />
                 </VStack>

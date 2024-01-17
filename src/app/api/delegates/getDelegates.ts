@@ -1,13 +1,14 @@
+import "server-only";
+
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/utils";
-import { Delegate, DelegateStatement } from "./delegate";
-import { getStatment } from "../statements/getStatements";
-
-import "server-only";
+import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
+import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../quorum/getQuorum";
+import { isCitizen } from "../citizens/isCitizen";
 
 export async function getDelegates({
   page = 1,
@@ -63,7 +64,7 @@ export async function getDelegates({
 
   const statements = await Promise.all(
     delegates.map((delegate) =>
-      getStatment({ addressOrENSName: delegate.delegate })
+      getDelegateStatement({ addressOrENSName: delegate.delegate })
     )
   );
 
@@ -107,13 +108,17 @@ export async function getDelegate({
     where: { delegate: address },
   });
 
-  const delegateStatement = await getStatment({ addressOrENSName });
+  const delegateStatement = await getDelegateStatement({ addressOrENSName });
 
   const quorum = await getCurrentQuorum();
+
+  const _isCitizen = await isCitizen(address);
 
   // Build out delegate JSON response
   return {
     address: address,
+    // TODO: frh -> check this with real data
+    citizen: _isCitizen.length > 0,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply)
@@ -132,15 +137,4 @@ export async function getDelegate({
     numOfDelegators: numOfDelegators?.num_for_delegators || 0n,
     statement: delegateStatement,
   };
-}
-
-export async function getDelegateStatement({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}): Promise<DelegateStatement | null> {
-  const delegateStatement = await getStatment({ addressOrENSName });
-
-  // Build out delegate JSON response
-  return delegateStatement;
 }

@@ -34,7 +34,7 @@ export default function DelegatesVotesSort({ fetchDelegateVotes }) {
             {delegatesVotesSortOptions[delegatesVotesSort].value}
             <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
           </Listbox.Button>
-          <Listbox.Options className="mt-3 absolute right-4 md:right-auto bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-[1rem] flex flex-col gap-1">
+          <Listbox.Options className="mt-3 absolute right-4 md:right-auto bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1">
             {Object.entries(delegatesVotesSortOptions).map(([key, option]) => (
               <Listbox.Option key={key} value={key} as={Fragment}>
                 {({ delegatesVotesSort }) => {

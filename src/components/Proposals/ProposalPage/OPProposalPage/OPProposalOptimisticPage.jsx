@@ -16,10 +16,8 @@ import {
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
-import {
-  getDelegate,
-  getDelegateStatement,
-} from "@/app/api/delegates/getDelegates";
+import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
 import { cn, formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "@/lib/constants";
