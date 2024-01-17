@@ -91,7 +91,7 @@ export default function ProposalVotesList({
         {proposalVotes.map((vote) => (
           <VStack
             key={vote.transactionHash}
-            gap={4}
+            gap={2}
             className={styles.vote_row}
           >
             <VStack>

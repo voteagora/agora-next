@@ -11,13 +11,16 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { fetchAndSetAll } from "@/lib/utils";
+import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
   fetchVotingPower: (
     addressOrENSName: string | `0x${string}`,
     blockNumber: number
-  ) => Promise<{ votingPower: string }>;
+  ) => Promise<VotingPowerData>;
   fetchAuthorityChains: (
     address: string | `0x${string}`,
     blockNumber: number
@@ -25,17 +28,10 @@ type Props = {
   fetchDelegate: (
     addressOrENSName: string | `0x${string}`
   ) => Promise<Delegate>;
-  fetchVoteForProposalAndDelegate: (
+  fetchVotesForProposalAndDelegate: (
     proposal_id: string,
     address: string | `0x${string}`
-  ) => Promise<
-    | {
-        vote: undefined;
-      }
-    | {
-        vote: Vote;
-      }
-  >;
+  ) => Promise<Vote[]>;
 };
 
 export default function ApprovalCastVoteButton({
@@ -43,12 +39,16 @@ export default function ApprovalCastVoteButton({
   fetchVotingPower,
   fetchAuthorityChains,
   fetchDelegate,
-  fetchVoteForProposalAndDelegate,
+  fetchVotesForProposalAndDelegate,
 }: Props) {
-  const [votingPower, setVotingPower] = useState("0");
+  const [votingPower, setVotingPower] = useState<VotingPowerData>({
+    directVP: "0",
+    advancedVP: "0",
+    totalVP: "0",
+  });
   const [delegate, setDelegate] = useState<Delegate>();
   const [chains, setChains] = useState<string[][]>([]);
-  const [vote, setVote] = useState<Vote>();
+  const [votes, setVotes] = useState<Vote[]>([]);
   const [isReady, setIsReady] = useState(false);
   const openDialog = useOpenDialog();
 
@@ -56,25 +56,19 @@ export default function ApprovalCastVoteButton({
 
   const fetchData = useCallback(async () => {
     try {
-      const promises: [
-        Promise<{ votingPower: string }>,
-        Promise<Delegate>,
-        Promise<{ chains: string[][] }>,
-        Promise<{ vote?: Vote }>
-      ] = [
-        fetchVotingPower(address!, proposal.snapshotBlockNumber),
-        fetchDelegate(address!),
-        fetchAuthorityChains(address!, proposal.snapshotBlockNumber),
-        fetchVoteForProposalAndDelegate(proposal.id, address!),
-      ];
+      await fetchAndSetAll(
+        [
+          () => fetchVotingPower(address!, proposal.snapshotBlockNumber),
+          () => fetchDelegate(address!),
+          async () =>
+            (
+              await fetchAuthorityChains(address!, proposal.snapshotBlockNumber)
+            ).chains,
+          () => fetchVotesForProposalAndDelegate(proposal.id, address!),
+        ],
+        [setVotingPower, setDelegate, setChains, setVotes]
+      );
 
-      const [votingPowerResult, delegateResult, chainsResult, voteResult] =
-        await Promise.all(promises);
-
-      setVotingPower(votingPowerResult.votingPower);
-      setDelegate(delegateResult);
-      setChains(chainsResult.chains);
-      setVote(voteResult.vote);
       setIsReady(true);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -85,7 +79,7 @@ export default function ApprovalCastVoteButton({
     fetchAuthorityChains,
     address,
     proposal,
-    fetchVoteForProposalAndDelegate,
+    fetchVotesForProposalAndDelegate,
   ]);
 
   useEffect(() => {
@@ -98,18 +92,22 @@ export default function ApprovalCastVoteButton({
     <VStack className={styles.cast_vote_container}>
       <VStack alignItems="items-stretch" className={styles.vote_actions}>
         <VoteButton
-          onClick={() =>
+          onClick={(missingVote: MissingVote) =>
             openDialog({
               type: "APPROVAL_CAST_VOTE",
               params: {
                 proposal: proposal,
                 hasStatement: !!delegate?.statement,
+                votingPower,
+                authorityChains: chains,
+                missingVote,
               },
             })
           }
           proposalStatus={proposal.status}
-          delegateVote={vote}
+          delegateVotes={votes}
           isReady={isReady}
+          votingPower={votingPower}
         />
       </VStack>
     </VStack>
@@ -119,13 +117,15 @@ export default function ApprovalCastVoteButton({
 function VoteButton({
   onClick,
   proposalStatus,
-  delegateVote,
+  delegateVotes,
   isReady,
+  votingPower,
 }: {
-  onClick: () => void;
+  onClick: (missingVote: MissingVote) => void;
   proposalStatus: Proposal["status"];
-  delegateVote?: Vote;
+  delegateVotes: Vote[];
   isReady: boolean;
+  votingPower: VotingPowerData;
 }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
@@ -146,9 +146,9 @@ function VoteButton({
     return <DisabledVoteButton reason="Loading..." />;
   }
 
-  const hasVoted = !!delegateVote?.transactionHash;
+  const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
 
-  if (hasVoted) {
+  if (missingVote === "NONE") {
     return <DisabledVoteButton reason="Already voted" />;
   }
 
@@ -156,7 +156,7 @@ function VoteButton({
     <HStack gap={2} className="pt-1">
       <CastButton
         onClick={() => {
-          onClick();
+          onClick(missingVote);
         }}
       />
     </HStack>

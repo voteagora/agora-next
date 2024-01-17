@@ -10,6 +10,8 @@ import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/Appr
 import { Proposal } from "@/app/api/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { Delegatees } from "@prisma/client";
+import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { MissingVote } from "@/lib/voteUtils";
 
 export type DialogType =
   | DelegateDialogType
@@ -56,23 +58,34 @@ export type CastProposalDialogType = {
 //   params: {};
 // };
 
+export type CastVoteDialogProps = {
+  proposalId: string;
+  reason: string;
+  supportType: SupportTextProps["supportType"];
+  closeDialog: () => void;
+  delegate: any;
+  votingPower: VotingPowerData;
+  authorityChains: string[][];
+  missingVote: MissingVote;
+};
+
 export type CastVoteDialogType = {
   type: "CAST_VOTE";
-  params: {
-    proposalId: string;
-    reason: string;
-    supportType: SupportTextProps["supportType"];
-    delegate: any;
-    votingPower: string;
-  };
+  params: Omit<CastVoteDialogProps, "closeDialog">;
+};
+
+export type ApprovalCastVoteDialogProps = {
+  proposal: Proposal;
+  hasStatement: boolean;
+  votingPower: VotingPowerData;
+  authorityChains: string[][];
+  missingVote: MissingVote;
+  closeDialog: () => void;
 };
 
 export type ApprovalCastVoteDialogType = {
   type: "APPROVAL_CAST_VOTE";
-  params: {
-    proposal: Proposal;
-    hasStatement: boolean;
-  };
+  params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -122,7 +135,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   CAST_VOTE: (
-    { proposalId, reason, supportType, delegate, votingPower },
+    {
+      proposalId,
+      reason,
+      supportType,
+      delegate,
+      votingPower,
+      authorityChains,
+      missingVote,
+    },
     closeDialog
   ) => {
     return (
@@ -133,15 +154,23 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
         delegate={delegate}
         votingPower={votingPower}
+        authorityChains={authorityChains}
+        missingVote={missingVote}
       />
     );
   },
-  APPROVAL_CAST_VOTE: ({ proposal, hasStatement }, closeDialog) => {
+  APPROVAL_CAST_VOTE: (
+    { proposal, hasStatement, votingPower, authorityChains, missingVote },
+    closeDialog
+  ) => {
     return (
       <ApprovalCastVoteDialog
         proposal={proposal}
         hasStatement={hasStatement}
         closeDialog={closeDialog}
+        votingPower={votingPower}
+        authorityChains={authorityChains}
+        missingVote={missingVote}
       />
     );
   },
