@@ -80,6 +80,13 @@ async function getDelegators(addressOrENSName) {
   return getCurrentDelegators({ addressOrENSName });
 }
 
+export async function generateMetadata({}, parent) {
+  return {
+    title: "Agora - Optimism Voters",
+    description: "See which voters are active on Optimism governance.",
+  };
+}
+
 export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
