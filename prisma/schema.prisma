@@ -26,6 +26,18 @@ model DelegateStatements {
   @@schema("user_data")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model address_metadata {
+  address    String
+  kind       String
+  dao_slug   String
+  metadata   Json?
+  created_at DateTime @default(now()) @db.Date
+
+  @@ignore
+  @@schema("center")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view kent_proposal_stats_test {
   proposal_id                String?
@@ -437,9 +449,9 @@ view subdelegations_kent {
 }
 
 enum ProposalType {
+  OPTIMISTIC
   STANDARD
   APPROVAL
-  OPTIMISTIC
 
   @@map("proposal_type")
   @@schema("center")

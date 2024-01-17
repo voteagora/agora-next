@@ -1,23 +1,42 @@
 "use client";
+
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
+import { useSearchParams } from "next/navigation";
 import DelegateStatement from "./DelegateStatement";
-import { Button } from "@/components/Button";
+import { type DelegateStatement as DelegateStatementType } from "@/app/api/delegateStatement/delegateStatement";
 
 export default function DelegateStatementContainer({
   addressOrENSName,
   statement,
 }: {
   addressOrENSName: string;
-  statement: any;
+  statement: DelegateStatementType | null;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
 
+  const delegateStatement = (
+    statement?.payload as { delegateStatement: string }
+  )?.delegateStatement;
+
+  const searchParams = useSearchParams();
+  const dssave = searchParams ? searchParams.get("dssave") : null;
+  const showSuccessMessage = dssave === "true";
+
   return (
     <>
-      {!statement && !statement?.delegateStatement && (
-        <div className="mb-8 p-8 align-middle text-center rounded-md bg-gray-100">
+      {showSuccessMessage && (
+        <div
+          className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4"
+          role="alert"
+        >
+          <p className="font-bold">Statement Saved</p>
+          <p>Nice! Thank you for telling the community what you believe in.</p>
+        </div>
+      )}
+      {!delegateStatement && (
+        <div className="p-8 align-middle text-center rounded-md bg-gray-100">
           <p>No delegate statement for {addressOrENSName}.</p>
           {isConnected && address === addressOrENSName && (
             <p className="my-3">
@@ -34,9 +53,7 @@ export default function DelegateStatementContainer({
         </div>
       )}
 
-      {statement && statement.delegateStatement && (
-        <DelegateStatement statement={statement.delegateStatement} />
-      )}
+      {delegateStatement && <DelegateStatement statement={delegateStatement} />}
     </>
   );
 }

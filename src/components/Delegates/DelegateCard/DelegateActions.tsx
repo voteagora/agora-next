@@ -5,36 +5,19 @@ import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
-import { Delegation } from "@/app/api/delegations/delegation";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-import { Delegatees } from "@prisma/client";
+import { Delegation } from "@/app/api/delegations/delegation";
 
 export function DelegateActions({
   delegate,
   className,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
   isAdvancedUser,
-  fetchDirectDelegatee,
   delegators,
 }: {
   delegate: DelegateChunk;
   className?: string;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
-  fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   delegators: Delegation[] | null;
 }) {
   const { isConnected } = useAgoraContext();
@@ -54,21 +37,10 @@ export function DelegateActions({
           (isAdvancedUser ? (
             <AdvancedDelegateButton
               delegate={delegate}
-              fetchVotingPowerForSubdelegation={() =>
-                fetchVotingPowerForSubdelegation(address)
-              }
-              checkIfDelegatingToProxy={() => checkIfDelegatingToProxy(address)}
-              fetchCurrentDelegatees={() => fetchCurrentDelegatees(address)}
-              getProxyAddress={() => getProxyAddress(address)}
               delegators={delegators}
             />
           ) : (
-            <DelegateButton
-              full={!twitter && !discord}
-              delegate={delegate}
-              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-              fetchDirectDelegatee={fetchDirectDelegatee}
-            />
+            <DelegateButton full={!twitter && !discord} delegate={delegate} />
           ))}
       </div>
     </HStack>

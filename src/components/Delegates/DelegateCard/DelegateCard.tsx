@@ -3,23 +3,16 @@ import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import styles from "./delegateCard.module.scss";
 import DelegateCardClient from "./DelegateCardClient";
+import { Delegate } from "@/app/api/delegates/delegate";
 
-export default async function DelegateCard({
-  delegate,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
-  fetchDirectDelegatee,
-  getDelegators,
-}) {
+export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
     <VStack className={styles.container}>
       <VStack className={styles.card}>
-        <VStack alignItems="stretch" className={styles.image}>
+        <VStack alignItems="items-stretch" className={styles.image}>
           <DelegateProfileImage
             address={delegate.address}
+            citizen={delegate.citizen}
             votingPower={delegate.votingPower}
           />
         </VStack>
@@ -68,21 +61,9 @@ export default async function DelegateCard({
             />
             <PanelRow
               title="Delegated from"
-              detail={pluralizeAddresses(delegate.numOfDelegators)}
+              detail={pluralizeAddresses(Number(delegate.numOfDelegators))}
             />
-
-            <DelegateCardClient
-              delegate={delegate}
-              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-              fetchVotingPowerForSubdelegation={
-                fetchVotingPowerForSubdelegation
-              }
-              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-              fetchCurrentDelegatees={fetchCurrentDelegatees}
-              getProxyAddress={getProxyAddress}
-              fetchDirectDelegatee={fetchDirectDelegatee}
-              getDelegators={getDelegators}
-            />
+            <DelegateCardClient delegate={delegate} />
           </VStack>
         </div>
       </VStack>
@@ -90,9 +71,19 @@ export default async function DelegateCard({
   );
 }
 
-export const PanelRow = ({ title, detail }) => {
+export const PanelRow = ({
+  title,
+  detail,
+}: {
+  title: string;
+  detail: string | JSX.Element;
+}) => {
   return (
-    <HStack gap="2" justifyContent="justify-between" alignItems="baseline">
+    <HStack
+      gap={2}
+      justifyContent="justify-between"
+      alignItems="items-baseline"
+    >
       <span className="whitespace-nowrap">{title}</span>
 
       <span className={styles.row}>{detail}</span>
