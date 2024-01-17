@@ -5,6 +5,8 @@ import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { DelegateActions } from "./DelegateActions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegatees } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 type Props = {
   delegate: DelegateChunk;
@@ -18,6 +20,7 @@ type Props = {
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+  getDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 };
 
 export default function DelegateCardClient({
@@ -28,8 +31,29 @@ export default function DelegateCardClient({
   fetchCurrentDelegatees,
   getProxyAddress,
   fetchDirectDelegatee,
+  getDelegators,
 }: Props) {
   const { isAdvancedUser } = useIsAdvancedUser();
+  const { address } = useAccount();
+  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
+
+  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
+    let fetchedDelegators;
+    try {
+      fetchedDelegators = await getDelegators(addressOrENSName);
+    } catch (error) {
+      fetchedDelegators = null;
+    }
+    setDelegators(fetchedDelegators);
+  };
+
+  useEffect(() => {
+    if (address) {
+      fetchDelegatorsAndSet(address);
+    } else {
+      setDelegators(null);
+    }
+  }, [address]);
 
   return (
     <DelegateActions
@@ -41,6 +65,7 @@ export default function DelegateCardClient({
       getProxyAddress={getProxyAddress}
       isAdvancedUser={isAdvancedUser}
       fetchDirectDelegatee={fetchDirectDelegatee}
+      delegators={delegators}
     />
   );
 }

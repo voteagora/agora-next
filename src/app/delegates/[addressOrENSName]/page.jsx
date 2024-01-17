@@ -115,6 +115,7 @@ export default async function Page({ params: { addressOrENSName } }) {
             getProxyAddress={getProxyAddress}
             fetchCurrentDelegatees={getDelegatees}
             fetchDirectDelegatee={fetchDirectDelegatee}
+            getDelegators={getDelegators}
           />
         </VStack>
       )}
