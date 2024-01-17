@@ -1,4 +1,5 @@
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useContractWrite } from "wagmi";
 
@@ -10,6 +11,7 @@ const useAdvancedVoting = ({
   authorityChains,
   reason = "",
   params,
+  missingVote,
 }: {
   proposalId: string;
   support: number;
@@ -18,6 +20,7 @@ const useAdvancedVoting = ({
   authorityChains: string[][];
   reason?: string;
   params?: `0x${string}`;
+  missingVote: MissingVote;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -68,18 +71,22 @@ const useAdvancedVoting = ({
       setIsError(false);
       setIsSuccess(false);
 
-      if (authorityChains.length > 0) {
-        if (standardVP) {
+      switch (missingVote) {
+        case "DIRECT":
           standardVote();
-        }
-        advancedVote();
-      } else {
-        standardVote();
+          break;
+        case "ADVANCED":
+          advancedVote();
+          break;
+        case "BOTH":
+          standardVote();
+          advancedVote();
+          break;
       }
     };
 
     vote();
-  }, [authorityChains, standardVP, standardVote, advancedVote]);
+  }, [standardVote, advancedVote, missingVote]);
 
   useEffect(() => {
     if (advancedVoteIsLoading || standardVoteIsLoading) {
