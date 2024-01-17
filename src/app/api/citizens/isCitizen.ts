@@ -8,6 +8,7 @@ export async function isCitizen({
 }: {
   address: string;
 }) {
+
   return prisma.$queryRaw<{
     address: string;
   }[]>(
