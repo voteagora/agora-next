@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
-import { DelegateActions } from "../Delegates/DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -13,6 +12,7 @@ import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelega
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate } from "@/app/api/delegates/delegate";
 import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
+import { Delegation } from "@/app/api/delegations/delegation";
 
 interface Props {
   address: string;
@@ -29,6 +29,7 @@ interface Props {
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<any>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
+  delegators: Delegation[] | null;
 }
 
 export default function VoterHoverCard({
@@ -42,6 +43,7 @@ export default function VoterHoverCard({
   fetchDirectDelegatee,
   getProxyAddress,
   isAdvancedUser,
+  delegators,
 }: Props) {
   const router = useRouter();
   // delegateStatement is loaded separately to avoid delays in loading the hover card
@@ -67,6 +69,14 @@ export default function VoterHoverCard({
     fetchDelegateStatementAndSet(address);
     fetchDelegateAndSet(address);
   }, []);
+
+  let truncatedStatement = "";
+  if (delegate?.statement?.payload) {
+    const delegateStatement = (
+      delegate?.statement?.payload as { delegateStatement: string }
+    ).delegateStatement;
+    truncatedStatement = delegateStatement.slice(0, 120);
+  }
 
   return (
     <>
@@ -94,8 +104,7 @@ export default function VoterHoverCard({
               <p
                 className={`break-words text-gray-600 overflow-hidden line-clamp-2 text-ellipsis`}
               >
-                {delegateStatement.delegateStatement &&
-                  `${delegateStatement.delegateStatement.slice(0, 120)}`}
+                {truncatedStatement}
               </p>
             </VStack>
           </Link>
@@ -112,16 +121,7 @@ export default function VoterHoverCard({
                 (isAdvancedUser ? (
                   <AdvancedDelegateButton
                     delegate={delegate}
-                    fetchVotingPowerForSubdelegation={() =>
-                      fetchVotingPowerForSubdelegation(connectedAddress)
-                    }
-                    checkIfDelegatingToProxy={() =>
-                      checkIfDelegatingToProxy(connectedAddress)
-                    }
-                    fetchCurrentDelegatees={() =>
-                      fetchCurrentDelegatees(connectedAddress)
-                    }
-                    getProxyAddress={() => getProxyAddress(connectedAddress)}
+                    delegators={delegators}
                   />
                 ) : (
                   <DelegateButton
@@ -129,10 +129,6 @@ export default function VoterHoverCard({
                       !delegateStatement.twitter && !delegateStatement.discord
                     }
                     delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchDirectDelegatee={fetchDirectDelegatee}
                   />
                 ))}
             </div>

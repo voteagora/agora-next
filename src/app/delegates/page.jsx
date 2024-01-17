@@ -17,6 +17,7 @@ import {
 
 import {
   getCurrentDelegatees,
+  getCurrentDelegators,
   getDirectDelegatee,
 } from "../api/delegations/getDelegations";
 import { TabsContent } from "@/components/ui/tabs";
@@ -78,6 +79,19 @@ async function fetchDirectDelegatee(addressOrENSName) {
   "use server";
 
   return getDirectDelegatee({ addressOrENSName });
+}
+
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
+export async function generateMetadata({}, parent) {
+  return {
+    title: "Agora - Optimism Voters",
+    description: "See which voters are active on Optimism governance.",
+  };
 }
 
 export default async function Page({ searchParams }) {

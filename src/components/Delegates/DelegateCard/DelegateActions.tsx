@@ -7,15 +7,18 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import { Delegation } from "@/app/api/delegations/delegation";
 
 export function DelegateActions({
   delegate,
   className,
   isAdvancedUser,
+  delegators,
 }: {
   delegate: DelegateChunk;
   className?: string;
   isAdvancedUser: boolean;
+  delegators: Delegation[] | null;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
@@ -32,7 +35,10 @@ export function DelegateActions({
         {isConnected &&
           address &&
           (isAdvancedUser ? (
-            <AdvancedDelegateButton delegate={delegate} />
+            <AdvancedDelegateButton
+              delegate={delegate}
+              delegators={delegators}
+            />
           ) : (
             <DelegateButton full={!twitter && !discord} delegate={delegate} />
           ))}

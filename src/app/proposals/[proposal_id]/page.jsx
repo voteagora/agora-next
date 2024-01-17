@@ -13,6 +13,31 @@ async function fetchProposal(proposal_id) {
   };
 }
 
+export async function generateMetadata({ params }, parent) {
+  const { proposal } = await fetchProposal(params.proposal_id);
+
+  const cleanText = (text) => {
+    return text
+      .replace(/#{1,6}\s/g, "") // Removes Markdown headings
+      .replace(/\n/g, " "); // Replaces newlines with space
+  };
+
+  const cleanTitle = cleanText(proposal.markdowntitle);
+  const truncatedTitle =
+    cleanTitle.length > 60 ? cleanTitle.substring(0, 57) + "..." : cleanTitle;
+
+  const cleanDescription = cleanText(proposal.description);
+  const truncatedDescription =
+    cleanDescription.length > 160
+      ? cleanDescription.substring(0, 157) + "..."
+      : cleanDescription;
+
+  return {
+    title: `Agora - OP Proposal: ${truncatedTitle}`,
+    description: truncatedDescription,
+  };
+}
+
 export default async function Page({ params: { proposal_id } }) {
   const { proposal } = await fetchProposal(proposal_id);
 

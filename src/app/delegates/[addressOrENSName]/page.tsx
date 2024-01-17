@@ -23,6 +23,16 @@ import {
   fetchCurrentDelegators,
 } from "@/app/delegates/actions";
 
+export async function generateMetadata(
+  { params }: { params: any },
+  parent: any
+) {
+  return {
+    title: `Agora - OP Voter`,
+    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+  };
+}
+
 export default async function Page({
   params: { addressOrENSName },
 }: {

@@ -12,6 +12,8 @@ import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvid
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegatees } from "@prisma/client";
+import { Delegation } from "@/app/api/delegations/delegation";
+import { useAccount } from "wagmi";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -27,17 +29,39 @@ interface Props {
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number) => Promise<DelegatePaginated>;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+  getDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
   fetchDirectDelegatee,
+  getDelegators,
 }: Props) {
   const router = useRouter();
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
+  const { address } = useAccount();
+  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
+
+  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
+    let fetchedDelegators;
+    try {
+      fetchedDelegators = await getDelegators(addressOrENSName);
+    } catch (error) {
+      fetchedDelegators = null;
+    }
+    setDelegators(fetchedDelegators);
+  };
+
+  useEffect(() => {
+    if (address) {
+      fetchDelegatorsAndSet(address);
+    } else {
+      setDelegators(null);
+    }
+  }, [address]);
 
   useEffect(() => {
     setPages([initialDelegates]);
@@ -125,6 +149,7 @@ export default function DelegateCardList({
                     delegate={delegate}
                     isAdvancedUser={isAdvancedUser}
                     fetchDirectDelegatee={fetchDirectDelegatee}
+                    delegators={delegators}
                   />
                 </VStack>
               </VStack>
