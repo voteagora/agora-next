@@ -26,7 +26,7 @@ export default function Page() {
         </VStack>
         <div className="h-auto lg:h-16 w-full lg:w-auto flex flex-col lg:flex-row items-center rounded-lg border border-gray-300 shadow-newDefault">
           {" "}
-          <a href="https://vote.optimism.io/retropgf/3">
+          <a href="https://optimism-agora-prod.agora-prod.workers.dev/retropgf/3">
             <HStack className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
               <Image src={sunny} alt="Github" width="32" />
               <div className="max-w-[10rem]">View all recipients</div>
@@ -179,7 +179,7 @@ export default function Page() {
         </VStack>
       </VStack>
       <a
-        href="https://vote.optimism.io/retropgf/3"
+        href="https://optimism-agora-prod.agora-prod.workers.dev/retropgf/3"
         className="fixed bottom-16 z-50 p-4 bg-white rounded-md shadow-md border border-gray-300"
       >
         <HStack className="gap-2">
