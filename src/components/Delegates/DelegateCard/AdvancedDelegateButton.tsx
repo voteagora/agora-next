@@ -1,7 +1,5 @@
-import { Button } from "@/components/Button";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { useAccount } from "wagmi";
+import { Button } from "@/components/Button";
 import {
   Tooltip,
   TooltipContent,
@@ -9,25 +7,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Delegation } from "@/app/api/delegations/delegation";
-
-type Props = {
-  delegate: DelegateChunk;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
-};
-
-export function AdvancedDelegateButton({
-  delegate,
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import {
   fetchVotingPowerForSubdelegation,
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   getProxyAddress,
+} from "@/app/delegates/actions";
+import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+
+export function AdvancedDelegateButton({
+  delegate,
   delegators,
-}: Props & {
+}: {
+  delegate: DelegateChunk;
   delegators: Delegation[] | null;
 }) {
   const { address } = useAccount();
@@ -49,26 +42,10 @@ export function AdvancedDelegateButton({
       <Tooltip>
         {isDisabled ? (
           <TooltipTrigger>
-            <DelegateButton
-              delegate={delegate}
-              fetchVotingPowerForSubdelegation={
-                fetchVotingPowerForSubdelegation
-              }
-              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-              fetchCurrentDelegatees={fetchCurrentDelegatees}
-              getProxyAddress={getProxyAddress}
-              isDisabled={isDisabled}
-            />
+            <DelegateButton delegate={delegate} isDisabled={isDisabled} />
           </TooltipTrigger>
         ) : (
-          <DelegateButton
-            delegate={delegate}
-            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-            fetchCurrentDelegatees={fetchCurrentDelegatees}
-            getProxyAddress={getProxyAddress}
-            isDisabled={isDisabled}
-          />
+          <DelegateButton delegate={delegate} isDisabled={isDisabled} />
         )}
 
         <TooltipContent>
@@ -84,12 +61,9 @@ export function AdvancedDelegateButton({
 
 const DelegateButton = ({
   delegate,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
   isDisabled,
-}: Props & {
+}: {
+  delegate: DelegateChunk;
   isDisabled: boolean;
 }) => {
   const openDialog = useOpenDialog();

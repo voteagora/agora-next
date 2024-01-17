@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
-import { DelegateActions } from "../Delegates/DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,7 +10,8 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
-import { Delegate, DelegateStatement } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/delegates/delegate";
+import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Delegation } from "@/app/api/delegations/delegation";
 
 interface Props {
@@ -70,6 +70,14 @@ export default function VoterHoverCard({
     fetchDelegateAndSet(address);
   }, []);
 
+  let truncatedStatement = "";
+  if (delegate?.statement?.payload) {
+    const delegateStatement = (
+      delegate?.statement?.payload as { delegateStatement: string }
+    ).delegateStatement;
+    truncatedStatement = delegateStatement.slice(0, 120);
+  }
+
   return (
     <>
       {!delegateStatement ? (
@@ -96,8 +104,7 @@ export default function VoterHoverCard({
               <p
                 className={`break-words text-gray-600 overflow-hidden line-clamp-2 text-ellipsis`}
               >
-                {delegateStatement.delegateStatement &&
-                  `${delegateStatement.delegateStatement.slice(0, 120)}`}
+                {truncatedStatement}
               </p>
             </VStack>
           </Link>
@@ -114,16 +121,6 @@ export default function VoterHoverCard({
                 (isAdvancedUser ? (
                   <AdvancedDelegateButton
                     delegate={delegate}
-                    fetchVotingPowerForSubdelegation={() =>
-                      fetchVotingPowerForSubdelegation(connectedAddress)
-                    }
-                    checkIfDelegatingToProxy={() =>
-                      checkIfDelegatingToProxy(connectedAddress)
-                    }
-                    fetchCurrentDelegatees={() =>
-                      fetchCurrentDelegatees(connectedAddress)
-                    }
-                    getProxyAddress={() => getProxyAddress(connectedAddress)}
                     delegators={delegators}
                   />
                 ) : (
@@ -132,10 +129,6 @@ export default function VoterHoverCard({
                       !delegateStatement.twitter && !delegateStatement.discord
                     }
                     delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchDirectDelegatee={fetchDirectDelegatee}
                   />
                 ))}
             </div>

@@ -7,20 +7,37 @@ import { useEnsName } from "wagmi";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 import styles from "./delegateCard.module.scss";
+import Image from "next/image";
+import badge from "@/icons/badge.svg";
 
-export function DelegateProfileImage({ address, votingPower }) {
+export function DelegateProfileImage({
+  address,
+  votingPower,
+  citizen,
+}: {
+  address: string;
+  votingPower: string;
+  citizen?: boolean;
+}) {
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
 
   const { data } = useEnsName({
     chainId: 1,
-    address,
+    address: address as `0x${string}`,
   });
 
   return (
     <HStack className="gap-4">
       <div className={styles.profile_image}>
+        {citizen && (
+          <Image
+            className="absolute bottom-[-5px] right-[-7px] z-10"
+            src={badge}
+            alt="badge symbol"
+          />
+        )}
         <ENSAvatar className={styles.avatar} ensName={data} />
       </div>
 
