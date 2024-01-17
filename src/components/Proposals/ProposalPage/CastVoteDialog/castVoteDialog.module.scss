@@ -43,8 +43,10 @@
   border-radius: $border-radius-lg;
 }
 
-.full_width {
+.dialog_container {
   width: 100%;
+  position: relative;
+  transform-style: preserve-3d;
 }
 
 .no_reason {
@@ -60,4 +62,21 @@
   max-height: 40vh;
   overflow-y: scroll;
   color: $gray-700;
+}
+
+.alert {
+  position: absolute;
+  bottom: -90px;
+  left: -$spacing-6;
+  background-color: $gray-fa;
+  width: $max-width-md;
+  border-radius: $border-radius-lg;
+  border: 1px solid $gray-eb;
+  box-shadow: $box-shadow-md;
+  padding: $spacing-6;
+  padding-top: 2rem;
+  padding-bottom: 1rem;
+  font-size: $font-size-xs;
+  color: $gray-4f;
+  transform: translateZ(-1px);
 }

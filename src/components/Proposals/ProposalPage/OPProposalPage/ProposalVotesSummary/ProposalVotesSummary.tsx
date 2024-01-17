@@ -35,14 +35,18 @@ export default function ProposalVotesSummary({
       </HStack>
       <ProposalVotesBar proposal={proposal} />
       <HStack justifyContent="justify-between" className="text-gray-4f">
-        <div>
-          QUORUM{" "}
-          <TokenAmountDisplay
-            amount={proposal.quorum}
-            decimals={18}
-            currency={"OP"}
-          />
-        </div>
+        <>
+          {proposal.quorum && (
+            <div>
+              QUORUM{" "}
+              <TokenAmountDisplay
+                amount={proposal.quorum}
+                decimals={18}
+                currency={"OP"}
+              />
+            </div>
+          )}
+        </>
         <ProposalTimeStatus
           proposalStatus={proposal.status}
           proposalEndTime={proposal.end_time}

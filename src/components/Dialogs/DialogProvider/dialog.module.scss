@@ -21,5 +21,6 @@
     box-shadow: $box-shadow-xl;
     margin: auto;
     z-index: 1100;
+    transform-style: preserve-3d;
   }
 }
