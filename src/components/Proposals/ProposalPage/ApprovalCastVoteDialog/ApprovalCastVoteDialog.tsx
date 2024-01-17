@@ -12,12 +12,9 @@ import {
 } from "../CastVoteDialog/CastVoteDialog";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { CheckIcon } from "lucide-react";
-import { Proposal } from "@/app/api/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import styles from "./approvalCastVoteDialog.module.scss";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { Button } from "@/components/ui/button";
 
 const abiCoder = new AbiCoder();
@@ -68,7 +65,6 @@ export function ApprovalCastVoteDialog({
     }
   };
 
-  const governorContract = OptimismContracts.governor;
   // TODO: ADD against option if is supported
   // 0 = against, 1 = for, 2 = abstain
   const { isLoading, isSuccess, write, isError } = useAdvancedVoting({
