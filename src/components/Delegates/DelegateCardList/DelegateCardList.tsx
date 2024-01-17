@@ -58,7 +58,7 @@ export default function DelegateCardList({
   const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const { address } = useAccount();
-  const [delegators, setDelegators] = React.useState<Delegation[] | null>(null);
+  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
 
   const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
     let fetchedDelegators;

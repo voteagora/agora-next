@@ -103,7 +103,7 @@ export default function ProposalVotesList({
                   >
                     <HStack gap={1} alignItems="items-center">
                       <HumanAddress address={vote.address} />
-                      {vote.address === connectedAddress.toLowerCase() && (
+                      {vote.address === connectedAddress?.toLowerCase() && (
                         <p>(you)</p>
                       )}
                       <VoteText support={vote.support} />
