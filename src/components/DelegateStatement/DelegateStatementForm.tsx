@@ -107,7 +107,10 @@ export default function DelegateStatementForm({
   }
 
   const canSubmit =
-    !!walletClient && !form.formState.isSubmitting && !!form.formState.isValid;
+    !!walletClient &&
+    !form.formState.isSubmitting &&
+    !!form.formState.isValid &&
+    !!agreeCodeConduct;
 
   return (
     <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">

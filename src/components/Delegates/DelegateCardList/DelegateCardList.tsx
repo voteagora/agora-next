@@ -148,7 +148,6 @@ export default function DelegateCardList({
                   <DelegateActions
                     delegate={delegate}
                     isAdvancedUser={isAdvancedUser}
-                    fetchDirectDelegatee={fetchDirectDelegatee}
                     delegators={delegators}
                   />
                 </VStack>

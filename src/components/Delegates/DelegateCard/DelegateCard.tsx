@@ -76,7 +76,7 @@ export const PanelRow = ({
   detail,
 }: {
   title: string;
-  detail: string;
+  detail: string | JSX.Element;
 }) => {
   return (
     <HStack
