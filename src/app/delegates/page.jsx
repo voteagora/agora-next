@@ -17,6 +17,7 @@ import {
 } from "../api/voting-power/getVotingPower";
 import {
   getCurrentDelegatees,
+  getCurrentDelegators,
   getDirectDelegatee,
 } from "../api/delegations/getDelegations";
 
@@ -73,6 +74,12 @@ async function fetchDirectDelegatee(addressOrENSName) {
   return getDirectDelegatee({ addressOrENSName });
 }
 
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
 export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
@@ -105,6 +112,7 @@ export default async function Page({ searchParams }) {
         fetchCurrentDelegatees={fetchCurrentDelegatees}
         getProxyAddress={getProxyAddress}
         fetchDirectDelegatee={fetchDirectDelegatee}
+        getDelegators={getDelegators}
       />
     </section>
   );

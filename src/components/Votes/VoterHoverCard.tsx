@@ -12,6 +12,7 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate, DelegateStatement } from "@/app/api/delegates/delegate";
+import { Delegation } from "@/app/api/delegations/delegation";
 
 interface Props {
   address: string;
@@ -28,6 +29,7 @@ interface Props {
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<any>;
   getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
+  delegators: Delegation[] | null;
 }
 
 export default function VoterHoverCard({
@@ -41,6 +43,7 @@ export default function VoterHoverCard({
   fetchDirectDelegatee,
   getProxyAddress,
   isAdvancedUser,
+  delegators,
 }: Props) {
   const router = useRouter();
   // delegateStatement is loaded separately to avoid delays in loading the hover card
@@ -121,6 +124,7 @@ export default function VoterHoverCard({
                       fetchCurrentDelegatees(connectedAddress)
                     }
                     getProxyAddress={() => getProxyAddress(connectedAddress)}
+                    delegators={delegators}
                   />
                 ) : (
                   <DelegateButton

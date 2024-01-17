@@ -25,6 +25,7 @@ import { cn, formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "@/lib/constants";
 import {
   getCurrentDelegatees,
+  getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 
@@ -119,6 +120,12 @@ async function getProxyAddress(addressOrENSName) {
   return getProxy({ addressOrENSName });
 }
 
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
+}
+
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
   const proposalVotes = await fetchProposalVotes(proposal.id);
@@ -182,6 +189,7 @@ export default async function OPProposalPage({ proposal }) {
             fetchDirectDelegatee={fetchDirectDelegatee}
             getProxyAddress={getProxyAddress}
             proposal_id={proposal.id}
+            getDelegators={getDelegators}
           />
           {/* Show the input for the user to vote on a proposal if allowed */}
           <CastVoteInput
