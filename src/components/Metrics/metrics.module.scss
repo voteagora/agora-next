@@ -1,5 +1,8 @@
 @import "@/styles/variables";
 .metric_card_container_link {
+  @media (max-width: $max-width-6xl) {
+    flex-basis: 47%;
+  }
   @media (max-width: $max-width-lg) {
     width: 100%;
   }

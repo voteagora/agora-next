@@ -3,6 +3,10 @@
 .metrics_container {
   display: flex;
   justify-content: space-between;
+  @media (max-width: $max-width-6xl) {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
   @media (max-width: $max-width-lg) {
     display: flex;
     flex-direction: column;
