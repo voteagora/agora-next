@@ -87,7 +87,7 @@ function CastVoteDialogContents({
         <div>
           {delegate.statement ? (
             <VoteButton onClick={write}>
-              Vote {supportType.toLowerCase()} with{" "}
+              Vote {supportType.toLowerCase()} with{"\u00A0"}
               <TokenAmountDisplay
                 amount={vpToDisplay}
                 decimals={18}
