@@ -87,6 +87,13 @@ async function fetchDirectDelegatee(addressOrENSName) {
   return getDirectDelegatee({ addressOrENSName });
 }
 
+export async function generateMetadata({ params }, parent) {
+  return {
+    title: `Agora - OP Voter`,
+    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+  };
+}
+
 export default async function Page({ params: { addressOrENSName } }) {
   const [delegate, delegateVotes, statement, delegatees, delegators] =
     await Promise.all([
