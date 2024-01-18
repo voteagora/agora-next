@@ -66,7 +66,7 @@ export default function ApprovalProposalVotesList({
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={meta.hasNextPage}
-        pageStart={0}
+        pageStart={1}
         loadMore={loadMore}
         useWindow={false}
         loader={

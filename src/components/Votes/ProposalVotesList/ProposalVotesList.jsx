@@ -79,7 +79,7 @@ export default function ProposalVotesList({
     <div className={styles.vote_container}>
       <InfiniteScroll
         hasMore={meta.hasNextPage}
-        pageStart={0}
+        pageStart={1}
         loadMore={loadMore}
         useWindow={false}
         loader={
@@ -87,6 +87,7 @@ export default function ProposalVotesList({
             Loading more votes...
           </div>
         }
+        element="main"
       >
         {proposalVotes.map((vote) => (
           <VStack
