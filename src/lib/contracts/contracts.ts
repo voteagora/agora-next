@@ -21,7 +21,7 @@ export const OptimismContracts = {
     chainId: 10,
     abi: OptimismGovernor__factory.abi,
     v6UpgradeBlock:
-      process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114615036 : 114615036, // TODO: Update this once prod is upgraded
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114995000 : 114615036,
   },
 
   proposalTypesConfigurator: {
