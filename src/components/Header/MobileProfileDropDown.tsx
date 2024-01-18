@@ -54,7 +54,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
   }, [address]);
 
   return (
-    <Popover className="relative">
+    <Popover className="relative cursor-auto">
       {({ open }) => (
         <>
           <Popover.Button className="mt-1 outline-none">
@@ -112,7 +112,7 @@ export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
                         src={icons.power}
                         onClick={() => disconnect()}
                         alt="Disconnect Wallet"
-                        className={styles.mobile__wallet}
+                        className="cursor-pointer"
                       />
                     </HStack>
 
