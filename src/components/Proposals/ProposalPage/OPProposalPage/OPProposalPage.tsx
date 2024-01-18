@@ -1,147 +1,93 @@
+"use client";
+
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalPage.module.scss";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import {
-  getVotesForProposalAndDelegate,
-  getVotesForProposal,
-} from "@/app/api/votes/getVotes";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import {
-  getProxy,
-  getVotingPowerAtSnapshot,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
-} from "@/app/api/voting-power/getVotingPower";
-import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
-import {
-  getCurrentDelegatees,
-  getCurrentDelegators,
-  getDirectDelegatee,
-} from "@/app/api/delegations/getDelegations";
 import { Proposal } from "@/app/api/proposals/proposal";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
-
-async function fetchProposalVotes(proposal_id: string, page = 1) {
-  "use server";
-
-  return await getVotesForProposal({ proposal_id, page });
-}
-
-async function fetchVotingPower(
-  addressOrENSName: string | `0x${string}`,
-  blockNumber: number
-) {
-  "use server";
-
-  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function fetchBalanceForDirectDelegation(
-  addressOrENSName: string | `0x${string}`
-) {
-  "use server";
-
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
-}
-
-async function fetchAuthorityChains(
-  address: string | `0x${string}`,
-  blockNumber: number
-) {
-  "use server";
-
-  return {
-    chains: await getAuthorityChains({
-      blockNumber,
-      address,
-    }),
-  };
-}
-
-async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return await getDelegate({
-    addressOrENSName,
-  });
-}
-
-async function fetchDelegateStatement(
-  addressOrENSName: string | `0x${string}`
-) {
-  "use server";
-
-  return await getDelegateStatement({
-    addressOrENSName,
-  });
-}
-
-async function fetchVotesForProposalAndDelegate(
-  proposal_id: string,
-  address: string | `0x${string}`
-) {
-  "use server";
-
-  return await getVotesForProposalAndDelegate({
-    proposal_id,
-    address,
-  });
-}
-
-async function fetchVotingPowerForSubdelegation(
-  addressOrENSName: string | `0x${string}`
-) {
-  "use server";
-
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
-}
-
-async function checkIfDelegatingToProxy(
-  addressOrENSName: string | `0x${string}`
-) {
-  "use server";
-
-  return isDelegatingToProxy({ addressOrENSName });
-}
-
-async function fetchCurrentDelegatees(
-  addressOrENSName: string | `0x${string}`
-) {
-  "use server";
-
-  return getCurrentDelegatees({ addressOrENSName });
-}
-
-async function fetchDirectDelegatee(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return getDirectDelegatee({ addressOrENSName });
-}
-
-async function getProxyAddress(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return getProxy({ addressOrENSName });
-}
-
-async function getDelegators(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return getCurrentDelegators({ addressOrENSName });
-}
+import { useAccount } from "wagmi";
+import {
+  fetchProposalVotes,
+  fetchVotingPower,
+  fetchBalanceForDirectDelegation,
+  fetchAuthorityChains,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchVotesForProposalAndDelegate,
+  fetchVotingPowerForSubdelegation,
+  checkIfDelegatingToProxy,
+  fetchCurrentDelegatees,
+  fetchDirectDelegatee,
+  getProxyAddress,
+  getDelegators,
+} from "@/app/proposals/actions";
+import { useCallback, useEffect, useState } from "react";
+import { fetchAndSetAll } from "@/lib/utils";
+import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 
 export default async function OPProposalPage({
+  id,
+  snapshotBlockNumber,
   proposal,
+  proposalVotes,
 }: {
-  proposal: Proposal;
+  id: string;
+  snapshotBlockNumber: number;
+  proposal: any;
+  proposalVotes: any;
 }) {
-  const proposalVotes = await fetchProposalVotes(proposal.id);
+  const { address } = useAccount();
+  const [reason, setReason] = useState("");
+  // TODO: frh -> typings
+  const [votingPower, setVotingPower] = useState<any>({
+    directVP: "0",
+    advancedVP: "0",
+    totalVP: "0",
+  });
+  const [delegate, setDelegate] = useState({});
+  const [chains, setChains] = useState<any[][]>([]);
+  const [votes, setVotes] = useState<any[]>([]);
+  const [isReady, setIsReady] = useState(false);
+  console.log("address: ", address);
+
+  const fetchData = useCallback(async () => {
+    try {
+      console.log("6 proposal", Date.now() / 1000);
+      await fetchAndSetAll(
+        [
+          () => fetchVotingPower(address!, snapshotBlockNumber),
+          () => fetchDelegate(address!),
+          async () =>
+            (
+              await fetchAuthorityChains(address!, snapshotBlockNumber)
+            ).chains,
+          () => fetchVotesForProposalAndDelegate(id, address!),
+        ],
+        [setVotingPower, setDelegate, setChains, setVotes]
+      );
+
+      setIsReady(true);
+      console.log("7 proposal", Date.now() / 1000);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [id, address, snapshotBlockNumber]);
+
+  useEffect(() => {
+    if (address && snapshotBlockNumber) {
+      console.log(
+        "5 proposal",
+        Date.now() / 1000,
+        "address",
+        address,
+        "snapshotBlockNumber",
+        snapshotBlockNumber
+      );
+      fetchData();
+    }
+  }, [fetchData, address, snapshotBlockNumber]);
 
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
@@ -163,35 +109,19 @@ export default async function OPProposalPage({
           <VStack gap={4} className={styles.proposal_actions_panel}>
             <div>
               <div className={styles.proposal_header}>Proposal votes</div>
-              {/* Show the summar bar with For, Against, Abstain */}
               <ProposalVotesSummary proposal={proposal} />
             </div>
-            {/* Show the scrolling list of votes for the proposal */}
             <ProposalVotesList
               initialProposalVotes={proposalVotes}
-              fetchVotesForProposal={fetchProposalVotes}
-              fetchDelegate={fetchDelegate}
-              fetchDelegateStatement={fetchDelegateStatement}
-              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-              fetchVotingPowerForSubdelegation={
-                fetchVotingPowerForSubdelegation
-              }
-              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-              fetchCurrentDelegatees={fetchCurrentDelegatees}
-              fetchDirectDelegatee={fetchDirectDelegatee}
-              getProxyAddress={getProxyAddress}
-              proposal_id={proposal.id}
-              getDelegators={getDelegators}
+              proposal_id={id}
             />
-            {/* Show the input for the user to vote on a proposal if allowed */}
             <CastVoteInput
               proposal={proposal}
-              fetchVotingPower={fetchVotingPower}
-              fetchAuthorityChains={fetchAuthorityChains}
-              fetchDelegate={fetchDelegate}
-              fetchVotesForProposalAndDelegate={
-                fetchVotesForProposalAndDelegate
-              }
+              votingPower={votingPower}
+              delegate={delegate}
+              chains={chains}
+              votes={votes}
+              isReady={isReady}
             />
           </VStack>
         </VStack>

@@ -4,6 +4,21 @@ import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/O
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import { getProposal } from "@/app/api/proposals/getProposals";
+import {
+  fetchProposalVotes,
+  fetchVotingPower,
+  fetchBalanceForDirectDelegation,
+  fetchAuthorityChains,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchVotesForProposalAndDelegate,
+  fetchVotingPowerForSubdelegation,
+  checkIfDelegatingToProxy,
+  fetchCurrentDelegatees,
+  fetchDirectDelegatee,
+  getProxyAddress,
+  getDelegators,
+} from "@/app/proposals/actions";
 
 async function fetchProposal(proposal_id) {
   "use server";
@@ -39,7 +54,10 @@ export async function generateMetadata({ params }, parent) {
 }
 
 export default async function Page({ params: { proposal_id } }) {
+  console.log("1 proposal", Date.now() / 1000);
   const { proposal } = await fetchProposal(proposal_id);
+  // TODO: frh -> move this down but it is all good for now
+  const proposalVotes = await fetchProposalVotes(proposal.id);
 
   let RenderComponent;
   switch (proposal.proposalType) {
@@ -59,7 +77,17 @@ export default async function Page({ params: { proposal_id } }) {
 
   return (
     <HStack justifyContent="justify-between" className="mt-12">
-      <div>{RenderComponent && <RenderComponent proposal={proposal} />}</div>
+      <div>
+        {/* TODO: frh -> adapt these params to the other proposals */}
+        {RenderComponent && (
+          <RenderComponent
+            id={proposal.id}
+            snapshotBlockNumber={proposal.snapshotBlockNumber}
+            proposal={proposal}
+            proposalVotes={proposalVotes}
+          />
+        )}
+      </div>
       <VStack gap={6}></VStack>
     </HStack>
   );

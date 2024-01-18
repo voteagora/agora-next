@@ -34,7 +34,8 @@ export default function ProposalVotesSummary({
           />
         </div>
       </HStack>
-      <ProposalVotesBar proposal={proposal} />
+      {/* TODO: frh -> this  gives errors*/}
+      {/* <ProposalVotesBar proposal={proposal} /> */}
       <VStack className="font-medium">
         <HStack justifyContent="justify-between" className="text-gray-4f pb-2">
           <>

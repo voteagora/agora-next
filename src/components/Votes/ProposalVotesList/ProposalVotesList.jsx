@@ -11,7 +11,7 @@ import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAccount } from "wagmi";
-
+import { getDelegators, fetchVotesForProposal } from "@/app/proposals/actions";
 import {
   HoverCard,
   HoverCardContent,
@@ -20,17 +20,7 @@ import {
 
 export default function ProposalVotesList({
   initialProposalVotes,
-  fetchVotesForProposal,
-  fetchDelegate,
-  fetchDelegateStatement,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  fetchDirectDelegatee,
-  getProxyAddress,
   proposal_id,
-  getDelegators,
 }) {
   const { address } = useAccount();
   const fetching = React.useRef(false);
@@ -38,15 +28,15 @@ export default function ProposalVotesList({
   const [meta, setMeta] = React.useState(initialProposalVotes.meta);
   const [delegators, setDelegators] = React.useState(null);
 
-  const fetchDelegatorsAndSet = async (addressOrENSName) => {
-    let fetchedDelegators;
-    try {
-      fetchedDelegators = await getDelegators(addressOrENSName);
-    } catch (error) {
-      fetchedDelegators = null;
-    }
-    setDelegators(fetchedDelegators);
-  };
+  // const fetchDelegatorsAndSet = async (addressOrENSName) => {
+  //   let fetchedDelegators;
+  //   try {
+  //     fetchedDelegators = await getDelegators(addressOrENSName);
+  //   } catch (error) {
+  //     fetchedDelegators = null;
+  //   }
+  //   setDelegators(fetchedDelegators);
+  // };
 
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
@@ -67,13 +57,13 @@ export default function ProposalVotesList({
   const { isAdvancedUser } = useIsAdvancedUser();
   const { address: connectedAddress } = useAccount();
 
-  React.useEffect(() => {
-    if (address) {
-      fetchDelegatorsAndSet(address);
-    } else {
-      setDelegators(null);
-    }
-  }, [address]);
+  // React.useEffect(() => {
+  //   if (address) {
+  //     fetchDelegatorsAndSet(address);
+  //   } else {
+  //     setDelegators(null);
+  //   }
+  // }, [address]);
 
   return (
     <div className={styles.vote_container}>
@@ -126,7 +116,7 @@ export default function ProposalVotesList({
                   side="left"
                   sideOffset="3"
                 >
-                  <VoterHoverCard
+                  {/* <VoterHoverCard
                     address={vote.address}
                     fetchDelegate={fetchDelegate}
                     fetchDelegateStatement={fetchDelegateStatement}
@@ -142,7 +132,7 @@ export default function ProposalVotesList({
                     getProxyAddress={getProxyAddress}
                     isAdvancedUser={isAdvancedUser}
                     delegators={delegators}
-                  />
+                  /> */}
                 </HoverCardContent>
               </HoverCard>
             </VStack>
