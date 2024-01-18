@@ -1,10 +1,7 @@
 "use client";
 
 import { HStack, VStack } from "@/components/Layout/Stack";
-import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
 import styles from "./styles.module.scss";
-import CastProposalDialogLoading from "./CastProposalDialogLoading";
 
 type Props = {
   isError: boolean;
