@@ -151,7 +151,7 @@ export function ApprovalCastVoteDialog({
           />
         </VStack>
       )}
-      <AdvancedVoteAlert />
+      {missingVote === "BOTH" && <AdvancedVoteAlert />}
     </div>
   );
 }
