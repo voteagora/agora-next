@@ -22,7 +22,8 @@ export default function ApprovedTransactions({ proposalData }) {
       className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
     >
       <p className="px-4 mb-2 font-mono text-xs font-medium leading-4 text-gray-af">
-        Proposed Transactions - only approved options will execute
+        Proposed Transactions (signal only – transactions are manually executed
+        by the Foundation)
       </p>
       <VStack className="px-4">
         {proposalData.options

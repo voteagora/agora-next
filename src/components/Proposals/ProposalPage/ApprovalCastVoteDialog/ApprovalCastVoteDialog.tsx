@@ -90,28 +90,31 @@ export function ApprovalCastVoteDialog({
   return (
     <div className={styles.container}>
       {hasStatement && isLoading && <LoadingVote />}
-      {hasStatement && isSuccess && <SuccessMessage />}
+      {hasStatement && isSuccess && (
+        <SuccessMessage closeDialog={closeDialog} />
+      )}
       {hasStatement && isError && <p>Something went wrong</p>}
       {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (
-        <VStack gap={3}>
-          <VStack className={styles.title_box}>
-            <p className={styles.title}>
-              Select up to {maxChecked} option{maxChecked > 1 && "s"}
-            </p>
-            <p className={styles.notes}>
-              Your vote is final and cannot be edited once submitted.
-            </p>
-          </VStack>
-          <VStack className={styles.options_list}>
-            {proposalData.options.map((option, index) => (
-              <CheckCard
-                key={index}
-                title={option.description}
-                description={
-                  <p>
-                    {/* TODO: add token transfer request | commented because data not indexed correctly */}
-                    {/* {BigInt(
+        <>
+          <VStack gap={3}>
+            <VStack className={styles.title_box}>
+              <p className={styles.title}>
+                Select up to {maxChecked} option{maxChecked > 1 && "s"}
+              </p>
+              <p className={styles.notes}>
+                Your vote is final and cannot be edited once submitted.
+              </p>
+            </VStack>
+            <VStack className={styles.options_list}>
+              {proposalData.options.map((option, index) => (
+                <CheckCard
+                  key={index}
+                  title={option.description}
+                  description={
+                    <p>
+                      {/* TODO: add token transfer request | commented because data not indexed correctly */}
+                      {/* {BigInt(
                         option.budgetTokensSpent.amount
                       ) === 0n ? (
                         "No token transfer request"
@@ -123,35 +126,36 @@ export function ApprovalCastVoteDialog({
                           />
                         </>
                       )} */}
-                  </p>
-                }
-                checked={selectedOptions.includes(index)}
+                    </p>
+                  }
+                  checked={selectedOptions.includes(index)}
+                  checkedOptions={selectedOptions.length}
+                  onClick={() => handleOnChange(index)}
+                  abstain={abstain}
+                />
+              ))}
+              <CheckCard
+                key={proposalData.options.length}
+                title={"Abstain: vote for no options"}
+                description={""}
+                checked={!!abstain}
                 checkedOptions={selectedOptions.length}
-                onClick={() => handleOnChange(index)}
+                onClick={() => handleOnChange(abstainOptionId)}
                 abstain={abstain}
               />
-            ))}
-            <CheckCard
-              key={proposalData.options.length}
-              title={"Abstain: vote for no options"}
-              description={""}
-              checked={!!abstain}
-              checkedOptions={selectedOptions.length}
-              onClick={() => handleOnChange(abstainOptionId)}
+            </VStack>
+            <CastVoteWithReason
+              onVoteClick={write}
+              reason={reason}
+              setReason={setReason}
+              numberOfOptions={selectedOptions.length}
               abstain={abstain}
+              votingPower={vpToDisplay}
             />
           </VStack>
-          <CastVoteWithReason
-            onVoteClick={write}
-            reason={reason}
-            setReason={setReason}
-            numberOfOptions={selectedOptions.length}
-            abstain={abstain}
-            votingPower={vpToDisplay}
-          />
-        </VStack>
+          {missingVote === "BOTH" && <AdvancedVoteAlert />}
+        </>
       )}
-      {missingVote === "BOTH" && <AdvancedVoteAlert />}
     </div>
   );
 }

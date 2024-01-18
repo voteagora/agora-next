@@ -131,7 +131,7 @@ export function parseVote(
     address: vote.voter,
     proposal_id: vote.proposal_id,
     support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
-    weight: vote.weight,
+    weight: vote.weight.toFixed(0),
     reason: vote.reason,
     params: parseParams(vote.params, proposalData),
     proposalValue: getProposalTotalValue(proposalData) || BigInt(0),

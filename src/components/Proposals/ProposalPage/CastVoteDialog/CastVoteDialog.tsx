@@ -51,56 +51,58 @@ function CastVoteDialogContents({
   }
 
   return (
-    <VStack gap={4} className={styles.dialog_container}>
-      <HStack justifyContent="justify-between">
-        <VStack>
-          {delegate.address ? (
-            <div className={styles.subtitle}>
-              <HumanAddress address={delegate.address} />
-            </div>
-          ) : (
-            <div className={styles.subtitle}>Anonymous</div>
-          )}
-          <div className={styles.title}>
-            Casting vote&nbsp;{supportType.toLowerCase()}
-          </div>
-        </VStack>
-        <VStack alignItems="items-end">
-          <div className={styles.subtitle}>with</div>
-          <TokenAmountDisplay
-            amount={vpToDisplay}
-            decimals={18}
-            currency="OP"
-          />
-        </VStack>
-      </HStack>
-      <div className={styles.reason_box}>
-        {reason ? (
-          <div className={styles.has_reason}>{reason}</div>
-        ) : (
-          <div className={styles.no_reason}>No voting reason provided</div>
-        )}
-      </div>
-      {isLoading && <LoadingVote />}
-      {isSuccess && <SuccessMessage />}
+    <>
       {!isLoading && !isSuccess && (
-        <div>
-          {delegate.statement ? (
-            <VoteButton onClick={write}>
-              Vote {supportType.toLowerCase()} with{"\u00A0"}
+        <VStack gap={4} className={styles.dialog_container}>
+          <HStack justifyContent="justify-between">
+            <VStack>
+              {delegate.address ? (
+                <div className={styles.subtitle}>
+                  <HumanAddress address={delegate.address} />
+                </div>
+              ) : (
+                <div className={styles.subtitle}>Anonymous</div>
+              )}
+              <div className={styles.title}>
+                Casting vote&nbsp;{supportType.toLowerCase()}
+              </div>
+            </VStack>
+            <VStack alignItems="items-end">
+              <div className={styles.subtitle}>with</div>
               <TokenAmountDisplay
                 amount={vpToDisplay}
                 decimals={18}
                 currency="OP"
               />
-            </VoteButton>
-          ) : (
-            <NoStatementView closeDialog={closeDialog} />
-          )}
-        </div>
+            </VStack>
+          </HStack>
+          <div className={styles.reason_box}>
+            {reason ? (
+              <div className={styles.has_reason}>{reason}</div>
+            ) : (
+              <div className={styles.no_reason}>No voting reason provided</div>
+            )}
+          </div>
+          <div>
+            {delegate.statement ? (
+              <VoteButton onClick={write}>
+                Vote {supportType.toLowerCase()} with{"\u00A0"}
+                <TokenAmountDisplay
+                  amount={vpToDisplay}
+                  decimals={18}
+                  currency="OP"
+                />
+              </VoteButton>
+            ) : (
+              <NoStatementView closeDialog={closeDialog} />
+            )}
+          </div>
+          {missingVote === "BOTH" && <AdvancedVoteAlert />}
+        </VStack>
       )}
-      {missingVote === "BOTH" && <AdvancedVoteAlert />}
-    </VStack>
+      {isLoading && <LoadingVote />}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} />}
+    </>
   );
 }
 
@@ -128,24 +130,44 @@ export function AdvancedVoteAlert() {
   );
 }
 
-export function SuccessMessage() {
+export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
   return (
-    <HStack justifyContent="justify-between" alignItems="items-center">
-      <div>
-        Success! Your vote has been cast. It will appear once the transaction is
-        confirmed.
+    <VStack className={styles.full_width}>
+      <img src={`/images/congrats.svg`} className="w-full mb-3" />
+      <div className="font-black text-2xl mb-2">
+        Your vote has been submitted!
       </div>
-      <Image src={icons.ballot} alt={icons.ballot} className="h-5" />
-    </HStack>
+      <div className="text-gray-700 text-sm mb-5">
+        It might take up to a minute for the changes to be reflected. Thank you
+        for participating in Optimism’s token house.
+      </div>
+      <div>
+        <div onClick={closeDialog} className={`${styles.vote_container}`}>
+          Got it
+        </div>
+      </div>
+    </VStack>
   );
 }
 
 export function LoadingVote() {
   return (
-    <HStack justifyContent="justify-between" alignItems="items-center">
-      <div>Writing your vote to the chain</div>
-      <Image src={icons.spinner} alt={"spinner"} />
-    </HStack>
+    <VStack className={styles.full_width}>
+      <img src={`/images/vote-pending.svg`} className="w-full mb-3" />
+      <div className="font-black text-2xl mb-2">Casting your vote</div>
+      <div className="text-gray-700 text-sm mb-5">
+        It might take up to a minute for the changes to be reflected.
+      </div>
+      <div>
+        <div
+          className={`flex flex-row justify-center w-full py-3 bg-gray-eo rounded-lg`}
+        >
+          <div className="text-gray-700 font-medium">
+            Writing your vote to the chain...
+          </div>
+        </div>
+      </div>
+    </VStack>
   );
 }
 

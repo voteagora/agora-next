@@ -42,7 +42,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
   }, [address]);
 
   return (
-    <Popover className="relative">
+    <Popover className="relative cursor-auto">
       {({ open }) => (
         <>
           <Popover.Button className={styles.desktop__button}>
@@ -111,7 +111,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                           disconnect();
                         }}
                         alt="Disconnect Wallet"
-                        className={styles.desktop__wallet}
+                        className="cursor-pointer"
                       />
                     </HStack>
 
