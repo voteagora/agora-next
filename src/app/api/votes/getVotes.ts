@@ -17,7 +17,12 @@ export const getVotesForDelegate = ({
   page: number;
   sort: VotesSort | undefined;
   sortOrder: VotesSortOrder | undefined;
-}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, { page, sort, sortOrder });
+}) =>
+  addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
+    page,
+    sort,
+    sortOrder,
+  });
 
 async function getVotesForDelegateForAddress({
   address,
@@ -38,6 +43,16 @@ async function getVotesForDelegateForAddress({
         Prisma.sql`
         SELECT * FROM (
           SELECT * FROM (
+          SELECT 
+            STRING_AGG(transaction_hash,'|') as transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            SUM(weight::numeric) as weight,
+            STRING_AGG(distinct reason, '\n --------- \n') as reason,
+            MAX(block_number) as block_number,
+            params 
+          FROM (
             SELECT
               *
               FROM center.vote_cast_events
@@ -49,6 +64,8 @@ async function getVotesForDelegateForAddress({
                 center.vote_cast_with_params_events
                 WHERE voter = ${address.toLocaleLowerCase()}
           ) t
+          GROUP BY 2,3,4,8
+          ) av
           LEFT JOIN LATERAL (
             SELECT
               proposals_mat.start_block,
@@ -58,7 +75,7 @@ async function getVotesForDelegateForAddress({
             FROM
               center.proposals_mat
             WHERE
-              proposals_mat.proposal_id = t.proposal_id) p ON TRUE
+              proposals_mat.proposal_id = av.proposal_id) p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET ${skip}
@@ -109,6 +126,16 @@ export async function getVotesForProposal({
         Prisma.sql`
         SELECT * FROM (
           SELECT * FROM (
+          SELECT 
+            STRING_AGG(transaction_hash,'|') as transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            SUM(weight::numeric) as weight,
+            STRING_AGG(distinct reason, '\n --------- \n') as reason,
+            MAX(block_number) as block_number,
+            params
+          FROM (
             SELECT
               *
               FROM center.vote_cast_events
@@ -120,6 +147,8 @@ export async function getVotesForProposal({
                 center.vote_cast_with_params_events
                 WHERE proposal_id = ${proposal_id}
           ) t
+          GROUP BY 2,3,4,8
+          ) av
           LEFT JOIN LATERAL (
             SELECT
               proposals_mat.start_block,
@@ -129,10 +158,9 @@ export async function getVotesForProposal({
             FROM
               center.proposals_mat
             WHERE
-              proposals_mat.proposal_id = ${proposal_id} AND
-              proposals_mat.proposal_id = t.proposal_id) p ON TRUE
+              proposals_mat.proposal_id = ${proposal_id}) p ON TRUE
         ) q
-        ORDER BY weight::NUMERIC DESC
+        ORDER BY weight DESC
         OFFSET ${skip}
         LIMIT ${take};
       `
