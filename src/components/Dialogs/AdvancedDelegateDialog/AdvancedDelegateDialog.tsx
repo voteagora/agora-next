@@ -17,6 +17,7 @@ import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatUnits } from "viem";
 import { Button } from "@/components/Button";
 import { SuccessView } from "./SuccessView";
+import { track } from "@vercel/analytics";
 
 export function AdvancedDelegateDialog({
   target,
@@ -117,6 +118,21 @@ export function AdvancedDelegateDialog({
     allocation: allowance, // (value / 100000) 100% = 100000
   });
 
+  const writeWithTracking = () => {
+    const trackingData = {
+      dao_slug: "OP",
+      userAddress: address || "unknown",
+      proxyAddress: proxyAddress || "unknown",
+      targetDelegation: target || "unknown",
+      totalDelegatees: delegatees.length || "unknown",
+      totalVotingPower: availableBalance,
+    };
+
+    track("Advanced Delegation", trackingData);
+
+    write();
+  };
+
   return (
     <VStack
       justifyContent="justify-center"
@@ -158,12 +174,12 @@ export function AdvancedDelegateDialog({
               <Button disabled={false}>Submitting your delegation...</Button>
             )}
             {isError && (
-              <Button disabled={false} onClick={() => write()}>
+              <Button disabled={false} onClick={() => writeWithTracking()}>
                 Delegation failed
               </Button>
             )}
             {!isError && !isLoading && (
-              <Button disabled={false} onClick={() => write()}>
+              <Button disabled={false} onClick={() => writeWithTracking()}>
                 Delegate your votes
               </Button>
             )}
