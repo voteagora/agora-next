@@ -61,21 +61,22 @@ export default function ProposalVotesSummary({
         </HStack>
         <HStack
           justifyContent="justify-between"
+          alignItems="items-center"
           className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md"
         >
           <div>
             {proposal.status === "ACTIVE" && (
-              <p className="text-blue-600 bg-sky-200 rounded-md px-1 py-0.5 font-semibold">
+              <p className="text-blue-600 bg-sky-200 rounded-sm px-1 py-0.5 font-semibold">
                 ACTIVE
               </p>
             )}
             {proposal.status === "SUCCEEDED" && (
-              <p className="text-green-600 bg-green-200 rounded-md px-1 py-0.5 font-semibold">
+              <p className="text-green-600 bg-green-200 rounded-sm px-1 py-0.5 font-semibold">
                 SUCCEEDED
               </p>
             )}
             {proposal.status === "DEFEATED" && (
-              <p className="text-red-600 bg-red-200 rounded-md px-1 py-0.5 font-semibold">
+              <p className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
                 DEFEATED
               </p>
             )}
@@ -92,7 +93,9 @@ export default function ProposalVotesSummary({
               proposal.status !== "PENDING" &&
               proposal.status !== "ACTIVE" && (
                 <HStack gap={1}>
-                  Ended {formatDistanceToNowStrict(proposal.end_time)} ago
+                  <p>{`Ended ${formatDistanceToNowStrict(
+                    proposal.end_time
+                  )} ago on ${proposal.end_time.toLocaleDateString()}`}</p>
                 </HStack>
               )}
           </div>
