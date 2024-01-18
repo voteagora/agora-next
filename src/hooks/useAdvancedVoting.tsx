@@ -2,6 +2,7 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useContractWrite } from "wagmi";
+import { track } from "@vercel/analytics";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -71,14 +72,31 @@ const useAdvancedVoting = ({
       setIsError(false);
       setIsSuccess(false);
 
+      const trackingData: any = {
+        dao_slug: "OP",
+        proposal_id: BigInt(proposalId),
+        support: support,
+      };
+
+      if (reason) {
+        trackingData.reason = reason;
+      }
+
+      if (params) {
+        trackingData.params = params;
+      }
+
       switch (missingVote) {
         case "DIRECT":
+          track("Standard Vote", trackingData);
           standardVote();
           break;
         case "ADVANCED":
+          track("Advanced Vote", trackingData);
           advancedVote();
           break;
         case "BOTH":
+          track("Standard + Advanced Vote", trackingData);
           standardVote();
           advancedVote();
           break;
@@ -86,6 +104,7 @@ const useAdvancedVoting = ({
     };
 
     vote();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [standardVote, advancedVote, missingVote]);
 
   useEffect(() => {
