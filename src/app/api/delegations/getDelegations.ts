@@ -5,6 +5,7 @@ import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -23,7 +24,11 @@ async function getCurrentDelegateesForAddress({
   address: string;
 }): Promise<Delegation[]> {
   const advancedDelegatees = await prisma.advancedDelegatees.findMany({
-    where: { from: address.toLowerCase(), delegated_amount: { gt: 0 } },
+    where: {
+      from: address.toLowerCase(),
+      delegated_amount: { gt: 0 },
+      contract: OptimismContracts.alligator.address.toLowerCase(),
+    },
   });
 
   // const directDelegatee = await (async () => {
@@ -133,7 +138,11 @@ async function getCurrentDelegatorsForAddress({
   address: string;
 }) {
   const advancedDelegators = prisma.advancedDelegatees.findMany({
-    where: { to: address.toLowerCase(), delegated_amount: { gt: 0 } },
+    where: {
+      to: address.toLowerCase(),
+      delegated_amount: { gt: 0 },
+      contract: OptimismContracts.alligator.address.toLowerCase(),
+    },
   });
 
   // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod

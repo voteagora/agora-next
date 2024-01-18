@@ -68,7 +68,9 @@ async function getVotingPowerAtSnapshotByAddress({
                 subdelegated_share,
                 block_number
             FROM center.advanced_voting_power_raw_snaps
-            WHERE chain_str=s.chain_str AND block_number <= ${blockNumber}
+            WHERE chain_str=s.chain_str 
+              AND contract=${OptimismContracts.alligator.address.toLowerCase()}
+              AND block_number <= ${blockNumber}
             ORDER BY block_number DESC
             LIMIT 1
         ) AS a ON TRUE
@@ -114,6 +116,7 @@ async function getCurrentVotingPowerForAddress({
   const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
     where: {
       delegate: address,
+      contract: OptimismContracts.alligator.address.toLowerCase(),
     },
   });
 
@@ -151,6 +154,7 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
   const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
     where: {
       delegate: address,
+      contract: OptimismContracts.alligator.address.toLowerCase(),
     },
   });
 
