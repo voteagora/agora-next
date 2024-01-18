@@ -80,13 +80,13 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                 <div className={styles.desktop__popover_container}>
                   <VStack gap={3}>
                     <HStack className={styles.desktop__popover_inside}>
-                      <div className="relative aspect-square">
+                      <div className="relative aspect-square mr-4">
                         <ENSAvatar
                           className={styles.desktop__avatar}
                           ensName={ensName}
                         />
                       </div>
-                      <VStack className="flex-1">
+                      <VStack>
                         {ensName ? (
                           <>
                             <span className={styles.desktop__ens}>
@@ -104,15 +104,16 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                           </>
                         )}
                       </VStack>
-
-                      <Image
-                        src={icons.power}
-                        onClick={() => {
-                          disconnect();
-                        }}
-                        alt="Disconnect Wallet"
-                        className="cursor-pointer"
-                      />
+                      <div className="ml-auto">
+                        <Image
+                          src={icons.power}
+                          onClick={() => {
+                            disconnect();
+                          }}
+                          alt="Disconnect Wallet"
+                          className="cursor-pointer"
+                        />
+                      </div>
                     </HStack>
 
                     <PanelRow
