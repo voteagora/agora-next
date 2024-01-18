@@ -236,6 +236,7 @@ view AdvancedDelegatees {
   delegated_amount Decimal @db.Decimal
   delegated_share  Decimal @db.Decimal
   block_number     BigInt
+  contract         String? @db.VarChar(42)
 
   @@map("advanced_delegatees")
   @@schema("center")
@@ -247,6 +248,7 @@ view AdvancedVotingPower {
   delegated_vp       Decimal  @db.Decimal
   advanced_vp        Decimal  @db.Decimal
   subdelegated_share Decimal? @db.Decimal
+  contract           String?  @db.VarChar(42)
 
   @@map("advanced_voting_power")
   @@schema("center")
@@ -271,6 +273,7 @@ view advanced_voting_power_raw_snaps {
   allowance          Decimal? @db.Decimal
   subdelegated_share Decimal? @db.Decimal
   block_number       BigInt?
+  contract           String?  @db.VarChar(42)
 
   @@ignore
   @@schema("center")
@@ -284,30 +287,9 @@ view AuthorityChainsSnaps {
   balance              Decimal  @db.Decimal
   balance_block_number BigInt
   allowance            Decimal  @db.Decimal
+  contract             String?  @db.VarChar(42)
 
   @@map("authority_chains_snaps")
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view proxies {
-  address      String?
-  proxy        String?
-  new_balance  String?
-  block_number BigInt?
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view proxies_snaps {
-  address      String?
-  proxy        String?
-  new_balance  String?
-  block_number BigInt?
-
-  @@ignore
   @@schema("center")
 }
 
@@ -320,6 +302,7 @@ view subdelegations {
   block_number         BigInt?
   balance              String?
   balance_block_number BigInt?
+  contract             String? @db.VarChar(42)
 
   @@ignore
   @@schema("center")
@@ -334,6 +317,7 @@ view subdelegations_snaps {
   block_number         BigInt?
   balance              String?
   balance_block_number BigInt?
+  contract             String? @db.VarChar(42)
 
   @@ignore
   @@schema("center")
@@ -392,6 +376,7 @@ view direct_chains {
   chain     String[]
   balance   Decimal? @db.Decimal
   allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar(42)
 
   @@ignore
   @@schema("center")
@@ -418,6 +403,7 @@ view authority_chains {
   chain     String[]
   balance   Decimal? @db.Decimal
   allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar(42)
 
   @@ignore
   @@schema("center")
@@ -443,6 +429,62 @@ view subdelegations_kent {
   block_number         BigInt?
   balance              String?
   balance_block_number BigInt?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view direct_chains_snaps {
+  delegate             String?
+  rules                Json[]
+  chain                String[]
+  balance              Decimal? @db.Decimal
+  balance_block_number BigInt?
+  allowance            Decimal? @db.Decimal
+  contract             String?  @db.VarChar(42)
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view vote_cast_events {
+  transaction_hash String? @db.VarChar(66)
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           String?
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@ignore
+  @@schema("center")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view vote_cast_with_params_events {
+  transaction_hash String? @db.VarChar(66)
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           String?
+  reason           String?
+  block_number     BigInt?
+  params           String?
 
   @@ignore
   @@schema("center")

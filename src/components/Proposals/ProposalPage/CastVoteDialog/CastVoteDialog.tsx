@@ -176,7 +176,7 @@ export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
     <div className={styles.note_to_user}>
       You do not have a delegate statement.{" "}
       <Link
-        href={"/statements/create"}
+        href={"/delegates/create"}
         className="underline"
         onClick={closeDialog}
       >

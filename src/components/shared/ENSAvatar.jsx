@@ -45,7 +45,11 @@ export default function ENSAvatar({ ensName, className = "" }) {
     if (data) {
       setAvatar(data);
     }
-  }, [data]);
+    // Set the default avatar when wallet is change from a ensName wallet to a non ensName wallet
+    if (!data && !ensName) {
+      setAvatar(altAvatar);
+    }
+  }, [altAvatar, data, ensName]);
 
   return (
     <div className={`${styles.ens_avatar} ${className}`}>
