@@ -132,7 +132,7 @@ view Votes {
   proposal_id      String
   voter            String
   support          String
-  weight           String
+  weight           Decimal      @db.Decimal
   reason           String?
   block_number     BigInt
   params           String?
