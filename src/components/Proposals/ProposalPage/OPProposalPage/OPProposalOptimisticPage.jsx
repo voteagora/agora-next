@@ -4,16 +4,29 @@ import styles from "./OPProposalPage.module.scss";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import {
-  getVoteForProposalAndDelegate,
+  getVotesForProposalAndDelegate,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
+import {
+  getProxy,
+  getVotingPowerAtSnapshot,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
+import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
 import { cn, formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "@/lib/constants";
+import {
+  getCurrentDelegatees,
+  getCurrentDelegators,
+  getDirectDelegatee,
+} from "@/app/api/delegations/getDelegations";
+import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -24,11 +37,10 @@ async function fetchProposalVotes(proposal_id, page = 1) {
 async function fetchVotingPower(address, blockNumber) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName: address })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({
+    blockNumber,
+    addressOrENSName: address,
+  });
 }
 
 async function fetchAuthorityChains(address, blockNumber) {
@@ -47,10 +59,10 @@ async function fetchDelegate(addressOrENSName) {
   });
 }
 
-async function fetchVoteForProposalAndDelegate(proposal_id, address) {
+async function fetchVotesForProposalAndDelegate(proposal_id, address) {
   "use server";
 
-  return await getVoteForProposalAndDelegate({
+  return await getVotesForProposalAndDelegate({
     proposal_id,
     address,
   });
@@ -60,6 +72,56 @@ async function fetchVotableSupply() {
   "use server";
 
   return getVotableSupply();
+}
+
+async function fetchDelegateStatement(addressOrENSName) {
+  "use server";
+
+  return await getDelegateStatement({
+    addressOrENSName,
+  });
+}
+
+async function fetchBalanceForDirectDelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+}
+
+async function fetchVotingPowerForSubdelegation(addressOrENSName) {
+  "use server";
+
+  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+}
+
+async function checkIfDelegatingToProxy(addressOrENSName) {
+  "use server";
+
+  return isDelegatingToProxy({ addressOrENSName });
+}
+
+async function fetchCurrentDelegatees(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegatees({ addressOrENSName });
+}
+
+async function fetchDirectDelegatee(addressOrENSName) {
+  "use server";
+
+  return getDirectDelegatee({ addressOrENSName });
+}
+
+async function getProxyAddress(addressOrENSName) {
+  "use server";
+
+  return getProxy({ addressOrENSName });
+}
+
+async function getDelegators(addressOrENSName) {
+  "use server";
+
+  return getCurrentDelegators({ addressOrENSName });
 }
 
 export default async function OPProposalPage({ proposal }) {
@@ -84,55 +146,71 @@ export default async function OPProposalPage({ proposal }) {
       className={styles.proposal_container}
     >
       <ProposalDescription proposal={proposal} />
-      <VStack
-        gap={4}
-        justifyContent="justify-between"
-        className={styles.proposal_votes_container}
-      >
-        <VStack gap={4} className={styles.proposal_actions_panel}>
-          <div>
-            <div className={styles.proposal_header}>Proposal votes</div>
-            <div
-              className={cn(styles.proposal_votes_summary_container, "!py-4")}
-            >
-              <p
-                className={
-                  status === "approved"
-                    ? "text-green-positive"
-                    : "text-red-negative"
-                }
+      <div>
+        <OpManagerDeleteProposal proposal={proposal} />
+        <VStack
+          gap={4}
+          justifyContent="justify-between"
+          className={styles.proposal_votes_container}
+        >
+          <VStack gap={4} className={styles.proposal_actions_panel}>
+            <div>
+              <div className={styles.proposal_header}>Proposal votes</div>
+              <div
+                className={cn(styles.proposal_votes_summary_container, "!py-4")}
               >
-                This proposal is optimistically {status}
-              </p>
-              <p className="font-normal mt-1 text-gray-4f">
-                This proposal will automatically pass unless{" "}
-                {disapprovalThreshold}% of the votable supply of OP is against.
-                Currently, {againstRelativeAmount}% ({againstLength} OP) is
-                against.
-              </p>
+                <p
+                  className={
+                    status === "approved"
+                      ? "text-green-positive"
+                      : "text-red-negative"
+                  }
+                >
+                  This proposal is optimistically {status}
+                </p>
+                <p className="mt-1 font-normal text-gray-4f">
+                  This proposal will automatically pass unless{" "}
+                  {disapprovalThreshold}% of the votable supply of OP is
+                  against. Currently, {againstRelativeAmount}% ({againstLength}{" "}
+                  OP) is against.
+                </p>
+              </div>
             </div>
-          </div>
-          {/* Show the scrolling list of votes for the proposal */}
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            fetchVotesForProposal={fetchProposalVotes}
-            proposal_id={proposal.id}
-          />
-          {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput
-            proposal={proposal}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
-            fetchDelegate={fetchDelegate}
-            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
-            isOptimistic
-          />
-          <p className="text-gray-4f text-xs mx-4">
-            If you agree with this proposal, you don’t need to vote. Only vote
-            against if you oppose this proposal.
-          </p>
+            {/* Show the scrolling list of votes for the proposal */}
+            <ProposalVotesList
+              initialProposalVotes={proposalVotes}
+              fetchVotesForProposal={fetchProposalVotes}
+              fetchDelegate={fetchDelegate}
+              fetchDelegateStatement={fetchDelegateStatement}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+              fetchVotingPowerForSubdelegation={
+                fetchVotingPowerForSubdelegation
+              }
+              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+              fetchCurrentDelegatees={fetchCurrentDelegatees}
+              fetchDirectDelegatee={fetchDirectDelegatee}
+              getProxyAddress={getProxyAddress}
+              proposal_id={proposal.id}
+              getDelegators={getDelegators}
+            />
+            {/* Show the input for the user to vote on a proposal if allowed */}
+            <CastVoteInput
+              proposal={proposal}
+              fetchVotingPower={fetchVotingPower}
+              fetchAuthorityChains={fetchAuthorityChains}
+              fetchDelegate={fetchDelegate}
+              fetchVotesForProposalAndDelegate={
+                fetchVotesForProposalAndDelegate
+              }
+              isOptimistic
+            />
+            <p className="mx-4 text-xs text-gray-4f">
+              If you agree with this proposal, you don’t need to vote. Only vote
+              against if you oppose this proposal.
+            </p>
+          </VStack>
         </VStack>
-      </VStack>
+      </div>
     </HStack>
   );
 }

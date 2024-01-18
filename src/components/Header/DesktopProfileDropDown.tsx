@@ -42,7 +42,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
   }, [address]);
 
   return (
-    <Popover className="relative">
+    <Popover className="relative cursor-auto">
       {({ open }) => (
         <>
           <Popover.Button className={styles.desktop__button}>
@@ -80,13 +80,13 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                 <div className={styles.desktop__popover_container}>
                   <VStack gap={3}>
                     <HStack className={styles.desktop__popover_inside}>
-                      <div className="relative aspect-square">
+                      <div className="relative aspect-square mr-4">
                         <ENSAvatar
                           className={styles.desktop__avatar}
                           ensName={ensName}
                         />
                       </div>
-                      <VStack className="flex-1">
+                      <VStack>
                         {ensName ? (
                           <>
                             <span className={styles.desktop__ens}>
@@ -104,15 +104,16 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                           </>
                         )}
                       </VStack>
-
-                      <Image
-                        src={icons.power}
-                        onClick={() => {
-                          disconnect();
-                        }}
-                        alt="Disconnect Wallet"
-                        className={styles.desktop__wallet}
-                      />
+                      <div className="ml-auto">
+                        <Image
+                          src={icons.power}
+                          onClick={() => {
+                            disconnect();
+                          }}
+                          alt="Disconnect Wallet"
+                          className="cursor-pointer"
+                        />
+                      </div>
                     </HStack>
 
                     <PanelRow
@@ -134,6 +135,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                         <ValueWrapper>
                           <Link
                             href={`/delegates/${delegate?.address}`}
+                            onClick={() => close()}
                             className="underline"
                           >
                             View more
@@ -165,24 +167,30 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                         </ValueWrapper>
                       }
                     />
-
-                    <Link
-                      href={`/statements/create`}
-                      className={styles.desktop__create_statement}
-                    >
-                      <div>
-                        {hasStatement
-                          ? "Edit delegate statement"
-                          : "Create delegate statement"}
-                      </div>
-                    </Link>
-
+                    {hasStatement ? (
+                      <Link
+                        href={`/delegates/edit`}
+                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                        onClick={() => close()}
+                      >
+                        Edit delegate statement
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/delegates/create`}
+                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                        onClick={() => close()}
+                      >
+                        Create delegate statement
+                      </Link>
+                    )}
                     {hasStatement && (
                       <Link
-                        href={`/delegate/${ensName ?? address}`}
-                        className={styles.desktop__profile}
+                        href={`/delegates/${ensName ?? address}`}
+                        className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
+                        onClick={() => close()}
                       >
-                        <div>View my profile</div>
+                        View my profile
                       </Link>
                     )}
                   </VStack>

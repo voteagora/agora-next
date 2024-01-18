@@ -1,13 +1,15 @@
+import "server-only";
+
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
-import { resolveENSName } from "@/app/lib/utils";
+import { resolveENSName } from "@/app/lib/ENSUtils";
+import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
-import { getStatment } from "../statements/getStatements";
-
-import "server-only";
 import { getCurrentQuorum } from "../quorum/getQuorum";
+import { isCitizen } from "../citizens/isCitizen";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export async function getDelegates({
   page = 1,
@@ -29,6 +31,11 @@ export async function getDelegates({
             take,
             orderBy: {
               num_of_delegators: "desc",
+            },
+            where: {
+              num_of_delegators: {
+                not: null,
+              },
             },
           });
         case "weighted_random":
@@ -58,7 +65,7 @@ export async function getDelegates({
 
   const statements = await Promise.all(
     delegates.map((delegate) =>
-      getStatment({ addressOrENSName: delegate.delegate })
+      getDelegateStatement({ addressOrENSName: delegate.delegate })
     )
   );
 
@@ -66,7 +73,7 @@ export async function getDelegates({
     meta,
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
-      votingPower: delegate.voting_power?.toFixed(),
+      votingPower: delegate.voting_power?.toFixed(0),
       statement: statements[index],
     })),
   };
@@ -88,7 +95,10 @@ export async function getDelegate({
     where: { delegate: address },
   });
   const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
-    where: { delegate: address },
+    where: {
+      delegate: address,
+      contract: OptimismContracts.alligator.address.toLowerCase(),
+    },
   });
 
   const totalVotingPower =
@@ -102,13 +112,17 @@ export async function getDelegate({
     where: { delegate: address },
   });
 
-  const delegateStatement = await getStatment({ addressOrENSName });
+  const delegateStatement = await getDelegateStatement({ addressOrENSName });
 
   const quorum = await getCurrentQuorum();
+
+  const _isCitizen = await isCitizen(address);
 
   // Build out delegate JSON response
   return {
     address: address,
+    // TODO: frh -> check this with real data
+    citizen: _isCitizen.length > 0,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply)

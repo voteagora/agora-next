@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "cypress": "cypress open",
-    "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json"
+    "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json",
+    "typecheck": "tsc --pretty --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
@@ -19,6 +20,7 @@
     "@hookform/resolvers": "^3.3.2",
     "@prisma/client": "4.16.2",
     "@radix-ui/react-dropdown-menu": "^2.0.5",
+    "@radix-ui/react-hover-card": "^1.0.7",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-popover": "^1.0.6",
     "@radix-ui/react-select": "^2.0.0",
@@ -27,7 +29,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.80.1",
-    "@vercel/analytics": "^1.0.1",
+    "@vercel/analytics": "^1.1.1",
     "@vercel/speed-insights": "^1.0.2",
     "autoprefixer": "10.4.14",
     "bufferutil": "^4.0.7",

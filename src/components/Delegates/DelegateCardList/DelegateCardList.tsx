@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Image from "next/image";
 import { VStack } from "../../Layout/Stack";
@@ -13,10 +12,13 @@ import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvid
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegatees } from "@prisma/client";
+import Link from "next/link";
+import { Delegation } from "@/app/api/delegations/delegation";
+import { useAccount } from "wagmi";
 
 export type DelegateChunk = Pick<
   Delegate,
-  "address" | "votingPower" | "statement"
+  "address" | "votingPower" | "statement" | "citizen"
 >;
 
 interface DelegatePaginated {
@@ -27,33 +29,40 @@ interface DelegatePaginated {
 interface Props {
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number) => Promise<DelegatePaginated>;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
-  completeDelegation: () => void;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+  getDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
   fetchDirectDelegatee,
+  getDelegators,
 }: Props) {
   const router = useRouter();
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialDelegates] || []);
-  const [meta, setMeta] = React.useState(initialDelegates.meta);
+  const fetching = useRef(false);
+  const [pages, setPages] = useState([initialDelegates] || []);
+  const [meta, setMeta] = useState(initialDelegates.meta);
+  const { address } = useAccount();
+  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
+
+  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
+    let fetchedDelegators;
+    try {
+      fetchedDelegators = await getDelegators(addressOrENSName);
+    } catch (error) {
+      fetchedDelegators = null;
+    }
+    setDelegators(fetchedDelegators);
+  };
+
+  useEffect(() => {
+    if (address) {
+      fetchDelegatorsAndSet(address);
+    } else {
+      setDelegators(null);
+    }
+  }, [address]);
 
   useEffect(() => {
     setPages([initialDelegates]);
@@ -111,47 +120,34 @@ export default function DelegateCardList({
         {delegates.map((delegate, i) => {
           let truncatedStatement = "";
 
-          if (delegate.statement && delegate.statement.delegateStatement) {
-            truncatedStatement = delegate.statement.delegateStatement.slice(
-              0,
-              120
-            );
+          if (delegate?.statement?.payload) {
+            const delegateStatement = (
+              delegate?.statement?.payload as { delegateStatement: string }
+            ).delegateStatement;
+            truncatedStatement = delegateStatement.slice(0, 120);
           }
 
           return (
             <div key={delegate.address} className={styles.link}>
-              <VStack className={styles.link_container}>
-                <VStack gap={4} className="h-full">
-                  <div
-                    onClick={(e) =>
-                      handleClick(e, `/delegates/${delegate.address}`)
-                    }
-                  >
-                    <VStack gap={4} justifyContent="justify-center">
-                      <DelegateProfileImage
-                        address={delegate.address}
-                        votingPower={delegate.votingPower}
-                      />
-                      <p className={styles.summary}>{truncatedStatement}</p>
-                    </VStack>
+              <Link href={`/delegates/${delegate.address}`}>
+                <VStack gap={4} className={styles.link_container}>
+                  <VStack gap={4} justifyContent="justify-center">
+                    <DelegateProfileImage
+                      address={delegate.address}
+                      votingPower={delegate.votingPower}
+                      citizen={delegate.citizen}
+                    />
+                    <p className={styles.summary}>{truncatedStatement}</p>
+                  </VStack>
+                  <div className="min-h-[24px]">
+                    <DelegateActions
+                      delegate={delegate}
+                      isAdvancedUser={isAdvancedUser}
+                      delegators={delegators}
+                    />
                   </div>
-                  <div className="flex-grow" />
-                  <DelegateActions
-                    delegate={delegate}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchVotingPowerForSubdelegation={
-                      fetchVotingPowerForSubdelegation
-                    }
-                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-                    fetchCurrentDelegatees={fetchCurrentDelegatees}
-                    getProxyAddress={getProxyAddress}
-                    isAdvancedUser={isAdvancedUser}
-                    fetchDirectDelegatee={fetchDirectDelegatee}
-                  />
                 </VStack>
-              </VStack>
+              </Link>
             </div>
           );
         })}

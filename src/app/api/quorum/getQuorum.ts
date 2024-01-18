@@ -16,10 +16,7 @@ export async function getQuorumForProposal(
     }
     case "optimism": {
       const contractQuorum = OptimismContracts.governor.contract.quorum(
-        // TODO: Remove after governor update
-        process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-          ? proposal.start_block
-          : proposal.proposal_id
+        proposal.proposal_id
       );
 
       // If no quorum is set, calculate it based on votable supply

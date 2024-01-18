@@ -5,15 +5,24 @@ import { VotesSort, VotesSortOrder } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import { Prisma } from "@prisma/client";
 
 export const getVotesForDelegate = ({
-  addressOrENSName, page, sort, sortOrder
+  addressOrENSName,
+  page,
+  sort,
+  sortOrder,
 }: {
   addressOrENSName: string;
   page: number;
-  sort: VotesSort;
-  sortOrder: VotesSortOrder;
-}) => addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, { page, sort, sortOrder });
+  sort: VotesSort | undefined;
+  sortOrder: VotesSortOrder | undefined;
+}) =>
+  addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
+    page,
+    sort,
+    sortOrder,
+  });
 
 async function getVotesForDelegateForAddress({
   address,
@@ -23,21 +32,56 @@ async function getVotesForDelegateForAddress({
 }: {
   address: string;
   page: number;
-  sort: VotesSort;
-  sortOrder: VotesSortOrder;
+  sort: VotesSort | undefined;
+  sortOrder: VotesSortOrder | undefined;
 }) {
   const pageSize = 10;
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.votes.findMany({
-        where: { voter: address },
-        take,
-        skip,
-        orderBy: {
-          [sort]: sortOrder,
-        },
-      }),
+      prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
+        Prisma.sql`
+        SELECT * FROM (
+          SELECT * FROM (
+          SELECT 
+            STRING_AGG(transaction_hash,'|') as transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            SUM(weight::numeric) as weight,
+            STRING_AGG(distinct reason, '\n --------- \n') as reason,
+            MAX(block_number) as block_number,
+            params 
+          FROM (
+            SELECT
+              *
+              FROM center.vote_cast_events
+              WHERE voter = ${address.toLocaleLowerCase()}
+            UNION ALL
+              SELECT
+                *
+              FROM
+                center.vote_cast_with_params_events
+                WHERE voter = ${address.toLocaleLowerCase()}
+          ) t
+          GROUP BY 2,3,4,8
+          ) av
+          LEFT JOIN LATERAL (
+            SELECT
+              proposals_mat.start_block,
+              proposals_mat.description,
+              proposals_mat.proposal_data,
+              proposals_mat.proposal_type::center.proposal_type AS proposal_type
+            FROM
+              center.proposals_mat
+            WHERE
+              proposals_mat.proposal_id = av.proposal_id) p ON TRUE
+        ) q
+        ORDER BY block_number DESC
+        OFFSET ${skip}
+        LIMIT ${take};
+      `
+      ),
     page,
     pageSize
   );
@@ -78,14 +122,49 @@ export async function getVotesForProposal({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.votes.findMany({
-        where: { proposal_id },
-        take,
-        skip,
-        orderBy: {
-          [sort]: sortOrder,
-        },
-      }),
+      prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
+        Prisma.sql`
+        SELECT * FROM (
+          SELECT * FROM (
+          SELECT 
+            STRING_AGG(transaction_hash,'|') as transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            SUM(weight::numeric) as weight,
+            STRING_AGG(distinct reason, '\n --------- \n') as reason,
+            MAX(block_number) as block_number,
+            params
+          FROM (
+            SELECT
+              *
+              FROM center.vote_cast_events
+              WHERE proposal_id = ${proposal_id}
+            UNION ALL
+              SELECT
+                *
+              FROM
+                center.vote_cast_with_params_events
+                WHERE proposal_id = ${proposal_id}
+          ) t
+          GROUP BY 2,3,4,8
+          ) av
+          LEFT JOIN LATERAL (
+            SELECT
+              proposals_mat.start_block,
+              proposals_mat.description,
+              proposals_mat.proposal_data,
+              proposals_mat.proposal_type::center.proposal_type AS proposal_type
+            FROM
+              center.proposals_mat
+            WHERE
+              proposals_mat.proposal_id = ${proposal_id}) p ON TRUE
+        ) q
+        ORDER BY weight DESC
+        OFFSET ${skip}
+        LIMIT ${take};
+      `
+      ),
     page,
     pageSize
   );
@@ -109,30 +188,27 @@ export async function getVotesForProposal({
   };
 }
 
-export async function getVoteForProposalAndDelegate({
+export async function getVotesForProposalAndDelegate({
   proposal_id,
   address,
 }: {
   proposal_id: string;
   address: string;
 }) {
-  const vote = await prisma.votes.findFirst({
+  const votes = await prisma.votes.findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
-  if (!vote) {
-    return {
-      vote: undefined,
-    };
-  }
-
   const latestBlock = await provider.getBlock("latest");
-  const proposalData = parseProposalData(
-    JSON.stringify(vote.proposal_data || {}),
-    vote.proposal_type
-  );
 
-  return {
-    vote: parseVote(vote, proposalData, latestBlock),
-  };
+  return votes.map((vote) =>
+    parseVote(
+      vote,
+      parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      ),
+      latestBlock
+    )
+  );
 }

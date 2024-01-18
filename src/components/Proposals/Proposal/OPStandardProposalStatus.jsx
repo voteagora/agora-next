@@ -13,7 +13,6 @@ export default function OPStandardProposalStatus({ proposal }) {
   const againstLength = formatNumber(proposal.proposalResults.against);
   const abstainLength = formatNumber(proposal.proposalResults.abstain);
   const totalLength = forLength + againstLength + abstainLength;
-  console.log(totalLength);
   return (
     <div className="flex flex-col items-end gap-1 justify-center">
       <HStack
@@ -44,6 +43,12 @@ export default function OPStandardProposalStatus({ proposal }) {
             className=" bg-red-500 h-1 rounded-r-full"
             style={{ width: `${(againstLength / totalLength) * 100}%` }}
           ></div>
+        </div>
+      )}
+
+      {totalLength == 0 && (
+        <div className="flex w-52 h-1 bg-slate-100 rounded-full">
+          <div className=" bg-slate-500 h-1" style={{ width: `100%` }}></div>
         </div>
       )}
     </div>

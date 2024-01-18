@@ -15,6 +15,7 @@ import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { InfoIcon } from "lucide-react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
+import { track } from "@vercel/analytics";
 
 export function DelegateDialog({
   delegate,
@@ -25,7 +26,7 @@ export function DelegateDialog({
   delegate: DelegateChunk;
   fetchBalanceForDirectDelegation: (
     addressOrENSName: string
-  ) => Promise<string>;
+  ) => Promise<bigint>;
   fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
   completeDelegation: () => void;
 }) {
@@ -34,6 +35,20 @@ export function DelegateDialog({
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<Delegatees | null>(null);
   const [isReady, setIsReady] = useState(false);
+
+  const writeWithTracking = () => {
+    const trackingData = {
+      dao_slug: "OP",
+      delegateAddress: delegate.address || "unknown",
+      address: accountAddress || "unknown",
+      delegateEnsName: delegateEnsName || "unknown",
+      votingPower: votingPower || "unknown",
+    };
+
+    track("Delegate", trackingData);
+
+    write();
+  };
 
   const { data: delegateEnsName } = useEnsName({
     chainId: 1,
@@ -57,7 +72,7 @@ export function DelegateDialog({
     if (!accountAddress) return;
 
     const vp = await fetchBalanceForDirectDelegation(accountAddress);
-    setVotingPower(vp);
+    setVotingPower(vp.toString());
 
     const direct = await fetchDirectDelegatee(accountAddress);
     setDelegatee(direct);
@@ -181,7 +196,7 @@ export function DelegateDialog({
         )}
         {!accountAddress && (
           <ShadcnButton variant="outline" onClick={() => setOpen(true)}>
-            Connect wallet to vote
+            Connect wallet to delegate
           </ShadcnButton>
         )}
         {isLoading && (
@@ -189,12 +204,14 @@ export function DelegateDialog({
         )}
         {isSuccess && <Button disabled={false}>Delegation completed!</Button>}
         {isError && (
-          <Button disabled={false} onClick={() => write()}>
+          <Button disabled={false} onClick={() => writeWithTracking()}>
             Delegation failed - try again
           </Button>
         )}
         {!isError && !isSuccess && !isLoading && accountAddress && (
-          <ShadcnButton onClick={() => write()}>Delegate</ShadcnButton>
+          <ShadcnButton onClick={() => writeWithTracking()}>
+            Delegate
+          </ShadcnButton>
         )}
       </VStack>
     </VStack>

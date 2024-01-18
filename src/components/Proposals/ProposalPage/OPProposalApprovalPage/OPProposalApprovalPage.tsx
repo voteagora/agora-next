@@ -3,13 +3,14 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import {
-  getVoteForProposalAndDelegate,
+  getVotesForProposalAndDelegate,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { Proposal } from "@/app/api/proposals/proposal";
+import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
@@ -23,11 +24,7 @@ async function fetchVotingPower(
 ) {
   "use server";
 
-  return {
-    votingPower: (
-      await getVotingPowerAtSnapshot({ blockNumber, addressOrENSName })
-    ).totalVP,
-  };
+  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
 }
 
 async function fetchAuthorityChains(
@@ -52,13 +49,13 @@ async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   });
 }
 
-async function fetchVoteForProposalAndDelegate(
+async function fetchVotesForProposalAndDelegate(
   proposal_id: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
-  return await getVoteForProposalAndDelegate({
+  return await getVotesForProposalAndDelegate({
     proposal_id,
     address,
   });
@@ -80,24 +77,29 @@ export default async function OPProposalApprovalPage({
       className={styles.proposal_container}
     >
       <ProposalDescription proposal={proposal} />
-      <VStack
-        gap={4}
-        justifyContent="justify-between"
-        className={styles.proposal_votes_container}
-      >
-        <VStack gap={4} className={styles.proposal_actions_panel}>
-          {/* Show the results of the approval vote w/ a tab for votes */}
-          <ApprovalVotesPanel
-            proposal={proposal}
-            initialProposalVotes={proposalVotes}
-            fetchVotesForProposal={fetchProposalVotes}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
-            fetchDelegate={fetchDelegate}
-            fetchVoteForProposalAndDelegate={fetchVoteForProposalAndDelegate}
-          />
+      <div>
+        <OpManagerDeleteProposal proposal={proposal} />
+        <VStack
+          gap={4}
+          justifyContent="justify-between"
+          className={styles.proposal_votes_container}
+        >
+          <VStack gap={4} className={styles.proposal_actions_panel}>
+            {/* Show the results of the approval vote w/ a tab for votes */}
+            <ApprovalVotesPanel
+              proposal={proposal}
+              initialProposalVotes={proposalVotes}
+              fetchVotesForProposal={fetchProposalVotes}
+              fetchVotingPower={fetchVotingPower}
+              fetchAuthorityChains={fetchAuthorityChains}
+              fetchDelegate={fetchDelegate}
+              fetchVotesForProposalAndDelegate={
+                fetchVotesForProposalAndDelegate
+              }
+            />
+          </VStack>
         </VStack>
-      </VStack>
+      </div>
     </HStack>
   );
 }

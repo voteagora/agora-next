@@ -13,8 +13,12 @@ BigInt.prototype.toJSON = function (): string {
 };
 
 export const metadata = {
-  title: "Agora Next Again",
-  description: "The future of DAO governance",
+  metadataBase: new URL("https://vote.optimism.io"),
+  alternates: {
+    canonical: "/",
+  },
+  title: "Agora - Home of Optimism Voters",
+  description: "Agora is the home of Optimism voters.",
 };
 
 export default function RootLayout({

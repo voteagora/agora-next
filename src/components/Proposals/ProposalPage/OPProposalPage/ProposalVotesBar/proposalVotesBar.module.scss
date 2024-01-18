@@ -2,19 +2,19 @@
 
 .vote_bar_ticks {
   .for {
-    background: $color-green-700;
+    background: #06ab34;
     border-radius: $border-radius-full;
     width: 2px;
     height: 12px;
   }
   .against {
-    background: $red-600;
+    background: #d62600;
     border-radius: $border-radius-full;
     width: 2px;
     height: 12px;
   }
   .abstain {
-    background: $gray-af;
+    background: #afafaf;
     border-radius: $border-radius-full;
     width: 2px;
     height: 12px;

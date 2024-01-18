@@ -1,5 +1,7 @@
 // Cast for more accurate arithmetic
-const secondsPerBlock = BigInt(2);
+const secondsPerBlock = 2;
+const secondsPerBlockBeforeBedrock = 0.5;
+const bedrockBlockNumber = 105235062;
 
 /*
  * @param {number} blockNumber
@@ -13,11 +15,18 @@ export function getHumanBlockTime(
   latestBlockNumber: number | string | bigint,
   latestBlockTimestamp: number | string | bigint
 ) {
-  return new Date(
-    Number(
-      (BigInt(latestBlockTimestamp) +
-        secondsPerBlock * (BigInt(blockNumber) - BigInt(latestBlockNumber))) *
-        BigInt(1000)
-    )
+  const timeBeforeBedrock =
+    Math.max(bedrockBlockNumber - Number(blockNumber), 0) *
+    secondsPerBlockBeforeBedrock;
+  const timeAfterBedrock =
+    Math.min(
+      Number(latestBlockNumber) - Number(blockNumber),
+      Number(latestBlockNumber) - bedrockBlockNumber
+    ) * secondsPerBlock;
+
+  const timestamp = new Date(
+    (Number(latestBlockTimestamp) - timeBeforeBedrock - timeAfterBedrock) * 1000
   );
+
+  return timestamp;
 }

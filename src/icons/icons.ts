@@ -1,3 +1,4 @@
+import badge from "./badge.svg";
 import ballot from "./ballot.svg";
 import community from "./community.svg";
 import measure from "./measure.svg";
@@ -19,8 +20,10 @@ import power from "./power.svg";
 import profile from "./profile.svg";
 import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
+import sunny from "./sunny.svg";
 
 export const icons = {
+  badge,
   contractVoter,
   expand,
   anonNoun,
@@ -42,4 +45,5 @@ export const icons = {
   power,
   profile,
   info,
+  sunny
 };

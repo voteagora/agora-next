@@ -5,28 +5,31 @@ import { AbiCoder } from "ethers";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import {
+  AdvancedVoteAlert,
+  DisabledVoteDialog,
   LoadingVote,
   NoStatementView,
   SuccessMessage,
 } from "../CastVoteDialog/CastVoteDialog";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { CheckIcon } from "lucide-react";
-import { Proposal } from "@/app/api/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { OptimismContracts } from "@/lib/contracts/contracts";
-import { useContractWrite } from "wagmi";
 import styles from "./approvalCastVoteDialog.module.scss";
+import useAdvancedVoting from "@/hooks/useAdvancedVoting";
+import { Button } from "@/components/ui/button";
+import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
+import { getVpToDisplay } from "@/lib/voteUtils";
 
 const abiCoder = new AbiCoder();
+
 export function ApprovalCastVoteDialog({
   proposal,
   hasStatement,
   closeDialog,
-}: {
-  proposal: Proposal;
-  closeDialog: () => void;
-  hasStatement: boolean;
-}) {
+  votingPower,
+  authorityChains,
+  missingVote,
+}: ApprovalCastVoteDialogProps) {
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
@@ -60,15 +63,20 @@ export function ApprovalCastVoteDialog({
     }
   };
 
-  const governorContract = OptimismContracts.governor;
   // TODO: ADD against option if is supported
   // 0 = against, 1 = for, 2 = abstain
-  const { isLoading, isSuccess, write, isError } = useContractWrite({
-    address: governorContract.address as any,
-    abi: governorContract.abi,
-    functionName: "castVoteWithReasonAndParams",
-    args: [BigInt(proposal.id), abstain ? 2 : 1, reason, encodedParams],
+  const { isLoading, isSuccess, write, isError } = useAdvancedVoting({
+    proposalId: proposal.id,
+    support: abstain ? 2 : 1,
+    standardVP: BigInt(votingPower.directVP),
+    advancedVP: BigInt(votingPower.advancedVP),
+    authorityChains,
+    reason,
+    params: encodedParams,
+    missingVote,
   });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   useMemo(() => {
     const encoded = abstain
@@ -80,68 +88,79 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
+  if (missingVote === "BOTH" || missingVote === "ADVANCED") {
+    return <DisabledVoteDialog closeDialog={closeDialog} />;
+  }
+
   return (
     <div className={styles.container}>
       {hasStatement && isLoading && <LoadingVote />}
-      {hasStatement && isSuccess && <SuccessMessage />}
+      {hasStatement && isSuccess && (
+        <SuccessMessage closeDialog={closeDialog} />
+      )}
       {hasStatement && isError && <p>Something went wrong</p>}
       {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (
-        <VStack gap={3}>
-          <VStack className={styles.title_box}>
-            <p className={styles.title}>
-              Select up to {maxChecked} option{maxChecked > 1 && "s"}
-            </p>
-            <p className={styles.notes}>
-              Your vote is final and cannot be edited once submitted.
-            </p>
-          </VStack>
-          <VStack className={styles.options_list}>
-            {proposalData.options.map((option, index) => (
-              <CheckCard
-                key={index}
-                title={option.description}
-                description={
-                  <p>
-                    {/* TODO: add token transfer request | commented because data not indexed correctly */}
-                    {/* {BigInt(
+        <>
+          <VStack gap={3}>
+            <VStack className={styles.title_box}>
+              <p className={styles.title}>
+                Select up to {maxChecked} option{maxChecked > 1 && "s"}
+              </p>
+              <p className={styles.notes}>
+                Your vote is final and cannot be edited once submitted.
+              </p>
+            </VStack>
+            <VStack className={styles.options_list}>
+              {proposalData.options.map((option, index) => (
+                <CheckCard
+                  key={index}
+                  title={option.description}
+                  description={
+                    <p>
+                      {/* TODO: add token transfer request | commented because data not indexed correctly */}
+                      {/* {BigInt(
                         option.budgetTokensSpent.amount
                       ) === 0n ? (
                         "No token transfer request"
                       ) : (
                         <>
-                          Requesting{" "}
+                          Requesting{"\u00A0"}
                           <TokenAmountDisplay
                             fragment={option.budgetTokensSpent}
                           />
                         </>
                       )} */}
-                  </p>
-                }
-                checked={selectedOptions.includes(index)}
+                    </p>
+                  }
+                  checked={selectedOptions.includes(index)}
+                  checkedOptions={selectedOptions.length}
+                  onClick={() => handleOnChange(index)}
+                  abstain={abstain}
+                />
+              ))}
+              <CheckCard
+                key={proposalData.options.length}
+                title={"Abstain: vote for no options"}
+                description={""}
+                checked={!!abstain}
                 checkedOptions={selectedOptions.length}
-                onClick={() => handleOnChange(index)}
+                onClick={() => handleOnChange(abstainOptionId)}
                 abstain={abstain}
               />
-            ))}
-            <CheckCard
-              key={proposalData.options.length}
-              title={"Abstain: vote for no options"}
-              description={""}
-              checked={!!abstain}
-              checkedOptions={selectedOptions.length}
-              onClick={() => handleOnChange(abstainOptionId)}
+            </VStack>
+            <CastVoteWithReason
+              onVoteClick={write}
+              reason={reason}
+              setReason={setReason}
+              numberOfOptions={selectedOptions.length}
               abstain={abstain}
+              votingPower={vpToDisplay}
             />
           </VStack>
-          <CastVoteWithReason
-            onVoteClick={write}
-            reason={reason}
-            setReason={setReason}
-            numberOfOptions={selectedOptions.length}
-            abstain={abstain}
-          />
-        </VStack>
+          {/* @ts-ignore */}
+          {missingVote === "BOTH" && <AdvancedVoteAlert />}
+        </>
       )}
     </div>
   );
@@ -153,12 +172,14 @@ function CastVoteWithReason({
   onVoteClick,
   numberOfOptions,
   abstain,
+  votingPower,
 }: {
   onVoteClick: () => void;
   reason: string;
   setReason: React.Dispatch<React.SetStateAction<string>>;
   numberOfOptions: number;
   abstain: boolean;
+  votingPower: string;
 }) {
   return (
     <VStack className={styles.cast_vote_box} gap={4}>
@@ -168,26 +189,32 @@ function CastVoteWithReason({
         value={reason}
         onChange={(e) => setReason(e.target.value)}
       />
-      <VStack
-        justifyContent="justify-between"
-        alignItems="items-stretch"
-        className={styles.vote_button_box}
-      >
+      <VStack justifyContent="justify-between" alignItems="items-stretch">
         {!abstain && numberOfOptions > 0 && (
-          <button onClick={() => onVoteClick()}>
+          <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
-            {numberOfOptions > 1 && "s"} with{" "}
-            {<TokenAmountDisplay amount={0} decimals={18} currency="OP" />}
-          </button>
+            {numberOfOptions > 1 && "s"} with{"\u00A0"}
+            {
+              <TokenAmountDisplay
+                amount={votingPower}
+                decimals={18}
+                currency="OP"
+              />
+            }
+          </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
-          <button disabled>Select at least one option</button>
+          <Button disabled>Select at least one option</Button>
         )}
         {abstain && (
-          <button onClick={() => onVoteClick()}>
-            Vote for no options with{" "}
-            {<TokenAmountDisplay amount={0} decimals={18} currency="OP" />}
-          </button>
+          <Button onClick={() => onVoteClick()}>
+            Vote for no options with{"\u00A0"}
+            <TokenAmountDisplay
+              amount={votingPower}
+              decimals={18}
+              currency="OP"
+            />
+          </Button>
         )}
       </VStack>
     </VStack>
