@@ -12,6 +12,7 @@ import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvid
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegatees } from "@prisma/client";
+import Link from "next/link";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { useAccount } from "wagmi";
 
@@ -128,30 +129,25 @@ export default function DelegateCardList({
 
           return (
             <div key={delegate.address} className={styles.link}>
-              <VStack className={styles.link_container}>
-                <VStack gap={4} className="h-full">
-                  <div
-                    onClick={(e) =>
-                      handleClick(e, `/delegates/${delegate.address}`)
-                    }
-                  >
-                    <VStack gap={4} justifyContent="justify-center">
-                      <DelegateProfileImage
-                        address={delegate.address}
-                        votingPower={delegate.votingPower}
-                        citizen={delegate.citizen}
-                      />
-                      <p className={styles.summary}>{truncatedStatement}</p>
-                    </VStack>
+              <Link href={`/delegates/${delegate.address}`}>
+                <VStack gap={4} className={styles.link_container}>
+                  <VStack gap={4} justifyContent="justify-center">
+                    <DelegateProfileImage
+                      address={delegate.address}
+                      votingPower={delegate.votingPower}
+                      citizen={delegate.citizen}
+                    />
+                    <p className={styles.summary}>{truncatedStatement}</p>
+                  </VStack>
+                  <div className="min-h-[24px]">
+                    <DelegateActions
+                      delegate={delegate}
+                      isAdvancedUser={isAdvancedUser}
+                      delegators={delegators}
+                    />
                   </div>
-                  <div className="flex-grow" />
-                  <DelegateActions
-                    delegate={delegate}
-                    isAdvancedUser={isAdvancedUser}
-                    delegators={delegators}
-                  />
                 </VStack>
-              </VStack>
+              </Link>
             </div>
           );
         })}
