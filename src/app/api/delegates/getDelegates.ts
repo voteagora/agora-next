@@ -9,6 +9,7 @@ import { getDelegateStatement } from "../delegateStatement/getDelegateStatement"
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../quorum/getQuorum";
 import { isCitizen } from "../citizens/isCitizen";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export async function getDelegates({
   page = 1,
@@ -94,7 +95,10 @@ export async function getDelegate({
     where: { delegate: address },
   });
   const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
-    where: { delegate: address },
+    where: {
+      delegate: address,
+      contract: OptimismContracts.alligator.address.toLowerCase(),
+    },
   });
 
   const totalVotingPower =
