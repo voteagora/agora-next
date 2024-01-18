@@ -59,6 +59,9 @@ async function getVotingPowerAtSnapshotByAddress({
         FROM (
             SELECT chain_str
             FROM center.advanced_voting_power_raw_snaps
+            WHERE contract=${OptimismContracts.alligator.address.toLowerCase()}
+              AND block_number <= ${blockNumber}
+              AND delegate=${address} 
             GROUP BY chain_str
         ) s
         LEFT JOIN LATERAL (
