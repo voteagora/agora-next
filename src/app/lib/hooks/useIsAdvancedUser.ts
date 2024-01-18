@@ -39,6 +39,7 @@ const useIsAdvancedUser = () => {
     "0xC323Ee1d28D2508667f4BEbfC26F93c60aBdD203", // kentf.eth
     "0x4817B42Ec28851EF581a74855A89D2b8c45A33DD", // Kent Test 5
     "0x6EF3E0179e669C77C82664D0feDad3a637121Efe", // Jacopo Test
+    "0xA58090dd84D143ca90e95B05395e0F116A727714", // Jacopo Test 2
     "0xA18D0226043A76683950f3BAabf0a87Cfb32E1Cb", // stepandel.eth
     "0xEA64B234316728f1BFd3b7cDCc1EAf0066D8E055", // Stepan Test 2
     "0x924A0468961f09aB3c3A457382C9D06f48cff6aA", // Stepan Test 4
@@ -49,7 +50,7 @@ const useIsAdvancedUser = () => {
     "0xD753a89450213A8D7f7aCCE3a615d71ebD97366d", // Anika
     "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd", // Woj Test 1
     "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Agora manager throwaway
-    "0xC776cBDDeA014889E8BaB4323C894C5c34DB214D"  // Fernando
+    "0xC776cBDDeA014889E8BaB4323C894C5c34DB214D", // Fernando
   ] as `0x${string}`[];
 
   useContractRead({
