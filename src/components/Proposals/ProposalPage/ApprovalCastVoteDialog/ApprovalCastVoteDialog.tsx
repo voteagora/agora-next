@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import {
   AdvancedVoteAlert,
+  DisabledVoteDialog,
   LoadingVote,
   NoStatementView,
   SuccessMessage,
@@ -87,6 +88,10 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
+  if (missingVote === "BOTH" || missingVote === "ADVANCED") {
+    return <DisabledVoteDialog closeDialog={closeDialog} />;
+  }
+
   return (
     <div className={styles.container}>
       {hasStatement && isLoading && <LoadingVote />}
@@ -153,6 +158,7 @@ export function ApprovalCastVoteDialog({
               votingPower={vpToDisplay}
             />
           </VStack>
+          {/* @ts-ignore */}
           {missingVote === "BOTH" && <AdvancedVoteAlert />}
         </>
       )}

@@ -50,6 +50,10 @@ function CastVoteDialogContents({
     return null;
   }
 
+  if (missingVote === "BOTH" || missingVote === "ADVANCED") {
+    return <DisabledVoteDialog closeDialog={closeDialog} />;
+  }
+
   return (
     <>
       {!isLoading && !isSuccess && (
@@ -97,6 +101,7 @@ function CastVoteDialogContents({
               <NoStatementView closeDialog={closeDialog} />
             )}
           </div>
+          {/* @ts-ignore */}
           {missingVote === "BOTH" && <AdvancedVoteAlert />}
         </VStack>
       )}
@@ -134,10 +139,10 @@ export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
   return (
     <VStack className={styles.full_width}>
       <img src={`/images/congrats.svg`} className="w-full mb-3" />
-      <div className="font-black text-2xl mb-2">
+      <div className="mb-2 text-2xl font-black">
         Your vote has been submitted!
       </div>
-      <div className="text-gray-700 text-sm mb-5">
+      <div className="mb-5 text-sm text-gray-700">
         It might take up to a minute for the changes to be reflected. Thank you
         for participating in Optimism’s token house.
       </div>
@@ -154,15 +159,15 @@ export function LoadingVote() {
   return (
     <VStack className={styles.full_width}>
       <img src={`/images/vote-pending.svg`} className="w-full mb-3" />
-      <div className="font-black text-2xl mb-2">Casting your vote</div>
-      <div className="text-gray-700 text-sm mb-5">
+      <div className="mb-2 text-2xl font-black">Casting your vote</div>
+      <div className="mb-5 text-sm text-gray-700">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
         <div
           className={`flex flex-row justify-center w-full py-3 bg-gray-eo rounded-lg`}
         >
-          <div className="text-gray-700 font-medium">
+          <div className="font-medium text-gray-700">
             Writing your vote to the chain...
           </div>
         </div>
@@ -183,5 +188,39 @@ export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
         Please set one up to vote.
       </Link>
     </div>
+  );
+}
+
+export function DisabledVoteDialog({
+  closeDialog,
+}: {
+  closeDialog: () => void;
+}) {
+  return (
+    <VStack className={styles.full_width}>
+      <Image
+        width="457"
+        height="155"
+        src={`/images/vote-pending.svg`}
+        className="w-full mb-3"
+        alt="agora loading"
+      />
+      <div className="mb-2 text-2xl font-black">
+        Voting will be available soon!
+      </div>
+      <div className="mb-5 text-sm text-gray-700">
+        Thanks for trying to vote early! It looks like you’ve received votes via
+        advanced delegation – a new beta feature. Voting will be enabled
+        shortly. Please check back in a few days.
+      </div>
+      <div>
+        <div
+          className={`flex flex-row justify-center w-full py-3 border border-gray-eo rounded-lg cursor-pointer`}
+          onClick={closeDialog}
+        >
+          <div className="font-medium">Got it, I’ll come back later</div>
+        </div>
+      </div>
+    </VStack>
   );
 }
