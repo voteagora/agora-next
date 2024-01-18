@@ -18,6 +18,7 @@ export type Proposal = {
   quorum: BigNumberish | null;
   approvalThreshold: BigNumberish | null;
   proposalData: ParsedProposalData[ProposalType]["kind"];
+  unformattedProposalData: `0x${string}` | null | any;
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
   status: ProposalStatus | null;

@@ -10,6 +10,7 @@ import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower"
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { Proposal } from "@/app/api/proposals/proposal";
+import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
@@ -76,24 +77,29 @@ export default async function OPProposalApprovalPage({
       className={styles.proposal_container}
     >
       <ProposalDescription proposal={proposal} />
-      <VStack
-        gap={4}
-        justifyContent="justify-between"
-        className={styles.proposal_votes_container}
-      >
-        <VStack gap={4} className={styles.proposal_actions_panel}>
-          {/* Show the results of the approval vote w/ a tab for votes */}
-          <ApprovalVotesPanel
-            proposal={proposal}
-            initialProposalVotes={proposalVotes}
-            fetchVotesForProposal={fetchProposalVotes}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
-            fetchDelegate={fetchDelegate}
-            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
-          />
+      <div>
+        <OpManagerDeleteProposal proposal={proposal} />
+        <VStack
+          gap={4}
+          justifyContent="justify-between"
+          className={styles.proposal_votes_container}
+        >
+          <VStack gap={4} className={styles.proposal_actions_panel}>
+            {/* Show the results of the approval vote w/ a tab for votes */}
+            <ApprovalVotesPanel
+              proposal={proposal}
+              initialProposalVotes={proposalVotes}
+              fetchVotesForProposal={fetchProposalVotes}
+              fetchVotingPower={fetchVotingPower}
+              fetchAuthorityChains={fetchAuthorityChains}
+              fetchDelegate={fetchDelegate}
+              fetchVotesForProposalAndDelegate={
+                fetchVotesForProposalAndDelegate
+              }
+            />
+          </VStack>
         </VStack>
-      </VStack>
+      </div>
     </HStack>
   );
 }

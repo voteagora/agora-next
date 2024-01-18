@@ -2,7 +2,12 @@ import { ProposalType, Proposals } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal } from "@/app/api/proposals/proposal";
-import { Abi, decodeFunctionData } from "viem";
+import {
+  Abi,
+  decodeFunctionData,
+  encodeAbiParameters,
+  parseAbiParameters,
+} from "viem";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -187,46 +192,70 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
+  let unformattedProposalData;
+
+  if (proposal.proposal_type == "APPROVAL") {
+    unformattedProposalData = encodeAbiParameters(
+      parseAbiParameters([
+        "ProposalOption[] proposalOptions, ProposalSettings proposalSettings",
+        "struct ProposalOption { uint256 budgetTokenSpent; address[] targets; uint256[] values; bytes[] calldatas; string description; }",
+        "struct ProposalSettings { uint8 maxApprovals; uint8 criteria; address budgetToken; uint128 criteriaValue; uint128 budgetAmount; }",
+      ]),
+      // @ts-ignore
+      proposal.proposal_data
+    );
+  } else if (proposal.proposal_type == "OPTIMISTIC") {
+    unformattedProposalData = encodeAbiParameters(
+      [
+        { name: "thresholds", type: "uint248" },
+        { name: "isRelativeToVotableSupply", type: "bool" },
+      ],
+      // @ts-ignore
+      proposal.proposal_data?.[0]
+    );
+  }
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
       ? getHumanBlockTime(
-        proposal.created_block,
-        latestBlock.number,
-        latestBlock.timestamp
-      )
+          proposal.created_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
       : null,
     start_time: latestBlock
       ? getHumanBlockTime(
-        proposal.start_block,
-        latestBlock.number,
-        latestBlock.timestamp
-      )
+          proposal.start_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
       : null,
     end_time: latestBlock
       ? getHumanBlockTime(
-        proposal.end_block,
-        latestBlock.number,
-        latestBlock.timestamp
-      )
+          proposal.end_block,
+          latestBlock.number,
+          latestBlock.timestamp
+        )
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
+    unformattedProposalData,
     proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-        proposal,
-        proposalResuts,
-        Number(latestBlock.number),
-        quorum,
-        votableSupply
-      )
+          proposal,
+          proposalResuts,
+          Number(latestBlock.number),
+          quorum,
+          votableSupply
+        )
       : null,
   };
 }
