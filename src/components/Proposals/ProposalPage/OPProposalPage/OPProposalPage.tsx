@@ -22,6 +22,7 @@ import {
   fetchDirectDelegatee,
   getProxyAddress,
   getDelegators,
+  fetchAll,
 } from "@/app/proposals/actions";
 import { useCallback, useEffect, useState } from "react";
 import { fetchAndSetAll } from "@/lib/utils";
@@ -55,18 +56,16 @@ export default async function OPProposalPage({
   const fetchData = useCallback(async () => {
     try {
       console.log("6 proposal", Date.now() / 1000);
-      await fetchAndSetAll(
-        [
-          () => fetchVotingPower(address!, snapshotBlockNumber),
-          () => fetchDelegate(address!),
-          async () =>
-            (
-              await fetchAuthorityChains(address!, snapshotBlockNumber)
-            ).chains,
-          () => fetchVotesForProposalAndDelegate(id, address!),
-        ],
-        [setVotingPower, setDelegate, setChains, setVotes]
-      );
+      [setVotingPower, setDelegate, setChains, setVotes];
+      const eo = await fetchAll(address!, id, snapshotBlockNumber);
+      setVotingPower(eo[0]);
+      setDelegate(eo[1]);
+      // @ts-ignore
+      setChains(eo[2]);
+      // @ts-ignore
+      setVotes(eo[3]);
+
+      console.log("eo: ", eo);
 
       setIsReady(true);
       console.log("7 proposal", Date.now() / 1000);

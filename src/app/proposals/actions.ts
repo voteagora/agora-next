@@ -105,3 +105,16 @@ export async function getProxyAddress(addressOrENSName: string | `0x${string}`) 
 export async function getDelegators(addressOrENSName: string | `0x${string}`) {
     return getCurrentDelegators({ addressOrENSName });
 }
+
+export async function fetchAll(address: string | `0x${string}`, id: string, snapshotBlockNumber: number) {
+    return await Promise.all([
+        () => fetchVotingPower(address!, snapshotBlockNumber),
+        () => fetchDelegate(address!),
+        async () =>
+            (
+                await fetchAuthorityChains(address!, snapshotBlockNumber)
+            ).chains,
+        () => fetchVotesForProposalAndDelegate(id, address!),
+    ].map((fetcher) => fetcher()));
+
+}
