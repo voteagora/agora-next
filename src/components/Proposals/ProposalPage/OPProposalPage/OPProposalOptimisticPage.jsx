@@ -26,6 +26,7 @@ import {
   getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
+import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -145,64 +146,71 @@ export default async function OPProposalPage({ proposal }) {
       className={styles.proposal_container}
     >
       <ProposalDescription proposal={proposal} />
-      <VStack
-        gap={4}
-        justifyContent="justify-between"
-        className={styles.proposal_votes_container}
-      >
-        <VStack gap={4} className={styles.proposal_actions_panel}>
-          <div>
-            <div className={styles.proposal_header}>Proposal votes</div>
-            <div
-              className={cn(styles.proposal_votes_summary_container, "!py-4")}
-            >
-              <p
-                className={
-                  status === "approved"
-                    ? "text-green-positive"
-                    : "text-red-negative"
-                }
+      <div>
+        <OpManagerDeleteProposal proposal={proposal} />
+        <VStack
+          gap={4}
+          justifyContent="justify-between"
+          className={styles.proposal_votes_container}
+        >
+          <VStack gap={4} className={styles.proposal_actions_panel}>
+            <div>
+              <div className={styles.proposal_header}>Proposal votes</div>
+              <div
+                className={cn(styles.proposal_votes_summary_container, "!py-4")}
               >
-                This proposal is optimistically {status}
-              </p>
-              <p className="font-normal mt-1 text-gray-4f">
-                This proposal will automatically pass unless{" "}
-                {disapprovalThreshold}% of the votable supply of OP is against.
-                Currently, {againstRelativeAmount}% ({againstLength} OP) is
-                against.
-              </p>
+                <p
+                  className={
+                    status === "approved"
+                      ? "text-green-positive"
+                      : "text-red-negative"
+                  }
+                >
+                  This proposal is optimistically {status}
+                </p>
+                <p className="mt-1 font-normal text-gray-4f">
+                  This proposal will automatically pass unless{" "}
+                  {disapprovalThreshold}% of the votable supply of OP is
+                  against. Currently, {againstRelativeAmount}% ({againstLength}{" "}
+                  OP) is against.
+                </p>
+              </div>
             </div>
-          </div>
-          {/* Show the scrolling list of votes for the proposal */}
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            fetchVotesForProposal={fetchProposalVotes}
-            fetchDelegate={fetchDelegate}
-            fetchDelegateStatement={fetchDelegateStatement}
-            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-            fetchCurrentDelegatees={fetchCurrentDelegatees}
-            fetchDirectDelegatee={fetchDirectDelegatee}
-            getProxyAddress={getProxyAddress}
-            proposal_id={proposal.id}
-            getDelegators={getDelegators}
-          />
-          {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput
-            proposal={proposal}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
-            fetchDelegate={fetchDelegate}
-            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
-            isOptimistic
-          />
-          <p className="text-gray-4f text-xs mx-4">
-            If you agree with this proposal, you don’t need to vote. Only vote
-            against if you oppose this proposal.
-          </p>
+            {/* Show the scrolling list of votes for the proposal */}
+            <ProposalVotesList
+              initialProposalVotes={proposalVotes}
+              fetchVotesForProposal={fetchProposalVotes}
+              fetchDelegate={fetchDelegate}
+              fetchDelegateStatement={fetchDelegateStatement}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+              fetchVotingPowerForSubdelegation={
+                fetchVotingPowerForSubdelegation
+              }
+              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+              fetchCurrentDelegatees={fetchCurrentDelegatees}
+              fetchDirectDelegatee={fetchDirectDelegatee}
+              getProxyAddress={getProxyAddress}
+              proposal_id={proposal.id}
+              getDelegators={getDelegators}
+            />
+            {/* Show the input for the user to vote on a proposal if allowed */}
+            <CastVoteInput
+              proposal={proposal}
+              fetchVotingPower={fetchVotingPower}
+              fetchAuthorityChains={fetchAuthorityChains}
+              fetchDelegate={fetchDelegate}
+              fetchVotesForProposalAndDelegate={
+                fetchVotesForProposalAndDelegate
+              }
+              isOptimistic
+            />
+            <p className="mx-4 text-xs text-gray-4f">
+              If you agree with this proposal, you don’t need to vote. Only vote
+              against if you oppose this proposal.
+            </p>
+          </VStack>
         </VStack>
-      </VStack>
+      </div>
     </HStack>
   );
 }
