@@ -6,6 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import {
   getVotesForProposalAndDelegate,
   getVotesForProposal,
+  getAllForVoting,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import {
@@ -136,6 +137,16 @@ async function getDelegators(addressOrENSName: string | `0x${string}`) {
   return getCurrentDelegators({ addressOrENSName });
 }
 
+async function fetchAllForVoting(
+  address: string | `0x${string}`,
+  blockNumber: number,
+  proposal_id: string
+) {
+  "use server";
+
+  return await getAllForVoting(address, blockNumber, proposal_id);
+}
+
 export default async function OPProposalPage({
   proposal,
 }: {
@@ -186,12 +197,7 @@ export default async function OPProposalPage({
             {/* Show the input for the user to vote on a proposal if allowed */}
             <CastVoteInput
               proposal={proposal}
-              fetchVotingPower={fetchVotingPower}
-              fetchAuthorityChains={fetchAuthorityChains}
-              fetchDelegate={fetchDelegate}
-              fetchVotesForProposalAndDelegate={
-                fetchVotesForProposalAndDelegate
-              }
+              fetchAllForVoting={fetchAllForVoting}
             />
           </VStack>
         </VStack>

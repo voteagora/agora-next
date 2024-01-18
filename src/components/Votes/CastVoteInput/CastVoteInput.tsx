@@ -18,31 +18,14 @@ import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
-  fetchVotingPower: (
-    addressOrENSName: string | `0x${string}`,
-    blockNumber: number
-  ) => Promise<VotingPowerData>;
-  fetchAuthorityChains: (
-    address: string | `0x${string}`,
-    blockNumber: number
-  ) => Promise<{ chains: string[][] }>;
-  fetchDelegate: (
-    addressOrENSName: string | `0x${string}`
-  ) => Promise<Delegate>;
-  fetchVotesForProposalAndDelegate: (
-    proposal_id: string,
-    address: string | `0x${string}`
-  ) => Promise<Vote[]>;
   isOptimistic?: boolean;
+  fetchAllForVoting: any;
 };
 
 export default function CastVoteInput({
   proposal,
-  fetchVotingPower,
-  fetchAuthorityChains,
-  fetchDelegate,
-  fetchVotesForProposalAndDelegate,
   isOptimistic = false,
+  fetchAllForVoting,
 }: Props) {
   const [reason, setReason] = useState("");
   const [votingPower, setVotingPower] = useState<VotingPowerData>({
@@ -60,31 +43,26 @@ export default function CastVoteInput({
 
   const fetchData = useCallback(async () => {
     try {
-      await fetchAndSetAll(
-        [
-          () => fetchVotingPower(address!, proposal.snapshotBlockNumber),
-          () => fetchDelegate(address!),
-          async () =>
-            (
-              await fetchAuthorityChains(address!, proposal.snapshotBlockNumber)
-            ).chains,
-          () => fetchVotesForProposalAndDelegate(proposal.id, address!),
-        ],
-        [setVotingPower, setDelegate, setChains, setVotes]
+      const {
+        votingPower,
+        authorityChains,
+        delegate,
+        votesForProposalAndDelegate,
+      } = await fetchAllForVoting(
+        address!,
+        proposal.snapshotBlockNumber,
+        proposal.id
       );
 
+      setVotingPower(votingPower);
+      setDelegate(delegate);
+      setChains(authorityChains);
+      setVotes(votesForProposalAndDelegate);
       setIsReady(true);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [
-    fetchVotingPower,
-    fetchDelegate,
-    fetchAuthorityChains,
-    address,
-    proposal,
-    fetchVotesForProposalAndDelegate,
-  ]);
+  }, [address, proposal, fetchAllForVoting]);
 
   useEffect(() => {
     if (address && proposal.snapshotBlockNumber) {

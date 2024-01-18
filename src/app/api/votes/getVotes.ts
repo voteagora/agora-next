@@ -6,6 +6,9 @@ import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { Prisma } from "@prisma/client";
+import { getVotingPowerAtSnapshot } from "../voting-power/getVotingPower";
+import { getAuthorityChains } from "../authority-chains/getAuthorityChains";
+import { getDelegate } from "../delegates/getDelegates";
 
 export const getVotesForDelegate = ({
   addressOrENSName,
@@ -211,4 +214,25 @@ export async function getVotesForProposalAndDelegate({
       latestBlock
     )
   );
+}
+
+export async function getAllForVoting(
+  address: string | `0x${string}`,
+  blockNumber: number,
+  proposal_id: string
+) {
+  const [votingPower, authorityChains, delegate, votesForProposalAndDelegate] =
+    await Promise.all([
+      getVotingPowerAtSnapshot({ addressOrENSName: address, blockNumber }),
+      getAuthorityChains({ address, blockNumber }),
+      getDelegate({ addressOrENSName: address }),
+      getVotesForProposalAndDelegate({ proposal_id, address }),
+    ]);
+
+  return {
+    votingPower,
+    authorityChains,
+    delegate,
+    votesForProposalAndDelegate,
+  };
 }

@@ -6,6 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import {
   getVotesForProposalAndDelegate,
   getVotesForProposal,
+  getAllForVoting,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import {
@@ -124,6 +125,12 @@ async function getDelegators(addressOrENSName) {
   return getCurrentDelegators({ addressOrENSName });
 }
 
+async function fetchAllForVoting(address, blockNumber, proposal_id) {
+  "use server";
+
+  return await getAllForVoting(address, blockNumber, proposal_id);
+}
+
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
   const proposalVotes = await fetchProposalVotes(proposal.id);
@@ -196,12 +203,7 @@ export default async function OPProposalPage({ proposal }) {
             {/* Show the input for the user to vote on a proposal if allowed */}
             <CastVoteInput
               proposal={proposal}
-              fetchVotingPower={fetchVotingPower}
-              fetchAuthorityChains={fetchAuthorityChains}
-              fetchDelegate={fetchDelegate}
-              fetchVotesForProposalAndDelegate={
-                fetchVotesForProposalAndDelegate
-              }
+              fetchAllForVoting={fetchAllForVoting}
               isOptimistic
             />
             <p className="mx-4 text-xs text-gray-4f">
