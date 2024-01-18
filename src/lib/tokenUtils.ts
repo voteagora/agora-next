@@ -26,9 +26,28 @@ const format = new Intl.NumberFormat("en", {
   notation: "compact",
 });
 
+function scientificNotationToBigInt(numStr: any) {
+  // Check if the number is in scientific notation
+  if (!/\d+\.?\d*e[+-]*\d+/i.test(numStr)) {
+    return BigInt(numStr);
+  }
+
+  let [base, exponent] = numStr.toLowerCase().split("e");
+  exponent = Number(exponent);
+
+  // Remove the decimal point and adjust the exponent
+  base = base.replace(".", "");
+  exponent -= base.length - 1;
+
+  // Create a BigInt from the adjusted base and exponent
+  return BigInt(base + "0".repeat(exponent));
+}
+
 export function pluralizeVote(count: BigInt) {
+  const decimalCount = scientificNotationToBigInt(count.toString());
+
   const votes = Number(
-    ethers.formatUnits(count.toString(), tokens.get(DEPLOYMENT_NAME)!.decimals)
+    ethers.formatUnits(decimalCount, tokens.get(DEPLOYMENT_NAME)!.decimals)
   );
 
   if (votes === 1) {

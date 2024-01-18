@@ -64,7 +64,40 @@ export function formatNumber(
   decimals: number,
   maximumSignificantDigits = 4
 ) {
-  const standardUnitAmount = Number(formatUnits(amount, decimals));
+  let normalizedAmount;
+
+  if (typeof amount === "string" && amount.includes("e")) {
+    // Convert scientific notation to a full decimal string
+    const parts = amount.split("e");
+    const base = parts[0];
+    const exponent = parseInt(parts[1], 10);
+
+    if (exponent > 0) {
+      let decimalPointIndex = base.indexOf(".");
+      let decimalPartLength =
+        decimalPointIndex === -1 ? 0 : base.length - decimalPointIndex - 1;
+
+      if (decimalPartLength <= exponent) {
+        normalizedAmount =
+          base.replace(".", "") + "0".repeat(exponent - decimalPartLength);
+      } else {
+        const splitPoint = decimalPointIndex + exponent + 1;
+        normalizedAmount =
+          base.slice(0, splitPoint) +
+          "." +
+          base.slice(splitPoint).replace(".", "");
+      }
+    } else {
+      normalizedAmount =
+        "0." + "0".repeat(-1 - exponent) + base.replace(".", "");
+    }
+  } else {
+    normalizedAmount = amount;
+  }
+
+  const standardUnitAmount = Number(
+    formatUnits(normalizedAmount.toString(), decimals)
+  );
 
   const numberFormat = new Intl.NumberFormat("en", {
     notation: "compact",

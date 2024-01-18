@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 import { AuthorityChainsSnaps, Prisma } from "@prisma/client";
 
 export async function getAuthorityChains({
@@ -20,7 +21,9 @@ export async function getAuthorityChains({
       balance_block_number,
       allowance
     FROM center.authority_chains_snaps
-    WHERE delegate=${address.toLowerCase()} AND balance_block_number <= ${blockNumber}
+    WHERE delegate=${address.toLowerCase()} 
+      AND contract=${OptimismContracts.alligator.address.toLowerCase()}
+      AND balance_block_number <= ${blockNumber} 
     `
   );
 
