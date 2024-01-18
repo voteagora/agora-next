@@ -8,6 +8,7 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
 } from "viem";
+import { isOldApprovalModule } from "./contracts/contracts";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -195,10 +196,13 @@ export async function parseProposal(
   let unformattedProposalData;
 
   if (proposal.proposal_type == "APPROVAL") {
+    const isOldModule = isOldApprovalModule(proposal.created_block.toString());
     unformattedProposalData = encodeAbiParameters(
       parseAbiParameters([
         "ProposalOption[] proposalOptions, ProposalSettings proposalSettings",
-        "struct ProposalOption { uint256 budgetTokenSpent; address[] targets; uint256[] values; bytes[] calldatas; string description; }",
+        isOldModule
+          ? "struct ProposalOption { address[] targets; uint256[] values; bytes[] calldatas; string description; }"
+          : "struct ProposalOption { uint256 budgetTokenSpent; address[] targets; uint256[] values; bytes[] calldatas; string description; }",
         "struct ProposalSettings { uint8 maxApprovals; uint8 criteria; address budgetToken; uint128 criteriaValue; uint128 budgetAmount; }",
       ]),
       // @ts-ignore
