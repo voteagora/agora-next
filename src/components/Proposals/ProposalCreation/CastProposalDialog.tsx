@@ -31,11 +31,9 @@ export function CastProposalDialog({
           {txHash && !isLoading && !isSuccess && (
             <Message text="Transaction submitted and awaiting confirmation." />
           )}
-          {txHash && !isLoading && isSuccess && (
-            <SuccessMessage closeDialog={closeDialog} />
-          )}
           {isError && !txHash && <div>error</div>}
           {isLoading && <Loading />}
+          {isSuccess && <SuccessMessage closeDialog={closeDialog} />}
         </VStack>
       </VStack>
     </VStack>
