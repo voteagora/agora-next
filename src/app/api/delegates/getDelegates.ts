@@ -4,7 +4,7 @@ import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
-import { resolveENSName } from "@/app/lib/utils";
+import { resolveENSName } from "@/app/lib/ENSUtils";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../quorum/getQuorum";
