@@ -21,7 +21,7 @@ export const OptimismContracts = {
     chainId: 10,
     abi: OptimismGovernor__factory.abi,
     v6UpgradeBlock:
-      process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114615036 : 114615036, // TODO: Update this once prod is upgraded
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114995000 : 114615036,
   },
 
   proposalTypesConfigurator: {
@@ -50,10 +50,16 @@ export const OptimismContracts = {
 
   alligator: {
     contract: AlligatorOPV5__factory.connect(
-      "0x7f08F3095530B67CdF8466B7a923607944136Df0",
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
+        : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6",
+
       provider
     ),
-    address: "0x7f08F3095530B67CdF8466B7a923607944136Df0",
+    address:
+      process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
+        : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6",
     chainId: 10,
     abi: AlligatorOPV5__factory.abi,
   },

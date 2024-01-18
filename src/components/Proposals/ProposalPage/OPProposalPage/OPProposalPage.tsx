@@ -24,6 +24,7 @@ import {
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 import { Proposal } from "@/app/api/proposals/proposal";
+import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
@@ -151,42 +152,50 @@ export default async function OPProposalPage({
       className={styles.proposal_container}
     >
       <ProposalDescription proposal={proposal} />
-      <VStack
-        gap={4}
-        justifyContent="justify-between"
-        className={styles.proposal_votes_container}
-      >
-        <VStack gap={4} className={styles.proposal_actions_panel}>
-          <div>
-            <div className={styles.proposal_header}>Proposal votes</div>
-            {/* Show the summar bar with For, Against, Abstain */}
-            <ProposalVotesSummary proposal={proposal} />
-          </div>
-          {/* Show the scrolling list of votes for the proposal */}
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            fetchVotesForProposal={fetchProposalVotes}
-            fetchDelegate={fetchDelegate}
-            fetchDelegateStatement={fetchDelegateStatement}
-            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-            fetchCurrentDelegatees={fetchCurrentDelegatees}
-            fetchDirectDelegatee={fetchDirectDelegatee}
-            getProxyAddress={getProxyAddress}
-            proposal_id={proposal.id}
-            getDelegators={getDelegators}
-          />
-          {/* Show the input for the user to vote on a proposal if allowed */}
-          <CastVoteInput
-            proposal={proposal}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
-            fetchDelegate={fetchDelegate}
-            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
-          />
+      <div>
+        <OpManagerDeleteProposal proposal={proposal} />
+
+        <VStack
+          gap={4}
+          justifyContent="justify-between"
+          className={styles.proposal_votes_container}
+        >
+          <VStack gap={4} className={styles.proposal_actions_panel}>
+            <div>
+              <div className={styles.proposal_header}>Proposal votes</div>
+              {/* Show the summar bar with For, Against, Abstain */}
+              <ProposalVotesSummary proposal={proposal} />
+            </div>
+            {/* Show the scrolling list of votes for the proposal */}
+            <ProposalVotesList
+              initialProposalVotes={proposalVotes}
+              fetchVotesForProposal={fetchProposalVotes}
+              fetchDelegate={fetchDelegate}
+              fetchDelegateStatement={fetchDelegateStatement}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+              fetchVotingPowerForSubdelegation={
+                fetchVotingPowerForSubdelegation
+              }
+              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+              fetchCurrentDelegatees={fetchCurrentDelegatees}
+              fetchDirectDelegatee={fetchDirectDelegatee}
+              getProxyAddress={getProxyAddress}
+              proposal_id={proposal.id}
+              getDelegators={getDelegators}
+            />
+            {/* Show the input for the user to vote on a proposal if allowed */}
+            <CastVoteInput
+              proposal={proposal}
+              fetchVotingPower={fetchVotingPower}
+              fetchAuthorityChains={fetchAuthorityChains}
+              fetchDelegate={fetchDelegate}
+              fetchVotesForProposalAndDelegate={
+                fetchVotesForProposalAndDelegate
+              }
+            />
+          </VStack>
         </VStack>
-      </VStack>
+      </div>
     </HStack>
   );
 }

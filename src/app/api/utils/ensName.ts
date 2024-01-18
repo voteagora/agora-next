@@ -1,4 +1,4 @@
-import { resolveENSName } from "@/app/lib/utils";
+import { resolveENSName } from "@/app/lib/ENSUtils";
 import { isAddress } from "viem";
 
 export async function addressOrEnsNameWrap<T, P>(
@@ -9,6 +9,8 @@ export async function addressOrEnsNameWrap<T, P>(
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
+
+  console.log("resolved address", address);
 
   return await handler({ ...args, address });
 }
