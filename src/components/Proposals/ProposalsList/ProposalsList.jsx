@@ -3,13 +3,9 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroller";
-import { ReactMarkdown } from "react-markdown/lib/react-markdown";
-import { getHumanBlockTime } from "@/lib/blockTimes";
 import styles from "./proposalLists.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
-import Link from "next/link";
-import Image from "next/image";
 import Proposal from "../Proposal/Proposal";
 import Loader from "@/components/Layout/Loader";
 
@@ -51,12 +47,21 @@ export default function ProposalsList({
             hasMore={meta.hasNextPage}
             pageStart={0}
             loadMore={loadMore}
-            loader={<Loader />}
+            loader={
+              <div key={0}>
+                <HStack
+                  key="loader"
+                  className="gl_loader justify-center py-6 text-sm text-stone-500"
+                >
+                  Loading...
+                </HStack>
+              </div>
+            }
             element="main"
           >
             {proposals.map((proposal) => (
               <Proposal
-                key={proposal.id}
+                key={`${proposal.id}_${proposal.status}`}
                 proposal={proposal}
                 votableSupply={votableSupply}
               />
