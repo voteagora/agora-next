@@ -174,9 +174,9 @@ export default async function OPProposalPage({ proposal }) {
                   <div>
                     <p
                       className={
-                        proposal.status === "approved"
-                          ? "text-red-negative"
-                          : "text-green-positive"
+                        status === "approved"
+                          ? "text-green-positive"
+                          : "text-red-negative"
                       }
                     >
                       This proposal is optimistically {status}
