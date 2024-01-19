@@ -50,9 +50,9 @@ function CastVoteDialogContents({
     return null;
   }
 
-  // if (missingVote === "BOTH" || missingVote === "ADVANCED") {
-  //   return <DisabledVoteDialog closeDialog={closeDialog} />;
-  // }
+  if (missingVote === "BOTH" || missingVote === "ADVANCED") {
+    return <DisabledVoteDialog closeDialog={closeDialog} />;
+  }
 
   return (
     <>
