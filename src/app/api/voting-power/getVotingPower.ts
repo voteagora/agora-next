@@ -29,7 +29,7 @@ async function getVotingPowerAtSnapshotByAddress({
   address: string;
   blockNumber: number;
 }): Promise<VotingPowerData> {
-  const votingPower = await prisma.votingPowerSnaps.findFirst({
+  const votingPowerQuery = prisma.votingPowerSnaps.findFirst({
     where: {
       delegate: address,
       block_number: {
@@ -42,7 +42,7 @@ async function getVotingPowerAtSnapshotByAddress({
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPower = await prisma.$queryRaw<
+  const advancedVotingPowerQuery = prisma.$queryRaw<
     Prisma.AdvancedVotingPowerGetPayload<true>[]
   >(
     Prisma.sql`
@@ -82,6 +82,11 @@ async function getVotingPowerAtSnapshotByAddress({
     WHERE delegate=${address};
     `
   );
+
+  const [votingPower, advancedVotingPower] = await Promise.all([
+    votingPowerQuery,
+    advancedVotingPowerQuery,
+  ]);
 
   return {
     directVP: votingPower?.balance ?? "0",
