@@ -71,10 +71,13 @@ export async function getDelegates({
     pageSize
   );
 
-  const statements = await Promise.all(
-    delegates.map((delegate) =>
-      getDelegateStatement({ addressOrENSName: delegate.delegate })
-    )
+  const _delegates = await Promise.all(
+    delegates.map(async (delegate) => {
+      return {
+        citizen: await isCitizen(delegate.delegate),
+        statement: await getDelegateStatement({ addressOrENSName: delegate.delegate })
+      }
+    })
   );
 
   return {
@@ -82,8 +85,9 @@ export async function getDelegates({
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
-      statement: statements[index],
-    })),
+      citizen: _delegates[index].citizen.length > 0,
+      statement: _delegates[index].statement,
+    }))
   };
 }
 
@@ -175,7 +179,6 @@ export async function getDelegate({
   // Build out delegate JSON response
   return {
     address: address,
-    // TODO: frh -> check this with real data
     citizen: _isCitizen.length > 0,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
