@@ -10,7 +10,5 @@ export async function addressOrEnsNameWrap<T, P>(
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
 
-  console.log("resolved address", address);
-
   return await handler({ ...args, address });
 }
