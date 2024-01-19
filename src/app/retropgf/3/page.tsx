@@ -1,6 +1,7 @@
 // TODO: merge with main once summary retropgf is merged and update links
 import RetroPGFResults from "@/components/RetroPGF/RetroPGFResults";
 import { VStack } from "@/components/Layout/Stack";
+import { getRetroPGFResults } from "@/app/retropgf/actions";
 
 /**
  * TODO:
@@ -14,69 +15,17 @@ import { VStack } from "@/components/Layout/Stack";
  */
 // TODO: frh -> investigate apollo for infinite scroll
 // TODO: frh -> filters
-export async function getRetroPGFResults() {
-  const query = `
-    query {
-      retroPGF {
-        projects(first: 5) {
-          pageInfo {
-            hasNextPage
-          }
-          edges {
-            node {
-              applicant {
-                address {
-                  address
-                  resolvedName {
-                    address
-                    name
-                  }
-                }
-              }
-              awarded
-              displayName
-              id
-              impactCategory
-              includedInBallots
-              lists {
-                id
-              }
-              profile {
-                profileImageUrl
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  const url = "https://optimism-agora-dev.agora-dev.workers.dev/graphql";
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({ query }),
-  };
-
-  const response = await fetch(url, options);
-  const data = await response.json();
-
-  return data.data.retroPGF.projects;
-}
 
 export default async function Page() {
-  const projects = await getRetroPGFResults();
-  console.log("results page: ", projects);
+  const projects = await getRetroPGFResults().catch((error) =>
+    console.error("error", error)
+  );
 
   return (
     <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
       <RetroPGFResults
-        results={projects.edges}
-        hasNextPage={projects.pageInfo.hasNextPage}
+        initialResults={projects.edges}
+        initialPageInfo={projects.pageInfo}
       />
     </VStack>
   );

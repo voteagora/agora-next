@@ -11,7 +11,8 @@ import {
 import profileIcon from "@/icons/profile.svg";
 import Image from "next/image";
 import InfiniteScroll from "react-infinite-scroller";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getRetroPGFResults } from "@/app/retropgf/actions";
 
 // TODO: frh -> do infinite scroll and see if there are more categories
 const categories = {
@@ -19,7 +20,7 @@ const categories = {
   DEVELOPER_ECOSYSTEM: "Tooling and utilities",
 };
 
-export type Results = {
+export type Result = {
   node: {
     applicant: {
       address: {
@@ -40,30 +41,48 @@ export type Results = {
       profileImageUrl: string | null;
     };
   };
-}[];
+};
+
+export type Results = Result[];
+
+type pageInfo = {
+  hasNextPage: boolean;
+  endCursor: string;
+};
 
 export default function RetroPGFResults({
-  results,
-  hasNextPage,
+  initialResults,
+  initialPageInfo,
 }: {
-  results: Results;
-  hasNextPage: boolean;
+  initialResults: Results;
+  initialPageInfo: pageInfo;
 }) {
+  const [results, setResults] = useState(initialResults);
+  const [pageInfo, setPageInfo] = useState(initialPageInfo);
   const fetching = useRef(false);
 
-  // TODO: frh type
-  // const loadMore = async (page: number | string) => {
-  //   if (!fetching.current && meta.hasNextPage) {
-  //     fetching.current = true;
-  //     const data = await fetchDelegateVotes(page, sortOrder);
-  //     setMeta(data.meta);
-  //     setDelegateVotes((prev) =>
-  //       getUniqueDelegateVotes(prev.concat(data.votes))
-  //     );
-  //     fetching.current = false;
-  //   }
-  // };
-  console.log("results: ", results);
+  useEffect(() => {
+    setResults(initialResults);
+    setPageInfo(initialPageInfo);
+  }, [initialResults, initialPageInfo]);
+
+  const loadMore = async () => {
+    if (!fetching.current && pageInfo.hasNextPage) {
+      fetching.current = true;
+      const _results = await getRetroPGFResults(pageInfo.endCursor).catch(
+        (error) => console.error("error", error)
+      );
+      const existingIds = new Set(
+        results.map((result: Result) => result.node.id)
+      );
+      const uniqueResults = _results.edges.filter(
+        (result: Result) => !existingIds.has(result.node.id)
+      );
+      setResults((prev) => prev.concat(uniqueResults));
+      setPageInfo(_results.pageInfo);
+      fetching.current = false;
+    }
+  };
   return (
     <Table>
       <TableHeader className="border-none">
@@ -91,9 +110,9 @@ export default function RetroPGFResults({
       <TableBody className="text-gray-4f font-medium text-base">
         {/* @ts-ignore */}
         <InfiniteScroll
-          hasMore={true}
+          hasMore={pageInfo?.hasNextPage}
           pageStart={0}
-          loadMore={() => console.log("heelo")}
+          loadMore={loadMore}
           loader={
             <div key="loader">
               Loading... <br />
@@ -136,6 +155,7 @@ export default function RetroPGFResults({
                   <span>{_profile}</span>
                 </TableCell>
                 <TableCell>
+                  {/* TODO: frh -> there are more categories */}
                   {impactCategory.map((category) => (
                     <span
                       className="mx-1 py-0.5 px-1 rounded-[4px] bg-gray-fa text-xs"
