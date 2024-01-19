@@ -14,10 +14,11 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useEffect, useRef, useState } from "react";
 import { getRetroPGFResults } from "@/app/retropgf/actions";
 
-// TODO: frh -> do infinite scroll and see if there are more categories
 const categories = {
+  COLLECTIVE_GOVERNANCE: "Collective Governance",
+  DEVELOPER_ECOSYSTEM: "Developer Ecosystem",
   END_USER_EXPERIENCE_AND_ADOPTION: "End UX & Adoption",
-  DEVELOPER_ECOSYSTEM: "Tooling and utilities",
+  OP_STACK: "OP Stack",
 };
 
 export type Result = {
@@ -107,24 +108,24 @@ export default function RetroPGFResults({
           </TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className="text-gray-4f font-medium text-base">
-        {/* @ts-ignore */}
-        <InfiniteScroll
-          hasMore={pageInfo?.hasNextPage}
-          pageStart={0}
-          loadMore={loadMore}
-          loader={
-            <div key="loader">
-              Loading... <br />
-              <Image
-                src="/images/blink.gif"
-                alt="Blinking Agora Logo"
-                width={50}
-                height={20}
-              />
-            </div>
-          }
-        >
+      {/* @ts-ignore */}
+      <InfiniteScroll
+        hasMore={pageInfo?.hasNextPage}
+        pageStart={0}
+        loadMore={loadMore}
+        loader={
+          <div key="loader">
+            Loading... <br />
+            <Image
+              src="/images/blink.gif"
+              alt="Blinking Agora Logo"
+              width={50}
+              height={20}
+            />
+          </div>
+        }
+      >
+        <TableBody className="text-gray-4f font-medium text-base">
           {results.map((result) => {
             const {
               awarded,
@@ -155,20 +156,20 @@ export default function RetroPGFResults({
                   <span>{_profile}</span>
                 </TableCell>
                 <TableCell>
-                  {/* TODO: frh -> there are more categories */}
-                  {impactCategory.map((category) => (
+                  {/* We only show two categories + more */}
+                  {impactCategory.slice(0, 3).map((category, index) => (
                     <span
                       className="mx-1 py-0.5 px-1 rounded-[4px] bg-gray-fa text-xs"
                       key={category}
                     >
-                      {categories[category]}
+                      {index === 2 ? "More" : categories[category]}
                     </span>
                   ))}
                 </TableCell>
                 <TableCell className="text-right">
                   {includedInBallots}
                 </TableCell>
-                {/* TODO: frh -> this field */}
+                {/* TODO: frh -> this field and styles of table */}
                 <TableCell className="text-right">14</TableCell>
                 {/* TODO: frh -> see how to get total and formatting */}
                 <TableCell className="text-right flex justify-end gap-2 items-center">
@@ -178,8 +179,8 @@ export default function RetroPGFResults({
               </TableRow>
             );
           })}
-        </InfiniteScroll>
-      </TableBody>
+        </TableBody>
+      </InfiniteScroll>
     </Table>
   );
 }

@@ -1,4 +1,3 @@
-// TODO: merge with main once summary retropgf is merged and update links
 import RetroPGFResults from "@/components/RetroPGF/RetroPGFResults";
 import { VStack } from "@/components/Layout/Stack";
 import { getRetroPGFResults } from "@/app/retropgf/actions";
@@ -9,13 +8,9 @@ import { getRetroPGFResults } from "@/app/retropgf/actions";
  * - Text-ellipsis if project text is too long?
  * - Get filters on query
  * - Get mobile design
- * - Check if url is prod or not
- * - Infinite scroll?
  * - Where is this conversion of these impactCategories [ 'DEVELOPER_ECOSYSTEM', 'END_USER_EXPERIENCE_AND_ADOPTION' ] into "Tooling and utilities", "End UX & Adoption"
+ * - update links
  */
-// TODO: frh -> investigate apollo for infinite scroll
-// TODO: frh -> filters
-
 export default async function Page() {
   const projects = await getRetroPGFResults().catch((error) =>
     console.error("error", error)
