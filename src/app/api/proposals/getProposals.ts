@@ -26,6 +26,7 @@ export async function getProposals({ page = 1 }: { page: number }) {
         },
         where: {
           ...(prodDataOnly || {}),
+          cancelled_block: null,
         },
       }),
     page,
