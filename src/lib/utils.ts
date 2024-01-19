@@ -23,13 +23,13 @@ export function bpsToString(bps: number) {
 export const getProposalTypeText = (proposalType: string) => {
   switch (proposalType) {
     case "OPTIMISTIC":
-      return "An Optimistic Proposal";
+      return "Optimistic Proposal";
     case "STANDARD":
-      return "A Standard Proposal";
+      return "Standard Proposal";
     case "APPROVAL":
-      return "An Approval Vote Proposal";
+      return "Approval Vote Proposal";
     default:
-      return "A Proposal";
+      return "Proposal";
   }
 };
 
