@@ -42,6 +42,7 @@ export default function CastVoteInput({
   const { address } = useAccount();
 
   const fetchData = useCallback(async () => {
+    setIsReady(false);
     try {
       const {
         votingPower,
