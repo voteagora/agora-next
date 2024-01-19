@@ -166,21 +166,30 @@ export default async function OPProposalPage({ proposal }) {
               <div
                 className={cn(styles.proposal_votes_summary_container, "!py-4")}
               >
-                <p
-                  className={
-                    status === "approved"
-                      ? "text-green-positive"
-                      : "text-red-negative"
-                  }
-                >
-                  This proposal is optimistically {status}
-                </p>
-                <p className="mt-1 font-normal text-gray-4f">
-                  This proposal will automatically pass unless{" "}
-                  {disapprovalThreshold}% of the votable supply of OP is
-                  against. Currently, {againstRelativeAmount}% ({againstLength}{" "}
-                  OP) is against.
-                </p>
+                {proposal.status === "CANCELLED" ? (
+                  <p className="text-red-negative">
+                    This proposal has been cancelled
+                  </p>
+                ) : (
+                  <div>
+                    <p
+                      className={
+                        status === "approved"
+                          ? "text-green-positive"
+                          : "text-red-negative"
+                      }
+                    >
+                      This proposal is optimistically {status}
+                    </p>
+
+                    <p className="mt-1 font-normal text-gray-4f">
+                      This proposal will automatically pass unless{" "}
+                      {disapprovalThreshold}% of the votable supply of OP is
+                      against. Currently, {againstRelativeAmount}% (
+                      {againstLength} OP) is against.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             {/* Show the scrolling list of votes for the proposal */}
