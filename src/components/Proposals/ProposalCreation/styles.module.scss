@@ -1,4 +1,12 @@
 @import "@/styles/variables";
+@import "@/styles/mixins";
+
+.proposal_container {
+  @include buttonStyles;
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+}
 
 .info_panel {
   background-color: $gray-fa;

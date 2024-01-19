@@ -12,7 +12,7 @@ export async function isCitizen(address: string) {
     FROM center.address_metadata
     WHERE kind = 'citizen' 
     AND dao_slug = 'OP'
-    AND address = ${address}
+    AND LOWER(address) = LOWER(${address});
     `,
-  )
+  );
 }

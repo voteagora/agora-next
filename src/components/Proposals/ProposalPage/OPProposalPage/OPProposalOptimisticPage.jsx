@@ -6,6 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import {
   getVotesForProposalAndDelegate,
   getVotesForProposal,
+  getAllForVoting,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import {
@@ -27,6 +28,7 @@ import {
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
+import { formatUnits } from "ethers";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -124,6 +126,12 @@ async function getDelegators(addressOrENSName) {
   return getCurrentDelegators({ addressOrENSName });
 }
 
+async function fetchAllForVoting(address, blockNumber, proposal_id) {
+  "use server";
+
+  return await getAllForVoting(address, blockNumber, proposal_id);
+}
+
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
   const proposalVotes = await fetchProposalVotes(proposal.id);
@@ -131,9 +139,18 @@ export default async function OPProposalPage({ proposal }) {
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
-  const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
-  const againstRelativeAmount =
-    (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
+  const againstLengthString = formatNumber(
+    proposal.proposalResults.against,
+    18,
+    0
+  );
+  const againstLength = Number(
+    formatUnits(proposal.proposalResults.against, 18)
+  );
+
+  const againstRelativeAmount = parseFloat(
+    ((againstLength / formattedVotableSupply) * 100).toFixed(2)
+  );
   const status =
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
 
@@ -159,21 +176,30 @@ export default async function OPProposalPage({ proposal }) {
               <div
                 className={cn(styles.proposal_votes_summary_container, "!py-4")}
               >
-                <p
-                  className={
-                    status === "approved"
-                      ? "text-green-positive"
-                      : "text-red-negative"
-                  }
-                >
-                  This proposal is optimistically {status}
-                </p>
-                <p className="mt-1 font-normal text-gray-4f">
-                  This proposal will automatically pass unless{" "}
-                  {disapprovalThreshold}% of the votable supply of OP is
-                  against. Currently, {againstRelativeAmount}% ({againstLength}{" "}
-                  OP) is against.
-                </p>
+                {proposal.status === "CANCELLED" ? (
+                  <p className="text-red-negative">
+                    This proposal has been cancelled
+                  </p>
+                ) : (
+                  <div>
+                    <p
+                      className={
+                        status === "approved"
+                          ? "text-green-positive"
+                          : "text-red-negative"
+                      }
+                    >
+                      This proposal is optimistically {status}
+                    </p>
+
+                    <p className="mt-1 font-normal text-gray-4f">
+                      This proposal will automatically pass unless{" "}
+                      {disapprovalThreshold}% of the votable supply of OP is
+                      against. Currently {againstRelativeAmount}% (
+                      {againstLengthString} OP) is against.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             {/* Show the scrolling list of votes for the proposal */}
@@ -196,12 +222,7 @@ export default async function OPProposalPage({ proposal }) {
             {/* Show the input for the user to vote on a proposal if allowed */}
             <CastVoteInput
               proposal={proposal}
-              fetchVotingPower={fetchVotingPower}
-              fetchAuthorityChains={fetchAuthorityChains}
-              fetchDelegate={fetchDelegate}
-              fetchVotesForProposalAndDelegate={
-                fetchVotesForProposalAndDelegate
-              }
+              fetchAllForVoting={fetchAllForVoting}
               isOptimistic
             />
             <p className="mx-4 text-xs text-gray-4f">
