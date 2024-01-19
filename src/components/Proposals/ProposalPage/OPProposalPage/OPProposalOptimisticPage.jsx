@@ -28,6 +28,7 @@ import {
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
+import { formatUnits } from "ethers";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -138,9 +139,18 @@ export default async function OPProposalPage({ proposal }) {
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
-  const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
-  const againstRelativeAmount =
-    (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
+  const againstLengthString = formatNumber(
+    proposal.proposalResults.against,
+    18,
+    0
+  );
+  const againstLength = Number(
+    formatUnits(proposal.proposalResults.against, 18)
+  );
+
+  const againstRelativeAmount = parseFloat(
+    ((againstLength / formattedVotableSupply) * 100).toFixed(2)
+  );
   const status =
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
 
@@ -185,8 +195,8 @@ export default async function OPProposalPage({ proposal }) {
                     <p className="mt-1 font-normal text-gray-4f">
                       This proposal will automatically pass unless{" "}
                       {disapprovalThreshold}% of the votable supply of OP is
-                      against. Currently, {againstRelativeAmount}% (
-                      {againstLength} OP) is against.
+                      against. Currently {againstRelativeAmount}% (
+                      {againstLengthString} OP) is against.
                     </p>
                   </div>
                 )}
