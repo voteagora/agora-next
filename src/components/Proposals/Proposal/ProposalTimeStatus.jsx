@@ -16,6 +16,9 @@ export default function ProposalTimeStatus({
         </HStack>
       );
 
+    case "CANCELLED":
+      return <HStack gap={1}></HStack>;
+
     default:
       return (
         <HStack gap={1}>
