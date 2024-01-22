@@ -16,21 +16,24 @@ export default function ProposalsList({
   const [proposals, setProposals] = useState([]);
   const { address, isConnected } = useAccount();
 
-  useEffect(() => {
-    const getProposals = async () => {
-      if (address) {
-        const proposals = await fetchNeedsMyVoteProposals(address);
+  const getProposals = async () => {
+    if (address) {
+      const proposals = await fetchNeedsMyVoteProposals(address);
 
-        console.log(proposals.proposals);
-        setProposals(proposals.proposals);
-      }
-    };
+      setProposals(proposals.proposals);
+    }
+  };
+
+  useEffect(() => {
+    // reset when changing wallets
+    setProposals([]);
+
     getProposals();
   }, [address]);
 
   return (
     <>
-      {isConnected && (
+      {isConnected && proposals.length > 0 && (
         <VStack className={styles.proposals_list_container}>
           <PageHeader headerText="Needs my vote" />
 

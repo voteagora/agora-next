@@ -25,7 +25,7 @@ export async function getNeedsMyVoteProposals({
     proposals = await prisma.$queryRaw`
       SELECT p.*
       FROM "center"."proposals" p
-      LEFT JOIN "center"."votes" v ON p.proposal_id = v.proposal_id AND v.voter = ${address}
+      LEFT JOIN "center"."votes" v ON p.proposal_id = v.proposal_id AND v.voter = ${address.toLowerCase()}
       WHERE CAST(p.start_block AS INTEGER) < ${latestBlock?.number}
         AND CAST(p.end_block AS INTEGER) > ${latestBlock?.number}
         AND p.cancelled_block IS NULL
@@ -37,7 +37,7 @@ export async function getNeedsMyVoteProposals({
     proposals = await prisma.$queryRaw`
       SELECT p.*
       FROM "center"."proposals" p
-      LEFT JOIN "center"."votes" v ON p.proposal_id = v.proposal_id AND v.voter = ${address}
+      LEFT JOIN "center"."votes" v ON p.proposal_id = v.proposal_id AND v.voter = ${address.toLowerCase()}
       WHERE CAST(p.start_block AS INTEGER) < ${latestBlock?.number}
         AND CAST(p.end_block AS INTEGER) > ${latestBlock?.number}
         AND p.cancelled_block IS NULL
