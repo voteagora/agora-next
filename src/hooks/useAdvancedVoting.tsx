@@ -3,6 +3,7 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
+import { optimism } from "viem/chains";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -44,6 +45,7 @@ const useAdvancedVoting = ({
       reason,
       params ?? "0x",
     ],
+    chainId: optimism.id,
   });
 
   const {
@@ -64,6 +66,7 @@ const useAdvancedVoting = ({
         ? [BigInt(proposalId), support, reason, params]
         : [BigInt(proposalId), support, reason]
       : ([BigInt(proposalId), support] as any),
+    chainId: optimism.id,
   });
 
   const write = useCallback(() => {
