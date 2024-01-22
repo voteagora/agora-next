@@ -158,7 +158,7 @@ export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
 export function LoadingVote() {
   return (
     <VStack className={styles.full_width}>
-      <img src={`/images/vote-pending.svg`} className="w-full mb-3" />
+      <img src={`/images/action-pending.svg`} className="w-full mb-3" />
       <div className="mb-2 text-2xl font-black">Casting your vote</div>
       <div className="mb-5 text-sm text-gray-700">
         It might take up to a minute for the changes to be reflected.
@@ -201,7 +201,7 @@ export function DisabledVoteDialog({
       <Image
         width="457"
         height="155"
-        src={`/images/vote-pending.svg`}
+        src={`/images/action-pending.svg`}
         className="w-full mb-3"
         alt="agora loading"
       />
