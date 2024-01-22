@@ -38,7 +38,7 @@ export async function getRetroPGFResults(endCursor: string = "") {
       }
     `;
 
-  const url = "https://optimism-agora-dev.agora-dev.workers.dev/graphql";
+  const url = "https://optimism-agora-prod.agora-prod.workers.dev/graphql";
   const options = {
     method: "POST",
     headers: {

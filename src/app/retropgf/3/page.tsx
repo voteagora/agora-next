@@ -1,5 +1,6 @@
 import RetroPGFResults from "@/components/RetroPGF/RetroPGFResults";
-import { VStack } from "@/components/Layout/Stack";
+import RetroPGFHero from "@/components/RetroPGF/RetroPGFHero";
+import RetroPGFFilters from "@/components/RetroPGF/RetroPGFFilters";
 import { getRetroPGFResults } from "@/app/retropgf/actions";
 
 /**
@@ -8,6 +9,7 @@ import { getRetroPGFResults } from "@/app/retropgf/actions";
  * - Text-ellipsis if project text is too long?
  * - Get filters on query
  * - Get mobile design and styles of desktop
+ * - Make sure you port over the Card when you click
  */
 export default async function Page() {
   const projects = await getRetroPGFResults().catch((error) =>
@@ -15,11 +17,13 @@ export default async function Page() {
   );
 
   return (
-    <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
+    <>
+      <RetroPGFHero />
+      <RetroPGFFilters />
       <RetroPGFResults
         initialResults={projects.edges}
         initialPageInfo={projects.pageInfo}
       />
-    </VStack>
+    </>
   );
 }

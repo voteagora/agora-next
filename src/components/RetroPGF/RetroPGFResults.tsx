@@ -15,6 +15,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useEffect, useRef, useState } from "react";
 import { getRetroPGFResults } from "@/app/retropgf/actions";
 import { shortAddress } from "@/lib/utils";
+import { VStack } from "@/components/Layout/Stack";
 
 const categories = {
   COLLECTIVE_GOVERNANCE: "Collective Governance",
@@ -88,7 +89,7 @@ export default function RetroPGFResults({
     }
   };
   return (
-    <>
+    <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={pageInfo?.hasNextPage}
@@ -191,18 +192,25 @@ export default function RetroPGFResults({
                     {includedInLists}
                   </TableCell>
                   <TableCell className="text-right flex justify-end gap-2 items-center">
-                    {/* TODO: frh -> check in old project with percentage and check differences in includedInList, ballots and awarded */}
                     <span className="font-semibold text-black">
                       {awarded} OP
                     </span>
                     <span className="text-xs">(2,42%)</span>
                   </TableCell>
+                  {/* {formatNumber(Number(project.awarded))} OP
+                </span>{" "}
+                <span
+                  className={css`
+                    color: ${theme.colors.gray[700]};
+                  `}
+                >
+                  ({formatShare(Number(project.awarded) / 300_000)}%) */}
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </InfiniteScroll>
-    </>
+    </VStack>
   );
 }
