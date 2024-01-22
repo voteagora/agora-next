@@ -33,6 +33,7 @@ const useAdvancedVoting = ({
     isLoading: advancedVoteIsLoading,
     isError: advancedVoteIsError,
     isSuccess: advancedVoteIsSuccess,
+    data: advancedVoteData,
   } = useContractWrite({
     address: OptimismContracts.alligator.address as any,
     abi: OptimismContracts.alligator.abi,
@@ -53,6 +54,7 @@ const useAdvancedVoting = ({
     isLoading: standardVoteIsLoading,
     isError: standardVoteIsError,
     isSuccess: standardVoteIsSuccess,
+    data: standardVoteData,
   } = useContractWrite({
     address: OptimismContracts.governor.address as any,
     abi: OptimismContracts.governor.abi,
@@ -136,7 +138,13 @@ const useAdvancedVoting = ({
     standardVP,
   ]);
 
-  return { isLoading, isError, isSuccess, write };
+  return {
+    isLoading,
+    isError,
+    isSuccess,
+    write,
+    data: { advancedVoteData, standardVoteData },
+  };
 };
 
 export default useAdvancedVoting;
