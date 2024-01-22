@@ -26,9 +26,7 @@ export async function getRetroPGFResults(endCursor: string = "") {
                 id
                 impactCategory
                 includedInBallots
-                lists {
-                  id
-                }
+                includedInLists
                 profile {
                   profileImageUrl
                   name

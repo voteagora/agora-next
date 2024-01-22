@@ -21,6 +21,7 @@ import profile from "./profile.svg";
 import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
 import sunny from "./sunny.svg";
+import projectPlaceholder from "./projectPlaceholder.svg";
 
 export const icons = {
   badge,
@@ -45,5 +46,6 @@ export const icons = {
   power,
   profile,
   info,
-  sunny
+  sunny,
+  projectPlaceholder
 };

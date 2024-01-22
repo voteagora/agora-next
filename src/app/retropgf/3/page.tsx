@@ -7,9 +7,7 @@ import { getRetroPGFResults } from "@/app/retropgf/actions";
  * - Get exact fields from query, where is image coming from
  * - Text-ellipsis if project text is too long?
  * - Get filters on query
- * - Get mobile design
- * - Where is this conversion of these impactCategories [ 'DEVELOPER_ECOSYSTEM', 'END_USER_EXPERIENCE_AND_ADOPTION' ] into "Tooling and utilities", "End UX & Adoption"
- * - update links
+ * - Get mobile design and styles of desktop
  */
 export default async function Page() {
   const projects = await getRetroPGFResults().catch((error) =>
