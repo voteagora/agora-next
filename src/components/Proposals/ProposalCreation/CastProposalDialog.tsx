@@ -4,6 +4,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 type Props = {
   isError: boolean;
@@ -75,17 +76,7 @@ export function SuccessMessage({
           Got it
         </div>
       </div>
-      <div className="pt-4 text-xs text-gray-4f">
-        <a
-          href={getBlockScanUrl(txHash)}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="flex flex-row items-center justify-between w-full hover:underline"
-        >
-          <p>View transaction on block explorer</p>
-          <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
-        </a>
-      </div>
+      <BlockScanUrls hash1={txHash} />
     </VStack>
   );
 }

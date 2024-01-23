@@ -13,8 +13,7 @@ import { Button } from "@/components/ui/button";
 import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
 import pendingImage from "public/images/action-pending.svg";
 import congrats from "public/images/congrats.svg";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl } from "@/lib/utils";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -222,42 +221,10 @@ export function SuccessMessage({
           Got it
         </div>
       </div>
-      <div className="pt-4 text-xs text-gray-4f">
-        {data.advancedVoteData?.hash && data.standardVoteData?.hash ? (
-          <div className="flex items-center justify-between">
-            <a
-              href={getBlockScanUrl(data.standardVoteData.hash)}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex items-center justify-center hover:underline"
-            >
-              <p>View transaction 1</p>
-              <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
-            </a>
-            <a
-              href={getBlockScanUrl(data.advancedVoteData.hash)}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex items-center justify-center hover:underline"
-            >
-              <p>View transaction 2</p>
-              <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
-            </a>
-          </div>
-        ) : (
-          <a
-            href={getBlockScanUrl(
-              data.standardVoteData?.hash || data.advancedVoteData?.hash || ""
-            )}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="flex flex-row items-center justify-between w-full hover:underline"
-          >
-            <p>View transaction on block explorer</p>
-            <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
-          </a>
-        )}
-      </div>
+      <BlockScanUrls
+        hash1={data.standardVoteData?.hash}
+        hash2={data.advancedVoteData?.hash}
+      />
     </VStack>
   );
 }
