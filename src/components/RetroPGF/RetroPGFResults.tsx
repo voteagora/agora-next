@@ -111,6 +111,7 @@ export default function RetroPGFResults({
     }
   };
 
+  // TODO: frh -> think if styles on table or not
   return (
     <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
       {/* @ts-ignore */}
