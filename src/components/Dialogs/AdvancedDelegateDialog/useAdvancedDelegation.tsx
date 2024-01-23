@@ -33,6 +33,7 @@ const useAdvancedDelegation = ({
     isLoading: subdelegateIsLoading,
     isError: subdelegateIsError,
     isSuccess: subdelegateIsSuccess,
+    data: subdelegateData,
   } = useContractWrite({
     address: OptimismContracts.alligator.address as any,
     abi: OptimismContracts.alligator.abi,
@@ -49,6 +50,7 @@ const useAdvancedDelegation = ({
     isLoading: delegateToProxyIsLoading,
     isError: delegateToProxyIsError,
     isSuccess: delegateToProxyIsSuccess,
+    data: delegateToProxyData,
   } = useContractWrite({
     address: OptimismContracts.token.address as any,
     abi: OptimismContracts.token.abi,
@@ -97,7 +99,16 @@ const useAdvancedDelegation = ({
     isDelegatingToProxy,
   ]);
 
-  return { isLoading, isError, isSuccess, write };
+  return {
+    isLoading,
+    isError,
+    isSuccess,
+    write,
+    data: {
+      delegateToProxyData,
+      subdelegateData,
+    },
+  };
 };
 
 function buildRules(
