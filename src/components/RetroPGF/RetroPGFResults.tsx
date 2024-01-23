@@ -111,7 +111,6 @@ export default function RetroPGFResults({
     }
   };
 
-  // TODO: frh -> think if styles on table or not
   return (
     <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
       {/* @ts-ignore */}
@@ -134,41 +133,29 @@ export default function RetroPGFResults({
       >
         <Table>
           <TableHeader className="border-none">
-            <TableRow className="border-none text-xs flex sm:table-row justify-between items-center">
-              <TableHead
-                className="px-6 flex sm:table-cell items-center"
-                variant="gray"
-              >
+            <TableRow className="border-none text-xs">
+              <TableHead className="px-6" variant="gray">
                 Project
               </TableHead>
-              <TableHead
-                className="px-6 hidden sm:table-cell items-center"
-                variant="gray"
-              >
+              <TableHead className="px-6 hidden sm:table-cell" variant="gray">
                 Submitted by
               </TableHead>
-              <TableHead
-                className="px-6 hidden sm:table-cell items-center"
-                variant="gray"
-              >
+              <TableHead className="px-6 hidden sm:table-cell" variant="gray">
                 Categories
               </TableHead>
               <TableHead
-                className="px-6 text-right hidden sm:table-cell sm:min-w-[110px] items-center"
+                className="px-6 text-right hidden sm:table-cell whitespace-nowrap"
                 variant="gray"
               >
                 In ballots
               </TableHead>
               <TableHead
-                className="px-6 text-right hidden sm:table-cell sm:min-w-[95px] items-center"
+                className="px-6 text-right hidden sm:table-cell whitespace-nowrap"
                 variant="gray"
               >
                 In lists
               </TableHead>
-              <TableHead
-                className="px-6 text-right flex sm:table-cell items-center"
-                variant="gray"
-              >
+              <TableHead className="px-6 text-right" variant="gray">
                 Amount received
               </TableHead>
             </TableRow>
@@ -191,18 +178,15 @@ export default function RetroPGFResults({
                 shortAddress(applicant.address.address);
 
               return (
-                <TableRow
-                  className="border-none flex sm:table-row justify-between"
-                  key={id}
-                >
-                  <TableCell className="px-6 flex gap-2 items-center sm:table-cell">
+                <TableRow className="border-none" key={id}>
+                  <TableCell className="px-6">
                     {profile?.profileImageUrl ? (
                       <Image
                         src={profile.profileImageUrl}
                         alt={displayName}
                         width="32"
                         height="32"
-                        className="sm:inline sm:mr-2"
+                        className="inline mr-2"
                       />
                     ) : (
                       <Image
@@ -210,17 +194,20 @@ export default function RetroPGFResults({
                         alt={displayName}
                         width="32"
                         height="32"
+                        className="inline mr-2"
                       />
                     )}
-                    <span className="font-semibold text-black">
+                    <span className="font-semibold text-black inline-block max-w-[calc(100%-40px)] align-middle">
                       {displayName}
                     </span>
                   </TableCell>
-                  <TableCell className="gap-2 px-6 items-center hidden sm:table-cell">
-                    <div className="flex items-center gap-2">
-                      <Image src={profileIcon} alt={submittedBy} />
-                      <span>{submittedBy}</span>
-                    </div>
+                  <TableCell className="gap-2 px-6 hidden sm:table-cell">
+                    <Image
+                      src={profileIcon}
+                      alt={submittedBy}
+                      className="inline mr-2 mb-1"
+                    />
+                    <span>{submittedBy}</span>
                   </TableCell>
                   <TableCell className="px-4 min-w-[380px] hidden sm:table-cell">
                     {/* We only show two categories + more */}
@@ -241,12 +228,12 @@ export default function RetroPGFResults({
                   <TableCell className="text-right px-6 hidden sm:table-cell">
                     {includedInLists}
                   </TableCell>
-                  <TableCell className="text-right px-6 flex flex-col items-end justify-center sm:table-cell">
-                    <span className="font-semibold text-black min-w-[125px]">
+                  <TableCell className="text-right px-6">
+                    <span className="font-semibold text-black whitespace-nowrap">
                       {formatNumber(Number(awarded))} OP
                     </span>
-                    <span className="text-xs">
-                      {formatShare(Number(awarded) / 300_000)}%
+                    <span className="text-xs block sm:inline sm:ml-2">
+                      ({formatShare(Number(awarded) / 300_000)}%)
                     </span>
                   </TableCell>
                 </TableRow>
