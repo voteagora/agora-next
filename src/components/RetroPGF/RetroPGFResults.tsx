@@ -133,23 +133,41 @@ export default function RetroPGFResults({
       >
         <Table>
           <TableHeader className="border-none">
-            <TableRow className="border-none">
-              <TableHead className="text-xs" variant="gray">
+            <TableRow className="border-none text-xs flex sm:table-row justify-between items-center">
+              <TableHead
+                className="px-6 flex sm:table-cell items-center"
+                variant="gray"
+              >
                 Project
               </TableHead>
-              <TableHead className="text-xs" variant="gray">
+              <TableHead
+                className="px-6 hidden sm:table-cell items-center"
+                variant="gray"
+              >
                 Submitted by
               </TableHead>
-              <TableHead className="text-xs" variant="gray">
+              <TableHead
+                className="px-6 hidden sm:table-cell items-center"
+                variant="gray"
+              >
                 Categories
               </TableHead>
-              <TableHead className="text-xs text-right" variant="gray">
+              <TableHead
+                className="px-6 text-right hidden sm:table-cell sm:min-w-[110px] items-center"
+                variant="gray"
+              >
                 In ballots
               </TableHead>
-              <TableHead className="text-xs text-right" variant="gray">
+              <TableHead
+                className="px-6 text-right hidden sm:table-cell sm:min-w-[95px] items-center"
+                variant="gray"
+              >
                 In lists
               </TableHead>
-              <TableHead className="text-xs text-right" variant="gray">
+              <TableHead
+                className="px-6 text-right flex sm:table-cell items-center"
+                variant="gray"
+              >
                 Amount received
               </TableHead>
             </TableRow>
@@ -172,14 +190,18 @@ export default function RetroPGFResults({
                 shortAddress(applicant.address.address);
 
               return (
-                <TableRow className="border-none" key={id}>
-                  <TableCell>
+                <TableRow
+                  className="border-none flex sm:table-row justify-between"
+                  key={id}
+                >
+                  <TableCell className="px-6 flex gap-2 items-center sm:table-cell">
                     {profile?.profileImageUrl ? (
                       <Image
                         src={profile.profileImageUrl}
                         alt={displayName}
                         width="32"
                         height="32"
+                        className="sm:inline sm:mr-2"
                       />
                     ) : (
                       <Image
@@ -193,11 +215,13 @@ export default function RetroPGFResults({
                       {displayName}
                     </span>
                   </TableCell>
-                  <TableCell className="flex gap-2 items-center">
-                    <Image src={profileIcon} alt={submittedBy} />
-                    <span>{submittedBy}</span>
+                  <TableCell className="gap-2 px-6 items-center hidden sm:table-cell">
+                    <div className="flex items-center gap-2">
+                      <Image src={profileIcon} alt={submittedBy} />
+                      <span>{submittedBy}</span>
+                    </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4 min-w-[380px] hidden sm:table-cell">
                     {/* We only show two categories + more */}
                     {impactCategory.slice(0, 3).map((category, index) => (
                       <span
@@ -210,14 +234,14 @@ export default function RetroPGFResults({
                       </span>
                     ))}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right px-6 hidden sm:table-cell">
                     {includedInBallots}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right px-6 hidden sm:table-cell">
                     {includedInLists}
                   </TableCell>
-                  <TableCell className="text-right flex justify-end gap-2 items-center">
-                    <span className="font-semibold text-black">
+                  <TableCell className="text-right px-6 flex flex-col items-end justify-center sm:table-cell">
+                    <span className="font-semibold text-black min-w-[125px]">
                       {formatNumber(Number(awarded))} OP
                     </span>
                     <span className="text-xs">

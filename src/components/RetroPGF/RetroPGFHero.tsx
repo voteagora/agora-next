@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function RetroPGFHero() {
   return (
-    <VStack className="max-w-6xl gap-4 mt-8">
+    <VStack className="max-w-6xl gap-4 mt-12">
       <HStack className="justify-between items-center">
         <div className="text-2xl font-extrabold">
           Total OP allocated to each category
