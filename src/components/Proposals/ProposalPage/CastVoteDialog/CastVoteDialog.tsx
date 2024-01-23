@@ -46,11 +46,6 @@ function CastVoteDialogContents({
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
-  if (!delegate) {
-    // todo: log
-    return null;
-  }
-
   useEffect(() => {
     if (
       missingVote == "BOTH" &&
@@ -60,6 +55,12 @@ function CastVoteDialogContents({
       setLocalMissingVote("ADVANCED");
     }
   }, [data]);
+
+  if (!delegate) {
+    // todo: log
+    return null;
+  }
+
   if (
     missingVote === "BOTH" &&
     !data.advancedVoteData &&
