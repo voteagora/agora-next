@@ -62,11 +62,15 @@ const useAdvancedVoting = ({
       ? params
         ? "castVoteWithReasonAndParams"
         : "castVoteWithReason"
+      : params
+      ? "castVoteWithReasonAndParams"
       : "castVote",
     args: reason
       ? params
         ? [BigInt(proposalId), support, reason, params]
         : [BigInt(proposalId), support, reason]
+      : params
+      ? [BigInt(proposalId), support, reason, params]
       : ([BigInt(proposalId), support] as any),
     chainId: optimism.id,
   });
