@@ -4,10 +4,6 @@ import RetroPGFFilters from "@/components/RetroPGF/RetroPGFFilters";
 import { getRetroPGFResults } from "@/app/retropgf/actions";
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 
-/**
- * TODO:
- * - Make sure you port over the Card when you click
- */
 export default async function Page({
   searchParams,
 }: {
