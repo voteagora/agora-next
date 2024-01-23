@@ -2,6 +2,7 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { formatUnits } from "viem";
+import { optimism } from "viem/chains";
 import { useContractWrite } from "wagmi";
 
 const allowanceType = 1; // 1 - relative; 0 - absolute
@@ -40,6 +41,7 @@ const useAdvancedDelegation = ({
       target as any,
       buildRules(allocation, availableBalanceNumber) as any,
     ],
+    chainId: optimism.id,
   });
 
   const {
@@ -52,6 +54,7 @@ const useAdvancedDelegation = ({
     abi: OptimismContracts.token.abi,
     functionName: "delegate",
     args: [proxyAddress as any],
+    chainId: optimism.id,
   });
 
   const write = useCallback(() => {
