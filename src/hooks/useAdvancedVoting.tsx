@@ -3,6 +3,7 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
+import { optimism } from "viem/chains";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -32,6 +33,7 @@ const useAdvancedVoting = ({
     isLoading: advancedVoteIsLoading,
     isError: advancedVoteIsError,
     isSuccess: advancedVoteIsSuccess,
+    data: advancedVoteData,
   } = useContractWrite({
     address: OptimismContracts.alligator.address as any,
     abi: OptimismContracts.alligator.abi,
@@ -44,6 +46,7 @@ const useAdvancedVoting = ({
       reason,
       params ?? "0x",
     ],
+    chainId: optimism.id,
   });
 
   const {
@@ -51,6 +54,7 @@ const useAdvancedVoting = ({
     isLoading: standardVoteIsLoading,
     isError: standardVoteIsError,
     isSuccess: standardVoteIsSuccess,
+    data: standardVoteData,
   } = useContractWrite({
     address: OptimismContracts.governor.address as any,
     abi: OptimismContracts.governor.abi,
@@ -58,12 +62,17 @@ const useAdvancedVoting = ({
       ? params
         ? "castVoteWithReasonAndParams"
         : "castVoteWithReason"
+      : params
+      ? "castVoteWithReasonAndParams"
       : "castVote",
     args: reason
       ? params
         ? [BigInt(proposalId), support, reason, params]
         : [BigInt(proposalId), support, reason]
+      : params
+      ? [BigInt(proposalId), support, reason, params]
       : ([BigInt(proposalId), support] as any),
+    chainId: optimism.id,
   });
 
   const write = useCallback(() => {
@@ -133,7 +142,13 @@ const useAdvancedVoting = ({
     standardVP,
   ]);
 
-  return { isLoading, isError, isSuccess, write };
+  return {
+    isLoading,
+    isError,
+    isSuccess,
+    write,
+    data: { advancedVoteData, standardVoteData },
+  };
 };
 
 export default useAdvancedVoting;
