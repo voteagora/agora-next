@@ -2,6 +2,9 @@
 
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 type Props = {
   isError: boolean;
@@ -30,7 +33,9 @@ export function CastProposalDialog({
           )}
           {isError && !txHash && <div>error</div>}
           {isLoading && <Loading />}
-          {isSuccess && <SuccessMessage closeDialog={closeDialog} />}
+          {isSuccess && txHash && (
+            <SuccessMessage txHash={txHash} closeDialog={closeDialog} />
+          )}
         </VStack>
       </VStack>
     </VStack>
@@ -50,14 +55,20 @@ function Message({ text, image }: { text: string; image?: JSX.Element }) {
   );
 }
 
-export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
+export function SuccessMessage({
+  closeDialog,
+  txHash,
+}: {
+  closeDialog: () => void;
+  txHash: string;
+}) {
   return (
     <VStack className={styles.full_width}>
       <img src={`/images/congrats.svg`} className="w-full mb-3" />
-      <div className="font-black text-2xl mb-2">
+      <div className="mb-2 text-2xl font-black">
         Proposal successfully created!
       </div>
-      <div className="text-gray-700 text-sm mb-5 font-medium">
+      <div className="mb-5 text-sm font-medium text-gray-700">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
@@ -65,6 +76,7 @@ export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
           Got it
         </div>
       </div>
+      <BlockScanUrls hash1={txHash} />
     </VStack>
   );
 }
@@ -73,13 +85,13 @@ export function Loading() {
   return (
     <VStack className={styles.full_width}>
       <img src={`/images/action-pending.svg`} className="w-full mb-3" />
-      <div className="font-black text-2xl mb-2">Creating your proposal ...</div>
-      <div className="text-gray-4f mb-5 font-medium text-base">
+      <div className="mb-2 text-2xl font-black">Creating your proposal ...</div>
+      <div className="mb-5 text-base font-medium text-gray-4f">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
-        <div className="flex flex-row justify-center w-full py-3 bg-gray-eo rounded-lg">
-          <div className="text-gray-4f font-semibold text-base">
+        <div className="flex flex-row justify-center w-full py-3 rounded-lg bg-gray-eo">
+          <div className="text-base font-semibold text-gray-4f">
             Writing your proposal to chain...
           </div>
         </div>

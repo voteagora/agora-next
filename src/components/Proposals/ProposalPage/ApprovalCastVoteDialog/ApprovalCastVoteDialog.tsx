@@ -163,7 +163,7 @@ export function ApprovalCastVoteDialog({
     <div className={styles.container}>
       {hasStatement && isLoading && <LoadingVote />}
       {hasStatement && isSuccess && (
-        <SuccessMessage closeDialog={closeDialog} />
+        <SuccessMessage closeDialog={closeDialog} data={data} />
       )}
       {hasStatement && isError && <p>Something went wrong</p>}
       {!hasStatement && <NoStatementView closeDialog={closeDialog} />}

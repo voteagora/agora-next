@@ -1,10 +1,20 @@
 import { Button } from "@/components/Button";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Image from "next/image";
 import successfulDelegation from "public/images/successfulDelegation.svg";
 
 // TODO: Add notion link in "Learn more"
 
-export function SuccessView({ closeDialog }: { closeDialog: () => void }) {
+export function SuccessView({
+  closeDialog,
+  data,
+}: {
+  closeDialog: () => void;
+  data: {
+    delegateToProxyData: { hash: string } | undefined;
+    subdelegateData: { hash: string } | undefined;
+  };
+}) {
   return (
     <div>
       <div className="w-full">
@@ -15,7 +25,7 @@ export function SuccessView({ closeDialog }: { closeDialog: () => void }) {
         />
       </div>
 
-      <h1 className="font-extrabold text-2xl mt-4 mb-2">
+      <h1 className="mt-4 mb-2 text-2xl font-extrabold">
         You&apos;ve delegated your votes!
       </h1>
       <p className="text-gray-700">
@@ -34,6 +44,10 @@ export function SuccessView({ closeDialog }: { closeDialog: () => void }) {
       <Button className="w-full mt-6" onClick={() => closeDialog()}>
         Got it
       </Button>
+      <BlockScanUrls
+        hash1={data.delegateToProxyData?.hash}
+        hash2={data.subdelegateData?.hash}
+      />
     </div>
   );
 }
