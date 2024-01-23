@@ -6,7 +6,7 @@ import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 
 /**
  * TODO:
- * - Make sure you port over the Card when you click and styles of filters
+ * - Make sure you port over the Card when you click
  */
 export default async function Page({
   searchParams,

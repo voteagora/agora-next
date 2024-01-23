@@ -1,11 +1,11 @@
 "use client";
 
 import { TextInputWithTooltip } from "@/components/shared/Form/TextInputWithTooltip";
-import { VStack } from "@/components/Layout/Stack";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import search from "@/icons/search.svg";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
+import Image from "next/image";
 
 export default function RetroPGFSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,28 +25,22 @@ export default function RetroPGFSearch() {
   };
 
   return (
-    // TODO: frh -> glass-icon, styles
     <form onSubmit={(e) => e.preventDefault()}>
-      <TextInputWithTooltip
-        onChange={handleSearch}
-        inputRef={inputRef}
-        defaultValue={searchParam}
-        placeholder="Search projects"
-        tooltipMessage="Searches project names and descriptions"
-        // className={css`
-        //   padding: ${theme.spacing["2"]} ${theme.spacing["4"]};
-        //   padding-left: ${theme.spacing["8"]};
-        //   border-radius: ${theme.borderRadius.full};
-        //   background: #fafafa;
-        //   border-color: #ebebeb;
-        //   border-width: 1px;
-        //   width: 100%;
-
-        //   &::placeholder {
-        //     color: #afafaf;
-        //   }
-        // `}
-      />
+      <div className="relative">
+        <TextInputWithTooltip
+          onChange={handleSearch}
+          inputRef={inputRef}
+          defaultValue={searchParam}
+          placeholder="Search projects"
+          tooltipMessage="Searches project names and descriptions"
+          className="py-2 pr-4 pl-8 rounded-full bg-gray-fa border border-gray-eb w-full placeholder-gray-af"
+        />
+        <Image
+          className="absolute top-[50%] left-3 hidden sm:inline transform -translate-y-1/2 pointer-events-none"
+          src={search}
+          alt="Search projects"
+        />
+      </div>
     </form>
   );
 }
