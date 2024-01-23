@@ -1,18 +1,16 @@
 "use client";
 
-import { ReactNode } from "react";
-import { useAccount } from "wagmi";
+import { ReactNode, useEffect, useState } from "react";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
-import { icons } from "@/assets/icons/icons";
 import Link from "next/link";
 import styles from "./castVoteDialog.module.scss";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
-import { getVpToDisplay } from "@/lib/voteUtils";
+import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -33,25 +31,77 @@ function CastVoteDialogContents({
   authorityChains,
   missingVote,
 }: CastVoteDialogProps) {
-  const { write, isLoading, isSuccess } = useAdvancedVoting({
+  const [localMissingVote, setLocalMissingVote] =
+    useState<MissingVote>(missingVote);
+
+  const { write, isLoading, isSuccess, data } = useAdvancedVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
     standardVP: BigInt(votingPower.directVP),
     advancedVP: BigInt(votingPower.advancedVP),
     authorityChains,
     reason,
-    missingVote,
+    missingVote: localMissingVote,
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  useEffect(() => {
+    if (
+      missingVote == "BOTH" &&
+      data?.standardVoteData &&
+      !data?.advancedVoteData
+    ) {
+      setLocalMissingVote("ADVANCED");
+    }
+  }, [data]);
 
   if (!delegate) {
     // todo: log
     return null;
   }
 
-  if (missingVote === "BOTH" || missingVote === "ADVANCED") {
-    return <DisabledVoteDialog closeDialog={closeDialog} />;
+  if (
+    missingVote === "BOTH" &&
+    !data.advancedVoteData &&
+    data.standardVoteData
+  ) {
+    return (
+      <VStack gap={4} className={styles.dialog_container}>
+        <HStack justifyContent="justify-between">
+          <VStack>
+            {delegate.address ? (
+              <div className={styles.subtitle}>
+                <HumanAddress address={delegate.address} />
+              </div>
+            ) : (
+              <div className={styles.subtitle}>Anonymous</div>
+            )}
+            <div className={styles.title}>
+              Casting vote&nbsp;{supportType.toLowerCase()}
+            </div>
+          </VStack>
+          <VStack alignItems="items-end">
+            <div className={styles.subtitle}>with</div>
+            <TokenAmountDisplay
+              amount={vpToDisplay}
+              decimals={18}
+              currency="OP"
+            />
+          </VStack>
+        </HStack>
+        <div className={styles.reason_box}>
+          {reason ? (
+            <div className={styles.has_reason}>{reason}</div>
+          ) : (
+            <div className={styles.no_reason}>No voting reason provided</div>
+          )}
+        </div>
+        <div>
+          <VoteButton onClick={write}>Sign transaction 2/2</VoteButton>
+        </div>
+      </VStack>
+    );
   }
 
   return (
@@ -106,7 +156,7 @@ function CastVoteDialogContents({
         </VStack>
       )}
       {isLoading && <LoadingVote />}
-      {isSuccess && <SuccessMessage closeDialog={closeDialog} />}
+      {isSuccess && data && <SuccessMessage closeDialog={closeDialog} />}
     </>
   );
 }
