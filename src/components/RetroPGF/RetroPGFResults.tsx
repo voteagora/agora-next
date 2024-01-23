@@ -18,6 +18,7 @@ import { shortAddress } from "@/lib/utils";
 import { VStack } from "@/components/Layout/Stack";
 import { useSearchParams } from "next/navigation";
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const formatNumber = (number: number) => {
   const numberFormat = new Intl.NumberFormat("en", {
@@ -80,6 +81,7 @@ export default function RetroPGFResults({
   const [results, setResults] = useState(initialResults);
   const [pageInfo, setPageInfo] = useState(initialPageInfo);
   const fetching = useRef(false);
+  const openDialog = useOpenDialog();
 
   useEffect(() => {
     setResults(initialResults);
@@ -178,25 +180,30 @@ export default function RetroPGFResults({
                 shortAddress(applicant.address.address);
 
               return (
-                <TableRow className="border-none" key={id}>
+                <TableRow
+                  className="border-none"
+                  key={id}
+                  onClick={() =>
+                    openDialog({
+                      transparent: true,
+                      type: "RETROPGF_SHARE_CARD",
+                      params: {
+                        awarded,
+                        displayName,
+                        id,
+                        profileImageUrl: profile?.profileImageUrl,
+                      },
+                    })
+                  }
+                >
                   <TableCell className="px-6">
-                    {profile?.profileImageUrl ? (
-                      <Image
-                        src={profile.profileImageUrl}
-                        alt={displayName}
-                        width="32"
-                        height="32"
-                        className="inline mr-2"
-                      />
-                    ) : (
-                      <Image
-                        src={projectPlaceholder}
-                        alt={displayName}
-                        width="32"
-                        height="32"
-                        className="inline mr-2"
-                      />
-                    )}
+                    <Image
+                      src={profile?.profileImageUrl || projectPlaceholder}
+                      alt={displayName}
+                      width="32"
+                      height="32"
+                      className="inline mr-2"
+                    />
                     <span className="font-semibold text-black inline-block max-w-[calc(100%-40px)] align-middle">
                       {displayName}
                     </span>

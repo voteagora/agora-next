@@ -23,6 +23,7 @@ import contractVoter from "./contractVoter.svg";
 import sunny from "./sunny.svg";
 import projectPlaceholder from "./projectPlaceholder.svg";
 import search from "./search.svg";
+import shareCard from "./shareCard.svg";
 
 
 export const icons = {
@@ -50,5 +51,6 @@ export const icons = {
   info,
   sunny,
   projectPlaceholder,
-  search
+  search,
+  shareCard
 };
