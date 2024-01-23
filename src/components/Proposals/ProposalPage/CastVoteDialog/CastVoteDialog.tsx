@@ -11,6 +11,10 @@ import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
 import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
+import pendingImage from "public/images/action-pending.svg";
+import congrats from "public/images/congrats.svg";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -156,7 +160,9 @@ function CastVoteDialogContents({
         </VStack>
       )}
       {isLoading && <LoadingVote />}
-      {isSuccess && data && <SuccessMessage closeDialog={closeDialog} />}
+      {isSuccess && data && (
+        <SuccessMessage closeDialog={closeDialog} data={data} />
+      )}
     </>
   );
 }
@@ -185,10 +191,25 @@ export function AdvancedVoteAlert() {
   );
 }
 
-export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
+export function SuccessMessage({
+  closeDialog,
+  data,
+}: {
+  closeDialog: () => void;
+  data: {
+    advancedVoteData: { hash: string } | undefined;
+    standardVoteData: { hash: string } | undefined;
+  };
+}) {
   return (
     <VStack className={styles.full_width}>
-      <img src={`/images/congrats.svg`} className="w-full mb-3" />
+      <Image
+        width="457"
+        height="155"
+        src={congrats}
+        className="w-full mb-3"
+        alt="agora loading"
+      />
       <div className="mb-2 text-2xl font-black">
         Your vote has been submitted!
       </div>
@@ -200,6 +221,42 @@ export function SuccessMessage({ closeDialog }: { closeDialog: () => void }) {
         <div onClick={closeDialog} className={`${styles.vote_container}`}>
           Got it
         </div>
+      </div>
+      <div className="pt-4 text-xs text-gray-4f">
+        {data.advancedVoteData?.hash && data.standardVoteData?.hash ? (
+          <div className="flex items-center justify-between">
+            <a
+              href={getBlockScanUrl(data.standardVoteData.hash)}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex items-center justify-center hover:underline"
+            >
+              <p>View transaction 1</p>
+              <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
+            </a>
+            <a
+              href={getBlockScanUrl(data.advancedVoteData.hash)}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex items-center justify-center hover:underline"
+            >
+              <p>View transaction 2</p>
+              <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
+            </a>
+          </div>
+        ) : (
+          <a
+            href={getBlockScanUrl(
+              data.standardVoteData?.hash || data.advancedVoteData?.hash || ""
+            )}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="flex flex-row items-center justify-between w-full hover:underline"
+          >
+            <p>View transaction on block explorer</p>
+            <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
+          </a>
+        )}
       </div>
     </VStack>
   );
@@ -251,7 +308,7 @@ export function DisabledVoteDialog({
       <Image
         width="457"
         height="155"
-        src={`/images/action-pending.svg`}
+        src={pendingImage}
         className="w-full mb-3"
         alt="agora loading"
       />
