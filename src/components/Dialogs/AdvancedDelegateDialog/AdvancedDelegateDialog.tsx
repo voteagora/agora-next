@@ -108,7 +108,7 @@ export function AdvancedDelegateDialog({
     fetchData();
   }, [fetchData]);
 
-  const { write, isLoading, isError, isSuccess } = useAdvancedDelegation({
+  const { write, isLoading, isError, isSuccess, data } = useAdvancedDelegation({
     availableBalance,
     isDelegatingToProxy,
     proxyAddress,
@@ -144,7 +144,7 @@ export function AdvancedDelegateDialog({
       </div>
       <div className={showMessage ? "hidden" : "block w-full"}>
         {isSuccess ? (
-          <SuccessView closeDialog={completeDelegation} />
+          <SuccessView closeDialog={completeDelegation} data={data} />
         ) : isReady &&
           availableBalance !== "" &&
           !!delegatees &&
