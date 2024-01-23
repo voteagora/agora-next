@@ -16,12 +16,26 @@ import { useEffect, useRef, useState } from "react";
 import { getRetroPGFResults } from "@/app/retropgf/actions";
 import { shortAddress } from "@/lib/utils";
 import { VStack } from "@/components/Layout/Stack";
+import { useSearchParams } from "next/navigation";
+import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 
-const categories = {
-  COLLECTIVE_GOVERNANCE: "Collective Governance",
-  DEVELOPER_ECOSYSTEM: "Developer Ecosystem",
-  END_USER_EXPERIENCE_AND_ADOPTION: "End UX & Adoption",
-  OP_STACK: "OP Stack",
+const formatNumber = (number: number) => {
+  const numberFormat = new Intl.NumberFormat("en", {
+    style: "decimal",
+    useGrouping: true,
+  });
+
+  const parts = numberFormat.formatToParts(number);
+  return parts
+    .filter((part) => part.type !== "currency" && part.type !== "literal")
+    .map((part) => part.value)
+    .join("");
+};
+
+const formatShare = (value: number) => {
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+  });
 };
 
 export type Result = {
@@ -38,7 +52,7 @@ export type Result = {
     awarded: string;
     displayName: string;
     id: string;
-    impactCategory: (keyof typeof categories)[];
+    impactCategory: (keyof Omit<typeof retroPGFCategories, "ALL">)[];
     includedInBallots: number;
     includedInLists: number;
     profile: {
@@ -62,6 +76,7 @@ export default function RetroPGFResults({
   initialResults: Results;
   initialPageInfo: pageInfo;
 }) {
+  const searchParams = useSearchParams();
   const [results, setResults] = useState(initialResults);
   const [pageInfo, setPageInfo] = useState(initialPageInfo);
   const fetching = useRef(false);
@@ -74,9 +89,16 @@ export default function RetroPGFResults({
   const loadMore = async () => {
     if (!fetching.current && pageInfo.hasNextPage) {
       fetching.current = true;
-      const _results = await getRetroPGFResults(pageInfo.endCursor).catch(
-        (error) => console.error("error", error)
-      );
+      const _results = await getRetroPGFResults({
+        search: searchParams?.get("search") || "",
+        category:
+          (searchParams?.get("category") as keyof typeof retroPGFCategories) ||
+          null,
+        orderBy:
+          (searchParams?.get("orderBy") as keyof typeof retroPGFSort) ||
+          "mostAwarded",
+        endCursor: pageInfo.endCursor,
+      }).catch((error) => console.error("error", error));
       const existingIds = new Set(
         results.map((result: Result) => result.node.id)
       );
@@ -88,6 +110,7 @@ export default function RetroPGFResults({
       fetching.current = false;
     }
   };
+
   return (
     <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
       {/* @ts-ignore */}
@@ -181,7 +204,9 @@ export default function RetroPGFResults({
                         className="mx-1 py-0.5 px-1 rounded-[4px] bg-gray-fa text-xs"
                         key={category}
                       >
-                        {index === 2 ? "More" : categories[category]}
+                        {index === 2
+                          ? "More"
+                          : retroPGFCategories[category].text}
                       </span>
                     ))}
                   </TableCell>
@@ -193,18 +218,12 @@ export default function RetroPGFResults({
                   </TableCell>
                   <TableCell className="text-right flex justify-end gap-2 items-center">
                     <span className="font-semibold text-black">
-                      {awarded} OP
+                      {formatNumber(Number(awarded))} OP
                     </span>
-                    <span className="text-xs">(2,42%)</span>
+                    <span className="text-xs">
+                      {formatShare(Number(awarded) / 300_000)}%
+                    </span>
                   </TableCell>
-                  {/* {formatNumber(Number(project.awarded))} OP
-                </span>{" "}
-                <span
-                  className={css`
-                    color: ${theme.colors.gray[700]};
-                  `}
-                >
-                  ({formatShare(Number(project.awarded) / 300_000)}%) */}
                 </TableRow>
               );
             })}

@@ -1,11 +1,17 @@
 "use server";
 
-export async function getRetroPGFResults(endCursor: string = "") {
+import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
+
+// TODO: frh -> check how to shuffle
+export async function getRetroPGFResults(
+  { endCursor = "", search = "", category = null, orderBy = "mostAwarded" }:
+    { endCursor?: string, search: string, category: keyof typeof retroPGFCategories | null, orderBy: keyof typeof retroPGFSort }
+) {
   const pageSize = 20;
   const query = `
       query {
         retroPGF {
-          projects(first: ${pageSize}, after: "${endCursor}") {
+          projects(first: ${pageSize}, after: "${endCursor}", search: "${search}", category: ${category}, orderBy: ${orderBy}) {
             pageInfo {
               hasNextPage
               endCursor
