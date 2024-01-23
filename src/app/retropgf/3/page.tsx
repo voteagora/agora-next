@@ -6,9 +6,7 @@ import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 
 /**
  * TODO:
- * - Text-ellipsis if project text is too long?
- * - Get mobile design and styles of desktop
- * - Make sure you port over the Card when you click
+ * - Make sure you port over the Card when you click and styles of filters
  */
 export default async function Page({
   searchParams,

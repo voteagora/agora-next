@@ -2,16 +2,16 @@
 
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 
-// TODO: frh -> check how to shuffle
 export async function getRetroPGFResults(
   { endCursor = "", search = "", category = null, orderBy = "mostAwarded" }:
     { endCursor?: string, search: string, category: keyof typeof retroPGFCategories | null, orderBy: keyof typeof retroPGFSort }
 ) {
   const pageSize = 20;
+  const seed = Date.now().toString();
   const query = `
       query {
         retroPGF {
-          projects(first: ${pageSize}, after: "${endCursor}", search: "${search}", category: ${category}, orderBy: ${orderBy}) {
+          projects(first: ${pageSize}, after: "${endCursor}", search: "${search}", category: ${category}, orderBy: ${orderBy}, seed: "${seed}") {
             pageInfo {
               hasNextPage
               endCursor
