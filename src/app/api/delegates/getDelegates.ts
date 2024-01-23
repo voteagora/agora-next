@@ -116,50 +116,28 @@ export async function getDelegate({
 
   const delegateQuery = prisma.$queryRaw<DelegateStats[]>(
     Prisma.sql`
-    SELECT * FROM (
-      SELECT * FROM (
-      SELECT *
-      FROM (
-      SELECT
-        voter,
-        proposals_created,
-        proposals_voted,
-        "for",
-        "against",
-        "abstain",
-        participation_rate,
-        last_10_props
-      FROM center.voter_stats
-      WHERE voter=${address}
-      ) vs
-      
-      LEFT JOIN LATERAL (
-        SELECT
-          delegate,
-          voting_power
-        FROM
-          center.voting_power
-        WHERE delegate=vs.voter
-        LIMIT 1
-      ) vp ON TRUE
-      ) a
-      
-      LEFT JOIN LATERAL (
-        SELECT
-          advanced_vp
-        FROM center.advanced_voting_power
-        WHERE delegate=a.voter AND contract=${OptimismContracts.alligator.address.toLowerCase()}
-      ) ad ON TRUE
-      ) b
-      
-      LEFT JOIN LATERAL (
-        SELECT
-          num_for_delegators
-        FROM
-        center.num_of_delegators
-        WHERE delegate=b.voter
-        LIMIT 1
-      ) nd ON TRUE
+    SELECT 
+      voter,
+      proposals_created,
+      proposals_voted,
+      "for",
+      "against",
+      "abstain",
+      participation_rate,
+      last_10_props,
+      voting_power,
+      advanced_vp,
+      num_for_delegators
+    FROM 
+        (SELECT 1 as dummy) dummy_table
+    LEFT JOIN 
+        (SELECT * FROM center.voter_stats WHERE voter = ${address}) a ON TRUE
+    LEFT JOIN 
+        center.advanced_voting_power av ON av.delegate = ${address} AND contract = ${OptimismContracts.alligator.address.toLowerCase()}
+    LEFT JOIN 
+        (SELECT * FROM center.num_of_delegators nd WHERE delegate = ${address} LIMIT 1) b ON TRUE
+    LEFT JOIN 
+        (SELECT * FROM center.voting_power vp WHERE vp.delegate = ${address} LIMIT 1) c ON TRUE
     `
   );
 
