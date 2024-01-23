@@ -3,10 +3,9 @@
 import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder } from "ethers";
 import { cn } from "@/lib/utils";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AdvancedVoteAlert,
-  DisabledVoteDialog,
   LoadingVote,
   NoStatementView,
   SuccessMessage,
@@ -18,7 +17,7 @@ import styles from "./approvalCastVoteDialog.module.scss";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
-import { getVpToDisplay } from "@/lib/voteUtils";
+import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
 
 const abiCoder = new AbiCoder();
 
@@ -63,9 +62,12 @@ export function ApprovalCastVoteDialog({
     }
   };
 
+  const [localMissingVote, setLocalMissingVote] =
+    useState<MissingVote>(missingVote);
+
   // TODO: ADD against option if is supported
   // 0 = against, 1 = for, 2 = abstain
-  const { isLoading, isSuccess, write, isError } = useAdvancedVoting({
+  const { isLoading, isSuccess, write, isError, data } = useAdvancedVoting({
     proposalId: proposal.id,
     support: abstain ? 2 : 1,
     standardVP: BigInt(votingPower.directVP),
@@ -73,7 +75,7 @@ export function ApprovalCastVoteDialog({
     authorityChains,
     reason,
     params: encodedParams,
-    missingVote,
+    missingVote: localMissingVote,
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
@@ -88,8 +90,73 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
-  if (missingVote === "BOTH" || missingVote === "ADVANCED") {
-    return <DisabledVoteDialog closeDialog={closeDialog} />;
+  console.log(
+    "data",
+    data,
+    isLoading,
+    isSuccess,
+    isError,
+    missingVote,
+    localMissingVote
+  );
+
+  useEffect(() => {
+    if (
+      missingVote == "BOTH" &&
+      data?.standardVoteData &&
+      !data?.advancedVoteData
+    ) {
+      setLocalMissingVote("ADVANCED");
+    }
+  }, [data]);
+  if (
+    missingVote === "BOTH" &&
+    !data.advancedVoteData &&
+    data.standardVoteData
+  ) {
+    return (
+      <VStack gap={3}>
+        <VStack className={styles.title_box}>
+          <p className={styles.title}>
+            Select up to {maxChecked} option{maxChecked > 1 && "s"}
+          </p>
+          <p className={styles.notes}>
+            Your vote is final and cannot be edited once submitted.
+          </p>
+        </VStack>
+        <VStack className={styles.options_list}>
+          {proposalData.options.map((option, index) => (
+            <CheckCard
+              key={index}
+              title={option.description}
+              description={<p></p>}
+              checked={selectedOptions.includes(index)}
+              checkedOptions={selectedOptions.length}
+              onClick={() => handleOnChange(index)}
+              abstain={abstain}
+            />
+          ))}
+          <CheckCard
+            key={proposalData.options.length}
+            title={"Abstain: vote for no options"}
+            description={""}
+            checked={!!abstain}
+            checkedOptions={selectedOptions.length}
+            onClick={() => handleOnChange(abstainOptionId)}
+            abstain={abstain}
+          />
+        </VStack>
+        <CastVoteWithReason
+          onVoteClick={write}
+          reason={reason}
+          setReason={setReason}
+          numberOfOptions={selectedOptions.length}
+          abstain={abstain}
+          votingPower={vpToDisplay}
+          copy="Sign transaction 2/2"
+        />
+      </VStack>
+    );
   }
 
   return (
@@ -173,6 +240,7 @@ function CastVoteWithReason({
   numberOfOptions,
   abstain,
   votingPower,
+  copy,
 }: {
   onVoteClick: () => void;
   reason: string;
@@ -180,6 +248,7 @@ function CastVoteWithReason({
   numberOfOptions: number;
   abstain: boolean;
   votingPower: string;
+  copy?: string;
 }) {
   return (
     <VStack className={styles.cast_vote_box} gap={4}>
@@ -208,12 +277,18 @@ function CastVoteWithReason({
         )}
         {abstain && (
           <Button onClick={() => onVoteClick()}>
-            Vote for no options with{"\u00A0"}
-            <TokenAmountDisplay
-              amount={votingPower}
-              decimals={18}
-              currency="OP"
-            />
+            {!copy ? (
+              <>
+                Vote for no options with{"\u00A0"}
+                <TokenAmountDisplay
+                  amount={votingPower}
+                  decimals={18}
+                  currency="OP"
+                />
+              </>
+            ) : (
+              copy
+            )}
           </Button>
         )}
       </VStack>

@@ -47,6 +47,8 @@ const useIsAdvancedUser = () => {
     "0xb979C87c6502D745ef8A438ccBD8cc9b27502991", // Stepan Test 6
     "0x97301D575F517A70E66Bd1A92886F7c7D2e3959B", // Stepan Test 7
     "0xeCbdDA9c9Fa136389ab212EdB5e7295b266f7277", // Stepan Test 8
+    "0x875A3f19AFFd58c5615d6eb4a6136AA13c1Dc387", // Stepan Test 9 (Rainbow)
+    "0xb55C9A9Fda63A39D24A276d02315656eA3125cD6", // Stepan Test 10 (Coinbase)
     "0xD753a89450213A8D7f7aCCE3a615d71ebD97366d", // Anika
     "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd", // Woj Test 1
     "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Agora manager throwaway
