@@ -28,6 +28,7 @@ async function fetchVotableSupply() {
 
 export default async function Home() {
   const proposals = await fetchProposals();
+  console.log("proposals: ", proposals);
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
