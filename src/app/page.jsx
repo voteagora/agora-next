@@ -8,6 +8,8 @@ import { getProposals } from "./api/proposals/getProposals";
 import { getMetrics } from "./api/metrics/getMetrics";
 import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 
+export const dynamic = "force-dynamic";
+
 async function fetchProposals(page = 1) {
   "use server";
 
@@ -28,7 +30,6 @@ async function fetchVotableSupply() {
 
 export default async function Home() {
   const proposals = await fetchProposals();
-  console.log("proposals: ", proposals);
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
