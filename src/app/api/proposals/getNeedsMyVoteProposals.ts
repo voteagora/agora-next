@@ -24,24 +24,30 @@ export async function getNeedsMyVoteProposals({
     // get only proposals from the prod contract
     proposals = await prisma.$queryRaw`
       SELECT p.*
-      FROM "center"."proposals" p
+      FROM (
+        SELECT *
+        FROM "center"."proposals"
+        WHERE CAST(start_block AS INTEGER) < ${latestBlock?.number}
+          AND CAST(end_block AS INTEGER) > ${latestBlock?.number}
+          AND cancelled_block IS NULL
+          AND p.contract = ${OptimismContracts.governor.address.toLowerCase()}
+      ) AS p
       LEFT JOIN "center"."votes" v ON p.proposal_id = v.proposal_id AND v.voter = ${address.toLowerCase()}
-      WHERE CAST(p.start_block AS INTEGER) < ${latestBlock?.number}
-        AND CAST(p.end_block AS INTEGER) > ${latestBlock?.number}
-        AND p.cancelled_block IS NULL
-        AND p.contract = ${OptimismContracts.governor.address.toLowerCase()}
-        AND v.proposal_id IS NULL;
+      WHERE v.proposal_id IS NULL;
       `;
   } else {
     // get proposals from anywhere
     proposals = await prisma.$queryRaw`
       SELECT p.*
-      FROM "center"."proposals" p
+      FROM (
+        SELECT *
+        FROM "center"."proposals"
+        WHERE CAST(start_block AS INTEGER) < ${latestBlock?.number}
+          AND CAST(end_block AS INTEGER) > ${latestBlock?.number}
+          AND cancelled_block IS NULL
+      ) AS p
       LEFT JOIN "center"."votes" v ON p.proposal_id = v.proposal_id AND v.voter = ${address.toLowerCase()}
-      WHERE CAST(p.start_block AS INTEGER) < ${latestBlock?.number}
-        AND CAST(p.end_block AS INTEGER) > ${latestBlock?.number}
-        AND p.cancelled_block IS NULL
-        AND v.proposal_id IS NULL;
+      WHERE v.proposal_id IS NULL;
       `;
   }
 
