@@ -181,7 +181,7 @@ export default function RetroPGFResults({
 
               return (
                 <TableRow
-                  className="border-none"
+                  className="border-none cursor-pointer"
                   key={id}
                   onClick={() =>
                     openDialog({

@@ -43,7 +43,7 @@ const Modal: FC<
             onClick={(e) => e.stopPropagation()}
             className={
               transparent
-                ? styles.dialog_content_transparent
+                ? styles.dialog_transparent_content
                 : styles.dialog_content
             }
           >
