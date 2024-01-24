@@ -28,15 +28,17 @@ export default function ProposalVotesList({
   checkIfDelegatingToProxy,
   fetchCurrentDelegatees,
   fetchDirectDelegatee,
+  fetchUserVotes,
   getProxyAddress,
   proposal_id,
   getDelegators,
 }) {
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposalVotes] || []);
   const [meta, setMeta] = React.useState(initialProposalVotes.meta);
   const [delegators, setDelegators] = React.useState(null);
+  const [userVotes, setUserVotes] = React.useState([]);
 
   const fetchDelegatorsAndSet = async (addressOrENSName) => {
     let fetchedDelegators;
@@ -48,12 +50,21 @@ export default function ProposalVotesList({
     setDelegators(fetchedDelegators);
   };
 
+  const fetchUserVoteAndSet = async (proposal_id, address) => {
+    let fetchedUserVotes;
+    try {
+      fetchedUserVotes = await fetchUserVotes(proposal_id, address);
+      console.log("fetchedUserVotes", fetchedUserVotes);
+    } catch (error) {
+      fetchedUserVotes = [];
+    }
+    setUserVotes(fetchedUserVotes);
+  };
+
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchVotesForProposal(proposal_id, page);
-      console.log("DATA");
-      console.log(data);
       const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
       const uniqueVotes = data.votes.filter(
         (v) => !existingIds.has(v.transactionHash)
@@ -63,17 +74,37 @@ export default function ProposalVotesList({
       fetching.current = false;
     }
   };
-  const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
+
+  let proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
+
+  if (userVotes.length > 0) {
+    proposalVotes = [
+      ...userVotes,
+      ...pages.reduce((all, page) => all.concat(page.votes), []),
+    ];
+
+    if (pages.length == 1) {
+      // if the delegates vote is on the first page, remove it from the list for clarity
+      // if the delegate is lower on the list, we can keep it since its not that confusing
+      // and running this check on a long list can be very expensive
+      proposalVotes = proposalVotes.filter(
+        // filter out duplicate (own) votes
+        (v, i, a) =>
+          a.findIndex((t) => t.transactionHash === v.transactionHash) === i
+      );
+    }
+  }
+
   const { isAdvancedUser } = useIsAdvancedUser();
-  const { address: connectedAddress } = useAccount();
 
   React.useEffect(() => {
-    if (address) {
-      fetchDelegatorsAndSet(address);
+    if (connectedAddress) {
+      fetchDelegatorsAndSet(connectedAddress);
+      fetchUserVoteAndSet(proposal_id, connectedAddress);
     } else {
       setDelegators(null);
     }
-  }, [address]);
+  }, [connectedAddress]);
 
   return (
     <div className={styles.vote_container}>

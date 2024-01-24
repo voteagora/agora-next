@@ -190,6 +190,7 @@ export default async function OPProposalPage({
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               fetchDirectDelegatee={fetchDirectDelegatee}
+              fetchUserVotes={fetchVotesForProposalAndDelegate}
               getProxyAddress={getProxyAddress}
               proposal_id={proposal.id}
               getDelegators={getDelegators}
