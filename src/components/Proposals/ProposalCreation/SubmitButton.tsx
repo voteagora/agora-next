@@ -1,9 +1,9 @@
 "use client";
 
-import { css, cx } from "@emotion/css";
+import { cx } from "@emotion/css";
 import { Form } from "./CreateProposalForm";
 import { ethers, AbiCoder } from "ethers";
-import * as theme from "@/styles/theme";
+import { revalidatePath } from "next/cache";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,6 +60,8 @@ export default function SubmitButton({
 
   useEffect(() => {
     if (isSuccess || isError || isLoading || data?.hash) {
+      console.log("success creating proposal");
+      revalidatePath("/", "page");
       openDialog({
         type: "CAST_PROPOSAL",
         params: {
