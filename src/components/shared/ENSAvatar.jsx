@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import Image from "next/image";
 import { useEnsAvatar } from "wagmi";
-import { css } from "@emotion/css";
 import avatar0 from "./avatars/avatar0.svg";
 import avatar1 from "./avatars/avatar1.svg";
 import avatar2 from "./avatars/avatar2.svg";
