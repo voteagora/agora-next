@@ -255,10 +255,11 @@ view AdvancedVotingPower {
 }
 
 view VotingPowerSnaps {
-  id           String  @unique
+  id           String   @unique
   delegate     String?
   balance      String?
   block_number BigInt?
+  ordinal      Decimal? @db.Decimal
 
   @@map("voting_power_snaps")
   @@schema("center")
