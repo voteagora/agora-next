@@ -103,6 +103,7 @@ export default function ProposalVotesList({
       fetchUserVoteAndSet(proposal_id, connectedAddress);
     } else {
       setDelegators(null);
+      setUserVotes([]);
     }
   }, [connectedAddress]);
 
