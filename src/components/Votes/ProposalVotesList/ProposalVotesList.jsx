@@ -54,7 +54,6 @@ export default function ProposalVotesList({
     let fetchedUserVotes;
     try {
       fetchedUserVotes = await fetchUserVotes(proposal_id, address);
-      console.log("fetchedUserVotes", fetchedUserVotes);
     } catch (error) {
       fetchedUserVotes = [];
     }
