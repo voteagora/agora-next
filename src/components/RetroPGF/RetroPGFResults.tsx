@@ -132,34 +132,40 @@ export default function RetroPGFResults({
       >
         <Table>
           <TableHeader className="border-none">
-            <TableRow className="border-none text-xs">
-              <TableHead className="px-6" variant="gray">
+            <TableRow className="border-none text-sm">
+              <TableHead className="px-6 font-normal" variant="gray">
                 Project
               </TableHead>
-              <TableHead className="px-6 hidden sm:table-cell" variant="gray">
+              <TableHead
+                className="px-6 font-normal hidden sm:table-cell"
+                variant="gray"
+              >
                 Submitted by
               </TableHead>
-              <TableHead className="px-6 hidden sm:table-cell" variant="gray">
+              <TableHead
+                className="px-6 font-normal hidden sm:table-cell"
+                variant="gray"
+              >
                 Categories
               </TableHead>
               <TableHead
-                className="px-6 text-right hidden sm:table-cell whitespace-nowrap"
+                className="px-6 font-normal text-right hidden sm:table-cell whitespace-nowrap"
                 variant="gray"
               >
                 In ballots
               </TableHead>
               <TableHead
-                className="px-6 text-right hidden sm:table-cell whitespace-nowrap"
+                className="px-6 font-normal text-right hidden sm:table-cell whitespace-nowrap"
                 variant="gray"
               >
                 In lists
               </TableHead>
-              <TableHead className="px-6 text-right" variant="gray">
+              <TableHead className="px-6 font-normal text-right" variant="gray">
                 Amount received
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="text-gray-4f font-medium text-base">
+          <TableBody className="text-gray-4f font-medium text-sm">
             {results.map((result) => {
               const {
                 applicant,
