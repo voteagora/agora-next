@@ -1,9 +1,8 @@
 "use client";
 
-import { css, cx } from "@emotion/css";
+import { cx } from "@emotion/css";
 import { Form } from "./CreateProposalForm";
 import { ethers, AbiCoder } from "ethers";
-import * as theme from "@/styles/theme";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {

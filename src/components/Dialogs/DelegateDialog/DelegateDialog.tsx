@@ -2,7 +2,6 @@ import { useAccount, useBalance, useContractWrite, useEnsName } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { OptimismContracts } from "@/lib/contracts/contracts";
-import { DelegationDisplayAmount } from "./DelegationDisplayAmount";
 import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
 import { useModal } from "connectkit";
@@ -16,6 +15,7 @@ import ENSName from "@/components/shared/ENSName";
 import { InfoIcon } from "lucide-react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { track } from "@vercel/analytics";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function DelegateDialog({
   delegate,
@@ -60,7 +60,7 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isLoading, isSuccess, isError, write } = useContractWrite({
+  const { isLoading, isSuccess, isError, write, data } = useContractWrite({
     address: OptimismContracts.token.address as any,
     abi: OptimismContracts.token.abi,
     functionName: "delegate",
@@ -202,7 +202,14 @@ export function DelegateDialog({
         {isLoading && (
           <Button disabled={false}>Submitting your delegation...</Button>
         )}
-        {isSuccess && <Button disabled={false}>Delegation completed!</Button>}
+        {isSuccess && (
+          <div>
+            <Button className="w-full" disabled={false}>
+              Delegation completed!
+            </Button>
+            <BlockScanUrls hash1={data?.hash} />
+          </div>
+        )}
         {isError && (
           <Button disabled={false} onClick={() => writeWithTracking()}>
             Delegation failed - try again

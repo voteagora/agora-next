@@ -77,7 +77,6 @@ const useAdvancedVoting = ({
 
   const write = useCallback(() => {
     const vote = async () => {
-      setIsLoading(true);
       setIsError(false);
       setIsSuccess(false);
 
@@ -124,12 +123,19 @@ const useAdvancedVoting = ({
       setIsError(true);
       setIsLoading(false);
     }
-    if (
-      (authorityChains.length === 0 || advancedVoteIsSuccess) &&
-      ((!standardVP && authorityChains.length > 0) || standardVoteIsSuccess)
-    ) {
-      setIsSuccess(true);
-      setIsLoading(false);
+    switch (missingVote) {
+      case "BOTH":
+        if (advancedVoteIsSuccess && standardVoteIsSuccess) {
+          setIsSuccess(true);
+          setIsLoading(false);
+        }
+        break;
+      default:
+        if (advancedVoteIsSuccess || standardVoteIsSuccess) {
+          setIsSuccess(true);
+          setIsLoading(false);
+        }
+        break;
     }
   }, [
     advancedVoteIsLoading,
@@ -140,6 +146,7 @@ const useAdvancedVoting = ({
     standardVoteIsSuccess,
     authorityChains,
     standardVP,
+    missingVote,
   ]);
 
   return {

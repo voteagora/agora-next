@@ -78,6 +78,8 @@ export function TextInputTooltip({
       onChange={(event) => onChange(event.target.value)}
       onClick={onClick}
       onBlur={onBlur}
+      autoComplete="off"
+      data-1p-ignore
     />
   );
 }

@@ -183,3 +183,13 @@ export async function fetchAndSetAll<
   const values = await Promise.all(fetchers.map((fetcher) => fetcher()));
   values.forEach((value, index) => setters[index](value));
 }
+
+export function getBlockScanUrl(hash: string | `0x${string}`) {
+  switch (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME) {
+    case "optimism":
+      return `https://optimistic.etherscan.io/tx/${hash}`;
+
+    default:
+      return `https://etherscan.io/tx/${hash}`;
+  }
+}
