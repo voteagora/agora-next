@@ -157,10 +157,11 @@ export function checkMissingVoteForDelegate(
   delegateVotes: Vote[],
   votingPower: VotingPowerData
 ): MissingVote {
+  const nonZeroVotes = delegateVotes.filter((vote) => BigInt(vote.weight) > 0n);
   const hasAdvancedVP = BigInt(votingPower.advancedVP) > 0n;
   const hasDirectVP = BigInt(votingPower.directVP) > 0n;
-  const hasVoted = delegateVotes.length > 0;
-  const hasMultipleVotes = delegateVotes.length > 1;
+  const hasVoted = nonZeroVotes.length > 0;
+  const hasMultipleVotes = nonZeroVotes.length > 1;
   const hasVotedWithDirectVP = delegateVotes.some(
     (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
   );

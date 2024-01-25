@@ -37,7 +37,7 @@ async function getVotingPowerAtSnapshotByAddress({
       },
     },
     orderBy: {
-      block_number: "desc",
+      ordinal: "desc",
     },
   });
 
