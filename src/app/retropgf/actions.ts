@@ -67,109 +67,64 @@ export async function getResultsProjectId(id: string): Promise<RetroPGFProject> 
         retroPGF {
           project(id: "${id}") {
             id
-            ...RetroPGFApplicationBannerFragment
-            ...RetroPGFApplicationContentFragment
-          }
-        }
-      }
-
-      fragment RetroPGFAddProjectToBallotModalContentFragment on Project {
-        id
-        ...RetroPGFModalApplicationRowFragment
-      }
-
-      fragment RetroPGFApplicationBannerFragment on Project {
-        id
-        bio
-        impactCategory
-        displayName
-        websiteUrl
-        applicant {
-          address {
-            address
-          }
-          id
-        }
-        applicantType
-        profile {
-          profileImageUrl
-          bannerImageUrl
-          id
-        }
-        includedInBallots
-        ...RetroPGFAddProjectToBallotModalContentFragment
-      }
-
-      fragment RetroPGFApplicationContentContributionLinkFragment on ContributionLink {
-        type
-        url
-        description
-      }
-
-      fragment RetroPGFApplicationContentFragment on Project {
-        impactDescription
-        contributionDescription
-        contributionLinks {
-          ...RetroPGFApplicationContentContributionLinkFragment
-        }
-        impactMetrics {
-          ...RetroPGFApplicationContentImpactMetricFragment
-        }
-        ...RetroPGFApplicationContentFundingSourceFragment
-        ...RetroPGFApplicationListContainerFragment
-      }
-
-      fragment RetroPGFApplicationContentFundingSourceFragment on Project {
-        fundingSources {
-          type
-          currency
-          amount
-          description
-        }
-      }
-
-      fragment RetroPGFApplicationContentImpactMetricFragment on ImpactMetric {
-        description
-        number
-        url
-      }
-
-      fragment RetroPGFApplicationListContainerFragment on Project {
-        lists {
-          ...RetroPGFListRowFragment
-          id
-        }
-      }
-
-      fragment RetroPGFListRowFragment on List {
-        id
-        author {
-          resolvedName {
-            address
-          }
-        }
-        listName
-        listDescription
-        categories
-        listContentCount
-        listContentShort {
-          project {
+            bio
+            impactCategory
             displayName
-            profile {
-              profileImageUrl
+            websiteUrl
+            applicant {
+              address {
+                address
+              }
               id
             }
-            id
+            applicantType
+            profile {
+              profileImageUrl
+              bannerImageUrl
+              id
+            }
+            includedInBallots
+            impactDescription
+            contributionDescription
+            contributionLinks {
+              type
+              url
+              description
+            }
+            impactMetrics {
+              description
+              number
+              url
+            }
+            fundingSources {
+              type
+              currency
+              amount
+              description
+            }
+            lists {
+              id
+              author {
+                resolvedName {
+                  address
+                }
+              }
+              listName
+              listDescription
+              categories
+              listContentCount
+              listContentShort {
+                project {
+                  displayName
+                  profile {
+                    profileImageUrl
+                    id
+                  }
+                  id
+                }
+              }
+            }
           }
-        }
-      }
-
-      fragment RetroPGFModalApplicationRowFragment on Project {
-        displayName
-        bio
-        profile {
-          profileImageUrl
-          id
         }
       }
     `;

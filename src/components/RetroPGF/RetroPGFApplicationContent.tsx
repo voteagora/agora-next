@@ -75,7 +75,7 @@ export default function RetroPGFApplicationContent({
       <RetroPGFApplicationContentFundingSource
         fundingSources={fundingSources}
       />
-      {/* <RetroPGFApplicationListContainer fragmentRef={project} /> */}
+      <RetroPGFApplicationListContainer lists={[]} />
     </VStack>
   );
 }
@@ -152,7 +152,6 @@ const ImpactMetric = ({
   );
 };
 
-// TODO: frh -> spend 5 min seeing if formatNumber refactor makes sense
 function formatNumber(number: number) {
   const numberFormat = new Intl.NumberFormat("en", {
     style: "decimal",
