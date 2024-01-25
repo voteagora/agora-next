@@ -42,6 +42,7 @@ export default function RetroPGFApplicationBanner({
     websiteUrl,
     profile,
   } = retroPGFProject;
+
   // const openDialog = useOpenDialog();
 
   // const { isSignedIn } = useSIWE();
@@ -93,7 +94,6 @@ export default function RetroPGFApplicationBanner({
                 </h3>
                 <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-gray-700">
                   <p className="bg-gray-fa py-0 px-3 rounded-[24px]">
-                    {/* TODO: frh -> this type */}
                     {capitalizeFirstLetter(applicantType)}
                   </p>
                   {/* TODO: frh -> style this and twitter*/}

@@ -10,12 +10,7 @@ export type RetroPGFProject = {
         };
         id: string;
     };
-    applicantType: {
-        address: {
-            address: string;
-        };
-        id: string;
-    };
+    applicantType: string;
     profile: {
         profileImageUrl: string;
         bannerImageUrl: string;
