@@ -26,17 +26,20 @@ export default function RetroPGFShareCardDialog({
   displayName,
   id,
   profileImageUrl,
+  closeDialog,
 }: {
   awarded: string;
   displayName: string;
   id: string;
   profileImageUrl: string | null;
+  closeDialog: () => void;
 }) {
   return (
     <VStack className="items-center justify-center p-8 h-full relative w-[100vw]">
       <Link
+        onClick={closeDialog}
         href={`/retropgf/3/application/${parseProjectId(id)}`}
-        className="p-8 relative flex w-[320px] sm:w-[800px] bottom-[20vh] "
+        className="p-8 relative flex w-[320px] sm:w-[800px] bottom-[20vh]"
       >
         <Image
           src={shareCard}

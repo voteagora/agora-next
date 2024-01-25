@@ -187,23 +187,27 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  RETROPGF_SHARE_CARD: ({
-    awarded,
-    displayName,
-    id,
-    profileImageUrl,
-  }: {
-    awarded: string;
-    displayName: string;
-    id: string;
-    profileImageUrl: string | null;
-  }) => {
+  RETROPGF_SHARE_CARD: (
+    {
+      awarded,
+      displayName,
+      id,
+      profileImageUrl,
+    }: {
+      awarded: string;
+      displayName: string;
+      id: string;
+      profileImageUrl: string | null;
+    },
+    closeDialog
+  ) => {
     return (
       <RetroPGFShareCardDialog
         awarded={awarded}
         displayName={displayName}
         id={id}
         profileImageUrl={profileImageUrl}
+        closeDialog={closeDialog}
       />
     );
   },
