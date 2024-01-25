@@ -15,9 +15,9 @@ export default async function Page({
   }
 
   return (
-    <>
+    <div className="mt-8">
       <RetroPGFApplicationBanner retroPGFProject={retroPGFProject} />
       <RetroPGFApplicationContent retroPGFProject={retroPGFProject} />
-    </>
+    </div>
   );
 }
