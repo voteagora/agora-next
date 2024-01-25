@@ -1,42 +1,61 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProposalTypes } from "@prisma/client";
 import ProposalType from "./ProposalType";
+import { fetchProposalTypes } from "@/app/admin/actions";
+import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
 
 // TODO: Take init values from the chain
 export default function ProposalTypeSettings({
-  initProposalTypes,
   votableSupply,
 }: {
-  initProposalTypes: ProposalTypes[];
   votableSupply: string;
 }) {
-  const [proposalTypes, setProposalTypes] = useState(
-    initProposalTypes.map(({ quorum, approval_threshold, name }) => ({
-      name,
-      quorum: Number(quorum) / 100,
-      approval_threshold: Number(approval_threshold) / 100,
-    }))
-  );
+  const [loading, setLoading] = useState(true);
+  const [proposalTypes, setProposalTypes] = useState<
+    { name: string; quorum: number; approval_threshold: number }[]
+  >([]);
+
+  useEffect(() => {
+    const getProposalTypes = async () => {
+      const response = (await fetchProposalTypes().catch((error) =>
+        console.error(error)
+      )) as ProposalTypes[];
+      const _proposalTypes = response.map(
+        ({ quorum, approval_threshold, name }) => ({
+          name,
+          quorum: Number(quorum) / 100,
+          approval_threshold: Number(approval_threshold) / 100,
+        })
+      );
+      setLoading(false);
+      setProposalTypes(_proposalTypes);
+    };
+    getProposalTypes();
+  }, []);
 
   return (
     <section className="gl_box">
       <h1 className="font-extrabold text-2xl">Proposal type settings</h1>
       <p>Create and manage different types of proposals</p>
-      {proposalTypes.map((proposalType, key) => (
-        <Fragment key={key}>
-          <ProposalType
-            votableSupply={votableSupply}
-            proposalType={proposalType}
-            index={key}
-          />
-          <Separator className="my-8" />
-        </Fragment>
-      ))}
+      {loading ? (
+        <AgoraLoader />
+      ) : (
+        proposalTypes.map((proposalType, key) => (
+          <Fragment key={key}>
+            <ProposalType
+              votableSupply={votableSupply}
+              proposalType={proposalType}
+              index={key}
+            />
+            <Separator className="my-8" />
+          </Fragment>
+        ))
+      )}
       <div
         className="inline-flex items-center gap-2 cursor-pointer"
         onClick={() => {
