@@ -14,7 +14,12 @@ export default function DelegatesSearch() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        router.push(`/delegates/${enteredName}`);
+        if (
+          enteredName.match(/^(0x)?[0-9a-f]{40}$/i) ||
+          enteredName.endsWith(".eth")
+        ) {
+          router.push(`/delegates/${enteredName}`);
+        }
       }}
     >
       <VStack className="relative">
