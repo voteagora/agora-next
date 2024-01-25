@@ -8,10 +8,8 @@ import { getProposals } from "./api/proposals/getProposals";
 import { getMetrics } from "./api/metrics/getMetrics";
 import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 
-// No cache
-export const dynamic = "force-dynamic";
-export const revalidate = false;
-export const fetchCache = "force-no-store";
+// Revalidate cache every 60 seconds
+export const revalidate = 60;
 
 async function fetchProposals(page = 1) {
   "use server";
