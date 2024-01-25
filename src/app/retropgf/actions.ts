@@ -60,7 +60,6 @@ export async function getRetroPGFResults(
   return data.data.retroPGF.projects;
 }
 
-// TODO: frh -> lists are missing in this query
 export async function getResultsProjectId(id: string): Promise<RetroPGFProject> {
   const query = `
       {
@@ -101,28 +100,6 @@ export async function getResultsProjectId(id: string): Promise<RetroPGFProject> 
               currency
               amount
               description
-            }
-            lists {
-              id
-              author {
-                resolvedName {
-                  address
-                }
-              }
-              listName
-              listDescription
-              categories
-              listContentCount
-              listContentShort {
-                project {
-                  displayName
-                  profile {
-                    profileImageUrl
-                    id
-                  }
-                  id
-                }
-              }
             }
           }
         }

@@ -35,28 +35,4 @@ export type RetroPGFProject = {
         amount: number;
         description: string;
     }[];
-    lists: List[];
-}
-// TODO: frh -> check list
-type List = {
-    id: string;
-    author: {
-        resolvedName: {
-            address: string;
-        }
-    };
-    listName: string;
-    listDescription: string;
-    categories: string[];
-    listContentCount: number;
-    listContentShort: {
-        project: {
-            displayName: string;
-            profile: {
-                profileImageUrl: string;
-                id: string;
-            };
-            id: string;
-        };
-    }[];
 }

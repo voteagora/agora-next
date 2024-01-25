@@ -2,7 +2,6 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { icons } from "@/icons/icons";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import RetroPGFApplicationContentFundingSource from "./RetroPGFApplicationContentFundingSource";
-import RetroPGFApplicationListContainer from "./RetroPGFApplicationListContainer";
 import { type RetroPGFProject } from "@/lib/types";
 import Image from "next/image";
 
@@ -75,7 +74,6 @@ export default function RetroPGFApplicationContent({
       <RetroPGFApplicationContentFundingSource
         fundingSources={fundingSources}
       />
-      <RetroPGFApplicationListContainer lists={[]} />
     </VStack>
   );
 }
