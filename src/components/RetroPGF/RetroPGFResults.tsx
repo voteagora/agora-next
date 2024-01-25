@@ -121,14 +121,11 @@ export default function RetroPGFResults({
         pageStart={0}
         loadMore={loadMore}
         loader={
-          <div key="loader">
-            Loading... <br />
-            <Image
-              src="/images/blink.gif"
-              alt="Blinking Agora Logo"
-              width={50}
-              height={20}
-            />
+          <div
+            key="loader"
+            className="flex justify-center py-6 text-sm text-stone-500"
+          >
+            Loading...
           </div>
         }
         element="main"
