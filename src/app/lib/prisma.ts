@@ -17,16 +17,15 @@ if (process.env.NODE_ENV === "production") {
 
 // Logging middleware
 prisma.$use(async (params, next) => {
-  // TODO: frh -> bring this back
-  // console.log(params);
+  console.log(params);
 
   const before = Date.now();
   const result = await next(params);
   const after = Date.now();
 
-  // console.log(
-  //   `Query ${params.model}.${params.action} took ${after - before}ms`
-  // );
+  console.log(
+    `Query ${params.model}.${params.action} took ${after - before}ms`
+  );
 
   return result;
 });

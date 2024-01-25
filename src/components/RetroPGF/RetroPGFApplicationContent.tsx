@@ -25,7 +25,7 @@ export default function RetroPGFApplicationContent({
           <h2 className="font-inter font-black text-2xl leading-[29px] text-black mb-[14px]">
             Contribution
           </h2>
-          <div className="font-inter font-medium text-base leading-6 text-gray-4f pb-0 sm:pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap break-normal">
+          <div className="font-inter font-medium text-base leading-6 text-gray-4f pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap break-normal">
             {contributionDescription}
           </div>
         </VStack>
@@ -45,12 +45,12 @@ export default function RetroPGFApplicationContent({
           </div>
         </VStack>
       </div>
-      <div className="flex flex-col sm:flex-row gap-0 sm:gap-16 items-stretch sm:items-start justify-end sm:justify-between px-4 pt-4 pb-8 max-w-6xl">
+      <div className="flex flex-col sm:flex-row gap-0 sm:gap-16 items-stretch sm:items-start justify-end sm:justify-between px-4 py-8 max-w-6xl">
         <VStack>
           <h2 className="font-inter  font-black text-2xl leading-[29px] text-black mb-[14px]">
             Impact
           </h2>
-          <div className="font-inter  font-medium text-base leading-6 text-gray-4f pb-0 sm:pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap">
+          <div className="font-inter  font-medium text-base leading-6 text-gray-4f pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap">
             {impactDescription}
           </div>
         </VStack>

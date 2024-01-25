@@ -1,16 +1,5 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-
-// import graphql from "babel-plugin-relay/macro";
-// import { useFragment } from "react-relay";
-// import { RetroPGFApplicationBannerFragment$key } from "./__generated__/RetroPGFApplicationBannerFragment.graphql";
-// import { NounResolvedLink } from "../../../components/NounResolvedLink";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-// import ProjectPlaceholder from "../ProjectPlaceholder.svg";
-// import { buttonStyles } from "../../EditDelegatePage/EditDelegatePage";
-// import { useSIWE } from "connectkit";
-// import { useBallot } from "../RetroPGFVoterStore/useBallot";
-// import { useOpenDialog } from "../../../components/DialogProvider/DialogProvider";
-// import { RetroPGFStep } from "../BallotModal/RetroPGFAddToBallotModal";
 import { type RetroPGFProject } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -43,14 +32,6 @@ export default function RetroPGFApplicationBanner({
     profile,
   } = retroPGFProject;
 
-  // const openDialog = useOpenDialog();
-
-  // const { isSignedIn } = useSIWE();
-  // const { signature, doesBallotContainProject, projectAllocaiton } =
-  //   useBallot();
-
-  // const projectToAdd = parseProjectId(id);
-
   return (
     <div className="flex flex-col sm:flex-row items-center w-full max-w-6xl pb-8 px-4">
       <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-white border border-gray-300 shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
@@ -62,31 +43,30 @@ export default function RetroPGFApplicationBanner({
           </HStack>
         </div>
         <div
-          // TODO: check this values
           className={cn(
-            "relative overflow-hidden h-[300px] w-full rounded-2xl border-8 border-white before:content-[''] before:absolute",
-            "before:top-0 before:right-0 before:bottom-0 before:left-0 before:bg-gray-fa before:bg-cover before:bg-center",
-            `bg-[url('${
+            "relative overflow-hidden h-[300px] w-full rounded-2xl border-8 border-white bg-gray-fa bg-cover bg-center"
+          )}
+          style={{
+            backgroundImage: `url(${
               profile?.bannerImageUrl
                 ? profile.bannerImageUrl
                 : profile?.profileImageUrl ?? ""
-            }')]`,
-            `blur-[${profile?.bannerImageUrl ? "0px" : "40px"}]`
-          )}
+            })`,
+            filter: `blur(${profile?.bannerImageUrl ? "0px" : "40px"})`,
+          }}
         />
         <Image
           src={profile?.profileImageUrl || projectPlaceholder}
           alt={`${displayName} icon`}
-          // TODO: frh -> check top auto here in desktop
           className={cn(
-            "absolute top-[200px] sm:top-auto left-[50%] sm:left-[20px] -translate-x-1/2 sm:translate-x-0",
+            "absolute top-[200px] sm:top-[258px] left-[50%] sm:left-[20px] -translate-x-1/2 sm:translate-x-0",
             "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-white shadow-newDefault"
           )}
           height="120"
           width="120"
         />
-        <div className="absolute flex flex-col sm:flex-row items-center justify-between top-[316px] sm:top-auto bottom-auto sm:bottom-0 left-[316px] sm:left-[144px] w-full sm:w-[calc(100%-144px)] py-0 px-3 sm:px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between">
+        <div className="absolute flex flex-col sm:flex-row items-center justify-between top-[316px] sm:top-auto bottom-auto sm:bottom-0 left-0 sm:left-[144px] w-full sm:w-[calc(100%-144px)] py-0 px-3 sm:pl-6 sm:pb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between w-full">
             <VStack className="w-full">
               <div className="gap-3 items-center flex flex-col sm:flex-row mt-4 sm:mt-auto">
                 <h3 className="font-bold text-2xl text-center sm:text-left">
@@ -96,9 +76,10 @@ export default function RetroPGFApplicationBanner({
                   <p className="bg-gray-fa py-0 px-3 rounded-[24px]">
                     {capitalizeFirstLetter(applicantType)}
                   </p>
-                  {/* TODO: frh -> style this and twitter*/}
-                  <HumanAddress address={applicant.address.address} />
-                  <div className="bg-gray-ga py-0 px-3 rounded-[24px]">
+                  <div className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                    <HumanAddress address={applicant.address.address} />
+                  </div>
+                  <div className="bg-gray-fa py-0 px-3 rounded-[24px]">
                     <a href={websiteUrl} rel="noreferrer" target="_blank">
                       <HStack>
                         {extractWebsiteName(websiteUrl)}
@@ -114,7 +95,7 @@ export default function RetroPGFApplicationBanner({
               </p>
             </VStack>
             <HStack className="gap-2">
-              <VStack className="mr-4 mt-5">
+              <VStack className="mr-4 mt-5 items-end">
                 <div className="text-sm text-gray-700 whitespace-nowrap texr-right">
                   Appears in
                 </div>
@@ -122,33 +103,6 @@ export default function RetroPGFApplicationBanner({
                   {includedInBallots} ballots
                 </div>
               </VStack>
-              {/* TODO: frh -> this values and this button from components ui */}
-              {/* {isSignedIn && !signature && (
-                <button
-                  className={css`
-                    ${buttonStyles};
-                    margin-top: ${theme.spacing["4"]};
-                    margin-right: ${theme.spacing["4"]};
-                    white-space: nowrap;
-                  `}
-                  className=""
-                  onClick={() =>
-                    openDialog({
-                      type: "RPGF",
-                      params: {
-                        step: RetroPGFStep.BALLOT,
-                        projectFragmentRef: project,
-                      },
-                    })
-                  }
-                >
-                  {" "}
-                  {doesBallotContainProject(projectToAdd)
-                    ? formatNumber(Number(projectAllocaiton(projectToAdd))) +
-                      " OP allocated"
-                    : "Add to Ballot"}
-                </button>
-              )} */}
             </HStack>
           </div>
         </div>
@@ -157,18 +111,8 @@ export default function RetroPGFApplicationBanner({
   );
 }
 
-function formatNumber(value: number) {
-  return value.toLocaleString("en-US", {
-    maximumFractionDigits: 0,
-  });
-}
-
 function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLocaleLowerCase();
-}
-
-function parseProjectId(projectId: string): string {
-  return projectId.split("|")[1];
 }
 
 type CategoryListItemProps = {
