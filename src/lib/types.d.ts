@@ -1,16 +1,3 @@
-type ResolvedName = {
-    address?: string;
-    name: string;
-}
-
-type Applicant = {
-    address: {
-        address: string;
-        resolvedName: ResolvedName;
-    };
-    id: string;
-}
-
 export type RetroPGFProject = {
     id: string;
     bio: string;
@@ -20,15 +7,15 @@ export type RetroPGFProject = {
     applicant: {
         address: {
             address: string;
-            // TODO: frh -> check this
-            resolvedName: {
-                address: string;
-                name: string;
-            } | null;
         };
         id: string;
     };
-    applicantType: string;
+    applicantType: {
+        address: {
+            address: string;
+        };
+        id: string;
+    };
     profile: {
         profileImageUrl: string;
         bannerImageUrl: string;
@@ -55,11 +42,14 @@ export type RetroPGFProject = {
     }[];
     lists: List[];
 }
-
 // TODO: frh -> check list
 type List = {
     id: string;
-    author: ResolvedName;
+    author: {
+        resolvedName: {
+            address: string;
+        }
+    };
     listName: string;
     listDescription: string;
     categories: string[];

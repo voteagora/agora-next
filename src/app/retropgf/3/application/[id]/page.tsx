@@ -9,7 +9,6 @@ export default async function Page({
   params: { id: string };
 }) {
   const retroPGFProject = await getResultsProjectId(id);
-  console.log("retroPGFProject: ", retroPGFProject);
 
   if (!retroPGFProject) {
     redirect("/retropgf/3");

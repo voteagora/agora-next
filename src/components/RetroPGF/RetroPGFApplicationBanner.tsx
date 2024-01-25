@@ -15,6 +15,7 @@ import { type RetroPGFProject } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
+import HumanAddress from "@/components/shared/HumanAddress";
 
 function extractWebsiteName(urlString: string): string {
   try {
@@ -32,6 +33,7 @@ export default function RetroPGFApplicationBanner({
   retroPGFProject: RetroPGFProject;
 }) {
   const {
+    applicant,
     applicantType,
     bio,
     displayName,
@@ -71,11 +73,10 @@ export default function RetroPGFApplicationBanner({
             `blur-[${profile?.bannerImageUrl ? "0px" : "40px"}]`
           )}
         />
-        {/* TODO: frh -> test projectplacholder and check quality of image */}
         <Image
           src={profile?.profileImageUrl || projectPlaceholder}
           alt={`${displayName} icon`}
-          // TODO: frh -> check top auto here and translate
+          // TODO: frh -> check top auto here in desktop
           className={cn(
             "absolute top-[200px] sm:top-auto left-[50%] sm:left-[20px] -translate-x-1/2 sm:translate-x-0",
             "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-white shadow-newDefault"
@@ -92,19 +93,11 @@ export default function RetroPGFApplicationBanner({
                 </h3>
                 <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-gray-700">
                   <p className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                    {/* TODO: frh -> this type */}
                     {capitalizeFirstLetter(applicantType)}
                   </p>
-
-                  {/* TODO: frh -> i think this was resolved by human address */}
-                  {/* <NounResolvedLink
-                    resolvedName={project.applicant.address.resolvedName}
-                    className={css`
-                      background-color: ${theme.colors.gray.fa};
-                      padding: 0 ${theme.spacing[3]};
-                      border-radius: 24px;
-                    `}
-                  /> */}
-
+                  {/* TODO: frh -> style this and twitter*/}
+                  <HumanAddress address={applicant.address.address} />
                   <div className="bg-gray-ga py-0 px-3 rounded-[24px]">
                     <a href={websiteUrl} rel="noreferrer" target="_blank">
                       <HStack>

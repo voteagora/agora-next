@@ -60,6 +60,7 @@ export async function getRetroPGFResults(
   return data.data.retroPGF.projects;
 }
 
+// TODO: frh -> lists are missing in this query
 export async function getResultsProjectId(id: string): Promise<RetroPGFProject> {
   const query = `
       {
@@ -70,20 +71,6 @@ export async function getResultsProjectId(id: string): Promise<RetroPGFProject> 
             ...RetroPGFApplicationContentFragment
           }
         }
-      }
-
-      fragment ENSAvatarFragment on ResolvedName {
-        name
-      }
-
-      fragment NounResolvedLinkFragment on ResolvedName {
-        address
-        ...NounResolvedNameFragment
-      }
-
-      fragment NounResolvedNameFragment on ResolvedName {
-        address
-        name
       }
 
       fragment RetroPGFAddProjectToBallotModalContentFragment on Project {
@@ -100,9 +87,6 @@ export async function getResultsProjectId(id: string): Promise<RetroPGFProject> 
         applicant {
           address {
             address
-            resolvedName {
-              ...NounResolvedLinkFragment
-            }
           }
           id
         }
@@ -161,8 +145,7 @@ export async function getResultsProjectId(id: string): Promise<RetroPGFProject> 
         id
         author {
           resolvedName {
-            ...NounResolvedNameFragment
-            ...ENSAvatarFragment
+            address
           }
         }
         listName
