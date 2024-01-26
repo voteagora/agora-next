@@ -4,7 +4,7 @@ import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import {
   getVotesForProposalAndDelegate,
-  getMyVoteForProposal,
+  getUserVotesForProposal,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
@@ -56,7 +56,19 @@ async function fetchVotesForProposalAndDelegate(
 ) {
   "use server";
 
-  return await getMyVoteForProposal({
+  return await getVotesForProposalAndDelegate({
+    proposal_id,
+    address,
+  });
+}
+
+async function fetchUserVotesForProposal(
+  proposal_id: string,
+  address: string | `0x${string}`
+) {
+  "use server";
+
+  return await getUserVotesForProposal({
     proposal_id,
     address,
   });
@@ -97,6 +109,7 @@ export default async function OPProposalApprovalPage({
               fetchVotesForProposalAndDelegate={
                 fetchVotesForProposalAndDelegate
               }
+              fetchUserVotesForProposal={fetchUserVotesForProposal}
             />
           </VStack>
         </VStack>

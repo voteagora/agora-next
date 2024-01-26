@@ -191,7 +191,7 @@ export async function getVotesForProposal({
   };
 }
 
-export async function getMyVoteForProposal({
+export async function getUserVotesForProposal({
   proposal_id,
   address,
 }: {
@@ -218,8 +218,6 @@ export async function getMyVoteForProposal({
   );
 
   const latestBlock = await provider.getBlock("latest");
-
-  console.log(votes);
 
   return votes.map((vote) =>
     parseVote(
