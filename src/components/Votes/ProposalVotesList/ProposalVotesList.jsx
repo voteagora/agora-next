@@ -74,25 +74,7 @@ export default function ProposalVotesList({
     }
   };
 
-  let proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
-
-  if (userVotes.length > 0) {
-    proposalVotes = [
-      ...userVotes,
-      ...pages.reduce((all, page) => all.concat(page.votes), []),
-    ];
-
-    if (pages.length == 1) {
-      // if the delegates vote is on the first page, remove it from the list for clarity
-      // if the delegate is lower on the list, we can keep it since its not that confusing
-      // and running this check on a long list can be very expensive
-      proposalVotes = proposalVotes.filter(
-        // filter out duplicate (own) votes
-        (v, i, a) =>
-          a.findIndex((t) => t.transactionHash === v.transactionHash) === i
-      );
-    }
-  }
+  const proposalVotes = pages.reduce((all, page) => all.concat(page.votes), []);
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
@@ -120,67 +102,121 @@ export default function ProposalVotesList({
         }
         element="main"
       >
-        {proposalVotes.map((vote) => (
-          <VStack
-            key={vote.transactionHash}
-            gap={2}
-            className={styles.vote_row}
-          >
-            <VStack>
-              <HoverCard openDelay={100} closeDelay={100}>
-                <HoverCardTrigger>
-                  <HStack
-                    justifyContent="justify-between"
-                    className={styles.voter}
-                  >
-                    <HStack gap={1} alignItems="items-center">
-                      <HumanAddress address={vote.address} />
-                      {vote.address === connectedAddress?.toLowerCase() && (
-                        <p>(you)</p>
-                      )}
-                      <VoteText support={vote.support} />
-                    </HStack>
-                    <HStack
-                      alignItems="items-center"
-                      className={styles.vote_weight}
-                    >
-                      <TokenAmountDisplay
-                        amount={vote.weight}
-                        decimals={18}
-                        currency="OP"
-                      />
-                    </HStack>
-                  </HStack>
-                </HoverCardTrigger>
-                <HoverCardContent
-                  className="w-full shadow"
-                  side="left"
-                  sideOffset="3"
-                >
-                  <VoterHoverCard
-                    address={vote.address}
-                    fetchDelegate={fetchDelegate}
-                    fetchDelegateStatement={fetchDelegateStatement}
-                    fetchBalanceForDirectDelegation={
-                      fetchBalanceForDirectDelegation
-                    }
-                    fetchVotingPowerForSubdelegation={
-                      fetchVotingPowerForSubdelegation
-                    }
-                    checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-                    fetchCurrentDelegatees={fetchCurrentDelegatees}
-                    fetchDirectDelegatee={fetchDirectDelegatee}
-                    getProxyAddress={getProxyAddress}
-                    isAdvancedUser={isAdvancedUser}
-                    delegators={delegators}
-                  />
-                </HoverCardContent>
-              </HoverCard>
-            </VStack>
-            <pre className={styles.vote_reason}>{vote.reason}</pre>
-          </VStack>
-        ))}
+        <ul className="flex flex-col">
+          {userVotes.map((vote) => (
+            <li key={vote.transactionHash}>
+              <SingleVote
+                vote={vote}
+                fetchDelegate={fetchDelegate}
+                fetchDelegateStatement={fetchDelegateStatement}
+                fetchBalanceForDirectDelegation={
+                  fetchBalanceForDirectDelegation
+                }
+                fetchVotingPowerForSubdelegation={
+                  fetchVotingPowerForSubdelegation
+                }
+                checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+                fetchCurrentDelegatees={fetchCurrentDelegatees}
+                fetchDirectDelegatee={fetchDirectDelegatee}
+                getProxyAddress={getProxyAddress}
+                isAdvancedUser={isAdvancedUser}
+                delegators={delegators}
+              />
+            </li>
+          ))}
+          {proposalVotes.map((vote) => (
+            <li
+              key={vote.transactionHash}
+              className={`${
+                connectedAddress?.toLowerCase() === vote.address && "hidden"
+              }`}
+            >
+              <SingleVote
+                vote={vote}
+                fetchDelegate={fetchDelegate}
+                fetchDelegateStatement={fetchDelegateStatement}
+                fetchBalanceForDirectDelegation={
+                  fetchBalanceForDirectDelegation
+                }
+                fetchVotingPowerForSubdelegation={
+                  fetchVotingPowerForSubdelegation
+                }
+                checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+                fetchCurrentDelegatees={fetchCurrentDelegatees}
+                fetchDirectDelegatee={fetchDirectDelegatee}
+                getProxyAddress={getProxyAddress}
+                isAdvancedUser={isAdvancedUser}
+                delegators={delegators}
+              />
+            </li>
+          ))}
+        </ul>
       </InfiniteScroll>
     </div>
+  );
+}
+
+function SingleVote({
+  vote,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchBalanceForDirectDelegation,
+  fetchVotingPowerForSubdelegation,
+  checkIfDelegatingToProxy,
+  fetchCurrentDelegatees,
+  fetchDirectDelegatee,
+  getProxyAddress,
+  isAdvancedUser,
+  delegators,
+}) {
+  const { address: connectedAddress } = useAccount();
+
+  return (
+    <VStack key={vote.transactionHash} gap={2} className={styles.vote_row}>
+      <VStack>
+        <HoverCard openDelay={100} closeDelay={100}>
+          <HoverCardTrigger>
+            <HStack justifyContent="justify-between" className={styles.voter}>
+              <HStack gap={1} alignItems="items-center">
+                <HumanAddress address={vote.address} />
+                {vote.address === connectedAddress?.toLowerCase() && (
+                  <p>(you)</p>
+                )}
+                <VoteText support={vote.support} />
+              </HStack>
+              <HStack alignItems="items-center" className={styles.vote_weight}>
+                <TokenAmountDisplay
+                  amount={vote.weight}
+                  decimals={18}
+                  currency="OP"
+                />
+              </HStack>
+            </HStack>
+          </HoverCardTrigger>
+          <HoverCardContent
+            className="w-full shadow"
+            side="left"
+            sideOffset="3"
+          >
+            <VoterHoverCard
+              address={vote.address}
+              fetchDelegate={fetchDelegate}
+              fetchDelegateStatement={fetchDelegateStatement}
+              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+              fetchVotingPowerForSubdelegation={
+                fetchVotingPowerForSubdelegation
+              }
+              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
+              fetchCurrentDelegatees={fetchCurrentDelegatees}
+              fetchDirectDelegatee={fetchDirectDelegatee}
+              getProxyAddress={getProxyAddress}
+              isAdvancedUser={isAdvancedUser}
+              delegators={delegators}
+            />
+          </HoverCardContent>
+        </HoverCard>
+      </VStack>
+      <pre className={styles.vote_reason}>{vote.reason}</pre>
+    </VStack>
   );
 }
