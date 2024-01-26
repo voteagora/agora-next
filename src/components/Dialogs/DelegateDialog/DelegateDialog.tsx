@@ -16,6 +16,8 @@ import { InfoIcon } from "lucide-react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { waitForTransaction } from "wagmi/actions";
 
 export function DelegateDialog({
   delegate,
@@ -31,12 +33,16 @@ export function DelegateDialog({
   completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
+  const [isLoading, setIsLoading] = useState(false);
   const { setOpen } = useModal();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<Delegatees | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const { setRefetchDelegate } = useConnectButtonContext();
+  const sameDelegatee = delegate.address === delegatee?.delegatee;
 
-  const writeWithTracking = () => {
+  const writeWithTracking = async () => {
+    setIsLoading(true);
     const trackingData = {
       dao_slug: "OP",
       delegateAddress: delegate.address || "unknown",
@@ -47,7 +53,10 @@ export function DelegateDialog({
 
     track("Delegate", trackingData);
 
-    write();
+    const tx = await writeAsync();
+    await waitForTransaction({ hash: tx.hash });
+    setIsLoading(false);
+    setRefetchDelegate(true);
   };
 
   const { data: delegateEnsName } = useEnsName({
@@ -60,7 +69,7 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isLoading, isSuccess, isError, write, data } = useContractWrite({
+  const { isSuccess, isError, writeAsync, data } = useContractWrite({
     address: OptimismContracts.token.address as any,
     abi: OptimismContracts.token.abi,
     functionName: "delegate",
@@ -199,10 +208,15 @@ export function DelegateDialog({
             Connect wallet to delegate
           </ShadcnButton>
         )}
-        {isLoading && (
+        {accountAddress && sameDelegatee && (
+          <ShadcnButton variant="outline" className="cursor-not-allowed">
+            You cannot delegate to the same address again
+          </ShadcnButton>
+        )}
+        {isLoading && !isError && (
           <Button disabled={false}>Submitting your delegation...</Button>
         )}
-        {isSuccess && (
+        {isSuccess && !isLoading && (
           <div>
             <Button className="w-full" disabled={false}>
               Delegation completed!
@@ -210,16 +224,20 @@ export function DelegateDialog({
             <BlockScanUrls hash1={data?.hash} />
           </div>
         )}
-        {isError && (
+        {isError && !sameDelegatee && (
           <Button disabled={false} onClick={() => writeWithTracking()}>
             Delegation failed - try again
           </Button>
         )}
-        {!isError && !isSuccess && !isLoading && accountAddress && (
-          <ShadcnButton onClick={() => writeWithTracking()}>
-            Delegate
-          </ShadcnButton>
-        )}
+        {!isError &&
+          !isSuccess &&
+          !isLoading &&
+          accountAddress &&
+          !sameDelegatee && (
+            <ShadcnButton onClick={() => writeWithTracking()}>
+              Delegate
+            </ShadcnButton>
+          )}
       </VStack>
     </VStack>
   );

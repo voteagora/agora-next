@@ -18,6 +18,8 @@ import { formatUnits } from "viem";
 import { Button } from "@/components/Button";
 import { SuccessView } from "./SuccessView";
 import { track } from "@vercel/analytics";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { waitForTransaction } from "wagmi/actions";
 
 export function AdvancedDelegateDialog({
   target,
@@ -43,6 +45,8 @@ export function AdvancedDelegateDialog({
   const [proxyAddress, setProxyAddress] = useState<string>("");
   const [isReady, setIsReady] = useState(false);
   const { address } = useAccount();
+  const { setRefetchDelegate } = useConnectButtonContext();
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -108,7 +112,7 @@ export function AdvancedDelegateDialog({
     fetchData();
   }, [fetchData]);
 
-  const { write, isLoading, isError, isSuccess, data } = useAdvancedDelegation({
+  const { writeAsync, isError, isSuccess, data } = useAdvancedDelegation({
     availableBalance,
     isDelegatingToProxy,
     proxyAddress,
@@ -118,7 +122,9 @@ export function AdvancedDelegateDialog({
     allocation: allowance, // (value / 100000) 100% = 100000
   });
 
-  const writeWithTracking = () => {
+  const writeWithTracking = async () => {
+    setIsLoading(true);
+
     const trackingData = {
       dao_slug: "OP",
       userAddress: address || "unknown",
@@ -130,7 +136,10 @@ export function AdvancedDelegateDialog({
 
     track("Advanced Delegation", trackingData);
 
-    write();
+    const tx = await writeAsync();
+    await waitForTransaction({ hash: tx.hash });
+    setIsLoading(false);
+    setRefetchDelegate(true);
   };
 
   return (
@@ -143,7 +152,7 @@ export function AdvancedDelegateDialog({
         <Message setShowMessage={setShowMessage} />
       </div>
       <div className={showMessage ? "hidden" : "block w-full"}>
-        {isSuccess ? (
+        {!isLoading && isSuccess ? (
           <SuccessView closeDialog={completeDelegation} data={data} />
         ) : isReady &&
           availableBalance !== "" &&
