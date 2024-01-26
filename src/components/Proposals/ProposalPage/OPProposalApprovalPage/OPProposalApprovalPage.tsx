@@ -4,6 +4,7 @@ import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import {
   getVotesForProposalAndDelegate,
+  getMyVoteForProposal,
   getVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
@@ -55,7 +56,7 @@ async function fetchVotesForProposalAndDelegate(
 ) {
   "use server";
 
-  return await getVotesForProposalAndDelegate({
+  return await getMyVoteForProposal({
     proposal_id,
     address,
   });

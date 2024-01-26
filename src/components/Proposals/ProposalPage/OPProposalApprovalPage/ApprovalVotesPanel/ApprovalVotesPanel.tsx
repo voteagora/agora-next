@@ -91,6 +91,7 @@ export default function ApprovalVotesPanel({
           <ApprovalProposalVotesList
             initialProposalVotes={initialProposalVotes}
             fetchVotesForProposal={fetchVotesForProposal}
+            fetchUserVotes={fetchVotesForProposalAndDelegate}
             proposal_id={proposal.id}
           />
         )}
