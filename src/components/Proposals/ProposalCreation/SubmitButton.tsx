@@ -27,7 +27,11 @@ export default function SubmitButton({
   formTarget: React.RefObject<HTMLFormElement>;
   form: Form;
 }) {
-  const { governorFunction, inputData } = getInputData(form);
+  const {
+    governorFunction,
+    inputData,
+    error: inputDataError,
+  } = getInputData(form);
   const { isConnected } = useAccount();
   const { setOpen } = useModal();
   const [isClient, setIsClient] = useState(false);
@@ -83,11 +87,20 @@ export default function SubmitButton({
 
   return (
     <>
-      {onPrepareError ? (
-        <p className="text-red-700 text-sm max-w-[420px]">
-          {error?.message || JSON.stringify(error)}
-        </p>
-      ) : (
+      <div className="flex flex-col gap-2">
+        {!!inputDataError && (
+          <p className="text-red-700 text-sm max-w-[420px] break-words">
+            {(inputDataError as { message?: string })?.message ||
+              JSON.stringify(inputDataError)}
+          </p>
+        )}
+        {onPrepareError && (
+          <p className="text-red-700 text-sm max-w-[420px] break-words">
+            {error?.message || JSON.stringify(error)}
+          </p>
+        )}
+      </div>
+      {!onPrepareError && !inputDataError && (
         <p className={styles.create_prop_form__submit_text}>
           Only the Optimism Foundation manager address can create proposals for
           the time being.
@@ -96,7 +109,7 @@ export default function SubmitButton({
       <Button
         type="submit"
         variant={"outline"}
-        disabled={isLoading || onPrepareError}
+        disabled={isLoading || onPrepareError || !!inputDataError}
         className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
         onClick={(e) => {
           e.preventDefault();
@@ -124,7 +137,9 @@ type InputData = BasicInputData | ApprovalInputData;
 function getInputData(form: Form): {
   governorFunction: "propose" | "proposeWithModule";
   inputData: InputData;
+  error: unknown;
 } {
+  let error = null;
   const description = "# " + form.state.title + "\n" + form.state.description;
   let governorFunction: "propose" | "proposeWithModule" = "propose";
 
@@ -233,9 +248,10 @@ function getInputData(form: Form): {
     }
   } catch (e) {
     console.error(e);
+    error = e;
   }
 
-  return { governorFunction, inputData };
+  return { governorFunction, inputData, error };
 }
 
 function encodeTransfer(to: string, amount: number): string {
