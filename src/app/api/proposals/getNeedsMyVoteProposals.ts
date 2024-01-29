@@ -1,13 +1,11 @@
-import "server-only";
-
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { Proposals } from "@prisma/client";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getQuorumForProposal } from "../quorum/getQuorum";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { DEPLOYMENT_NAME } from "@/lib/config";
+import { ProposalPayload } from "./proposal";
 
 export async function getNeedsMyVoteProposals({
   address,
@@ -29,7 +27,7 @@ export async function getNeedsMyVoteProposals({
       : "";
 
   // get only proposals from the prod contract
-  const proposals = await prisma.$queryRawUnsafe<Proposals[]>(
+  const proposals = await prisma.$queryRawUnsafe<ProposalPayload[]>(
     `
       SELECT p.*
       FROM (

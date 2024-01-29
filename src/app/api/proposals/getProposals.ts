@@ -3,11 +3,10 @@ import { paginatePrismaResult } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-
-import "server-only";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getQuorumForProposal } from "../quorum/getQuorum";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 
 export async function getProposals({ page = 1 }: { page: number }) {
   const pageSize = 10;
@@ -18,7 +17,7 @@ export async function getProposals({ page = 1 }: { page: number }) {
 
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.proposals.findMany({
+      prisma[`${DEPLOYMENT_NAME}Proposals`].findMany({
         take,
         skip,
         orderBy: {
@@ -55,7 +54,7 @@ export async function getProposals({ page = 1 }: { page: number }) {
 }
 
 export async function getProposal({ proposal_id }: { proposal_id: string }) {
-  const proposal = await prisma.proposals.findFirst({
+  const proposal = await prisma[`${DEPLOYMENT_NAME}Proposals`].findFirst({
     where: { proposal_id },
   });
 
@@ -71,7 +70,7 @@ export async function getProposal({ proposal_id }: { proposal_id: string }) {
 }
 
 export async function getProposalTypes() {
-  return prisma.proposalTypes.findMany({
+  return prisma[`${DEPLOYMENT_NAME}ProposalTypes`].findMany({
     where: {
       contract:
         OptimismContracts.proposalTypesConfigurator.address.toLowerCase(),

@@ -1,9 +1,8 @@
 import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { OptimismContracts } from "@/lib/contracts/contracts";
-import { Prisma } from "@prisma/client";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { VotingPowerData } from "./votingPower";
+import { AdvancedVotingPowerPayload, VotingPowerData } from "./votingPower";
 import { DEPLOYMENT_NAME } from "@/lib/config";
 
 /**
@@ -30,7 +29,9 @@ async function getVotingPowerAtSnapshotByAddress({
   address: string;
   blockNumber: number;
 }): Promise<VotingPowerData> {
-  const votingPowerQuery = prisma.votingPowerSnaps.findFirst({
+  const votingPowerQuery = prisma[
+    `${DEPLOYMENT_NAME}VotingPowerSnaps`
+  ].findFirst({
     where: {
       delegate: address,
       block_number: {
@@ -44,7 +45,7 @@ async function getVotingPowerAtSnapshotByAddress({
 
   // This query pulls only partially delegated voting power
   const advancedVotingPowerQuery = prisma.$queryRawUnsafe<
-    Prisma.AdvancedVotingPowerGetPayload<true>[]
+    AdvancedVotingPowerPayload[]
   >(
     `
     SELECT
@@ -60,9 +61,9 @@ async function getVotingPowerAtSnapshotByAddress({
         FROM (
             SELECT chain_str
             FROM ${DEPLOYMENT_NAME + ".advanced_voting_power_raw_snaps"}
-            WHERE contract=$2
+            WHERE contract = $2
               AND block_number <= $3
-              AND delegate=$1
+              AND delegate = $1
             GROUP BY chain_str
         ) s
         LEFT JOIN LATERAL (
@@ -73,14 +74,14 @@ async function getVotingPowerAtSnapshotByAddress({
                 block_number
             FROM ${DEPLOYMENT_NAME + ".advanced_voting_power_raw_snaps"}
             WHERE chain_str=s.chain_str 
-              AND contract=$2
+              AND contract = $2
               AND block_number <= $3
             ORDER BY block_number DESC
             LIMIT 1
         ) AS a ON TRUE
         GROUP BY 1, 2
     ) t
-    WHERE delegate=$1;
+    WHERE delegate = $1;
     `,
     address,
     OptimismContracts.alligator.address.toLowerCase(),
@@ -118,14 +119,16 @@ async function getCurrentVotingPowerForAddress({
 }: {
   address: string;
 }): Promise<VotingPowerData> {
-  const votingPower = await prisma.votingPower.findFirst({
+  const votingPower = await prisma[`${DEPLOYMENT_NAME}VotingPower`].findFirst({
     where: {
       delegate: address,
     },
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+  const advancedVotingPower = await prisma[
+    `${DEPLOYMENT_NAME}AdvancedVotingPower`
+  ].findFirst({
     where: {
       delegate: address,
       contract: OptimismContracts.alligator.address.toLowerCase(),
@@ -163,7 +166,9 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
 }: {
   address: string;
 }): Promise<string> {
-  const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
+  const advancedVotingPower = await prisma[
+    `${DEPLOYMENT_NAME}AdvancedVotingPower`
+  ].findFirst({
     where: {
       delegate: address,
       contract: OptimismContracts.alligator.address.toLowerCase(),
@@ -226,7 +231,7 @@ async function isAddressDelegatingToProxy({
 }): Promise<boolean> {
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma.delegatees.findFirst({
+    prisma[`${DEPLOYMENT_NAME}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);

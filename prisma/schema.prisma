@@ -26,18 +26,7 @@ model DelegateStatements {
   @@schema("user_data")
 }
 
-model Contracts {
-  address       String        @id
-  chain         Chain?
-  contract_type ContractType?
-  dao           String
-  env           Env?
-
-  @@map("contracts")
-  @@schema("config")
-}
-
-view Votes {
+view OptimismVotes {
   transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
   voter            String
@@ -55,7 +44,7 @@ view Votes {
   @@schema("optimism")
 }
 
-view VotingPower {
+view OptimismVotingPower {
   delegate     String  @unique
   voting_power String?
 
@@ -63,14 +52,14 @@ view VotingPower {
   @@schema("optimism")
 }
 
-view VotableSupply {
+view OptimismVotableSupply {
   votable_supply String @unique
 
   @@map("votable_supply")
   @@schema("optimism")
 }
 
-view Delegates {
+view OptimismDelegates {
   delegate          String   @unique
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
@@ -81,7 +70,7 @@ view Delegates {
   @@schema("optimism")
 }
 
-view Proposals {
+view OptimismProposals {
   proposal_id        String       @unique
   contract           String?      @db.VarChar(42)
   proposer           String
@@ -101,7 +90,7 @@ view Proposals {
   @@schema("optimism")
 }
 
-view AdvancedDelegatees {
+view OptimismAdvancedDelegatees {
   pair             String  @unique
   from             String
   to               String
@@ -114,7 +103,7 @@ view AdvancedDelegatees {
   @@schema("optimism")
 }
 
-view AdvancedVotingPower {
+view OptimismAdvancedVotingPower {
   delegate           String   @unique
   vp_allowance       Decimal  @db.Decimal
   delegated_vp       Decimal  @db.Decimal
@@ -141,7 +130,7 @@ view advanced_voting_power_raw_snaps {
   @@schema("optimism")
 }
 
-view AuthorityChainsSnaps {
+view OptimismAuthorityChainsSnaps {
   id                   String   @unique
   delegate             String
   rules                Json[]
@@ -185,7 +174,7 @@ view subdelegations_snaps {
   @@schema("optimism")
 }
 
-view Delegatees {
+view OptimismDelegatees {
   delegator    String  @unique
   delegatee    String
   block_number BigInt
@@ -208,7 +197,7 @@ view direct_chains {
   @@schema("optimism")
 }
 
-view ProposalTypes {
+view OptimismProposalTypes {
   id                 String @unique
   contract           String @db.VarChar(42)
   block_number       BigInt
@@ -219,6 +208,30 @@ view ProposalTypes {
   inputs             Json
 
   @@map("proposal_types")
+  @@schema("optimism")
+}
+
+view OptimismVotingPowerSnaps {
+  id           String   @id
+  delegate     String?
+  balance      String?
+  block_number BigInt?
+  ordinal      Decimal? @db.Decimal
+
+  @@map("voting_power_snaps")
+  @@schema("optimism")
+}
+
+view OptimismVoterStats {
+  voter              String   @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+
+  @@map("voter_stats")
   @@schema("optimism")
 }
 
@@ -355,28 +368,15 @@ view subdelegation_events {
   @@schema("optimism")
 }
 
-view VotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+model Contracts {
+  address       String        @id
+  chain         Chain?
+  contract_type ContractType?
+  dao           String
+  env           Env?
 
-  @@map("voting_power_snaps")
-  @@schema("optimism")
-}
-
-view VoterStats {
-  voter              String   @unique
-  proposals_voted    BigInt?
-  participation_rate Float?
-  last_10_props      Decimal? @db.Decimal
-  for                BigInt?
-  abstain            BigInt?
-  against            BigInt?
-
-  @@map("voter_stats")
-  @@schema("optimism")
+  @@map("contracts")
+  @@schema("config")
 }
 
 enum DaoSlug {

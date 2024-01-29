@@ -1,11 +1,11 @@
 import { Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
-import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -23,15 +23,15 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const advancedDelegatees = await prisma.advancedDelegatees.findMany({
+  const advancedDelegatees = await prisma[
+    `${DEPLOYMENT_NAME}AdvancedDelegatees`
+  ].findMany({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
       contract: OptimismContracts.alligator.address.toLowerCase(),
     },
   });
-
-  console.log("advancedDelegatees result", advancedDelegatees);
 
   // const directDelegatee = await (async () => {
   //   const [proxyAddress, delegatee] = await Promise.all([
@@ -139,7 +139,9 @@ async function getCurrentDelegatorsForAddress({
 }: {
   address: string;
 }) {
-  const advancedDelegators = prisma.advancedDelegatees.findMany({
+  const advancedDelegators = prisma[
+    `${DEPLOYMENT_NAME}AdvancedDelegatees`
+  ].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
@@ -232,7 +234,7 @@ const getDirectDelegateeForAddress = async ({
 }) => {
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma.delegatees.findFirst({
+    prisma[`${DEPLOYMENT_NAME}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);

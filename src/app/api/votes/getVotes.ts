@@ -1,11 +1,10 @@
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
-import { VotesSort, VotesSortOrder } from "./vote";
+import { VotePayload, VotesSort, VotesSortOrder } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { Prisma } from "@prisma/client";
 import { getVotingPowerAtSnapshot } from "../voting-power/getVotingPower";
 import { getAuthorityChains } from "../authority-chains/getAuthorityChains";
 import { getDelegate } from "../delegates/getDelegates";
@@ -43,7 +42,7 @@ async function getVotesForDelegateForAddress({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.$queryRawUnsafe<Prisma.VotesGetPayload<true>[]>(
+      prisma.$queryRawUnsafe<VotePayload[]>(
         `
         SELECT * FROM (
           SELECT * FROM (
@@ -128,7 +127,7 @@ export async function getVotesForProposal({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.$queryRawUnsafe<Prisma.VotesGetPayload<true>[]>(
+      prisma.$queryRawUnsafe<VotePayload[]>(
         `
         SELECT * FROM (
           SELECT * FROM (
@@ -201,7 +200,7 @@ export async function getVotesForProposalAndDelegate({
   proposal_id: string;
   address: string;
 }) {
-  const votes = await prisma.votes.findMany({
+  const votes = await prisma[`${DEPLOYMENT_NAME}Votes`].findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 

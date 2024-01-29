@@ -1,12 +1,10 @@
-import "server-only";
-
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import {
-  AdvancedVotingPower,
-  Delegates,
+  OptimismAdvancedVotingPower,
+  OptimismDelegates,
+  OptimismVoterStats,
+  OptimismVotingPower,
   Prisma,
-  VoterStats,
-  VotingPower,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
@@ -17,6 +15,8 @@ import { getCurrentQuorum } from "../quorum/getQuorum";
 import { isCitizen } from "../citizens/isCitizen";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { DEPLOYMENT_NAME } from "@/lib/config";
+
+type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
 
 export async function getDelegates({
   page = 1,
@@ -33,7 +33,7 @@ export async function getDelegates({
     (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
-          return prisma.delegates.findMany({
+          return prisma[`${DEPLOYMENT_NAME}Delegates`].findMany({
             skip,
             take,
             orderBy: {
@@ -46,7 +46,7 @@ export async function getDelegates({
             },
           });
         case "weighted_random":
-          return prisma.$queryRawUnsafe<Prisma.DelegatesGetPayload<true>[]>(
+          return prisma.$queryRawUnsafe<DelegatesGetPaylod[]>(
             `
             SELECT *, setseed($1)::Text
             FROM ${DEPLOYMENT_NAME + ".delegates"}
@@ -60,7 +60,7 @@ export async function getDelegates({
             take
           );
         default:
-          return prisma.delegates.findMany({
+          return prisma[`${DEPLOYMENT_NAME}Delegates`].findMany({
             skip,
             take,
             orderBy: {
@@ -96,16 +96,16 @@ export async function getDelegates({
 }
 
 type DelegateStats = {
-  voter: VoterStats["voter"];
-  proposals_voted: VoterStats["proposals_voted"];
-  for: VoterStats["for"];
-  against: VoterStats["against"];
-  abstain: VoterStats["abstain"];
-  participation_rate: VoterStats["participation_rate"];
-  last_10_props: VoterStats["last_10_props"];
-  voting_power: VotingPower["voting_power"];
-  advanced_vp: AdvancedVotingPower["advanced_vp"];
-  num_of_delegators: Delegates["num_of_delegators"];
+  voter: OptimismVoterStats["voter"];
+  proposals_voted: OptimismVoterStats["proposals_voted"];
+  for: OptimismVoterStats["for"];
+  against: OptimismVoterStats["against"];
+  abstain: OptimismVoterStats["abstain"];
+  participation_rate: OptimismVoterStats["participation_rate"];
+  last_10_props: OptimismVoterStats["last_10_props"];
+  voting_power: OptimismVotingPower["voting_power"];
+  advanced_vp: OptimismAdvancedVotingPower["advanced_vp"];
+  num_of_delegators: OptimismDelegates["num_of_delegators"];
 };
 
 export async function getDelegate({
@@ -156,7 +156,7 @@ export async function getDelegate({
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
       (await delegateQuery)?.[0] || undefined,
-      prisma.votableSupply.findFirst({}),
+      prisma[`${DEPLOYMENT_NAME}VotableSupply`].findFirst({}),
       getDelegateStatement({ addressOrENSName }),
       getCurrentQuorum(),
       isCitizen(address),

@@ -1,7 +1,9 @@
 import prisma from "@/app/lib/prisma";
 import { DEPLOYMENT_NAME } from "@/lib/config";
 import { OptimismContracts } from "@/lib/contracts/contracts";
-import { AuthorityChainsSnaps, Prisma } from "@prisma/client";
+import { OptimismAuthorityChainsSnaps } from "@prisma/client";
+
+type AuthorityChainsSnaps = OptimismAuthorityChainsSnaps;
 
 export async function getAuthorityChains({
   address,
@@ -10,9 +12,7 @@ export async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const chains = await prisma.$queryRawUnsafe<
-    Prisma.AuthorityChainsSnapsGetPayload<true>[]
-  >(
+  const chains = await prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
       ac.chain,
@@ -43,7 +43,7 @@ export async function getAuthorityChains({
   );
 
   const reversedChains = chains
-    .map((chain: AuthorityChainsSnaps) => {
+    .map((chain) => {
       const chains = chain.chain.reverse();
       chains.push(chain.delegate);
       return chains;

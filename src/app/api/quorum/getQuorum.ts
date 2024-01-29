@@ -1,19 +1,11 @@
 import provider from "@/app/lib/provider";
-import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { DEPLOYMENT_NAME } from "@/lib/config";
-import { NounsContracts, OptimismContracts } from "@/lib/contracts/contracts";
+import { OptimismContracts } from "@/lib/contracts/contracts";
+import { ProposalPayload } from "../proposals/proposal";
 
-export async function getQuorumForProposal(
-  proposal: Prisma.ProposalsGetPayload<true>
-) {
+export async function getQuorumForProposal(proposal: ProposalPayload) {
   switch (DEPLOYMENT_NAME) {
-    case "nouns": {
-      if (!proposal) {
-        return null;
-      }
-      return NounsContracts.governor.contract.quorumVotes(proposal.proposal_id);
-    }
     case "optimism": {
       const contractQuorum = OptimismContracts.governor.contract.quorum(
         proposal.proposal_id
@@ -21,7 +13,9 @@ export async function getQuorumForProposal(
 
       // If no quorum is set, calculate it based on votable supply
       if (!contractQuorum) {
-        const votableSupply = await prisma.votableSupply.findFirst({});
+        const votableSupply = await prisma[
+          `${DEPLOYMENT_NAME}VotableSupply`
+        ].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
       }
 
