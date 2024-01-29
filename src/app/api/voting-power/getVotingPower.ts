@@ -58,7 +58,7 @@ async function getVotingPowerAtSnapshotByAddress({
             SUM(allowance) as vp_allowance
         FROM (
             SELECT chain_str
-            FROM center.advanced_voting_power_raw_snaps
+            FROM optimism.advanced_voting_power_raw_snaps
             WHERE contract=${OptimismContracts.alligator.address.toLowerCase()}
               AND block_number <= ${blockNumber}
               AND delegate=${address} 
@@ -70,7 +70,7 @@ async function getVotingPowerAtSnapshotByAddress({
                 allowance,
                 subdelegated_share,
                 block_number
-            FROM center.advanced_voting_power_raw_snaps
+            FROM optimism.advanced_voting_power_raw_snaps
             WHERE chain_str=s.chain_str 
               AND contract=${OptimismContracts.alligator.address.toLowerCase()}
               AND block_number <= ${blockNumber}

@@ -3,10 +3,9 @@ import "server-only";
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import {
   AdvancedVotingPower,
-  NumberOfDelegators,
+  Delegates,
   Prisma,
   VoterStats,
-  VoterStatsPayload,
   VotingPower,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
@@ -17,7 +16,6 @@ import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../quorum/getQuorum";
 import { isCitizen } from "../citizens/isCitizen";
 import { OptimismContracts } from "@/lib/contracts/contracts";
-import { Decimal, DefaultArgs } from "@prisma/client/runtime";
 
 export async function getDelegates({
   page = 1,
@@ -50,7 +48,7 @@ export async function getDelegates({
           return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
             Prisma.sql`
             SELECT *, setseed(${seed})::Text
-            FROM center.delegates
+            FROM optimism.delegates
             WHERE voting_power > 0
             ORDER BY -log(random()) / voting_power
             OFFSET ${skip}
@@ -75,8 +73,10 @@ export async function getDelegates({
     delegates.map(async (delegate) => {
       return {
         citizen: await isCitizen(delegate.delegate),
-        statement: await getDelegateStatement({ addressOrENSName: delegate.delegate })
-      }
+        statement: await getDelegateStatement({
+          addressOrENSName: delegate.delegate,
+        }),
+      };
     })
   );
 
@@ -87,13 +87,12 @@ export async function getDelegates({
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
-    }))
+    })),
   };
 }
 
 type DelegateStats = {
   voter: VoterStats["voter"];
-  proposals_created: VoterStats["proposals_created"];
   proposals_voted: VoterStats["proposals_voted"];
   for: VoterStats["for"];
   against: VoterStats["against"];
@@ -102,7 +101,7 @@ type DelegateStats = {
   last_10_props: VoterStats["last_10_props"];
   voting_power: VotingPower["voting_power"];
   advanced_vp: AdvancedVotingPower["advanced_vp"];
-  num_for_delegators: NumberOfDelegators["num_for_delegators"];
+  num_of_delegators: Delegates["num_of_delegators"];
 };
 
 export async function getDelegate({
@@ -118,7 +117,6 @@ export async function getDelegate({
     Prisma.sql`
     SELECT 
       voter,
-      proposals_created,
       proposals_voted,
       "for",
       "against",
@@ -127,17 +125,17 @@ export async function getDelegate({
       last_10_props,
       voting_power,
       advanced_vp,
-      num_for_delegators
+      num_of_delegators
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
-        (SELECT * FROM center.voter_stats WHERE voter = ${address}) a ON TRUE
+        (SELECT * FROM optimism.voter_stats WHERE voter = ${address}) a ON TRUE
     LEFT JOIN 
-        center.advanced_voting_power av ON av.delegate = ${address} AND contract = ${OptimismContracts.alligator.address.toLowerCase()}
+        optimism.advanced_voting_power av ON av.delegate = ${address} AND contract = ${OptimismContracts.alligator.address.toLowerCase()}
     LEFT JOIN 
-        (SELECT * FROM center.num_of_delegators nd WHERE delegate = ${address} LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM optimism.delegates nd WHERE delegate = ${address} LIMIT 1) b ON TRUE
     LEFT JOIN 
-        (SELECT * FROM center.voting_power vp WHERE vp.delegate = ${address} LIMIT 1) c ON TRUE
+        (SELECT * FROM optimism.voting_power vp WHERE vp.delegate = ${address} LIMIT 1) c ON TRUE
     `
   );
 
@@ -166,14 +164,14 @@ export async function getDelegate({
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
         : 0,
-    proposalsCreated: delegate?.proposals_created || 0n,
+    proposalsCreated: 0n,
     proposalsVotedOn: delegate?.proposals_voted || 0n,
-    votedFor: delegate?.for?.toFixed() || "0",
-    votedAgainst: delegate?.against?.toFixed() || "0",
-    votedAbstain: delegate?.abstain?.toFixed() || "0",
+    votedFor: delegate?.for?.toString() || "0",
+    votedAgainst: delegate?.against?.toString() || "0",
+    votedAbstain: delegate?.abstain?.toString() || "0",
     votingParticipation: delegate?.participation_rate || 0,
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
-    numOfDelegators: delegate?.num_for_delegators || 0n,
+    numOfDelegators: BigInt(delegate?.num_of_delegators?.toFixed(0) || 0n),
     statement: delegateStatement,
   };
 }

@@ -167,7 +167,7 @@ async function getCurrentDelegatorsForAddress({
   //           to_delegate as delegatee,
   //           block_number,
   //           ROW_NUMBER() OVER (PARTITION BY delegator ORDER BY block_number DESC, log_index DESC, transaction_index DESC) as rn
-  //       FROM center.delegate_changed_events
+  //       FROM optimism.delegate_changed_events
   //       WHERE to_delegate=${address.toLowerCase()}
   //     ) t1
   //     WHERE rn=1
@@ -177,7 +177,7 @@ async function getCurrentDelegatorsForAddress({
   //         COALESCE(SUM(
   //           CASE WHEN "from"=delegator THEN -"value"::NUMERIC ELSE "value"::NUMERIC END
   //         ), 0) AS balance
-  //       FROM center.transfer_events
+  //       FROM optimism.transfer_events
   //       WHERE "from"=delegator OR "to"=delegator
   //     ) t3 ON TRUE
   //     `

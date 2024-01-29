@@ -58,13 +58,13 @@ async function getVotesForDelegateForAddress({
           FROM (
             SELECT
               *
-              FROM center.vote_cast_events
+              FROM optimism.vote_cast_events
               WHERE voter = ${address.toLocaleLowerCase()}
             UNION ALL
               SELECT
                 *
               FROM
-                center.vote_cast_with_params_events
+                optimism.vote_cast_with_params_events
                 WHERE voter = ${address.toLocaleLowerCase()}
           ) t
           GROUP BY 2,3,4,8
@@ -74,9 +74,9 @@ async function getVotesForDelegateForAddress({
               proposals_mat.start_block,
               proposals_mat.description,
               proposals_mat.proposal_data,
-              proposals_mat.proposal_type::center.proposal_type AS proposal_type
+              proposals_mat.proposal_type::config.proposal_type AS proposal_type
             FROM
-              center.proposals_mat
+              optimism.proposals_mat
             WHERE
               proposals_mat.proposal_id = av.proposal_id) p ON TRUE
         ) q
@@ -141,13 +141,13 @@ export async function getVotesForProposal({
           FROM (
             SELECT
               *
-              FROM center.vote_cast_events
+              FROM optimism.vote_cast_events
               WHERE proposal_id = ${proposal_id}
             UNION ALL
               SELECT
                 *
               FROM
-                center.vote_cast_with_params_events
+                optimism.vote_cast_with_params_events
                 WHERE proposal_id = ${proposal_id}
           ) t
           GROUP BY 2,3,4,8
@@ -157,9 +157,9 @@ export async function getVotesForProposal({
               proposals_mat.start_block,
               proposals_mat.description,
               proposals_mat.proposal_data,
-              proposals_mat.proposal_type::center.proposal_type AS proposal_type
+              proposals_mat.proposal_type::config.proposal_type AS proposal_type
             FROM
-              center.proposals_mat
+              optimism.proposals_mat
             WHERE
               proposals_mat.proposal_id = ${proposal_id}) p ON TRUE
         ) q

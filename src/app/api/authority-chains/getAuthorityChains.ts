@@ -20,11 +20,11 @@ export async function getAuthorityChains({
       ac.balance,
       ac.balance_block_number,
       ac.allowance
-    FROM center.authority_chains_snaps ac
+    FROM optimism.authority_chains_snaps ac
     CROSS JOIN LATERAL (
       SELECT
         MAX(balance_block_number) AS max_block_number
-      FROM center.authority_chains_snaps
+      FROM optimism.authority_chains_snaps
       WHERE chain = ac.chain
         AND delegate = ${address.toLowerCase()}
         AND contract = ${OptimismContracts.alligator.address.toLowerCase()}
