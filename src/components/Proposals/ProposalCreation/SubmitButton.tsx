@@ -83,8 +83,10 @@ export default function SubmitButton({
 
   return (
     <>
-      {error?.message ? (
-        <p className="text-red-700 text-sm max-w-[420px]">{error?.message}</p>
+      {onPrepareError ? (
+        <p className="text-red-700 text-sm max-w-[420px]">
+          {error?.message || JSON.stringify(error)}
+        </p>
       ) : (
         <p className={styles.create_prop_form__submit_text}>
           Only the Optimism Foundation manager address can create proposals for
