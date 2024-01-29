@@ -32,7 +32,11 @@ export default function SubmitButton({
   const { setOpen } = useModal();
   const [isClient, setIsClient] = useState(false);
 
-  const { config, isError: onPrepareError } = usePrepareContractWrite({
+  const {
+    config,
+    isError: onPrepareError,
+    error,
+  } = usePrepareContractWrite({
     address: governorContract.address as any,
     abi: governorContract.abi,
     functionName: governorFunction,
@@ -78,26 +82,36 @@ export default function SubmitButton({
   }, []);
 
   return (
-    <Button
-      type="submit"
-      variant={"outline"}
-      disabled={isLoading || onPrepareError}
-      className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
-      onClick={(e) => {
-        e.preventDefault();
-        if (!isConnected) {
-          setOpen(true);
-          return;
-        }
-        if (formTarget.current?.checkValidity() && !onPrepareError) {
-          formTarget.current?.reportValidity();
-          submitProposal();
-        }
-      }}
-    >
-      {/* hack to suppress Suspense boundary error */}
-      {isClient && isConnected ? "Submit proposal" : "Connect wallet"}
-    </Button>
+    <>
+      {error?.message ? (
+        <p className="text-red-700 text-sm max-w-[420px]">{error?.message}</p>
+      ) : (
+        <p className={styles.create_prop_form__submit_text}>
+          Only the Optimism Foundation manager address can create proposals for
+          the time being.
+        </p>
+      )}
+      <Button
+        type="submit"
+        variant={"outline"}
+        disabled={isLoading || onPrepareError}
+        className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
+        onClick={(e) => {
+          e.preventDefault();
+          if (!isConnected) {
+            setOpen(true);
+            return;
+          }
+          if (formTarget.current?.checkValidity() && !onPrepareError) {
+            formTarget.current?.reportValidity();
+            submitProposal();
+          }
+        }}
+      >
+        {/* hack to suppress Suspense boundary error */}
+        {isClient && isConnected ? "Submit proposal" : "Connect wallet"}
+      </Button>
+    </>
   );
 }
 
