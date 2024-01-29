@@ -1,6 +1,7 @@
 "use server";
 
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
+import { type RetroPGFProject } from "@/lib/types";
 
 export async function getRetroPGFResults(
   { endCursor = "", search = "", category = null, orderBy = "mostAwarded" }:
@@ -57,4 +58,65 @@ export async function getRetroPGFResults(
   const response = await fetch(url, options);
   const data = await response.json();
   return data.data.retroPGF.projects;
+}
+
+export async function getResultsProjectId(id: string): Promise<RetroPGFProject> {
+  const query = `
+      {
+        retroPGF {
+          project(id: "${id}") {
+            id
+            bio
+            impactCategory
+            displayName
+            websiteUrl
+            applicant {
+              address {
+                address
+              }
+              id
+            }
+            applicantType
+            profile {
+              profileImageUrl
+              bannerImageUrl
+              id
+            }
+            includedInBallots
+            impactDescription
+            contributionDescription
+            contributionLinks {
+              type
+              url
+              description
+            }
+            impactMetrics {
+              description
+              number
+              url
+            }
+            fundingSources {
+              type
+              currency
+              amount
+              description
+            }
+          }
+        }
+      }
+    `;
+
+  const url = "https://optimism-agora-prod.agora-prod.workers.dev/graphql";
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ query }),
+  };
+
+  const response = await fetch(url, options);
+  const data = await response.json();
+  return data.data.retroPGF.project;
 }

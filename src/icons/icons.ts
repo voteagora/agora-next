@@ -24,7 +24,9 @@ import sunny from "./sunny.svg";
 import projectPlaceholder from "./projectPlaceholder.svg";
 import search from "./search.svg";
 import shareCard from "./shareCard.svg";
-
+import scroll from "./scroll.svg";
+import github from "./github.svg";
+import world from "./world.svg";
 
 export const icons = {
   badge,
@@ -52,5 +54,8 @@ export const icons = {
   sunny,
   projectPlaceholder,
   search,
-  shareCard
+  shareCard,
+  scroll,
+  github,
+  world
 };

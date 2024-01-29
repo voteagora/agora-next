@@ -2,6 +2,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import shareCard from "@/icons/shareCard.svg";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
 import Image from "next/image";
+import Link from "next/link";
 
 function parseProjectId(projectId: string) {
   return projectId.split("|")[1];
@@ -25,20 +26,20 @@ export default function RetroPGFShareCardDialog({
   displayName,
   id,
   profileImageUrl,
+  closeDialog,
 }: {
   awarded: string;
   displayName: string;
   id: string;
   profileImageUrl: string | null;
+  closeDialog: () => void;
 }) {
   return (
     <VStack className="items-center justify-center p-8 h-full relative w-[100vw]">
-      {/* TODO: frh -> update once application page is done */}
-      <a
-        href={`https://optimism-agora-prod.agora-prod.workers.dev/retropgf/3/application/${parseProjectId(
-          id
-        )}`}
-        className="p-8 relative flex w-[320px] sm:w-[800px] bottom-[20vh] "
+      <Link
+        onClick={closeDialog}
+        href={`/retropgf/3/application/${parseProjectId(id)}`}
+        className="p-8 relative flex w-[320px] sm:w-[800px] bottom-[20vh]"
       >
         <Image
           src={shareCard}
@@ -71,7 +72,7 @@ export default function RetroPGFShareCardDialog({
             <h1 className="text-red-600 font-bold">OP</h1>
           </HStack>
         </VStack>
-      </a>
+      </Link>
     </VStack>
   );
 }
