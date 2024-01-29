@@ -17,11 +17,13 @@ type Props = {
   children: ReactNode;
 };
 
-const Modal: FC<{ open: boolean; onClose: () => void } & Props> = ({
-  open,
-  children,
-  onClose,
-}) => {
+const Modal: FC<
+  {
+    open: boolean;
+    onClose: () => void;
+    transparent: boolean | undefined;
+  } & Props
+> = ({ open, children, onClose, transparent }) => {
   if (!open) return null;
 
   return (
@@ -31,7 +33,7 @@ const Modal: FC<{ open: boolean; onClose: () => void } & Props> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className={styles.dialog}
+          className={transparent ? styles.dialog_transparent : styles.dialog}
           onClick={onClose}
         >
           <motion.div
@@ -39,7 +41,11 @@ const Modal: FC<{ open: boolean; onClose: () => void } & Props> = ({
             animate={{ scale: 1, y: 0 }}
             transition={{ duration: 0.1, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
-            className={styles.dialog_content}
+            className={
+              transparent
+                ? styles.dialog_transparent_content
+                : styles.dialog_content
+            }
           >
             {children}
           </motion.div>
@@ -60,7 +66,11 @@ export const DialogProvider: FC<Props> = ({ children }) => {
 
   return (
     <DialogContext.Provider value={setCurrentDialog}>
-      <Modal open={!!currentDialog} onClose={() => setCurrentDialog(null)}>
+      <Modal
+        open={!!currentDialog}
+        onClose={() => setCurrentDialog(null)}
+        transparent={(currentDialog as { transparent?: boolean })?.transparent}
+      >
         {renderedDialog}
       </Modal>
       {children}
