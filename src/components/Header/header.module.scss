@@ -46,7 +46,7 @@
   border: 1px solid $gray-eb;
   background-color: $gray-fa;
   font-weight: $font-weight-medium;
-  padding: 0 $spacing-4;
+  padding: 8px 16px;
   border-radius: $border-radius-full;
   cursor: pointer;
   display: flex;
@@ -87,7 +87,7 @@
 
 .desktop {
   &__button {
-    padding: $spacing-2;
+    padding: 0 $spacing-2;
     outline: none;
   }
 
