@@ -16,6 +16,7 @@ import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../quorum/getQuorum";
 import { isCitizen } from "../citizens/isCitizen";
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 
 export async function getDelegates({
   page = 1,
@@ -45,15 +46,18 @@ export async function getDelegates({
             },
           });
         case "weighted_random":
-          return prisma.$queryRaw<Prisma.DelegatesGetPayload<true>[]>(
-            Prisma.sql`
-            SELECT *, setseed(${seed})::Text
-            FROM optimism.delegates
+          return prisma.$queryRawUnsafe<Prisma.DelegatesGetPayload<true>[]>(
+            `
+            SELECT *, setseed($1)::Text
+            FROM ${DEPLOYMENT_NAME + ".delegates"}
             WHERE voting_power > 0
             ORDER BY -log(random()) / voting_power
-            OFFSET ${skip}
-            LIMIT ${take};
-            `
+            OFFSET $2
+            LIMIT $3;
+            `,
+            seed,
+            skip,
+            take
           );
         default:
           return prisma.delegates.findMany({
@@ -113,8 +117,8 @@ export async function getDelegate({
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
 
-  const delegateQuery = prisma.$queryRaw<DelegateStats[]>(
-    Prisma.sql`
+  const delegateQuery = prisma.$queryRawUnsafe<DelegateStats[]>(
+    `
     SELECT 
       voter,
       proposals_voted,
@@ -129,14 +133,24 @@ export async function getDelegate({
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
-        (SELECT * FROM optimism.voter_stats WHERE voter = ${address}) a ON TRUE
+        (SELECT * FROM ${
+          DEPLOYMENT_NAME + ".voter_stats"
+        } WHERE voter = $1) a ON TRUE
     LEFT JOIN 
-        optimism.advanced_voting_power av ON av.delegate = ${address} AND contract = ${OptimismContracts.alligator.address.toLowerCase()}
+      ${
+        DEPLOYMENT_NAME + ".advanced_voting_power"
+      } av ON av.delegate = $1 AND contract = $2
     LEFT JOIN 
-        (SELECT num_of_delegators FROM optimism.delegates nd WHERE delegate = ${address} LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${
+          DEPLOYMENT_NAME + ".delegates"
+        } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN 
-        (SELECT * FROM optimism.voting_power vp WHERE vp.delegate = ${address} LIMIT 1) c ON TRUE
-    `
+        (SELECT * FROM ${
+          DEPLOYMENT_NAME + ".voting_power"
+        } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
+    `,
+    address,
+    OptimismContracts.alligator.address.toLowerCase()
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =

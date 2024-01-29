@@ -4,6 +4,7 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 import { Prisma } from "@prisma/client";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData } from "./votingPower";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 
 /**
  * Voting Power at a given block number
@@ -42,10 +43,10 @@ async function getVotingPowerAtSnapshotByAddress({
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPowerQuery = prisma.$queryRaw<
+  const advancedVotingPowerQuery = prisma.$queryRawUnsafe<
     Prisma.AdvancedVotingPowerGetPayload<true>[]
   >(
-    Prisma.sql`
+    `
     SELECT
       delegate,
       vp_allowance,
@@ -58,10 +59,10 @@ async function getVotingPowerAtSnapshotByAddress({
             SUM(allowance) as vp_allowance
         FROM (
             SELECT chain_str
-            FROM optimism.advanced_voting_power_raw_snaps
-            WHERE contract=${OptimismContracts.alligator.address.toLowerCase()}
-              AND block_number <= ${blockNumber}
-              AND delegate=${address} 
+            FROM ${DEPLOYMENT_NAME + ".advanced_voting_power_raw_snaps"}
+            WHERE contract=$2
+              AND block_number <= $3
+              AND delegate=$1
             GROUP BY chain_str
         ) s
         LEFT JOIN LATERAL (
@@ -70,17 +71,20 @@ async function getVotingPowerAtSnapshotByAddress({
                 allowance,
                 subdelegated_share,
                 block_number
-            FROM optimism.advanced_voting_power_raw_snaps
+            FROM ${DEPLOYMENT_NAME + ".advanced_voting_power_raw_snaps"}
             WHERE chain_str=s.chain_str 
-              AND contract=${OptimismContracts.alligator.address.toLowerCase()}
-              AND block_number <= ${blockNumber}
+              AND contract=$2
+              AND block_number <= $3
             ORDER BY block_number DESC
             LIMIT 1
         ) AS a ON TRUE
         GROUP BY 1, 2
     ) t
-    WHERE delegate=${address};
-    `
+    WHERE delegate=$1;
+    `,
+    address,
+    OptimismContracts.alligator.address.toLowerCase(),
+    blockNumber
   );
 
   const [votingPower, advancedVotingPower] = await Promise.all([

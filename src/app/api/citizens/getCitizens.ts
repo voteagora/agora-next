@@ -4,6 +4,7 @@ import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 
 type citizen = {
   address: string;
@@ -28,30 +29,39 @@ export async function getCitizens({
   const { meta, data: _citizens } = await paginatePrismaResult(
     (skip: number, take: number) => {
       if (sort === "shuffle") {
-        return prisma.$queryRaw<citizen[]>(
-          Prisma.sql`
-            SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power, setseed(${seed})::Text
+        return prisma.$queryRawUnsafe<citizen[]>(
+          `
+            SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power, setseed($1)::Text
             FROM center.address_metadata address_metadata
-            JOIN optimism.delegates delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+            JOIN ${
+              DEPLOYMENT_NAME + ".delegates"
+            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
             ORDER BY random()
-            OFFSET ${skip}
-            LIMIT ${take};
-            `
+            OFFSET $2
+            LIMIT $3;
+            `,
+          seed,
+          skip,
+          take
         );
       } else {
-        return prisma.$queryRaw<citizen[]>(
-          Prisma.sql`
+        return prisma.$queryRawUnsafe<citizen[]>(
+          `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM center.address_metadata address_metadata
-            JOIN optimism.delegates delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+            JOIN ${
+              DEPLOYMENT_NAME + ".delegates"
+            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
             ORDER BY delegate.voting_power DESC
-            OFFSET ${skip}
-            LIMIT ${take};
-          `
+            OFFSET $1
+            LIMIT $2;
+          `,
+          skip,
+          take
         );
       }
     },

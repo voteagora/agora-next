@@ -9,6 +9,7 @@ import { Prisma } from "@prisma/client";
 import { getVotingPowerAtSnapshot } from "../voting-power/getVotingPower";
 import { getAuthorityChains } from "../authority-chains/getAuthorityChains";
 import { getDelegate } from "../delegates/getDelegates";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 
 export const getVotesForDelegate = ({
   addressOrENSName,
@@ -42,8 +43,8 @@ async function getVotesForDelegateForAddress({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
-        Prisma.sql`
+      prisma.$queryRawUnsafe<Prisma.VotesGetPayload<true>[]>(
+        `
         SELECT * FROM (
           SELECT * FROM (
           SELECT 
@@ -58,14 +59,13 @@ async function getVotesForDelegateForAddress({
           FROM (
             SELECT
               *
-              FROM optimism.vote_cast_events
-              WHERE voter = ${address.toLocaleLowerCase()}
+              FROM ${DEPLOYMENT_NAME + ".vote_cast_events"}
+              WHERE voter = $1
             UNION ALL
               SELECT
                 *
-              FROM
-                optimism.vote_cast_with_params_events
-                WHERE voter = ${address.toLocaleLowerCase()}
+              FROM ${DEPLOYMENT_NAME + ".vote_cast_with_params_events"}
+              WHERE voter = $1
           ) t
           GROUP BY 2,3,4,8
           ) av
@@ -76,14 +76,17 @@ async function getVotesForDelegateForAddress({
               proposals_mat.proposal_data,
               proposals_mat.proposal_type::config.proposal_type AS proposal_type
             FROM
-              optimism.proposals_mat
+              ${DEPLOYMENT_NAME + ".proposals_mat"} proposals_mat
             WHERE
               proposals_mat.proposal_id = av.proposal_id) p ON TRUE
         ) q
         ORDER BY block_number DESC
-        OFFSET ${skip}
-        LIMIT ${take};
-      `
+        OFFSET $2
+        LIMIT $3;
+      `,
+        address.toLocaleLowerCase(),
+        skip,
+        take
       ),
     page,
     pageSize
@@ -113,7 +116,7 @@ async function getVotesForDelegateForAddress({
 export async function getVotesForProposal({
   proposal_id,
   page = 1,
-  sort = "block_number",
+  sort = "weight",
   sortOrder = "desc",
 }: {
   proposal_id: string;
@@ -125,8 +128,8 @@ export async function getVotesForProposal({
 
   const { meta, data: votes } = await paginatePrismaResult(
     (skip: number, take: number) =>
-      prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
-        Prisma.sql`
+      prisma.$queryRawUnsafe<Prisma.VotesGetPayload<true>[]>(
+        `
         SELECT * FROM (
           SELECT * FROM (
           SELECT 
@@ -141,14 +144,13 @@ export async function getVotesForProposal({
           FROM (
             SELECT
               *
-              FROM optimism.vote_cast_events
-              WHERE proposal_id = ${proposal_id}
+            FROM ${DEPLOYMENT_NAME + ".vote_cast_events"}
+            WHERE proposal_id = $1
             UNION ALL
-              SELECT
-                *
-              FROM
-                optimism.vote_cast_with_params_events
-                WHERE proposal_id = ${proposal_id}
+            SELECT
+              *
+            FROM ${DEPLOYMENT_NAME + ".vote_cast_with_params_events"}
+            WHERE proposal_id = $1
           ) t
           GROUP BY 2,3,4,8
           ) av
@@ -158,15 +160,16 @@ export async function getVotesForProposal({
               proposals_mat.description,
               proposals_mat.proposal_data,
               proposals_mat.proposal_type::config.proposal_type AS proposal_type
-            FROM
-              optimism.proposals_mat
-            WHERE
-              proposals_mat.proposal_id = ${proposal_id}) p ON TRUE
+            FROM ${DEPLOYMENT_NAME + ".proposals_mat"} proposals_mat
+            WHERE proposals_mat.proposal_id = $1) p ON TRUE
         ) q
-        ORDER BY weight DESC
-        OFFSET ${skip}
-        LIMIT ${take};
-      `
+        ORDER BY ${sort} DESC
+        OFFSET $2
+        LIMIT $3;
+      `,
+        proposal_id,
+        skip,
+        take
       ),
     page,
     pageSize

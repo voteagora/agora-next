@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { DEPLOYMENT_NAME } from "@/lib/config";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { AuthorityChainsSnaps, Prisma } from "@prisma/client";
 
@@ -9,10 +10,10 @@ export async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const chains = await prisma.$queryRaw<
+  const chains = await prisma.$queryRawUnsafe<
     Prisma.AuthorityChainsSnapsGetPayload<true>[]
   >(
-    Prisma.sql`
+    `
     SELECT
       ac.chain,
       ac.rules,
@@ -20,22 +21,25 @@ export async function getAuthorityChains({
       ac.balance,
       ac.balance_block_number,
       ac.allowance
-    FROM optimism.authority_chains_snaps ac
+    FROM ${DEPLOYMENT_NAME + ".authority_chains_snaps"} ac
     CROSS JOIN LATERAL (
       SELECT
         MAX(balance_block_number) AS max_block_number
-      FROM optimism.authority_chains_snaps
+      FROM ${DEPLOYMENT_NAME + ".authority_chains_snaps"}
       WHERE chain = ac.chain
-        AND delegate = ${address.toLowerCase()}
-        AND contract = ${OptimismContracts.alligator.address.toLowerCase()}
-        AND balance_block_number <= ${blockNumber}
+        AND delegate = $1
+        AND contract = $2
+        AND balance_block_number <= $3
     ) AS max_blocks
-    WHERE ac.delegate = ${address.toLowerCase()}
-      AND ac.contract = ${OptimismContracts.alligator.address.toLowerCase()}
+    WHERE ac.delegate = $1
+      AND ac.contract = $2
       AND ac.balance_block_number = max_blocks.max_block_number
       AND ac.balance > 0
       AND ac.allowance > 0;
-    `
+    `,
+    address.toLowerCase(),
+    OptimismContracts.alligator.address.toLowerCase(),
+    blockNumber
   );
 
   const reversedChains = chains
