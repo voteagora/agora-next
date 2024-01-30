@@ -24,7 +24,7 @@ export function DelegateButton({
           params: {
             delegate,
             fetchBalanceForDirectDelegation,
-            fetchDirectDelegatee: fetchDirectDelegatee,
+            fetchDirectDelegatee,
           },
         });
       }}
