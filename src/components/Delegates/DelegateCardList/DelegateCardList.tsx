@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-import { Delegatees } from "@prisma/client";
+// import { Delegatees } from "@prisma/client";
 import Link from "next/link";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { useAccount } from "wagmi";
@@ -29,15 +29,13 @@ interface DelegatePaginated {
 interface Props {
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number) => Promise<DelegatePaginated>;
-  fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
-  getDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
+  fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  fetchDirectDelegatee,
-  getDelegators,
+  fetchDelegators,
 }: Props) {
   const router = useRouter();
   const fetching = useRef(false);
@@ -49,7 +47,7 @@ export default function DelegateCardList({
   const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
     let fetchedDelegators;
     try {
-      fetchedDelegators = await getDelegators(addressOrENSName);
+      fetchedDelegators = await fetchDelegators(addressOrENSName);
     } catch (error) {
       fetchedDelegators = null;
     }
