@@ -67,7 +67,7 @@ export default async function Page({
         {statement && <TopIssues statement={statement} />}
         <DelegationsContainer delegatees={delegatees} delegators={delegators} />
 
-        {/* TODO: frh -> this could be refactor with revalidatePath */}
+        {/* TODO: -> this could be refactor with revalidatePath */}
         <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
