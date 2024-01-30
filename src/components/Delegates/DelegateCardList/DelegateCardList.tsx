@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-// import { Delegatees } from "@prisma/client";
 import Link from "next/link";
 import { Delegation } from "@/app/api/delegations/delegation";
 import { useAccount } from "wagmi";

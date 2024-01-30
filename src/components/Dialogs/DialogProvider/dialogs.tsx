@@ -9,9 +9,9 @@ import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelega
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
-import { Delegatees } from "@prisma/client";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
+import { DelegateePayload } from "@/app/api/delegations/delegation";
 
 export type DialogType =
   | DelegateDialogType
@@ -28,7 +28,9 @@ export type DelegateDialogType = {
     fetchBalanceForDirectDelegation: (
       addressOrENSName: string
     ) => Promise<bigint>;
-    fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+    fetchDirectDelegatee: (
+      addressOrENSName: string
+    ) => Promise<DelegateePayload | null>;
   };
 };
 
