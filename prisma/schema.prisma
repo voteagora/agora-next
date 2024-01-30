@@ -38,81 +38,6 @@ model address_metadata {
   @@schema("center")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view kent_proposal_stats_test {
-  proposal_id                String?
-  proposer                   String?
-  description                String?
-  created_at                 String?
-  end_block                  String?
-  deadline                   String?
-  quorum                     String?
-  cancelled_at               BigInt?
-  executed_at                BigInt?
-  total_votes                BigInt?
-  total_voting_power         Decimal? @db.Decimal
-  total_voting_power_for     Decimal? @db.Decimal
-  total_voting_power_against Decimal? @db.Decimal
-  total_voting_power_abstain Decimal? @db.Decimal
-  total_votes_for            BigInt?
-  total_votes_against        BigInt?
-  total_votes_abstain        BigInt?
-  total_votes_with_reason    BigInt?
-  status                     String?
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view proposals_chronological_desc {
-  block_number BigInt?
-  proposal_id  String?
-  proposer     String?
-  start_block  String?
-  end_block    String?
-  description  String?
-  inputs       Json?
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view charlie_delegates_test {
-  address            String?
-  tokens_owned       Decimal? @db.Decimal
-  tokens_represented Decimal? @db.Decimal
-  total_voting_power Decimal? @db.Decimal
-  delegators         String[]
-  delegatees         BigInt?
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view charlie_voting_power_snapshot {
-  proposal_id  String?
-  address      String?
-  voting_power Decimal? @db.Decimal
-
-  @@ignore
-  @@schema("center")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view charlie_events_all {
-  event_type   String?
-  block_number BigInt?
-  executor     String?
-  details      String?
-  inputs       Json?
-
-  @@ignore
-  @@schema("center")
-}
-
 view ProposalsData {
   block_number     BigInt?
   transaction_hash String  @unique @db.VarChar(66)
@@ -142,13 +67,6 @@ view Votes {
   proposal_type    ProposalType
 
   @@map("votes")
-  @@schema("center")
-}
-
-view NumberOfProposals {
-  num_of_props BigInt @unique
-
-  @@map("num_of_props")
   @@schema("center")
 }
 
@@ -331,42 +249,6 @@ view Delegatees {
   balance      Decimal @db.Decimal
 
   @@map("delegatees")
-  @@schema("center")
-}
-
-view DelegateChangedEvents {
-  network           Unsupported("network")?
-  sighash           String?                 @db.VarChar(66)
-  address           String?                 @db.VarChar(42)
-  block_number      BigInt?
-  block_hash        String?                 @db.VarChar(66)
-  log_index         Int?
-  transaction_index Int?
-  transaction_hash  String                  @unique @db.VarChar(66)
-  delegator         String?
-  from_delegate     String?
-  to_delegate       String?
-  inputs            Json?
-
-  @@map("delegate_changed_events")
-  @@schema("center")
-}
-
-view TransferEvents {
-  network           Unsupported("network")?
-  sighash           String?                 @db.VarChar(66)
-  address           String?                 @db.VarChar(42)
-  block_number      BigInt?
-  block_hash        String?                 @db.VarChar(66)
-  log_index         Int?
-  transaction_index Int?
-  transaction_hash  String                  @unique @db.VarChar(66)
-  from              String?
-  to                String?
-  value             String?
-  inputs            Json?
-
-  @@map("transfer_events")
   @@schema("center")
 }
 
