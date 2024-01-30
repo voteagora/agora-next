@@ -11,10 +11,10 @@ const DraftProposalFormSubmit: React.FC = () => {
     <div className="">
       <AccordionItem
         value="draft-submit"
-        className="w-full rounded-2xl border border-gray-eo"
+        className="w-full rounded-2xl border border-gray-eo shadow-sm"
       >
         <AccordionTrigger>
-          <h2 className="text-2xl font-bold">Submit proposal</h2>
+          <h2 className="text-2xl font-black">Submit proposal</h2>
         </AccordionTrigger>
         <AccordionContent>
           <p>test content</p>
