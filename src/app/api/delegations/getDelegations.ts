@@ -6,6 +6,12 @@ import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "../voting-power/getVotingPower";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -249,3 +255,14 @@ export const getDirectDelegatee = ({
 }: {
   addressOrENSName: string;
 }) => addressOrEnsNameWrap(getDirectDelegateeForAddress, addressOrENSName);
+
+export const getAllForAForAdvancedDelegation = async (address: string) => {
+  return await Promise.all([
+    getVotingPowerAvailableForSubdelegation({ addressOrENSName: address }),
+    isDelegatingToProxy({ addressOrENSName: address }),
+    getCurrentDelegatees({ addressOrENSName: address }),
+    getProxy({ addressOrENSName: address }),
+    getCurrentDelegators({ addressOrENSName: address }),
+    getVotingPowerAvailableForDirectDelegation({ addressOrENSName: address }),
+  ]);
+};

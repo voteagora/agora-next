@@ -54,12 +54,12 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
-      <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+    <div className="flex flex-col items-center justify-between w-full max-w-full gap-6 mt-12 xl:flex-row xl:items-start">
+      <VStack className="static w-full xl:sticky top-16 shrink-0 xl:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
 
-      <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full gap-8">
+      <VStack className="flex-1 max-w-full min-w-0 gap-8 xl:ml-12">
         <DelegateStatementContainer
           addressOrENSName={addressOrENSName}
           statement={statement}
