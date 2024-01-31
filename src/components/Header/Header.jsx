@@ -14,10 +14,16 @@ async function fetchDelegate(addressOrENSName) {
 export default function Header() {
   return (
     <VStack>
-      <HStack className="main_header" justifyContent="justify-between">
-        <LogoLink instance_name="Optimism" />
-        <Navbar />
-        <ConnectButton fetchDelegate={fetchDelegate} />
+      <HStack className="flex flex-row w-full items-center">
+        <div className="w-full flex justify-start">
+          <LogoLink instance_name="Optimism" />
+        </div>
+        <div className="w-full flex justify-center">
+          <Navbar />
+        </div>
+        <div className="min-w-[24px] sm:w-full flex justify-end">
+          <ConnectButton fetchDelegate={fetchDelegate} />
+        </div>
       </HStack>
     </VStack>
   );

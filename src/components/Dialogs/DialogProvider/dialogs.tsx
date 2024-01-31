@@ -7,6 +7,7 @@ import {
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
+import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
 import { Proposal } from "@/app/api/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { Delegatees } from "@prisma/client";
@@ -18,7 +19,8 @@ export type DialogType =
   | CastProposalDialogType
   | CastVoteDialogType
   | AdvancedDelegateDialogType
-  | ApprovalCastVoteDialogType;
+  | ApprovalCastVoteDialogType
+  | RetroPGFShareCardDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -50,6 +52,17 @@ export type CastProposalDialogType = {
     isError: boolean;
     isSuccess: boolean;
     txHash?: string;
+  };
+};
+
+export type RetroPGFShareCardDialog = {
+  transparent: boolean;
+  type: "RETROPGF_SHARE_CARD";
+  params: {
+    awarded: string;
+    displayName: string;
+    id: string;
+    profileImageUrl: string | null;
   };
 };
 
@@ -171,6 +184,30 @@ export const dialogs: DialogDefinitions<DialogType> = {
         votingPower={votingPower}
         authorityChains={authorityChains}
         missingVote={missingVote}
+      />
+    );
+  },
+  RETROPGF_SHARE_CARD: (
+    {
+      awarded,
+      displayName,
+      id,
+      profileImageUrl,
+    }: {
+      awarded: string;
+      displayName: string;
+      id: string;
+      profileImageUrl: string | null;
+    },
+    closeDialog
+  ) => {
+    return (
+      <RetroPGFShareCardDialog
+        awarded={awarded}
+        displayName={displayName}
+        id={id}
+        profileImageUrl={profileImageUrl}
+        closeDialog={closeDialog}
       />
     );
   },

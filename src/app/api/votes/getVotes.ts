@@ -191,6 +191,46 @@ export async function getVotesForProposal({
   };
 }
 
+export async function getUserVotesForProposal({
+  proposal_id,
+  address,
+}: {
+  proposal_id: string;
+  address: string;
+}) {
+  const votes = await prisma.$queryRaw<Prisma.VotesGetPayload<true>[]>(
+    Prisma.sql`
+    SELECT 
+      STRING_AGG(transaction_hash,'|') as transaction_hash,
+      proposal_id,
+      proposal_type,
+      proposal_data,
+      voter,
+      support,
+      SUM(weight::numeric) as weight,
+      STRING_AGG(distinct reason, '\n --------- \n') as reason,
+      MAX(block_number) as block_number,
+      params
+    FROM center.votes
+    WHERE proposal_id = ${proposal_id} AND voter = ${address.toLowerCase()}
+    GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
+    `
+  );
+
+  const latestBlock = await provider.getBlock("latest");
+
+  return votes.map((vote) =>
+    parseVote(
+      vote,
+      parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      ),
+      latestBlock
+    )
+  );
+}
+
 export async function getVotesForProposalAndDelegate({
   proposal_id,
   address,

@@ -26,9 +26,9 @@ export function ConnectButton({ fetchDelegate }: Props) {
   }, [address, fetchDelegate]);
 
   return (
-    <>
+    <div>
       <MobileConnectButton delegate={delegate} />
       <DesktopConnectButton delegate={delegate} />
-    </>
+    </div>
   );
 }

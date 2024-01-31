@@ -31,4 +31,35 @@ export const delegatesVotesSortOptions = {
   },
 };
 
+export const retroPGFCategories = {
+  ALL: {
+    filter: "All projects"
+  },
+  COLLECTIVE_GOVERNANCE: {
+    text: "Collective Governance",
+    filter: "Collective Governance (104)"
+  },
+  DEVELOPER_ECOSYSTEM: {
+    text: "Developer Ecosystem",
+    filter: "Developer Ecosystem (304)"
+  },
+  END_USER_EXPERIENCE_AND_ADOPTION: {
+    text: "End UX & Adoption",
+    filter: "End User Experience & Adoption (472)"
+  },
+  OP_STACK: {
+    text: "OP Stack",
+    filter: "OP Stack (165)"
+  }
+};
+
+export const retroPGFSort = {
+  mostAwarded: "by most RPGF received",
+  alphabeticalAZ: "Alphabetical (A-Z)",
+  alphabeticalZA: "Alphabetical (Z-A)",
+  shuffle: "Shuffle",
+  byIncludedInBallots: "Least in ballots",
+  mostInBallots: "Most in ballots",
+};
+
 export const disapprovalThreshold = 12;

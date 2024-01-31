@@ -6,6 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import {
   getVotesForProposalAndDelegate,
   getVotesForProposal,
+  getUserVotesForProposal,
   getAllForVoting,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -90,6 +91,18 @@ async function fetchVotesForProposalAndDelegate(
   "use server";
 
   return await getVotesForProposalAndDelegate({
+    proposal_id,
+    address,
+  });
+}
+
+async function fetchUserVotesForProposal(
+  proposal_id: string,
+  address: string | `0x${string}`
+) {
+  "use server";
+
+  return await getUserVotesForProposal({
     proposal_id,
     address,
   });
@@ -190,6 +203,7 @@ export default async function OPProposalPage({
               checkIfDelegatingToProxy={checkIfDelegatingToProxy}
               fetchCurrentDelegatees={fetchCurrentDelegatees}
               fetchDirectDelegatee={fetchDirectDelegatee}
+              fetchUserVotes={fetchUserVotesForProposal}
               getProxyAddress={getProxyAddress}
               proposal_id={proposal.id}
               getDelegators={getDelegators}

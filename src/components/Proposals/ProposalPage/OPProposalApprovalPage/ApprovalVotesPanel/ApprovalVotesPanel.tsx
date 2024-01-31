@@ -49,6 +49,10 @@ type Props = {
     proposal_id: string,
     address: string | `0x${string}`
   ) => Promise<Vote[]>;
+  fetchUserVotesForProposal: (
+    proposal_id: string,
+    address: string | `0x${string}`
+  ) => Promise<Vote[]>;
 };
 
 export default function ApprovalVotesPanel({
@@ -59,6 +63,7 @@ export default function ApprovalVotesPanel({
   fetchAuthorityChains,
   fetchDelegate,
   fetchVotesForProposalAndDelegate,
+  fetchUserVotesForProposal,
 }: Props) {
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
@@ -91,6 +96,7 @@ export default function ApprovalVotesPanel({
           <ApprovalProposalVotesList
             initialProposalVotes={initialProposalVotes}
             fetchVotesForProposal={fetchVotesForProposal}
+            fetchUserVotes={fetchUserVotesForProposal}
             proposal_id={proposal.id}
           />
         )}
