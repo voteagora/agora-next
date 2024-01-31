@@ -8,11 +8,14 @@ import {
 
 import DraftProposalAbstract from "./DraftProposalAbstract";
 import DraftProposalTextInput from "./DraftProposalTextInput";
+import DraftProposalTypeChoice from "./DraftProposalTypeChoice";
 
 const staticText = {
   heading: "Create proposal draft",
   description:
     "Use this draft to create and share the proposal you’d like to submit",
+  proposalTypeExplanation:
+    "Passed on-chain, Executable Proposals execute code related to ENS and ENS DAO contracts, as voted on by the DAO.",
   proposalTitlePlaceholder: "[EPx.x][Executable] My proposal title...",
   proposalDescriptionPlaceholder:
     "A short (1-2 sentence) description of the proposal...",
@@ -34,6 +37,10 @@ const DraftProposalFormCreate: React.FC = () => {
           <p className="text-gray-4f px-6 pb-7 max-w-[620px]">
             {staticText.description}
           </p>
+          <DraftProposalTypeChoice
+            label="Proposal type"
+            explanation={staticText.proposalTypeExplanation}
+          />
           <DraftProposalTextInput
             label="Title"
             placeholder={staticText.proposalTitlePlaceholder}
