@@ -27,6 +27,8 @@ import shareCard from "./shareCard.svg";
 import scroll from "./scroll.svg";
 import github from "./github.svg";
 import world from "./world.svg";
+import createTransaction from "./createTransaction.svg";
+import uploadTransaction from "./uploadTransaction.svg";
 
 export const icons = {
   badge,
@@ -57,5 +59,7 @@ export const icons = {
   shareCard,
   scroll,
   github,
-  world
+  world,
+  createTransaction,
+  uploadTransaction,
 };

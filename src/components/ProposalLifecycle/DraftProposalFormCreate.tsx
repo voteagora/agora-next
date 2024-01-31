@@ -9,6 +9,7 @@ import {
 import DraftProposalAbstract from "./DraftProposalAbstract";
 import DraftProposalTextInput from "./DraftProposalTextInput";
 import DraftProposalTypeChoice from "./DraftProposalTypeChoice";
+import DraftProposalTransaction from "./DraftProposalTransaction";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -21,6 +22,8 @@ const staticText = {
     "A short (1-2 sentence) description of the proposal...",
   proposalAbstractPlaceholder:
     "Here’s what my proposal aims to achieve (p.s. I like markdown formatting)...",
+  proposedTransactionDescription:
+    "Proposed transactions will execute after a proposal passes and then gets executed. If you skip this step, a transfer of 0 ETH to you (the proposer) will be added.",
 };
 
 const DraftProposalFormCreate: React.FC = () => {
@@ -52,6 +55,10 @@ const DraftProposalFormCreate: React.FC = () => {
           <DraftProposalAbstract
             label="Abstract"
             placeholder={staticText.proposalAbstractPlaceholder}
+          />
+          <DraftProposalTransaction
+            label="Proposed transaction"
+            description={staticText.proposedTransactionDescription}
           />
         </AccordionContent>
       </AccordionItem>
