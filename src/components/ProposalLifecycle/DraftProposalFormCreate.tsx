@@ -10,6 +10,7 @@ import DraftProposalAbstract from "./DraftProposalAbstract";
 import DraftProposalTextInput from "./DraftProposalTextInput";
 import DraftProposalTypeChoice from "./DraftProposalTypeChoice";
 import DraftProposalTransaction from "./DraftProposalTransaction";
+import DraftProposalCreateButton from "./DraftProposalCreateButton";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -60,6 +61,7 @@ const DraftProposalFormCreate: React.FC = () => {
             label="Proposed transaction"
             description={staticText.proposedTransactionDescription}
           />
+          <DraftProposalCreateButton description="This will post your draft to both the ENS forums and request an update to the ENS DAO docs." />
         </AccordionContent>
       </AccordionItem>
     </div>
