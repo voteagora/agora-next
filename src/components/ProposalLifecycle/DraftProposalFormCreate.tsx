@@ -6,10 +6,18 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 
+import DraftProposalAbstract from "./DraftProposalAbstract";
+import DraftProposalTextInput from "./DraftProposalTextInput";
+
 const staticText = {
   heading: "Create proposal draft",
   description:
-    "We encourage you to go to Discourse to post a temp check that helps gauge the community’s interest. It’s not mandatory, but helps create alignment with the voter base.",
+    "Use this draft to create and share the proposal you’d like to submit",
+  proposalTitlePlaceholder: "[EPx.x][Executable] My proposal title...",
+  proposalDescriptionPlaceholder:
+    "A short (1-2 sentence) description of the proposal...",
+  proposalAbstractPlaceholder:
+    "Here’s what my proposal aims to achieve (p.s. I like markdown formatting)...",
 };
 
 const DraftProposalFormCreate: React.FC = () => {
@@ -23,7 +31,21 @@ const DraftProposalFormCreate: React.FC = () => {
           <h2 className="text-2xl font-black">{staticText.heading}</h2>
         </AccordionTrigger>
         <AccordionContent>
-          <p className="text-gray-4f px-6">{staticText.description}</p>
+          <p className="text-gray-4f px-6 pb-7 max-w-[620px]">
+            {staticText.description}
+          </p>
+          <DraftProposalTextInput
+            label="Title"
+            placeholder={staticText.proposalTitlePlaceholder}
+          />
+          <DraftProposalTextInput
+            label="Description"
+            placeholder={staticText.proposalDescriptionPlaceholder}
+          />
+          <DraftProposalAbstract
+            label="Abstract"
+            placeholder={staticText.proposalAbstractPlaceholder}
+          />
         </AccordionContent>
       </AccordionItem>
     </div>
