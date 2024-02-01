@@ -4,7 +4,7 @@ import React from "react";
 
 const DraftProposalPage: React.FC = () => {
   return (
-    <div className="flex flex-row w-full gap-x-6 pt-9">
+    <div className="flex flex-row gap-x-6 pt-9 items-start max-w-screen-xl mx-auto">
       <DraftProposalForm />
       <DraftProposalChecklist />
     </div>

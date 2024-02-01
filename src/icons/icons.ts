@@ -17,9 +17,18 @@ import vote from "./vote.svg";
 import liquid from "./liquid.svg";
 import spinner from "./spinner.svg";
 import power from "./power.svg";
+import profile from "./profile.svg";
 import info from "./info.svg";
 import contractVoter from "./contractVoter.svg";
 import sunny from "./sunny.svg";
+import projectPlaceholder from "./projectPlaceholder.svg";
+import search from "./search.svg";
+import shareCard from "./shareCard.svg";
+import scroll from "./scroll.svg";
+import github from "./github.svg";
+import world from "./world.svg";
+import createTransaction from "./createTransaction.svg";
+import uploadTransaction from "./uploadTransaction.svg";
 
 export const icons = {
   badge,
@@ -42,6 +51,15 @@ export const icons = {
   liquid,
   spinner,
   power,
+  profile,
   info,
-  sunny
+  sunny,
+  projectPlaceholder,
+  search,
+  shareCard,
+  scroll,
+  github,
+  world,
+  createTransaction,
+  uploadTransaction,
 };
