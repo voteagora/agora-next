@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createPublicClient, http, parseAbi, parseAbiItem } from 'viem'
+import { createPublicClient, http, parseAbi } from 'viem'
 import { optimism } from "viem/chains";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 
