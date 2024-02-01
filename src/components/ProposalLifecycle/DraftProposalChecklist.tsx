@@ -47,7 +47,7 @@ const checklistItems = [
 
 const DraftProposalChecklist: React.FC = () => {
   return (
-    <div className="w-[350px] bg-gray-fa border border-gray-eo rounded-2xl px-6 pt-6 pb-9">
+    <div className="w-[350px] flex-shrink-0 bg-gray-fa border border-gray-eo rounded-2xl px-6 pt-6 pb-9">
       <h2 className="font-black text-2xl mb-7">Proposal checklist</h2>
       <Accordion type="single" collapsible>
         {checklistItems.map((item) => (
