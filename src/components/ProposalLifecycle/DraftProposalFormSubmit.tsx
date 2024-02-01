@@ -5,6 +5,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
+import DraftProposalReview from "./DraftProposalReview";
+
+const staticText = {
+  description:
+    "Please proofread a preview of your proposal below. If you need to change any of its content, please edit your draft in the previous step.",
+};
 
 const DraftProposalFormSubmit: React.FC = () => {
   return (
@@ -17,7 +23,10 @@ const DraftProposalFormSubmit: React.FC = () => {
           <h2 className="text-2xl font-black">Submit proposal</h2>
         </AccordionTrigger>
         <AccordionContent>
-          <p>test content</p>
+          <p className="text-gray-4f px-6 pb-7 max-w-[620px]">
+            {staticText.description}
+          </p>
+          <DraftProposalReview description="asd" checkmarkInfo="asd" />
         </AccordionContent>
       </AccordionItem>
     </div>
