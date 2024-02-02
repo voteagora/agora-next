@@ -21,13 +21,6 @@ export default async function getFeedLogs() {
 
     const { number } = await publicClient.getBlock();
 
-    // TODO: frh ->         
-    // 'event SubDelegation(address indexed from, address indexed to, SubdelegationRules subdelegationRules)'
-    // event SubDelegations(address indexed from, address[] to, SubdelegationRules subdelegationRules);
-    // event SubDelegations(address indexed from, address[] to, SubdelegationRules[] subdelegationRules);
-    // TODO: frh -> once display is correctly check that for example initialized show for both alligator and governor contract
-
-    // TODO: frh if error change to latest
     return await publicClient.getLogs({
         address: getContractAddresses(),
         events: parseAbi([
@@ -59,8 +52,197 @@ export default async function getFeedLogs() {
             'event VoteCastWithParams(address indexed voter, uint256 proposalId, uint8 support, uint256 weight, string reason, bytes params)',
             'event VotingDelaySet(uint256 oldVotingDelay, uint256 newVotingDelay)',
             'event VotingPeriodSet(uint256 oldVotingPeriod, uint256 newVotingPeriod)'
+            // @ts-ignore
+        ]).concat([
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "from",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint8",
+                                "name": "maxRedelegations",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "blocksBeforeVoteCloses",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "uint32",
+                                "name": "notValidBefore",
+                                "type": "uint32"
+                            },
+                            {
+                                "internalType": "uint32",
+                                "name": "notValidAfter",
+                                "type": "uint32"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "customRule",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "enum AllowanceType",
+                                "name": "allowanceType",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "allowance",
+                                "type": "uint256"
+                            }
+                        ],
+                        "indexed": false,
+                        "internalType": "struct SubdelegationRules",
+                        "name": "subdelegationRules",
+                        "type": "tuple"
+                    }
+                ],
+                "name": "SubDelegation",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "from",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "address[]",
+                        "name": "to",
+                        "type": "address[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint8",
+                                "name": "maxRedelegations",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "blocksBeforeVoteCloses",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "uint32",
+                                "name": "notValidBefore",
+                                "type": "uint32"
+                            },
+                            {
+                                "internalType": "uint32",
+                                "name": "notValidAfter",
+                                "type": "uint32"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "customRule",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "enum AllowanceType",
+                                "name": "allowanceType",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "allowance",
+                                "type": "uint256"
+                            }
+                        ],
+                        "indexed": false,
+                        "internalType": "struct SubdelegationRules",
+                        "name": "subdelegationRules",
+                        "type": "tuple"
+                    }
+                ],
+                "name": "SubDelegations",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "from",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "address[]",
+                        "name": "to",
+                        "type": "address[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint8",
+                                "name": "maxRedelegations",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "blocksBeforeVoteCloses",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "uint32",
+                                "name": "notValidBefore",
+                                "type": "uint32"
+                            },
+                            {
+                                "internalType": "uint32",
+                                "name": "notValidAfter",
+                                "type": "uint32"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "customRule",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "enum AllowanceType",
+                                "name": "allowanceType",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "allowance",
+                                "type": "uint256"
+                            }
+                        ],
+                        "indexed": false,
+                        "internalType": "struct SubdelegationRules[]",
+                        "name": "subdelegationRules",
+                        "type": "tuple[]"
+                    }
+                ],
+                "name": "SubDelegations",
+                "type": "event"
+            },
         ]),
         // 'latest' | 'earliest' | 'pending' | 'safe' | 'finalized'
-        fromBlock: 'finalized'
+        // TODO: frh if too big kb error change to latest
+        fromBlock: 'safe'
     });
 }
