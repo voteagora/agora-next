@@ -1,6 +1,5 @@
 import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
-import { DEPLOYMENT_NAME } from "@/lib/config";
 import { contracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "../proposals/proposal";
 
