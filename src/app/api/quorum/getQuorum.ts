@@ -1,38 +1,10 @@
-import provider from "@/app/lib/provider";
-import prisma from "@/app/lib/prisma";
-import { DEPLOYMENT_NAME } from "@/lib/config";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "../proposals/proposal";
+import {
+  getCurrentQuorumForNamespace,
+  getQuorumForProposalForNamespace,
+} from "../common/quorum/getQuorum";
 
-export async function getQuorumForProposal(proposal: ProposalPayload) {
-  switch (DEPLOYMENT_NAME) {
-    case "optimism": {
-      const contractQuorum = OptimismContracts.governor.contract.quorum(
-        proposal.proposal_id
-      );
+export const getQuorumForProposal = (proposal: ProposalPayload) =>
+  getQuorumForProposalForNamespace({ proposal, namespace: "optimism" });
 
-      // If no quorum is set, calculate it based on votable supply
-      if (!contractQuorum) {
-        const votableSupply = await prisma[
-          `${DEPLOYMENT_NAME}VotableSupply`
-        ].findFirst({});
-        return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
-      }
-
-      return contractQuorum;
-    }
-  }
-}
-
-export async function getCurrentQuorum() {
-  switch (DEPLOYMENT_NAME) {
-    case "optimism": {
-      const latestBlock = await provider.getBlock("latest");
-      if (!latestBlock) {
-        return null;
-      }
-      // latest - 1 because latest block might not be mined yet
-      return OptimismContracts.governor.contract.quorum(latestBlock.number - 1);
-    }
-  }
-}
+export const getCurrentQuorum = () => getCurrentQuorumForNamespace("optimism");
