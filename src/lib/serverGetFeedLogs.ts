@@ -19,6 +19,7 @@ export default async function getFeedLogs() {
         transport: http(`https://opt-mainnet.g.alchemy.com/v2/${alchemyId}`)
     });
 
+    // TODO: frh -> delete this if not needed
     const { number } = await publicClient.getBlock();
 
     return await publicClient.getLogs({
