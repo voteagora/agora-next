@@ -26,6 +26,8 @@ export default async function getFeedLogs() {
     // event SubDelegations(address indexed from, address[] to, SubdelegationRules subdelegationRules);
     // event SubDelegations(address indexed from, address[] to, SubdelegationRules[] subdelegationRules);
     // TODO: frh -> once display is correctly check that for example initialized show for both alligator and governor contract
+
+    // TODO: frh if error change to latest
     return await publicClient.getLogs({
         address: getContractAddresses(),
         events: parseAbi([
@@ -58,6 +60,7 @@ export default async function getFeedLogs() {
             'event VotingDelaySet(uint256 oldVotingDelay, uint256 newVotingDelay)',
             'event VotingPeriodSet(uint256 oldVotingPeriod, uint256 newVotingPeriod)'
         ]),
-        fromBlock: number,
+        // 'latest' | 'earliest' | 'pending' | 'safe' | 'finalized'
+        fromBlock: 'finalized'
     });
 }
