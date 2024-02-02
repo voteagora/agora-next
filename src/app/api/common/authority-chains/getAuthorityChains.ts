@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/prisma";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { contracts } from "@/lib/contracts/contracts";
 import { OptimismAuthorityChainsSnaps } from "@prisma/client";
 
 type AuthorityChainsSnaps = OptimismAuthorityChainsSnaps;
@@ -39,7 +39,7 @@ export async function getAuthorityChainsForNamespace({
       AND ac.allowance > 0;
     `,
     address.toLowerCase(),
-    OptimismContracts.alligator.address.toLowerCase(),
+    contracts(namespace).alligator.address.toLowerCase(),
     blockNumber
   );
 

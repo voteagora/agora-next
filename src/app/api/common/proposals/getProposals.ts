@@ -3,7 +3,7 @@ import { paginatePrismaResult } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { contracts } from "@/lib/contracts/contracts";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
 
@@ -17,7 +17,7 @@ export async function getProposalsForNamespace({
   const pageSize = 10;
 
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
-    contract: OptimismContracts.governor.address.toLowerCase(),
+    contract: contracts(namespace).governor.address.toLowerCase(),
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
@@ -94,7 +94,7 @@ export async function getProposalTypesForNamespace({
   return prisma[`${namespace}ProposalTypes`].findMany({
     where: {
       contract:
-        OptimismContracts.proposalTypesConfigurator.address.toLowerCase(),
+        contracts(namespace).proposalTypesConfigurator.address.toLowerCase(),
     },
   });
 }

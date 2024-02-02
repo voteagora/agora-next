@@ -1,7 +1,7 @@
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { contracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "./proposal";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
@@ -24,7 +24,7 @@ export async function getNeedsMyVoteProposalsForNamespace({
 
   const prodDataOnly =
     process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-      ? `AND contract = ${OptimismContracts.governor.address.toLowerCase()}` // TODO: use namespace flag to determine contract
+      ? `AND contract = ${contracts(namespace).governor.address.toLowerCase()}` // TODO: use namespace flag to determine contract
       : "";
 
   const proposals = await prisma.$queryRawUnsafe<ProposalPayload[]>(

@@ -9,7 +9,7 @@ import {
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { contracts } from "@/lib/contracts/contracts";
 import { getDelegateStatement } from "../../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../../quorum/getQuorum";
@@ -151,7 +151,7 @@ export async function getDelegateForNamespace({
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
-    OptimismContracts.alligator.address.toLowerCase()
+    contracts(namespace).alligator.address.toLowerCase()
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =

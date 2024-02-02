@@ -3,7 +3,7 @@ import { getHumanBlockTime } from "@/lib/blockTimes";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { contracts } from "@/lib/contracts/contracts";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 
 /**
@@ -36,7 +36,7 @@ async function getCurrentDelegateesForAddress({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: OptimismContracts.alligator.address.toLowerCase(),
+      contract: contracts(namespace).alligator.address.toLowerCase(),
     },
   });
 
@@ -158,7 +158,7 @@ async function getCurrentDelegatorsForAddress({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: OptimismContracts.alligator.address.toLowerCase(),
+      contract: contracts(namespace).alligator.address.toLowerCase(),
     },
   });
 
@@ -265,7 +265,7 @@ const getDirectDelegateeForAddress = async ({
   namespace: "optimism";
 }) => {
   const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address),
+    getProxyAddress(address, namespace),
     prisma[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),

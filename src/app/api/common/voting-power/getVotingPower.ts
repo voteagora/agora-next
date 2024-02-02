@@ -1,6 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import { contracts } from "@/lib/contracts/contracts";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { AdvancedVotingPowerPayload, VotingPowerData } from "./votingPower";
 
@@ -87,7 +87,7 @@ async function getVotingPowerAtSnapshotByAddress({
     WHERE delegate = $1;
     `,
     address,
-    OptimismContracts.alligator.address.toLowerCase(), // TODO: update based on namespace
+    contracts(namespace).alligator.address.toLowerCase(), // TODO: update based on namespace
     blockNumber
   );
 
@@ -142,7 +142,7 @@ async function getCurrentVotingPowerForAddress({
   ].findFirst({
     where: {
       delegate: address,
-      contract: OptimismContracts.alligator.address.toLowerCase(),
+      contract: contracts(namespace).alligator.address.toLowerCase(),
     },
   });
 
@@ -188,14 +188,14 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
   ].findFirst({
     where: {
       delegate: address,
-      contract: OptimismContracts.alligator.address.toLowerCase(),
+      contract: contracts(namespace).alligator.address.toLowerCase(),
     },
   });
 
   const undelegatedVotingPower = (async () => {
     const [isBalanceAccountedFor, balance] = await Promise.all([
       isAddressDelegatingToProxy({ address, namespace }),
-      OptimismContracts.token.contract.balanceOf(address),
+      contracts(namespace).token.contract.balanceOf(address),
     ]);
     return isBalanceAccountedFor ? 0n : balance;
   })();
@@ -233,7 +233,7 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
   address: string;
   namespace: "optimism";
 }): Promise<bigint> {
-  return OptimismContracts.token.contract.balanceOf(address); // TODO: update based on namespace
+  return contracts(namespace).token.contract.balanceOf(address); // TODO: update based on namespace
 }
 
 /**
