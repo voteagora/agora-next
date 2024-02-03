@@ -45,7 +45,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
     <Popover className="relative cursor-auto">
       {({ open }) => (
         <>
-          <Popover.Button className={styles.desktop__button}>
+          <Popover.Button className="flex">
             <div className={styles.desktop_connect_button_inner}>
               <div className={styles.testing}>
                 <ENSAvatar ensName={ensName} />
@@ -86,7 +86,7 @@ export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
                           ensName={ensName}
                         />
                       </div>
-                      <VStack>
+                      <VStack className="justify-center">
                         {ensName ? (
                           <>
                             <span className={styles.desktop__ens}>
