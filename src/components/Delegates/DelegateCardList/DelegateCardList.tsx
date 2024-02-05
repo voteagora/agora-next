@@ -12,7 +12,7 @@ import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvid
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useAccount } from "wagmi";
 
 export type DelegateChunk = Pick<

@@ -15,7 +15,7 @@ import { InfoIcon } from "lucide-react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
-import { DelegateePayload } from "@/app/api/delegations/delegation";
+import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 
 export function DelegateDialog({
   delegate,

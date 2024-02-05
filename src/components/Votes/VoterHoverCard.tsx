@@ -11,8 +11,8 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
-import { Delegation } from "@/app/api/delegations/delegation";
+import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 
 interface Props {
   address: string;

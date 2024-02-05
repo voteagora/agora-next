@@ -11,7 +11,7 @@ import { Proposal } from "@/app/api/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
-import { DelegateePayload } from "@/app/api/delegations/delegation";
+import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 
 export type DialogType =
   | DelegateDialogType

@@ -12,7 +12,6 @@ import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
