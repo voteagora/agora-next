@@ -1,5 +1,6 @@
 import { getFeedLogs } from "@/app/api/feed/getFeedLogs";
 import FeedEventFilter from "@/components/Feed/FeedEventFilter";
+import BlockDate from "@/components/Feed/BlockDate";
 
 async function getLogs(params: {
   page?: number;
@@ -39,44 +40,41 @@ export default async function Page({
   searchParams: { event: "all" | "delegations" | "votes" };
 }) {
   const logs = await getLogs({ event: searchParams?.event });
-  console.log("logs: ", logs);
-  // let uniqueEvents = logs
-  //   .filter((v, i, a) => a.findIndex((t) => t.eventName === v.eventName) === i)
-  //   .map((item) => item.eventName);
 
-  // console.log("uniqueEvents: ", uniqueEvents);
   return (
-    <FeedEventFilter />
-    // <div className="flex flex-col gap-4">
-    //   {/* TODO: frh -> optimize this reverse */}
-    //   {logs.reverse().map((log) => {
-    //     // Block number, block hash, transaction index and transaction hash can be the same in many elements
-    //     // args provides a decoded, human-readable representation of the event data, topics includes the hashed event signature and indexed parameters, and data contains the raw, encoded event data, which often requires decoding based on the contract's ABI
-    //     const {
-    //       address,
-    //       blockNumber,
-    //       blockHash,
-    //       args,
-    //       logIndex,
-    //       eventName,
-    //       data,
-    //     } = log;
-    //     return (
-    //       <div
-    //         // logIndex represents the position or index of a specific log entry within the block in which it is included.
-    //         key={data + blockHash + logIndex}
-    //         className="flex flex-col gap-1 bg-gray-300 rounded-xl p-4"
-    //       >
-    //         <span>
-    //           Block number: {blockNumber.toString()}{" "}
-    //           {/* {new Date(Number(timestamp) * 1000).toString()} */}
-    //         </span>
-    //         <span>Contract: {address}</span>
-    //         <span>Args: {JSON.stringify(args)}</span>
-    //         <span>Event name: {eventName}</span>
-    //       </div>
-    //     );
-    //   })}
-    // </div>
+    <>
+      <FeedEventFilter />
+      <div className="flex flex-col gap-4">
+        {/* TODO: frh -> optimize this reverse */}
+        {logs.map((log) => {
+          // Block number, block hash, transaction index and transaction hash can be the same in many elements
+          // args provides a decoded, human-readable representation of the event data, topics includes the hashed event signature and indexed parameters, and data contains the raw, encoded event data, which often requires decoding based on the contract's ABI
+          const {
+            address,
+            block_number,
+            block_hash,
+            transaction_hash,
+            inputs,
+            sighash,
+          } = log;
+          return (
+            <div
+              // logIndex represents the position or index of a specific log entry within the block in which it is included.
+              key={sighash + block_hash + transaction_hash}
+              className="flex flex-col gap-1 bg-gray-300 rounded-xl p-4"
+            >
+              <span>
+                Block number: {block_number.toString()}{" "}
+                {/* {new Date(Number(timestamp) * 1000).toString()} */}
+              </span>
+              <span>Contract: {address}</span>
+              <span>Args: {JSON.stringify(inputs)}</span>
+              <span>Event name: {sighash}</span>
+              <BlockDate blockNumber={block_number} />
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }

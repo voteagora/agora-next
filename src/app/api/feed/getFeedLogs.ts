@@ -23,7 +23,6 @@ export async function getFeedLogs({
     seed?: number;
     event: 'all' | 'delegations' | 'votes'
 }) {
-    console.log("hola");
     const pageSize = 20;
     // TODO: frh -> this type and see if address or rest of params is needed
     // TODO: frh -> make sure there are only two subdelegations
