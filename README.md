@@ -1,6 +1,5 @@
 ## Getting Started
 
-
 1. Git clone this repo
 
 2. Hit up the Discord and make sure that you get a local copy of the `.env.local` file. This is required to run the application locally. Then run the development server:
@@ -17,23 +16,44 @@ You will find a mix of different styles at work in this repo. We are a small tea
 
 The entire data model for this application is based on Postgres and Prisma. All data access should happen through the `/api` endpoints which will use Prisma to interact with the database.
 
-We will be building a publicly accessible API soon, but for now, to keep things performant, we are using the NextJS pattern of keeping our backend, data fetching code in the `api` directory where you can see the methods that fetch the main objects in our Database: 
+We will be building a publicly accessible API soon, but for now, to keep things performant, we are using the NextJS pattern of keeping our backend, data fetching code in the `api` directory where you can see the methods that fetch the main objects in our Database:
 
-* Proposals
-* Votes
-* Deletgates (users)
-* Proposal transactions etc.
+- Proposals
+- Votes
+- Deletgates (users)
+- Proposal transactions etc.
 
-Most of this data comes in the form as views, or materialized views in our Postgres database that we call via Prisma and then fethc the results to the page and cascade that state down to the components. 
+Most of this data comes in the form as views, or materialized views in our Postgres database that we call via Prisma and then fetch the results to the page and cascade that state down to the components.
 
 NextJS has some peculiar data access patterns given the mix of server-side and client-side components, that we are still getting used to. When in doubt, have a look at the `<ProposalsList />` component the `src/app/page.jsx` to see the fetching model in action. The general rule in NextJS is that you primary "server" component should do the fetching to keep it fast and use the cache in the best way possible, and then your client components can recieve that data from server components to add any interactivity you want.
 
 You will want to have a Database / SQL Viewer so that you can explore the data. Most of us use:
-* TablePlus: https://tableplus.com/
+
+- [TablePlus](https://tableplus.com/)
 
 Ping the Discord to get access to the database.
 
 You can also explore the queries here: `https://github.com/voteagora/queries`
+
+#### Database strcuture
+
+This applicaiton uses a Postgres database with the following schemas:
+
+- **center**: Admin-only access
+- **config**: Shared configuration data
+- **agora**: Shared data, such as customer information and aggregations
+- **[dao namespace]**: Dao dedicated namespaces like optimism, ens, etc.
+
+While prisma is used to manage the access to the database and typescript abstractions, the actual schema is managed in a separate [repository](https://github.com/voteagora/queries) using custom migration scripts.
+
+To make sure that you are using the latest schema, you should run the following command:
+
+```bash
+npx prisma db pull
+npx prisma generate
+```
+
+More information about how to work with the database can be found in the [Database Maunal](https://www.notion.so/argoagora/931fd8eb09a448f398e7ca29a4ea828b?v=33621ec012de422d8f12ffe642629d6c)
 
 ### Typescript vs. Javascript
 
@@ -45,11 +65,11 @@ The application is using a combination of Tailwind, Emotion and native SCSS. Our
 
 There are three theme files in this repo, but the goal will be to move 1 or 2 in the near future.
 
-1) `@/styles/theme.js` -> This is the Javascript representation of the theme file and should be used only if you are porting old `emotion/css` components from the old repo. 
-2) `@/styles/variables.scss` -> This the same theme file expressed as SCSS variables so that we can import the theme into component level SCSS files more easily.
-3) `tailwind.config.js` -> This is the Tailwind configuration file. We are using Tailwind for utility classes but still want the flexibility of native CSS so this allows us to import our theme into Tailwind.
+1. `@/styles/theme.js` -> This is the Javascript representation of the theme file and should be used only if you are porting old `emotion/css` components from the old repo.
+2. `@/styles/variables.scss` -> This the same theme file expressed as SCSS variables so that we can import the theme into component level SCSS files more easily.
+3. `tailwind.config.js` -> This is the Tailwind configuration file. We are using Tailwind for utility classes but still want the flexibility of native CSS so this allows us to import our theme into Tailwind.
 
-If you add a new style to any of these files, you should duplicate them across all files. 
+If you add a new style to any of these files, you should duplicate them across all files.
 
 ### Building new components
 
@@ -63,7 +83,6 @@ Use `@/components/Hero` as the reference for this section to see how clean the t
 6. Use semantic HTML elements where appropirate and target styles using the class name
 7. In your SCSS file, make sure that you import
 
-
 ### Global styles
 
 There will be some styles that should be set as Global styles, if that is the case they should be prefixed with `gl_` and imported into `@/styles/globals.scss`.
@@ -72,22 +91,21 @@ There will be some styles that should be set as Global styles, if that is the ca
 
 The `HStack` and `VStack` components have been modified to support Tailwind directives. Everything is pretty similar except for two key details:
 
-1) Gaps are now passed as ints instead of strings: ie, `gap={4}` instead of `gap="4"`
-2) The justify and align directives use tailwind vs. standard CSS directives. Have a look at the `Stack.tsx` component to see how this is done and to see all available directives.
+1. Gaps are now passed as ints instead of strings: ie, `gap={4}` instead of `gap="4"`
+2. The justify and align directives use tailwind vs. standard CSS directives. Have a look at the `Stack.tsx` component to see how this is done and to see all available directives.
 
 The main usage of direct Tailwind classes can be found in a single component
 
 `@/components/Layout/PageContainer.tsx`
 
 ```jsx
-
 import React, { ReactNode } from "react";
 
 import { VStack } from "@/components/Layout/Stack";
 import { Analytics } from "@vercel/analytics/react";
 
 type Props = {
-  children: ReactNode;
+  children: ReactNode,
 };
 
 export function PageContainer({ children }: Props) {
@@ -100,25 +118,22 @@ export function PageContainer({ children }: Props) {
     </div>
   );
 }
-
 ```
 
 The rest of the time, you should be able to use standard SCSS directives along with the variables in the `@/styles/variables.scss` file.
 
-
-## Understand the layout of the application 
+## Understand the layout of the application
 
 In NextJS there are a few key files and folders to understand:
 
 `@/app`
 This directory holds the primary application and each folder represents a different section of the app. So for example the `@/app/delegates` maps to: `https://app.example.com/delegates`
 
-There is no Router. 
+There is no Router.
 
 The router is the directory structure of the `/app` directory.
 
 Each folder contains a magical page called `page.jsx` or `page.tsx` this acts as the `index` page for the route. So for example `@/app/delegates/page.jsx` is the index page for `https://app.example.com/delegates`
-
 
 `@app/lib`
 Helpers and utilities, reserverd word.
@@ -137,7 +152,7 @@ This is where all of the server functions will live. Anything that deals with th
 
 `@/components`
 
-This is where all of the React components will live that will be pulled into the pages and views. 
+This is where all of the React components will live that will be pulled into the pages and views.
 
 `@/styles`
 
@@ -146,7 +161,6 @@ This is where all of the global styles and themes will live
 `@/assets`
 
 This is where all of the images, fonts, and other assets will live.
-
 
 ## Deploy on Vercel
 

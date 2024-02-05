@@ -8,7 +8,7 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
 import { useAccount } from "wagmi";
-import { Vote } from "@/app/api/votes/vote";
+import { Vote } from "@/app/api/common/votes/vote";
 
 type Props = {
   initialProposalVotes: {

@@ -10,7 +10,7 @@ import {
 import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
 import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
