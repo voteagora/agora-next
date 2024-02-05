@@ -11,7 +11,7 @@ import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/Ap
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { Vote } from "@/app/api/common/votes/vote";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 
 type Props = {
   proposal: Proposal;
