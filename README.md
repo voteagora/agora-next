@@ -37,12 +37,12 @@ You can also explore the queries here: `https://github.com/voteagora/queries`
 
 #### Database strcuture
 
-This applicaiton uses a Postgres database with the following architecture:
+This applicaiton uses a Postgres database with the following schemas:
 
 - **center**: Admin-only access
 - **config**: Shared configuration data
 - **agora**: Shared data, such as customer information and aggregations
-- **[dao namespace]**: Specific namespaces like optimism, ens, etc.
+- **[dao namespace]**: Dao dedicated namespaces like optimism, ens, etc.
 
 While prisma is used to manage the access to the database and typescript types, the actual schema is managed in a separate repository: `https://github.com/voteagora/queries` using custom migration scripts.
 
