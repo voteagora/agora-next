@@ -15,7 +15,7 @@ export async function isCitizenForNamespace(
   >(
     Prisma.sql`
     SELECT address
-    FROM center.address_metadata
+    FROM agora.address_metadata
     WHERE kind = 'citizen' 
     AND dao_slug = ${daoSlug}
     AND LOWER(address) = LOWER(${address});

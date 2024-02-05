@@ -6,24 +6,47 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["config", "optimism", "user_data"]
+  schemas  = ["agora", "config", "optimism"]
 }
 
 model DelegateStatements {
-  address   String
-  dao_slug  DaoSlug
-  signature String
-  payload   Json
-  twitter   String?
-  discord   String?
-  email     String?
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @default(now()) @db.Date
+  address    String
+  dao_slug   DaoSlug
+  signature  String
+  payload    Json
+  twitter    String?
+  discord    String?
+  email      String?
+  created_at DateTime? @default(now()) @db.Date
+  updated_at DateTime? @default(now()) @db.Date
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
   @@map("delegate_statements")
-  @@schema("user_data")
+  @@schema("agora")
+}
+
+model Contracts {
+  address       String        @id
+  chain         Chain?
+  contract_type ContractType?
+  dao           String
+  env           Env?
+
+  @@map("contracts")
+  @@schema("config")
+}
+
+model AddressMetadata {
+  address    String
+  kind       String
+  dao_slug   DaoSlug
+  metadata   Json?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("address_metadata")
+  @@id([address, kind, dao_slug])
+  @@schema("agora")
 }
 
 view OptimismVotes {
@@ -123,7 +146,7 @@ view advanced_voting_power_raw_snaps {
   rules              Json[]
   allowance          Decimal? @db.Decimal
   subdelegated_share Decimal? @db.Decimal
-  block_number       Decimal? @db.Decimal
+  block_number       BigInt?
   contract           String?  @db.VarChar(42)
 
   @@ignore
@@ -136,7 +159,7 @@ view OptimismAuthorityChainsSnaps {
   rules                Json[]
   chain                String[]
   balance              Decimal  @db.Decimal
-  balance_block_number Decimal  @db.Decimal
+  balance_block_number BigInt
   allowance            Decimal  @db.Decimal
   contract             String?  @db.VarChar(42)
 
@@ -311,7 +334,7 @@ view authority_chains_snaps_wrapper {
   rules                Json[]
   chain                String[]
   balance              Decimal? @db.Decimal
-  balance_block_number Decimal? @db.Decimal
+  balance_block_number BigInt?
   allowance            Decimal? @db.Decimal
   contract             String?  @db.VarChar(42)
 
@@ -368,17 +391,6 @@ view subdelegation_events {
   @@schema("optimism")
 }
 
-model Contracts {
-  address       String        @id
-  chain         Chain?
-  contract_type ContractType?
-  dao           String
-  env           Env?
-
-  @@map("contracts")
-  @@schema("config")
-}
-
 enum DaoSlug {
   OP
   ENS
@@ -387,7 +399,7 @@ enum DaoSlug {
   LYRA
 
   @@map("dao_slug")
-  @@schema("user_data")
+  @@schema("config")
 }
 
 enum Chain {

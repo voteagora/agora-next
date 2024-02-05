@@ -33,7 +33,7 @@ export async function getCitizensForNamespace({
         return prisma.$queryRawUnsafe<citizen[]>(
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power, setseed($1)::Text
-            FROM center.address_metadata address_metadata
+            FROM agora.address_metadata address_metadata
             JOIN ${
               namespace + ".delegates"
             } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
@@ -51,7 +51,7 @@ export async function getCitizensForNamespace({
         return prisma.$queryRawUnsafe<citizen[]>(
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
-            FROM center.address_metadata address_metadata
+            FROM agora.address_metadata address_metadata
             JOIN ${
               namespace + ".delegates"
             } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
