@@ -1,6 +1,6 @@
 "use client";
 
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import { MobileConnectButton } from "./MobileConnectButton";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";

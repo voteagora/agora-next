@@ -8,18 +8,7 @@ import { getCitizens } from "../api/citizens/getCitizens";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
-import {
-  getProxy,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
-} from "../api/voting-power/getVotingPower";
-
-import {
-  getCurrentDelegatees,
-  getCurrentDelegators,
-  getDirectDelegatee,
-} from "../api/delegations/getDelegations";
+import { getCurrentDelegators } from "../api/delegations/getDelegations";
 import { TabsContent } from "@/components/ui/tabs";
 
 async function fetchCitizens(sort, page = 1, seed) {
@@ -34,57 +23,16 @@ async function fetchDelegates(sort, page = 1, seed) {
   return getDelegates({ page, seed, sort });
 }
 
-// Pass address of the connected wallet
-async function fetchVotingPowerForSubdelegation(addressOrENSName) {
-  "use server";
-
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function checkIfDelegatingToProxy(addressOrENSName) {
-  "use server";
-
-  return isDelegatingToProxy({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function fetchBalanceForDirectDelegation(addressOrENSName) {
-  "use server";
-
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function fetchCurrentDelegatees(addressOrENSName) {
-  "use server";
-
-  return getCurrentDelegatees({ addressOrENSName });
-}
-
-// Pass address of the connected wallet
-async function getProxyAddress(addressOrENSName) {
-  "use server";
-
-  return getProxy({ addressOrENSName });
-}
-
 async function fetchDaoMetrics() {
   "use server";
 
   return getMetrics();
 }
 
-async function fetchDirectDelegatee(addressOrENSName) {
+async function fetchDelegators(address) {
   "use server";
 
-  return getDirectDelegatee({ addressOrENSName });
-}
-
-async function getDelegators(addressOrENSName) {
-  "use server";
-
-  return getCurrentDelegators({ addressOrENSName });
+  return getCurrentDelegators(address);
 }
 
 export async function generateMetadata({}, parent) {
@@ -118,12 +66,7 @@ export default async function Page({ searchParams }) {
 
               return getDelegates({ page, seed, sort });
             }}
-            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-            fetchCurrentDelegatees={fetchCurrentDelegatees}
-            getProxyAddress={getProxyAddress}
-            fetchDirectDelegatee={fetchDirectDelegatee}
+            fetchDelegators={fetchDelegators}
           />
         </TabsContent>
         <TabsContent value="citizens">
@@ -134,12 +77,7 @@ export default async function Page({ searchParams }) {
 
               return getCitizens({ page, seed, sort: citizensSort });
             }}
-            fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-            fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-            checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-            fetchCurrentDelegatees={fetchCurrentDelegatees}
-            getProxyAddress={getProxyAddress}
-            fetchDirectDelegatee={fetchDirectDelegatee}
+            fetchDelegators={fetchDelegators}
           />{" "}
         </TabsContent>
       </DelegateTabs>

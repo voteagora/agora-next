@@ -3,8 +3,10 @@ import {
   ProposalStatus,
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
-import { ProposalType } from "@prisma/client";
+import { OptimismProposals, ProposalType } from "@prisma/client";
 import { BigNumberish } from "ethers";
+
+export type ProposalPayload = OptimismProposals;
 
 export type Proposal = {
   id: string;

@@ -5,7 +5,7 @@ import styles from "./header.module.scss";
 import Image from "next/image";
 import walletIcon from "@/icons/wallet.svg";
 import { MobileProfileDropDown } from "./MobileProfileDropDown";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 type Props = {
   delegate: Delegate | undefined;
