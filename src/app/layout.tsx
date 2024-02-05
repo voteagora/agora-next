@@ -1,6 +1,7 @@
 import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
 import Header from "@/components/Header/Header";
+import { ProposalLifecycleDraftProvider } from "@/contexts/ProposalLifecycleDraftContext";
 
 declare global {
   interface BigInt {
@@ -32,8 +33,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <ClientLayout>
-        <Header />
-        {children}
+        <ProposalLifecycleDraftProvider>
+          <Header />
+          {children}
+        </ProposalLifecycleDraftProvider>
       </ClientLayout>
     </html>
   );
