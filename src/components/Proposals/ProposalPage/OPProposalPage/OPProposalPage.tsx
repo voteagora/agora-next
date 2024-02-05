@@ -25,7 +25,7 @@ import {
   getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {

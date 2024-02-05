@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   fetchVotingPowerForSubdelegation,

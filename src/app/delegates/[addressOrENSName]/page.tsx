@@ -8,11 +8,10 @@ import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
-import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
+import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {

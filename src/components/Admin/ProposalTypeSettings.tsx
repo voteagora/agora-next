@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Fragment, useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProposalTypes } from "@prisma/client";
+import { OptimismProposalTypes } from "@prisma/client";
 import ProposalType from "./ProposalType";
 import { fetchProposalTypes } from "@/app/admin/actions";
 import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
@@ -24,7 +24,7 @@ export default function ProposalTypeSettings({
     const getProposalTypes = async () => {
       const response = (await fetchProposalTypes().catch((error) =>
         console.error(error)
-      )) as ProposalTypes[];
+      )) as OptimismProposalTypes[];
       const _proposalTypes = response.map(
         ({ quorum, approval_threshold, name }) => ({
           name,
