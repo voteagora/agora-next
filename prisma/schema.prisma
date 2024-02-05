@@ -10,15 +10,15 @@ datasource db {
 }
 
 model DelegateStatements {
-  address    String
-  dao_slug   DaoSlug
-  signature  String
-  payload    Json
-  twitter    String?
-  discord    String?
-  email      String?
-  created_at DateTime? @default(now()) @db.Date
-  updated_at DateTime? @default(now()) @db.Date
+  address   String
+  dao_slug  DaoSlug
+  signature String
+  payload   Json
+  twitter   String?
+  discord   String?
+  email     String?
+  createdAt DateTime? @default(now()) @map("created_at") @db.Date
+  updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -44,8 +44,8 @@ model AddressMetadata {
   metadata   Json?
   created_at DateTime? @default(now()) @db.Timestamptz(6)
 
-  @@map("address_metadata")
   @@id([address, kind, dao_slug])
+  @@map("address_metadata")
   @@schema("agora")
 }
 
