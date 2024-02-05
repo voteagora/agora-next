@@ -12,7 +12,7 @@ export function DesktopConnectButton({
     <ConnectKitButton.Custom>
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
         return (
-          <button
+          <div
             onClick={!isConnected ? () => show?.() : undefined}
             className={styles.desktop_connect_button}
           >
@@ -21,7 +21,7 @@ export function DesktopConnectButton({
             ) : (
               "Connect Wallet"
             )}
-          </button>
+          </div>
         );
       }}
     </ConnectKitButton.Custom>

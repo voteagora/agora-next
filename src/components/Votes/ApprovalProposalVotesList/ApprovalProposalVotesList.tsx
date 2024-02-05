@@ -30,17 +30,21 @@ type Props = {
     };
     votes: Vote[];
   }>;
+  fetchUserVotes: (proposal_id: string, address: string) => Promise<Vote[]>;
   proposal_id: string;
 };
 
 export default function ApprovalProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
+  fetchUserVotes,
   proposal_id,
 }: Props) {
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposalVotes] || []);
   const [meta, setMeta] = React.useState(initialProposalVotes.meta);
+  const [userVotes, setUserVotes] = React.useState<Vote[]>([]);
+  const { address: connectedAddress } = useAccount();
 
   const proposalVotes = pages.reduce(
     (all: Vote[], page) => all.concat(page.votes),
@@ -61,6 +65,24 @@ export default function ApprovalProposalVotesList({
     }
   };
 
+  const fetchUserVoteAndSet = async (proposal_id: string, address: string) => {
+    let fetchedUserVotes: Vote[];
+    try {
+      fetchedUserVotes = await fetchUserVotes(proposal_id, address);
+    } catch (error) {
+      fetchedUserVotes = [];
+    }
+    setUserVotes(fetchedUserVotes);
+  };
+
+  React.useEffect(() => {
+    if (connectedAddress) {
+      fetchUserVoteAndSet(proposal_id, connectedAddress);
+    } else {
+      setUserVotes([]);
+    }
+  }, [connectedAddress]);
+
   return (
     <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
       {/* @ts-ignore */}
@@ -79,8 +101,18 @@ export default function ApprovalProposalVotesList({
         }
       >
         <ul className="flex flex-col divide-y">
+          {userVotes.map((vote) => (
+            <li key={vote.transactionHash} className={`p-4`}>
+              <SingleVote vote={vote} />
+            </li>
+          ))}
           {proposalVotes.map((vote) => (
-            <li key={vote.transactionHash} className="p-4">
+            <li
+              key={vote.transactionHash}
+              className={`p-4 ${
+                connectedAddress?.toLowerCase() === vote.address && "hidden"
+              }`}
+            >
               <SingleVote vote={vote} />
             </li>
           ))}
