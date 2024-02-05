@@ -1,4 +1,4 @@
-import { ProposalPayload } from "../proposals/proposal";
+import { ProposalPayload } from "../common/proposals/proposal";
 import {
   getCurrentQuorumForNamespace,
   getQuorumForProposalForNamespace,

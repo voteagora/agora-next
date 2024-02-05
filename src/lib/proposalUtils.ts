@@ -1,7 +1,7 @@
 import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
-import { Proposal, ProposalPayload } from "@/app/api/proposals/proposal";
+import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import {
   Abi,
   decodeFunctionData,

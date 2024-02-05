@@ -7,7 +7,7 @@ import {
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
