@@ -53,6 +53,8 @@ npx prisma db pull
 npx prisma generate
 ```
 
+More information about how to work with the database can be found in the [Database Maunal](https://www.notion.so/argoagora/931fd8eb09a448f398e7ca29a4ea828b?v=33621ec012de422d8f12ffe642629d6c)
+
 ### Typescript vs. Javascript
 
 You will see a mix of JS and TS. Don't be alarmed. TS was meant to bolster the productivity of Javascript engineers but sometimes, it can get in the way when you are doing something simple. As a general rule, we will want backend API code written in TypeScript and will eventually move the whole app over, but if some views start as JSX files, don't complain or hammer Discord. Learn to love the chaos.
