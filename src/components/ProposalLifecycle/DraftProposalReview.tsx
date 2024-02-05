@@ -54,17 +54,17 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
           <p>Please review carefully</p>
         </div>
         <div className="flex flex-col gap-y-6 px-6 pt-6 pb-9 bg-white border border-gray-eb rounded-2xl z-20">
-          <h3 className="text-2xl font-black">{variables.proposalTitle}</h3>
+          <h3 className="text-2xl font-black">{proposalState.title}</h3>
           <div className="bg-[#F7F7F7] h-[160px] rounded-lg border border-gray-eo"></div>
           <div className="flex flex-col gap-y-1 text-base">
             <label className="font-medium">Description</label>
-            <p className="text-gray-4f">{variables.proposalDescription}</p>
+            <p className="text-gray-4f">{proposalState.description}</p>
           </div>
           <div className="flex flex-col gap-y-1 text-base">
             <label className="font-medium">Abstract</label>
-            {/* in markdown */}
+            {/* TODO in markdown */}
             <p className="text-gray-4f max-w-[620px]">
-              {variables.proposalAbstract}
+              {proposalState.abstract}
             </p>
           </div>
         </div>
