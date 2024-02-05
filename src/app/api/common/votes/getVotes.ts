@@ -196,6 +196,50 @@ export async function getVotesForProposalForNamespace({
   };
 }
 
+export async function getUserVotesForProposalForNamespace({
+  proposal_id,
+  address,
+  namespace,
+}: {
+  proposal_id: string;
+  address: string;
+  namespace: "optimism";
+}) {
+  const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
+    `
+    SELECT 
+      STRING_AGG(transaction_hash,'|') as transaction_hash,
+      proposal_id,
+      proposal_type,
+      proposal_data,
+      voter,
+      support,
+      SUM(weight::numeric) as weight,
+      STRING_AGG(distinct reason, '\n --------- \n') as reason,
+      MAX(block_number) as block_number,
+      params
+    FROM ${namespace + ".votes"}
+    WHERE proposal_id = $1AND voter = $2
+    GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
+    `,
+    proposal_id,
+    address.toLowerCase()
+  );
+
+  const latestBlock = await provider.getBlock("latest");
+
+  return votes.map((vote) =>
+    parseVote(
+      vote,
+      parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      ),
+      latestBlock
+    )
+  );
+}
+
 export async function getVotesForProposalAndDelegateForNamespace({
   proposal_id,
   address,

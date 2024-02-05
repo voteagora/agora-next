@@ -2,6 +2,7 @@ import { getVotingPowerAtSnapshot } from "../voting-power/getVotingPower";
 import { getAuthorityChains } from "../authority-chains/getAuthorityChains";
 import { getDelegate } from "../delegates/getDelegates";
 import {
+  getUserVotesForProposalForNamespace,
   getVotesForDelegateForNamespace,
   getVotesForProposalAndDelegateForNamespace,
   getVotesForProposalForNamespace,
@@ -43,6 +44,19 @@ export const getVotesForProposal = ({
     page,
     sort,
     sortOrder,
+    namespace: "optimism",
+  });
+
+export const getUserVotesForProposal = ({
+  proposal_id,
+  address,
+}: {
+  proposal_id: string;
+  address: string;
+}) =>
+  getUserVotesForProposalForNamespace({
+    proposal_id,
+    address,
     namespace: "optimism",
   });
 
