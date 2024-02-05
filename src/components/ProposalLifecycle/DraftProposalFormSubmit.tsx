@@ -26,7 +26,7 @@ const DraftProposalFormSubmit: React.FC = () => {
           <p className="text-gray-4f px-6 pb-7 max-w-[620px]">
             {staticText.description}
           </p>
-          <DraftProposalReview description="asd" checkmarkInfo="asd" />
+          <DraftProposalReview />
         </AccordionContent>
       </AccordionItem>
     </div>
