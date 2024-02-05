@@ -4,6 +4,9 @@ import Image from "next/image";
 interface DraftProposalCreateButtonProps {
   description: string;
   checkmarkInfo: string;
+  setStage: React.Dispatch<
+    React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
+  >;
 }
 
 const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
@@ -16,7 +19,10 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
       <div className="flex flex-col px-6 pt-6 pb-9 bg-white border-gray-eb rounded-b-lg shadow">
         <div className="flex flex-row w-full justify-between items-center">
           <p className="text-gray-4f max-w-[400px]">{description}</p>
-          <button className="w-[200px] flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm">
+          <button
+            className="w-[200px] flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm"
+            onClick={() => props.setStage("draft-submit")}
+          >
             <span className="flex flex-row items-center">Create draft</span>
           </button>
         </div>

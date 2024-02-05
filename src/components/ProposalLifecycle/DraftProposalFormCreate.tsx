@@ -1,10 +1,14 @@
-import React from "react";
+"use client";
+
+import React, { useContext } from "react";
 
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
+
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 import DraftProposalAbstract from "./DraftProposalAbstract";
 import DraftProposalTextInput from "./DraftProposalTextInput";
@@ -31,7 +35,17 @@ const staticText = {
     "Both of these are required. Please uncheck only if you’ve already completed these manually.",
 };
 
-const DraftProposalFormCreate: React.FC = () => {
+interface DraftProposalFormCreateProps {
+  setStage: React.Dispatch<
+    React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
+  >;
+}
+
+const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
+  props
+) => {
+  const { setStage } = props;
+
   return (
     <div className="">
       <AccordionItem
@@ -68,6 +82,7 @@ const DraftProposalFormCreate: React.FC = () => {
           <DraftProposalCreateButton
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
+            setStage={setStage}
           />
         </AccordionContent>
       </AccordionItem>

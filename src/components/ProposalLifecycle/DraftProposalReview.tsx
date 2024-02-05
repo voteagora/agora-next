@@ -1,11 +1,11 @@
-import { icons } from "@/icons/icons";
-import Image from "next/image";
-import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
+"use client";
 
-interface DraftProposalReviewProps {
-  description: string;
-  checkmarkInfo: string;
-}
+import React, { useContext } from "react";
+
+import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
+
+interface DraftProposalReviewProps {}
 
 const staticText = {
   submitRequirement:
@@ -21,7 +21,30 @@ const variables = {
 };
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { description, checkmarkInfo } = props;
+  const { state: proposalState } = useContext(ProposalLifecycleDraftContext);
+
+  const handleSubmitProposal = () => {
+    alert(
+      "Proposal submitted. Title: " +
+        proposalState.title +
+        " Description: " +
+        proposalState.description +
+        " Abstract: " +
+        proposalState.abstract +
+        " Proposal Type: " +
+        proposalState.proposalType +
+        " Transaction: " +
+        proposalState.transaction +
+        " Audit URL: " +
+        proposalState.auditURL +
+        " Update ENS Docs Status: " +
+        proposalState.updateENSDocsStatus +
+        " Post on Discourse Status: " +
+        proposalState.postOnDiscourseStatus +
+        " Temp Check Link: " +
+        proposalState.tempCheckLink
+    );
+  };
 
   return (
     <div>
@@ -69,7 +92,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               ></input>
             </div>
           </div>
-          <button className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4">
+          <button
+            className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4"
+            onClick={handleSubmitProposal}
+          >
             Submit proposal
           </button>
         </div>

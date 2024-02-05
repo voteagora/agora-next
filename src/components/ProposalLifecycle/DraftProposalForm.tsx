@@ -29,7 +29,7 @@ const DraftProposalForm: React.FC = () => {
       >
         <DraftProposalFormTempCheck setStage={setStage} />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
-        <DraftProposalFormCreate />
+        <DraftProposalFormCreate setStage={setStage} />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit />
       </Accordion>
