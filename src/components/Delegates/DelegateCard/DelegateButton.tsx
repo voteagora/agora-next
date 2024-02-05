@@ -5,7 +5,6 @@ import {
   fetchDirectDelegatee,
   fetchBalanceForDirectDelegation,
 } from "@/app/delegates/actions";
-import { Delegatees } from "@prisma/client";
 
 export function DelegateButton({
   full,
@@ -25,9 +24,7 @@ export function DelegateButton({
           params: {
             delegate,
             fetchBalanceForDirectDelegation,
-            fetchDirectDelegatee: fetchDirectDelegatee as (
-              addressOrENSName: string
-            ) => Promise<Delegatees>,
+            fetchDirectDelegatee,
           },
         });
       }}

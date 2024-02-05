@@ -17,7 +17,7 @@ import HumanAddress from "../shared/HumanAddress";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 
 type Props = {

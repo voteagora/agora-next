@@ -8,10 +8,10 @@ import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
 import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
-import { Proposal } from "@/app/api/proposals/proposal";
-import { Delegate } from "@/app/api/delegates/delegate";
-import { Vote } from "@/app/api/votes/vote";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Vote } from "@/app/api/common/votes/vote";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 
 type Props = {
   proposal: Proposal;

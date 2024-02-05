@@ -6,7 +6,7 @@ import { fetchDelegateStatement } from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import DelegateStatementForm from "./DelegateStatementForm";
 import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
-import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
+import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
