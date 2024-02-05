@@ -1,12 +1,19 @@
 import { getFeedLogs } from "@/app/api/feed/getFeedLogs";
+import FeedEventFilter from "@/components/Feed/FeedEventFilter";
 
-async function getLogs() {
+async function getLogs(params: {
+  page?: number;
+  sort?: string;
+  seed?: number;
+  event: "all" | "delegations" | "votes";
+}) {
   "use server";
 
-  return getFeedLogs({});
+  return getFeedLogs(params);
 }
 
 /**
+ * TODO: frh -> I assume having a feed of proposal creation makes no sense since this can already be seen in current page and there are 55 proposals
  * TODO: frh ->
  *
  * 1.  See how to get date from events
@@ -26,8 +33,12 @@ async function getLogs() {
  *
  */
 
-export default async function Page() {
-  const logs = await getLogs();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { event: "all" | "delegations" | "votes" };
+}) {
+  const logs = await getLogs({ event: searchParams?.event });
   console.log("logs: ", logs);
   // let uniqueEvents = logs
   //   .filter((v, i, a) => a.findIndex((t) => t.eventName === v.eventName) === i)
@@ -35,7 +46,7 @@ export default async function Page() {
 
   // console.log("uniqueEvents: ", uniqueEvents);
   return (
-    <span>hello</span>
+    <FeedEventFilter />
     // <div className="flex flex-col gap-4">
     //   {/* TODO: frh -> optimize this reverse */}
     //   {logs.reverse().map((log) => {
