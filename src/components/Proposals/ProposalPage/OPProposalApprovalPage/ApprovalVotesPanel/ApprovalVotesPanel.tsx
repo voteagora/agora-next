@@ -10,7 +10,7 @@ import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalPropos
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { Vote } from "@/app/api/votes/vote";
+import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 
 type Props = {

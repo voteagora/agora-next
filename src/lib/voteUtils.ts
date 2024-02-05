@@ -8,7 +8,7 @@ import {
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
-import { Vote, VotePayload } from "@/app/api/votes/vote";
+import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { isOldApprovalModule } from "./contracts/contracts";
 import { DEPLOYMENT_NAME } from "./config";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";

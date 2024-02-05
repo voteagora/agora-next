@@ -10,7 +10,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { Vote } from "@/app/api/votes/vote";
+import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 import { fetchAndSetAll } from "@/lib/utils";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
