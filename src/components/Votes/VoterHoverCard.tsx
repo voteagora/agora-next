@@ -10,7 +10,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Delegation } from "@/app/api/delegations/delegation";
 

@@ -9,7 +9,7 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import HumanAddress from "../shared/HumanAddress";
 import styles from "./header.module.scss";
 import Image from "next/image";

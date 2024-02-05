@@ -9,7 +9,7 @@ import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesL
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/proposals/proposal";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import { Vote } from "@/app/api/votes/vote";
 import { VotingPowerData } from "@/app/api/voting-power/votingPower";
 

@@ -9,7 +9,7 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
 import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/delegations/delegation";
