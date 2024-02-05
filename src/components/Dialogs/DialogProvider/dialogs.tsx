@@ -9,7 +9,7 @@ import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelega
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 
