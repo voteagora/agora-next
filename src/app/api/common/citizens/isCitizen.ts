@@ -17,7 +17,7 @@ export async function isCitizenForNamespace(
     SELECT address
     FROM agora.address_metadata
     WHERE kind = 'citizen' 
-    AND dao_slug = ${daoSlug}
+    AND dao_slug = ${daoSlug}::config.dao_slug
     AND LOWER(address) = LOWER(${address});
     `
   );
