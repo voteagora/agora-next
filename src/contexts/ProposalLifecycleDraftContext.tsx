@@ -4,7 +4,7 @@ import React, { createContext, useReducer, ReactNode } from "react";
 
 interface ProposalLifecycleDraft {
   tempCheckLink: string;
-  proposalType: "Executable" | "Social";
+  proposalType: "executable" | "social";
   title: string;
   description: string;
   abstract: string;
@@ -16,7 +16,7 @@ interface ProposalLifecycleDraft {
 
 type ProposalLifecycleDraftUpdateFunction =
   | { type: "UPDATE_TEMP_CHECK_LINK"; payload: string }
-  | { type: "UPDATE_PROPOSAL_TYPE"; payload: "Executable" | "Social" }
+  | { type: "UPDATE_PROPOSAL_TYPE"; payload: "executable" | "social" }
   | { type: "UPDATE_TITLE"; payload: string }
   | { type: "UPDATE_DESCRIPTION"; payload: string }
   | { type: "UPDATE_ABSTRACT"; payload: string }
@@ -27,7 +27,7 @@ type ProposalLifecycleDraftUpdateFunction =
 
 const initialState: ProposalLifecycleDraft = {
   tempCheckLink: "",
-  proposalType: "Executable",
+  proposalType: "executable",
   title: "",
   description: "",
   abstract: "",
@@ -70,7 +70,7 @@ const reducer = (
 export const ProposalLifecycleDraftContext = createContext<{
   state: ProposalLifecycleDraft;
   updateTempCheckLink: (tempCheckLink: string) => void;
-  updateProposalType: (proposalType: "Executable" | "Social") => void;
+  updateProposalType: (proposalType: "executable" | "social") => void;
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
   updateAbstract: (abstract: string) => void;
@@ -102,7 +102,7 @@ export const ProposalLifecycleDraftProvider = ({
     dispatch({ type: "UPDATE_TEMP_CHECK_LINK", payload: tempCheckLink });
   };
 
-  const updateProposalType = (proposalType: "Executable" | "Social") => {
+  const updateProposalType = (proposalType: "executable" | "social") => {
     dispatch({ type: "UPDATE_PROPOSAL_TYPE", payload: proposalType });
   };
 

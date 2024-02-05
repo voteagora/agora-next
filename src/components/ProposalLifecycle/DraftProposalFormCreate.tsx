@@ -11,10 +11,11 @@ import {
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 import DraftProposalAbstract from "./DraftProposalAbstract";
-import DraftProposalTextInput from "./DraftProposalTextInput";
 import DraftProposalTypeChoice from "./DraftProposalTypeChoice";
 import DraftProposalTransaction from "./DraftProposalTransaction";
 import DraftProposalCreateButton from "./DraftProposalCreateButton";
+import DraftProposalTitleInput from "./DraftProposalTitleInput";
+import DraftProposalDescriptionInput from "./DraftProposalDescriptionInput";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -63,11 +64,11 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
             label="Proposal type"
             explanation={staticText.proposalTypeExplanation}
           />
-          <DraftProposalTextInput
+          <DraftProposalTitleInput
             label="Title"
             placeholder={staticText.proposalTitlePlaceholder}
           />
-          <DraftProposalTextInput
+          <DraftProposalDescriptionInput
             label="Description"
             placeholder={staticText.proposalDescriptionPlaceholder}
           />

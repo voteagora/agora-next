@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useContext } from "react";
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 interface DraftProposalTypeChoiceProps {
   label: string;
@@ -12,8 +13,8 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
 ) => {
   const { label, explanation } = props;
 
-  const [proposalType, setProposalType] = useState<"executable" | "social">(
-    "executable"
+  const { state, updateProposalType } = useContext(
+    ProposalLifecycleDraftContext
   );
 
   return (
@@ -23,17 +24,19 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
         <div className="flex flex-row p-1 rounded-lg border border-gray-eo">
           <button
             className={`py-2 px-5 font-medium rounded-lg ${
-              proposalType === "executable" ? "bg-gray-fa" : "text-gray-af"
+              state.proposalType === "executable"
+                ? "bg-gray-fa"
+                : "text-gray-af"
             }`}
-            onClick={() => setProposalType("executable")}
+            onClick={() => updateProposalType("executable")}
           >
             Executable
           </button>
           <button
             className={`py-2 px-5 font-medium rounded-lg ${
-              proposalType === "social" ? "bg-gray-fa" : "text-gray-af"
+              state.proposalType === "social" ? "bg-gray-fa" : "text-gray-af"
             }`}
-            onClick={() => setProposalType("social")}
+            onClick={() => updateProposalType("social")}
           >
             Social
           </button>
