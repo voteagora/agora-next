@@ -37,7 +37,7 @@ export function DelegateActions({
       <div>
         {isConnected ? (
           address &&
-          (address && isAdvancedUser ? (
+          (isAdvancedUser ? (
             <AdvancedDelegateButton
               delegate={delegate}
               delegators={delegators}
