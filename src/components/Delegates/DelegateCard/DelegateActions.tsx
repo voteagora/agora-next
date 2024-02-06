@@ -10,6 +10,7 @@ import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
+import { type SyntheticEvent } from "react";
 
 export function DelegateActions({
   delegate,
@@ -46,7 +47,17 @@ export function DelegateActions({
           ))
         ) : (
           <ConnectKitButton.Custom>
-            {({ show }) => <Button onClick={() => show?.()}>Delegate</Button>}
+            {({ show }) => (
+              <Button
+                onClick={(e: SyntheticEvent) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  show?.();
+                }}
+              >
+                Delegate
+              </Button>
+            )}
           </ConnectKitButton.Custom>
         )}
       </div>
