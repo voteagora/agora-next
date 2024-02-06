@@ -17,15 +17,14 @@ async function fetchProposal(proposal_id) {
 export async function generateMetadata({ params }, parent) {
   const { proposal } = await fetchProposal(params.proposal_id);
 
-  const title = truncateString(cleanString(proposal.markdowntitle), 60);
-  const description = truncateString(cleanString(proposal.description), 160);
+  const title = truncateString(cleanString(proposal.markdowntitle), 40);
+  const description = truncateString(cleanString(proposal.description), 80);
 
-  const ogTitle = `Agora - OP Proposal: ${title}`;
   const preview = `/api/images/og/proposal?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
 
   return {
-    title: ogTitle,
-    description: description,
+    title: `Agora - OP Proposal: ${title}`,
+    description: cleanString(proposal.description),
     openGraph: {
       images: [preview],
     },
