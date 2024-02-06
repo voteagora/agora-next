@@ -23,9 +23,7 @@ export async function getNeedsMyVoteProposalsForNamespace({
   }
 
   const prodDataOnly =
-    process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-      ? `AND contract = ${contracts(namespace).governor.address.toLowerCase()}` // TODO: use namespace flag to determine contract
-      : "";
+    process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? `AND contract = $3` : "";
 
   const proposals = await prisma.$queryRawUnsafe<ProposalPayload[]>(
     `
@@ -44,7 +42,8 @@ export async function getNeedsMyVoteProposalsForNamespace({
       WHERE v.proposal_id IS NULL;
       `,
     latestBlock.number,
-    address.toLowerCase()
+    address.toLowerCase(),
+    contracts(namespace).governor.address.toLowerCase()
   );
 
   const resolvedProposals = Promise.all(
