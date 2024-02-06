@@ -8,6 +8,8 @@ import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Delegation } from "@/app/api/common/delegations/delegation";
+import { Button } from "@/components/Button";
+import { ConnectKitButton } from "connectkit";
 
 export function DelegateActions({
   delegate,
@@ -32,16 +34,21 @@ export function DelegateActions({
     >
       <DelegateSocialLinks discord={discord} twitter={twitter} />
       <div>
-        {isConnected &&
+        {isConnected ? (
           address &&
-          (isAdvancedUser ? (
+          (address && isAdvancedUser ? (
             <AdvancedDelegateButton
               delegate={delegate}
               delegators={delegators}
             />
           ) : (
             <DelegateButton full={!twitter && !discord} delegate={delegate} />
-          ))}
+          ))
+        ) : (
+          <ConnectKitButton.Custom>
+            {({ show }) => <Button onClick={() => show?.()}>Delegate</Button>}
+          </ConnectKitButton.Custom>
+        )}
       </div>
     </HStack>
   );
