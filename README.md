@@ -53,7 +53,7 @@ npx prisma db pull
 npx prisma generate
 ```
 
-More information about how to work with the database can be found in the [Database Maunal](https://www.notion.so/argoagora/931fd8eb09a448f398e7ca29a4ea828b?v=33621ec012de422d8f12ffe642629d6c)
+More information about how to work with the database can be found in the [Database Maunal](https://www.notion.so/argoagora/Database-Manual-7f59ed03bffb4096a2b19e34e2956085)
 
 ### Typescript vs. Javascript
 
