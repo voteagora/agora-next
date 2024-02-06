@@ -1,10 +1,10 @@
-import React from "react";
-import { HStack, VStack } from "@/components/Layout/Stack";
-import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
-import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
-import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import { getProposal } from "@/app/api/proposals/getProposals";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
+import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
+import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
+import React from "react";
 
 async function fetchProposal(proposal_id) {
   "use server";
@@ -17,17 +17,15 @@ async function fetchProposal(proposal_id) {
 export async function generateMetadata({ params }, parent) {
   const { proposal } = await fetchProposal(params.proposal_id);
 
+  const title = truncateString(cleanString(proposal.markdowntitle), 60);
+  const description = truncateString(cleanString(proposal.description), 160);
 
-  const cleanTitle = cleanString(proposal.markdowntitle);
-  const cleanDescription = cleanString(proposal.description);
-  const truncatedTitle =    truncateString(cleanTitle, 60);
-  const truncatedDescription = truncateString(cleanDescription,160);
-  const title = `Agora - OP Proposal: ${truncatedTitle}`
-  const preview = `/api/images/og/proposal?title=${encodeURIComponent(truncatedTitle)}&description=${encodeURIComponent(truncatedDescription)}`
+  const ogTitle = `Agora - OP Proposal: ${title}`;
+  const preview = `/api/images/og/proposal?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
 
   return {
-    title: title,
-    description: truncatedDescription,
+    title: ogTitle,
+    description: description,
     openGraph: {
       images: [preview],
     },
