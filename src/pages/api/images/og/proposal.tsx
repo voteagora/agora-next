@@ -5,7 +5,6 @@ export const runtime = "edge";
 
 export default async function GET(
   req: NextApiRequest,
-  res: NextApiResponse<ImageResponse>,
 ) {
 
   const { searchParams } = new URL(req.url);
@@ -36,7 +35,6 @@ export default async function GET(
         <div tw="flex flex-col justify-between h-full px-16 pt-16 pb-22">
 
           <div tw="flex">
-
             <div tw="flex flex-row items-center border border-gray-300 rounded-full px-8 py-6">
 
               <svg tw="w-10 h-10" viewBox="0 0 16 16" fill="none"
@@ -57,9 +55,7 @@ export default async function GET(
                   </clipPath>
                 </defs>
               </svg>
-
               <div tw="bg-gray-300 w-1 h-3/4 mx-8"></div>
-
               <svg tw="w-10 h-10" viewBox="0 0 1024 1024" fill="none"
                    xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_7374_19399)">
@@ -77,7 +73,6 @@ export default async function GET(
                   </clipPath>
                 </defs>
               </svg>
-
             </div>
           </div>
 
