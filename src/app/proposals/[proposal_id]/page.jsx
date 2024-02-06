@@ -4,6 +4,7 @@ import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/O
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import { getProposal } from "@/app/api/proposals/getProposals";
+import { cleanString, truncateString } from "@/app/lib/utils/text";
 
 async function fetchProposal(proposal_id) {
   "use server";
@@ -16,25 +17,24 @@ async function fetchProposal(proposal_id) {
 export async function generateMetadata({ params }, parent) {
   const { proposal } = await fetchProposal(params.proposal_id);
 
-  const cleanText = (text) => {
-    return text
-      .replace(/#{1,6}\s/g, "") // Removes Markdown headings
-      .replace(/\n/g, " "); // Replaces newlines with space
-  };
 
-  const cleanTitle = cleanText(proposal.markdowntitle);
-  const truncatedTitle =
-    cleanTitle.length > 60 ? cleanTitle.substring(0, 57) + "..." : cleanTitle;
-
-  const cleanDescription = cleanText(proposal.description);
-  const truncatedDescription =
-    cleanDescription.length > 160
-      ? cleanDescription.substring(0, 157) + "..."
-      : cleanDescription;
+  const cleanTitle = cleanString(proposal.markdowntitle);
+  const cleanDescription = cleanString(proposal.description);
+  const truncatedTitle =    truncateString(cleanTitle, 60);
+  const truncatedDescription = truncateString(cleanDescription,160);
+  const title = `Agora - OP Proposal: ${truncatedTitle}`
+  const preview = `/api/images/og/proposal?title=${encodeURIComponent(truncatedTitle)}&description=${encodeURIComponent(truncatedDescription)}`
 
   return {
-    title: `Agora - OP Proposal: ${truncatedTitle}`,
+    title: title,
     description: truncatedDescription,
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
   };
 }
 
