@@ -59,9 +59,9 @@ async function getVotingPowerForProposalByAddress({
   >(
     `
     SELECT 
-      balance,
       proxy,
-      allowance * (1 - COALESCE(subdelegated_share, 0)) as available_vp
+      MAX(balance),
+      SUM(allowance * (1 - COALESCE(subdelegated_share, 0))) as available_vp
     FROM (
       SELECT
         a.delegate,
@@ -93,7 +93,8 @@ async function getVotingPowerForProposalByAddress({
         LIMIT 1
       ) AS a ON TRUE
     ) t
-    WHERE allowance > 0;
+    WHERE allowance > 0
+    GROUP BY proxy;
     `,
     address,
     contracts(namespace).alligator.address.toLowerCase(),
@@ -105,12 +106,14 @@ async function getVotingPowerForProposalByAddress({
     advancedVotingPowerQuery,
   ]);
 
+  // We need to recalculate advanced vp to account for voted vp
+  // If a user has voted, then chnaged their subdelegation, new delegate might not be able to use the full allowance
   const advancedVP = await (async () => {
     const avialableVP = await Promise.all(
       advancedVotingPower.map(async (row) => {
         const weightCastByProxy = await contracts(
           namespace
-        ).governor.contract.weightCast(row.proxy.toString(), proposalId);
+        ).governor.contract.weightCast(proposalId, row.proxy.toString());
         const remainingVP =
           BigInt(row.balance?.toFixed(0) ?? 0) - weightCastByProxy;
 
