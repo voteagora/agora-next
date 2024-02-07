@@ -8,6 +8,15 @@ module.exports = {
 };
 
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/delegate/:addressOrENSName',
+        destination: '/delegates/:addressOrENSName',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
