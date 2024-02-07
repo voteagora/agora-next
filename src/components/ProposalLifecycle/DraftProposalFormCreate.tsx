@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useContext } from "react";
 
 import {
   AccordionContent,
@@ -6,11 +8,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
+
 import DraftProposalAbstract from "./DraftProposalAbstract";
-import DraftProposalTextInput from "./DraftProposalTextInput";
 import DraftProposalTypeChoice from "./DraftProposalTypeChoice";
 import DraftProposalTransaction from "./DraftProposalTransaction";
 import DraftProposalCreateButton from "./DraftProposalCreateButton";
+import DraftProposalTitleInput from "./DraftProposalTitleInput";
+import DraftProposalDescriptionInput from "./DraftProposalDescriptionInput";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -31,7 +36,17 @@ const staticText = {
     "Both of these are required. Please uncheck only if you’ve already completed these manually.",
 };
 
-const DraftProposalFormCreate: React.FC = () => {
+interface DraftProposalFormCreateProps {
+  setStage: React.Dispatch<
+    React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
+  >;
+}
+
+const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
+  props
+) => {
+  const { setStage } = props;
+
   return (
     <div className="">
       <AccordionItem
@@ -49,11 +64,11 @@ const DraftProposalFormCreate: React.FC = () => {
             label="Proposal type"
             explanation={staticText.proposalTypeExplanation}
           />
-          <DraftProposalTextInput
+          <DraftProposalTitleInput
             label="Title"
             placeholder={staticText.proposalTitlePlaceholder}
           />
-          <DraftProposalTextInput
+          <DraftProposalDescriptionInput
             label="Description"
             placeholder={staticText.proposalDescriptionPlaceholder}
           />
@@ -68,6 +83,7 @@ const DraftProposalFormCreate: React.FC = () => {
           <DraftProposalCreateButton
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
+            setStage={setStage}
           />
         </AccordionContent>
       </AccordionItem>
