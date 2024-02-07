@@ -4,7 +4,7 @@ import { DelegateActions } from "./DelegateActions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { fetchCurrentDelegators } from "@/app/delegates/actions";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 

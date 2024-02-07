@@ -12,12 +12,10 @@ import {
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import {
   getProxy,
-  getVotingPowerAtSnapshot,
   getVotingPowerAvailableForDirectDelegation,
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
-import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import {
@@ -25,22 +23,13 @@ import {
   getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
 
   return await getVotesForProposal({ proposal_id, page });
-}
-
-async function fetchVotingPower(
-  addressOrENSName: string | `0x${string}`,
-  blockNumber: number
-) {
-  "use server";
-
-  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
 }
 
 // Pass address of the connected wallet
@@ -50,20 +39,6 @@ async function fetchBalanceForDirectDelegation(
   "use server";
 
   return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
-}
-
-async function fetchAuthorityChains(
-  address: string | `0x${string}`,
-  blockNumber: number
-) {
-  "use server";
-
-  return {
-    chains: await getAuthorityChains({
-      blockNumber,
-      address,
-    }),
-  };
 }
 
 async function fetchDelegate(addressOrENSName: string | `0x${string}`) {

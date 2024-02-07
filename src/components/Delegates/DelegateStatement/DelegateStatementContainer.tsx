@@ -4,7 +4,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import DelegateStatement from "./DelegateStatement";
-import { type DelegateStatement as DelegateStatementType } from "@/app/api/delegateStatement/delegateStatement";
+import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
 
 export default function DelegateStatementContainer({
   addressOrENSName,

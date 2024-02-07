@@ -1,7 +1,7 @@
-import { ProposalType, Proposals } from "@prisma/client";
+import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import {
   Abi,
   decodeFunctionData,
@@ -176,7 +176,7 @@ export function getTitleFromProposalDescription(description: string = "") {
  */
 
 export async function parseProposal(
-  proposal: Proposals,
+  proposal: ProposalPayload,
   latestBlock: Block | null,
   quorum: bigint | null,
   votableSupply: bigint
@@ -558,7 +558,7 @@ export type ProposalStatus =
   | "EXECUTED";
 
 export async function getProposalStatus(
-  proposal: Proposals,
+  proposal: ProposalPayload,
   proposalResults: ParsedProposalResults[ProposalType],
   latestBlock: number,
   quorum: bigint | null,

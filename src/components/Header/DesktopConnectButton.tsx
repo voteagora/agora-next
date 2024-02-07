@@ -1,6 +1,6 @@
 import { ConnectKitButton } from "connectkit";
 import styles from "./header.module.scss";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import { DesktopProfileDropDown } from "./DesktopProfileDropDown";
 
 export function DesktopConnectButton({

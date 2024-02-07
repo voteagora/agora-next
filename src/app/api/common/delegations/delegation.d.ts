@@ -1,3 +1,7 @@
+import { OptimismDelegatees } from "@prisma/client";
+
+export type DelegateePayload = OptimismDelegatees;
+
 export type Delegation = {
   from: string;
   to: string;

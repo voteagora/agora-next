@@ -91,9 +91,9 @@ export function formatNumberForAdvancedDelegation(amount: string) {
  * Contract calls
  *
  */
-export async function getTokenSupply(dao: "OPTIMISM") {
+export async function getTokenSupply(dao: "optimism") {
   switch (dao) {
-    case "OPTIMISM": {
+    case "optimism": {
       return OptimismContracts.token.contract.totalSupply();
     }
   }

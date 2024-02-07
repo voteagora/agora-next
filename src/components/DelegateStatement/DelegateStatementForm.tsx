@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useAccount, useWalletClient, useSignMessage } from "wagmi";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import {
   fetchDelegate,
   submitDelegateStatement,
