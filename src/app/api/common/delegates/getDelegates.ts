@@ -163,9 +163,34 @@ export async function getDelegateForNamespace({
       isCitizenForNamespace(address, namespace),
     ]);
 
+  const numOfDelegatesQuery = prisma.$queryRawUnsafe<
+    { num_of_delegators: BigInt }[]
+  >(
+    `
+    SELECT 
+      SUM(count) as num_of_delegators
+    FROM (
+      SELECT count(*)
+      FROM optimism.advanced_delegatees
+      WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
+      UNION ALL
+      SELECT
+        SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+      FROM center.optimism_delegate_changed_events
+      WHERE to_delegate=$1 OR from_delegate=$1
+    ) t;
+    `,
+    address,
+    contracts(namespace).alligator.address.toLowerCase()
+  );
+
   const totalVotingPower =
     BigInt(delegate?.voting_power || 0) +
     BigInt(delegate?.advanced_vp?.toFixed(0) || 0);
+
+  const cachedNumOfDelegators = BigInt(
+    delegate.num_of_delegators?.toFixed() || "0"
+  );
 
   // Build out delegate JSON response
   return {
@@ -186,7 +211,14 @@ export async function getDelegateForNamespace({
     votedAbstain: delegate?.abstain?.toString() || "0",
     votingParticipation: delegate?.participation_rate || 0,
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
-    numOfDelegators: BigInt(delegate?.num_of_delegators?.toFixed(0) || 0n),
+    numOfDelegators:
+      // Use cached amount when recalculation is expensive
+      cachedNumOfDelegators < 1000n
+        ? BigInt(
+            (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
+              "0"
+          )
+        : cachedNumOfDelegators,
     statement: delegateStatement,
   };
 }
