@@ -16,7 +16,16 @@ import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
-  fetchAllForVoting: any;
+  fetchAllForVoting: (
+    address: string | `0x${string}`,
+    blockNumber: number,
+    proposal_id: string
+  ) => Promise<{
+    votingPower: VotingPowerData;
+    authorityChains: string[][];
+    delegate: Delegate;
+    votesForProposalAndDelegate: Vote[];
+  }>;
 };
 
 export default function ApprovalCastVoteButton({

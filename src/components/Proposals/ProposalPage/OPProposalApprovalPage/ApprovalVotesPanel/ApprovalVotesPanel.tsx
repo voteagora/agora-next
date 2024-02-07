@@ -10,6 +10,8 @@ import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalPropos
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 type Props = {
   proposal: Proposal;
@@ -32,7 +34,16 @@ type Props = {
     };
     votes: Vote[];
   }>;
-  fetchAllForVoting: any;
+  fetchAllForVoting: (
+    address: string | `0x${string}`,
+    blockNumber: number,
+    proposal_id: string
+  ) => Promise<{
+    votingPower: VotingPowerData;
+    authorityChains: string[][];
+    delegate: Delegate;
+    votesForProposalAndDelegate: Vote[];
+  }>;
   fetchUserVotesForProposal: (
     proposal_id: string,
     address: string | `0x${string}`
