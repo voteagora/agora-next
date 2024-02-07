@@ -19,13 +19,27 @@ import {
   fetchDelegateStatement,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
+import { formatNumber } from "@/lib/tokenUtils";
+import { truncateString } from "@/app/lib/utils/text";
 
 export async function generateMetadata(
   { params }: { params: any },
-  parent: any
+  parent: any,
 ) {
 
-  const preview = `/api/images/og/delegate`;
+  const [delegate, delegateStatement] =
+    await Promise.all([
+      fetchDelegate(params.addressOrENSName),
+      fetchDelegateStatement(params.addressOrENSName),
+    ]);
+
+  const description = encodeURIComponent("Optimism Voter");
+  const ens = encodeURIComponent("lefteris.eth");
+  const statement = (delegateStatement?.payload as { delegateStatement: string })?.delegateStatement;
+  const truncatedStatement = encodeURIComponent(truncateString(statement, 340));
+  const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
+
+  const preview = `/api/images/og/delegate?ens=${ens}&title=${ens}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
 
   return {
     title: `Agora - OP Voter`,
@@ -41,8 +55,8 @@ export async function generateMetadata(
 }
 
 export default async function Page({
-  params: { addressOrENSName },
-}: {
+                                     params: { addressOrENSName },
+                                   }: {
   params: { addressOrENSName: string };
 }) {
   const [delegate, delegateVotes, statement, delegatees, delegators] =
@@ -61,7 +75,8 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
+    <div
+      className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
@@ -98,14 +113,14 @@ export default async function Page({
               <DelegateVotes
                 fetchDelegateVotes={async (
                   page: number,
-                  sortOrder: VotesSortOrder
+                  sortOrder: VotesSortOrder,
                 ) => {
                   "use server";
 
                   return fetchVotesForDelegate(
                     addressOrENSName,
                     page,
-                    sortOrder
+                    sortOrder,
                   );
                 }}
               />

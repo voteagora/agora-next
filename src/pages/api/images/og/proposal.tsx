@@ -12,8 +12,12 @@ export default async function GET(
   const title = searchParams.has("title") ? searchParams.get("title") : "Agora Proposal";
   const description = searchParams.has("description") ? searchParams.get("description") : "My default description";
 
-  const fontData = await fetch(
-    new URL("../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
+  const interBoldFont = await fetch(
+    new URL("../../../../assets/fonts/Inter-Black.ttf", import.meta.url),
+  ).then((res) => res.arrayBuffer());
+
+  const interRegularFont = await fetch(
+    new URL("../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
 
@@ -87,8 +91,16 @@ export default async function GET(
       height: 630,
       fonts: [
         {
+          data: interBoldFont,
           name: "Inter",
-          data: fontData,
+          style: "normal",
+          weight: 900,
+        },
+        {
+          data: interRegularFont,
+          name: "Inter",
+          style: "normal",
+          weight: 500,
         },
       ],
     },

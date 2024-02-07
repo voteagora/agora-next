@@ -11,7 +11,7 @@ export default async function GET(
 
   const ens = searchParams.has("ens") ? searchParams.get("ens") : "optimismvoter.eth";
   const title = searchParams.has("title") ? searchParams.get("title") : "Optimism Agora";
-  const token = searchParams.has("token") ? searchParams.get("token") : "70.23k OP";
+  const votes = searchParams.has("votes") ? searchParams.get("votes") : "70.23k OP";
 
   const description = searchParams.has("description") ? searchParams.get("description") : "Home of Token House Governance and RPGF";
   const statement = searchParams.has("statement") ? searchParams.get("statement") : "Default delegate statement";
@@ -100,7 +100,7 @@ export default async function GET(
                   <div tw="flex w-16 h-16 bg-gray-800 rounded-full"></div>
                   <div tw="flex flex-col justify-center ml-5">
                     <div tw="flex text-2xl font-bold mb-1">{ens}</div>
-                    <div tw="flex text-xl text-slate-600">{token}</div>
+                    <div tw="flex text-xl text-slate-600">{votes}</div>
                   </div>
                 </div>
               </div>
