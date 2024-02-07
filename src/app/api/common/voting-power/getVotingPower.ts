@@ -87,7 +87,7 @@ async function getVotingPowerAtSnapshotByAddress({
     WHERE delegate = $1;
     `,
     address,
-    contracts(namespace).alligator.address.toLowerCase(), // TODO: update based on namespace
+    contracts(namespace).alligator.address.toLowerCase(),
     blockNumber
   );
 
