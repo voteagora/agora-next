@@ -71,7 +71,7 @@ async function getVotingPowerForProposalByAddress({
         proxy
       FROM (
         SELECT chain_str
-        FROM ${namespace + ".advanced_voting_power_raw_snaps_v2"}
+        FROM ${namespace + ".advanced_voting_power_raw_snaps"}
         WHERE contract = $2
           AND block_number <= $3
           AND delegate = $1
@@ -85,7 +85,7 @@ async function getVotingPowerForProposalByAddress({
           balance,
           proxy,
           block_number
-        FROM ${namespace + ".advanced_voting_power_raw_snaps_v2"}
+        FROM ${namespace + ".advanced_voting_power_raw_snaps"}
         WHERE chain_str=s.chain_str 
           AND contract = $2
           AND block_number <= $3

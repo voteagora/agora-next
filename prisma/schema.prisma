@@ -146,7 +146,9 @@ view advanced_voting_power_raw_snaps {
   rules              Json[]
   allowance          Decimal? @db.Decimal
   subdelegated_share Decimal? @db.Decimal
+  balance            Decimal? @db.Decimal
   block_number       BigInt?
+  proxy              String?
   contract           String?  @db.VarChar(42)
 
   @@ignore
@@ -164,7 +166,7 @@ view OptimismAuthorityChainsSnaps {
   allowance            Decimal  @db.Decimal
   contract             String?  @db.VarChar(42)
 
-  @@map("authority_chains_snaps_v2")
+  @@map("authority_chains_snaps")
   @@schema("optimism")
 }
 
@@ -289,6 +291,7 @@ view direct_chains_snaps {
   delegate             String?
   rules                Json[]
   chain                String[]
+  proxy                String?
   balance              Decimal? @db.Decimal
   balance_block_number BigInt?
   allowance            Decimal? @db.Decimal
@@ -334,6 +337,7 @@ view authority_chains_snaps_wrapper {
   delegate             String?
   rules                Json[]
   chain                String[]
+  proxy                String?
   balance              Decimal? @db.Decimal
   balance_block_number BigInt?
   allowance            Decimal? @db.Decimal
@@ -387,68 +391,6 @@ view subdelegation_events {
   subdelegation_rules String?
   block_number        BigInt?
   contract            String? @db.VarChar(42)
-
-  @@ignore
-  @@schema("optimism")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view direct_chains_snaps_v2 {
-  delegate             String?
-  rules                Json[]
-  chain                String[]
-  proxy                String?
-  balance              Decimal? @db.Decimal
-  balance_block_number BigInt?
-  allowance            Decimal? @db.Decimal
-  contract             String?  @db.VarChar(42)
-
-  @@ignore
-  @@schema("optimism")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view authority_chains_snaps_wrapper_v2 {
-  delegate             String?
-  rules                Json[]
-  chain                String[]
-  proxy                String?
-  balance              Decimal? @db.Decimal
-  balance_block_number BigInt?
-  allowance            Decimal? @db.Decimal
-  contract             String?  @db.VarChar(42)
-
-  @@ignore
-  @@schema("optimism")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view authority_chains_snaps {
-  id                   String?
-  delegate             String?
-  rules                Json[]
-  chain                String[]
-  balance              Decimal? @db.Decimal
-  balance_block_number BigInt?
-  allowance            Decimal? @db.Decimal
-  contract             String?  @db.VarChar(42)
-
-  @@ignore
-  @@schema("optimism")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view advanced_voting_power_raw_snaps_v2 {
-  chain_str          String?
-  delegate           String?
-  chain              String[]
-  rules              Json[]
-  allowance          Decimal? @db.Decimal
-  subdelegated_share Decimal? @db.Decimal
-  balance            Decimal? @db.Decimal
-  block_number       BigInt?
-  proxy              String?
-  contract           String?  @db.VarChar(42)
 
   @@ignore
   @@schema("optimism")
