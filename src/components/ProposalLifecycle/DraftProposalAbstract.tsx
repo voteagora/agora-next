@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useContext } from "react";
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
+
 import MarkdownPreview from "@uiw/react-markdown-preview";
 
 // example markdown to test with for the developer convenience :)
@@ -26,7 +28,7 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
   const { label, placeholder } = props;
 
   // can be markdown
-  const [abstractInput, setAbstractInput] = useState("");
+  const { state, updateAbstract } = useContext(ProposalLifecycleDraftContext);
   const [selectedMode, setSelectedMode] = useState<"write" | "preview">(
     "write"
   );
@@ -39,18 +41,21 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
           <textarea
             className="py-3 px-4 border-0 placeholder-gray-af w-full bg-gray-fa rounded-t-lg focus:outline-none focus:ring-0 resize-none"
             placeholder={placeholder}
-            onChange={(e) => setAbstractInput(e.target.value)}
-            value={abstractInput}
+            value={state.abstract}
+            onChange={(e) => updateAbstract(e.target.value)}
             rows={8}
           ></textarea>
         ) : (
           <div>
             <MarkdownPreview
-              source={abstractInput}
+              source={state.abstract}
               className="h-full py-3 px-4 rounded-t-lg max-w-[650px] bg-transparent"
               // make background transparent
               style={{
                 backgroundColor: "transparent",
+              }}
+              wrapperElement={{
+                "data-color-mode": "light",
               }}
             />
           </div>
