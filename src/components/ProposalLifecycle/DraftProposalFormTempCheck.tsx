@@ -31,7 +31,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
     ProposalLifecycleDraftContext
   );
 
-  const [isValidDiscourseLink, setIsValidDiscourseLink] = useState(true);
+  const [isValidDiscourseLink, setIsValidDiscourseLink] = useState(false);
 
   const handleTempCheckLinkChange = (
     e: React.ChangeEvent<HTMLInputElement>

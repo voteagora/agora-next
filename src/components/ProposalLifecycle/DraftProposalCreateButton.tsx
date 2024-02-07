@@ -1,5 +1,7 @@
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
+import { useContext } from "react";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -14,16 +16,19 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
 ) => {
   const { description, checkmarkInfo } = props;
 
+  const { state } = useContext(ProposalLifecycleDraftContext);
+
   return (
     <div className="bg-gray-fa rounded-b-2xl">
       <div className="flex flex-col px-6 pt-6 pb-9 bg-white border-gray-eb rounded-b-lg shadow">
         <div className="flex flex-row w-full justify-between items-center">
           <p className="text-gray-4f max-w-[400px]">{description}</p>
           <button
-            className="w-[200px] flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm"
+            className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
             onClick={() => props.setStage("draft-submit")}
+            disabled={!state.title || !state.description || !state.abstract}
           >
-            <span className="flex flex-row items-center">Create draft</span>
+            <span className="text-center">Create draft</span>
           </button>
         </div>
       </div>
