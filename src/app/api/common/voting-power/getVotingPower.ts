@@ -60,7 +60,7 @@ async function getVotingPowerForProposalByAddress({
     `
     SELECT 
       proxy,
-      MAX(balance),
+      MAX(balance) as balance,
       SUM(allowance * (1 - COALESCE(subdelegated_share, 0))) as available_vp
     FROM (
       SELECT
