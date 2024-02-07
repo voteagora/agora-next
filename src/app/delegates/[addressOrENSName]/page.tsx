@@ -5,31 +5,38 @@
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
-import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
-import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
+import { VotesSortOrder } from "@/app/api/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
-  fetchDelegateStatement,
-  fetchDelegate,
-  fetchVotesForDelegate,
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchVotesForDelegate,
 } from "@/app/delegates/actions";
 
 export async function generateMetadata(
   { params }: { params: any },
   parent: any
 ) {
+
+  const preview = `/api/images/og/delegate`;
+
   return {
     title: `Agora - OP Voter`,
     description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
   };
 }
 

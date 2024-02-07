@@ -36,7 +36,6 @@ export default async function GET(
 
           <div tw="flex">
             <div tw="flex flex-row items-center border border-gray-300 rounded-full px-8 py-6">
-
               <svg tw="w-10 h-10" viewBox="0 0 16 16" fill="none"
                    xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_379_1614)">

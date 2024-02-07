@@ -15,8 +15,8 @@ async function fetchProposal(proposal_id) {
 }
 
 export async function generateMetadata({ params }, parent) {
-  const { proposal } = await fetchProposal(params.proposal_id);
 
+  const { proposal } = await fetchProposal(params.proposal_id);
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
   const description = truncateString(cleanString(proposal.description), 80);
 
