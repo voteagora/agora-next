@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest } from "next";
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
@@ -12,10 +12,13 @@ export default async function GET(
   const title = searchParams.has("title") ? searchParams.get("title") : "Agora Proposal";
   const description = searchParams.has("description") ? searchParams.get("description") : "My default description";
 
-  const fontData = await fetch(
+  const interBoldFont = await fetch(
     new URL("../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
+  const interRegularFont = await fetch(
+    new URL("../../../../assets/fonts/Inter-Regular.ttf", import.meta.url),
+  ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
@@ -43,22 +46,26 @@ export default async function GET(
             </div>
 
             <div tw="flex flex-col">
-              <div tw="font-medium text-[68px] mb-8">{title}</div>
-              <div tw="font-black text-[42px] text-[#4F4F4F]">{description}</div>
+              <div tw="font-bold text-[68px] mb-6">{title}</div>
+              <div tw="font-regular text-[42px] text-[#4F4F4F]">{description}</div>
             </div>
           </div>
 
           <div tw="flex w-1/2">
-            <div tw="flex shadow-lg rounded-lg p-10 w-full">
+            <div tw="flex flex-col shadow-lg rounded-lg p-10 w-full">
 
-              <div tw="flex border border-gray-300">
-                <div tw="flex w-20 h-20 bg-gray-800 rounded-full"></div>
-                <div tw="flex flex-col ml-5">
-                  <div tw="flex">{title}</div>
-                  <div tw="flex">{description}</div>
+              <div tw="flex mb-6">
+
+                <div tw="flex">
+                  <div tw="flex w-16 h-16 bg-gray-800 rounded-full"></div>
+                  <div tw="flex flex-col justify-center ml-5">
+                    <div tw="flex text-2xl font-bold mb-1">{title}</div>
+                    <div tw="flex text-xl text-slate-600">{description}</div>
+                  </div>
                 </div>
               </div>
-            <div>So much text here</div>
+
+              <div tw="text-2xl text-slate-600">So much text here hello worls lsjdflskjf sljfsldkfjsdl;fksdj fsdkl;fsdjfl;kdsj</div>
             </div>
           </div>
         </div>
@@ -70,8 +77,16 @@ export default async function GET(
       height: 630,
       fonts: [
         {
+          data: interBoldFont,
           name: "Inter",
-          data: fontData,
+          style: "normal",
+          weight: 700,
+        },
+        {
+          data: interRegularFont,
+          name: "Inter",
+          style: "normal",
+          weight: 400,
         },
       ],
     },
