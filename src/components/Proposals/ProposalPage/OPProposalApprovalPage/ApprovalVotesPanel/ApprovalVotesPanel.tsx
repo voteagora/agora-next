@@ -9,9 +9,7 @@ import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesL
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Delegate } from "@/app/api/common/delegates/delegate";
 import { Vote } from "@/app/api/common/votes/vote";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 
 type Props = {
   proposal: Proposal;
@@ -34,21 +32,7 @@ type Props = {
     };
     votes: Vote[];
   }>;
-  fetchVotingPower: (
-    addressOrENSName: string | `0x${string}`,
-    blockNumber: number
-  ) => Promise<VotingPowerData>;
-  fetchAuthorityChains: (
-    address: string | `0x${string}`,
-    blockNumber: number
-  ) => Promise<{ chains: string[][] }>;
-  fetchDelegate: (
-    addressOrENSName: string | `0x${string}`
-  ) => Promise<Delegate>;
-  fetchVotesForProposalAndDelegate: (
-    proposal_id: string,
-    address: string | `0x${string}`
-  ) => Promise<Vote[]>;
+  fetchAllForVoting: any;
   fetchUserVotesForProposal: (
     proposal_id: string,
     address: string | `0x${string}`
@@ -59,10 +43,7 @@ export default function ApprovalVotesPanel({
   proposal,
   initialProposalVotes,
   fetchVotesForProposal,
-  fetchVotingPower,
-  fetchAuthorityChains,
-  fetchDelegate,
-  fetchVotesForProposalAndDelegate,
+  fetchAllForVoting,
   fetchUserVotesForProposal,
 }: Props) {
   const [activeTab, setActiveTab] = useState(1);
@@ -104,10 +85,7 @@ export default function ApprovalVotesPanel({
         <div className={styles.button_container}>
           <ApprovalCastVoteButton
             proposal={proposal}
-            fetchVotingPower={fetchVotingPower}
-            fetchAuthorityChains={fetchAuthorityChains}
-            fetchDelegate={fetchDelegate}
-            fetchVotesForProposalAndDelegate={fetchVotesForProposalAndDelegate}
+            fetchAllForVoting={fetchAllForVoting}
           />
         </div>
       </VStack>
