@@ -12,13 +12,22 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import { fetchAndSetAll } from "@/lib/utils";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 type Props = {
   proposal: Proposal;
   isOptimistic?: boolean;
-  fetchAllForVoting: any;
+  fetchAllForVoting: (
+    address: string | `0x${string}`,
+    blockNumber: number,
+    proposal_id: string
+  ) => Promise<{
+    votingPower: VotingPowerData;
+    authorityChains: string[][];
+    delegate: Delegate;
+    votesForProposalAndDelegate: Vote[];
+  }>;
 };
 
 export default function CastVoteInput({

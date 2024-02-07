@@ -1,10 +1,8 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalPage.module.scss";
-import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import {
-  getVotesForProposalAndDelegate,
   getVotesForProposal,
   getAllForVoting,
   getUserVotesForProposal,
@@ -12,12 +10,10 @@ import {
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import {
   getProxy,
-  getVotingPowerAtSnapshot,
   getVotingPowerAvailableForDirectDelegation,
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
-import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
@@ -37,37 +33,11 @@ async function fetchProposalVotes(proposal_id, page = 1) {
   return getVotesForProposal({ proposal_id, page });
 }
 
-async function fetchVotingPower(address, blockNumber) {
-  "use server";
-
-  return getVotingPowerAtSnapshot({
-    blockNumber,
-    addressOrENSName: address,
-  });
-}
-
-async function fetchAuthorityChains(address, blockNumber) {
-  "use server";
-
-  return {
-    chains: await getAuthorityChains({ blockNumber, address }),
-  };
-}
-
 async function fetchDelegate(addressOrENSName) {
   "use server";
 
   return await getDelegate({
     addressOrENSName,
-  });
-}
-
-async function fetchVotesForProposalAndDelegate(proposal_id, address) {
-  "use server";
-
-  return await getVotesForProposalAndDelegate({
-    proposal_id,
-    address,
   });
 }
 
