@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import {
   AccordionContent,
@@ -25,11 +25,32 @@ interface DraftProposalFormTempCheckProps {
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   props
 ) => {
+  const { setStage } = props;
+
   const { state, updateTempCheckLink } = useContext(
     ProposalLifecycleDraftContext
   );
 
-  const { setStage } = props;
+  const [isValidDiscourseLink, setIsValidDiscourseLink] = useState(true);
+
+  const handleTempCheckLinkChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    validateTempCheckLink(e.target.value);
+    updateTempCheckLink(e.target.value);
+  };
+
+  const validateTempCheckLink = (linkInput: string) => {
+    // check if starts with "https://discuss.ens.domains/"
+    const discourseLink = linkInput;
+    const discourseLinkRegex = /^https:\/\/discuss.ens.domains/;
+
+    if (discourseLinkRegex.test(discourseLink)) {
+      setIsValidDiscourseLink(true);
+    } else {
+      setIsValidDiscourseLink(false);
+    }
+  };
 
   return (
     <AccordionItem
@@ -47,17 +68,25 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
         <div className="py-1 px-6 flex flex-row w-full">
           <div className="flex flex-row items-center justify-between py-6 font-medium w-full">
             <input
-              className="py-3 px-4 w-80 border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-              placeholder="Temp check link"
+              className={`py-3 px-4 w-80 border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent ${
+                !isValidDiscourseLink &&
+                state.tempCheckLink !== "" &&
+                "border-red-500 text-red-500"
+              }`}
+              placeholder="https://discuss.ens.domains/t/..."
               value={state.tempCheckLink}
-              onChange={(e) => updateTempCheckLink(e.target.value)}
+              onChange={(e) => handleTempCheckLinkChange(e)}
             ></input>
             <div className="flex flex-row gap-x-6">
-              <button className="py-3 px-5 border border-gray-eo rounded-lg">
+              <button
+                className="py-3 px-5 border border-gray-eo rounded-lg"
+                onClick={() => setStage("draft-create")}
+              >
                 Skip
               </button>
               <button
-                className="py-3 px-6 border border-black bg-black text-white rounded-lg"
+                className={`py-3 px-6 border border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
+                disabled={!isValidDiscourseLink}
                 onClick={() => setStage("draft-create")}
               >
                 Continue
