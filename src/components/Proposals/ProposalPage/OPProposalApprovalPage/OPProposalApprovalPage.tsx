@@ -3,12 +3,10 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import {
-  getVotesForProposalAndDelegate,
   getUserVotesForProposal,
   getVotesForProposal,
+  getAllForVoting,
 } from "@/app/api/votes/getVotes";
-import { getVotingPowerAtSnapshot } from "@/app/api/voting-power/getVotingPower";
-import { getAuthorityChains } from "@/app/api/authority-chains/getAuthorityChains";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
@@ -19,27 +17,14 @@ async function fetchProposalVotes(proposal_id: string, page = 1) {
   return getVotesForProposal({ proposal_id, page });
 }
 
-async function fetchVotingPower(
-  addressOrENSName: string | `0x${string}`,
-  blockNumber: number
-) {
-  "use server";
-
-  return getVotingPowerAtSnapshot({ blockNumber, addressOrENSName });
-}
-
-async function fetchAuthorityChains(
+async function fetchAllForVoting(
   address: string | `0x${string}`,
-  blockNumber: number
+  blockNumber: number,
+  proposal_id: string
 ) {
   "use server";
 
-  return {
-    chains: await getAuthorityChains({
-      blockNumber,
-      address,
-    }),
-  };
+  return await getAllForVoting(address, blockNumber, proposal_id);
 }
 
 async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
@@ -47,18 +32,6 @@ async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
 
   return await getDelegate({
     addressOrENSName,
-  });
-}
-
-async function fetchVotesForProposalAndDelegate(
-  proposal_id: string,
-  address: string | `0x${string}`
-) {
-  "use server";
-
-  return await getVotesForProposalAndDelegate({
-    proposal_id,
-    address,
   });
 }
 
@@ -103,12 +76,7 @@ export default async function OPProposalApprovalPage({
               proposal={proposal}
               initialProposalVotes={proposalVotes}
               fetchVotesForProposal={fetchProposalVotes}
-              fetchVotingPower={fetchVotingPower}
-              fetchAuthorityChains={fetchAuthorityChains}
-              fetchDelegate={fetchDelegate}
-              fetchVotesForProposalAndDelegate={
-                fetchVotesForProposalAndDelegate
-              }
+              fetchAllForVoting={fetchAllForVoting}
               fetchUserVotesForProposal={fetchUserVotesForProposal}
             />
           </VStack>
