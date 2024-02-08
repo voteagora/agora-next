@@ -2,11 +2,10 @@
 
 import { DelegateActions } from "./DelegateActions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-import { fetchCurrentDelegators } from "@/app/delegates/actions";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-import { Delegation } from "@/app/api/common/delegations/delegation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { fetchAllDelegatorsInChainsForAddress } from "@/app/delegates/actions";
 
 export default function DelegateCardClient({
   delegate,
@@ -15,17 +14,17 @@ export default function DelegateCardClient({
 }) {
   const { isAdvancedUser } = useIsAdvancedUser();
   const { address } = useAccount();
-  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
+  const [delegators, setDelegators] = useState<string[] | null>(null);
 
-  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
-    let fetchedDelegators;
-    try {
-      fetchedDelegators = await fetchCurrentDelegators(addressOrENSName);
-    } catch (error) {
-      fetchedDelegators = null;
-    }
-    setDelegators(fetchedDelegators);
-  };
+  const fetchDelegatorsAndSet = useCallback(
+    async (addressOrENSName: string) => {
+      const fetchedDelegators = await fetchAllDelegatorsInChainsForAddress(
+        addressOrENSName
+      );
+      setDelegators(fetchedDelegators);
+    },
+    []
+  );
 
   useEffect(() => {
     if (address) {
@@ -33,7 +32,7 @@ export default function DelegateCardClient({
     } else {
       setDelegators(null);
     }
-  }, [address]);
+  }, [address, fetchDelegatorsAndSet]);
 
   return (
     <DelegateActions
