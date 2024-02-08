@@ -105,6 +105,7 @@ view OptimismProposals {
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
+  proposal_data_raw  String?
   proposal_type      ProposalType
   proposal_type_data Json?
   proposal_results   Json?
@@ -375,6 +376,7 @@ view proposals_wrapper {
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
+  proposal_data_raw  String?
   proposal_type      ProposalType?
   proposal_type_data Json?
   proposal_results   Json?
