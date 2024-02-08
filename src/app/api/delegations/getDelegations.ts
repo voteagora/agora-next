@@ -1,4 +1,5 @@
 import {
+  getAllDelegatorsInChainsForAddressForNamespace,
   getCurrentDelegateesForNamespace,
   getCurrentDelegatorsForNamespace,
   getDirectDelegateeForNamespace,
@@ -40,3 +41,19 @@ export const getDirectDelegatee = ({
   addressOrENSName: string;
 }) =>
   getDirectDelegateeForNamespace({ addressOrENSName, namespace: "optimism" });
+
+/**
+ * Get all addresses that are in the delegation chain for a given address
+ * @param addressOrENSName
+ * @returns {delegations}
+ */
+
+export const getAllDelegatorsInChainsForAddress = ({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) =>
+  getAllDelegatorsInChainsForAddressForNamespace({
+    addressOrENSName,
+    namespace: "optimism",
+  });
