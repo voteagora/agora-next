@@ -2,13 +2,7 @@ import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
-import {
-  Abi,
-  decodeFunctionData,
-  encodeAbiParameters,
-  parseAbiParameters,
-} from "viem";
-import { isOldApprovalModule } from "./contracts/contracts";
+import { Abi, decodeFunctionData } from "viem";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
