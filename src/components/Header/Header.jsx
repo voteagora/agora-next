@@ -7,8 +7,8 @@ import { ConnectButton } from "./ConnectButton";
 export default function Header() {
   return (
     <VStack>
-      <HStack className="flex flex-row w-full items-center">
-        <div className="w-full flex justify-start">
+      <HStack className="flex flex-row w-full items-center gap-1">
+        <div className="sm:w-full flex justify-start">
           <LogoLink instance_name="Optimism" />
         </div>
         <div className="w-full flex justify-center">
