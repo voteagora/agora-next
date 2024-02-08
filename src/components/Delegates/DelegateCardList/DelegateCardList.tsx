@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import Image from "next/image";
 import { VStack } from "../../Layout/Stack";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
@@ -14,6 +13,7 @@ import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useAccount } from "wagmi";
+import { fetchAllDelegatorsInChainsForAddress } from "@/app/delegates/actions";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -41,17 +41,17 @@ export default function DelegateCardList({
   const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const { address } = useAccount();
-  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
+  const [delegators, setDelegators] = useState<string[] | null>(null);
 
-  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
-    let fetchedDelegators;
-    try {
-      fetchedDelegators = await fetchDelegators(addressOrENSName);
-    } catch (error) {
-      fetchedDelegators = null;
-    }
-    setDelegators(fetchedDelegators);
-  };
+  const fetchDelegatorsAndSet = useCallback(
+    async (addressOrENSName: string) => {
+      const fetchedDelegators = await fetchAllDelegatorsInChainsForAddress(
+        addressOrENSName
+      );
+      setDelegators(fetchedDelegators);
+    },
+    []
+  );
 
   useEffect(() => {
     if (address) {
@@ -59,7 +59,7 @@ export default function DelegateCardList({
     } else {
       setDelegators(null);
     }
-  }, [address]);
+  }, [address, fetchDelegatorsAndSet]);
 
   useEffect(() => {
     setPages([initialDelegates]);

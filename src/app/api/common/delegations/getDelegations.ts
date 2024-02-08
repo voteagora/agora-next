@@ -277,3 +277,41 @@ const getDirectDelegateeForAddress = async ({
 
   return delegatee;
 };
+
+/**
+ * Get all addresses that are in the delegation chain for a given address
+ * @param addressOrENSName
+ * @param namespace - "optimism"
+ * @returns {addresses}
+ */
+
+export const getAllDelegatorsInChainsForAddressForNamespace = ({
+  addressOrENSName,
+  namespace,
+}: {
+  addressOrENSName: string;
+  namespace: "optimism";
+}) =>
+  addressOrEnsNameWrap(getAllDelegatorsInChainsForAddress, addressOrENSName, {
+    namespace,
+  });
+
+async function getAllDelegatorsInChainsForAddress({
+  address,
+  namespace,
+}: {
+  address: string;
+  namespace: "optimism";
+}) {
+  const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
+    `
+    SELECT array_agg(DISTINCT u.element) AS addresses
+    FROM ${namespace + ".authority_chains"}, unnest(chain) as u(element)
+    WHERE delegate=$1 AND contract=$2 AND allowance > 0;
+    `,
+    address,
+    contracts(namespace).alligator.address.toLowerCase()
+  );
+
+  return allAddresess[0].addresses;
+}
