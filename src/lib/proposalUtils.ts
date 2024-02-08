@@ -193,32 +193,6 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
-  let unformattedProposalData;
-
-  if (proposal.proposal_type == "APPROVAL") {
-    const isOldModule = isOldApprovalModule(proposal.created_block.toString());
-    unformattedProposalData = encodeAbiParameters(
-      parseAbiParameters([
-        "ProposalOption[] proposalOptions, ProposalSettings proposalSettings",
-        isOldModule
-          ? "struct ProposalOption { address[] targets; uint256[] values; bytes[] calldatas; string description; }"
-          : "struct ProposalOption { uint256 budgetTokenSpent; address[] targets; uint256[] values; bytes[] calldatas; string description; }",
-        "struct ProposalSettings { uint8 maxApprovals; uint8 criteria; address budgetToken; uint128 criteriaValue; uint128 budgetAmount; }",
-      ]),
-      // @ts-ignore
-      proposal.proposal_data
-    );
-  } else if (proposal.proposal_type == "OPTIMISTIC") {
-    unformattedProposalData = encodeAbiParameters(
-      [
-        { name: "thresholds", type: "uint248" },
-        { name: "isRelativeToVotableSupply", type: "bool" },
-      ],
-      // @ts-ignore
-      proposal.proposal_data?.[0]
-    );
-  }
-
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -249,7 +223,7 @@ export async function parseProposal(
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
-    unformattedProposalData,
+    unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
