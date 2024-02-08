@@ -20,7 +20,8 @@ import {
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
-import { truncateString } from "@/app/lib/utils/text";
+import { truncateAddress, truncateString } from "@/app/lib/utils/text";
+import { isAddress } from "viem";
 
 export async function generateMetadata(
   { params }: { params: any },
@@ -33,16 +34,17 @@ export async function generateMetadata(
   ]);
 
   const description = encodeURIComponent("Optimism Voter");
-  const ens = encodeURIComponent(params.addressOrENSName);
+  const address = encodeURIComponent(isAddress(params.addressOrENSName) ? truncateAddress(params.addressOrENSName) : params.addressOrENSName);
+
   const statement = (delegateStatement?.payload as { delegateStatement: string })?.delegateStatement;
-  const truncatedStatement = encodeURIComponent(truncateString(statement, 340));
+  const truncatedStatement = statement ? encodeURIComponent(truncateString(statement, 220)) : "";
   const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
 
-  const preview = `/api/images/og/delegate?ens=${ens}&title=${ens}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
+  const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
 
   return {
     title: `Agora - OP Voter`,
-    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+    description: `See what ${address} believes and how they vote on Optimism governance.`,
     openGraph: {
       images: [preview],
     },

@@ -9,12 +9,10 @@ export default async function GET(
 
   const { searchParams } = new URL(req.url);
 
-  const ens = searchParams.has("ens") ? searchParams.get("ens") : "optimismvoter.eth";
-  const title = searchParams.has("title") ? searchParams.get("title") : "Optimism Agora";
-  const votes = searchParams.has("votes") ? searchParams.get("votes") : "70.23k OP";
-
-  const description = searchParams.has("description") ? searchParams.get("description") : "Home of Token House Governance and RPGF";
-  const statement = searchParams.has("statement") ? searchParams.get("statement") : "Default delegate statement";
+  const address = searchParams.has("address") ? searchParams.get("address") : "voter.eth";
+  const votes = searchParams.has("votes") ? searchParams.get("votes") : "10 VOTES";
+  const description = searchParams.has("description") ? searchParams.get("description") : "DAO Voter";
+  const statement = searchParams.has("statement") ? searchParams.get("statement") : "Delegate statement";
 
   const interBoldFont = await fetch(
     new URL("../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
@@ -24,13 +22,16 @@ export default async function GET(
     new URL("../../../../assets/fonts/Inter-Regular.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
+  const bg = await fetch(
+    new URL("../../../../assets/images/og-delegate-bg.png", import.meta.url),
+  ).then((res) => res.arrayBuffer());
+
   // TODO add background image as an import
   return new ImageResponse(
     (
       <div
         style={{
           backgroundColor: "white",
-          backgroundImage: "url('http://localhost:3000/images/og-delegate-bg.png')",
           height: "100%",
           width: "100%",
           display: "flex",
@@ -41,7 +42,7 @@ export default async function GET(
           flexWrap: "nowrap",
         }}
       >
-
+        <img src={bg} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
             <div tw="flex">
@@ -89,7 +90,7 @@ export default async function GET(
             </div>
 
             <div tw="flex flex-col">
-              <div tw="font-bold text-5xl w-1/2">{title}</div>
+              <div tw="font-bold text-5xl w-1/2">{address}</div>
               <div tw="font-regular mt-[30px] text-4xl text-gray-600">{description}</div>
             </div>
           </div>
@@ -99,9 +100,11 @@ export default async function GET(
             <div tw="flex flex-col w-full">
               <div tw="flex mb-[26px]">
                 <div tw="flex">
-                  <div tw="flex w-[57px] h-[57px] bg-gray-600 rounded-full"></div>
+                  <div tw="flex w-[58px] h-[58px] bg-gray-600 rounded-full">
+
+                  </div>
                   <div tw="flex flex-col justify-center ml-[16px]">
-                    <div tw="flex text-2xl mb-[4px]">{ens}</div>
+                    <div tw="flex text-2xl mb-[4px]">{address}</div>
                     <div tw="flex text-[17px] text-slate-800">{votes}</div>
                   </div>
                 </div>

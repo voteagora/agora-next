@@ -20,16 +20,16 @@ export default async function GET(
     new URL("../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
-  const imageData = await fetch(new URL("../../../../../public/images/og-proposal-bg.png", import.meta.url)).then(
-    (res) => res.arrayBuffer(),
-  );
+
+  const bg = await fetch(
+    new URL("../../../../assets/images/og-delegates-bg.png", import.meta.url),
+  ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
       <div
         style={{
           backgroundColor: "white",
-          backgroundImage: `url('http://localhost:3000/images/og-delegates-bg.png')`,
           height: "100%",
           width: "100%",
           display: "flex",
@@ -40,6 +40,7 @@ export default async function GET(
           flexWrap: "nowrap",
         }}
       >
+        <img src={bg} style={{ position: "absolute" }} />
 
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
