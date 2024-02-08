@@ -14,14 +14,10 @@ import styles from "./proposalVotesList.module.scss";
 
 export function ProposalSingleVote({
   vote,
-  fetchDelegate,
-  fetchDelegateStatement,
   isAdvancedUser,
   delegators,
 }: {
   vote: Vote;
-  fetchDelegate: (addressOrENSName: string) => Promise<any>;
-  fetchDelegateStatement: (addressOrENSName: string) => Promise<any>;
   isAdvancedUser: boolean;
   delegators: string[] | null;
 }) {
@@ -56,8 +52,6 @@ export function ProposalSingleVote({
           >
             <VoterHoverCard
               address={vote.address}
-              fetchDelegate={fetchDelegate}
-              fetchDelegateStatement={fetchDelegateStatement}
               isAdvancedUser={isAdvancedUser}
               delegators={delegators}
             />

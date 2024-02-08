@@ -8,12 +8,10 @@ import { ProposalSingleVote } from "./ProposalSingleVote";
 import { Vote } from "@/app/api/common/votes/vote";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  fetchAllDelegatorsInChainsForAddress,
-  fetchDelegate,
-  fetchDelegateStatement,
   fetchProposalVotes,
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
+import { fetchAllDelegatorsInChainsForAddress } from "@/app/delegates/actions";
 
 export default function ProposalVotesList({
   initialProposalVotes,
@@ -123,8 +121,6 @@ export default function ProposalVotesList({
             <li key={vote.transactionHash}>
               <ProposalSingleVote
                 vote={vote}
-                fetchDelegate={fetchDelegate}
-                fetchDelegateStatement={fetchDelegateStatement}
                 isAdvancedUser={isAdvancedUser}
                 delegators={delegators}
               />
@@ -139,8 +135,6 @@ export default function ProposalVotesList({
             >
               <ProposalSingleVote
                 vote={vote}
-                fetchDelegate={fetchDelegate}
-                fetchDelegateStatement={fetchDelegateStatement}
                 isAdvancedUser={isAdvancedUser}
                 delegators={delegators}
               />

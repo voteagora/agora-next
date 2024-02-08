@@ -12,46 +12,40 @@ import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelega
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
+import { fetchDelegate, fetchDelegateStatement } from "@/app/delegates/actions";
 
 interface Props {
   address: string;
-  fetchDelegate: (addressOrENSName: string) => Promise<any>;
-  fetchDelegateStatement: (addressOrENSName: string) => Promise<any>;
   isAdvancedUser: boolean;
   delegators: string[] | null;
 }
 
 export default function VoterHoverCard({
   address,
-  fetchDelegate,
-  fetchDelegateStatement,
   isAdvancedUser,
   delegators,
 }: Props) {
   const router = useRouter();
   // delegateStatement is loaded separately to avoid delays in loading the hover card
   const [delegateStatement, setDelegateStatement] =
-    useState<DelegateStatement>();
+    useState<DelegateStatement | null>();
   // full delegate object is required for the delegate button, that can appear later
   const [delegate, setDelegate] = useState<Delegate>();
 
   const { isConnected } = useAgoraContext();
   const { address: connectedAddress } = useAccount();
 
-  const fetchDelegateAndSet = useCallback(
-    async (addressOrENSName: string) => {
-      const delegate = await fetchDelegate(addressOrENSName);
-      setDelegate(delegate);
-    },
-    [fetchDelegate]
-  );
+  const fetchDelegateAndSet = useCallback(async (addressOrENSName: string) => {
+    const delegate = await fetchDelegate(addressOrENSName);
+    setDelegate(delegate);
+  }, []);
 
   const fetchDelegateStatementAndSet = useCallback(
     async (addressOrENSName: string) => {
       const delegateStatement = await fetchDelegateStatement(addressOrENSName);
       setDelegateStatement(delegateStatement);
     },
-    [fetchDelegateStatement]
+    []
   );
 
   useEffect(() => {
