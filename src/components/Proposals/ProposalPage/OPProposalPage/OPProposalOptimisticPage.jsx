@@ -8,22 +8,12 @@ import {
   getUserVotesForProposal,
 } from "@/app/api/votes/getVotes";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import {
-  getProxy,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
-} from "@/app/api/voting-power/getVotingPower";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
 import { cn, formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "@/lib/constants";
-import {
-  getCurrentDelegatees,
-  getCurrentDelegators,
-  getDirectDelegatee,
-} from "@/app/api/delegations/getDelegations";
+import { getCurrentDelegators } from "@/app/api/delegations/getDelegations";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 import { formatUnits } from "ethers";
 
@@ -62,42 +52,6 @@ async function fetchDelegateStatement(addressOrENSName) {
   return await getDelegateStatement({
     addressOrENSName,
   });
-}
-
-async function fetchBalanceForDirectDelegation(addressOrENSName) {
-  "use server";
-
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
-}
-
-async function fetchVotingPowerForSubdelegation(addressOrENSName) {
-  "use server";
-
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
-}
-
-async function checkIfDelegatingToProxy(addressOrENSName) {
-  "use server";
-
-  return isDelegatingToProxy({ addressOrENSName });
-}
-
-async function fetchCurrentDelegatees(addressOrENSName) {
-  "use server";
-
-  return getCurrentDelegatees({ addressOrENSName });
-}
-
-async function fetchDirectDelegatee(addressOrENSName) {
-  "use server";
-
-  return getDirectDelegatee({ addressOrENSName });
-}
-
-async function getProxyAddress(addressOrENSName) {
-  "use server";
-
-  return getProxy({ addressOrENSName });
 }
 
 async function getDelegators(addressOrENSName) {
@@ -188,15 +142,7 @@ export default async function OPProposalPage({ proposal }) {
               fetchVotesForProposal={fetchProposalVotes}
               fetchDelegate={fetchDelegate}
               fetchDelegateStatement={fetchDelegateStatement}
-              fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-              fetchVotingPowerForSubdelegation={
-                fetchVotingPowerForSubdelegation
-              }
-              checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-              fetchCurrentDelegatees={fetchCurrentDelegatees}
-              fetchDirectDelegatee={fetchDirectDelegatee}
               fetchUserVotes={fetchUserVotesForProposal}
-              getProxyAddress={getProxyAddress}
               proposal_id={proposal.id}
               getDelegators={getDelegators}
             />
