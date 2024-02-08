@@ -3,9 +3,7 @@
 import { DelegateActions } from "./DelegateActions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-import { useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
-import { fetchAllDelegatorsInChainsForAddress } from "@/app/delegates/actions";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 export default function DelegateCardClient({
   delegate,
@@ -13,32 +11,13 @@ export default function DelegateCardClient({
   delegate: DelegateChunk;
 }) {
   const { isAdvancedUser } = useIsAdvancedUser();
-  const { address } = useAccount();
-  const [delegators, setDelegators] = useState<string[] | null>(null);
-
-  const fetchDelegatorsAndSet = useCallback(
-    async (addressOrENSName: string) => {
-      const fetchedDelegators = await fetchAllDelegatorsInChainsForAddress(
-        addressOrENSName
-      );
-      setDelegators(fetchedDelegators);
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (address) {
-      fetchDelegatorsAndSet(address);
-    } else {
-      setDelegators(null);
-    }
-  }, [address, fetchDelegatorsAndSet]);
+  const { advancedDelegators } = useConnectedDelegate();
 
   return (
     <DelegateActions
       delegate={delegate}
       isAdvancedUser={isAdvancedUser}
-      delegators={delegators}
+      delegators={advancedDelegators}
     />
   );
 }
