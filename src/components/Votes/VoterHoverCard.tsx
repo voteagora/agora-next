@@ -10,8 +10,7 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
-import { fetchDelegate, fetchDelegateStatement } from "@/app/delegates/actions";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 interface Props {
   address: string;
