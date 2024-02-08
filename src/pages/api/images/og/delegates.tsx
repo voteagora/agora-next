@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest } from "next";
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";

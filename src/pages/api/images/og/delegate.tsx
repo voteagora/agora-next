@@ -1,6 +1,5 @@
 import type { NextApiRequest } from "next";
 import { ImageResponse } from "next/og";
-import { useEnsAvatar } from "wagmi";
 
 export const runtime = "edge";
 
