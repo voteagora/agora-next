@@ -6,7 +6,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   fetchVotingPowerForSubdelegation,
@@ -21,20 +20,19 @@ export function AdvancedDelegateButton({
   delegators,
 }: {
   delegate: DelegateChunk;
-  delegators: Delegation[] | null;
+  delegators: string[] | null;
 }) {
   const { address } = useAccount();
 
   const isSelfDelegation =
     address?.toLowerCase() === delegate.address?.toLowerCase();
 
+  console.log("delegators", delegators);
+
   const isDisabled =
     !!address &&
     !!(
-      isSelfDelegation ||
-      delegators
-        ?.map((delegator) => delegator.from.toLowerCase())
-        .includes(delegate.address?.toLowerCase())
+      isSelfDelegation || delegators?.includes(delegate.address?.toLowerCase())
     );
 
   return (
@@ -51,7 +49,10 @@ export function AdvancedDelegateButton({
         <TooltipContent>
           <p>
             Delegating back to{" "}
-            {isSelfDelegation ? "yourself" : "your delegator"} is not supported
+            {isSelfDelegation
+              ? "yourself"
+              : "your direct or indirect delegator"}{" "}
+            is not supported
           </p>
         </TooltipContent>
       </Tooltip>

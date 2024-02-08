@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
 import { useRouter } from "next/navigation";
@@ -12,36 +12,19 @@ import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelega
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
-import { Delegation } from "@/app/api/common/delegations/delegation";
 
 interface Props {
   address: string;
   fetchDelegate: (addressOrENSName: string) => Promise<any>;
   fetchDelegateStatement: (addressOrENSName: string) => Promise<any>;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  fetchDirectDelegatee: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
-  delegators: Delegation[] | null;
+  delegators: string[] | null;
 }
 
 export default function VoterHoverCard({
   address,
   fetchDelegate,
   fetchDelegateStatement,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  fetchDirectDelegatee,
-  getProxyAddress,
   isAdvancedUser,
   delegators,
 }: Props) {
@@ -55,20 +38,26 @@ export default function VoterHoverCard({
   const { isConnected } = useAgoraContext();
   const { address: connectedAddress } = useAccount();
 
-  const fetchDelegateAndSet = async (addressOrENSName: string) => {
-    const delegate = await fetchDelegate(addressOrENSName);
-    setDelegate(delegate);
-  };
+  const fetchDelegateAndSet = useCallback(
+    async (addressOrENSName: string) => {
+      const delegate = await fetchDelegate(addressOrENSName);
+      setDelegate(delegate);
+    },
+    [fetchDelegate]
+  );
 
-  const fetchDelegateStatementAndSet = async (addressOrENSName: string) => {
-    const delegateStatement = await fetchDelegateStatement(addressOrENSName);
-    setDelegateStatement(delegateStatement);
-  };
+  const fetchDelegateStatementAndSet = useCallback(
+    async (addressOrENSName: string) => {
+      const delegateStatement = await fetchDelegateStatement(addressOrENSName);
+      setDelegateStatement(delegateStatement);
+    },
+    [fetchDelegateStatement]
+  );
 
   useEffect(() => {
     fetchDelegateStatementAndSet(address);
     fetchDelegateAndSet(address);
-  }, []);
+  }, [fetchDelegateAndSet, fetchDelegateStatementAndSet, address]);
 
   let truncatedStatement = "";
   if (delegate?.statement?.payload) {

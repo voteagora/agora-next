@@ -10,6 +10,7 @@ import {
   getDirectDelegatee,
   getCurrentDelegatees,
   getCurrentDelegators,
+  getAllDelegatorsInChainsForAddress,
 } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
@@ -96,4 +97,11 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
 
 export async function fetchCurrentDelegators(addressOrENSName: string) {
   return getCurrentDelegators({ addressOrENSName });
+}
+
+// Pass address of the connected wallet
+export async function fetchAllDelegatorsInChainsForAddress(
+  addressOrENSName: string
+) {
+  return getAllDelegatorsInChainsForAddress({ addressOrENSName });
 }
