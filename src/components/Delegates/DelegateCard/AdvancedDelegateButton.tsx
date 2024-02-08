@@ -27,8 +27,6 @@ export function AdvancedDelegateButton({
   const isSelfDelegation =
     address?.toLowerCase() === delegate.address?.toLowerCase();
 
-  console.log("delegators", delegators);
-
   const isDisabled =
     !!address &&
     !!(
