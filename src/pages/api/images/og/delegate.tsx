@@ -22,7 +22,6 @@ export default async function GET(
     new URL("../../../../assets/fonts/Inter-Regular.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
-
   const bg = await fetch(
     new URL("../../../../assets/images/og-delegate-bg.png", import.meta.url)).then(
     (res) => res.arrayBuffer(),
@@ -45,7 +44,6 @@ export default async function GET(
         }}
       >
         <img src={bg} style={{ position: "absolute" }} />
-
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
             <div tw="flex">

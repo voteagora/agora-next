@@ -43,11 +43,8 @@ export default async function GET(
           flexWrap: "nowrap",
         }}
       >
-
         <img src={bg} style={{ position: "absolute" }} />
-
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
-
           <div tw="flex flex-col justify-between h-full w-full">
             <div tw="flex">
               <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
