@@ -3,6 +3,7 @@ import {
   fetchAllDelegatorsInChainsForAddress,
   fetchDelegate,
 } from "@/app/delegates/actions";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -12,6 +13,7 @@ const useConnectedDelegate = () => {
   const [advancedDelegators, setAdvancedDelegators] = useState<string[] | null>(
     null
   );
+  const [balance, setBalance] = useState<bigint | null>(null);
 
   const fetchDelegateAndSet = useCallback(async (address: string) => {
     if (address) {
@@ -30,14 +32,25 @@ const useConnectedDelegate = () => {
     []
   );
 
+  const fetchBalance = useCallback(async (address: string) => {
+    const balance = await OptimismContracts.token.contract.balanceOf(address);
+    setBalance(balance);
+  }, []);
+
   useEffect(() => {
     if (address) {
       fetchDelegateAndSet(address);
       fetchAdvancedDelegatorsAndSet(address);
+      fetchBalance(address);
     }
-  }, [address, fetchDelegateAndSet, fetchAdvancedDelegatorsAndSet]);
+  }, [
+    address,
+    fetchDelegateAndSet,
+    fetchAdvancedDelegatorsAndSet,
+    fetchBalance,
+  ]);
 
-  return { delegate, advancedDelegators };
+  return { delegate, advancedDelegators, balance };
 };
 
 export default useConnectedDelegate;

@@ -1,8 +1,7 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { HStack, VStack } from "../Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import ENSAvatar from "../shared/ENSAvatar";
@@ -26,20 +25,8 @@ const ValueWrapper = ({ children }: { children: ReactNode }) => (
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
-  const [balance, setBalance] = useState<bigint>();
-  const { delegate } = useConnectedDelegate();
+  const { delegate, balance } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;
-
-  useEffect(() => {
-    if (!address) return;
-
-    const getBalance = async () => {
-      const balance = await OptimismContracts.token.contract.balanceOf(address);
-      setBalance(balance);
-    };
-
-    getBalance();
-  }, [address]);
 
   return (
     <Popover className="relative cursor-auto">
