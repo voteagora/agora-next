@@ -42,7 +42,10 @@ module.exports = {
         40: "10rem",
         48: "12rem",
         56: "14rem",
-        64: "16rem",
+        64: "16rem"
+      },
+      minWidth: {
+        desktop: '1280px',
       },
       gap: {
         0.5: "0.125rem", // 2px

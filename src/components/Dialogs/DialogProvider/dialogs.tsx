@@ -7,18 +7,20 @@ import {
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
-import { Delegatees } from "@prisma/client";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
+import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 
 export type DialogType =
   | DelegateDialogType
   | CastProposalDialogType
   | CastVoteDialogType
   | AdvancedDelegateDialogType
-  | ApprovalCastVoteDialogType;
+  | ApprovalCastVoteDialogType
+  | RetroPGFShareCardDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -28,7 +30,9 @@ export type DelegateDialogType = {
     fetchBalanceForDirectDelegation: (
       addressOrENSName: string
     ) => Promise<bigint>;
-    fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+    fetchDirectDelegatee: (
+      addressOrENSName: string
+    ) => Promise<DelegateePayload | null>;
   };
 };
 
@@ -50,6 +54,17 @@ export type CastProposalDialogType = {
     isError: boolean;
     isSuccess: boolean;
     txHash?: string;
+  };
+};
+
+export type RetroPGFShareCardDialog = {
+  transparent: boolean;
+  type: "RETROPGF_SHARE_CARD";
+  params: {
+    awarded: string;
+    displayName: string;
+    id: string;
+    profileImageUrl: string | null;
   };
 };
 
@@ -97,7 +112,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
       <DelegateDialog
         delegate={delegate}
         fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-        completeDelegation={closeDialog}
         fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );
@@ -171,6 +185,30 @@ export const dialogs: DialogDefinitions<DialogType> = {
         votingPower={votingPower}
         authorityChains={authorityChains}
         missingVote={missingVote}
+      />
+    );
+  },
+  RETROPGF_SHARE_CARD: (
+    {
+      awarded,
+      displayName,
+      id,
+      profileImageUrl,
+    }: {
+      awarded: string;
+      displayName: string;
+      id: string;
+      profileImageUrl: string | null;
+    },
+    closeDialog
+  ) => {
+    return (
+      <RetroPGFShareCardDialog
+        awarded={awarded}
+        displayName={displayName}
+        id={id}
+        profileImageUrl={profileImageUrl}
+        closeDialog={closeDialog}
       />
     );
   },

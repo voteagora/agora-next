@@ -1,12 +1,11 @@
 "use client";
 
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 import { MobileConnectButton } from "./MobileConnectButton";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { DesktopConnectButton } from "./DesktopConnectButton";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { last } from "cypress/types/lodash";
 
 type Props = {
   fetchDelegate: (address: string) => Promise<Delegate>;
@@ -59,9 +58,9 @@ export function ConnectButton({ fetchDelegate }: Props) {
   ]);
 
   return (
-    <>
-      <MobileConnectButton delegate={delegate} />
-      <DesktopConnectButton delegate={delegate} />
-    </>
+    <div>
+      <MobileConnectButton />
+      <DesktopConnectButton />
+    </div>
   );
 }

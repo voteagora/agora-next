@@ -1,74 +1,42 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DelegateSocialLinks } from "../Delegates/DelegateCard/DelegateSocialLinks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
-import { Delegate } from "@/app/api/delegates/delegate";
-import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegate } from "@/app/api/common/delegates/delegate";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 interface Props {
   address: string;
-  fetchDelegate: (addressOrENSName: string) => Promise<any>;
-  fetchDelegateStatement: (addressOrENSName: string) => Promise<any>;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  fetchVotingPowerForSubdelegation: (
-    addressOrENSName: string
-  ) => Promise<string>;
-  checkIfDelegatingToProxy: (addressOrENSName: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (addressOrENSName: string) => Promise<any>;
-  fetchDirectDelegatee: (addressOrENSName: string) => Promise<any>;
-  getProxyAddress: (addressOrENSName: string) => Promise<string>;
   isAdvancedUser: boolean;
-  delegators: Delegation[] | null;
+  delegators: string[] | null;
 }
 
 export default function VoterHoverCard({
   address,
-  fetchDelegate,
-  fetchDelegateStatement,
-  fetchBalanceForDirectDelegation,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  fetchDirectDelegatee,
-  getProxyAddress,
   isAdvancedUser,
   delegators,
 }: Props) {
-  const router = useRouter();
-  // delegateStatement is loaded separately to avoid delays in loading the hover card
-  const [delegateStatement, setDelegateStatement] =
-    useState<DelegateStatement>();
   // full delegate object is required for the delegate button, that can appear later
   const [delegate, setDelegate] = useState<Delegate>();
 
   const { isConnected } = useAgoraContext();
   const { address: connectedAddress } = useAccount();
 
-  const fetchDelegateAndSet = async (addressOrENSName: string) => {
+  const fetchDelegateAndSet = useCallback(async (addressOrENSName: string) => {
     const delegate = await fetchDelegate(addressOrENSName);
     setDelegate(delegate);
-  };
-
-  const fetchDelegateStatementAndSet = async (addressOrENSName: string) => {
-    const delegateStatement = await fetchDelegateStatement(addressOrENSName);
-    setDelegateStatement(delegateStatement);
-  };
+  }, []);
 
   useEffect(() => {
-    fetchDelegateStatementAndSet(address);
     fetchDelegateAndSet(address);
-  }, []);
+  }, [fetchDelegateAndSet, address]);
 
   let truncatedStatement = "";
   if (delegate?.statement?.payload) {
@@ -80,7 +48,7 @@ export default function VoterHoverCard({
 
   return (
     <>
-      {!delegateStatement ? (
+      {!delegate?.statement ? (
         <VStack gap={4} className="h-full w-[300px] p-2">
           <VStack gap={4} justifyContent="justify-center">
             <HStack gap={4} justifyContent="justify-start">
@@ -111,8 +79,8 @@ export default function VoterHoverCard({
           <div className="flex-grow" />
           <HStack alignItems="items-stretch" className={"justify-between"}>
             <DelegateSocialLinks
-              discord={delegateStatement.discord}
-              twitter={delegateStatement.twitter}
+              discord={delegate?.statement.discord}
+              twitter={delegate?.statement.twitter}
             />
             <div>
               {!!delegate &&
@@ -126,7 +94,8 @@ export default function VoterHoverCard({
                 ) : (
                   <DelegateButton
                     full={
-                      !delegateStatement.twitter && !delegateStatement.discord
+                      !delegate?.statement.twitter &&
+                      !delegate?.statement.discord
                     }
                     delegate={delegate}
                   />
