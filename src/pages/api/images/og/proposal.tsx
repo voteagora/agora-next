@@ -24,12 +24,15 @@ export default async function GET(
     (res) => res.arrayBuffer(),
   );
 
+  const bg = await fetch(
+    new URL("../../../../assets/images/og-proposal-bg.png", import.meta.url),
+  ).then((res) => res.arrayBuffer());
+
   return new ImageResponse(
     (
       <div
         style={{
           backgroundColor: "white",
-          backgroundImage: `url('http://localhost:3000/images/og-proposal-bg.png')`,
           height: "100%",
           width: "100%",
           display: "flex",
@@ -40,6 +43,8 @@ export default async function GET(
           flexWrap: "nowrap",
         }}
       >
+
+        <img src={bg} style={{ position: "absolute" }} />
 
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
 
