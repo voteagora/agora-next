@@ -9,25 +9,25 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
-import { Delegate } from "@/app/api/common/delegates/delegate";
 import HumanAddress from "../shared/HumanAddress";
 import styles from "./header.module.scss";
 import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 type Props = {
   ensName: string | undefined;
-  delegate: Delegate | undefined;
 };
 
 const ValueWrapper = ({ children }: { children: ReactNode }) => (
   <div className={styles.desktop__wrapper}>{children}</div>
 );
 
-export const DesktopProfileDropDown = ({ ensName, delegate }: Props) => {
+export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const [balance, setBalance] = useState<bigint>();
+  const { delegate } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;
 
   useEffect(() => {
