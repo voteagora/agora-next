@@ -113,8 +113,7 @@ export function DelegateDialog({
           >
             <VStack className={styles.amount_container}>
               <HStack alignItems="items-center" gap={1}>
-                Your total delegatable votes{" "}
-                <InfoIcon size={12} className="opacity-50" />
+                Your total delegatable votes
               </HStack>
               <AdvancedDelegationDisplayAmount amount={votingPower} />
             </VStack>

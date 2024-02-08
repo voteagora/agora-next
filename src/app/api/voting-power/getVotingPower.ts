@@ -1,7 +1,7 @@
 import {
   getCurrentVotingPowerForNamespace,
   getProxyForNamespace,
-  getVotingPowerAtSnapshotForNamespace,
+  getVotingPowerForProposalForNamespace,
   getVotingPowerAvailableForDirectDelegationForNamespace,
   getVotingPowerAvailableForSubdelegationForNamespace,
   isDelegatingToProxyForNamespace,
@@ -13,16 +13,19 @@ import {
  * @param blockNumber
  * @returns VotingPowerData
  */
-export const getVotingPowerAtSnapshot = ({
+export const getVotingPowerForProposal = ({
   addressOrENSName,
   blockNumber,
+  proposalId,
 }: {
   addressOrENSName: string;
   blockNumber: number;
+  proposalId: string;
 }) =>
-  getVotingPowerAtSnapshotForNamespace({
+  getVotingPowerForProposalForNamespace({
     addressOrENSName,
     blockNumber,
+    proposalId,
     namespace: "optimism",
   });
 

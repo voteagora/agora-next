@@ -1,4 +1,4 @@
-import { getVotingPowerAtSnapshot } from "../voting-power/getVotingPower";
+import { getVotingPowerForProposal } from "../voting-power/getVotingPower";
 import { getAuthorityChains } from "../authority-chains/getAuthorityChains";
 import { getDelegate } from "../delegates/getDelegates";
 import {
@@ -80,7 +80,11 @@ export async function getAllForVoting(
 ) {
   const [votingPower, authorityChains, delegate, votesForProposalAndDelegate] =
     await Promise.all([
-      getVotingPowerAtSnapshot({ addressOrENSName: address, blockNumber }),
+      getVotingPowerForProposal({
+        addressOrENSName: address,
+        blockNumber,
+        proposalId: proposal_id,
+      }),
       getAuthorityChains({ address, blockNumber }),
       getDelegate({ addressOrENSName: address }),
       getVotesForProposalAndDelegate({ proposal_id, address }),
