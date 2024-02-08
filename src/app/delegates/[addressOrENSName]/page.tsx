@@ -43,7 +43,7 @@ export async function generateMetadata(
   const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
 
   return {
-    title: `Agora - OP Voter`,
+    title: `${address} on Agora`,
     description: `See what ${address} believes and how they vote on Optimism governance.`,
     openGraph: {
       images: [preview],

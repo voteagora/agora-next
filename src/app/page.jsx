@@ -42,6 +42,8 @@ export async function generateMetadata({}, parent) {
   const preview = `/api/images/og/proposals`;
 
   return {
+    title: "Optimism Agora",
+    description: "Home of token house governance and RPGF",
     openGraph: {
       images: [preview],
     },

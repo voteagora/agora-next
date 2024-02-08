@@ -20,10 +20,6 @@ export default async function GET(
     new URL("../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
-  const imageData = await fetch(new URL("../../../../../public/images/og-proposal-bg.png", import.meta.url)).then(
-    (res) => res.arrayBuffer(),
-  );
-
   const bg = await fetch(
     new URL("../../../../assets/images/og-proposal-bg.png", import.meta.url),
   ).then((res) => res.arrayBuffer());

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }, parent) {
   const preview = `/api/images/og/proposal?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
 
   return {
-    title: `Agora - OP Proposal: ${title}`,
+    title: title,
     description: cleanString(proposal.description),
     openGraph: {
       images: [preview],
