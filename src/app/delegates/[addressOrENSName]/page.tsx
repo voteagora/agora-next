@@ -27,14 +27,13 @@ export async function generateMetadata(
   parent: any,
 ) {
 
-  const [delegate, delegateStatement] =
-    await Promise.all([
-      fetchDelegate(params.addressOrENSName),
-      fetchDelegateStatement(params.addressOrENSName),
-    ]);
+  const [delegate, delegateStatement] = await Promise.all([
+    fetchDelegate(params.addressOrENSName),
+    fetchDelegateStatement(params.addressOrENSName),
+  ]);
 
   const description = encodeURIComponent("Optimism Voter");
-  const ens = encodeURIComponent("lefteris.eth");
+  const ens = encodeURIComponent(params.addressOrENSName);
   const statement = (delegateStatement?.payload as { delegateStatement: string })?.delegateStatement;
   const truncatedStatement = encodeURIComponent(truncateString(statement, 340));
   const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);

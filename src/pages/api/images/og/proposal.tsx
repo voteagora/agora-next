@@ -36,6 +36,7 @@ export default async function GET(
           flexWrap: "nowrap",
         }}
       >
+
         <div tw="flex flex-col justify-between h-full px-16 pt-16 pb-22">
 
           <div tw="flex">

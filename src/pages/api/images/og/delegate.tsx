@@ -24,11 +24,13 @@ export default async function GET(
     new URL("../../../../assets/fonts/Inter-Regular.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
+
   return new ImageResponse(
     (
       <div
         style={{
           backgroundColor: "white",
+          backgroundImage: "url('http://localhost:3000/images/img.png')",
           height: "100%",
           width: "100%",
           display: "flex",
@@ -85,7 +87,7 @@ export default async function GET(
             </div>
 
             <div tw="flex flex-col">
-              <div tw="font-bold text-[68px] mb-6">{title}</div>
+              <div tw="font-bold text-[68px] mb-6 w-1/2 truncate">{title}</div>
               <div tw="font-regular text-[42px] text-[#4F4F4F]">{description}</div>
             </div>
           </div>
