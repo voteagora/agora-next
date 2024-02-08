@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DelegateSocialLinks } from "../Delegates/DelegateCard/DelegateSocialLinks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -11,8 +10,7 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
-import { fetchDelegate, fetchDelegateStatement } from "@/app/delegates/actions";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 interface Props {
   address: string;
@@ -25,10 +23,6 @@ export default function VoterHoverCard({
   isAdvancedUser,
   delegators,
 }: Props) {
-  const router = useRouter();
-  // delegateStatement is loaded separately to avoid delays in loading the hover card
-  const [delegateStatement, setDelegateStatement] =
-    useState<DelegateStatement | null>();
   // full delegate object is required for the delegate button, that can appear later
   const [delegate, setDelegate] = useState<Delegate>();
 
@@ -40,18 +34,9 @@ export default function VoterHoverCard({
     setDelegate(delegate);
   }, []);
 
-  const fetchDelegateStatementAndSet = useCallback(
-    async (addressOrENSName: string) => {
-      const delegateStatement = await fetchDelegateStatement(addressOrENSName);
-      setDelegateStatement(delegateStatement);
-    },
-    []
-  );
-
   useEffect(() => {
-    fetchDelegateStatementAndSet(address);
     fetchDelegateAndSet(address);
-  }, [fetchDelegateAndSet, fetchDelegateStatementAndSet, address]);
+  }, [fetchDelegateAndSet, address]);
 
   let truncatedStatement = "";
   if (delegate?.statement?.payload) {
@@ -63,7 +48,7 @@ export default function VoterHoverCard({
 
   return (
     <>
-      {!delegateStatement ? (
+      {!delegate?.statement ? (
         <VStack gap={4} className="h-full w-[300px] p-2">
           <VStack gap={4} justifyContent="justify-center">
             <HStack gap={4} justifyContent="justify-start">
@@ -94,8 +79,8 @@ export default function VoterHoverCard({
           <div className="flex-grow" />
           <HStack alignItems="items-stretch" className={"justify-between"}>
             <DelegateSocialLinks
-              discord={delegateStatement.discord}
-              twitter={delegateStatement.twitter}
+              discord={delegate?.statement.discord}
+              twitter={delegate?.statement.twitter}
             />
             <div>
               {!!delegate &&
@@ -109,7 +94,8 @@ export default function VoterHoverCard({
                 ) : (
                   <DelegateButton
                     full={
-                      !delegateStatement.twitter && !delegateStatement.discord
+                      !delegate?.statement.twitter &&
+                      !delegate?.statement.discord
                     }
                     delegate={delegate}
                   />
