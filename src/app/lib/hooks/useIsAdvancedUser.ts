@@ -53,7 +53,6 @@ const useIsAdvancedUser = () => {
     "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd", // Woj Test 1
     "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Agora manager throwaway
     "0xC776cBDDeA014889E8BaB4323C894C5c34DB214D", // Fernando
-    "0x75336b7F786dF5647f6B20Dc36eAb9E27D704894", // Fernando 2
   ] as `0x${string}`[];
 
   useContractRead({
