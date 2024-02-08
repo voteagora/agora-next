@@ -5,10 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 
 export async function generateMetadata() {
+
+
+  const preview = `/api/images/og/proposals`;
+
   return {
     title: "Agora - Optimism's RetroPGF Round 3 Summary",
-    description:
-      "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.",
+    description: "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.",
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
   };
 }
 
@@ -25,10 +35,12 @@ export default function Page() {
             logic, or dive into the results data directly in a spreadsheet.
           </div>
         </VStack>
-        <div className="h-auto lg:h-16 w-full lg:w-auto flex flex-col lg:flex-row items-center rounded-lg border border-gray-300 shadow-newDefault">
+        <div
+          className="h-auto lg:h-16 w-full lg:w-auto flex flex-col lg:flex-row items-center rounded-lg border border-gray-300 shadow-newDefault">
           {" "}
           <Link href="/retropgf/3">
-            <HStack className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
+            <HStack
+              className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
               <Image src={sunny} alt="Github" width="32" />
               <div className="max-w-[10rem]">View all recipients</div>
             </HStack>
@@ -38,7 +50,8 @@ export default function Page() {
             target="_blank"
             rel="noreferrer"
           >
-            <HStack className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
+            <HStack
+              className="items-center gap-2 p-4 lg:border-r lg:border-r-gray-300 text-gray-700 hover:text-black transition-colors duration-200">
               <Image
                 src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png"
                 alt="Github"
