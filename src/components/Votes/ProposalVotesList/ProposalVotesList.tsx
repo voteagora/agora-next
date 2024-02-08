@@ -11,7 +11,7 @@ import {
   fetchProposalVotes,
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
-import { fetchAllDelegatorsInChainsForAddress } from "@/app/delegates/actions";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 export default function ProposalVotesList({
   initialProposalVotes,
@@ -28,21 +28,11 @@ export default function ProposalVotesList({
   proposal_id: string;
 }) {
   const { address: connectedAddress } = useAccount();
+  const { advancedDelegators } = useConnectedDelegate();
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialProposalVotes] || []);
   const [meta, setMeta] = useState(initialProposalVotes.meta);
-  const [delegators, setDelegators] = useState<string[] | null>(null);
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
-
-  const fetchDelegatorsAndSet = useCallback(
-    async (addressOrENSName: string) => {
-      const fetchedDelegators = await fetchAllDelegatorsInChainsForAddress(
-        addressOrENSName
-      );
-      setDelegators(fetchedDelegators);
-    },
-    []
-  );
 
   const fetchUserVoteAndSet = useCallback(
     async (proposal_id: string, address: string) => {
@@ -88,18 +78,11 @@ export default function ProposalVotesList({
 
   useEffect(() => {
     if (connectedAddress) {
-      fetchDelegatorsAndSet(connectedAddress);
       fetchUserVoteAndSet(proposal_id, connectedAddress);
     } else {
-      setDelegators(null);
       setUserVotes([]);
     }
-  }, [
-    connectedAddress,
-    fetchDelegatorsAndSet,
-    fetchUserVoteAndSet,
-    proposal_id,
-  ]);
+  }, [connectedAddress, fetchUserVoteAndSet, proposal_id]);
 
   return (
     <div className={styles.vote_container}>
@@ -122,7 +105,7 @@ export default function ProposalVotesList({
               <ProposalSingleVote
                 vote={vote}
                 isAdvancedUser={isAdvancedUser}
-                delegators={delegators}
+                delegators={advancedDelegators}
               />
             </li>
           ))}
@@ -136,7 +119,7 @@ export default function ProposalVotesList({
               <ProposalSingleVote
                 vote={vote}
                 isAdvancedUser={isAdvancedUser}
-                delegators={delegators}
+                delegators={advancedDelegators}
               />
             </li>
           ))}
