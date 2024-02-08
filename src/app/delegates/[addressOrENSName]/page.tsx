@@ -5,6 +5,8 @@
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
+import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
+import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
 import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
@@ -13,51 +15,26 @@ import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFo
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
+  fetchDelegateStatement,
+  fetchDelegate,
+  fetchVotesForDelegate,
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
-  fetchDelegate,
-  fetchDelegateStatement,
-  fetchVotesForDelegate,
 } from "@/app/delegates/actions";
-import { formatNumber } from "@/lib/tokenUtils";
-import { truncateAddress, truncateString } from "@/app/lib/utils/text";
-import { isAddress } from "viem";
 
 export async function generateMetadata(
   { params }: { params: any },
-  parent: any,
+  parent: any
 ) {
-
-  const [delegate, delegateStatement] = await Promise.all([
-    fetchDelegate(params.addressOrENSName),
-    fetchDelegateStatement(params.addressOrENSName),
-  ]);
-
-  const description = encodeURIComponent("Optimism Voter");
-  const address = encodeURIComponent(isAddress(params.addressOrENSName) ? truncateAddress(params.addressOrENSName) : params.addressOrENSName);
-
-  const statement = (delegateStatement?.payload as { delegateStatement: string })?.delegateStatement;
-  const truncatedStatement = statement ? encodeURIComponent(truncateString(statement, 220)) : "";
-  const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
-
-  const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
-
   return {
-    title: `${address} on Agora`,
-    description: `See what ${address} believes and how they vote on Optimism governance.`,
-    openGraph: {
-      images: [preview],
-    },
-    other: {
-      ["fc:frame"]: "vNext",
-      ["fc:frame:image"]: preview,
-    },
+    title: `Agora - OP Voter`,
+    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
   };
 }
 
 export default async function Page({
-                                     params: { addressOrENSName },
-                                   }: {
+  params: { addressOrENSName },
+}: {
   params: { addressOrENSName: string };
 }) {
   const [delegate, delegateVotes, statement, delegatees, delegators] =
@@ -76,13 +53,12 @@ export default async function Page({
   }
 
   return (
-    <div
-      className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
-      <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
 
-      <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full gap-8">
+      <VStack className="sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <DelegateStatementContainer
           addressOrENSName={addressOrENSName}
           statement={statement}
@@ -94,7 +70,7 @@ export default async function Page({
         <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col justify-between gap-2 md:flex-row">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
                 {/* <div className="flex flex-col justify-between gap-2 md:flex-row">
                   <DelegatesVotesSort
@@ -114,14 +90,14 @@ export default async function Page({
               <DelegateVotes
                 fetchDelegateVotes={async (
                   page: number,
-                  sortOrder: VotesSortOrder,
+                  sortOrder: VotesSortOrder
                 ) => {
                   "use server";
 
                   return fetchVotesForDelegate(
                     addressOrENSName,
                     page,
-                    sortOrder,
+                    sortOrder
                   );
                 }}
               />
