@@ -1,10 +1,13 @@
-import type { NextApiRequest } from "next";
+// @ts-nocheck
+// Added nocheck to avoid compile issues with passing ArrayBuffer to an img src
+
+import {NextRequest}   from "next/server";
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
 export async function GET(
-  req: NextApiRequest,
+  req: NextRequest,
 ) {
 
   const { searchParams } = new URL(req.url);
@@ -46,7 +49,7 @@ export async function GET(
             <div tw="flex">
               <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
 
-                <svg tw="w-[36px] h-[36px]" viewBox="0 0 16 16" fill="none"
+                <svg style={{ width: "36px", height: "36px" }} viewBox="0 0 16 16" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_379_1614)">
                     <ellipse cx="8.0013" cy="2.50016" rx="7.66667" ry="1.83333" transform="rotate(-180 8.0013 2.50016)"
@@ -67,7 +70,7 @@ export async function GET(
 
                 <div tw="bg-gray-300 w-px h-3/4 mx-[18px]"></div>
 
-                <svg tw="w-[40px] h-[40px]" viewBox="0 0 1024 1024" fill="none"
+                <svg style={{ width: "36px", height: "36px" }} viewBox="0 0 1024 1024" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_7374_19399)">
                     <circle cx="512" cy="512" r="512" fill="#FF0420" />
