@@ -1,7 +1,6 @@
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
-import { icons } from "@/icons/icons";
-import Image from "next/image";
-import { useContext } from "react";
+import { Checkbox } from "../ui/checkbox";
+import { useContext, useState } from "react";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -16,7 +15,9 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
 ) => {
   const { description, checkmarkInfo } = props;
 
-  const { state } = useContext(ProposalLifecycleDraftContext);
+  const { state, updateENSDocsStatus, updateDiscourseStatus } = useContext(
+    ProposalLifecycleDraftContext
+  );
 
   return (
     <div className="bg-gray-fa rounded-b-2xl">
@@ -37,12 +38,22 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
         <div className="flex flex-row w-full items-center">
           <p className="text-gray-4f pr-5">Update ENS docs</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
-          <input type="checkbox" className="w-4 h-4 border-2 border-gray-eo" />
+          <Checkbox
+            checked={state.updateENSDocsStatus}
+            onCheckedChange={() =>
+              updateENSDocsStatus(!state.updateENSDocsStatus)
+            }
+          />
         </div>
         <div className="flex flex-row w-full items-center">
-          <p className="text-gray-4f pr-5">Update ENS docs</p>
+          <p className="text-gray-4f pr-5">Post draft on discourse</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
-          <input type="checkbox" className="w-4 h-4 border-2 border-gray-eo" />
+          <Checkbox
+            checked={state.postOnDiscourseStatus}
+            onCheckedChange={() =>
+              updateDiscourseStatus(!state.postOnDiscourseStatus)
+            }
+          />
         </div>
       </div>
     </div>
