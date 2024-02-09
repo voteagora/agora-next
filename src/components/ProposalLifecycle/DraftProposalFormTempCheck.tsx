@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   AccordionContent,
@@ -33,24 +33,20 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
 
   const [isValidDiscourseLink, setIsValidDiscourseLink] = useState(false);
 
-  const handleTempCheckLinkChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    validateTempCheckLink(e.target.value);
-    updateTempCheckLink(e.target.value);
-  };
-
-  const validateTempCheckLink = (linkInput: string) => {
+  const validateTempCheckLink = () => {
     // check if starts with "https://discuss.ens.domains/"
-    const discourseLink = linkInput;
     const discourseLinkRegex = /^https:\/\/discuss.ens.domains/;
 
-    if (discourseLinkRegex.test(discourseLink)) {
+    if (discourseLinkRegex.test(state.tempCheckLink)) {
       setIsValidDiscourseLink(true);
     } else {
       setIsValidDiscourseLink(false);
     }
   };
+
+  useEffect(() => {
+    validateTempCheckLink();
+  }, [state.tempCheckLink]);
 
   return (
     <AccordionItem
@@ -75,7 +71,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
               }`}
               placeholder="https://discuss.ens.domains/t/..."
               value={state.tempCheckLink}
-              onChange={(e) => handleTempCheckLinkChange(e)}
+              onChange={(e) => updateTempCheckLink(e.target.value)}
             ></input>
             <div className="flex flex-row gap-x-6">
               <button
