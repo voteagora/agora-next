@@ -78,6 +78,16 @@ export function ApprovalCastVoteDialog({
     missingVote: localMissingVote,
   });
 
+  // console.log("isLoading: ", isLoading);
+
+  // console.log("isSuccess: ", isSuccess);
+
+  // console.log("write: ", write);
+
+  console.log("isError: ", isError);
+
+  // console.log("data: ", data);
+
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   useMemo(() => {
@@ -90,15 +100,15 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
-  console.log(
-    "data",
-    data,
-    isLoading,
-    isSuccess,
-    isError,
-    missingVote,
-    localMissingVote
-  );
+  // console.log(
+  //   "data",
+  //   data,
+  //   isLoading,
+  //   isSuccess,
+  //   isError,
+  //   missingVote,
+  //   localMissingVote
+  // );
 
   useEffect(() => {
     if (
