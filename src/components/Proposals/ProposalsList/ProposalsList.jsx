@@ -59,16 +59,13 @@ export default function ProposalsList({
             }
             element="main"
           >
-            {proposals.map(
-              (proposal) =>
-                proposal.status !== "ACTIVE" && (
-                  <Proposal
-                    key={`${proposal.id}_${proposal.status}`}
-                    proposal={proposal}
-                    votableSupply={votableSupply}
-                  />
-                )
-            )}
+            {proposals.map((proposal) => (
+              <Proposal
+                key={`${proposal.id}_${proposal.status}`}
+                proposal={proposal}
+                votableSupply={votableSupply}
+              />
+            ))}
           </InfiniteScroll>
         </div>
       </VStack>
