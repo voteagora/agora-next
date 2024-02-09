@@ -12,7 +12,7 @@ export async function resolveENSName(name: string) {
 }
 
 export async function reverseResolveENSName(
-  address: string
+  address: string,
 ): Promise<string | null> {
   try {
     const ensName = await ethProvider.lookupAddress(address);
@@ -20,6 +20,17 @@ export async function reverseResolveENSName(
     return ensName || null;
   } catch (error) {
     console.error("ENS Resolution Error", error);
+    return null;
+  }
+}
+
+export async function resolveENSProfileImage(address: string): Promise<{ linkage: any[]; url: string; } | null> {
+  try {
+    const avatar = await ethProvider.getAvatar(address.toLowerCase());
+    // Assuming ethProvider.getAvatar correctly returns a Promise<{linkage: any[]; url: string;} | null>
+    return avatar;
+  } catch (error) {
+    console.error("ENS Avatar error", error);
     return null;
   }
 }

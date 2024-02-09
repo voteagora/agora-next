@@ -19,33 +19,34 @@ import {
   fetchDelegateStatement,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
-import { truncateString } from "@/app/lib/utils/text";
 import { formatNumber } from "@/lib/tokenUtils";
-import { processAddressOrEnsName } from "@/app/lib/ENSUtils";
+import { processAddressOrEnsName, resolveENSProfileImage } from "@/app/lib/ENSUtils";
 
 export async function generateMetadata(
   { params }: { params: any },
-  parent: any
+  parent: any,
 ) {
+
   const [delegate, delegateStatement] = await Promise.all([
     fetchDelegate(params.addressOrENSName),
     fetchDelegateStatement(params.addressOrENSName),
   ]);
 
-  const description = encodeURIComponent("Optimism Voter");
   const address = encodeURIComponent(
-    (await processAddressOrEnsName(params.addressOrENSName)) as string
+    (await processAddressOrEnsName(params.addressOrENSName)) as string,
   );
+
+  const avatarInfo = await resolveENSProfileImage(params.addressOrENSName);
 
   const statement = (
     delegateStatement?.payload as { delegateStatement: string }
   )?.delegateStatement;
-  const truncatedStatement = statement
-    ? encodeURIComponent(truncateString(statement, 220))
-    : "";
+
+  const truncatedStatement = statement ? encodeURIComponent(statement) : "";
+  const description = encodeURIComponent("Optimism Voter");
   const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
 
-  const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
+  const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}&avatar=${avatarInfo?.url}`;
 
   return {
     title: `${address} on Agora`,
@@ -61,11 +62,11 @@ export async function generateMetadata(
 }
 
 export default async function Page({
-  params: { addressOrENSName },
-}: {
+                                     params: { addressOrENSName },
+                                   }: {
   params: { addressOrENSName: string };
 }) {
-  const [delegate, delegateVotes, statement, delegatees, delegators] =
+  const [delegate, delegateVotes, statement, delegates, delegators] =
     await Promise.all([
       fetchDelegate(addressOrENSName),
       fetchVotesForDelegate(addressOrENSName),
@@ -81,7 +82,8 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
+    <div
+      className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
@@ -92,7 +94,7 @@ export default async function Page({
           statement={statement}
         />
         {statement && <TopIssues statement={statement} />}
-        <DelegationsContainer delegatees={delegatees} delegators={delegators} />
+        <DelegationsContainer delegatees={delegates} delegators={delegators} />
 
         {/* TODO: -> this could be refactor with revalidatePath */}
         <DelegateVotesProvider initialVotes={delegateVotes}>
@@ -118,14 +120,14 @@ export default async function Page({
               <DelegateVotes
                 fetchDelegateVotes={async (
                   page: number,
-                  sortOrder: VotesSortOrder
+                  sortOrder: VotesSortOrder,
                 ) => {
                   "use server";
 
                   return fetchVotesForDelegate(
                     addressOrENSName,
                     page,
-                    sortOrder
+                    sortOrder,
                   );
                 }}
               />

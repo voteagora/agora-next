@@ -2,6 +2,8 @@
 // Added nocheck to avoid compile issues with passing ArrayBuffer to an img src
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
+import { truncateString } from "@/app/lib/utils/text";
+import { IconPill } from "@/app/api/images/og/icons";
 
 export const runtime = "edge";
 
@@ -12,9 +14,10 @@ export async function GET(
   const { searchParams } = new URL(req.url);
 
   const address = searchParams.has("address") ? searchParams.get("address") : "voter.eth";
+  const avatar: string | null | undefined = searchParams.has("avatar") ? searchParams.get("avatar") : undefined;
   const votes = searchParams.has("votes") ? searchParams.get("votes") : "10 VOTES";
   const description = searchParams.has("description") ? searchParams.get("description") : "DAO Voter";
-  const statement = searchParams.has("statement") ? searchParams.get("statement") : "Delegate statement";
+  const statement = truncateString(searchParams.has("statement") ? searchParams.get("statement") : "Delegate statement", 220);
 
   const interBoldFont = await fetch(
     new URL("../../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
@@ -44,55 +47,14 @@ export async function GET(
           flexWrap: "nowrap",
         }}
       >
-        <img src={bg} style={{ position: "absolute" }} />
+        <img src={bg} style={{ position: "absolute" }} alt="background" />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
-            <div tw="flex">
-              <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
 
-                <svg style={{ width: "36px", height: "36px" }} viewBox="0 0 16 16" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_379_1614)">
-                    <ellipse cx="8.0013" cy="2.50016" rx="7.66667" ry="1.83333" transform="rotate(-180 8.0013 2.50016)"
-                             fill="black" />
-                    <ellipse cx="2.16667" cy="10.3335" rx="5" ry="1.83333" transform="rotate(90 2.16667 10.3335)"
-                             fill="black" />
-                    <ellipse cx="7.9987" cy="10.6667" rx="4.66667" ry="1.83333" transform="rotate(90 7.9987 10.6667)"
-                             fill="black" />
-                    <ellipse cx="13.8346" cy="10.3335" rx="5" ry="1.83333" transform="rotate(90 13.8346 10.3335)"
-                             fill="black" />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_379_1614">
-                      <rect width="16" height="16" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-
-                <div tw="bg-gray-300 w-px h-3/4 mx-[18px]"></div>
-
-                <svg style={{ width: "36px", height: "36px" }} viewBox="0 0 1024 1024" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_7374_19399)">
-                    <circle cx="512" cy="512" r="512" fill="#FF0420" />
-                    <path
-                      d="M362.769 648.081C332.283 648.081 307.305 640.908 287.834 626.562C268.62 611.959 259.013 591.208 259.013 564.308C259.013 558.672 259.653 551.755 260.934 543.557C264.265 525.111 269.004 502.951 275.153 477.076C292.574 406.624 337.535 371.398 410.036 371.398C429.763 371.398 447.44 374.728 463.067 381.389C478.695 387.794 490.992 397.529 499.958 410.595C508.925 423.404 513.408 438.776 513.408 456.709C513.408 462.089 512.768 468.878 511.487 477.076C507.644 499.876 503.032 522.037 497.652 543.557C488.686 578.654 473.186 604.914 451.154 622.335C429.122 639.499 399.66 648.081 362.769 648.081ZM368.149 592.745C382.496 592.745 394.665 588.518 404.656 580.063C414.904 571.609 422.205 558.672 426.56 541.251C432.453 517.169 436.936 496.162 440.01 478.229C441.035 472.849 441.547 467.341 441.547 461.704C441.547 438.391 429.378 426.735 405.04 426.735C390.694 426.735 378.397 430.962 368.149 439.416C358.158 447.87 350.985 460.808 346.629 478.229C342.018 495.393 337.407 516.401 332.795 541.251C331.77 546.375 331.258 551.755 331.258 557.391C331.258 580.96 343.555 592.745 368.149 592.745Z"
-                      fill="white" />
-                    <path
-                      d="M531.052 644.239C528.234 644.239 526.056 643.342 524.519 641.549C523.238 639.499 522.854 637.193 523.366 634.632L576.397 384.848C576.91 382.03 578.319 379.724 580.624 377.931C582.93 376.137 585.364 375.241 587.926 375.241H690.145C718.582 375.241 741.383 381.133 758.547 392.918C775.968 404.702 784.679 421.739 784.679 444.027C784.679 450.432 783.91 457.093 782.373 464.01C775.968 493.472 763.031 515.248 743.56 529.338C724.346 543.428 697.959 550.474 664.398 550.474H612.52L594.843 634.632C594.331 637.45 592.922 639.755 590.616 641.549C588.31 643.342 585.876 644.239 583.314 644.239H531.052ZM667.088 497.443C677.848 497.443 687.199 494.496 695.141 488.604C703.339 482.712 708.719 474.258 711.281 463.242C712.049 458.886 712.433 455.043 712.433 451.713C712.433 444.284 710.256 438.647 705.901 434.805C701.545 430.706 694.116 428.656 683.612 428.656H637.498L622.896 497.443H667.088Z"
-                      fill="white" />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_7374_19399">
-                      <rect width="1024" height="1024" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </div>
-            </div>
+            <IconPill />
 
             <div tw="flex flex-col">
-              <div tw="font-bold text-5xl w-1/2">{address}</div>
+              <div tw="font-bold text-5xl w-1/2">{truncateString(address, 20)}</div>
               <div tw="font-regular mt-[30px] text-4xl text-gray-600">{description}</div>
             </div>
           </div>
@@ -102,11 +64,36 @@ export async function GET(
             <div tw="flex flex-col w-full">
               <div tw="flex mb-[26px]">
                 <div tw="flex">
-                  <div tw="flex w-[58px] h-[58px] bg-gray-600 rounded-full">
+                  <div tw="flex">
+                    {avatar ? (
+                      <img
+                        src={avatar}
+                        alt="avatar"
+                        width="60"
+                        height="60"
+                        style={{ borderRadius: "50%" }}
+                      />
+                    ) : (
+                      <svg style={{ width: 60, height: 61 }} viewBox="0 0 60 61" fill="none"
+                           xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2.03015" y="0.333862" width="58.0108" height="58.0108" rx="29.0054"
+                              transform="rotate(2 2.03015 0.333862)" fill="#2A2929" />
+                        <path
+                          d="M25.8831 31.4012C26.6024 31.4012 27.1856 31.9536 27.1856 32.635C27.1856 33.9978 28.3519 35.1026 29.7906 35.1026C31.2293 35.1026 32.3956 33.9978 32.3956 32.635C32.3956 31.9536 32.9788 31.4012 33.6981 31.4012C34.4175 31.4012 35.0006 31.9536 35.0006 32.635C35.0006 35.3606 32.668 37.5702 29.7906 37.5702C26.9132 37.5702 24.5806 35.3606 24.5806 32.635C24.5806 31.9536 25.1637 31.4012 25.8831 31.4012Z"
+                          fill="white" />
+                        <path
+                          d="M17.4167 21.3767L18.1698 23.1854C18.8351 24.7832 20.1678 26.047 21.8502 26.6755L23.7665 27.3914L21.8502 28.1073C20.1678 28.7358 18.8351 29.9997 18.1698 31.5975L17.4167 33.4061L16.6637 31.5975C15.9984 29.9997 14.6657 28.7358 12.9832 28.1073L11.067 27.3914L12.9832 26.6755C14.6657 26.047 15.9984 24.7832 16.6637 23.1854L17.4167 21.3767Z"
+                          fill="white" />
+                        <path
+                          d="M42.4901 21.3767L43.2432 23.1854C43.9084 24.7832 45.2412 26.047 46.9236 26.6755L48.8398 27.3914L46.9236 28.1073C45.2412 28.7358 43.9084 29.9997 43.2432 31.5975L42.4901 33.4061L41.7371 31.5975C41.0718 29.9997 39.739 28.7358 38.0566 28.1073L36.1404 27.3914L38.0566 26.6755C39.739 26.047 41.0718 24.7832 41.737 23.1854L42.4901 21.3767Z"
+                          fill="white" />
+                      </svg>
+                    )
+                    }
 
                   </div>
                   <div tw="flex flex-col justify-center ml-[16px]">
-                    <div tw="flex text-2xl mb-[4px]">{address}</div>
+                    <div tw="flex text-2xl mb-[4px]">{truncateString(address, 30)}</div>
                     <div tw="flex text-[17px] text-slate-800">{votes}</div>
                   </div>
                 </div>
