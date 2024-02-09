@@ -7,7 +7,6 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
-import { Delegation } from "@/app/api/common/delegations/delegation";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
@@ -21,7 +20,7 @@ export function DelegateActions({
   delegate: DelegateChunk;
   className?: string;
   isAdvancedUser: boolean;
-  delegators: Delegation[] | null;
+  delegators: string[] | null;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();

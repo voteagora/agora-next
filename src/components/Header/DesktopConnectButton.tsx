@@ -1,13 +1,8 @@
 import { ConnectKitButton } from "connectkit";
 import styles from "./header.module.scss";
-import { Delegate } from "@/app/api/common/delegates/delegate";
 import { DesktopProfileDropDown } from "./DesktopProfileDropDown";
 
-export function DesktopConnectButton({
-  delegate,
-}: {
-  delegate: Delegate | undefined;
-}) {
+export function DesktopConnectButton() {
   return (
     <ConnectKitButton.Custom>
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
@@ -17,7 +12,7 @@ export function DesktopConnectButton({
             className={styles.desktop_connect_button}
           >
             {isConnected ? (
-              <DesktopProfileDropDown ensName={ensName} delegate={delegate} />
+              <DesktopProfileDropDown ensName={ensName} />
             ) : (
               "Connect Wallet"
             )}

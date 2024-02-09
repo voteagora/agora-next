@@ -2,27 +2,23 @@
 
 import { css } from "@emotion/css";
 import * as theme from "@/styles/theme";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
-import { ethers } from "ethers";
 import Image from "next/image";
 import { HStack, VStack } from "../Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
-import HumanAddress from "../shared/HumanAddress";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
-import { Delegate } from "@/app/api/common/delegates/delegate";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 type Props = {
   ensName: string | undefined;
-  delegate: Delegate | undefined;
 };
 
 // Add your variants
@@ -36,22 +32,11 @@ const MobileValueWrapper = ({ children }: { children: ReactNode }) => (
   <div className={css(`font-size: ${theme.fontSize.base}`)}>{children}</div>
 );
 
-export const MobileProfileDropDown = ({ ensName, delegate }: Props) => {
+export const MobileProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
-  const [balance, setBalance] = useState<bigint>();
+  const { delegate, balance } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;
-
-  useEffect(() => {
-    if (!address) return;
-
-    const getBalance = async () => {
-      const balance = await OptimismContracts.token.contract.balanceOf(address);
-      setBalance(balance);
-    };
-
-    getBalance();
-  }, [address]);
 
   return (
     <Popover className="relative cursor-auto">

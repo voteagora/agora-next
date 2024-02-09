@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import Image from "next/image";
 import { VStack } from "../../Layout/Stack";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
@@ -13,7 +12,7 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
-import { useAccount } from "wagmi";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -34,32 +33,12 @@ interface Props {
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  fetchDelegators,
 }: Props) {
   const router = useRouter();
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const { address } = useAccount();
-  const [delegators, setDelegators] = useState<Delegation[] | null>(null);
-
-  const fetchDelegatorsAndSet = async (addressOrENSName: string) => {
-    let fetchedDelegators;
-    try {
-      fetchedDelegators = await fetchDelegators(addressOrENSName);
-    } catch (error) {
-      fetchedDelegators = null;
-    }
-    setDelegators(fetchedDelegators);
-  };
-
-  useEffect(() => {
-    if (address) {
-      fetchDelegatorsAndSet(address);
-    } else {
-      setDelegators(null);
-    }
-  }, [address]);
+  const { advancedDelegators } = useConnectedDelegate();
 
   useEffect(() => {
     setPages([initialDelegates]);
@@ -140,7 +119,7 @@ export default function DelegateCardList({
                     <DelegateActions
                       delegate={delegate}
                       isAdvancedUser={isAdvancedUser}
-                      delegators={delegators}
+                      delegators={advancedDelegators}
                     />
                   </div>
                 </VStack>
