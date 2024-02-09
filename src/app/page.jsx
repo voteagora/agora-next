@@ -47,10 +47,10 @@ export default async function Home() {
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
       <PageDivider />
-      <NeedsMyVoteProposalsList
+      {/* <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
-      />
+      /> */}
       <ProposalsList
         initialProposals={proposals}
         fetchProposals={fetchProposals}
