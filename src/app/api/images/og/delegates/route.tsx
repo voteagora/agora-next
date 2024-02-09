@@ -3,31 +3,28 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export default async function GET(
+export async function GET(
   req: NextApiRequest,
 ) {
 
   const { searchParams } = new URL(req.url);
 
-  const address = searchParams.has("address") ? searchParams.get("address") : "voter.eth";
-  const votes = searchParams.has("votes") ? searchParams.get("votes") : "10 VOTES";
-  const description = searchParams.has("description") ? searchParams.get("description") : "DAO Voter";
-  const statement = searchParams.has("statement") ? searchParams.get("statement") : "Delegate statement";
+  const title = searchParams.has("title") ? searchParams.get("title") : "Optimism Agora";
+  const description = searchParams.has("description") ? searchParams.get("description") : "Home of Token House Governance and RPGF";
 
   const interBoldFont = await fetch(
-    new URL("../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
+    new URL("../../../../../assets/fonts/Inter-Black.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   const interRegularFont = await fetch(
-    new URL("../../../../assets/fonts/Inter-Regular.ttf", import.meta.url),
+    new URL("../../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
-  const bg = await fetch(
-    new URL("../../../../assets/images/og-delegate-bg.png", import.meta.url)).then(
-    (res) => res.arrayBuffer(),
-  );
 
-  // TODO add background image as an import
+  const bg = await fetch(
+    new URL("../../../../../assets/images/og-delegates-bg.png", import.meta.url),
+  ).then((res) => res.arrayBuffer());
+
   return new ImageResponse(
     (
       <div
@@ -91,29 +88,8 @@ export default async function GET(
             </div>
 
             <div tw="flex flex-col">
-              <div tw="font-bold text-5xl w-1/2">{address}</div>
+              <div tw="font-bold text-5xl w-full">{title}</div>
               <div tw="font-regular mt-[30px] text-4xl text-gray-600">{description}</div>
-            </div>
-          </div>
-
-
-          <div tw="flex w-[430px] ml-[97px] mt-[34px]">
-            <div tw="flex flex-col w-full">
-              <div tw="flex mb-[26px]">
-                <div tw="flex">
-                  <div tw="flex w-[58px] h-[58px] bg-gray-600 rounded-full">
-
-                  </div>
-                  <div tw="flex flex-col justify-center ml-[16px]">
-                    <div tw="flex text-2xl mb-[4px]">{address}</div>
-                    <div tw="flex text-[17px] text-slate-800">{votes}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div tw="flex flex-col h-full">
-                <div tw="flex text-2xl text-gray-800 h-60">{statement}</div>
-              </div>
             </div>
           </div>
         </div>
@@ -127,13 +103,13 @@ export default async function GET(
           data: interBoldFont,
           name: "Inter",
           style: "normal",
-          weight: 700,
+          weight: 900,
         },
         {
           data: interRegularFont,
           name: "Inter",
           style: "normal",
-          weight: 400,
+          weight: 500,
         },
       ],
     },

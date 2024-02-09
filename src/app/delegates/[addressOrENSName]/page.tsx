@@ -1,12 +1,10 @@
 /*
- * Show page for a single delegate
- * Takes in the delegate address as a parameter
+ * Show page for a single x
+ * Takes in the x address as a parameter
  */
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
-import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
 import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
@@ -15,26 +13,51 @@ import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFo
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
-  fetchDelegateStatement,
-  fetchDelegate,
-  fetchVotesForDelegate,
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchVotesForDelegate,
 } from "@/app/delegates/actions";
+import { truncateAddress, truncateString } from "@/app/lib/utils/text";
+import { isAddress } from "viem";
+import { formatNumber } from "@/lib/tokenUtils";
 
 export async function generateMetadata(
   { params }: { params: any },
-  parent: any
+  parent: any,
 ) {
+
+  const [delegate, delegateStatement] = await Promise.all([
+    fetchDelegate(params.addressOrENSName),
+    fetchDelegateStatement(params.addressOrENSName),
+  ]);
+
+  const description = encodeURIComponent("Optimism Voter");
+  const address = encodeURIComponent(isAddress(params.addressOrENSName) ? truncateAddress(params.addressOrENSName) : params.addressOrENSName);
+
+  const statement = (delegateStatement?.payload as { delegateStatement: string })?.delegateStatement;
+  const truncatedStatement = statement ? encodeURIComponent(truncateString(statement, 220)) : "";
+  const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
+
+  const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}`;
+
   return {
-    title: `Agora - OP Voter`,
-    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+    title: `${address} on Agora`,
+    description: `See what ${address} believes and how they vote on Optimism governance.`,
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
   };
 }
 
 export default async function Page({
-  params: { addressOrENSName },
-}: {
+                                     params: { addressOrENSName },
+                                   }: {
   params: { addressOrENSName: string };
 }) {
   const [delegate, delegateVotes, statement, delegatees, delegators] =
@@ -53,7 +76,8 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
+    <div
+      className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
@@ -90,14 +114,14 @@ export default async function Page({
               <DelegateVotes
                 fetchDelegateVotes={async (
                   page: number,
-                  sortOrder: VotesSortOrder
+                  sortOrder: VotesSortOrder,
                 ) => {
                   "use server";
 
                   return fetchVotesForDelegate(
                     addressOrENSName,
                     page,
-                    sortOrder
+                    sortOrder,
                   );
                 }}
               />

@@ -3,26 +3,25 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export default async function GET(
+export async function GET(
   req: NextApiRequest,
 ) {
 
   const { searchParams } = new URL(req.url);
 
-  const title = searchParams.has("title") ? searchParams.get("title") : "Optimism Agora";
-  const description = searchParams.has("description") ? searchParams.get("description") : "Home of Token House Governance and RPGF";
+  const title = searchParams.has("title") ? searchParams.get("title") : "Agora Proposal";
+  const description = searchParams.has("description") ? searchParams.get("description") : "My default description";
 
   const interBoldFont = await fetch(
-    new URL("../../../../assets/fonts/Inter-Black.ttf", import.meta.url),
+    new URL("../../../../../assets/fonts/Inter-Black.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   const interRegularFont = await fetch(
-    new URL("../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
+    new URL("../../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
-
   const bg = await fetch(
-    new URL("../../../../assets/images/og-proposals-bg.png", import.meta.url),
+    new URL("../../../../../assets/images/og-proposal-bg.png", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
@@ -42,7 +41,7 @@ export default async function GET(
       >
         <img src={bg} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
-          <div tw="flex flex-col justify-between h-full w-[470px]">
+          <div tw="flex flex-col justify-between h-full w-full">
             <div tw="flex">
               <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
 
