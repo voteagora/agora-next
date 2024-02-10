@@ -23,30 +23,25 @@ import { formatNumber } from "@/lib/tokenUtils";
 import { processAddressOrEnsName, resolveENSProfileImage } from "@/app/lib/ENSUtils";
 
 export async function generateMetadata(
-  { params }: { params: any },
+  { params }: { params: { addressOrENSName: string; } },
   parent: any,
 ) {
-
-  const [delegate, delegateStatement] = await Promise.all([
+  const [delegate, delegateStatement, address] = await Promise.all([
     fetchDelegate(params.addressOrENSName),
     fetchDelegateStatement(params.addressOrENSName),
+    processAddressOrEnsName(params.addressOrENSName),
   ]);
 
-  const address = encodeURIComponent(
-    (await processAddressOrEnsName(params.addressOrENSName)) as string,
-  );
-
-  const avatarInfo = await resolveENSProfileImage(params.addressOrENSName);
-
-  const statement = (
-    delegateStatement?.payload as { delegateStatement: string }
-  )?.delegateStatement;
-
-  const truncatedStatement = statement ? encodeURIComponent(statement) : "";
-  const description = encodeURIComponent("Optimism Voter");
+  const avatar = await resolveENSProfileImage(address || params.addressOrENSName);
+  const statement = (delegateStatement?.payload as { delegateStatement: string })?.delegateStatement;
   const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
 
-  const preview = `/api/images/og/delegate?address=${address}&description=${description}&statement=${truncatedStatement}&votes=${votes}&avatar=${avatarInfo?.url}`;
+  const imgParams = [
+    avatar && `avatar=${encodeURIComponent(avatar)}`,
+    statement && `statement=${encodeURIComponent(statement)}`,
+  ].filter(Boolean);
+
+  const preview = `/api/images/og/delegate?${imgParams.join("&")}&address=${address}&votes=${votes}`;
 
   return {
     title: `${address} on Agora`,
@@ -55,8 +50,8 @@ export async function generateMetadata(
       images: [preview],
     },
     other: {
-      ["fc:frame"]: "vNext",
-      ["fc:frame:image"]: preview,
+      "fc:frame": "vNext",
+      "fc:frame:image": preview,
     },
   };
 }

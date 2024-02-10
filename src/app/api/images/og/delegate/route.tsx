@@ -14,10 +14,10 @@ export async function GET(
   const { searchParams } = new URL(req.url);
 
   const address = searchParams.has("address") ? searchParams.get("address") : "voter.eth";
-  const avatar: string | null | undefined = searchParams.has("avatar") ? searchParams.get("avatar") : undefined;
-  const votes = searchParams.has("votes") ? searchParams.get("votes") : "10 VOTES";
-  const description = searchParams.has("description") ? searchParams.get("description") : "DAO Voter";
-  const statement = truncateString(searchParams.has("statement") ? searchParams.get("statement") : "Delegate statement", 220);
+  const avatar = searchParams.has("avatar") ? searchParams.get("avatar") : null;
+  const votes = searchParams.has("votes") ? searchParams.get("votes") : "NO VOTES";
+  const description = searchParams.has("description") ? searchParams.get("description") : "Optimism Voter";
+  const statement = searchParams.has("statement") ? truncateString(searchParams.get("statement"), 220) : null;
 
   const interBoldFont = await fetch(
     new URL("../../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
@@ -100,7 +100,9 @@ export async function GET(
               </div>
 
               <div tw="flex flex-col h-full">
-                <div tw="flex text-2xl text-gray-800 h-60">{statement}</div>
+                {statement && (
+                  <div tw="flex text-2xl text-gray-800 h-60">{statement}</div>
+                )}
               </div>
             </div>
           </div>

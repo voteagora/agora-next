@@ -1,6 +1,7 @@
 import { ethProvider } from "@/app/lib/provider";
-import { isAddress } from "viem";
 import { truncateAddress } from "@/app/lib/utils/text";
+
+export const isENSName = (name: string) => name.endsWith(".eth");
 
 export async function resolveENSName(name: string) {
   const address = await ethProvider.resolveName(name);
@@ -11,9 +12,7 @@ export async function resolveENSName(name: string) {
   return address.toLowerCase();
 }
 
-export async function reverseResolveENSName(
-  address: string,
-): Promise<string | null> {
+export async function reverseResolveENSName(address: string): Promise<string | null> {
   try {
     const ensName = await ethProvider.lookupAddress(address);
 
@@ -24,11 +23,17 @@ export async function reverseResolveENSName(
   }
 }
 
-export async function resolveENSProfileImage(address: string): Promise<{ linkage: any[]; url: string; } | null> {
+
+export async function resolveENSProfileImage(address: string): Promise<string | null> {
+
+  const lowerCaseAddress = address.toLowerCase();
+
+  // Only resolve ENS names
+  if (!isENSName(lowerCaseAddress)) {
+    return null;
+  }
   try {
-    const avatar = await ethProvider.getAvatar(address.toLowerCase());
-    // Assuming ethProvider.getAvatar correctly returns a Promise<{linkage: any[]; url: string;} | null>
-    return avatar;
+    return await ethProvider.getAvatar(lowerCaseAddress);
   } catch (error) {
     console.error("ENS Avatar error", error);
     return null;
@@ -36,24 +41,15 @@ export async function resolveENSProfileImage(address: string): Promise<{ linkage
 }
 
 export async function processAddressOrEnsName(addressOrENSName: string) {
-  if (isAddress(addressOrENSName)) {
-    const ensName = await reverseResolveENSName(addressOrENSName.toLowerCase());
-    if (ensName) {
-      return ensName;
-    } else {
-      return truncateAddress(addressOrENSName);
-    }
-  } else {
-    try {
-      const address = await resolveENSName(addressOrENSName);
-      if (address) {
-        return addressOrENSName;
-      } else {
-        return "";
-      }
-    } catch (error) {
-      console.error("Error resolving ENS name:", error);
-      return null;
-    }
+
+  if (isENSName(addressOrENSName)) {
+    return addressOrENSName;
+  }
+
+  try {
+    return await reverseResolveENSName(addressOrENSName) || truncateAddress(addressOrENSName);
+  } catch (error) {
+    console.error("Error in reverse resolving ENS name:", error);
+    return null;
   }
 }
