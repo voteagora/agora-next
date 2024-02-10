@@ -3,7 +3,7 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { truncateString } from "@/app/lib/utils/text";
-import { IconPill } from "@/app/api/images/og/icons";
+import {AgoraPartnerLogos} from "@/components/ui/misc/icons";
 
 export const runtime = "edge";
 
@@ -51,7 +51,7 @@ export async function GET(
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
 
-            <IconPill />
+            <AgoraPartnerLogos />
 
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-1/2">{truncateString(address, 20)}</div>
