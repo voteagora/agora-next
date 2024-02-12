@@ -1,7 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 
 export default function OptionsResultsPanel({

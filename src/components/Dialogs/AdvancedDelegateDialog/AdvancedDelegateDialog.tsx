@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatUnits } from "viem";

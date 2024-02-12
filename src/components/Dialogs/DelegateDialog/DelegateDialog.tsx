@@ -8,7 +8,6 @@ import { useModal } from "connectkit";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { useCallback, useEffect, useState } from "react";
-import { Delegatees } from "@prisma/client";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
@@ -16,6 +15,7 @@ import { InfoIcon } from "lucide-react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 
 export function DelegateDialog({
   delegate,
@@ -27,13 +27,15 @@ export function DelegateDialog({
   fetchBalanceForDirectDelegation: (
     addressOrENSName: string
   ) => Promise<bigint>;
-  fetchDirectDelegatee: (addressOrENSName: string) => Promise<Delegatees>;
+  fetchDirectDelegatee: (
+    addressOrENSName: string
+  ) => Promise<DelegateePayload | null>;
   completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
   const { setOpen } = useModal();
   const [votingPower, setVotingPower] = useState<string>("");
-  const [delegatee, setDelegatee] = useState<Delegatees | null>(null);
+  const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   const writeWithTracking = () => {
@@ -111,8 +113,7 @@ export function DelegateDialog({
           >
             <VStack className={styles.amount_container}>
               <HStack alignItems="items-center" gap={1}>
-                Your total delegatable votes{" "}
-                <InfoIcon size={12} className="opacity-50" />
+                Your total delegatable votes
               </HStack>
               <AdvancedDelegationDisplayAmount amount={votingPower} />
             </VStack>
