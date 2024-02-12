@@ -13,7 +13,7 @@ const DraftProposalDescriptionInput: React.FC<
 > = (props) => {
   const { label, placeholder } = props;
 
-  const { state, updateDescription } = useContext(
+  const { proposalState, updateDescription } = useContext(
     ProposalLifecycleDraftContext
   );
 
@@ -23,7 +23,7 @@ const DraftProposalDescriptionInput: React.FC<
       <input
         className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
         placeholder={placeholder}
-        value={state.description}
+        value={proposalState.description}
         onChange={(e) => updateDescription(e.target.value)}
       ></input>
     </div>

@@ -28,7 +28,9 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
   const { label, placeholder } = props;
 
   // can be markdown
-  const { state, updateAbstract } = useContext(ProposalLifecycleDraftContext);
+  const { proposalState, updateAbstract } = useContext(
+    ProposalLifecycleDraftContext
+  );
   const [selectedMode, setSelectedMode] = useState<"write" | "preview">(
     "write"
   );
@@ -41,14 +43,14 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
           <textarea
             className="py-3 px-4 border-0 placeholder-gray-af w-full bg-gray-fa rounded-t-lg focus:outline-none focus:ring-0 resize-none"
             placeholder={placeholder}
-            value={state.abstract}
+            value={proposalState.abstract}
             onChange={(e) => updateAbstract(e.target.value)}
             rows={8}
           ></textarea>
         ) : (
           <div>
             <MarkdownPreview
-              source={state.abstract}
+              source={proposalState.abstract}
               className="h-full py-3 px-4 rounded-t-lg max-w-[650px] bg-transparent"
               // make background transparent
               style={{
