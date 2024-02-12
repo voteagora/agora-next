@@ -1,19 +1,19 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import InfiniteScroll from "react-infinite-scroller";
-import styles from "./proposalLists.module.scss";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
+import { useRouter } from "next/navigation";
+import * as React from "react";
+import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
-import Loader from "@/components/Layout/Loader";
+import styles from "./proposalLists.module.scss";
 
 export default function ProposalsList({
-  initialProposals,
-  fetchProposals,
-  votableSupply,
-}) {
+                                        initialProposals,
+                                        fetchProposals,
+                                        votableSupply,
+                                      }) {
   const router = useRouter();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposals] || []);
@@ -25,7 +25,7 @@ export default function ProposalsList({
       const data = await fetchProposals(page);
       const existingIds = new Set(proposals.map((p) => p.id));
       const uniqueProposals = data.proposals.filter(
-        (p) => !existingIds.has(p.id)
+        (p) => !existingIds.has(p.id),
       );
       setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
       setMeta(data.meta);
@@ -39,7 +39,12 @@ export default function ProposalsList({
     <VStack className={styles.proposals_list_container}>
       {/* {address && <NonVotedProposalsList address={address} />} */}
 
-      <PageHeader headerText="All Proposals" />
+      <div className="flex flex-col md:flex-row justify-between items-baseline gap-2">
+        <PageHeader headerText="All Proposals" />
+        <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
+          <ProposalsFilter />
+        </div>
+      </div>
 
       <VStack className={styles.proposals_table_container}>
         <div className={styles.proposals_table}>
