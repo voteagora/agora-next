@@ -128,12 +128,13 @@ view OptimismAdvancedDelegatees {
 }
 
 view OptimismAdvancedVotingPower {
-  delegate           String   @unique
-  vp_allowance       Decimal  @db.Decimal
-  delegated_vp       Decimal  @db.Decimal
-  advanced_vp        Decimal  @db.Decimal
-  subdelegated_share Decimal? @db.Decimal
-  contract           String?  @db.VarChar(42)
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal? @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String?  @db.VarChar(42)
 
   @@map("advanced_voting_power")
   @@schema("optimism")
