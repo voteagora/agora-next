@@ -4,7 +4,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import DelegateStatement from "./DelegateStatement";
-import { type DelegateStatement as DelegateStatementType } from "@/app/api/delegateStatement/delegateStatement";
+import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
 
 export default function DelegateStatementContainer({
   addressOrENSName,
@@ -37,7 +37,9 @@ export default function DelegateStatementContainer({
       )}
       {!delegateStatement && (
         <div className="p-8 align-middle text-center rounded-md bg-gray-100">
-          <p>No delegate statement for {addressOrENSName}.</p>
+          <p className="break-words">
+            No delegate statement for {addressOrENSName}
+          </p>
           {isConnected && address === addressOrENSName && (
             <p className="my-3">
               <a

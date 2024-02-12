@@ -3,7 +3,7 @@ import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import styles from "./delegateCard.module.scss";
 import DelegateCardClient from "./DelegateCardClient";
-import { Delegate } from "@/app/api/delegates/delegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (

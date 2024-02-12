@@ -1,4 +1,4 @@
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import DelegationToRow from "./DelegationToRow";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import DelegationFromRow from "./DelegationFromRow";

@@ -11,13 +11,14 @@ import {
   getCurrentDelegatees,
   getCurrentDelegators,
   getAllForAForAdvancedDelegation,
+  getAllDelegatorsInChainsForAddress,
 } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
-import { VotesSortOrder } from "@/app/api/votes/vote";
+import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import { revalidatePath } from "next/cache";
 
 // Pass address of the connected wallet
@@ -102,4 +103,11 @@ export async function fetchCurrentDelegators(addressOrENSName: string) {
 // TODO temporary fetch all query - optimization via API needed
 export async function fetchAllForAdvancedDelegation(address: string) {
   return getAllForAForAdvancedDelegation(address);
+}
+
+// Pass address of the connected wallet
+export async function fetchAllDelegatorsInChainsForAddress(
+  addressOrENSName: string
+) {
+  return getAllDelegatorsInChainsForAddress({ addressOrENSName });
 }

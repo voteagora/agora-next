@@ -8,11 +8,10 @@ import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
 import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
-import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
+import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
@@ -54,12 +53,12 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col items-center justify-between w-full max-w-full gap-6 mt-12 xl:flex-row xl:items-start">
-      <VStack className="static w-full xl:sticky top-16 shrink-0 xl:max-w-xs">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
 
-      <VStack className="flex-1 max-w-full min-w-0 gap-8 xl:ml-12">
+      <VStack className="sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <DelegateStatementContainer
           addressOrENSName={addressOrENSName}
           statement={statement}
@@ -71,7 +70,7 @@ export default async function Page({
         <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col justify-between gap-2 md:flex-row">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
                 {/* <div className="flex flex-col justify-between gap-2 md:flex-row">
                   <DelegatesVotesSort
