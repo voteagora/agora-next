@@ -67,26 +67,21 @@ export function ApprovalCastVoteDialog({
 
   // TODO: ADD against option if is supported
   // 0 = against, 1 = for, 2 = abstain
-  const { isLoading, isSuccess, write, isError, data } = useAdvancedVoting({
-    proposalId: proposal.id,
-    support: abstain ? 2 : 1,
-    standardVP: BigInt(votingPower.directVP),
-    advancedVP: BigInt(votingPower.advancedVP),
-    authorityChains,
-    reason,
-    params: encodedParams,
-    missingVote: localMissingVote,
-  });
-
-  // console.log("isLoading: ", isLoading);
-
-  // console.log("isSuccess: ", isSuccess);
-
-  // console.log("write: ", write);
+  const { isLoading, isSuccess, write, isError, data, error } =
+    useAdvancedVoting({
+      proposalId: proposal.id,
+      support: abstain ? 2 : 1,
+      standardVP: BigInt(votingPower.directVP),
+      advancedVP: BigInt(votingPower.advancedVP),
+      authorityChains,
+      reason,
+      params: encodedParams,
+      missingVote: localMissingVote,
+    });
 
   console.log("isError: ", isError);
-
-  // console.log("data: ", data);
+  console.log("error: ", error);
+  console.log("data: ", data);
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
@@ -99,16 +94,6 @@ export function ApprovalCastVoteDialog({
         ) as `0x${string}`);
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
-
-  // console.log(
-  //   "data",
-  //   data,
-  //   isLoading,
-  //   isSuccess,
-  //   isError,
-  //   missingVote,
-  //   localMissingVote
-  // );
 
   useEffect(() => {
     if (
