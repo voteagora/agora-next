@@ -3,7 +3,7 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { truncateString } from "@/app/lib/utils/text";
-import { LogoPill } from "@/app/api/images/og/shared";
+import { LogoPill } from "@/app/api/images/og/assets/shared";
 
 export const runtime = "edge";
 
@@ -20,15 +20,15 @@ export async function GET(
   const statement = searchParams.has("statement") ? truncateString(searchParams.get("statement"), 220) : null;
 
   const interBoldFont = await fetch(
-    new URL("../../../../../assets/fonts/Inter-Bold.ttf", import.meta.url),
+    new URL("../assets/Inter-Bold.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   const interRegularFont = await fetch(
-    new URL("../../../../../assets/fonts/Inter-Regular.ttf", import.meta.url),
+    new URL("../assets/Inter-Regular.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   const bg = await fetch(
-    new URL("../../../../../assets/images/og-delegate-bg.png", import.meta.url)).then(
+    new URL("../assets/og-delegate-bg.png", import.meta.url)).then(
     (res) => res.arrayBuffer(),
   );
 

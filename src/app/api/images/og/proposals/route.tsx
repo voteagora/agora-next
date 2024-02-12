@@ -3,7 +3,7 @@
 
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
-import { LogoPill } from "@/app/api/images/og/shared";
+import { LogoPill } from "@/app/api/images/og/assets/shared";
 
 export const runtime = "edge";
 
@@ -17,16 +17,16 @@ export async function GET(
   const description = searchParams.has("description") ? searchParams.get("description") : "Home of Token House Governance and RPGF";
 
   const interBoldFont = await fetch(
-    new URL("../../../../../assets/fonts/Inter-Black.ttf", import.meta.url),
+    new URL("../assets/Inter-Black.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   const interRegularFont = await fetch(
-    new URL("../../../../../assets/fonts/Inter-Medium.ttf", import.meta.url),
+    new URL("../assets/Inter-Medium.ttf", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
 
   const bg = await fetch(
-    new URL("../../../../../assets/images/og-proposals-bg.png", import.meta.url),
+    new URL("../assets/og-proposals-bg.png", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
