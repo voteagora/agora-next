@@ -239,7 +239,7 @@ function InfoDialog({
 }) {
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
   return (
-    <div className="absolute w-full bg-white rounded-lg">
+    <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
       <VStack className={styles.amount_container + " !pb-0 !px-0"}>
         <div
           className="absolute cursor-pointer top-2 right-2 opacity-80"
