@@ -13,7 +13,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
 ) => {
   const { label, explanation } = props;
 
-  const { state, updateProposalType } = useContext(
+  const { proposalState, updateProposalType } = useContext(
     ProposalLifecycleDraftContext
   );
 
@@ -24,7 +24,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
         <div className="flex flex-row p-1 rounded-lg border border-gray-eo">
           <button
             className={`py-2 px-5 font-medium rounded-lg ${
-              state.proposalType === "executable"
+              proposalState.proposalType === "executable"
                 ? "bg-gray-fa"
                 : "text-gray-af"
             }`}
@@ -34,7 +34,9 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
           </button>
           <button
             className={`py-2 px-5 font-medium rounded-lg ${
-              state.proposalType === "social" ? "bg-gray-fa" : "text-gray-af"
+              proposalState.proposalType === "social"
+                ? "bg-gray-fa"
+                : "text-gray-af"
             }`}
             onClick={() => updateProposalType("social")}
           >
