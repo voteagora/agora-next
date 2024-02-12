@@ -1,8 +1,6 @@
-export const AgoraPartnerLogos = () => {
+export const LogoPill = () => {
 
   return <div tw="flex">
-
-
     <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
       <svg style={{ width: "36px", height: "36px" }} viewBox="0 0 16 16" fill="none"
            xmlns="http://www.w3.org/2000/svg">
@@ -22,10 +20,7 @@ export const AgoraPartnerLogos = () => {
           </clipPath>
         </defs>
       </svg>
-
-
       <div tw="bg-gray-300 w-px h-3/4 mx-[18px]"></div>
-
       <svg style={{ width: "36px", height: "36px" }} viewBox="0 0 1024 1024" fill="none"
            xmlns="http://www.w3.org/2000/svg">
         <g>
@@ -44,5 +39,5 @@ export const AgoraPartnerLogos = () => {
         </defs>
       </svg>
     </div>
-  </div>
-}
+  </div>;
+};

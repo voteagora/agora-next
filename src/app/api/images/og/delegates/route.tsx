@@ -3,7 +3,7 @@
 
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
-import { AgoraPartnerLogos } from "@/components/ui/misc/icons";
+import { LogoPill } from "@/app/api/images/og/shared";
 
 export const runtime = "edge";
 
@@ -48,7 +48,7 @@ export async function GET(
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
 
-            <AgoraPartnerLogos />
+            <LogoPill />
 
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-full">{title}</div>
