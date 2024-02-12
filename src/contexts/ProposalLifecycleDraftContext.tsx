@@ -3,7 +3,7 @@
 import React, { createContext, useReducer, ReactNode, useEffect } from "react";
 
 interface ProposalTransaction {
-  id: string;
+  order: number;
   target: string;
   value: string;
   calldata: string;
@@ -19,7 +19,6 @@ interface ProposalLifecycleDraft {
   title: string;
   description: string;
   abstract: string;
-  transaction: string;
   auditURL: string;
   updateENSDocsStatus: boolean;
   postOnDiscourseStatus: boolean;
@@ -32,12 +31,18 @@ type ProposalLifecycleDraftUpdateFunction =
   | { type: "UPDATE_TITLE"; payload: string }
   | { type: "UPDATE_DESCRIPTION"; payload: string }
   | { type: "UPDATE_ABSTRACT"; payload: string }
-  | { type: "UPDATE_TRANSACTION"; payload: string }
   | { type: "UPDATE_AUDIT_URL"; payload: string }
   | { type: "UPDATE_ENS_DOCS_STATUS"; payload: boolean }
   | { type: "UPDATE_DISCOURSE_STATUS"; payload: boolean }
-  | { type: "ADD_TRANSACTION"; payload: ProposalTransaction }
-  | { type: "REMOVE_TRANSACTION"; payload: string };
+  | { type: "ADD_TRANSACTION" }
+  | {
+      type: "UPDATE_TRANSACTION";
+      payload: {
+        order: number;
+        fieldName: keyof ProposalTransaction;
+        value: string | boolean;
+      };
+    };
 
 const initialState: ProposalLifecycleDraft = {
   tempCheckLink: "",
@@ -45,7 +50,6 @@ const initialState: ProposalLifecycleDraft = {
   title: "",
   description: "",
   abstract: "",
-  transaction: "",
   auditURL: "",
   updateENSDocsStatus: true,
   postOnDiscourseStatus: true,
@@ -68,8 +72,6 @@ const reducer = (
       return { ...state, description: action.payload };
     case "UPDATE_ABSTRACT":
       return { ...state, abstract: action.payload };
-    case "UPDATE_TRANSACTION":
-      return { ...state, transaction: action.payload };
     case "UPDATE_AUDIT_URL":
       return { ...state, auditURL: action.payload };
     case "UPDATE_ENS_DOCS_STATUS":
@@ -79,14 +81,33 @@ const reducer = (
     case "ADD_TRANSACTION":
       return {
         ...state,
-        transactions: [...state.transactions, action.payload],
+        transactions: [
+          ...state.transactions,
+          {
+            order: state.transactions.length,
+            target: "",
+            value: "",
+            calldata: "",
+            functionDetails: "",
+            contractABI: "",
+            description: "",
+            isValid: false,
+          },
+        ],
       };
-    case "REMOVE_TRANSACTION":
+    case "UPDATE_TRANSACTION":
       return {
         ...state,
-        transactions: state.transactions.filter(
-          (transaction) => transaction.id !== action.payload
-        ),
+        transactions: state.transactions.map((transaction) => {
+          if (transaction.order === action.payload.order) {
+            return {
+              ...transaction,
+              [action.payload.fieldName]: action.payload.value,
+            };
+          }
+
+          return transaction;
+        }),
       };
     default:
       return state;
@@ -100,12 +121,15 @@ export const ProposalLifecycleDraftContext = createContext<{
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
   updateAbstract: (abstract: string) => void;
-  updateTransaction: (transaction: string) => void;
   updateAuditURL: (auditURL: string) => void;
   updateENSDocsStatus: (updateENSDocsStatus: boolean) => void;
   updateDiscourseStatus: (postOnDiscourseStatus: boolean) => void;
-  addTransaction: (transaction: ProposalTransaction) => void;
-  removeTransaction: (id: string) => void;
+  addTransaction: () => void;
+  updateTransaction: (
+    order: number,
+    fieldName: keyof ProposalTransaction,
+    value: string | boolean
+  ) => void;
 }>({
   proposalState: initialState,
   updateTempCheckLink: () => {},
@@ -113,12 +137,11 @@ export const ProposalLifecycleDraftContext = createContext<{
   updateTitle: () => {},
   updateDescription: () => {},
   updateAbstract: () => {},
-  updateTransaction: () => {},
   updateAuditURL: () => {},
   updateENSDocsStatus: () => {},
   updateDiscourseStatus: () => {},
   addTransaction: () => {},
-  removeTransaction: () => {},
+  updateTransaction: () => {},
 });
 
 export const ProposalLifecycleDraftProvider = ({
@@ -153,10 +176,6 @@ export const ProposalLifecycleDraftProvider = ({
     dispatch({ type: "UPDATE_ABSTRACT", payload: abstract });
   };
 
-  const updateTransaction = (transaction: string) => {
-    dispatch({ type: "UPDATE_TRANSACTION", payload: transaction });
-  };
-
   const updateAuditURL = (auditURL: string) => {
     dispatch({ type: "UPDATE_AUDIT_URL", payload: auditURL });
   };
@@ -172,17 +191,20 @@ export const ProposalLifecycleDraftProvider = ({
     });
   };
 
-  const addTransaction = (transaction: ProposalTransaction) => {
+  const addTransaction = () => {
     dispatch({
       type: "ADD_TRANSACTION",
-      payload: transaction,
     });
   };
 
-  const removeTransaction = (id: string) => {
+  const updateTransaction = (
+    order: number,
+    fieldName: keyof ProposalTransaction,
+    value: string | boolean
+  ) => {
     dispatch({
-      type: "REMOVE_TRANSACTION",
-      payload: id,
+      type: "UPDATE_TRANSACTION",
+      payload: { order: order, fieldName: fieldName, value: value },
     });
   };
 
@@ -215,8 +237,6 @@ export const ProposalLifecycleDraftProvider = ({
     if (abstract) {
       updateAbstract(abstract);
     }
-
-    // TODO read transactions from localStorage
   }, []);
 
   return (
@@ -228,12 +248,11 @@ export const ProposalLifecycleDraftProvider = ({
         updateTitle,
         updateDescription,
         updateAbstract,
-        updateTransaction,
         updateAuditURL,
         updateENSDocsStatus,
         updateDiscourseStatus,
         addTransaction,
-        removeTransaction,
+        updateTransaction,
       }}
     >
       {children}

@@ -1,7 +1,8 @@
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 interface DraftProposalTransactionProps {
   label: string;
@@ -16,6 +17,15 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
   const [transactionMode, setTransactionMode] = useState<
     "init" | "upload" | "create"
   >("init");
+
+  const { proposalState, addTransaction, updateTransaction } = useContext(
+    ProposalLifecycleDraftContext
+  );
+
+  const handleCreateTransaction = () => {
+    addTransaction();
+    setTransactionMode("create");
+  };
 
   return (
     <div className="flex flex-col px-6 py-4 border-y border-gray-eb">
@@ -37,7 +47,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
           </button>
           <button
             className="w-full flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm"
-            onClick={() => setTransactionMode("create")}
+            onClick={() => handleCreateTransaction()}
           >
             <span className="flex flex-row items-center">
               <Image
@@ -58,47 +68,51 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
             <DraftProposalTransactionInput
               label="Target"
               placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value=""
-              updateFunction={() => {}}
+              value={proposalState.transactions[0].target}
+              field="target"
+              order={0}
             />
             <DraftProposalTransactionInput
               label="Value"
               placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value=""
-              updateFunction={() => {}}
+              value={proposalState.transactions[0].value}
+              field="value"
+              order={0}
             />
           </div>
           <div className="flex flex-row gap-x-10">
             <DraftProposalTransactionInput
               label="Calldata"
               placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value=""
-              updateFunction={() => {}}
+              value={proposalState.transactions[0].calldata}
+              field="calldata"
+              order={0}
             />
             <DraftProposalTransactionInput
               label="Function details"
               placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value=""
-              updateFunction={() => {}}
+              value={proposalState.transactions[0].functionDetails}
+              field="functionDetails"
+              order={0}
             />
           </div>
           <DraftProposalTransactionInput
             label="Contract ABI"
             placeholder="ABI"
-            value=""
-            updateFunction={() => {}}
+            value={proposalState.transactions[0].contractABI}
+            field="contractABI"
+            order={0}
           />
           <DraftProposalTransactionInput
             label="Transaction description"
             placeholder="Permits depositing ETH on Compound v3"
-            value=""
-            updateFunction={() => {}}
+            value={proposalState.transactions[0].description}
+            field="description"
+            order={0}
           />
           <DraftProposalTransactionValidity
             label="Transaction validity"
             placeholder="Permits depositing ETH on Compound v3"
-            value=""
-            updateFunction={() => {}}
           />
           <DraftProposalAddAnotherTransaction />
           <DraftProposalTransactionAuditPayload />
@@ -114,13 +128,22 @@ interface DraftProposalTransactionInputProps {
   label: string;
   placeholder: string;
   value: string;
-  updateFunction: React.Dispatch<React.SetStateAction<string>>;
+  field:
+    | "target"
+    | "value"
+    | "calldata"
+    | "functionDetails"
+    | "contractABI"
+    | "description";
+  order: number;
 }
 
 const DraftProposalTransactionInput: React.FC<
   DraftProposalTransactionInputProps
 > = (props) => {
-  const { label, placeholder, value, updateFunction } = props;
+  const { label, placeholder, value, field, order } = props;
+
+  const { updateTransaction } = useContext(ProposalLifecycleDraftContext);
 
   return (
     <div className="flex flex-col w-full">
@@ -129,7 +152,7 @@ const DraftProposalTransactionInput: React.FC<
         className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
         placeholder={placeholder}
         value={value}
-        onChange={(e) => updateFunction(e.target.value)}
+        onChange={(e) => updateTransaction(order, field, e.target.value)}
       ></input>
     </div>
   );
@@ -138,14 +161,12 @@ const DraftProposalTransactionInput: React.FC<
 interface DraftProposalTransactionValidityProps {
   label: string;
   placeholder: string;
-  value: string;
-  updateFunction: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const DraftProposalTransactionValidity: React.FC<
   DraftProposalTransactionValidityProps
 > = (props) => {
-  const { label, placeholder, value, updateFunction } = props;
+  const { label, placeholder } = props;
 
   return (
     <div className="flex flex-col w-full">

@@ -57,8 +57,8 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
         proposalState.abstract +
         " Proposal Type: " +
         proposalState.proposalType +
-        " Transaction: " +
-        proposalState.transaction +
+        " Transactions: " +
+        JSON.stringify(proposalState.transactions) +
         " Audit URL: " +
         proposalState.auditURL +
         " Update ENS Docs Status: " +
