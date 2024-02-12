@@ -15,9 +15,8 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
 ) => {
   const { description, checkmarkInfo } = props;
 
-  const { state, updateENSDocsStatus, updateDiscourseStatus } = useContext(
-    ProposalLifecycleDraftContext
-  );
+  const { proposalState, updateENSDocsStatus, updateDiscourseStatus } =
+    useContext(ProposalLifecycleDraftContext);
 
   return (
     <div className="bg-gray-fa rounded-b-2xl">
@@ -27,7 +26,11 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <button
             className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
             onClick={() => props.setStage("draft-submit")}
-            disabled={!state.title || !state.description || !state.abstract}
+            disabled={
+              !proposalState.title ||
+              !proposalState.description ||
+              !proposalState.abstract
+            }
           >
             <span className="text-center">Create draft</span>
           </button>
@@ -39,9 +42,9 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <p className="text-gray-4f pr-5">Update ENS docs</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
           <Checkbox
-            checked={state.updateENSDocsStatus}
+            checked={proposalState.updateENSDocsStatus}
             onCheckedChange={() =>
-              updateENSDocsStatus(!state.updateENSDocsStatus)
+              updateENSDocsStatus(!proposalState.updateENSDocsStatus)
             }
           />
         </div>
@@ -49,9 +52,9 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <p className="text-gray-4f pr-5">Post draft on discourse</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
           <Checkbox
-            checked={state.postOnDiscourseStatus}
+            checked={proposalState.postOnDiscourseStatus}
             onCheckedChange={() =>
-              updateDiscourseStatus(!state.postOnDiscourseStatus)
+              updateDiscourseStatus(!proposalState.postOnDiscourseStatus)
             }
           />
         </div>

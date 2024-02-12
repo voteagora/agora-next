@@ -27,7 +27,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
 ) => {
   const { setStage } = props;
 
-  const { state, updateTempCheckLink } = useContext(
+  const { proposalState, updateTempCheckLink } = useContext(
     ProposalLifecycleDraftContext
   );
 
@@ -37,7 +37,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
     // check if starts with "https://discuss.ens.domains/"
     const discourseLinkRegex = /^https:\/\/discuss.ens.domains/;
 
-    if (discourseLinkRegex.test(state.tempCheckLink)) {
+    if (discourseLinkRegex.test(proposalState.tempCheckLink)) {
       setIsValidDiscourseLink(true);
     } else {
       setIsValidDiscourseLink(false);
@@ -46,7 +46,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
 
   useEffect(() => {
     validateTempCheckLink();
-  }, [state.tempCheckLink]);
+  }, [proposalState.tempCheckLink]);
 
   return (
     <AccordionItem
@@ -66,11 +66,11 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
             <input
               className={`py-3 px-4 w-80 border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent ${
                 !isValidDiscourseLink &&
-                state.tempCheckLink !== "" &&
+                proposalState.tempCheckLink !== "" &&
                 "border-red-500 text-red-500"
               }`}
               placeholder="https://discuss.ens.domains/t/..."
-              value={state.tempCheckLink}
+              value={proposalState.tempCheckLink}
               onChange={(e) => updateTempCheckLink(e.target.value)}
             ></input>
             <div className="flex flex-row gap-x-6">

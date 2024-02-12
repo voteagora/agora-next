@@ -24,7 +24,7 @@ const variables = {
 };
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { state: proposalState } = useContext(ProposalLifecycleDraftContext);
+  const { proposalState } = useContext(ProposalLifecycleDraftContext);
 
   const [sponsorInput, setSponsorInput] = useState<string>("");
 

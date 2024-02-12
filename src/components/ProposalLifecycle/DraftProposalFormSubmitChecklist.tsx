@@ -9,13 +9,13 @@ interface DraftProposalFormSubmitChecklistProps {
 const DraftProposalFormSubmitChecklist: React.FC<
   DraftProposalFormSubmitChecklistProps
 > = (props) => {
-  const { state } = useContext(ProposalLifecycleDraftContext);
+  const { proposalState } = useContext(ProposalLifecycleDraftContext);
 
   return (
     <ul className="border border-gray-eo rounded-lg w-full divide-y divide-gray-eo">
       <DraftProposalFormSubmitChecklistRow
         title="Discourse Temp Check"
-        status={state.tempCheckLink !== ""}
+        status={proposalState.tempCheckLink !== ""}
       />
       <DraftProposalFormSubmitChecklistRow
         title="Transaction simulation"

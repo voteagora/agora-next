@@ -2,6 +2,17 @@
 
 import React, { createContext, useReducer, ReactNode, useEffect } from "react";
 
+interface ProposalTransaction {
+  id: string;
+  target: string;
+  value: string;
+  calldata: string;
+  functionDetails: string;
+  contractABI: string;
+  description: string;
+  isValid: boolean;
+}
+
 interface ProposalLifecycleDraft {
   tempCheckLink: string;
   proposalType: "executable" | "social";
@@ -12,6 +23,7 @@ interface ProposalLifecycleDraft {
   auditURL: string;
   updateENSDocsStatus: boolean;
   postOnDiscourseStatus: boolean;
+  transactions: ProposalTransaction[];
 }
 
 type ProposalLifecycleDraftUpdateFunction =
@@ -23,7 +35,9 @@ type ProposalLifecycleDraftUpdateFunction =
   | { type: "UPDATE_TRANSACTION"; payload: string }
   | { type: "UPDATE_AUDIT_URL"; payload: string }
   | { type: "UPDATE_ENS_DOCS_STATUS"; payload: boolean }
-  | { type: "UPDATE_DISCOURSE_STATUS"; payload: boolean };
+  | { type: "UPDATE_DISCOURSE_STATUS"; payload: boolean }
+  | { type: "ADD_TRANSACTION"; payload: ProposalTransaction }
+  | { type: "REMOVE_TRANSACTION"; payload: string };
 
 const initialState: ProposalLifecycleDraft = {
   tempCheckLink: "",
@@ -35,6 +49,7 @@ const initialState: ProposalLifecycleDraft = {
   auditURL: "",
   updateENSDocsStatus: true,
   postOnDiscourseStatus: true,
+  transactions: [],
 };
 
 // Define the reducer function to handle state updates
@@ -61,14 +76,25 @@ const reducer = (
       return { ...state, updateENSDocsStatus: action.payload };
     case "UPDATE_DISCOURSE_STATUS":
       return { ...state, postOnDiscourseStatus: action.payload };
-
+    case "ADD_TRANSACTION":
+      return {
+        ...state,
+        transactions: [...state.transactions, action.payload],
+      };
+    case "REMOVE_TRANSACTION":
+      return {
+        ...state,
+        transactions: state.transactions.filter(
+          (transaction) => transaction.id !== action.payload
+        ),
+      };
     default:
       return state;
   }
 };
 
 export const ProposalLifecycleDraftContext = createContext<{
-  state: ProposalLifecycleDraft;
+  proposalState: ProposalLifecycleDraft;
   updateTempCheckLink: (tempCheckLink: string) => void;
   updateProposalType: (proposalType: "executable" | "social") => void;
   updateTitle: (title: string) => void;
@@ -78,8 +104,10 @@ export const ProposalLifecycleDraftContext = createContext<{
   updateAuditURL: (auditURL: string) => void;
   updateENSDocsStatus: (updateENSDocsStatus: boolean) => void;
   updateDiscourseStatus: (postOnDiscourseStatus: boolean) => void;
+  addTransaction: (transaction: ProposalTransaction) => void;
+  removeTransaction: (id: string) => void;
 }>({
-  state: initialState,
+  proposalState: initialState,
   updateTempCheckLink: () => {},
   updateProposalType: () => {},
   updateTitle: () => {},
@@ -89,6 +117,8 @@ export const ProposalLifecycleDraftContext = createContext<{
   updateAuditURL: () => {},
   updateENSDocsStatus: () => {},
   updateDiscourseStatus: () => {},
+  addTransaction: () => {},
+  removeTransaction: () => {},
 });
 
 export const ProposalLifecycleDraftProvider = ({
@@ -96,7 +126,7 @@ export const ProposalLifecycleDraftProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [proposalState, dispatch] = useReducer(reducer, initialState);
 
   const updateTempCheckLink = (tempCheckLink: string) => {
     localStorage.setItem("new-proposal-draft-tempcheck-link", tempCheckLink);
@@ -142,6 +172,20 @@ export const ProposalLifecycleDraftProvider = ({
     });
   };
 
+  const addTransaction = (transaction: ProposalTransaction) => {
+    dispatch({
+      type: "ADD_TRANSACTION",
+      payload: transaction,
+    });
+  };
+
+  const removeTransaction = (id: string) => {
+    dispatch({
+      type: "REMOVE_TRANSACTION",
+      payload: id,
+    });
+  };
+
   useEffect(() => {
     const tempCheckLink = localStorage.getItem(
       "new-proposal-draft-tempcheck-link"
@@ -171,12 +215,14 @@ export const ProposalLifecycleDraftProvider = ({
     if (abstract) {
       updateAbstract(abstract);
     }
+
+    // TODO read transactions from localStorage
   }, []);
 
   return (
     <ProposalLifecycleDraftContext.Provider
       value={{
-        state,
+        proposalState,
         updateTempCheckLink,
         updateProposalType,
         updateTitle,
@@ -186,6 +232,8 @@ export const ProposalLifecycleDraftProvider = ({
         updateAuditURL,
         updateENSDocsStatus,
         updateDiscourseStatus,
+        addTransaction,
+        removeTransaction,
       }}
     >
       {children}

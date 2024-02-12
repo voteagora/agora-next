@@ -1,7 +1,7 @@
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
 
 interface DraftProposalTransactionProps {
   label: string;
