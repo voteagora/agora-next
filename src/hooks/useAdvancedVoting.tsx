@@ -48,7 +48,6 @@ const useAdvancedVoting = ({
     ],
     chainId: optimism.id,
   });
-  console.log("advancedVoteIsError: ", advancedVoteIsError);
 
   const {
     write: standardVote,
