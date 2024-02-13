@@ -57,7 +57,13 @@ export async function getAuthorityChainsForNamespace({
     })
     .sort((a, b) => b.length - a.length);
 
-  reversedChains.push([address]);
+  // Only add the address to the chain if it's not already there
+  if (
+    reversedChains.length < 1 ||
+    reversedChains[reversedChains.length - 1].length > 1
+  ) {
+    reversedChains.push([address]);
+  }
 
   return reversedChains;
 }

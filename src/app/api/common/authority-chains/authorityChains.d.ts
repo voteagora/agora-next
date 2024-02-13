@@ -11,3 +11,10 @@ export type AuthorityChainRules = {
   max_redelegations: number;
   blocks_before_vote_closes: number;
 };
+
+export type AuhtorityChainsAggregate = {
+  chains: String[][];
+  rules: Prisma.JsonValue[][];
+  balances: Decimal[];
+  proxies: String[];
+};
