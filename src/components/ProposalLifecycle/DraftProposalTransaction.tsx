@@ -14,24 +14,15 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
 ) => {
   const { label, description } = props;
 
-  const [transactionMode, setTransactionMode] = useState<
-    "init" | "upload" | "create"
-  >("init");
-
   const { proposalState, addTransaction, updateTransaction } = useContext(
     ProposalLifecycleDraftContext
   );
-
-  const handleCreateTransaction = () => {
-    addTransaction();
-    setTransactionMode("create");
-  };
 
   return (
     <div className="flex flex-col px-6 py-4 border-y border-gray-eb">
       <label className="font-medium mb-2">{label}</label>
       <p className="text-xs max-w-[620px] text-gray-4f mb-6">{description}</p>
-      {transactionMode === "init" && (
+      {proposalState.transactions.length === 0 && (
         <div className="flex flex-row w-full gap-x-5">
           <button className="w-full flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm">
             <span className="flex flex-row items-center">
@@ -47,7 +38,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
           </button>
           <button
             className="w-full flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm"
-            onClick={() => handleCreateTransaction()}
+            onClick={() => addTransaction()}
           >
             <span className="flex flex-row items-center">
               <Image
@@ -62,58 +53,63 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
           </button>
         </div>
       )}
-      {transactionMode === "create" && (
+      {proposalState.transactions.length > 0 && (
         <div className="flex flex-col w-full gap-y-4">
-          <div className="flex flex-row gap-x-10">
-            <DraftProposalTransactionInput
-              label="Target"
-              placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value={proposalState.transactions[0].target}
-              field="target"
-              order={0}
-            />
-            <DraftProposalTransactionInput
-              label="Value"
-              placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value={proposalState.transactions[0].value}
-              field="value"
-              order={0}
-            />
-          </div>
-          <div className="flex flex-row gap-x-10">
-            <DraftProposalTransactionInput
-              label="Calldata"
-              placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value={proposalState.transactions[0].calldata}
-              field="calldata"
-              order={0}
-            />
-            <DraftProposalTransactionInput
-              label="Function details"
-              placeholder="0x4F2083f5fBede34C2714aFfb3105"
-              value={proposalState.transactions[0].functionDetails}
-              field="functionDetails"
-              order={0}
-            />
-          </div>
-          <DraftProposalTransactionInput
-            label="Contract ABI"
-            placeholder="ABI"
-            value={proposalState.transactions[0].contractABI}
-            field="contractABI"
-            order={0}
-          />
-          <DraftProposalTransactionInput
-            label="Transaction description"
-            placeholder="Permits depositing ETH on Compound v3"
-            value={proposalState.transactions[0].description}
-            field="description"
-            order={0}
-          />
-          <DraftProposalTransactionValidity
-            label="Transaction validity"
-            placeholder="Permits depositing ETH on Compound v3"
-          />
+          {proposalState.transactions.map((transaction, index) => (
+            <div className="flex flex-col w-full gap-y-4">
+              <div className="flex flex-row gap-x-10">
+                <DraftProposalTransactionInput
+                  label="Target"
+                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  value={proposalState.transactions[index].target}
+                  field="target"
+                  order={index}
+                />
+                <DraftProposalTransactionInput
+                  label="Value"
+                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  value={proposalState.transactions[index].value}
+                  field="value"
+                  order={index}
+                />
+              </div>
+              <div className="flex flex-row gap-x-10">
+                <DraftProposalTransactionInput
+                  label="Calldata"
+                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  value={proposalState.transactions[index].calldata}
+                  field="calldata"
+                  order={index}
+                />
+                <DraftProposalTransactionInput
+                  label="Function details"
+                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  value={proposalState.transactions[index].functionDetails}
+                  field="functionDetails"
+                  order={index}
+                />
+              </div>
+              <DraftProposalTransactionInput
+                label="Contract ABI"
+                placeholder="ABI"
+                value={proposalState.transactions[index].contractABI}
+                field="contractABI"
+                order={index}
+              />
+              <DraftProposalTransactionInput
+                label="Transaction description"
+                placeholder="Permits depositing ETH on Compound v3"
+                value={proposalState.transactions[index].description}
+                field="description"
+                order={index}
+              />
+              <DraftProposalTransactionValidity
+                label="Transaction validity"
+                placeholder="Permits depositing ETH on Compound v3"
+                order={index}
+              />
+            </div>
+          ))}
           <DraftProposalAddAnotherTransaction />
           <DraftProposalTransactionAuditPayload />
         </div>
@@ -161,12 +157,13 @@ const DraftProposalTransactionInput: React.FC<
 interface DraftProposalTransactionValidityProps {
   label: string;
   placeholder: string;
+  order: number;
 }
 
 const DraftProposalTransactionValidity: React.FC<
   DraftProposalTransactionValidityProps
 > = (props) => {
-  const { label, placeholder } = props;
+  const { label, placeholder, order } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"Unconfirmed" | "Valid" | "Invalid">(
     "Unconfirmed"
@@ -185,9 +182,9 @@ const DraftProposalTransactionValidity: React.FC<
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          target: proposalState.transactions[0].target,
-          value: proposalState.transactions[0].value,
-          calldata: proposalState.transactions[0].calldata,
+          target: proposalState.transactions[order].target,
+          value: proposalState.transactions[order].value,
+          calldata: proposalState.transactions[order].calldata,
           networkId: "1",
           from: "0xF417ACe7b13c0ef4fcb5548390a450A4B75D3eB3", // todo
         }),
@@ -232,6 +229,7 @@ const DraftProposalTransactionValidity: React.FC<
 };
 
 const DraftProposalAddAnotherTransaction = () => {
+  const { addTransaction } = useContext(ProposalLifecycleDraftContext);
   return (
     <div className="flex flex-col px-6 py-4 w-full border border-gray-eo rounded-lg">
       <label className="font-medium mb-4">{"Add another transaction"}</label>
@@ -244,7 +242,7 @@ const DraftProposalAddAnotherTransaction = () => {
         </button>
         <button
           className="py-3 w-full border border-gray-eo rounded-lg text-center font-semibold focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-          onClick={() => alert("Custom transaction")}
+          onClick={() => addTransaction()}
         >
           Custom transaction
         </button>
