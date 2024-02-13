@@ -56,7 +56,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
       {proposalState.transactions.length > 0 && (
         <div className="flex flex-col w-full gap-y-4">
           {proposalState.transactions.map((transaction, index) => (
-            <div className="flex flex-col w-full gap-y-4">
+            <div key={index} className="flex flex-col w-full gap-y-4">
               <div className="flex flex-row gap-x-10">
                 <DraftProposalTransactionInput
                   label="Target"
