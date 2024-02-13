@@ -8,33 +8,54 @@ import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply"
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
 
 export async function getProposalsForNamespace({
-  page = 1,
-  namespace,
-}: {
-  page: number;
+                                                 filter,
+                                                 namespace,
+                                                 page = 1,
+                                               }: {
+  filter: string;
   namespace: "optimism";
+  page: number;
 }) {
   const pageSize = 10;
-
+console.log(filter);
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: contracts(namespace).governor.address.toLowerCase(),
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
-    (skip: number, take: number) =>
-      prisma[`${namespace}Proposals`].findMany({
-        take,
-        skip,
-        orderBy: {
-          ordinal: "desc",
-        },
-        where: {
-          ...(prodDataOnly || {}),
-          cancelled_block: null,
-        },
-      }),
+    (skip: number, take: number) => {
+
+      switch (filter) {
+
+        case "cancelled":
+          return prisma[`${namespace}Proposals`].findMany({
+            take,
+            skip,
+            orderBy: {
+              ordinal: "desc",
+            },
+            where: {
+              ...(prodDataOnly || {}),
+              cancelled_block: { not: null },
+            },
+          });
+
+        default:
+          return prisma[`${namespace}Proposals`].findMany({
+            take,
+            skip,
+            orderBy: {
+              ordinal: "desc",
+            },
+            where: {
+              ...(prodDataOnly || {}),
+              cancelled_block: null,
+            },
+          });
+      }
+    },
     page,
-    pageSize
+    pageSize,
   );
 
   const latestBlock = await provider.getBlock("latest");
@@ -50,9 +71,9 @@ export async function getProposalsForNamespace({
         proposal,
         latestBlock,
         quorum,
-        BigInt(votableSupply)
+        BigInt(votableSupply),
       );
-    })
+    }),
   );
 
   return {
@@ -62,9 +83,9 @@ export async function getProposalsForNamespace({
 }
 
 export async function getProposalForNamespace({
-  proposal_id,
-  namespace,
-}: {
+                                                proposal_id,
+                                                namespace,
+                                              }: {
   proposal_id: string;
   namespace: "optimism";
 }) {
@@ -87,8 +108,8 @@ export async function getProposalForNamespace({
 }
 
 export async function getProposalTypesForNamespace({
-  namespace,
-}: {
+                                                     namespace,
+                                                   }: {
   namespace: "optimism";
 }) {
   return prisma[`${namespace}ProposalTypes`].findMany({

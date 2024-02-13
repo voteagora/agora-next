@@ -1,11 +1,11 @@
 export const proposalsFilterOptions = {
   recent: {
     value: "Recent",
-    sort: "recent",
+    filter: "recent",
   },
   cancelled: {
     value: "Cancelled",
-    sort: "cancelled",
+    filter: "cancelled",
   },
 }
 export const delegatesFilterOptions = {

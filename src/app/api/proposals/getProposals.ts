@@ -4,8 +4,8 @@ import {
   getProposalsForNamespace,
 } from "../common/proposals/getProposals";
 
-export const getProposals = ({ page = 1 }: { page: number }) =>
-  getProposalsForNamespace({ page, namespace: "optimism" });
+export const getProposals = ({ filter, page = 1 }: { page: number, filter:string}) =>
+  getProposalsForNamespace({ filter, namespace: "optimism", page});
 
 export const getProposal = ({ proposal_id }: { proposal_id: string }) =>
   getProposalForNamespace({ proposal_id, namespace: "optimism" });

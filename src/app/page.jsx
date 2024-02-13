@@ -1,3 +1,4 @@
+import { getDelegates } from "@/app/api/delegates/getDelegates";
 import Hero from "@/components/Hero/Hero";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
@@ -14,10 +15,10 @@ import { getProposals } from "./api/proposals/getProposals";
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
 
-async function fetchProposals(page = 1) {
+async function fetchProposals(filter, page) {
   "use server";
 
-  return getProposals({ page });
+  return getProposals({ filter, page });
 }
 
 async function fetchNeedsMyVoteProposals(address) {
@@ -38,11 +39,11 @@ async function fetchVotableSupply() {
   return getVotableSupply();
 }
 
-export default async function Home() {
+export default async function Home({ searchParams }) {
 
-  const sort = proposalsFilterOptions[searchParams.orderBy]?.sort || proposalsFilterOptions.recent.sort;
-  // TODO: impelment
-  const proposals = await fetchProposals();
+  const filter = proposalsFilterOptions[searchParams.filter]?.filter || proposalsFilterOptions.recent.filter;
+
+  const proposals = await fetchProposals(filter);
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
@@ -51,15 +52,18 @@ export default async function Home() {
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
       <PageDivider />
-        <NeedsMyVoteProposalsList
-          fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
-          votableSupply={votableSupply}
-        />
-        <ProposalsList
-          initialProposals={proposals}
-          fetchProposals={fetchProposals}
-          votableSupply={votableSupply}
-        />
+      <NeedsMyVoteProposalsList
+        fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
+        votableSupply={votableSupply}
+      />
+      <ProposalsList
+        initialProposals={proposals}
+        fetchProposals={async (page) => {
+          "use server";
+          return getProposals({ filter, page });
+        }}
+        votableSupply={votableSupply}
+      />
     </VStack>
-);
+  );
 }

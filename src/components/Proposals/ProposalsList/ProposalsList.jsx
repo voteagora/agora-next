@@ -3,7 +3,6 @@
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
-import { useRouter } from "next/navigation";
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
@@ -14,7 +13,6 @@ export default function ProposalsList({
                                         fetchProposals,
                                         votableSupply,
                                       }) {
-  const router = useRouter();
   const fetching = React.useRef(false);
   const [pages, setPages] = React.useState([initialProposals] || []);
   const [meta, setMeta] = React.useState(initialProposals.meta);

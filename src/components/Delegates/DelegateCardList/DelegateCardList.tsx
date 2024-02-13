@@ -64,7 +64,7 @@ export default function DelegateCardList({
         (d) => !existingIds.has(d.address)
       );
       setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
-      setMeta(data.meta);
+      setMeta(data.meta) ;
       fetching.current = false;
     }
   };
