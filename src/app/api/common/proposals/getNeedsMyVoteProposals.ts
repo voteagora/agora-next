@@ -39,7 +39,8 @@ export async function getNeedsMyVoteProposalsForNamespace({
       LEFT JOIN ${
         namespace + ".votes"
       } v ON p.proposal_id = v.proposal_id AND v.voter = $2
-      WHERE v.proposal_id IS NULL;
+      WHERE v.proposal_id IS NULL
+      ORDER BY p.ordinal DESC;
       `,
     latestBlock.number,
     address.toLowerCase(),
