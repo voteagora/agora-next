@@ -17,7 +17,7 @@ export async function getProposalsForNamespace({
   page: number;
 }) {
   const pageSize = 10;
-console.log(filter);
+  console.log(filter);
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: contracts(namespace).governor.address.toLowerCase(),
   };
@@ -25,33 +25,30 @@ console.log(filter);
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) => {
 
-      switch (filter) {
-
-        case "cancelled":
-          return prisma[`${namespace}Proposals`].findMany({
-            take,
-            skip,
-            orderBy: {
-              ordinal: "desc",
-            },
-            where: {
-              ...(prodDataOnly || {}),
-              cancelled_block: { not: null },
-            },
-          });
-
-        default:
-          return prisma[`${namespace}Proposals`].findMany({
-            take,
-            skip,
-            orderBy: {
-              ordinal: "desc",
-            },
-            where: {
-              ...(prodDataOnly || {}),
-              cancelled_block: null,
-            },
-          });
+      if (filter === "cancelled") {
+        return prisma[`${namespace}Proposals`].findMany({
+          take,
+          skip,
+          orderBy: {
+            ordinal: "desc",
+          },
+          where: {
+            ...(prodDataOnly || {}),
+            cancelled_block: { not: null },
+          },
+        });
+      } else {
+        return prisma[`${namespace}Proposals`].findMany({
+          take,
+          skip,
+          orderBy: {
+            ordinal: "desc",
+          },
+          where: {
+            ...(prodDataOnly || {}),
+            cancelled_block: null,
+          },
+        });
       }
     },
     page,

@@ -4,7 +4,7 @@ import {
   getProposalsForNamespace,
 } from "../common/proposals/getProposals";
 
-export const getProposals = ({ filter, page = 1 }: { page: number, filter:string}) =>
+export const getProposals = ({ filter = "recent", page = 1 }: { page: number, filter:string}) =>
   getProposalsForNamespace({ filter, namespace: "optimism", page});
 
 export const getProposal = ({ proposal_id }: { proposal_id: string }) =>
