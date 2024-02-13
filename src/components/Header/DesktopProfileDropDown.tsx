@@ -26,6 +26,8 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const { delegate, balance } = useConnectedDelegate();
+  // TODO: frh -> delegate profile dropdown not working
+  console.log("delegate profile dropdown: ", delegate);
   const hasStatement = !!delegate?.statement;
 
   return (
