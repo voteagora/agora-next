@@ -17,7 +17,6 @@ export async function getProposalsForNamespace({
   page: number;
 }) {
   const pageSize = 10;
-  console.log(filter);
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: contracts(namespace).governor.address.toLowerCase(),
   };
