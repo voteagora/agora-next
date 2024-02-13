@@ -45,13 +45,10 @@ export async function getTotalVotableAllowance({
   subdelegated_amount, // Subdelegated amount is a cumulative value of all absolute subdelegations
   proposalId,
 }: AuhtorityChainsAggregate & { proposalId: string }) {
-  const subdelegatedShare =
-    BigInt(subdelegated_share.toFixed(0)) > 100000n
-      ? 100000n
-      : BigInt(subdelegated_share.toFixed(0));
+  const subdelegatedShare = Number(subdelegated_share.toFixed(5));
   const subdelegatedAmount = BigInt(subdelegated_amount.toFixed(0));
 
-  if (subdelegatedShare === 100000n) {
+  if (subdelegatedShare > 1) {
     return 0n;
   }
 
@@ -66,8 +63,6 @@ export async function getTotalVotableAllowance({
   );
   const allowances: bigint[] = new Array(balances.length);
 
-  console.log("allowances", allowances);
-
   const drainedAmount: Map<string, bigint> = new Map();
 
   chains.forEach((chain, i) => {
@@ -75,8 +70,6 @@ export async function getTotalVotableAllowance({
     // This accounts for already casted votes
     allowances[i] =
       BigInt(balances[i]?.toFixed(0) ?? 0) - weightsCastByProxies[i];
-
-    console.log("allowances", allowances);
 
     chain.reverse().forEach((address, j) => {
       const rule = chainRules[j] as AuthorityChainRules;
@@ -125,8 +118,9 @@ export async function getTotalVotableAllowance({
   });
 
   const totalAllowance =
-    allowances.reduce((a, b) => a + b, 0n) *
-      (1n - subdelegatedShare / 100000n) -
+    (allowances.reduce((a, b) => a + b, 0n) *
+      BigInt((1 - subdelegatedShare) * 100000)) /
+      100000n -
     subdelegatedAmount;
   return bigIntMax(totalAllowance, 0n);
 }

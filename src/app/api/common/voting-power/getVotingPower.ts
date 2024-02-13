@@ -65,14 +65,16 @@ async function getVotingPowerForProposalByAddress({
       array_agg(balance) as balances,
       json_agg(rules) as rules,
       json_agg(chain) as chains,
-      SUM(subdelegated_share) as subdelegated_share,
-      SUM(subdelegated_amount) as subdelegated_amount,
+      SUM(COALESCE(subdelegated_share,0)) as subdelegated_share,
+      SUM(COALESCE(subdelegated_amount,0)) as subdelegated_amount
     FROM (
       SELECT
         a.delegate,
         rules,
         chain,
         allowance,
+        subdelegated_share,
+        subdelegated_amount,
         balance,
         proxy
       FROM (
