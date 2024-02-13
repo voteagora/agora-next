@@ -32,14 +32,12 @@ export async function getQuorumForProposalForNamespace({
 export async function getCurrentQuorumForNamespace(namespace: "optimism") {
   switch (namespace) {
     case "optimism": {
-      const latestBlock = await provider.getBlock("latest");
+      const latestBlock = await provider.getBlockNumber();
       if (!latestBlock) {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return contracts(namespace).governor.contract.quorum(
-        latestBlock.number - 1
-      );
+      return contracts(namespace).governor.contract.quorum(latestBlock - 1);
     }
   }
 }
