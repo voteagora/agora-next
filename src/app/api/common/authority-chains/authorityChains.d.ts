@@ -17,4 +17,6 @@ export type AuhtorityChainsAggregate = {
   rules: Prisma.JsonValue[][];
   balances: Decimal[];
   proxies: String[];
+  subdelegated_share: Decimal;
+  subdelegated_amount: Decimal;
 };

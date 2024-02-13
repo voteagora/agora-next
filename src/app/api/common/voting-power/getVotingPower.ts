@@ -64,7 +64,9 @@ async function getVotingPowerForProposalByAddress({
       array_agg(proxy) as proxies,
       array_agg(balance) as balances,
       json_agg(rules) as rules,
-      json_agg(chain) as chains
+      json_agg(chain) as chains,
+      SUM(subdelegated_share) as subdelegated_share,
+      SUM(subdelegated_amount) as subdelegated_amount,
     FROM (
       SELECT
         a.delegate,
@@ -87,6 +89,8 @@ async function getVotingPowerForProposalByAddress({
           rules,
           chain,
           allowance,
+          subdelegated_share,
+          subdelegated_amount,
           balance,
           proxy,
           block_number
@@ -114,8 +118,6 @@ async function getVotingPowerForProposalByAddress({
     ...advancedVotingPower[0],
     proposalId,
   });
-
-  console.log("advancedVP", advancedVP);
 
   return {
     directVP: votingPower?.balance ?? "0",

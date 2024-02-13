@@ -41,8 +41,20 @@ export async function getTotalVotableAllowance({
   rules,
   balances,
   proxies,
+  subdelegated_share, // Subdelegated share is a cumulative value of all relative subdelegations
+  subdelegated_amount, // Subdelegated amount is a cumulative value of all absolute subdelegations
   proposalId,
 }: AuhtorityChainsAggregate & { proposalId: string }) {
+  const subdelegatedShare =
+    BigInt(subdelegated_share.toFixed(0)) > 100000n
+      ? 100000n
+      : BigInt(subdelegated_share.toFixed(0));
+  const subdelegatedAmount = BigInt(subdelegated_amount.toFixed(0));
+
+  if (subdelegatedShare === 100000n) {
+    return 0n;
+  }
+
   const latestBlockNumber = await provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(
     proxies.map((proxy) =>
@@ -112,5 +124,9 @@ export async function getTotalVotableAllowance({
     });
   });
 
-  return allowances.reduce((a, b) => a + b, 0n);
+  const totalAllowance =
+    allowances.reduce((a, b) => a + b, 0n) *
+      (1n - subdelegatedShare / 100000n) -
+    subdelegatedAmount;
+  return bigIntMax(totalAllowance, 0n);
 }
