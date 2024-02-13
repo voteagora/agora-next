@@ -167,17 +167,62 @@ const DraftProposalTransactionValidity: React.FC<
   DraftProposalTransactionValidityProps
 > = (props) => {
   const { label, placeholder } = props;
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<"Unconfirmed" | "Valid" | "Invalid">(
+    "Unconfirmed"
+  );
+
+  const { proposalState } = useContext(ProposalLifecycleDraftContext);
+
+  async function simulate() {
+    // call tha backend /simulate endpoint
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/simulate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          target: proposalState.transactions[0].target,
+          value: proposalState.transactions[0].value,
+          calldata: proposalState.transactions[0].calldata,
+          networkId: "1",
+          from: "0xF417ACe7b13c0ef4fcb5548390a450A4B75D3eB3", // todo
+        }),
+      });
+
+      // 0x4F2083f5fBede34C2714aFfb3105539775f7FE64
+      // 0x0000000000000000000000000000000000000000
+      // 0x0000000000000000000000000000000000000000
+      // 0x0000000000000000000000000000000000000000
+
+      const res = await response.json();
+
+      if (res.response.transaction.status) {
+        setStatus("Valid");
+      } else {
+        setStatus("Invalid");
+      }
+    } catch (e) {
+      console.log(e);
+      setStatus("Invalid");
+    }
+
+    setIsLoading(false);
+  }
 
   return (
     <div className="flex flex-col w-full">
       <label className="font-medium text-sm mb-1">{label}</label>
       <div className="flex flex-row gap-x-6">
         <div className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent">
-          <p>Unconfirmed</p>
+          <p>{status}</p>
         </div>
         <button
           className="py-3 px-5 font-semibold border border-gray-eo placeholder-gray-af bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-          onClick={() => alert("Simulating transaction")}
+          onClick={() => simulate()}
         >
           Simulate
         </button>
