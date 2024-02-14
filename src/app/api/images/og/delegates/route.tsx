@@ -4,26 +4,24 @@ import { LogoPill } from "@/app/api/images/og/assets/shared";
 
 export const runtime = "edge";
 
-export async function GET(
-  req: NextRequest,
-) {
-
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const title = searchParams.get("title") || "Optimism Agora";
-  const description = searchParams.get("description") || "Home of Token House Governance and RPGF";
+  const description =
+    searchParams.get("description") ||
+    "Home of Token House Governance and RPGF";
 
   const interBoldFont = await fetch(
-    new URL("../assets/Inter-Black.ttf", import.meta.url),
+    new URL("../assets/Inter-Black.ttf", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
   const interRegularFont = await fetch(
-    new URL("../assets/Inter-Medium.ttf", import.meta.url),
+    new URL("../assets/Inter-Medium.ttf", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
-
   const bg = await fetch(
-    new URL("../assets/og-delegates-bg.png", import.meta.url),
+    new URL("../assets/og-delegates-bg.png", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
@@ -34,7 +32,7 @@ export async function GET(
           height: "100%",
           width: "100%",
           display: "flex",
-          fontFamily: "\"Inter\"",
+          fontFamily: '"Inter"',
           alignItems: "flex-start",
           justifyContent: "flex-start",
           flexDirection: "column",
@@ -45,12 +43,13 @@ export async function GET(
         <img src={bg} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
-
             <LogoPill />
 
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-full">{title}</div>
-              <div tw="font-regular mt-[30px] text-4xl text-gray-600">{description}</div>
+              <div tw="font-regular mt-[30px] text-4xl text-gray-600">
+                {description}
+              </div>
             </div>
           </div>
         </div>
@@ -73,6 +72,6 @@ export async function GET(
           weight: 500,
         },
       ],
-    },
+    }
   );
 }
