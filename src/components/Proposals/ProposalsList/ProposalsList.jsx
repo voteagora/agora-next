@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
@@ -9,13 +11,18 @@ import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
 
 export default function ProposalsList({
-                                        initialProposals,
-                                        fetchProposals,
-                                        votableSupply,
-                                      }) {
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialProposals] || []);
-  const [meta, setMeta] = React.useState(initialProposals.meta);
+  initialProposals,
+  fetchProposals,
+  votableSupply,
+}) {
+  const fetching = useRef(false);
+  const [pages, setPages] = useState([initialProposals] || []);
+  const [meta, setMeta] = useState(initialProposals.meta);
+
+  useEffect(() => {
+    setPages([initialProposals]);
+    setMeta(initialProposals.meta);
+  }, [initialProposals]);
 
   const loadMore = async (page) => {
     if (!fetching.current && meta.hasNextPage) {
@@ -23,7 +30,7 @@ export default function ProposalsList({
       const data = await fetchProposals(page);
       const existingIds = new Set(proposals.map((p) => p.id));
       const uniqueProposals = data.proposals.filter(
-        (p) => !existingIds.has(p.id),
+        (p) => !existingIds.has(p.id)
       );
       setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
       setMeta(data.meta);
