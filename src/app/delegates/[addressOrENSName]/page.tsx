@@ -1,6 +1,6 @@
 /*
- * Show page for a single x
- * Takes in the x address as a parameter
+ * Show page for a single delegate
+ * Takes in the delegate address as a parameter
  */
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
