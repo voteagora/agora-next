@@ -19,7 +19,7 @@ export function ProposalSingleVote({
 }: {
   vote: Vote;
   isAdvancedUser: boolean;
-  delegators: string[] | null;
+  delegators: string[] | undefined;
 }) {
   const { address: connectedAddress } = useAccount();
 

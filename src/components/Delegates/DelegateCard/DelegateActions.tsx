@@ -17,7 +17,7 @@ export function DelegateActions({
   delegate: DelegateChunk;
   className?: string;
   isAdvancedUser: boolean;
-  delegators: string[] | null;
+  delegators: string[] | undefined;
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
