@@ -25,36 +25,32 @@ export default function ProposalsFilter() {
   }, [router, selected]);
 
   return (
-    <Listbox as="div" value={selected} onChange={setSelected}>
-      {() => (
-        <>
-          <Listbox.Button className="w-full md:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
-            {isRecentFilter
-              ? proposalsFilterOptions.relevant.value
-              : proposalsFilterOptions.everything.value}
-            <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
-          </Listbox.Button>
-          <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1">
-            {Object.entries(proposalsFilterOptions).map(([key, option]) => (
-              <Listbox.Option key={key} value={option.filter} as={Fragment}>
-                {({ selected }) => {
-                  return (
-                    <li
-                      className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
-                        selected
-                          ? "text-black bg-white border-[#ebebeb]"
-                          : "text-[#66676b] border-transparent"
-                      }`}
-                    >
-                      {option.value}
-                    </li>
-                  );
-                }}
-              </Listbox.Option>
-            ))}
-          </Listbox.Options>
-        </>
-      )}
-    </Listbox>
+    <div className="relative">
+      <Listbox value={selected} onChange={setSelected}>
+        <Listbox.Button className="w-full md:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
+          {selected === proposalsFilterOptions.relevant.filter
+            ? proposalsFilterOptions.relevant.value
+            : proposalsFilterOptions.everything.value}
+          <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
+        </Listbox.Button>
+        <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1">
+          {Object.values(proposalsFilterOptions).map((option) => (
+            <Listbox.Option key={option.filter} value={option.filter}>
+              {({ selected }) => (
+                <li
+                  className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
+                    selected
+                      ? "text-black bg-white border-[#ebebeb]"
+                      : "text-[#66676b] border-transparent"
+                  }`}
+                >
+                  {option.value}
+                </li>
+              )}
+            </Listbox.Option>
+          ))}
+        </Listbox.Options>
+      </Listbox>
+    </div>
   );
 }
