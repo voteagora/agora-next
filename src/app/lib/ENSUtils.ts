@@ -1,7 +1,6 @@
 import { ethProvider } from "@/app/lib/provider";
 import { truncateAddress } from "@/app/lib/utils/text";
-
-export const isENSName = (name: string) => name.endsWith(".eth");
+import { isAddress } from "viem";
 
 export async function resolveENSName(name: string) {
   const address = await ethProvider.resolveName(name);
@@ -28,8 +27,8 @@ export async function resolveENSProfileImage(address: string): Promise<string | 
 
   const lowerCaseAddress = address.toLowerCase();
 
-  // Only resolve ENS names
-  if (!isENSName(lowerCaseAddress)) {
+  //  Assume we already have an ens name
+  if (isAddress(lowerCaseAddress)) {
     return null;
   }
   try {
@@ -42,7 +41,8 @@ export async function resolveENSProfileImage(address: string): Promise<string | 
 
 export async function processAddressOrEnsName(addressOrENSName: string) {
 
-  if (isENSName(addressOrENSName)) {
+  // Assume resolved ens name
+  if (!isAddress(addressOrENSName)) {
     return addressOrENSName;
   }
 

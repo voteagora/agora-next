@@ -1,5 +1,3 @@
-// @ts-nocheck
-// Added nocheck to avoid compile issues with passing ArrayBuffer to an img src
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { truncateString } from "@/app/lib/utils/text";
@@ -13,11 +11,12 @@ export async function GET(
 
   const { searchParams } = new URL(req.url);
 
-  const address = searchParams.has("address") ? searchParams.get("address") : "voter.eth";
-  const avatar = searchParams.has("avatar") ? searchParams.get("avatar") : null;
-  const votes = searchParams.has("votes") ? searchParams.get("votes") : "NO VOTES";
-  const description = searchParams.has("description") ? searchParams.get("description") : "Optimism Voter";
-  const statement = searchParams.has("statement") ? truncateString(searchParams.get("statement"), 220) : null;
+  const address = searchParams.get("address") || "voter.eth";
+
+  const avatar = searchParams.get("avatar") || null;
+  const votes = searchParams.get("votes") || "NO VOTES";
+  const description = searchParams.get("description") || "Optimism Voter";
+  const statement = searchParams.has("statement") ? truncateString(searchParams.get("statement") || "", 220) : null;
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Bold.ttf", import.meta.url),
@@ -47,18 +46,16 @@ export async function GET(
           flexWrap: "nowrap",
         }}
       >
+        {/* @ts-ignore */}
         <img src={bg} style={{ position: "absolute" }} alt="background" />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
-
             <LogoPill />
-
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-1/2">{truncateString(address, 20)}</div>
               <div tw="font-regular mt-[30px] text-4xl text-gray-600">{description}</div>
             </div>
           </div>
-
 
           <div tw="flex w-[430px] ml-[97px] mt-[34px]">
             <div tw="flex flex-col w-full">

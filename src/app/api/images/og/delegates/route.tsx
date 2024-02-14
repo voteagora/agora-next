@@ -1,6 +1,3 @@
-// @ts-nocheck
-// Added nocheck to avoid compile issues with passing ArrayBuffer to an img src
-
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
@@ -13,8 +10,8 @@ export async function GET(
 
   const { searchParams } = new URL(req.url);
 
-  const title = searchParams.has("title") ? searchParams.get("title") : "Optimism Agora";
-  const description = searchParams.has("description") ? searchParams.get("description") : "Home of Token House Governance and RPGF";
+  const title = searchParams.get("title") || "Optimism Agora";
+  const description = searchParams.get("description") || "Home of Token House Governance and RPGF";
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url),
@@ -44,6 +41,7 @@ export async function GET(
           flexWrap: "nowrap",
         }}
       >
+        {/* @ts-ignore */}
         <img src={bg} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
