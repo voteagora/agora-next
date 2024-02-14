@@ -4,11 +4,10 @@ import {
   getProposalsForNamespace,
 } from "../common/proposals/getProposals";
 
-import { proposalsFilterOptions } from "@/lib/constants";
 
-export const getProposals = ({ filter = proposalsFilterOptions.relevant.filter, page = 1 }: {
+export const getProposals = ({ filter = "relevant", page = 1 }: {
   page: number,
-  filter: string
+  filter: "relevant" | "everything",
 }) =>
   getProposalsForNamespace({ filter, namespace: "optimism", page });
 
