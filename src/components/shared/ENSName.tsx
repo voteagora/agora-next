@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useEnsName } from "wagmi";
-import {truncateAddress} from "@/app/lib/utils/text";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 // This component will display the ENS name for a given address
 const ENSName = ({ address }: { address: string | `0x${string}` }) => {

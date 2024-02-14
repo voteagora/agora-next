@@ -11,7 +11,9 @@ export async function resolveENSName(name: string) {
   return address.toLowerCase();
 }
 
-export async function reverseResolveENSName(address: string): Promise<string | null> {
+export async function reverseResolveENSName(
+  address: string
+): Promise<string | null> {
   try {
     const ensName = await ethProvider.lookupAddress(address);
 
@@ -22,9 +24,9 @@ export async function reverseResolveENSName(address: string): Promise<string | n
   }
 }
 
-
-export async function resolveENSProfileImage(address: string): Promise<string | null> {
-
+export async function resolveENSProfileImage(
+  address: string
+): Promise<string | null> {
   const lowerCaseAddress = address.toLowerCase();
 
   //  Assume we already have an ens name
@@ -40,14 +42,16 @@ export async function resolveENSProfileImage(address: string): Promise<string | 
 }
 
 export async function processAddressOrEnsName(addressOrENSName: string) {
-
   // Assume resolved ens name
   if (!isAddress(addressOrENSName)) {
     return addressOrENSName;
   }
 
   try {
-    return await reverseResolveENSName(addressOrENSName) || truncateAddress(addressOrENSName);
+    return (
+      (await reverseResolveENSName(addressOrENSName)) ||
+      truncateAddress(addressOrENSName)
+    );
   } catch (error) {
     console.error("Error in reverse resolving ENS name:", error);
     return null;

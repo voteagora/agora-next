@@ -38,7 +38,6 @@ async function fetchVotableSupply() {
 }
 
 export async function generateMetadata({}, parent) {
-
   const preview = `/api/images/og/proposals`;
 
   return {

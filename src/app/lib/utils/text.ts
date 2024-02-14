@@ -10,6 +10,6 @@ export const truncateString = (str: string, maxLength: number) => {
 
 export const truncateAddress = (address: string) => {
   return `${address.substring(0, 4)}...${address.substring(
-    address?.length - 4,
+    address?.length - 4
   )}`;
 };

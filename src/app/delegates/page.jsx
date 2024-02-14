@@ -36,7 +36,6 @@ async function fetchDelegators(address) {
 }
 
 export async function generateMetadata({}, parent) {
-
   const preview = `/api/images/og/delegates`;
 
   return {
