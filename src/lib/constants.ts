@@ -1,13 +1,13 @@
 export const proposalsFilterOptions = {
-  recent: {
-    value: "Recent",
-    filter: "recent",
+  relevant: {
+    value: "Relevant",
+    filter: "relevant",
   },
-  cancelled: {
-    value: "Cancelled",
-    filter: "cancelled",
+  everything: {
+    value: "Everything",
+    filter: "everything",
   },
-}
+};
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",

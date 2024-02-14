@@ -8,10 +8,10 @@ import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply"
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
 
 export async function getProposalsForNamespace({
-                                                 filter,
-                                                 namespace,
-                                                 page = 1,
-                                               }: {
+  filter,
+  namespace,
+  page = 1,
+}: {
   filter: string;
   namespace: "optimism";
   page: number;
@@ -23,20 +23,7 @@ export async function getProposalsForNamespace({
 
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) => {
-
-      if (filter === "cancelled") {
-        return prisma[`${namespace}Proposals`].findMany({
-          take,
-          skip,
-          orderBy: {
-            ordinal: "desc",
-          },
-          where: {
-            ...(prodDataOnly || {}),
-            cancelled_block: { not: null },
-          },
-        });
-      } else {
+      if (filter === "relevant") {
         return prisma[`${namespace}Proposals`].findMany({
           take,
           skip,
@@ -48,10 +35,21 @@ export async function getProposalsForNamespace({
             cancelled_block: null,
           },
         });
+      } else {
+        return prisma[`${namespace}Proposals`].findMany({
+          take,
+          skip,
+          orderBy: {
+            ordinal: "desc",
+          },
+          where: {
+            ...(prodDataOnly || {}),
+          },
+        });
       }
     },
     page,
-    pageSize,
+    pageSize
   );
 
   const latestBlock = await provider.getBlock("latest");
@@ -67,9 +65,9 @@ export async function getProposalsForNamespace({
         proposal,
         latestBlock,
         quorum,
-        BigInt(votableSupply),
+        BigInt(votableSupply)
       );
-    }),
+    })
   );
 
   return {
@@ -79,9 +77,9 @@ export async function getProposalsForNamespace({
 }
 
 export async function getProposalForNamespace({
-                                                proposal_id,
-                                                namespace,
-                                              }: {
+  proposal_id,
+  namespace,
+}: {
   proposal_id: string;
   namespace: "optimism";
 }) {
@@ -104,8 +102,8 @@ export async function getProposalForNamespace({
 }
 
 export async function getProposalTypesForNamespace({
-                                                     namespace,
-                                                   }: {
+  namespace,
+}: {
   namespace: "optimism";
 }) {
   return prisma[`${namespace}ProposalTypes`].findMany({
