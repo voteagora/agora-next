@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const address = searchParams.get("address") || "voter.eth";
 
   const avatar = searchParams.get("avatar") || null;
-  const votes = searchParams.get("votes") || "NO VOTES";
+  const votes = searchParams.get("votes") || null;
   const description = searchParams.get("description") || "Optimism Voter";
   const statement = searchParams.has("statement")
     ? truncateString(searchParams.get("statement") || "", 220)
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
               <div tw="font-bold text-5xl w-1/2">
                 {truncateString(address, 20)}
               </div>
-              <div tw="font-regular mt-[30px] text-4xl text-gray-600">
+              <div tw="font-normal mt-[30px] text-4xl text-gray-600">
                 {description}
               </div>
             </div>
@@ -107,7 +107,9 @@ export async function GET(req: NextRequest) {
                     <div tw="flex text-2xl mb-[4px]">
                       {truncateString(address, 30)}
                     </div>
-                    <div tw="flex text-[17px] text-slate-800">{votes}</div>
+                    {votes && (
+                      <div tw="flex text-[17px] text-slate-800">{votes}</div>
+                    )}
                   </div>
                 </div>
               </div>
