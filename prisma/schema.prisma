@@ -128,12 +128,13 @@ view OptimismAdvancedDelegatees {
 }
 
 view OptimismAdvancedVotingPower {
-  delegate           String   @unique
-  vp_allowance       Decimal  @db.Decimal
-  delegated_vp       Decimal  @db.Decimal
-  advanced_vp        Decimal  @db.Decimal
-  subdelegated_share Decimal? @db.Decimal
-  contract           String?  @db.VarChar(42)
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String?  @db.VarChar(42)
 
   @@map("advanced_voting_power")
   @@schema("optimism")
@@ -141,16 +142,17 @@ view OptimismAdvancedVotingPower {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_voting_power_raw_snaps {
-  chain_str          String?
-  delegate           String?
-  chain              String[]
-  rules              Json[]
-  allowance          Decimal? @db.Decimal
-  subdelegated_share Decimal? @db.Decimal
-  balance            Decimal? @db.Decimal
-  block_number       BigInt?
-  proxy              String?
-  contract           String?  @db.VarChar(42)
+  chain_str           String?
+  delegate            String?
+  chain               String[]
+  rules               Json[]
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar(42)
 
   @@ignore
   @@schema("optimism")
