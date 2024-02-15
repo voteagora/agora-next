@@ -39,14 +39,20 @@ async function fetchVotableSupply() {
 
 export async function generateMetadata({}, parent) {
   const preview = `/api/images/og/proposals`;
+  const title = "Optimism Agora";
+  const description = "Home of token house governance and RPGF";
 
   return {
-    title: "Optimism Agora",
-    description: "Home of token house governance and RPGF",
+    title: title,
+    description: description,
     openGraph: {
-      images: [preview],
+      images: preview,
     },
     other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
       ["fc:frame"]: "vNext",
       ["fc:frame:image"]: preview,
     },
