@@ -1,12 +1,9 @@
-import { Delegate } from "@/app/api/common/delegates/delegate";
-import {
-  fetchAllDelegatorsInChainsForAddress,
-  fetchDelegate,
-} from "@/app/delegates/actions";
-import { OptimismContracts } from "@/lib/contracts/contracts";
-import { useCallback, useEffect, useState } from "react";
+import { fetchConnectedDelegate, } from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
+import { Delegate } from "@/app/api/common/delegates/delegate";
+import { useState, useCallback, useEffect } from "react";
 
+// TODO: think about strategy to refetchConnectedDelegate, since balance and voting power can change on every block
 const useConnectedDelegate = () => {
   const { address } = useAccount();
   const [delegate, setDelegate] = useState<Delegate | null>(null);
@@ -17,38 +14,18 @@ const useConnectedDelegate = () => {
 
   const fetchDelegateAndSet = useCallback(async (address: string) => {
     if (address) {
-      const delegate = await fetchDelegate(address);
+      const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address);
       setDelegate(delegate);
+      setAdvancedDelegators(advancedDelegators);
+      setBalance(balance);
     }
-  }, []);
-
-  const fetchAdvancedDelegatorsAndSet = useCallback(
-    async (addressOrENSName: string) => {
-      const fetchedDelegators = await fetchAllDelegatorsInChainsForAddress(
-        addressOrENSName
-      );
-      setAdvancedDelegators(fetchedDelegators);
-    },
-    []
-  );
-
-  const fetchBalance = useCallback(async (address: string) => {
-    const balance = await OptimismContracts.token.contract.balanceOf(address);
-    setBalance(balance);
   }, []);
 
   useEffect(() => {
     if (address) {
       fetchDelegateAndSet(address);
-      fetchAdvancedDelegatorsAndSet(address);
-      fetchBalance(address);
     }
-  }, [
-    address,
-    fetchDelegateAndSet,
-    fetchAdvancedDelegatorsAndSet,
-    fetchBalance,
-  ]);
+  }, [address, fetchDelegateAndSet]);
 
   return { delegate, advancedDelegators, balance };
 };
