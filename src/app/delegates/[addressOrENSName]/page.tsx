@@ -38,19 +38,23 @@ export async function generateMetadata(
   const avatar = await resolveENSProfileImage(
     address || params.addressOrENSName
   );
+
   const statement = (
     delegateStatement?.payload as { delegateStatement: string }
   )?.delegateStatement;
-  const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
 
   const imgParams = [
+    delegate.votingPower &&
+      `votes=${encodeURIComponent(
+        `${formatNumber(delegate.votingPower || "0")} OP`
+      )}`,
     avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
   ].filter(Boolean);
 
   const preview = `/api/images/og/delegate?${imgParams.join(
     "&"
-  )}&address=${address}&votes=${votes}`;
+  )}&address=${address}`;
   const title = `${address} on Agora`;
   const description = `See what ${address} believes and how they vote on Optimism governance.`;
 
@@ -65,8 +69,6 @@ export async function generateMetadata(
       ["twitter:title"]: title,
       ["twitter:description"]: description,
       ["twitter:image"]: preview,
-      ["fc:frame"]: "vNext",
-      ["fc:frame:image"]: preview,
     },
   };
 }

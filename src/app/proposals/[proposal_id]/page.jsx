@@ -34,8 +34,6 @@ export async function generateMetadata({ params }, parent) {
       ["twitter:title"]: title,
       ["twitter:description"]: description,
       ["twitter:image"]: preview,
-      ["fc:frame"]: "vNext",
-      ["fc:frame:image"]: preview,
     },
   };
 }
