@@ -42,6 +42,12 @@ type ProposalLifecycleDraftUpdateFunction =
         fieldName: keyof ProposalTransaction;
         value: string | boolean;
       };
+    }
+  | {
+      type: "REMOVE_TRANSACTION";
+      payload: {
+        order: number;
+      };
     };
 
 const initialState: ProposalLifecycleDraft = {
@@ -109,6 +115,13 @@ const reducer = (
           return transaction;
         }),
       };
+    case "REMOVE_TRANSACTION":
+      return {
+        ...state,
+        transactions: state.transactions.filter(
+          (transaction) => transaction.order !== action.payload.order
+        ),
+      };
     default:
       return state;
   }
@@ -130,6 +143,7 @@ export const ProposalLifecycleDraftContext = createContext<{
     fieldName: keyof ProposalTransaction,
     value: string | boolean
   ) => void;
+  removeTransaction: (order: number) => void;
 }>({
   proposalState: initialState,
   updateTempCheckLink: () => {},
@@ -142,6 +156,7 @@ export const ProposalLifecycleDraftContext = createContext<{
   updateDiscourseStatus: () => {},
   addTransaction: () => {},
   updateTransaction: () => {},
+  removeTransaction: () => {},
 });
 
 export const ProposalLifecycleDraftProvider = ({
@@ -208,6 +223,13 @@ export const ProposalLifecycleDraftProvider = ({
     });
   };
 
+  const removeTransaction = (order: number) => {
+    dispatch({
+      type: "REMOVE_TRANSACTION",
+      payload: { order: order },
+    });
+  };
+
   useEffect(() => {
     const tempCheckLink = localStorage.getItem(
       "new-proposal-draft-tempcheck-link"
@@ -253,6 +275,7 @@ export const ProposalLifecycleDraftProvider = ({
         updateDiscourseStatus,
         addTransaction,
         updateTransaction,
+        removeTransaction,
       }}
     >
       {children}

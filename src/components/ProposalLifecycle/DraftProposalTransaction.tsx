@@ -1,5 +1,6 @@
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { icons } from "@/icons/icons";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 
 import { useContext, useState } from "react";
@@ -14,9 +15,12 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
 ) => {
   const { label, description } = props;
 
-  const { proposalState, addTransaction, updateTransaction } = useContext(
-    ProposalLifecycleDraftContext
-  );
+  const {
+    proposalState,
+    addTransaction,
+    updateTransaction,
+    removeTransaction,
+  } = useContext(ProposalLifecycleDraftContext);
 
   return (
     <div className="flex flex-col px-6 py-4 border-y border-gray-eb">
@@ -54,20 +58,31 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
         </div>
       )}
       {proposalState.transactions.length > 0 && (
-        <div className="flex flex-col w-full gap-y-4">
+        <div className="flex flex-col w-full gap-y-8">
           {proposalState.transactions.map((transaction, index) => (
             <div key={index} className="flex flex-col w-full gap-y-4">
+              <div className="flex flex-row w-full justify-between">
+                <p className="text-xl font-semibold">{`Transaction ${
+                  index + 1
+                }`}</p>
+                <button
+                  className="rounded-full bg-stone-100 p-2 hover:bg-stone-200"
+                  onClick={() => removeTransaction(index)}
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              </div>
               <div className="flex flex-row gap-x-10">
                 <DraftProposalTransactionInput
                   label="Target"
-                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  placeholder="address"
                   value={proposalState.transactions[index].target}
                   field="target"
                   order={index}
                 />
                 <DraftProposalTransactionInput
                   label="Value"
-                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  placeholder="ETH amount"
                   value={proposalState.transactions[index].value}
                   field="value"
                   order={index}
@@ -76,14 +91,14 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
               <div className="flex flex-row gap-x-10">
                 <DraftProposalTransactionInput
                   label="Calldata"
-                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  placeholder="bytes"
                   value={proposalState.transactions[index].calldata}
                   field="calldata"
                   order={index}
                 />
                 <DraftProposalTransactionInput
                   label="Function details"
-                  placeholder="0x4F2083f5fBede34C2714aFfb3105"
+                  placeholder="transfer(to, amount)"
                   value={proposalState.transactions[index].functionDetails}
                   field="functionDetails"
                   order={index}
@@ -103,14 +118,13 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 field="description"
                 order={index}
               />
-              <DraftProposalTransactionValidity
-                label="Transaction validity"
-                placeholder="Permits depositing ETH on Compound v3"
-                order={index}
-              />
             </div>
           ))}
           <DraftProposalAddAnotherTransaction />
+          <DraftProposalTransactionValidity
+            label="Transaction validity"
+            placeholder="Permits depositing ETH on Compound v3"
+          />
           <DraftProposalTransactionAuditPayload />
         </div>
       )}
@@ -157,13 +171,12 @@ const DraftProposalTransactionInput: React.FC<
 interface DraftProposalTransactionValidityProps {
   label: string;
   placeholder: string;
-  order: number;
 }
 
 const DraftProposalTransactionValidity: React.FC<
   DraftProposalTransactionValidityProps
 > = (props) => {
-  const { label, placeholder, order } = props;
+  const { label, placeholder } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"Unconfirmed" | "Valid" | "Invalid">(
     "Unconfirmed"
@@ -175,19 +188,23 @@ const DraftProposalTransactionValidity: React.FC<
     // call tha backend /simulate endpoint
     setIsLoading(true);
 
+    const transactionsBundle = proposalState.transactions.map((transaction) => {
+      return {
+        target: transaction.target,
+        value: transaction.value,
+        calldata: transaction.calldata,
+        networkId: "1",
+        from: "0xF417ACe7b13c0ef4fcb5548390a450A4B75D3eB3", // todo
+      };
+    });
+
     try {
-      const response = await fetch("/api/simulate", {
+      const response = await fetch("/api/simulate-bundle", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          target: proposalState.transactions[order].target,
-          value: proposalState.transactions[order].value,
-          calldata: proposalState.transactions[order].calldata,
-          networkId: "1",
-          from: "0xF417ACe7b13c0ef4fcb5548390a450A4B75D3eB3", // todo
-        }),
+        body: JSON.stringify(transactionsBundle),
       });
 
       // 0x4F2083f5fBede34C2714aFfb3105539775f7FE64
@@ -197,7 +214,15 @@ const DraftProposalTransactionValidity: React.FC<
 
       const res = await response.json();
 
-      if (res.response.transaction.status) {
+      let allValid = true;
+
+      for (const simulation of res.response.simulation_results) {
+        if (!simulation.transaction.status) {
+          allValid = false;
+        }
+      }
+
+      if (allValid) {
         setStatus("Valid");
       } else {
         setStatus("Invalid");
@@ -214,14 +239,14 @@ const DraftProposalTransactionValidity: React.FC<
     <div className="flex flex-col w-full">
       <label className="font-medium text-sm mb-1">{label}</label>
       <div className="flex flex-row gap-x-6">
-        <div className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent">
+        <div className="py-3 px-4 flex-grow border border-gray-eo placeholder-gray-af bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent">
           <p>{status}</p>
         </div>
         <button
           className="py-3 px-5 font-semibold border border-gray-eo placeholder-gray-af bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
           onClick={() => simulate()}
         >
-          Simulate
+          Simulate all
         </button>
       </div>
     </div>
