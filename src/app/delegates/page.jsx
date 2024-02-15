@@ -36,9 +36,18 @@ async function fetchDelegators(address) {
 }
 
 export async function generateMetadata({}, parent) {
+  const preview = `/api/images/og/delegates`;
+
   return {
-    title: "Agora - Optimism Voters",
+    title: "Voter on Agora",
     description: "See which voters are active on Optimism governance.",
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
   };
 }
 

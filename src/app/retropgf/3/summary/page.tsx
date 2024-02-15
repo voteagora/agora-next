@@ -5,10 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 
 export async function generateMetadata() {
+  const preview = `/api/images/og/proposals`;
+
   return {
     title: "Agora - Optimism's RetroPGF Round 3 Summary",
     description:
       "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.",
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
   };
 }
 
