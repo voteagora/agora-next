@@ -1,8 +1,8 @@
 import prisma from "@/app/lib/prisma";
+import provider from "@/app/lib/provider";
 import { contracts } from "@/lib/contracts/contracts";
-import { OptimismAuthorityChainsSnaps } from "@prisma/client";
-
-type AuthorityChainsSnaps = OptimismAuthorityChainsSnaps;
+import { AuthorityChainsSnaps } from "./authorityChains";
+import { validateChain } from "@/lib/alligatorUtils";
 
 export async function getAuthorityChainsForNamespace({
   address,
@@ -13,7 +13,7 @@ export async function getAuthorityChainsForNamespace({
   blockNumber: number;
   namespace: "optimism";
 }): Promise<Array<string[]>> {
-  const chains = await prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
+  const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
       ac.chain,
@@ -43,7 +43,13 @@ export async function getAuthorityChainsForNamespace({
     blockNumber
   );
 
+  const [chains, latestBlockNumber] = await Promise.all([
+    chainsQuery,
+    provider.getBlockNumber(),
+  ]);
+
   const reversedChains = chains
+    .filter((chain) => validateChain(chain, latestBlockNumber))
     .map((chain) => {
       const chains = chain.chain.reverse();
       chains.push(chain.delegate);
@@ -51,7 +57,13 @@ export async function getAuthorityChainsForNamespace({
     })
     .sort((a, b) => b.length - a.length);
 
-  reversedChains.push([address]);
+  // Only add the address to the chain if it's not already there
+  if (
+    reversedChains.length < 1 ||
+    reversedChains[reversedChains.length - 1].length > 1
+  ) {
+    reversedChains.push([address]);
+  }
 
   return reversedChains;
 }

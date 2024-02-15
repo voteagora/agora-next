@@ -1,10 +1,12 @@
 import prisma from "@/app/lib/prisma";
-import { getProxyAddress } from "@/lib/alligatorUtils";
+import {
+  getProxyAddress,
+  getTotalVotableAllowance,
+} from "@/lib/alligatorUtils";
 import { contracts } from "@/lib/contracts/contracts";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData } from "./votingPower";
-import { Decimal } from "@prisma/client/runtime";
-import { bigIntMin } from "@/lib/bigintUtils";
+import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
 
 /**
  * Voting Power at a given block number
@@ -55,18 +57,24 @@ async function getVotingPowerForProposalByAddress({
 
   // This query pulls only partially delegated voting power
   const advancedVotingPowerQuery = prisma.$queryRawUnsafe<
-    { balance: Decimal; proxy: String; available_vp: Decimal }[]
+    AuhtorityChainsAggregate[]
   >(
     `
     SELECT 
-      proxy,
-      MAX(balance) as balance,
-      SUM(allowance * (1 - COALESCE(subdelegated_share, 0))) as available_vp
+      array_agg(proxy) as proxies,
+      array_agg(balance) as balances,
+      json_agg(rules) as rules,
+      json_agg(chain) as chains,
+      SUM(COALESCE(subdelegated_share,0)) as subdelegated_share,
+      SUM(COALESCE(subdelegated_amount,0)) as subdelegated_amount
     FROM (
       SELECT
         a.delegate,
+        rules,
+        chain,
         allowance,
         subdelegated_share,
+        subdelegated_amount,
         balance,
         proxy
       FROM (
@@ -80,8 +88,11 @@ async function getVotingPowerForProposalByAddress({
       LEFT JOIN LATERAL (
         SELECT
           delegate,
+          rules,
+          chain,
           allowance,
           subdelegated_share,
+          subdelegated_amount,
           balance,
           proxy,
           block_number
@@ -93,8 +104,7 @@ async function getVotingPowerForProposalByAddress({
         LIMIT 1
       ) AS a ON TRUE
     ) t
-    WHERE allowance > 0
-    GROUP BY proxy;
+    WHERE allowance > 0;
     `,
     address,
     contracts(namespace).alligator.address.toLowerCase(),
@@ -106,26 +116,10 @@ async function getVotingPowerForProposalByAddress({
     advancedVotingPowerQuery,
   ]);
 
-  // We need to recalculate advanced vp to account for voted vp
-  // If a user has voted, then chnaged their subdelegation, new delegate might not be able to use the full allowance
-  const advancedVP = await (async () => {
-    const avialableVP = await Promise.all(
-      advancedVotingPower.map(async (row) => {
-        const weightCastByProxy = await contracts(
-          namespace
-        ).governor.contract.weightCast(proposalId, row.proxy.toString());
-        const remainingVP =
-          BigInt(row.balance?.toFixed(0) ?? 0) - weightCastByProxy;
-
-        return bigIntMin(
-          remainingVP,
-          BigInt(row.available_vp?.toFixed(0) ?? 0)
-        );
-      })
-    );
-
-    return avialableVP.reduce((acc, cur) => acc + cur, 0n);
-  })();
+  const advancedVP = await getTotalVotableAllowance({
+    ...advancedVotingPower[0],
+    proposalId,
+  });
 
   return {
     directVP: votingPower?.balance ?? "0",
@@ -229,7 +223,7 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
   })();
 
   return (
-    BigInt(advancedVotingPower?.vp_allowance.toFixed(0) ?? "0") +
+    BigInt(advancedVotingPower?.vp_delegatable_allowance.toFixed(0) ?? "0") +
     (await undelegatedVotingPower)
   ).toString();
 }
