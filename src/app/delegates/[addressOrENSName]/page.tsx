@@ -27,7 +27,7 @@ import {
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
-  parent: any
+  parent: any,
 ) {
   const [delegate, delegateStatement, address] = await Promise.all([
     fetchDelegate(params.addressOrENSName),
@@ -36,21 +36,22 @@ export async function generateMetadata(
   ]);
 
   const avatar = await resolveENSProfileImage(
-    address || params.addressOrENSName
+    address || params.addressOrENSName,
   );
+
   const statement = (
     delegateStatement?.payload as { delegateStatement: string }
   )?.delegateStatement;
-  const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
 
   const imgParams = [
+    delegate.votingPower && `votes=${encodeURIComponent(`${formatNumber(delegate.votingPower || "0")} OP`)}`,
     avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
   ].filter(Boolean);
 
   const preview = `/api/images/og/delegate?${imgParams.join(
-    "&"
-  )}&address=${address}&votes=${votes}`;
+    "&",
+  )}&address=${address}`;
   const title = `${address} on Agora`;
   const description = `See what ${address} believes and how they vote on Optimism governance.`;
 
@@ -72,8 +73,8 @@ export async function generateMetadata(
 }
 
 export default async function Page({
-  params: { addressOrENSName },
-}: {
+                                     params: { addressOrENSName },
+                                   }: {
   params: { addressOrENSName: string };
 }) {
   const [delegate, delegateVotes, statement, delegates, delegators] =
@@ -92,7 +93,8 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
+    <div
+      className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
@@ -129,14 +131,14 @@ export default async function Page({
               <DelegateVotes
                 fetchDelegateVotes={async (
                   page: number,
-                  sortOrder: VotesSortOrder
+                  sortOrder: VotesSortOrder,
                 ) => {
                   "use server";
 
                   return fetchVotesForDelegate(
                     addressOrENSName,
                     page,
-                    sortOrder
+                    sortOrder,
                   );
                 }}
               />
