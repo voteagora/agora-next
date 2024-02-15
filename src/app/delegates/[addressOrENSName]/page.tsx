@@ -69,8 +69,6 @@ export async function generateMetadata(
       ["twitter:title"]: title,
       ["twitter:description"]: description,
       ["twitter:image"]: preview,
-      ["fc:frame"]: "vNext",
-      ["fc:frame:image"]: preview,
     },
   };
 }
