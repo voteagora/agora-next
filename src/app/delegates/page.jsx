@@ -37,14 +37,20 @@ async function fetchDelegators(address) {
 
 export async function generateMetadata({}, parent) {
   const preview = `/api/images/og/delegates`;
+  const title = "Voter on Agora";
+  const description = "Delegate your voting power to a trusted representative";
 
   return {
-    title: "Voter on Agora",
-    description: "See which voters are active on Optimism governance.",
+    title: title,
+    description: description,
     openGraph: {
-      images: [preview],
+      images: preview,
     },
     other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
       ["fc:frame"]: "vNext",
       ["fc:frame:image"]: preview,
     },

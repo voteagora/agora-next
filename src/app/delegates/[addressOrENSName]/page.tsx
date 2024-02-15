@@ -51,16 +51,22 @@ export async function generateMetadata(
   const preview = `/api/images/og/delegate?${imgParams.join(
     "&"
   )}&address=${address}&votes=${votes}`;
+  const title = `${address} on Agora`;
+  const description = `See what ${address} believes and how they vote on Optimism governance.`;
 
   return {
-    title: `${address} on Agora`,
-    description: `See what ${address} believes and how they vote on Optimism governance.`,
+    title: title,
+    description: description,
     openGraph: {
-      images: [preview],
+      images: preview,
     },
     other: {
-      "fc:frame": "vNext",
-      "fc:frame:image": preview,
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
     },
   };
 }
