@@ -4,11 +4,9 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 export default function BlockScanUrls({
   hash1,
   hash2,
-  text,
 }: {
   hash1: string | undefined;
   hash2?: string | undefined;
-  text?: string | undefined;
 }) {
   return (
     <div className="pt-4 text-xs text-gray-4f">
@@ -40,7 +38,7 @@ export default function BlockScanUrls({
           rel="noreferrer noopener"
           className="flex flex-row items-center justify-between w-full hover:underline"
         >
-          <p>{text || "View transaction on block explorer"}</p>
+          <p>View transaction on block explorer</p>
           <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
         </a>
       )}

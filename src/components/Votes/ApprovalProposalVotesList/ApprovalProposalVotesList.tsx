@@ -133,6 +133,7 @@ function SingleVote({ vote }: { vote: Vote }) {
     weight,
     transactionHash,
   } = vote;
+  const [hash1, hash2] = transactionHash.split("|");
 
   return (
     <VStack className={""}>
@@ -174,10 +175,7 @@ function SingleVote({ vote }: { vote: Vote }) {
           </p>
         </div>
       )}
-      <BlockScanUrls
-        hash1={transactionHash}
-        text="View vote on block explorer"
-      />
+      <BlockScanUrls hash1={hash1} hash2={hash2} />
     </VStack>
   );
 }
