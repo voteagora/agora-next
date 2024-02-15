@@ -37,6 +37,22 @@ async function fetchVotableSupply() {
   return getVotableSupply();
 }
 
+export async function generateMetadata({}, parent) {
+  const preview = `/api/images/og/proposals`;
+
+  return {
+    title: "Optimism Agora",
+    description: "Home of token house governance and RPGF",
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      ["fc:frame"]: "vNext",
+      ["fc:frame:image"]: preview,
+    },
+  };
+}
+
 export default async function Home() {
   const proposals = await fetchProposals();
   const metrics = await fetchDaoMetrics();

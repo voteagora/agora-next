@@ -5,8 +5,6 @@
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
-import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
 import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
@@ -15,20 +13,55 @@ import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFo
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
-  fetchDelegateStatement,
-  fetchDelegate,
-  fetchVotesForDelegate,
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchVotesForDelegate,
 } from "@/app/delegates/actions";
+import { formatNumber } from "@/lib/tokenUtils";
+import {
+  processAddressOrEnsName,
+  resolveENSProfileImage,
+} from "@/app/lib/ENSUtils";
 
 export async function generateMetadata(
-  { params }: { params: any },
+  { params }: { params: { addressOrENSName: string } },
   parent: any
 ) {
+  const [delegate, delegateStatement, address] = await Promise.all([
+    fetchDelegate(params.addressOrENSName),
+    fetchDelegateStatement(params.addressOrENSName),
+    processAddressOrEnsName(params.addressOrENSName),
+  ]);
+
+  const avatar = await resolveENSProfileImage(
+    address || params.addressOrENSName
+  );
+  const statement = (
+    delegateStatement?.payload as { delegateStatement: string }
+  )?.delegateStatement;
+  const votes = encodeURIComponent(`${formatNumber(delegate.votingPower)} OP`);
+
+  const imgParams = [
+    avatar && `avatar=${encodeURIComponent(avatar)}`,
+    statement && `statement=${encodeURIComponent(statement)}`,
+  ].filter(Boolean);
+
+  const preview = `/api/images/og/delegate?${imgParams.join(
+    "&"
+  )}&address=${address}&votes=${votes}`;
+
   return {
-    title: `Agora - OP Voter`,
-    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+    title: `${address} on Agora`,
+    description: `See what ${address} believes and how they vote on Optimism governance.`,
+    openGraph: {
+      images: [preview],
+    },
+    other: {
+      "fc:frame": "vNext",
+      "fc:frame:image": preview,
+    },
   };
 }
 
@@ -37,7 +70,7 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const [delegate, delegateVotes, statement, delegatees, delegators] =
+  const [delegate, delegateVotes, statement, delegates, delegators] =
     await Promise.all([
       fetchDelegate(addressOrENSName),
       fetchVotesForDelegate(addressOrENSName),
@@ -64,7 +97,7 @@ export default async function Page({
           statement={statement}
         />
         {statement && <TopIssues statement={statement} />}
-        <DelegationsContainer delegatees={delegatees} delegators={delegators} />
+        <DelegationsContainer delegatees={delegates} delegators={delegators} />
 
         {/* TODO: -> this could be refactor with revalidatePath */}
         <DelegateVotesProvider initialVotes={delegateVotes}>
