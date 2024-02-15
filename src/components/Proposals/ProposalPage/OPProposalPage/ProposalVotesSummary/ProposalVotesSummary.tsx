@@ -2,7 +2,7 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./proposalVotesSummary.module.scss";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { formatDistanceToNowStrict } from "date-fns";

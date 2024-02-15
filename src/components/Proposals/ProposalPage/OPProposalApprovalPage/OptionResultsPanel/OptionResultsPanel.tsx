@@ -1,8 +1,10 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
+import { parseUnits } from "viem";
+import { tokens } from "@/lib/tokenUtils";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -35,29 +37,43 @@ export default function OptionsResultsPanel({
   })();
 
   let availableBudget = BigInt(proposalSettings.budgetAmount);
+  let isExeeded = false;
 
   const mutableOptions = [...options];
-  const sortedOptions = mutableOptions.sort((a, b) => {
-    return BigInt(b.votes || 0) > BigInt(a.votes || 0)
-      ? 1
-      : BigInt(b.votes || 0) < BigInt(a.votes || 0)
-      ? -1
-      : 0;
-  });
+  const sortedOptions = mutableOptions
+    .map((option, i) => {
+      return { ...option, ...proposalData.options[i] };
+    })
+    .sort((a, b) => {
+      return BigInt(b.votes || 0) > BigInt(a.votes || 0)
+        ? 1
+        : BigInt(b.votes || 0) < BigInt(a.votes || 0)
+        ? -1
+        : 0;
+    });
 
   return (
     <VStack className={styles.approval_choices_container}>
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);
-        const optionBudget = BigInt(0);
+        const optionBudget = parseUnits(
+          option?.budgetTokensSpent?.toString() || "0",
+          tokens.get(proposalData.proposalSettings.budgetToken)?.decimals ?? 18
+        );
         if (proposalSettings.criteria === "TOP_CHOICES") {
           isApproved = index < Number(proposalSettings.criteriaValue);
         } else if (proposalSettings.criteria === "THRESHOLD") {
           const threshold = BigInt(proposalSettings.criteriaValue);
           isApproved =
-            votesAmountBN >= threshold && availableBudget >= optionBudget;
-          if (isApproved) availableBudget = availableBudget - optionBudget;
+            !isExeeded &&
+            votesAmountBN >= threshold &&
+            availableBudget >= optionBudget;
+          if (isApproved) {
+            availableBudget = availableBudget - optionBudget;
+          } else {
+            isExeeded = true;
+          }
         }
 
         return (

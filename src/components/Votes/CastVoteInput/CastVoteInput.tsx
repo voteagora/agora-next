@@ -8,18 +8,26 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { Proposal } from "@/app/api/proposals/proposal";
-import { Delegate } from "@/app/api/delegates/delegate";
-import { Vote } from "@/app/api/votes/vote";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Vote } from "@/app/api/common/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
-import { fetchAndSetAll } from "@/lib/utils";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 type Props = {
   proposal: Proposal;
   isOptimistic?: boolean;
-  fetchAllForVoting: any;
+  fetchAllForVoting: (
+    address: string | `0x${string}`,
+    blockNumber: number,
+    proposal_id: string
+  ) => Promise<{
+    votingPower: VotingPowerData;
+    authorityChains: string[][];
+    delegate: Delegate;
+    votesForProposalAndDelegate: Vote[];
+  }>;
 };
 
 export default function CastVoteInput({

@@ -13,8 +13,9 @@ export default function DelegatesFilter() {
   const orderByParam = searchParams.get("orderBy");
   const [selected, setSelected] = useState(orderByParam || "weightedRandom");
 
-  // TODO: frh -> this router.push is super slow but window.history.pushState does not revalidate the query and the
-  // problem using revalidatePath is that it erases searchParams, another idea to optimize this filter is to prefetch the data
+  // TODO: -> this router.push is super slow but window.history.pushState does not revalidate the query and the
+  // problem using revalidatePath is that it erases searchParams, another idea to optimize this filter is to prefetch
+  // the data, also use hooks useAddSearchParam and useDeleteSearchParam
   useEffect(() => {
     const handleChanges = (value) => {
       value === "weightedRandom"

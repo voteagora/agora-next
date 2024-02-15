@@ -1,14 +1,8 @@
-import { ProposalType, Proposals } from "@prisma/client";
+import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Block } from "ethers";
-import { Proposal } from "@/app/api/proposals/proposal";
-import {
-  Abi,
-  decodeFunctionData,
-  encodeAbiParameters,
-  parseAbiParameters,
-} from "viem";
-import { isOldApprovalModule } from "./contracts/contracts";
+import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
+import { Abi, decodeFunctionData } from "viem";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -176,8 +170,8 @@ export function getTitleFromProposalDescription(description: string = "") {
  */
 
 export async function parseProposal(
-  proposal: Proposals,
-  latestBlock: Block | null,
+  proposal: ProposalPayload,
+  latestBlock: number,
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
@@ -193,70 +187,32 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
-  let unformattedProposalData;
-
-  if (proposal.proposal_type == "APPROVAL") {
-    const isOldModule = isOldApprovalModule(proposal.created_block.toString());
-    unformattedProposalData = encodeAbiParameters(
-      parseAbiParameters([
-        "ProposalOption[] proposalOptions, ProposalSettings proposalSettings",
-        isOldModule
-          ? "struct ProposalOption { address[] targets; uint256[] values; bytes[] calldatas; string description; }"
-          : "struct ProposalOption { uint256 budgetTokenSpent; address[] targets; uint256[] values; bytes[] calldatas; string description; }",
-        "struct ProposalSettings { uint8 maxApprovals; uint8 criteria; address budgetToken; uint128 criteriaValue; uint128 budgetAmount; }",
-      ]),
-      // @ts-ignore
-      proposal.proposal_data
-    );
-  } else if (proposal.proposal_type == "OPTIMISTIC") {
-    unformattedProposalData = encodeAbiParameters(
-      [
-        { name: "thresholds", type: "uint248" },
-        { name: "isRelativeToVotableSupply", type: "bool" },
-      ],
-      // @ts-ignore
-      proposal.proposal_data?.[0]
-    );
-  }
-
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
-      ? getHumanBlockTime(
-          proposal.created_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(proposal.created_block, latestBlock)
       : null,
     start_time: latestBlock
-      ? getHumanBlockTime(
-          proposal.start_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(proposal.start_block, latestBlock)
       : null,
     end_time: latestBlock
-      ? getHumanBlockTime(
-          proposal.end_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(proposal.end_block, latestBlock)
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
-    unformattedProposalData,
+    unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResuts.kind,
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
           proposal,
           proposalResuts,
-          Number(latestBlock.number),
+          latestBlock,
           quorum,
           votableSupply
         )
@@ -558,7 +514,7 @@ export type ProposalStatus =
   | "EXECUTED";
 
 export async function getProposalStatus(
-  proposal: Proposals,
+  proposal: ProposalPayload,
   proposalResults: ParsedProposalResults[ProposalType],
   latestBlock: number,
   quorum: bigint | null,
