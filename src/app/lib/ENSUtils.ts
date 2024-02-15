@@ -32,7 +32,7 @@ export async function resolveENSProfileImage(
   // Return unless the address is a valid ENS name.
   // Basic detection for strings that start with 0x
   const pattern = /^0x[a-fA-F0-9]+/;
-  if(pattern.test(address)) {
+  if (pattern.test(address)) {
     return null;
   }
 

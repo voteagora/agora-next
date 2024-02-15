@@ -107,12 +107,9 @@ export async function GET(req: NextRequest) {
                     <div tw="flex text-2xl mb-[4px]">
                       {truncateString(address, 30)}
                     </div>
-                    {votes &&
-                      (
-                    <div tw="flex text-[17px] text-slate-800">{votes}</div>
-
-                      )
-                    }
+                    {votes && (
+                      <div tw="flex text-[17px] text-slate-800">{votes}</div>
+                    )}
                   </div>
                 </div>
               </div>
