@@ -19,6 +19,7 @@ import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateSta
 import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import { revalidatePath } from "next/cache";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -105,3 +106,17 @@ export async function fetchAllDelegatorsInChainsForAddress(
 ) {
   return getAllDelegatorsInChainsForAddress({ addressOrENSName });
 }
+
+export async function balanceOf(
+  address: string
+) {
+  return OptimismContracts.token.contract.balanceOf(address);
+}
+
+export const fetchConnectedDelegate = async (address: string) => {
+  return await Promise.all([
+    fetchDelegate(address),
+    fetchAllDelegatorsInChainsForAddress(address),
+    balanceOf(address)
+  ]);
+};
