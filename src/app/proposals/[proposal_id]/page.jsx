@@ -25,11 +25,15 @@ export async function generateMetadata({ params }, parent) {
 
   return {
     title: title,
-    description: cleanString(proposal.description),
+    description: description,
     openGraph: {
-      images: [preview],
+      images: preview,
     },
     other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
       ["fc:frame"]: "vNext",
       ["fc:frame:image"]: preview,
     },
