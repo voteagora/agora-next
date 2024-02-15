@@ -1,17 +1,33 @@
 import { fetchConnectedDelegate, } from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
-import { useQuery } from '@tanstack/react-query';
+import { Delegate } from "@/app/api/common/delegates/delegate";
+import { useState, useCallback, useEffect } from "react";
 
+// TODO: think about strategy to refetchConnectedDelegate, since balance and voting power can change on every block
 const useConnectedDelegate = () => {
   const { address } = useAccount();
+  const [delegate, setDelegate] = useState<Delegate | null>(null);
+  const [advancedDelegators, setAdvancedDelegators] = useState<string[] | null>(
+    null
+  );
+  const [balance, setBalance] = useState<bigint | null>(null);
 
-  const data = useQuery({
-    enabled: !!address,
-    queryKey: ['fetchConnectedDelegate', address],
-    queryFn: async () => await fetchConnectedDelegate(address as `0x${string}`)
-  });
+  const fetchDelegateAndSet = useCallback(async (address: string) => {
+    if (address) {
+      const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address);
+      setDelegate(delegate);
+      setAdvancedDelegators(advancedDelegators);
+      setBalance(balance);
+    }
+  }, []);
 
-  return { delegate: data?.data?.[0], advancedDelegators: data?.data?.[1], balance: data?.data?.[2] };
+  useEffect(() => {
+    if (address) {
+      fetchDelegateAndSet(address);
+    }
+  }, [address, fetchDelegateAndSet]);
+
+  return { delegate, advancedDelegators, balance };
 };
 
 export default useConnectedDelegate;

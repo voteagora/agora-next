@@ -15,7 +15,7 @@ import { fetchDelegate } from "@/app/delegates/actions";
 interface Props {
   address: string;
   isAdvancedUser: boolean;
-  delegators: string[] | undefined;
+  delegators: string[] | null;
 }
 
 export default function VoterHoverCard({

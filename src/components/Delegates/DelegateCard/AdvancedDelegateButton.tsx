@@ -20,7 +20,7 @@ export function AdvancedDelegateButton({
   delegators,
 }: {
   delegate: DelegateChunk;
-  delegators: string[] | undefined;
+  delegators: string[] | null;
 }) {
   const { address } = useAccount();
 
