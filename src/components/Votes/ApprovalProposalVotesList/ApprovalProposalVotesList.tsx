@@ -9,6 +9,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 import { Vote } from "@/app/api/common/votes/vote";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 type Props = {
   initialProposalVotes: {
@@ -124,7 +125,14 @@ export default function ApprovalProposalVotesList({
 
 function SingleVote({ vote }: { vote: Vote }) {
   const { address } = useAccount();
-  const { address: voterAddress, params, support, reason, weight } = vote;
+  const {
+    address: voterAddress,
+    params,
+    support,
+    reason,
+    weight,
+    transactionHash,
+  } = vote;
 
   return (
     <VStack className={""}>
@@ -166,6 +174,10 @@ function SingleVote({ vote }: { vote: Vote }) {
           </p>
         </div>
       )}
+      <BlockScanUrls
+        hash1={transactionHash}
+        text="View vote on block explorer"
+      />
     </VStack>
   );
 }
