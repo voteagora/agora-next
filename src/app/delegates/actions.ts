@@ -10,6 +10,7 @@ import {
   getDirectDelegatee,
   getCurrentDelegatees,
   getCurrentDelegators,
+  getAllForAForAdvancedDelegation,
   getAllDelegatorsInChainsForAddress,
 } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
@@ -98,6 +99,11 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
 
 export async function fetchCurrentDelegators(addressOrENSName: string) {
   return getCurrentDelegators({ addressOrENSName });
+}
+
+// TODO temporary fetch all query - optimization via API needed
+export async function fetchAllForAdvancedDelegation(address: string) {
+  return getAllForAForAdvancedDelegation(address);
 }
 
 // Pass address of the connected wallet
