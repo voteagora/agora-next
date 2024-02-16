@@ -4,12 +4,20 @@ import { DEPLOYMENT_NAME, Deployments } from "./config";
 
 // TODO: This file seems messy -- consider refactoring
 
-const tokens: Map<
-  Deployments,
+export const tokens: Map<
+  Deployments | string,
   { name: string; symbol: string; decimals: number }
 > = new Map([
   [
     "optimism",
+    {
+      name: "Optimism",
+      symbol: "OP",
+      decimals: 18,
+    },
+  ],
+  [
+    "0x4200000000000000000000000000000000000042",
     {
       name: "Optimism",
       symbol: "OP",

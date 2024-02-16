@@ -14,7 +14,7 @@ export async function getNeedsMyVoteProposalsForNamespace({
   namespace: "optimism";
 }) {
   const [latestBlock, votableSupply] = await Promise.all([
-    provider.getBlock("latest"),
+    provider.getBlockNumber(),
     getVotableSupplyForNamespace({ namespace }),
   ]);
 
@@ -39,9 +39,10 @@ export async function getNeedsMyVoteProposalsForNamespace({
       LEFT JOIN ${
         namespace + ".votes"
       } v ON p.proposal_id = v.proposal_id AND v.voter = $2
-      WHERE v.proposal_id IS NULL;
+      WHERE v.proposal_id IS NULL
+      ORDER BY p.ordinal DESC;
       `,
-    latestBlock.number,
+    latestBlock,
     address.toLowerCase(),
     contracts(namespace).governor.address.toLowerCase()
   );

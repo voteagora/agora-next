@@ -59,7 +59,7 @@ async function getCurrentDelegateesForAddress({
   //   return delegatee;
   // })();
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
 
   // const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
   //   where: {
@@ -115,11 +115,7 @@ async function getCurrentDelegateesForAddress({
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
       timestamp: latestBlock
-        ? getHumanBlockTime(
-            advancedDelegatee.block_number,
-            latestBlock.number,
-            latestBlock.timestamp
-          )
+        ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
       type: "ADVANCED",
       amount:
@@ -199,7 +195,7 @@ async function getCurrentDelegatorsForAddress({
   //   );
   // })();
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
 
   // TODO: These needs to be ordered by timestamp
 
@@ -225,11 +221,7 @@ async function getCurrentDelegatorsForAddress({
       to: advancedDelegator.to,
       allowance: advancedDelegator.delegated_amount.toFixed(0),
       timestamp: latestBlock
-        ? getHumanBlockTime(
-            advancedDelegator.block_number,
-            latestBlock.number,
-            latestBlock.timestamp
-          )
+        ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
         : null,
       type: "ADVANCED",
       amount:
