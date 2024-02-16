@@ -201,41 +201,34 @@ export function DelegateDialog({
             </VStack>
           </VStack>
         )}
-        {!accountAddress && (
+        {accountAddress ? (
+          sameDelegatee ? (
+            <ShadcnButton variant="outline" className="cursor-not-allowed">
+              You cannot delegate to the same address again
+            </ShadcnButton>
+          ) : isError ? (
+            <Button disabled={false} onClick={() => writeWithTracking()}>
+              Delegation failed - try again
+            </Button>
+          ) : isLoading ? (
+            <Button disabled={false}>Submitting your delegation...</Button>
+          ) : isSuccess ? (
+            <div>
+              <Button className="w-full" disabled={false}>
+                Delegation completed!
+              </Button>
+              <BlockScanUrls hash1={data?.hash} />
+            </div>
+          ) : (
+            <ShadcnButton onClick={() => writeWithTracking()}>
+              Delegate
+            </ShadcnButton>
+          )
+        ) : (
           <ShadcnButton variant="outline" onClick={() => setOpen(true)}>
             Connect wallet to delegate
           </ShadcnButton>
         )}
-        {accountAddress && sameDelegatee && (
-          <ShadcnButton variant="outline" className="cursor-not-allowed">
-            You cannot delegate to the same address again
-          </ShadcnButton>
-        )}
-        {isLoading && !isError && (
-          <Button disabled={false}>Submitting your delegation...</Button>
-        )}
-        {isSuccess && !isLoading && (
-          <div>
-            <Button className="w-full" disabled={false}>
-              Delegation completed!
-            </Button>
-            <BlockScanUrls hash1={data?.hash} />
-          </div>
-        )}
-        {isError && !sameDelegatee && (
-          <Button disabled={false} onClick={() => writeWithTracking()}>
-            Delegation failed - try again
-          </Button>
-        )}
-        {!isError &&
-          !isSuccess &&
-          !isLoading &&
-          accountAddress &&
-          !sameDelegatee && (
-            <ShadcnButton onClick={() => writeWithTracking()}>
-              Delegate
-            </ShadcnButton>
-          )}
       </VStack>
     </VStack>
   );
