@@ -25,6 +25,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
+import { useModal } from "connectkit";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -49,6 +50,7 @@ export function AdvancedDelegateDialog({
   const [opBalance, setOpBalance] = useState<bigint>(0n);
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
+  const { setOpen } = useModal();
 
   const getOpBalance = async (address: `0x${string}`) => {
     const balance = await OptimismContracts.token.contract.balanceOf(address);
@@ -205,15 +207,21 @@ export function AdvancedDelegateDialog({
                 directDelegatedVP={directDelegatedVP}
               />
             )}
-            {isError ? (
-              <Button disabled={false} onClick={() => writeWithTracking()}>
-                Delegation failed
-              </Button>
-            ) : isLoading ? (
-              <Button disabled={false}>Submitting your delegation...</Button>
+            {address ? (
+              isError ? (
+                <Button disabled={false} onClick={() => writeWithTracking()}>
+                  Delegation failed
+                </Button>
+              ) : isLoading ? (
+                <Button disabled={false}>Submitting your delegation...</Button>
+              ) : (
+                <Button disabled={false} onClick={() => writeWithTracking()}>
+                  Delegate your votes
+                </Button>
+              )
             ) : (
-              <Button disabled={false} onClick={() => writeWithTracking()}>
-                Delegate your votes
+              <Button onClick={() => setOpen(true)}>
+                Connect wallet to delegate
               </Button>
             )}
           </VStack>
