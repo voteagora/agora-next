@@ -1,4 +1,10 @@
 import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "../voting-power/getVotingPower";
+import {
   getAllDelegatorsInChainsForAddressForNamespace,
   getCurrentDelegateesForNamespace,
   getCurrentDelegatorsForNamespace,
@@ -39,8 +45,18 @@ export const getDirectDelegatee = ({
   addressOrENSName,
 }: {
   addressOrENSName: string;
-}) =>
-  getDirectDelegateeForNamespace({ addressOrENSName, namespace: "optimism" });
+}) => getDirectDelegateeForNamespace({ addressOrENSName, namespace: "optimism" });
+
+export const getAllForAForAdvancedDelegation = async (address: string) => {
+  return await Promise.all([
+    getVotingPowerAvailableForSubdelegation({ addressOrENSName: address }),
+    isDelegatingToProxy({ addressOrENSName: address }),
+    getCurrentDelegatees({ addressOrENSName: address }),
+    getProxy({ addressOrENSName: address }),
+    getCurrentDelegators({ addressOrENSName: address }),
+    getVotingPowerAvailableForDirectDelegation({ addressOrENSName: address }),
+  ]);
+};
 
 /**
  * Get all addresses that are in the delegation chain for a given address
