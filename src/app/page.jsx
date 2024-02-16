@@ -37,12 +37,32 @@ async function fetchVotableSupply() {
   return getVotableSupply();
 }
 
+export async function generateMetadata({}, parent) {
+  const preview = `/api/images/og/proposals`;
+  const title = "Optimism Agora";
+  const description = "Home of token house governance and RPGF";
+
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      images: preview,
+    },
+    other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
+    },
+  };
+}
+
 export default async function Home({ searchParams }) {
   const filter = searchParams?.filter
     ? proposalsFilterOptions.everything.filter
     : proposalsFilterOptions.relevant.filter;
-
   const proposals = await fetchProposals(filter);
+
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 

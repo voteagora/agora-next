@@ -12,7 +12,10 @@ import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDial
 import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
-import { DelegateePayload } from "@/app/api/common/delegations/delegation";
+import {
+  DelegateePayload,
+  Delegation,
+} from "@/app/api/common/delegations/delegation";
 
 export type DialogType =
   | DelegateDialogType
@@ -40,10 +43,9 @@ export type AdvancedDelegateDialogType = {
   type: "ADVANCED_DELEGATE";
   params: {
     target: string;
-    fetchVotingPowerForSubdelegation: (address: string) => Promise<string>;
-    checkIfDelegatingToProxy: (address: string) => Promise<boolean>;
-    fetchCurrentDelegatees: (address: string) => Promise<any>;
-    getProxyAddress: (address: string) => Promise<string>;
+    fetchAllForAdvancedDelegation: (
+      address: string
+    ) => Promise<[string, boolean, Delegation[], string, Delegation[], bigint]>;
   };
 };
 
@@ -118,22 +120,13 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   ADVANCED_DELEGATE: (
-    {
-      target,
-      fetchVotingPowerForSubdelegation,
-      checkIfDelegatingToProxy,
-      fetchCurrentDelegatees,
-      getProxyAddress,
-    },
+    { target, fetchAllForAdvancedDelegation },
     closeDialog
   ) => {
     return (
       <AdvancedDelegateDialog
         target={target}
-        fetchVotingPowerForSubdelegation={fetchVotingPowerForSubdelegation}
-        checkIfDelegatingToProxy={checkIfDelegatingToProxy}
-        fetchCurrentDelegatees={fetchCurrentDelegatees}
-        getProxyAddress={getProxyAddress}
+        fetchAllForAdvancedDelegation={fetchAllForAdvancedDelegation}
         completeDelegation={closeDialog}
       />
     );

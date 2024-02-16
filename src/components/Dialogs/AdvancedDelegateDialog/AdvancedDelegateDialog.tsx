@@ -15,25 +15,23 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatUnits } from "viem";
-import { Button } from "@/components/Button";
 import { SuccessView } from "./SuccessView";
 import { track } from "@vercel/analytics";
+import { CloseIcon } from "@/components/shared/CloseIcon";
+import { Button } from "@/components/ui/button";
+import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import { OptimismContracts } from "@/lib/contracts/contracts";
+import ENSName from "@/components/shared/ENSName";
+import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 
+type Params = AdvancedDelegateDialogType["params"] & {
+  completeDelegation: () => void;
+};
 export function AdvancedDelegateDialog({
   target,
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
+  fetchAllForAdvancedDelegation,
   completeDelegation,
-}: {
-  target: string;
-  fetchVotingPowerForSubdelegation: (address: string) => Promise<string>;
-  checkIfDelegatingToProxy: (address: string) => Promise<boolean>;
-  fetchCurrentDelegatees: (address: string) => Promise<any>;
-  getProxyAddress: (address: string) => Promise<string>;
-  completeDelegation: () => void;
-}) {
+}: Params) {
   const [allowance, setAllowance] = useState<number[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [availableBalance, setAvailableBalance] = useState<string>("");
@@ -42,23 +40,45 @@ export function AdvancedDelegateDialog({
   const [delegatees, setDelegatees] = useState<Delegation[]>([]);
   const [proxyAddress, setProxyAddress] = useState<string>("");
   const [isReady, setIsReady] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const { address } = useAccount();
+  const [opBalance, setOpBalance] = useState<bigint>(0n);
+  const [delegators, setDelegators] = useState<Delegation[]>();
+  const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
+
+  const getOpBalance = async (address: `0x${string}`) => {
+    const balance = await OptimismContracts.token.contract.balanceOf(address);
+
+    return balance;
+  };
 
   const fetchData = useCallback(async () => {
     try {
       if (!address) return;
       const promises = [
-        fetchVotingPowerForSubdelegation(address),
-        checkIfDelegatingToProxy(address),
-        fetchCurrentDelegatees(address),
-        getProxyAddress(address),
+        // TODO temporary fetch all query - optimization via API needed
+        fetchAllForAdvancedDelegation(address),
+        getOpBalance(address),
       ];
 
-      const [balance, isDelegating, delegatees, proxyAddress] =
-        await Promise.all(promises);
+      const [getAll, delegateOpBalance] = await Promise.all(promises);
 
+      // @ts-ignore
+      const [
+        balance,
+        isDelegating,
+        delegatees,
+        proxyAddress,
+        delegatorsRes,
+        directDelegatedVP,
+      ] = getAll;
+
+      setDirectDelegatedVP(directDelegatedVP);
       setAvailableBalance(balance);
       setIsDelegatingToProxy(isDelegating);
+      setOpBalance(delegateOpBalance as bigint);
+      setDelegators(delegatorsRes);
+
       let isTargetDelegated = false;
 
       const initialAllowance = delegatees.map((delegation: Delegation) => {
@@ -95,14 +115,7 @@ export function AdvancedDelegateDialog({
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [
-    address,
-    fetchVotingPowerForSubdelegation,
-    checkIfDelegatingToProxy,
-    fetchCurrentDelegatees,
-    getProxyAddress,
-    target,
-  ]);
+  }, [address, fetchAllForAdvancedDelegation, target]);
 
   useEffect(() => {
     fetchData();
@@ -153,7 +166,11 @@ export function AdvancedDelegateDialog({
             <VStack className={styles.amount_container}>
               <HStack alignItems="items-center" gap={1}>
                 Your total delegatable votes{" "}
-                <InfoIcon size={12} className="opacity-50" />
+                <InfoIcon
+                  size={12}
+                  className="cursor-pointer opacity-70"
+                  onClick={() => setShowInfo(true)}
+                />
               </HStack>
               <AdvancedDelegationDisplayAmount amount={availableBalance} />
             </VStack>
@@ -170,6 +187,15 @@ export function AdvancedDelegateDialog({
               ))}
             </VStack>
 
+            {showInfo && (
+              <InfoDialog
+                setShowInfo={setShowInfo}
+                availableBalance={availableBalance}
+                balance={opBalance || 0n}
+                delegators={delegators}
+                directDelegatedVP={directDelegatedVP}
+              />
+            )}
             {isLoading && (
               <Button disabled={false}>Submitting your delegation...</Button>
             )}
@@ -195,6 +221,87 @@ export function AdvancedDelegateDialog({
         )}
       </div>
     </VStack>
+  );
+}
+
+function InfoDialog({
+  setShowInfo,
+  availableBalance,
+  balance,
+  delegators,
+  directDelegatedVP,
+}: {
+  setShowInfo: Dispatch<any>;
+  availableBalance: string;
+  balance: bigint;
+  delegators: Delegation[] | undefined;
+  directDelegatedVP: bigint;
+}) {
+  const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
+  return (
+    <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
+      <VStack className={styles.amount_container + " !pb-0 !px-0"}>
+        <div
+          className="absolute cursor-pointer top-2 right-2 opacity-80"
+          onClick={() => setShowInfo(false)}
+        >
+          <CloseIcon className="w-4" />
+        </div>
+        <HStack alignItems="items-center" gap={1}>
+          Your total delegatable votes{" "}
+          <InfoIcon size={12} className="opacity-50" />
+        </HStack>
+        <AdvancedDelegationDisplayAmount amount={availableBalance} />
+        <VStack
+          className="w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-gray-eo max-h-[256px] overflow-y-scroll"
+          alignItems="items-start"
+          gap={3}
+        >
+          <HStack
+            alignItems="items-center"
+            justifyContent="justify-between"
+            className="w-full"
+          >
+            <p>You own</p>
+            <TokenAmountDisplay
+              amount={balance}
+              decimals={18}
+              currency={"OP"}
+            />
+          </HStack>
+          {delegators?.map((delegator, index) => (
+            <HStack
+              alignItems="items-center"
+              justifyContent="justify-between"
+              className="w-full"
+              key={index}
+            >
+              <p>
+                <ENSName address={delegator.from} />
+                &apos;s delegation
+              </p>
+              <TokenAmountDisplay
+                amount={BigInt(delegator.allowance)}
+                decimals={18}
+                currency={"OP"}
+              />
+            </HStack>
+          ))}
+        </VStack>
+        {directDelegatedFromOthers > 0n && (
+          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-gray-af border-gray-eo">
+            You’ve been delegated an additional{" "}
+            <TokenAmountDisplay
+              amount={directDelegatedFromOthers}
+              decimals={18}
+              currency={"OP"}
+            />{" "}
+            without the right to redelegate. You can only vote with this portion
+            of votes and cannot pass them to others.
+          </p>
+        )}
+      </VStack>
+    </div>
   );
 }
 

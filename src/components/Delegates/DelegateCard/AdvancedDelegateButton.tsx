@@ -7,12 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import {
-  fetchVotingPowerForSubdelegation,
-  checkIfDelegatingToProxy,
-  fetchCurrentDelegatees,
-  getProxyAddress,
-} from "@/app/delegates/actions";
+import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 
 export function AdvancedDelegateButton({
@@ -77,10 +72,7 @@ const DelegateButton = ({
           type: "ADVANCED_DELEGATE",
           params: {
             target: delegate.address,
-            fetchVotingPowerForSubdelegation,
-            checkIfDelegatingToProxy,
-            fetchCurrentDelegatees,
-            getProxyAddress,
+            fetchAllForAdvancedDelegation,
           },
         });
       }}

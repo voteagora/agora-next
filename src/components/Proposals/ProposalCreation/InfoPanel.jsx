@@ -23,7 +23,7 @@ export default function InfoPanel() {
           <span className="font-semibold">3. Create your proposal</span>
           <br />
           Now that the vote and proposal type are set, you can use this form to
-          creat your proposal. Proposed transactions are optional, as the Token
+          create your proposal. Proposed transactions are optional, as the Token
           House governor is not executable for now.
         </p>
         <p>

@@ -52,7 +52,7 @@ export async function getProposalsForNamespace({
     pageSize
   );
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
   const votableSupply = await getVotableSupplyForNamespace({ namespace });
 
   const resolvedProposals = Promise.all(
@@ -91,7 +91,7 @@ export async function getProposalForNamespace({
     return notFound();
   }
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
   const quorum = await getQuorumForProposalForNamespace({
     proposal,
     namespace,
