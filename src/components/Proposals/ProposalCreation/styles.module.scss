@@ -96,6 +96,20 @@
     margin-bottom: $spacing-4;
   }
 
+  &__remove {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 2px;
+    right: 0;
+    cursor: pointer;
+    color: $gray-eb;
+
+    &:hover {
+      color: $gray-4f;
+    }
+  }
+
   &__add {
     padding: $spacing-4;
     border: 1px solid $gray-300;
