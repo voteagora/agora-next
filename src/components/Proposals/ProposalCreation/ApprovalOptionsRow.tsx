@@ -45,11 +45,19 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
       </p>
       {form.state.options.map((_option, index) => (
         <VStack gap={4} key={index} className={styles.approval__option_row}>
-          <div className={styles.approval__option_title}>
-            Option {index + 1}
+          <div className="border-b border-dashed border-gray-300 font-semibold pb-1 flex flex-row justify-between">
+            <span>Option {index + 1}</span>
+            {form.state.options.length > 1 && (
+              <XCircleIcon
+                className="h-5 w-5 pointer text-gray-eb hover:text-gray-4f"
+                onClick={() => remove(index)}
+              />
+            )}
           </div>
           <VStack>
-            <label className={styles.create_prop_form__label}>Title</label>
+            <label className={styles.create_prop_form__label}>
+              Title (no markdown)
+            </label>
             <InputBox
               placeholder={"My option title"}
               value={form.state.options[index].title}
@@ -58,12 +66,6 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
             />
             <AddTransactionsDetails optionIndex={index} form={form} />
           </VStack>
-          {form.state.options.length > 1 && (
-            <XCircleIcon
-              className={styles.transaction_details_option__remove}
-              onClick={() => remove(index)}
-            />
-          )}
         </VStack>
       ))}
       <div onClick={addOption} className={styles.option_button}>
