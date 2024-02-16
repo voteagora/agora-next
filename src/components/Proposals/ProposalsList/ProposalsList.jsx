@@ -25,20 +25,20 @@ export default function ProposalsList({
   }, [initialProposals]);
 
   const loadMore = async (page) => {
-    if (!fetching.current && meta.hasNextPage) {
-      fetching.current = true;
-      const data = await fetchProposals(page);
-      const existingIds = new Set(proposals.map((p) => p.id));
-      const uniqueProposals = data.proposals.filter(
-        (p) => !existingIds.has(p.id)
-      );
-      setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
-      setMeta(data.meta);
-      fetching.current = false;
-    }
+    if (fetching.current || !meta.hasNextPage) return;
+
+    fetching.current = true;
+    const data = await fetchProposals(page);
+    const uniqueProposals = data.proposals.filter(
+      (p) => !proposals.some((existing) => existing.id === p.id)
+    );
+    setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
+    setMeta(data.meta);
+    fetching.current = false;
   };
 
-  const proposals = pages.reduce((all, page) => all.concat(page.proposals), []);
+  // const proposals = pages.reduce((all, page) => all.concat(page.proposals), []);
+  const proposals = pages.flatMap((page) => page.proposals);
 
   return (
     <VStack className={styles.proposals_list_container}>
