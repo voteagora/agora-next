@@ -171,7 +171,7 @@ export function getTitleFromProposalDescription(description: string = "") {
 
 export async function parseProposal(
   proposal: ProposalPayload,
-  latestBlock: Block | null,
+  latestBlock: number,
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
@@ -192,25 +192,13 @@ export async function parseProposal(
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
     created_time: latestBlock
-      ? getHumanBlockTime(
-          proposal.created_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(proposal.created_block, latestBlock)
       : null,
     start_time: latestBlock
-      ? getHumanBlockTime(
-          proposal.start_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(proposal.start_block, latestBlock)
       : null,
     end_time: latestBlock
-      ? getHumanBlockTime(
-          proposal.end_block,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(proposal.end_block, latestBlock)
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
@@ -224,7 +212,7 @@ export async function parseProposal(
       ? await getProposalStatus(
           proposal,
           proposalResuts,
-          Number(latestBlock.number),
+          latestBlock,
           quorum,
           votableSupply
         )

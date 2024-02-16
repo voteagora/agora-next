@@ -7,6 +7,9 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import { Button } from "@/components/Button";
+import { ConnectKitButton } from "connectkit";
+import { type SyntheticEvent } from "react";
 
 export function DelegateActions({
   delegate,
@@ -31,7 +34,7 @@ export function DelegateActions({
     >
       <DelegateSocialLinks discord={discord} twitter={twitter} />
       <div>
-        {isConnected &&
+        {isConnected ? (
           address &&
           (isAdvancedUser ? (
             <AdvancedDelegateButton
@@ -40,7 +43,22 @@ export function DelegateActions({
             />
           ) : (
             <DelegateButton full={!twitter && !discord} delegate={delegate} />
-          ))}
+          ))
+        ) : (
+          <ConnectKitButton.Custom>
+            {({ show }) => (
+              <Button
+                onClick={(e: SyntheticEvent) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  show?.();
+                }}
+              >
+                Delegate
+              </Button>
+            )}
+          </ConnectKitButton.Custom>
+        )}
       </div>
     </HStack>
   );

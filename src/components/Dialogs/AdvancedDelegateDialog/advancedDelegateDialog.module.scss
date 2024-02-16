@@ -9,6 +9,10 @@
   position: relative;
 }
 
+.dialog_container {
+  position: relative;
+}
+
 .amount_container {
   font-size: $font-size-xs;
   border: 1px solid $gray-300;
@@ -16,6 +20,7 @@
   justify-content: center;
   align-items: center;
   padding: $spacing-8 $spacing-2;
+  position: relative;
 }
 
 .circle_container {
