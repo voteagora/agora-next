@@ -205,15 +205,13 @@ export function AdvancedDelegateDialog({
                 directDelegatedVP={directDelegatedVP}
               />
             )}
-            {isLoading && (
-              <Button disabled={false}>Submitting your delegation...</Button>
-            )}
-            {isError && (
+            {isError ? (
               <Button disabled={false} onClick={() => writeWithTracking()}>
                 Delegation failed
               </Button>
-            )}
-            {!isError && !isLoading && (
+            ) : isLoading ? (
+              <Button disabled={false}>Submitting your delegation...</Button>
+            ) : (
               <Button disabled={false} onClick={() => writeWithTracking()}>
                 Delegate your votes
               </Button>
