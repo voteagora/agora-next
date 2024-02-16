@@ -37,7 +37,6 @@ export default function ProposalsList({
     fetching.current = false;
   };
 
-  // const proposals = pages.reduce((all, page) => all.concat(page.proposals), []);
   const proposals = pages.flatMap((page) => page.proposals);
 
   return (
