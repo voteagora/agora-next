@@ -95,7 +95,7 @@ export default function ProposalVotesSummary({
                 <HStack gap={1}>
                   <p>{`Ended ${formatDistanceToNowStrict(
                     proposal.end_time
-                  )} ago on ${proposal.end_time.toLocaleDateString()}`}</p>
+                  )} ago on ${proposal.end_time}`}</p>
                 </HStack>
               )}
           </div>
