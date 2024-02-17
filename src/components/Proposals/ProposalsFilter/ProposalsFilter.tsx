@@ -37,7 +37,7 @@ export default function ProposalsFilter() {
           {Object.values(proposalsFilterOptions).map((option) => (
             <Listbox.Option key={option.filter} value={option.filter}>
               {({ selected }) => (
-                <li
+                <div
                   className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                     selected
                       ? "text-black bg-white border-[#ebebeb]"
@@ -45,7 +45,7 @@ export default function ProposalsFilter() {
                   }`}
                 >
                   {option.value}
-                </li>
+                </div>
               )}
             </Listbox.Option>
           ))}
