@@ -28,7 +28,8 @@ export default function ProposalsList({
     if (fetching.current || !meta.hasNextPage) return;
 
     fetching.current = true;
-    const data = await fetchProposals(page);
+
+    const data = await fetchProposals(meta.currentPage + 1);
     const uniqueProposals = data.proposals.filter(
       (p) => !proposals.some((existing) => existing.id === p.id)
     );
