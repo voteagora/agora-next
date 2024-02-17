@@ -24,7 +24,7 @@ export default function ProposalsList({
     setMeta(initialProposals.meta);
   }, [initialProposals]);
 
-  const loadMore = async (page) => {
+  const loadMore = async () => {
     if (fetching.current || !meta.hasNextPage) return;
 
     fetching.current = true;
