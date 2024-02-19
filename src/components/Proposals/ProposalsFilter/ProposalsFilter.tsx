@@ -27,13 +27,13 @@ export default function ProposalsFilter() {
   return (
     <div className="relative">
       <Listbox value={selected} onChange={setSelected}>
-        <Listbox.Button className="w-full md:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
+        <Listbox.Button className="w-full sm:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
           {selected === proposalsFilterOptions.relevant.filter
             ? proposalsFilterOptions.relevant.value
             : proposalsFilterOptions.everything.value}
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
         </Listbox.Button>
-        <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1">
+        <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-10 w-max">
           {Object.values(proposalsFilterOptions).map((option) => (
             <Listbox.Option key={option.filter} value={option.filter}>
               {({ selected }) => (

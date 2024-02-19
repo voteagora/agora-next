@@ -13,9 +13,9 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-full py-20 sm:pt-32 lg:py-12">
-        <div className="flex flex-col lg:flex-row lg:gap-32 ">
-          <div className="lg:flex-1 lg:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
+      <div className="mx-auto max-w-full py-20 sm:py-12">
+        <div className="flex flex-col sm:flex-row sm:gap-32 ">
+          <div className="sm:flex-1 sm:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
             <h2 className="mt-1 font-semibold text-stone-900">
               Agora Changelog
             </h2>
@@ -34,7 +34,7 @@ export default function Page() {
           <div
             className={cn(
               styles.changelogContainer,
-              "lg:flex-1 lg:basis-2/3 mt-10 lg:mt-0 border-l pl-8 relative"
+              "sm:flex-1 sm:basis-2/3 mt-10 sm:mt-0 border-l pl-8 relative"
             )}
           >
             <div className="space-y-12">
