@@ -5,7 +5,6 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
-import styles from "@/styles/homepage.module.scss";
 import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 import { getMetrics } from "./api/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
@@ -67,7 +66,7 @@ export default async function Home({ searchParams }) {
   const votableSupply = await fetchVotableSupply();
 
   return (
-    <VStack className={styles.metrics_container}>
+    <VStack>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
       <PageDivider />

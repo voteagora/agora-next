@@ -30,7 +30,7 @@ export default function DelegatesSearch() {
           onChange={(value) => setEnteredName(value)}
           placeholder="Exact ENS or address"
           tooltipMessage="Please input exact ENS or address. Partial and fuzzy search is not supported yet."
-          className="py-2 px-4 pl-8 rounded-full bg-gray-fa border border-[#ebebeb] w-full 2xl:w-auto placeholder-gray-af"
+          className="py-2 px-4 pl-8 rounded-full bg-gray-fa border border-[#ebebeb] w-full sm:w-auto placeholder-gray-af"
         />
       </VStack>
     </form>

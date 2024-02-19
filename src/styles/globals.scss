@@ -38,7 +38,7 @@ html {
   font-weight: $font-weight-extrabold;
   padding: 0 $spacing-4;
   margin-bottom: $spacing-4;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     margin-bottom: 0px;
   }
 }
