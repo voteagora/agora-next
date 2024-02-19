@@ -3,12 +3,7 @@
 
 import { css } from "@emotion/css";
 
-export const screens = {
-  sm: "640px",
-  md: "768px",
-  lg: "1024px",
-  xl: "1280px",
-};
+export const screens = { sm: "640px" };
 
 export const spacing = {
   px: "1px",

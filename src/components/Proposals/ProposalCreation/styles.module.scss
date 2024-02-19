@@ -198,7 +198,7 @@
   padding-bottom: $spacing-4;
 
   &__inner {
-    @media (max-width: $max-width-4xl) {
+    @media (max-width: $screen-sm) {
       flex-direction: column;
     }
   }
@@ -206,7 +206,7 @@
   &__left {
     width: 50%;
 
-    @media (max-width: $max-width-4xl) {
+    @media (max-width: $screen-sm) {
       width: 100%;
     }
   }
@@ -214,7 +214,7 @@
   &__text {
     margin-top: $spacing-1;
     color: $gray-700;
-    @media (max-width: $max-width-4xl) {
+    @media (max-width: $screen-sm) {
       width: 100%;
       margin-top: $spacing-2;
       margin-left: 0;
@@ -224,7 +224,7 @@
   &__right {
     width: 50%;
 
-    @media (max-width: $max-width-4xl) {
+    @media (max-width: $screen-sm) {
       width: 100%;
     }
   }
