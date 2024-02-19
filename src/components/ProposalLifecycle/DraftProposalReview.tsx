@@ -8,25 +8,21 @@ import { useEnsAddress, useEnsAvatar } from "wagmi";
 import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";
 
-interface DraftProposalReviewProps {}
+interface DraftProposalReviewProps {
+  createProposal: () => void;
+}
 
 const staticText = {
   submitRequirement:
     "You do not meet the requirement to submit this proposal. However, you can ask someone who does to help you by sharing this link with them.",
 };
 
-const variables = {
-  proposalTitle: "[EP 4.6] [Executable] Endowment permission update",
-  proposalDescription:
-    "This proposal introduces new actions and strategies to the Endowment with the a",
-  proposalAbstract:
-    "Following the successful approval of E.P. 4.2, the second tranche of the Endowment was funded with 16,000 ETH. Community feedback during the E.P. 4.2 voting window indicated a desire to reduce exposure to Lido due to concerns about centralization risks in the network. While diversifying ETH-neutral holdings was already underway, the need for further diversification and divestment from Lido became clear during community discussions and the last Meta-gov call before the vote's closure. Consequently, karpatkey and @steakhouse proposed a 20% cap on Lido's maximum allocation within",
-};
-
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   const { proposalState } = useContext(ProposalLifecycleDraftContext);
 
   const [sponsorInput, setSponsorInput] = useState<string>("");
+
+  const createProposal = props.createProposal;
 
   const {
     data: ensResolvedAddress,
@@ -145,7 +141,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
           </div>
           <button
             className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4"
-            onClick={handleSubmitProposal}
+            onClick={() => createProposal()}
           >
             Submit proposal
           </button>
