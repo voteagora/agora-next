@@ -1,9 +1,8 @@
 import React from "react";
 
-// TODO: not working properly on ipad
 const Footer: React.FC = () => {
   return (
-    <footer className=" text-stone-500 pt-4 pb-8 gap-1 flex w-full justify-center text-sm px-4">
+    <footer className=" text-stone-500 pt-4 pb-8 gap-1 flex w-full sm:min-w-desktop justify-center text-sm px-4">
       <div className="text-stone-300">&copy;</div>
       <p>
         {new Date().getFullYear()} Agora

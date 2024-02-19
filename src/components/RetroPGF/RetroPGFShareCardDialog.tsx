@@ -21,7 +21,6 @@ function formatNumber(number: number) {
     .join("");
 }
 
-// TODO: frh -> card not scrollable on ipad
 export default function RetroPGFShareCardDialog({
   awarded,
   displayName,
