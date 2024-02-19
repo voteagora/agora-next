@@ -115,7 +115,6 @@ export default function DelegateStatementForm({
   return (
     <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
-        // TODO: frh -> not sticky
         <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
           <DelegateCard delegate={delegate} />
         </VStack>

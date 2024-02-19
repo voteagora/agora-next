@@ -67,7 +67,6 @@ export default function TopIssuesFormSection({
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-baseline">
         <h3 className="font-bold">Views on top issues</h3>
         <DropdownMenu>
-          {/* TODO: frh -> on click here it rescrolls on tablet */}
           <DropdownMenuTrigger className="text-[#66676b] outline-none">
             + Add a new issue
           </DropdownMenuTrigger>

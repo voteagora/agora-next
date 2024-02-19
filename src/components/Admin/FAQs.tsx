@@ -1,7 +1,6 @@
 export default function FAQs() {
   return (
     <aside className="sm:w-[320px]">
-      {/* TODO: frh -> position sticky */}
       <div className="gl_box gl_box_secondary sm:sticky sm:top-[20px]">
         <h1 className="font-extrabold text-xl mt-3">FAQ</h1>
         <div className="prose prose-sm space-y-6">
