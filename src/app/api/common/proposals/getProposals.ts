@@ -8,31 +8,46 @@ import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply"
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
 
 export async function getProposalsForNamespace({
-  page = 1,
+  filter,
   namespace,
+  page = 1,
 }: {
-  page: number;
+  filter: string;
   namespace: "optimism";
+  page: number;
 }) {
   const pageSize = 10;
-
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: contracts(namespace).governor.address.toLowerCase(),
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
-    (skip: number, take: number) =>
-      prisma[`${namespace}Proposals`].findMany({
-        take,
-        skip,
-        orderBy: {
-          ordinal: "desc",
-        },
-        where: {
-          ...(prodDataOnly || {}),
-          cancelled_block: null,
-        },
-      }),
+    (skip: number, take: number) => {
+      if (filter === "relevant") {
+        return prisma[`${namespace}Proposals`].findMany({
+          take,
+          skip,
+          orderBy: {
+            ordinal: "desc",
+          },
+          where: {
+            ...(prodDataOnly || {}),
+            cancelled_block: null,
+          },
+        });
+      } else {
+        return prisma[`${namespace}Proposals`].findMany({
+          take,
+          skip,
+          orderBy: {
+            ordinal: "desc",
+          },
+          where: {
+            ...(prodDataOnly || {}),
+          },
+        });
+      }
+    },
     page,
     pageSize
   );
