@@ -34,7 +34,7 @@ export default function CitizensFilter() {
             {citizensFilterOptions[selected]?.value || "Shuffle"}
             <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
           </Listbox.Button>
-          <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-10 w-max">
+          <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
             {Object.entries(citizensFilterOptions).map(([key, option]) => (
               <Listbox.Option key={key} value={key} as={Fragment}>
                 {({ selected }) => {
