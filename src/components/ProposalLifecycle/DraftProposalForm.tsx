@@ -12,16 +12,22 @@ type ProposalLifecycleDraftStage =
   | "draft-create"
   | "draft-submit";
 
-const DraftProposalForm: React.FC = () => {
+interface DraftProposalFormProps {
+  createProposal: () => void;
+}
+
+const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
   const [stage, setStage] =
     useState<ProposalLifecycleDraftStage>("draft-temp-check");
+
+  const createProposal = props.createProposal;
 
   return (
     <div className="flex-grow">
       <Accordion
         type="single"
         collapsible
-        className="flex flex-col"
+        className="flex flex-col min-h-screen"
         value={stage}
         onValueChange={(value) =>
           setStage(value as ProposalLifecycleDraftStage)
@@ -31,7 +37,7 @@ const DraftProposalForm: React.FC = () => {
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormCreate setStage={setStage} />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
-        <DraftProposalFormSubmit />
+        <DraftProposalFormSubmit createProposal={createProposal} />
       </Accordion>
     </div>
   );

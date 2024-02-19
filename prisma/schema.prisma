@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "optimism"]
+  schemas  = ["agora", "config", "optimism", "test"]
 }
 
 model DelegateStatements {
@@ -260,6 +260,42 @@ view OptimismVoterStats {
 
   @@map("voter_stats")
   @@schema("optimism")
+}
+
+view Proposal {
+  id                     Int                      @id @default(autoincrement())
+  temp_check_link        String
+  proposal_type          String                   @db.VarChar(50)
+  title                  String                   @db.VarChar(255)
+  description            String
+  abstract               String
+  audit_url              String?
+  update_ens_docs_status Boolean
+  post_on_discourse_status Boolean
+  dao                    String                   @db.VarChar(32)
+  proposal_status        String                   @db.VarChar(32)
+  author_address         String                   @db.VarChar(255)
+  transactions           ProposalTransaction[]
+
+  @@map(name: "proposal")
+  @@schema("test")
+}
+
+view ProposalTransaction {
+  id               Int      @id @default(autoincrement())
+  proposal_id      Int
+  order            Int
+  target           String   @db.VarChar(255)
+  value            String   @db.VarChar(255)
+  calldata         String
+  function_details String
+  contract_abi     String
+  description      String
+  is_valid         Boolean
+  proposal         Proposal @relation(fields: [proposal_id], references: [id])
+
+  @@map(name: "proposal_transaction")
+  @@schema("test")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
