@@ -5,10 +5,23 @@ import Image from "next/image";
 import Link from "next/link";
 
 export async function generateMetadata() {
+  const preview = `/api/images/og/proposals`;
+  const title = "Agora - Optimism's RetroPGF Round 3 Summary";
+  const description =
+    "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.";
+
   return {
-    title: "Agora - Optimism's RetroPGF Round 3 Summary",
-    description:
-      "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.",
+    title: title,
+    description: description,
+    openGraph: {
+      images: preview,
+    },
+    other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
+    },
   };
 }
 

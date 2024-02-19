@@ -99,7 +99,7 @@ async function getVotesForDelegateForAddress({
     };
   }
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
 
   return {
     meta,
@@ -184,7 +184,7 @@ export async function getVotesForProposalForNamespace({
     };
   }
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
   const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type
@@ -226,7 +226,7 @@ export async function getUserVotesForProposalForNamespace({
     address.toLowerCase()
   );
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
 
   return votes.map((vote) =>
     parseVote(
@@ -253,7 +253,7 @@ export async function getVotesForProposalAndDelegateForNamespace({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
-  const latestBlock = await provider.getBlock("latest");
+  const latestBlock = await provider.getBlockNumber();
 
   return votes.map((vote) =>
     parseVote(

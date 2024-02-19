@@ -36,17 +36,29 @@ async function fetchDelegators(address) {
 }
 
 export async function generateMetadata({}, parent) {
+  const preview = `/api/images/og/delegates`;
+  const title = "Voter on Agora";
+  const description = "Delegate your voting power to a trusted representative";
+
   return {
-    title: "Agora - Optimism Voters",
-    description: "See which voters are active on Optimism governance.",
+    title: title,
+    description: description,
+    openGraph: {
+      images: preview,
+    },
+    other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
+    },
   };
 }
 
 export default async function Page({ searchParams }) {
-  const sort =
-    delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
+  const sort = delegatesFilterOptions[searchParams.orderBy]?.sort || delegatesFilterOptions.weightedRandom.sort;
   const citizensSort =
-    citizensFilterOptions[searchParams.citizensOrderBy]?.value || "shuffle";
+    citizensFilterOptions[searchParams.citizensOrderBy]?.value || citizensFilterOptions.shuffle.sort;
   const seed = Math.random();
   const delegates = await fetchDelegates(sort);
   const citizens = await fetchCitizens(citizensSort);
