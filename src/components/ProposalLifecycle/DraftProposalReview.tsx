@@ -8,9 +8,7 @@ import { useEnsAddress, useEnsAvatar } from "wagmi";
 import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";
 
-interface DraftProposalReviewProps {
-  createProposal: () => void;
-}
+interface DraftProposalReviewProps {}
 
 const staticText = {
   submitRequirement:
@@ -21,8 +19,6 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   const { proposalState } = useContext(ProposalLifecycleDraftContext);
 
   const [sponsorInput, setSponsorInput] = useState<string>("");
-
-  const createProposal = props.createProposal;
 
   const {
     data: ensResolvedAddress,
@@ -139,10 +135,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               </div>
             </div>
           </div>
-          <button
-            className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4"
-            onClick={() => createProposal()}
-          >
+          <button className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4">
             Submit proposal
           </button>
         </div>

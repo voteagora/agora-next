@@ -12,15 +12,11 @@ const staticText = {
     "Please proofread a preview of your proposal below. If you need to change any of its content, please edit your draft in the previous step.",
 };
 
-interface DraftProposalFormSubmitProps {
-  createProposal: () => void;
-}
+interface DraftProposalFormSubmitProps {}
 
 const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
   props
 ) => {
-  const createProposal = props.createProposal;
-
   return (
     <div className="">
       <AccordionItem
@@ -34,7 +30,7 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
           <p className="text-gray-4f px-6 pb-7 max-w-[620px]">
             {staticText.description}
           </p>
-          <DraftProposalReview createProposal={createProposal} />
+          <DraftProposalReview />
         </AccordionContent>
       </AccordionItem>
     </div>

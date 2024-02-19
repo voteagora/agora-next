@@ -9,6 +9,7 @@ import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
+import CreateProposalButton from "@/components/ProposalLifecycle/CreateProposalButton";
 
 export default function ProposalsList({
   initialProposals,
@@ -48,6 +49,7 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
           <ProposalsFilter />
+          <CreateProposalButton />
         </div>
       </div>
 
