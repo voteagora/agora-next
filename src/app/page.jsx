@@ -1,22 +1,22 @@
-import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
-import styles from "@/styles/homepage.module.scss";
 import Hero from "@/components/Hero/Hero";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
-import { getProposals } from "./api/proposals/getProposals";
-import { getMetrics } from "./api/metrics/getMetrics";
+import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
+import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
+import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
+import { proposalsFilterOptions } from "@/lib/constants";
+import styles from "@/styles/homepage.module.scss";
 import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
+import { getMetrics } from "./api/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
+import { getProposals } from "./api/proposals/getProposals";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
 
-async function fetchProposals(page = 1) {
+async function fetchProposals(filter, page = 1) {
   "use server";
-
-  return getProposals({ page });
+  return getProposals({ filter, page });
 }
 
 async function fetchNeedsMyVoteProposals(address) {
@@ -57,8 +57,12 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Home() {
-  const proposals = await fetchProposals();
+export default async function Home({ searchParams }) {
+  const filter = searchParams?.filter
+    ? proposalsFilterOptions.everything.filter
+    : proposalsFilterOptions.relevant.filter;
+  const proposals = await fetchProposals(filter);
+
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
@@ -73,7 +77,10 @@ export default async function Home() {
       />
       <ProposalsList
         initialProposals={proposals}
-        fetchProposals={fetchProposals}
+        fetchProposals={async (page) => {
+          "use server";
+          return getProposals({ filter, page });
+        }}
         votableSupply={votableSupply}
       />
     </VStack>
