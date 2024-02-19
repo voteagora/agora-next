@@ -7,20 +7,27 @@ import DraftProposalFormTempCheck from "./DraftProposalFormTempCheck";
 import DraftProposalFormCreate from "./DraftProposalFormCreate";
 import DraftProposalFormSubmit from "./DraftProposalFormSubmit";
 
+import { Proposal } from "@prisma/client";
+
 type ProposalLifecycleDraftStage =
   | "draft-temp-check"
   | "draft-create"
   | "draft-submit";
 
 interface DraftProposalFormProps {
-  createProposal: () => void;
+  proposal: Proposal;
+  updateProposal: (
+    proposal: Proposal,
+    field: string,
+    value: string | boolean
+  ) => void;
 }
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
   const [stage, setStage] =
     useState<ProposalLifecycleDraftStage>("draft-temp-check");
 
-  const createProposal = props.createProposal;
+  const { proposal, updateProposal } = props;
 
   return (
     <div className="flex-grow">
@@ -33,11 +40,15 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           setStage(value as ProposalLifecycleDraftStage)
         }
       >
-        <DraftProposalFormTempCheck setStage={setStage} />
+        <DraftProposalFormTempCheck
+          setStage={setStage}
+          proposal={proposal}
+          updateProposal={updateProposal}
+        />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormCreate setStage={setStage} />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
-        <DraftProposalFormSubmit createProposal={createProposal} />
+        <DraftProposalFormSubmit />
       </Accordion>
     </div>
   );

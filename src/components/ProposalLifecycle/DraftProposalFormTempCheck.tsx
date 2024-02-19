@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion-proposal-draft";
 
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
+import { Proposal } from "@prisma/client";
 
 const staticText = {
   heading: "Create a temp check on Discourse",
@@ -20,12 +21,18 @@ interface DraftProposalFormTempCheckProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
+  proposal: Proposal;
+  updateProposal: (
+    proposal: Proposal,
+    field: string,
+    value: string | boolean
+  ) => void;
 }
 
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   props
 ) => {
-  const { setStage } = props;
+  const { setStage, proposal, updateProposal } = props;
 
   const { proposalState, updateTempCheckLink } = useContext(
     ProposalLifecycleDraftContext
@@ -41,6 +48,15 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
       setIsValidDiscourseLink(true);
     } else {
       setIsValidDiscourseLink(false);
+    }
+  };
+
+  const saveAndContinue = async () => {
+    // currently updates optimistically, notice no await
+    updateProposal(proposal, "temp_check_link", proposalState.tempCheckLink);
+
+    if (isValidDiscourseLink) {
+      setStage("draft-create");
     }
   };
 
@@ -83,7 +99,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
               <button
                 className={`py-3 px-6 border border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
                 disabled={!isValidDiscourseLink}
-                onClick={() => setStage("draft-create")}
+                onClick={() => saveAndContinue()}
               >
                 Continue
               </button>
