@@ -40,7 +40,7 @@
   }
 }
 .desktop_connect_button {
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     display: none;
   }
   border: 1px solid $gray-eb;
@@ -79,7 +79,7 @@
   &:active {
     opacity: 0.6;
   }
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     display: flex;
     align-items: center;
   }

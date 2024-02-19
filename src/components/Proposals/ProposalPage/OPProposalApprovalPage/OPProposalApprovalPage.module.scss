@@ -2,7 +2,7 @@
 
 .proposal_container {
   max-width: $max-width-6xl;
-  @media (max-width: $max-width-2xl) {
+  @media (max-width: $screen-sm) {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-end;
@@ -13,7 +13,7 @@
   padding-left: $spacing-4;
   padding-right: $spacing-4;
   max-width: $max-width-6xl;
-  @media (max-width: $max-width-2xl) {
+  @media (max-width: $screen-sm) {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-end;
@@ -31,7 +31,7 @@
   border-radius: $border-radius-xl;
   box-shadow: $box-shadow-newDefault;
   margin-bottom: $spacing-8;
-  @media (max-width: $max-width-2xl) {
+  @media (max-width: $screen-sm) {
     align-items: stretch;
     justify-content: flex-end;
     width: 100%;
