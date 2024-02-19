@@ -124,7 +124,7 @@ export function parseParams(
 export function parseVote(
   vote: VotePayload,
   proposalData: ParsedProposalData[ProposalType],
-  latestBlock: Block | null
+  latestBlock: number
 ): Vote {
   return {
     transactionHash: vote.transaction_hash,
@@ -138,11 +138,7 @@ export function parseVote(
     proposalTitle: getTitleFromProposalDescription(vote.description || ""),
     proposalType: vote.proposal_type,
     timestamp: latestBlock
-      ? getHumanBlockTime(
-          vote.block_number,
-          latestBlock.number,
-          latestBlock.timestamp
-        )
+      ? getHumanBlockTime(vote.block_number, latestBlock)
       : null,
   };
 }
