@@ -33,7 +33,7 @@ export default function RetroPGFSort() {
     <Listbox as="div" value={orderByParam} onChange={handleSelect}>
       {() => (
         <>
-          <Listbox.Button className="w-full md:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
+          <Listbox.Button className="w-full sm:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
             {orderByParam}
             <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
           </Listbox.Button>

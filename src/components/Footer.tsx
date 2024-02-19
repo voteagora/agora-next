@@ -1,12 +1,13 @@
 import React from "react";
 
+// TODO: not working properly on ipad
 const Footer: React.FC = () => {
   return (
     <footer className=" text-stone-500 pt-4 pb-8 gap-1 flex w-full justify-center text-sm px-4">
       <div className="text-stone-300">&copy;</div>
       <p>
         {new Date().getFullYear()} Agora
-        <span className="hidden lg:inline">
+        <span className="hidden sm:inline">
           , the onchain governance company
         </span>
       </p>
