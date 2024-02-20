@@ -6,13 +6,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 import DraftProposalReview from "./DraftProposalReview";
+import { Proposal } from "@prisma/client";
 
 const staticText = {
   description:
     "Please proofread a preview of your proposal below. If you need to change any of its content, please edit your draft in the previous step.",
 };
 
-interface DraftProposalFormSubmitProps {}
+interface DraftProposalFormSubmitProps {
+  proposal: Proposal;
+  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+}
 
 const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
   props
@@ -30,7 +34,10 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
           <p className="text-gray-4f px-6 pb-7 max-w-[620px]">
             {staticText.description}
           </p>
-          <DraftProposalReview />
+          <DraftProposalReview
+            proposal={props.proposal}
+            updateProposal={props.updateProposal}
+          />
         </AccordionContent>
       </AccordionItem>
     </div>

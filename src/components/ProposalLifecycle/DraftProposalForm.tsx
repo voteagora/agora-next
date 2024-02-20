@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { Accordion } from "@/components/ui/accordion-proposal-draft";
 import DraftProposalFormTempCheck from "./DraftProposalFormTempCheck";
@@ -8,6 +8,7 @@ import DraftProposalFormCreate from "./DraftProposalFormCreate";
 import DraftProposalFormSubmit from "./DraftProposalFormSubmit";
 
 import { Proposal } from "@prisma/client";
+import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 type ProposalLifecycleDraftStage =
   | "draft-temp-check"
@@ -25,13 +26,15 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
 
   const { proposal, updateProposal } = props;
 
+  const { proposalState } = useContext(ProposalLifecycleDraftContext);
+
   return (
     <div className="flex-grow">
       <Accordion
         type="single"
         collapsible
         className="flex flex-col min-h-screen"
-        value={stage}
+        value={proposalState.proposalStatus == "draft" ? stage : ""}
         onValueChange={(value) =>
           setStage(value as ProposalLifecycleDraftStage)
         }
@@ -48,7 +51,10 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           updateProposal={updateProposal}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
-        <DraftProposalFormSubmit />
+        <DraftProposalFormSubmit
+          proposal={proposal}
+          updateProposal={updateProposal}
+        />
       </Accordion>
     </div>
   );
