@@ -5,7 +5,6 @@ export default function ProposalTimeStatus({
   proposalStatus,
   proposalEndTime,
 }) {
-  // TODO: frh -> WIP approval proposal dates are the same, check standard and add proposal times to optimistic
   switch (proposalStatus) {
     case "PENDING":
       return <HStack gap={1}>Voting</HStack>;
