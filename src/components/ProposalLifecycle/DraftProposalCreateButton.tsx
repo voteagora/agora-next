@@ -1,6 +1,7 @@
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { Checkbox } from "../ui/checkbox";
 import { useContext, useState } from "react";
+import { Proposal } from "@prisma/client";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -8,15 +9,33 @@ interface DraftProposalCreateButtonProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
+  proposal: Proposal;
+  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
 }
 
 const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   props
 ) => {
-  const { description, checkmarkInfo } = props;
+  const { description, checkmarkInfo, setStage, proposal, updateProposal } =
+    props;
 
   const { proposalState, updateENSDocsStatus, updateDiscourseStatus } =
     useContext(ProposalLifecycleDraftContext);
+
+  const saveAndContinue = async () => {
+    // currently updates optimistically, notice no await
+    const updateData = {
+      proposal_type: proposalState.proposalType,
+      title: proposalState.title,
+      description: proposalState.description,
+      abstract: proposalState.abstract,
+      update_ens_docs_status: proposalState.updateENSDocsStatus,
+      post_on_discourse_status: proposalState.postOnDiscourseStatus,
+    };
+    updateProposal(proposal, updateData);
+
+    setStage("draft-submit");
+  };
 
   return (
     <div className="bg-gray-fa rounded-b-2xl">
@@ -25,7 +44,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <p className="text-gray-4f max-w-[400px]">{description}</p>
           <button
             className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
-            onClick={() => props.setStage("draft-submit")}
+            onClick={() => saveAndContinue()}
             disabled={
               !proposalState.title ||
               !proposalState.description ||

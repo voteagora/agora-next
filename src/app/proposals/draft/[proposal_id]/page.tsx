@@ -46,19 +46,20 @@ async function getProposalOrCreateNew(
 
 async function updateProposal(
   proposal: Proposal,
-  field: string,
-  value: string | boolean
+  updateData: Partial<Proposal>
 ): Promise<Proposal> {
   "use server";
 
-  return await prisma.proposal.update({
+  const updatedProposal = await prisma.proposal.update({
     where: {
       id: proposal.id,
     },
-    data: {
-      [field]: value,
-    },
+    data: updateData,
   });
+
+  console.log("updatedProposal", updatedProposal);
+
+  return updatedProposal;
 }
 
 export default async function DraftProposalPage({

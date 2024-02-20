@@ -22,11 +22,7 @@ interface DraftProposalFormTempCheckProps {
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
   proposal: Proposal;
-  updateProposal: (
-    proposal: Proposal,
-    field: string,
-    value: string | boolean
-  ) => void;
+  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
 }
 
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
@@ -53,7 +49,10 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
 
   const saveAndContinue = async () => {
     // currently updates optimistically, notice no await
-    updateProposal(proposal, "temp_check_link", proposalState.tempCheckLink);
+    const updateData = {
+      temp_check_link: proposalState.tempCheckLink,
+    };
+    updateProposal(proposal, updateData);
 
     if (isValidDiscourseLink) {
       setStage("draft-create");

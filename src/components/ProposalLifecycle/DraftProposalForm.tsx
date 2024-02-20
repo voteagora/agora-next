@@ -16,11 +16,7 @@ type ProposalLifecycleDraftStage =
 
 interface DraftProposalFormProps {
   proposal: Proposal;
-  updateProposal: (
-    proposal: Proposal,
-    field: string,
-    value: string | boolean
-  ) => void;
+  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
 }
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
@@ -46,7 +42,11 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           updateProposal={updateProposal}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
-        <DraftProposalFormCreate setStage={setStage} />
+        <DraftProposalFormCreate
+          setStage={setStage}
+          proposal={proposal}
+          updateProposal={updateProposal}
+        />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit />
       </Accordion>
