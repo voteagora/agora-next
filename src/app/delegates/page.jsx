@@ -56,10 +56,9 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
-  const sort =
-    delegatesFilterOptions[searchParams.orderBy]?.sort || "weighted_random";
+  const sort = delegatesFilterOptions[searchParams.orderBy]?.sort || delegatesFilterOptions.weightedRandom.sort;
   const citizensSort =
-    citizensFilterOptions[searchParams.citizensOrderBy]?.value || "shuffle";
+    citizensFilterOptions[searchParams.citizensOrderBy]?.value || citizensFilterOptions.shuffle.sort;
   const seed = Math.random();
   const delegates = await fetchDelegates(sort);
   const citizens = await fetchCitizens(citizensSort);
