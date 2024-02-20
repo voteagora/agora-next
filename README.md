@@ -10,9 +10,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## About this repo
 
-You will find a mix of different styles at work in this repo. We are a small team and will be settling on standards in the coming months as we move more and more of the multi-tennant / instance style of Agora, into one codebase.
+You will find a mix of different styles at work in this repo. We are a small team and will be settling on standards in the coming months as we move more and more of the multi-tenant / instance style of Agora, into one codebase.
 
-### Data and data access paterns
+### Data and data access patterns
 
 The entire data model for this application is based on Postgres and Prisma. All data access should happen through the `/api` endpoints which will use Prisma to interact with the database.
 
@@ -25,7 +25,7 @@ We will be building a publicly accessible API soon, but for now, to keep things 
 
 Most of this data comes in the form as views, or materialized views in our Postgres database that we call via Prisma and then fetch the results to the page and cascade that state down to the components.
 
-NextJS has some peculiar data access patterns given the mix of server-side and client-side components, that we are still getting used to. When in doubt, have a look at the `<ProposalsList />` component the `src/app/page.jsx` to see the fetching model in action. The general rule in NextJS is that you primary "server" component should do the fetching to keep it fast and use the cache in the best way possible, and then your client components can recieve that data from server components to add any interactivity you want.
+NextJS has some peculiar data access patterns given the mix of server-side and client-side components, that we are still getting used to. When in doubt, have a look at the `<ProposalsList />` component the `src/app/page.jsx` to see the fetching model in action. The general rule in NextJS is that you primary "server" component should do the fetching to keep it fast and use the cache in the best way possible, and then your client components can receive that data from server components to add any interactivity you want.
 
 You will want to have a Database / SQL Viewer so that you can explore the data. Most of us use:
 
@@ -35,9 +35,9 @@ Ping the Discord to get access to the database.
 
 You can also explore the queries here: `https://github.com/voteagora/queries`
 
-#### Database strcuture
+#### Database structure
 
-This applicaiton uses a Postgres database with the following schemas:
+This application uses a Postgres database with the following schemas:
 
 - **center**: Admin-only access
 - **config**: Shared configuration data
@@ -53,7 +53,7 @@ npx prisma db pull
 npx prisma generate
 ```
 
-More information about how to work with the database can be found in the [Database Maunal](https://www.notion.so/argoagora/Database-Manual-7f59ed03bffb4096a2b19e34e2956085)
+More information about how to work with the database can be found in the [Database Manual](https://www.notion.so/argoagora/Database-Manual-7f59ed03bffb4096a2b19e34e2956085)
 
 ### Typescript vs. Javascript
 
@@ -61,7 +61,7 @@ You will see a mix of JS and TS. Don't be alarmed. TS was meant to bolster the p
 
 ### Styles and CSS
 
-The application is using a combination of Tailwind, Emotion and native SCSS. Our old codebase relied exclusively on `emotion/css` in-line styles and you might see some relics of that form here but it's best to use the pattern shown in the Hero component as an example of how to write new code.
+The application is using a combination of Tailwind, Emotion and native SCSS. Our old codebase relied exclusively on `emotion/css` in-line styles, and you might see some relics of that form here, but it's best to use the pattern shown in the Hero component as an example of how to write new code.
 
 There are three theme files in this repo, but the goal will be to move 1 or 2 in the near future.
 
@@ -76,11 +76,11 @@ If you add a new style to any of these files, you should duplicate them across a
 Use `@/components/Hero` as the reference for this section to see how clean the template file is + the corresponding styles.
 
 1. Think of a good name for your component
-2. Navigate to the component tree and see if there is already a folder that semantically matches what your new comonent will do. If not, create one.
+2. Navigate to the component tree and see if there is already a folder that semantically matches what your new component will do. If not, create one.
 3. Duplicate the name of the folder as a JS/TSX file inside it. This will be your component.
 4. Create a `<folder_name>.module.scss` file and name it with the same name as your component file. This will hold the styles.
 5. Build your component
-6. Use semantic HTML elements where appropirate and target styles using the class name
+6. Use semantic HTML elements where appropriate and target styles using the class name
 7. In your SCSS file, make sure that you import
 
 ### Global styles
@@ -136,7 +136,7 @@ The router is the directory structure of the `/app` directory.
 Each folder contains a magical page called `page.jsx` or `page.tsx` this acts as the `index` page for the route. So for example `@/app/delegates/page.jsx` is the index page for `https://app.example.com/delegates`
 
 `@app/lib`
-Helpers and utilities, reserverd word.
+Helpers and utilities, reserved word.
 
 `@app/layout.tsx`
 
