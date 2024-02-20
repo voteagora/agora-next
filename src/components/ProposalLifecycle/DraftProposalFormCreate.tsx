@@ -16,6 +16,7 @@ import DraftProposalTransaction from "./DraftProposalTransaction";
 import DraftProposalCreateButton from "./DraftProposalCreateButton";
 import DraftProposalTitleInput from "./DraftProposalTitleInput";
 import DraftProposalDescriptionInput from "./DraftProposalDescriptionInput";
+import { Proposal } from "@prisma/client";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -40,13 +41,13 @@ interface DraftProposalFormCreateProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
+  proposal: Proposal;
+  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
 }
 
 const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
   props
 ) => {
-  const { setStage } = props;
-
   return (
     <div className="">
       <AccordionItem
@@ -83,7 +84,9 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           <DraftProposalCreateButton
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
-            setStage={setStage}
+            setStage={props.setStage}
+            proposal={props.proposal}
+            updateProposal={props.updateProposal}
           />
         </AccordionContent>
       </AccordionItem>
