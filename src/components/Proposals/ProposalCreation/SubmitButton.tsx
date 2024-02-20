@@ -265,7 +265,7 @@ function getInputData(form: Form): {
   return { governorFunction, inputData, error };
 }
 
-function encodeTransfer(to: string, amount: number): string {
+function encodeTransfer(to: string, amount: bigint): string {
   return (
     "0xa9059cbb" +
     abiCoder
