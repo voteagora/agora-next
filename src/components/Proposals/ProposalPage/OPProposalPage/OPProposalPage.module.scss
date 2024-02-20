@@ -28,7 +28,7 @@
   }
 
   .proposal_votes_summary_container {
-    padding: $spacing-2 $spacing-4 $spacing-3 $spacing-4;
+    padding: $spacing-4 $spacing-4 0 $spacing-4;
     border-radius: $border-radius-md;
     font-weight: $font-weight-bold;
     flex-shrink: 0;
@@ -36,6 +36,9 @@
     border: 1px solid $gray-300;
     margin: 0 $spacing-4;
     box-shadow: $box-shadow-newDefault;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .proposal_actions_panel {
