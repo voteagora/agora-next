@@ -44,10 +44,10 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
 
   const fetching = useRef(false);
 
-  const loadMore = async (page) => {
+  const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-      const data = await fetchDelegateVotes(page, sortOrder);
+      const data = await fetchDelegateVotes(meta.currentPage + 1, sortOrder);
       setMeta(data.meta);
       setDelegateVotes((prev) =>
         getUniqueDelegateVotes(prev.concat(data.votes))
@@ -78,7 +78,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         className="flex flex-col gap-4"
       >
         {delegateVotes.map(
-          (vote) =>
+          (vote, idx) =>
             vote && (
               <VoteDetailsContainer key={vote.transactionHash}>
                 <div className={styles.details_container}>
