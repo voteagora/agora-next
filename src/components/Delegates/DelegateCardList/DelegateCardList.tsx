@@ -6,7 +6,6 @@ import { VStack } from "../../Layout/Stack";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
-import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
@@ -34,7 +33,6 @@ export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
 }: Props) {
-  const router = useRouter();
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
@@ -44,14 +42,6 @@ export default function DelegateCardList({
     setPages([initialDelegates]);
     setMeta(initialDelegates.meta);
   }, [initialDelegates]);
-
-  const handleClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    href: string
-  ) => {
-    e.preventDefault();
-    router.push(href);
-  };
 
   const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
