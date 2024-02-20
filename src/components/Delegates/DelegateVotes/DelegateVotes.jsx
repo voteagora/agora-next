@@ -78,7 +78,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         className="flex flex-col gap-4"
       >
         {delegateVotes.map(
-          (vote, idx) =>
+          (vote) =>
             vote && (
               <VoteDetailsContainer key={vote.transactionHash}>
                 <div className={styles.details_container}>
