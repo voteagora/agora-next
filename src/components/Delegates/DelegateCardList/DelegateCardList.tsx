@@ -53,26 +53,24 @@ export default function DelegateCardList({
     router.push(href);
   };
 
-  const loadMore = async (page: any) => {
+  const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-      const data = await fetchDelegates(page);
-      const existingIds = new Set(
-        pages.flatMap((page) => page.delegates.map((d) => d.address))
-      );
+      const data = await fetchDelegates(meta.currentPage + 1);
+
+      // TODO: This is a temporary fix to avoid duplicates when filtering by "Weighted random"
       const uniqueDelegates = data.delegates.filter(
-        (d) => !existingIds.has(d.address)
+        (d) => !delegates.some((existing) => existing.address === d.address)
       );
+
       setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
-      setMeta(data.meta) ;
+      setMeta(data.meta);
       fetching.current = false;
     }
   };
 
-  const delegates = pages.reduce(
-    (all: DelegateChunk[], page) => all.concat(page.delegates),
-    []
-  );
+  const delegates = pages.flatMap((page) => page.delegates);
+
   const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
