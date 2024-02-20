@@ -26,9 +26,11 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
 ) => {
   const { proposalState } = useContext(ProposalLifecycleDraftContext);
 
+  const { proposal, updateProposal } = props;
+
   const handleCopySponsorsipLink = () => {
     navigator.clipboard.writeText(
-      `${window.location.origin}/proposals/sponsor/${proposalState.title}`
+      `${window.location.origin}/proposals/sponsor/${proposal.id}`
     );
     toast("Proposal link copied to clipboard!");
   };
@@ -47,8 +49,8 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
             {staticText.description}
           </p>
           <DraftProposalReview
-            proposal={props.proposal}
-            updateProposal={props.updateProposal}
+            proposal={proposal}
+            updateProposal={updateProposal}
           />
         </AccordionContent>
       </AccordionItem>
