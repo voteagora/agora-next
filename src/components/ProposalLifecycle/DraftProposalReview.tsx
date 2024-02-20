@@ -7,8 +7,12 @@ import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraft
 import { useEnsAddress, useEnsAvatar } from "wagmi";
 import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";
+import { Proposal } from "@prisma/client";
 
-interface DraftProposalReviewProps {}
+interface DraftProposalReviewProps {
+  proposal: Proposal;
+  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+}
 
 const staticText = {
   submitRequirement:
@@ -16,7 +20,11 @@ const staticText = {
 };
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { proposalState } = useContext(ProposalLifecycleDraftContext);
+  const { proposalState, updateProposalStatus } = useContext(
+    ProposalLifecycleDraftContext
+  );
+
+  const { proposal, updateProposal } = props;
 
   const [sponsorInput, setSponsorInput] = useState<string>("");
 
@@ -40,26 +48,13 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   });
 
   const handleSubmitProposal = () => {
-    alert(
-      "Proposal submitted. Title: " +
-        proposalState.title +
-        " Description: " +
-        proposalState.description +
-        " Abstract: " +
-        proposalState.abstract +
-        " Proposal Type: " +
-        proposalState.proposalType +
-        " Transactions: " +
-        JSON.stringify(proposalState.transactions) +
-        " Audit URL: " +
-        proposalState.auditURL +
-        " Update ENS Docs Status: " +
-        proposalState.updateENSDocsStatus +
-        " Post on Discourse Status: " +
-        proposalState.postOnDiscourseStatus +
-        " Temp Check Link: " +
-        proposalState.tempCheckLink
-    );
+    // TODO unify states and names across frontend state and database
+    const updateData = {
+      proposal_status: "sponsor_requested",
+    };
+    updateProposal(proposal, updateData);
+
+    updateProposalStatus("awaiting_sponsor");
   };
 
   return (
@@ -135,7 +130,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               </div>
             </div>
           </div>
-          <button className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4">
+          <button
+            className="w-full flex flex-row justify-center shadow-sm py-3 bg-black text-white rounded-lg mt-4"
+            onClick={() => handleSubmitProposal()}
+          >
             Submit proposal
           </button>
         </div>

@@ -23,6 +23,7 @@ interface ProposalLifecycleDraft {
   updateENSDocsStatus: boolean;
   postOnDiscourseStatus: boolean;
   transactions: ProposalTransaction[];
+  proposalStatus: "draft" | "awaiting_sponsor";
 }
 
 type ProposalLifecycleDraftUpdateFunction =
@@ -48,7 +49,8 @@ type ProposalLifecycleDraftUpdateFunction =
       payload: {
         order: number;
       };
-    };
+    }
+  | { type: "UPDATE_PROPOSAL_STATUS"; payload: "draft" | "awaiting_sponsor" };
 
 const initialState: ProposalLifecycleDraft = {
   tempCheckLink: "",
@@ -60,6 +62,7 @@ const initialState: ProposalLifecycleDraft = {
   updateENSDocsStatus: true,
   postOnDiscourseStatus: true,
   transactions: [],
+  proposalStatus: "draft",
 };
 
 // Define the reducer function to handle state updates
@@ -122,6 +125,8 @@ const reducer = (
           (transaction) => transaction.order !== action.payload.order
         ),
       };
+    case "UPDATE_PROPOSAL_STATUS":
+      return { ...state, proposalStatus: action.payload };
     default:
       return state;
   }
@@ -144,6 +149,7 @@ export const ProposalLifecycleDraftContext = createContext<{
     value: string | boolean
   ) => void;
   removeTransaction: (order: number) => void;
+  updateProposalStatus: (proposalStatus: "draft" | "awaiting_sponsor") => void;
 }>({
   proposalState: initialState,
   updateTempCheckLink: () => {},
@@ -157,6 +163,7 @@ export const ProposalLifecycleDraftContext = createContext<{
   addTransaction: () => {},
   updateTransaction: () => {},
   removeTransaction: () => {},
+  updateProposalStatus: () => {},
 });
 
 export const ProposalLifecycleDraftProvider = ({
@@ -230,6 +237,12 @@ export const ProposalLifecycleDraftProvider = ({
     });
   };
 
+  const updateProposalStatus = (
+    proposalStatus: "draft" | "awaiting_sponsor"
+  ) => {
+    dispatch({ type: "UPDATE_PROPOSAL_STATUS", payload: proposalStatus });
+  };
+
   useEffect(() => {
     const tempCheckLink = localStorage.getItem(
       "new-proposal-draft-tempcheck-link"
@@ -276,6 +289,7 @@ export const ProposalLifecycleDraftProvider = ({
         addTransaction,
         updateTransaction,
         removeTransaction,
+        updateProposalStatus,
       }}
     >
       {children}
