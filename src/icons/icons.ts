@@ -29,6 +29,7 @@ import github from "./github.svg";
 import world from "./world.svg";
 import createTransaction from "./createTransaction.svg";
 import uploadTransaction from "./uploadTransaction.svg";
+import usersEdit from "./usersEdit.svg";
 
 export const icons = {
   badge,
@@ -62,4 +63,5 @@ export const icons = {
   world,
   createTransaction,
   uploadTransaction,
+  usersEdit,
 };
