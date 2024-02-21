@@ -202,7 +202,7 @@ function getInputData(form: Form): {
 
         option.transactions.forEach((t) => {
           if (t.type === "Transfer") {
-            formattedOption[0] += BigInt(t.transferAmount);
+            formattedOption[0] += t.transferAmount;
             formattedOption[1].push(governanceTokenContract.address);
             formattedOption[2].push(BigInt(0));
             formattedOption[3].push(
@@ -269,10 +269,7 @@ function encodeTransfer(to: string, amount: bigint): string {
   return (
     "0xa9059cbb" +
     abiCoder
-      .encode(
-        ["address", "uint256"],
-        [ethers.getAddress(to), ethers.parseEther(amount.toString() || "0")]
-      )
+      .encode(["address", "uint256"], [ethers.getAddress(to), amount])
       .slice(2)
   );
 }
