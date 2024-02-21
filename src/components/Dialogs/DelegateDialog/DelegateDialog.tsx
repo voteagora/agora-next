@@ -55,7 +55,7 @@ export function DelegateDialog({
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });
     setIsLoading(false);
-    setRefetchDelegate(true);
+    setRefetchDelegate(trackingData.delegateAddress);
   };
 
   const { data: delegateEnsName } = useEnsName({

@@ -7,8 +7,8 @@ import {
 } from "react";
 
 type ConnectButtonContextType = {
-  refetchDelegate: boolean | null;
-  setRefetchDelegate: Dispatch<SetStateAction<boolean | null>>;
+  refetchDelegate: string | null;
+  setRefetchDelegate: Dispatch<SetStateAction<string | null>>;
 };
 
 const ConnectButtonContext = createContext<ConnectButtonContextType>({
@@ -21,7 +21,7 @@ export function useConnectButtonContext() {
 }
 
 const ConnectButtonProvider = ({ children }: { children: React.ReactNode }) => {
-  const [refetchDelegate, setRefetchDelegate] = useState<boolean | null>(null);
+  const [refetchDelegate, setRefetchDelegate] = useState<string | null>(null);
 
   return (
     <ConnectButtonContext.Provider

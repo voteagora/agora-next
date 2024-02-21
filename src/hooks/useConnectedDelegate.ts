@@ -1,4 +1,4 @@
-import { fetchConnectedDelegate, } from "@/app/delegates/actions";
+import { fetchConnectedDelegate, revalidateDelegateAddressPage } from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { useState, useCallback, useEffect } from "react";
@@ -24,6 +24,9 @@ const useConnectedDelegate = () => {
   const fetchDelegateAndSet = useCallback(async (address: string) => {
     if (address) {
       const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address);
+      if (refetchDelegate) {
+        revalidateDelegateAddressPage(refetchDelegate);
+      }
       setLastVotingPower(delegate.votingPower);
       setDelegate(delegate);
       setAdvancedDelegators(advancedDelegators);
@@ -39,7 +42,7 @@ const useConnectedDelegate = () => {
           const _retries = retries + 1;
           setRetries(_retries);
         } else {
-          setRefetchDelegate(false);
+          setRefetchDelegate(null);
           setRetries(0);
         }
       }

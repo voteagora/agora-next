@@ -26,6 +26,7 @@ import { OptimismContracts } from "@/lib/contracts/contracts";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
+import { useParams } from "next/navigation";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -51,6 +52,7 @@ export function AdvancedDelegateDialog({
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
+  const params = useParams<{ addressOrENSName: string }>();
 
   const getOpBalance = async (address: `0x${string}`) => {
     const balance = await OptimismContracts.token.contract.balanceOf(address);
@@ -154,7 +156,9 @@ export function AdvancedDelegateDialog({
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });
     setIsLoading(false);
-    setRefetchDelegate(true);
+    setRefetchDelegate(
+      params?.addressOrENSName ? params?.addressOrENSName : (address as string)
+    );
   };
 
   return (
