@@ -3,36 +3,33 @@
 import { MobileConnectButton } from "./MobileConnectButton";
 import { DesktopConnectButton } from "./DesktopConnectButton";
 import { useNetwork } from "wagmi";
-import { Button } from "@/components/ui/button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useEffect } from "react";
+import { useModal } from "connectkit";
 
 export function ConnectButton() {
+  const chainIdMainnet = 1;
   const chainIdOP = 10;
   const { chain } = useNetwork();
   const openDialog = useOpenDialog();
+  const { setOpen } = useModal();
+
+  useEffect(() => {
+    if (chain?.id === chainIdMainnet) {
+      setOpen(false);
+      openDialog({
+        type: "SWITCH_NETWORK",
+        params: {
+          chainId: chainIdOP,
+        },
+      });
+    }
+  }, [chain?.id, openDialog]);
 
   return (
     <div>
-      {chain?.id !== chainIdOP ? (
-        <Button
-          className="bg-red-700 hover:bg-red-600 text-xs sm:text-base p-2 sm:p-auto"
-          onClick={() =>
-            openDialog({
-              type: "SWITCH_NETWORK",
-              params: {
-                chainId: chainIdOP,
-              },
-            })
-          }
-        >
-          Wrong network
-        </Button>
-      ) : (
-        <>
-          <MobileConnectButton />
-          <DesktopConnectButton />
-        </>
-      )}
+      <MobileConnectButton />
+      <DesktopConnectButton />
     </div>
   );
 }
