@@ -6,7 +6,7 @@ const DraftProposalSponsorNote: React.FC = () => {
   return (
     <div className="w-[350px] flex-shrink-0 bg-[#FAFAF2] rounded-2xl ring-inset ring-1 ring-[#ECE3CA] text-[#B16B19] p-6">
       <div className="flex flex-row items-center mb-4">
-        <div className="p-2 border rounded-md border-[#ECE3CA] flex-shrink-0 mr-3">
+        <div className="p-2 border rounded-md border-[#ECE3CA] flex-shrink-0 mr-3 shadow-sm">
           <Image
             src={icons.usersEdit}
             alt="Upload icon"
