@@ -4,8 +4,8 @@ import React from "react";
 
 const DraftProposalSponsorNote: React.FC = () => {
   return (
-    <div className="w-[350px] flex-shrink-0 bg-[#FAFAF2] rounded-2xl ring-inset ring-1 ring-[#ECE3CA] text-[#B16B19] p-6">
-      <div className="flex flex-row items-center mb-4">
+    <div className="flex flex-col gap-y-4 w-[350px] flex-shrink-0 bg-[#FAFAF2] rounded-2xl ring-inset ring-1 ring-[#ECE3CA] text-[#B16B19] p-6">
+      <div className="flex flex-row items-center">
         <div className="p-2 border rounded-md border-[#ECE3CA] flex-shrink-0 mr-3 shadow-sm">
           <Image
             src={icons.usersEdit}
@@ -21,8 +21,11 @@ const DraftProposalSponsorNote: React.FC = () => {
       <p className="opacity-70">
         The proposer has created a draft proposal, but might not meet the
         proposal threshold to submit it themselves. They’d like you to help them
-        submit it. If you choose to do so, this proposal will be marked as
-        “submitted by nick.eth, authored by kartpatkey.eth”
+        submit it.
+      </p>
+      <p className="opacity-70">
+        If you choose to do so, this proposal will be marked as “submitted by
+        nick.eth, authored by kartpatkey.eth”
       </p>
     </div>
   );
