@@ -11,11 +11,12 @@ import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
-import { cn, formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 import { disapprovalThreshold } from "@/lib/constants";
 import { getCurrentDelegators } from "@/app/api/delegations/getDelegations";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 import { formatUnits } from "ethers";
+import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -107,9 +108,7 @@ export default async function OPProposalPage({ proposal }) {
           <VStack gap={4} className={styles.proposal_actions_panel}>
             <div>
               <div className={styles.proposal_header}>Proposal votes</div>
-              <div
-                className={cn(styles.proposal_votes_summary_container, "!py-4")}
-              >
+              <div className={styles.proposal_votes_summary_container}>
                 {proposal.status === "CANCELLED" ? (
                   <p className="text-red-negative">
                     This proposal has been cancelled
@@ -134,6 +133,12 @@ export default async function OPProposalPage({ proposal }) {
                     </p>
                   </div>
                 )}
+                <HStack className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md justify-end font-medium">
+                  <ProposalTimeStatus
+                    proposalStatus={proposal.status}
+                    proposalEndTime={proposal.end_time}
+                  />
+                </HStack>
               </div>
             </div>
             {/* Show the scrolling list of votes for the proposal */}
