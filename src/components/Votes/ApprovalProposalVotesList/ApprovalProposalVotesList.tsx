@@ -156,7 +156,7 @@ function SingleVote({ vote }: { vote: Vote }) {
           <p
             key={index}
             className={
-              "whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
+              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
             }
           >
             {++index}. {option}
