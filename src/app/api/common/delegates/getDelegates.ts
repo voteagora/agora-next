@@ -52,7 +52,7 @@ export async function getDelegatesForNamespace({
             SELECT *
             FROM ${namespace + ".delegates"}
             WHERE voting_power > 0
-            ORDER BY md5(CAST(delegate AS TEXT) || CAST($1 AS TEXT))
+            ORDER BY md5(CAST(delegate AS TEXT) || CAST($1 AS TEXT)), -log(random()) / voting_power
             OFFSET $2
             LIMIT $3;
             `,
