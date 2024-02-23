@@ -17,7 +17,7 @@ type citizen = {
 export async function getCitizensForNamespace({
   page = 1,
   sort = "shuffle",
-  seed = Math.random(),
+  seed,
   namespace,
 }: {
   page: number;
@@ -32,16 +32,15 @@ export async function getCitizensForNamespace({
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
-            SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power, setseed($1)::Text
-            FROM agora.address_metadata address_metadata
-            JOIN ${
-              namespace + ".delegates"
-            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
-            WHERE address_metadata.kind = 'citizen' 
-            AND address_metadata.dao_slug = 'OP'
-            ORDER BY random()
-            OFFSET $2
-            LIMIT $3;
+          SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
+          FROM agora.address_metadata address_metadata
+          JOIN ${namespace + ".delegates"
+          } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+          WHERE address_metadata.kind = 'citizen' 
+          AND address_metadata.dao_slug = 'OP'
+          ORDER BY md5(CAST(address_metadata.address AS TEXT) || CAST($1 AS TEXT))
+          OFFSET $2
+          LIMIT $3;        
             `,
           seed,
           skip,
@@ -52,9 +51,8 @@ export async function getCitizensForNamespace({
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM agora.address_metadata address_metadata
-            JOIN ${
-              namespace + ".delegates"
-            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+            JOIN ${namespace + ".delegates"
+          } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
             ORDER BY delegate.voting_power DESC
@@ -91,5 +89,6 @@ export async function getCitizensForNamespace({
   return {
     meta,
     delegates: citizens,
+    seed,
   };
 }
