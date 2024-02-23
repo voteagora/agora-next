@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { Checkbox } from "../ui/checkbox";
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { ProposalDraftWithTransactions } from "./types";
 
 interface DraftProposalFormSubmitChecklistProps {

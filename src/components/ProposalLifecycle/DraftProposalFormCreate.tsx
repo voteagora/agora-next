@@ -8,8 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
-
 import DraftProposalAbstract from "./DraftProposalAbstract";
 import DraftProposalTypeChoice from "./DraftProposalTypeChoice";
 import DraftProposalTransaction from "./DraftProposalTransaction";

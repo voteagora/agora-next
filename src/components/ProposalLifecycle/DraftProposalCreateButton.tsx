@@ -1,4 +1,3 @@
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { Checkbox } from "../ui/checkbox";
 import { useContext, useState } from "react";
 import { ProposalDraftWithTransactions } from "./types";

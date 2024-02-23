@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useContext, useEffect } from "react";
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 

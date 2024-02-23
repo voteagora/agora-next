@@ -3,7 +3,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";

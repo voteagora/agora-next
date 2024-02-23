@@ -8,7 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 

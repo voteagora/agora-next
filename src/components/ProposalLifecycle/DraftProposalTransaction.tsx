@@ -1,4 +1,3 @@
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { icons } from "@/icons/icons";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
@@ -160,6 +159,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
           <DraftProposalTransactionValidity
             label="Transaction validity"
             placeholder="Permits depositing ETH on Compound v3"
+            proposalState={proposalState}
           />
           <DraftProposalTransactionAuditPayload />
         </div>
@@ -236,18 +236,17 @@ const DraftProposalTransactionInput: React.FC<
 interface DraftProposalTransactionValidityProps {
   label: string;
   placeholder: string;
+  proposalState: ProposalDraftWithTransactions;
 }
 
 const DraftProposalTransactionValidity: React.FC<
   DraftProposalTransactionValidityProps
 > = (props) => {
-  const { label, placeholder } = props;
+  const { label, placeholder, proposalState } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"Unconfirmed" | "Valid" | "Invalid">(
     "Unconfirmed"
   );
-
-  const { proposalState } = useContext(ProposalLifecycleDraftContext);
 
   async function simulate() {
     // call tha backend /simulate endpoint

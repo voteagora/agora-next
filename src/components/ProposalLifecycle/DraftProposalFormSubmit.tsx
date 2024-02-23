@@ -8,7 +8,6 @@ import {
 import DraftProposalReview from "./DraftProposalReview";
 import { ProposalDraft } from "@prisma/client";
 import { LinkIcon } from "@heroicons/react/20/solid";
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import toast from "react-hot-toast";
 import { ProposalDraftWithTransactions } from "./types";
 
