@@ -174,27 +174,22 @@ export const ProposalLifecycleDraftProvider = ({
   const [proposalState, dispatch] = useReducer(reducer, initialState);
 
   const updateTempCheckLink = (tempCheckLink: string) => {
-    localStorage.setItem("new-proposal-draft-tempcheck-link", tempCheckLink);
     dispatch({ type: "UPDATE_TEMP_CHECK_LINK", payload: tempCheckLink });
   };
 
   const updateProposalType = (proposalType: "executable" | "social") => {
-    localStorage.setItem("new-proposal-draft-proposal-type", proposalType);
     dispatch({ type: "UPDATE_PROPOSAL_TYPE", payload: proposalType });
   };
 
   const updateTitle = (title: string) => {
-    localStorage.setItem("new-proposal-draft-title", title);
     dispatch({ type: "UPDATE_TITLE", payload: title });
   };
 
   const updateDescription = (description: string) => {
-    localStorage.setItem("new-proposal-draft-description", description);
     dispatch({ type: "UPDATE_DESCRIPTION", payload: description });
   };
 
   const updateAbstract = (abstract: string) => {
-    localStorage.setItem("new-proposal-draft-abstract", abstract);
     dispatch({ type: "UPDATE_ABSTRACT", payload: abstract });
   };
 
@@ -242,37 +237,6 @@ export const ProposalLifecycleDraftProvider = ({
   ) => {
     dispatch({ type: "UPDATE_PROPOSAL_STATUS", payload: proposalStatus });
   };
-
-  useEffect(() => {
-    const tempCheckLink = localStorage.getItem(
-      "new-proposal-draft-tempcheck-link"
-    );
-    if (tempCheckLink) {
-      updateTempCheckLink(tempCheckLink);
-    }
-
-    const proposalType = localStorage.getItem(
-      "new-proposal-draft-proposal-type"
-    );
-    if (proposalType) {
-      updateProposalType(proposalType as "executable" | "social");
-    }
-
-    const title = localStorage.getItem("new-proposal-draft-title");
-    if (title) {
-      updateTitle(title);
-    }
-
-    const description = localStorage.getItem("new-proposal-draft-description");
-    if (description) {
-      updateDescription(description);
-    }
-
-    const abstract = localStorage.getItem("new-proposal-draft-abstract");
-    if (abstract) {
-      updateAbstract(abstract);
-    }
-  }, []);
 
   return (
     <ProposalLifecycleDraftContext.Provider

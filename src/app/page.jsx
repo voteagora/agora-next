@@ -10,6 +10,8 @@ import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 import { getMetrics } from "./api/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
 import { getProposals } from "./api/proposals/getProposals";
+import { ProposalDraft } from "@prisma/client";
+import prisma from "@/app/lib/prisma";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -35,6 +37,28 @@ async function fetchVotableSupply() {
   "use server";
 
   return getVotableSupply();
+}
+
+async function createProposal() {
+  "use server";
+
+  const proposal = await prisma.proposalDraft.create({
+    data: {
+      temp_check_link: "",
+      proposal_type: "executable",
+      title: "TEST PROPOSAL 1",
+      description: "test",
+      abstract: "test",
+      audit_url: "test",
+      update_ens_docs_status: true,
+      post_on_discourse_status: true,
+      dao: "ens",
+      proposal_status: "draft",
+      author_address: "0x123",
+    },
+  });
+
+  return proposal;
 }
 
 export async function generateMetadata({}, parent) {
@@ -82,6 +106,7 @@ export default async function Home({ searchParams }) {
           return getProposals({ filter, page });
         }}
         votableSupply={votableSupply}
+        createProposal={createProposal}
       />
     </VStack>
   );

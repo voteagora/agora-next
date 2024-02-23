@@ -1,21 +1,38 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
+import { ProposalDraft } from "@prisma/client";
 
 interface DraftProposalTypeChoiceProps {
   label: string;
   explanation: string;
+  proposal: ProposalDraft;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => void;
 }
 
 const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
   props
 ) => {
-  const { label, explanation } = props;
+  const { label, explanation, proposal, updateProposal } = props;
 
   const { proposalState, updateProposalType } = useContext(
     ProposalLifecycleDraftContext
   );
+
+  async function handleUpdateProposalType(
+    proposalType: "executable" | "social"
+  ) {
+    updateProposalType(proposalType);
+    updateProposal(proposal, { proposal_type: proposalType });
+  }
+
+  useEffect(() => {
+    updateProposalType(proposal.proposal_type);
+  }, [proposal]);
 
   return (
     <div className="flex flex-col px-6 mb-5">
@@ -28,7 +45,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
                 ? "bg-gray-fa"
                 : "text-gray-af"
             }`}
-            onClick={() => updateProposalType("executable")}
+            onClick={() => handleUpdateProposalType("executable")}
           >
             Executable
           </button>
@@ -38,7 +55,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
                 ? "bg-gray-fa"
                 : "text-gray-af"
             }`}
-            onClick={() => updateProposalType("social")}
+            onClick={() => handleUpdateProposalType("social")}
           >
             Social
           </button>

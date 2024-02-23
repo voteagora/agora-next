@@ -264,10 +264,17 @@ view OptimismVoterStats {
   @@schema("optimism")
 }
 
-view Proposal {
+enum ProposalDraftType {
+  executable
+  social
+
+  @@schema("test")
+}
+
+view ProposalDraft {
   id                     Int                      @id @default(autoincrement())
   temp_check_link        String
-  proposal_type          String                   @db.VarChar(50)
+  proposal_type          ProposalDraftType
   title                  String                   @db.VarChar(255)
   description            String
   abstract               String
@@ -277,13 +284,13 @@ view Proposal {
   dao                    String                   @db.VarChar(32)
   proposal_status        String                   @db.VarChar(32)
   author_address         String                   @db.VarChar(255)
-  transactions           ProposalTransaction[]
+  transactions           ProposalDraftTransaction[]
 
   @@map(name: "proposal")
   @@schema("test")
 }
 
-view ProposalTransaction {
+view ProposalDraftTransaction {
   id               Int      @id @default(autoincrement())
   proposal_id      Int
   order            Int
@@ -294,7 +301,7 @@ view ProposalTransaction {
   contract_abi     String
   description      String
   is_valid         Boolean
-  proposal         Proposal @relation(fields: [proposal_id], references: [id])
+  proposal         ProposalDraft @relation(fields: [proposal_id], references: [id])
 
   @@map(name: "proposal_transaction")
   @@schema("test")

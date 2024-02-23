@@ -4,6 +4,8 @@ import React, { useState, useContext } from "react";
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import { ProposalDraft } from "@prisma/client";
+import { DebounceInput } from "react-debounce-input";
 
 // example markdown to test with for the developer convenience :)
 
@@ -22,10 +24,15 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 interface DraftProposalAbstractProps {
   label: string;
   placeholder: string;
+  proposal: ProposalDraft;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => void;
 }
 
 const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
-  const { label, placeholder } = props;
+  const { label, placeholder, proposal, updateProposal } = props;
 
   // can be markdown
   const { proposalState, updateAbstract } = useContext(
@@ -35,18 +42,27 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
     "write"
   );
 
+  async function handleAbstractUpdate(abstract: string) {
+    updateAbstract(abstract);
+    updateProposal(proposal, { abstract: abstract });
+  }
+
   return (
     <div className="flex flex-col px-6 mb-5">
       <label className="font-medium text-sm mb-1">{label}</label>
       <div className="min-h-[215px] w-full border border-gray-eo rounded-t-lg bg-gray-fa">
         {selectedMode === "write" ? (
-          <textarea
+          /* @ts-expect-error Server Component */
+          <DebounceInput
+            element="textarea"
+            debounceTimeout={1000}
             className="py-3 px-4 border-0 placeholder-gray-af w-full bg-gray-fa rounded-t-lg focus:outline-none focus:ring-0 resize-none"
             placeholder={placeholder}
-            value={proposalState.abstract}
-            onChange={(e) => updateAbstract(e.target.value)}
+            value={proposal.abstract}
+            onChange={(e) => handleAbstractUpdate(e.target.value)}
             rows={8}
-          ></textarea>
+            forceNotifyByEnter={false}
+          />
         ) : (
           <div>
             <MarkdownPreview
