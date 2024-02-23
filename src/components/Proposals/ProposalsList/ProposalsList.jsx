@@ -26,14 +26,9 @@ export default function ProposalsList({
 
   const loadMore = async () => {
     if (fetching.current || !meta.hasNextPage) return;
-
     fetching.current = true;
-
     const data = await fetchProposals(meta.currentPage + 1);
-    const uniqueProposals = data.proposals.filter(
-      (p) => !proposals.some((existing) => existing.id === p.id)
-    );
-    setPages((prev) => [...prev, { ...data, proposals: uniqueProposals }]);
+    setPages((prev) => [...prev, { ...data, proposals: data.proposals }]);
     setMeta(data.meta);
     fetching.current = false;
   };
