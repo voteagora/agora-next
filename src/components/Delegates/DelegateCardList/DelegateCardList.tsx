@@ -19,13 +19,14 @@ export type DelegateChunk = Pick<
 >;
 
 interface DelegatePaginated {
+  seed: number;
   meta: any;
   delegates: DelegateChunk[];
 }
 
 interface Props {
   initialDelegates: DelegatePaginated;
-  fetchDelegates: (page: number) => Promise<DelegatePaginated>;
+  fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
@@ -34,32 +35,27 @@ export default function DelegateCardList({
   fetchDelegates,
 }: Props) {
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
+  const [delegates, setDelegates] = useState(initialDelegates.delegates);
   const { advancedDelegators } = useConnectedDelegate();
 
   useEffect(() => {
-    setPages([initialDelegates]);
+    setDelegates(initialDelegates.delegates);
     setMeta(initialDelegates.meta);
   }, [initialDelegates]);
 
   const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-      const data = await fetchDelegates(meta.currentPage + 1);
-
-      // TODO: This is a temporary fix to avoid duplicates when filtering by "Weighted random"
-      const uniqueDelegates = data.delegates.filter(
-        (d) => !delegates.some((existing) => existing.address === d.address)
+      const data = await fetchDelegates(
+        meta.currentPage + 1,
+        initialDelegates.seed
       );
-
-      setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
+      setDelegates(delegates.concat(data.delegates));
       setMeta(data.meta);
       fetching.current = false;
     }
   };
-
-  const delegates = pages.flatMap((page) => page.delegates);
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
@@ -69,7 +65,7 @@ export default function DelegateCardList({
       <InfiniteScroll
         className={styles.infinite_scroll}
         hasMore={meta.hasNextPage}
-        pageStart={0}
+        pageStart={1}
         loadMore={loadMore}
         loader={
           <div
@@ -81,7 +77,7 @@ export default function DelegateCardList({
         }
         element="div"
       >
-        {delegates.map((delegate, i) => {
+        {delegates.map((delegate) => {
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {

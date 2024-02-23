@@ -11,13 +11,13 @@ import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import { getCurrentDelegators } from "../api/delegations/getDelegations";
 import { TabsContent } from "@/components/ui/tabs";
 
-async function fetchCitizens(sort, page = 1, seed) {
+async function fetchCitizens(sort, seed, page = 1) {
   "use server";
 
   return getCitizens({ page, seed, sort });
 }
 
-async function fetchDelegates(sort, page = 1, seed) {
+async function fetchDelegates(sort, seed, page = 1) {
   "use server";
 
   return getDelegates({ page, seed, sort });
@@ -56,12 +56,15 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
-  const sort = delegatesFilterOptions[searchParams.orderBy]?.sort || delegatesFilterOptions.weightedRandom.sort;
+  const sort =
+    delegatesFilterOptions[searchParams.orderBy]?.sort ||
+    delegatesFilterOptions.weightedRandom.sort;
   const citizensSort =
-    citizensFilterOptions[searchParams.citizensOrderBy]?.value || citizensFilterOptions.shuffle.sort;
+    citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
+    citizensFilterOptions.shuffle.sort;
   const seed = Math.random();
-  const delegates = await fetchDelegates(sort);
-  const citizens = await fetchCitizens(citizensSort);
+  const delegates = await fetchDelegates(sort, seed);
+  const citizens = await fetchCitizens(citizensSort, seed);
   const metrics = await fetchDaoMetrics();
 
   return (
@@ -73,7 +76,7 @@ export default async function Page({ searchParams }) {
         <TabsContent value="delegates">
           <DelegateCardList
             initialDelegates={delegates}
-            fetchDelegates={async (page) => {
+            fetchDelegates={async (page, seed) => {
               "use server";
 
               return getDelegates({ page, seed, sort });
@@ -84,7 +87,7 @@ export default async function Page({ searchParams }) {
         <TabsContent value="citizens">
           <DelegateCardList
             initialDelegates={citizens}
-            fetchDelegates={async (page) => {
+            fetchDelegates={async (page, seed) => {
               "use server";
 
               return getCitizens({ page, seed, sort: citizensSort });

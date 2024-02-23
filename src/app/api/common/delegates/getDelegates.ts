@@ -20,7 +20,7 @@ type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
 export async function getDelegatesForNamespace({
   page = 1,
   sort = "weighted_random",
-  seed = Math.random(),
+  seed,
   namespace,
 }: {
   page: number;
@@ -49,10 +49,10 @@ export async function getDelegatesForNamespace({
         case "weighted_random":
           return prisma.$queryRawUnsafe<DelegatesGetPaylod[]>(
             `
-            SELECT *, setseed($1)::Text
+            SELECT *
             FROM ${namespace + ".delegates"}
             WHERE voting_power > 0
-            ORDER BY -log(random()) / voting_power
+            ORDER BY md5(CAST(delegate AS TEXT) || CAST($1 AS TEXT))
             OFFSET $2
             LIMIT $3;
             `,
@@ -93,6 +93,7 @@ export async function getDelegatesForNamespace({
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
     })),
+    seed
   };
 }
 
@@ -138,17 +139,14 @@ export async function getDelegateForNamespace({
     LEFT JOIN 
         (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1) a ON TRUE
     LEFT JOIN 
-      ${
-        namespace + ".advanced_voting_power"
-      } av ON av.delegate = $1 AND contract = $2
+      ${namespace + ".advanced_voting_power"
+    } av ON av.delegate = $1 AND contract = $2
     LEFT JOIN 
-        (SELECT num_of_delegators FROM ${
-          namespace + ".delegates"
-        } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${namespace + ".delegates"
+    } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN 
-        (SELECT * FROM ${
-          namespace + ".voting_power"
-        } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
+        (SELECT * FROM ${namespace + ".voting_power"
+    } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
     contracts(namespace).alligator.address.toLowerCase()
@@ -215,9 +213,9 @@ export async function getDelegateForNamespace({
       // Use cached amount when recalculation is expensive
       cachedNumOfDelegators < 1000n
         ? BigInt(
-            (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
-              "0"
-          )
+          (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
+          "0"
+        )
         : cachedNumOfDelegators,
     statement: delegateStatement,
   };
