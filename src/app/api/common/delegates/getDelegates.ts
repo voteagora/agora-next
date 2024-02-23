@@ -31,7 +31,7 @@ export async function getDelegatesForNamespace({
   const pageSize = 20;
 
   const { meta, data: delegates } = await paginatePrismaResult(
-    (skip: number, take: number) => {
+    async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
           return prisma[`${namespace}Delegates`].findMany({
@@ -47,12 +47,13 @@ export async function getDelegatesForNamespace({
             },
           });
         case "weighted_random":
+          await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
           return prisma.$queryRawUnsafe<DelegatesGetPaylod[]>(
             `
             SELECT *
             FROM ${namespace + ".delegates"}
             WHERE voting_power > 0
-            ORDER BY md5(CAST(delegate AS TEXT) || CAST($1 AS TEXT)), -log(random()) / voting_power
+            ORDER BY -log(random()) / voting_power
             OFFSET $2
             LIMIT $3;
             `,
@@ -93,7 +94,7 @@ export async function getDelegatesForNamespace({
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
     })),
-    seed
+    seed,
   };
 }
 
@@ -139,14 +140,17 @@ export async function getDelegateForNamespace({
     LEFT JOIN 
         (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1) a ON TRUE
     LEFT JOIN 
-      ${namespace + ".advanced_voting_power"
-    } av ON av.delegate = $1 AND contract = $2
+      ${
+        namespace + ".advanced_voting_power"
+      } av ON av.delegate = $1 AND contract = $2
     LEFT JOIN 
-        (SELECT num_of_delegators FROM ${namespace + ".delegates"
-    } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${
+          namespace + ".delegates"
+        } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN 
-        (SELECT * FROM ${namespace + ".voting_power"
-    } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
+        (SELECT * FROM ${
+          namespace + ".voting_power"
+        } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
     contracts(namespace).alligator.address.toLowerCase()
@@ -213,9 +217,9 @@ export async function getDelegateForNamespace({
       // Use cached amount when recalculation is expensive
       cachedNumOfDelegators < 1000n
         ? BigInt(
-          (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
-          "0"
-        )
+            (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
+              "0"
+          )
         : cachedNumOfDelegators,
     statement: delegateStatement,
   };
