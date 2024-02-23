@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 import MarkdownPreview from "@uiw/react-markdown-preview";
@@ -46,6 +46,10 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
     updateAbstract(abstract);
     updateProposal(proposal, { abstract: abstract });
   }
+
+  useEffect(() => {
+    updateAbstract(proposal.abstract);
+  }, [proposal]);
 
   return (
     <div className="flex flex-col px-6 mb-5">
