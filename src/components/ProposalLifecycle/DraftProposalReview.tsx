@@ -9,6 +9,7 @@ import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";
 import { ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
+import MarkdownPreview from "@uiw/react-markdown-preview";
 
 interface DraftProposalReviewProps {
   proposalState: ProposalDraftWithTransactions;
@@ -79,10 +80,17 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
           </div>
           <div className="flex flex-col gap-y-1 text-base">
             <label className="font-medium">Abstract</label>
-            {/* TODO in markdown */}
-            <p className="text-gray-4f max-w-[620px]">
-              {proposalState.abstract}
-            </p>
+            <MarkdownPreview
+              source={proposalState.abstract}
+              className="h-full py-3 rounded-t-lg max-w-[650px] bg-transparent"
+              // make background transparent
+              style={{
+                backgroundColor: "transparent",
+              }}
+              wrapperElement={{
+                "data-color-mode": "light",
+              }}
+            />
           </div>
         </div>
       </div>
