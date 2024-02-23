@@ -80,7 +80,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
                   key={index}
                   className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
                 >
-                  <p>// {transaction.description}</p>
+                  <p>{`// ${transaction.description}`}</p>
                   <p>{transaction.target}</p>
                   <p>{transaction.function_details}</p>
                   <p>{transaction.value}</p>
