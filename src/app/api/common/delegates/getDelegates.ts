@@ -20,7 +20,7 @@ type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
 export async function getDelegatesForNamespace({
   page = 1,
   sort = "weighted_random",
-  seed = Math.random(),
+  seed,
   namespace,
 }: {
   page: number;
@@ -31,7 +31,7 @@ export async function getDelegatesForNamespace({
   const pageSize = 20;
 
   const { meta, data: delegates } = await paginatePrismaResult(
-    (skip: number, take: number) => {
+    async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
           return prisma[`${namespace}Delegates`].findMany({
@@ -47,9 +47,10 @@ export async function getDelegatesForNamespace({
             },
           });
         case "weighted_random":
+          await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
           return prisma.$queryRawUnsafe<DelegatesGetPaylod[]>(
             `
-            SELECT *, setseed($1)::Text
+            SELECT *
             FROM ${namespace + ".delegates"}
             WHERE voting_power > 0
             ORDER BY -log(random()) / voting_power
@@ -93,6 +94,7 @@ export async function getDelegatesForNamespace({
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
     })),
+    seed,
   };
 }
 

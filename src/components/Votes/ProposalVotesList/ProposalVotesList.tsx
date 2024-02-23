@@ -50,32 +50,6 @@ export default function ProposalVotesList({
     []
   );
 
-  const proposalVotes = pages.reduce(
-    (all, page) => all.concat(page.votes),
-    [] as Vote[]
-  );
-
-  const loadMore = useCallback(
-    async (page: number) => {
-      if (!fetching.current && meta.hasNextPage) {
-        fetching.current = true;
-        const data = await fetchProposalVotes(proposal_id, page);
-        const existingIds = new Set(
-          proposalVotes.map((v) => v.transactionHash)
-        );
-        const uniqueVotes = data.votes.filter(
-          (v) => !existingIds.has(v.transactionHash)
-        );
-        setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
-        setMeta(data.meta);
-        fetching.current = false;
-      }
-    },
-    [proposal_id, meta, proposalVotes]
-  );
-
-  const { isAdvancedUser } = useIsAdvancedUser();
-
   useEffect(() => {
     if (connectedAddress) {
       fetchUserVoteAndSet(proposal_id, connectedAddress);
@@ -84,12 +58,29 @@ export default function ProposalVotesList({
     }
   }, [connectedAddress, fetchUserVoteAndSet, proposal_id]);
 
+  const proposalVotes = pages.reduce(
+    (all, page) => all.concat(page.votes),
+    [] as Vote[]
+  );
+
+  const loadMore = useCallback(async () => {
+    if (!fetching.current && meta.hasNextPage) {
+      fetching.current = true;
+      const data = await fetchProposalVotes(proposal_id, meta.currentPage + 1);
+      setPages((prev) => [...prev, { ...data, votes: data.votes }]);
+      setMeta(data.meta);
+      fetching.current = false;
+    }
+  }, [proposal_id, meta, proposalVotes]);
+
+  const { isAdvancedUser } = useIsAdvancedUser();
+
   return (
     <div className={styles.vote_container}>
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={meta.hasNextPage}
-        pageStart={1}
+        pageStart={0}
         loadMore={loadMore}
         useWindow={false}
         loader={
