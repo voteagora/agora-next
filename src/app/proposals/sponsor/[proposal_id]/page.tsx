@@ -1,13 +1,19 @@
 import React from "react";
 import prisma from "@/app/lib/prisma";
-import { Proposal } from "@prisma/client";
 import DraftProposalSponsorNote from "@/components/ProposalLifecycle/DraftProposalSponsorNote";
 import DraftProposalSponsorReview from "@/components/ProposalLifecycle/DraftProposalSponsorReview";
+import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
+import { ProposalDraft } from "@prisma/client";
 
-async function getProposal(proposal_id: string): Promise<Proposal | null> {
-  const proposal = await prisma.proposal.findUnique({
+async function getProposal(
+  proposal_id: string
+): Promise<ProposalDraftWithTransactions | null> {
+  const proposal = await prisma.proposalDraft.findUnique({
     where: {
       id: Number(proposal_id),
+    },
+    include: {
+      transactions: true,
     },
   });
 
@@ -15,19 +21,17 @@ async function getProposal(proposal_id: string): Promise<Proposal | null> {
 }
 
 async function updateProposal(
-  proposal: Proposal,
-  updateData: Partial<Proposal>
-): Promise<Proposal> {
+  proposal: ProposalDraft,
+  updateData: Partial<ProposalDraft>
+): Promise<ProposalDraft> {
   "use server";
 
-  const updatedProposal = await prisma.proposal.update({
+  const updatedProposal = await prisma.proposalDraft.update({
     where: {
       id: proposal.id,
     },
     data: updateData,
   });
-
-  console.log("updatedProposal", updatedProposal);
 
   return updatedProposal;
 }
