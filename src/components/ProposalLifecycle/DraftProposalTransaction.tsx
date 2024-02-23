@@ -100,6 +100,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   label="Target"
                   placeholder="address"
                   updateTransaction={updateTransaction}
+                  setProposalState={setProposalState}
                   value={transactions[index].target}
                   field="target"
                 />
@@ -108,6 +109,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   label="Value"
                   placeholder="ETH amount"
                   updateTransaction={updateTransaction}
+                  setProposalState={setProposalState}
                   value={transactions[index].value}
                   field="value"
                 />
@@ -118,6 +120,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   label="Calldata"
                   placeholder="bytes"
                   updateTransaction={updateTransaction}
+                  setProposalState={setProposalState}
                   value={transactions[index].calldata}
                   field="calldata"
                 />
@@ -126,6 +129,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   label="Function details"
                   placeholder="transfer(to, amount)"
                   updateTransaction={updateTransaction}
+                  setProposalState={setProposalState}
                   value={transactions[index].function_details}
                   field="function_details"
                 />
@@ -135,6 +139,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 label="Contract ABI"
                 placeholder="ABI"
                 updateTransaction={updateTransaction}
+                setProposalState={setProposalState}
                 value={transactions[index].contract_abi}
                 field="contract_abi"
               />
@@ -143,6 +148,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 label="Transaction description"
                 placeholder="Permits depositing ETH on Compound v3"
                 updateTransaction={updateTransaction}
+                setProposalState={setProposalState}
                 value={transactions[index].description}
                 field="description"
               />
@@ -172,6 +178,9 @@ interface DraftProposalTransactionInputProps {
     transactionId: number,
     data: Partial<ProposalDraftTransaction>
   ) => Promise<ProposalDraftTransaction>;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
   value: string;
   field: keyof ProposalDraftTransaction;
 }
@@ -179,11 +188,33 @@ interface DraftProposalTransactionInputProps {
 const DraftProposalTransactionInput: React.FC<
   DraftProposalTransactionInputProps
 > = (props) => {
-  const { id, label, placeholder, updateTransaction, value, field } = props;
+  const {
+    id,
+    label,
+    placeholder,
+    updateTransaction,
+    setProposalState,
+    value,
+    field,
+  } = props;
 
   async function handleUpdateTransaction(newValue: string) {
-    updateTransaction(id, {
+    const updatedTransaction = await updateTransaction(id, {
       [field]: newValue,
+    });
+
+    setProposalState((prevState) => {
+      const newTransactions = prevState.transactions.map((transaction) => {
+        if (transaction.id === id) {
+          return updatedTransaction;
+        }
+        return transaction;
+      });
+
+      return {
+        ...prevState,
+        transactions: newTransactions,
+      };
     });
   }
 
