@@ -46,15 +46,15 @@ async function createProposal() {
     data: {
       temp_check_link: "",
       proposal_type: "executable",
-      title: "TEST PROPOSAL 1",
-      description: "test",
-      abstract: "test",
-      audit_url: "test",
+      title: "",
+      description: "",
+      abstract: "",
+      audit_url: "",
       update_ens_docs_status: true,
       post_on_discourse_status: true,
       dao: "ens",
       proposal_status: "draft",
-      author_address: "0x123",
+      author_address: "",
     },
   });
 
