@@ -3,7 +3,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { useEnsAddress, useEnsAvatar } from "wagmi";
 import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";

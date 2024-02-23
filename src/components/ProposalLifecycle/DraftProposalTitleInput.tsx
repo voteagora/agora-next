@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useContext } from "react";
-import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 
 import { ProposalDraft } from "@prisma/client";
 import { DebounceInput } from "react-debounce-input";
