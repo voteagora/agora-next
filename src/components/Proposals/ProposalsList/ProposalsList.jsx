@@ -15,6 +15,7 @@ export default function ProposalsList({
   initialProposals,
   fetchProposals,
   votableSupply,
+  createProposal,
 }) {
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialProposals] || []);
@@ -49,7 +50,7 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
           <ProposalsFilter />
-          <CreateProposalButton />
+          <CreateProposalButton createProposal={createProposal} />
         </div>
       </div>
 

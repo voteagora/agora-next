@@ -1,14 +1,21 @@
-"use client";
+import { ProposalDraft } from "@prisma/client";
 
-import Link from "next/link";
+interface CreateProposalButtonProps {
+  createProposal: () => Promise<ProposalDraft>;
+}
 
-export default function CreateProposalButton() {
+export default function CreateProposalButton(props: CreateProposalButtonProps) {
+  const { createProposal } = props;
+
   return (
-    <Link
-      href="/proposals/draft/new"
+    <button
       className={`w-full md:w-fit bg-stone-900 text-white text-base font-medium border border-stone-100 rounded-full py-2 px-4 flex items-center`}
+      onClick={async () => {
+        const proposal = await createProposal();
+        window.location.href = `/proposals/draft/${proposal.id}`;
+      }}
     >
-      Create Proposal
-    </Link>
+      Create proposal
+    </button>
   );
 }

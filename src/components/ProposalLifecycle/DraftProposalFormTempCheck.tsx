@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion-proposal-draft";
 
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
-import { Proposal } from "@prisma/client";
+import { ProposalDraft } from "@prisma/client";
 
 const staticText = {
   heading: "Create a temp check on Discourse",
@@ -21,8 +21,11 @@ interface DraftProposalFormTempCheckProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
-  proposal: Proposal;
-  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+  proposal: ProposalDraft;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => void;
 }
 
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
@@ -85,7 +88,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
                 "border-red-500 text-red-500"
               }`}
               placeholder="https://discuss.ens.domains/t/..."
-              value={proposalState.tempCheckLink}
+              defaultValue={proposal.temp_check_link || ""}
               onChange={(e) => updateTempCheckLink(e.target.value)}
             ></input>
             <div className="flex flex-row gap-x-6">

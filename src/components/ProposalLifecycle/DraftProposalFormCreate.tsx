@@ -16,7 +16,7 @@ import DraftProposalTransaction from "./DraftProposalTransaction";
 import DraftProposalCreateButton from "./DraftProposalCreateButton";
 import DraftProposalTitleInput from "./DraftProposalTitleInput";
 import DraftProposalDescriptionInput from "./DraftProposalDescriptionInput";
-import { Proposal } from "@prisma/client";
+import { ProposalDraft } from "@prisma/client";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -41,8 +41,11 @@ interface DraftProposalFormCreateProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
-  proposal: Proposal;
-  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+  proposal: ProposalDraft;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => void;
 }
 
 const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
@@ -64,18 +67,26 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           <DraftProposalTypeChoice
             label="Proposal type"
             explanation={staticText.proposalTypeExplanation}
+            proposal={props.proposal}
+            updateProposal={props.updateProposal}
           />
           <DraftProposalTitleInput
             label="Title"
             placeholder={staticText.proposalTitlePlaceholder}
+            proposal={props.proposal}
+            updateProposal={props.updateProposal}
           />
           <DraftProposalDescriptionInput
             label="Description"
             placeholder={staticText.proposalDescriptionPlaceholder}
+            proposal={props.proposal}
+            updateProposal={props.updateProposal}
           />
           <DraftProposalAbstract
             label="Abstract"
             placeholder={staticText.proposalAbstractPlaceholder}
+            proposal={props.proposal}
+            updateProposal={props.updateProposal}
           />
           <DraftProposalTransaction
             label="Proposed transaction"
