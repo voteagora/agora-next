@@ -31,6 +31,8 @@ interface DraftProposalFormTempCheckProps {
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   props
 ) => {
+  const { setStage, proposalState, updateProposal } = props;
+
   const validateTempCheckLink = (link: string) => {
     // check if starts with "https://discuss.ens.domains/"
     const discourseLinkRegex = /^https:\/\/discuss.ens.domains/;
@@ -38,13 +40,11 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
     return discourseLinkRegex.test(link);
   };
 
-  const { setStage, proposalState, updateProposal } = props;
-
   const [tempCheckInput, setTempCheckInput] = useState(
     proposalState.temp_check_link
   );
   const [isValidDiscourseLink, setIsValidDiscourseLink] = useState(
-    validateTempCheckLink(tempCheckInput)
+    validateTempCheckLink(proposalState.temp_check_link)
   );
 
   const saveAndContinue = async () => {
@@ -61,6 +61,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
 
   function handleNewTempCheckLink(link: string) {
     setTempCheckInput(link);
+    setIsValidDiscourseLink(validateTempCheckLink(link));
   }
 
   return (
