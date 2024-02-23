@@ -60,7 +60,7 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
           />
         </AccordionContent>
       </AccordionItem>
-      {proposalState.proposal_status == "awaiting_sponsor" && (
+      {proposalState.proposal_status == "sponsor_requested" && (
         <div className="flex flex-col gap-y-2 p-6">
           <p className="text-stone-700">
             {
