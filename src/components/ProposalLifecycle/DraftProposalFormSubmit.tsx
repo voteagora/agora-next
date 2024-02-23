@@ -6,10 +6,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 import DraftProposalReview from "./DraftProposalReview";
-import { Proposal } from "@prisma/client";
+import { ProposalDraft } from "@prisma/client";
 import { LinkIcon } from "@heroicons/react/20/solid";
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import toast from "react-hot-toast";
+import { ProposalDraftWithTransactions } from "./types";
 
 const staticText = {
   description:
@@ -17,20 +18,24 @@ const staticText = {
 };
 
 interface DraftProposalFormSubmitProps {
-  proposal: Proposal;
-  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => Promise<ProposalDraft>;
 }
 
 const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
   props
 ) => {
-  const { proposalState } = useContext(ProposalLifecycleDraftContext);
-
-  const { proposal, updateProposal } = props;
+  const { proposalState, setProposalState, updateProposal } = props;
 
   const handleCopySponsorsipLink = () => {
     navigator.clipboard.writeText(
-      `${window.location.origin}/proposals/sponsor/${proposal.id}`
+      `${window.location.origin}/proposals/sponsor/${proposalState.id}`
     );
     toast("Proposal link copied to clipboard!");
   };
@@ -49,12 +54,13 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
             {staticText.description}
           </p>
           <DraftProposalReview
-            proposal={proposal}
+            proposalState={proposalState}
+            setProposalState={setProposalState}
             updateProposal={updateProposal}
           />
         </AccordionContent>
       </AccordionItem>
-      {proposalState.proposalStatus == "awaiting_sponsor" && (
+      {proposalState.proposal_status == "awaiting_sponsor" && (
         <div className="flex flex-col gap-y-2 p-6">
           <p className="text-stone-700">
             {

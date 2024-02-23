@@ -74,7 +74,8 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit
-          proposal={proposal}
+          proposalState={proposalState}
+          setProposalState={setProposalState}
           updateProposal={updateProposal}
         />
       </Accordion>

@@ -1,7 +1,8 @@
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { Checkbox } from "../ui/checkbox";
 import { useContext, useState } from "react";
-import { Proposal } from "@prisma/client";
+import { ProposalDraftWithTransactions } from "./types";
+import { ProposalDraft } from "@prisma/client";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -9,32 +10,50 @@ interface DraftProposalCreateButtonProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
-  proposal: Proposal;
-  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => Promise<ProposalDraft>;
 }
 
 const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   props
 ) => {
-  const { description, checkmarkInfo, setStage, proposal, updateProposal } =
-    props;
-
-  const { proposalState, updateENSDocsStatus, updateDiscourseStatus } =
-    useContext(ProposalLifecycleDraftContext);
+  const {
+    description,
+    checkmarkInfo,
+    setStage,
+    proposalState,
+    setProposalState,
+    updateProposal,
+  } = props;
 
   const saveAndContinue = async () => {
-    // currently updates optimistically, notice no await
-    const updateData = {
-      proposal_type: proposalState.proposalType,
-      title: proposalState.title,
-      description: proposalState.description,
-      abstract: proposalState.abstract,
-      update_ens_docs_status: proposalState.updateENSDocsStatus,
-      post_on_discourse_status: proposalState.postOnDiscourseStatus,
-    };
-    updateProposal(proposal, updateData);
+    // TODO save / run validation etc
 
     setStage("draft-submit");
+  };
+
+  const handleChangeUpdateENSDocsStatus = () => {
+    setProposalState({
+      ...proposalState,
+      update_ens_docs_status: !proposalState.update_ens_docs_status,
+    });
+
+    // TODO sync with DB after we make the decision with ENS
+  };
+
+  const handleChangePostOnDiscourseStatus = () => {
+    setProposalState({
+      ...proposalState,
+      post_on_discourse_status: !proposalState.post_on_discourse_status,
+    });
+
+    // TODO sync with DB after we make the decision with ENS
   };
 
   return (
@@ -48,7 +67,8 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
             disabled={
               !proposalState.title ||
               !proposalState.description ||
-              !proposalState.abstract
+              !proposalState.abstract ||
+              proposalState.transactions.length === 0
             }
           >
             <span className="text-center">Create draft</span>
@@ -61,20 +81,16 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <p className="text-gray-4f pr-5">Update ENS docs</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
           <Checkbox
-            checked={proposalState.updateENSDocsStatus}
-            onCheckedChange={() =>
-              updateENSDocsStatus(!proposalState.updateENSDocsStatus)
-            }
+            checked={proposalState.update_ens_docs_status}
+            onCheckedChange={() => handleChangeUpdateENSDocsStatus()}
           />
         </div>
         <div className="flex flex-row w-full items-center">
           <p className="text-gray-4f pr-5">Post draft on discourse</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
           <Checkbox
-            checked={proposalState.postOnDiscourseStatus}
-            onCheckedChange={() =>
-              updateDiscourseStatus(!proposalState.postOnDiscourseStatus)
-            }
+            checked={proposalState.update_ens_docs_status}
+            onCheckedChange={() => handleChangePostOnDiscourseStatus()}
           />
         </div>
       </div>
