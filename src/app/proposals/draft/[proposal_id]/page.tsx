@@ -2,12 +2,20 @@ import DraftProposalChecklist from "@/components/ProposalLifecycle/DraftProposal
 import DraftProposalForm from "@/components/ProposalLifecycle/DraftProposalForm";
 import React from "react";
 import prisma from "@/app/lib/prisma";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 
-async function getProposal(proposal_id: string): Promise<ProposalDraft | null> {
+async function getProposal(
+  proposal_id: string
+): Promise<ProposalDraftWithTransactions | null> {
+  "use server";
+
   const proposal = await prisma.proposalDraft.findUnique({
     where: {
       id: Number(proposal_id),
+    },
+    include: {
+      transactions: true,
     },
   });
 
@@ -32,6 +40,52 @@ async function updateProposal(
   return updatedProposal;
 }
 
+async function addTransaction(
+  proposalId: number
+): Promise<ProposalDraftTransaction> {
+  "use server";
+
+  const count = await prisma.proposalDraftTransaction.count({
+    where: {
+      proposal_id: proposalId,
+    },
+  });
+
+  const transaction = await prisma.proposalDraftTransaction.create({
+    data: {
+      proposal_id: proposalId,
+      order: count,
+      target: "",
+      value: "",
+      calldata: "",
+      function_details: "",
+      contract_abi: "",
+      description: "",
+      is_valid: false,
+    },
+  });
+
+  return transaction;
+}
+
+async function updateTransaction(
+  transactionId: number,
+  data: Partial<ProposalDraftTransaction>
+): Promise<ProposalDraftTransaction> {
+  "use server";
+
+  const transaction = await prisma.proposalDraftTransaction.update({
+    where: {
+      id: transactionId,
+    },
+    data: data,
+  });
+
+  console.log("transaction", transaction);
+
+  return transaction;
+}
+
 export default async function DraftProposalPage({
   params: { proposal_id },
 }: {
@@ -49,7 +103,10 @@ export default async function DraftProposalPage({
     <div className="flex flex-row gap-x-6 pt-9 items-start max-w-screen-xl mx-auto">
       <DraftProposalForm
         proposal={proposalDraft}
+        getProposal={getProposal}
         updateProposal={updateProposal}
+        addTransaction={addTransaction}
+        updateTransaction={updateTransaction}
       />
       <DraftProposalChecklist />
     </div>

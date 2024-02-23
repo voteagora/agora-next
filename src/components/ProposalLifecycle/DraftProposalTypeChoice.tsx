@@ -3,36 +3,44 @@
 import React, { useContext, useEffect } from "react";
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
 import { ProposalDraft } from "@prisma/client";
+import { ProposalDraftWithTransactions } from "./types";
 
 interface DraftProposalTypeChoiceProps {
   label: string;
   explanation: string;
-  proposal: ProposalDraft;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
   updateProposal: (
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
-  ) => void;
+  ) => Promise<ProposalDraft>;
 }
 
 const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
   props
 ) => {
-  const { label, explanation, proposal, updateProposal } = props;
-
-  const { proposalState, updateProposalType } = useContext(
-    ProposalLifecycleDraftContext
-  );
+  const {
+    label,
+    explanation,
+    proposalState,
+    setProposalState,
+    updateProposal,
+  } = props;
 
   async function handleUpdateProposalType(
     proposalType: "executable" | "social"
   ) {
-    updateProposalType(proposalType);
-    updateProposal(proposal, { proposal_type: proposalType });
-  }
+    const updatedProposal = await updateProposal(proposalState, {
+      proposal_type: proposalType,
+    });
 
-  useEffect(() => {
-    updateProposalType(proposal.proposal_type);
-  }, [proposal]);
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
+  }
 
   return (
     <div className="flex flex-col px-6 mb-5">
@@ -41,7 +49,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
         <div className="flex flex-row p-1 rounded-lg border border-gray-eo">
           <button
             className={`py-2 px-5 font-medium rounded-lg ${
-              proposalState.proposalType === "executable"
+              proposalState.proposal_type === "executable"
                 ? "bg-gray-fa"
                 : "text-gray-af"
             }`}
@@ -51,7 +59,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
           </button>
           <button
             className={`py-2 px-5 font-medium rounded-lg ${
-              proposalState.proposalType === "social"
+              proposalState.proposal_type === "social"
                 ? "bg-gray-fa"
                 : "text-gray-af"
             }`}
