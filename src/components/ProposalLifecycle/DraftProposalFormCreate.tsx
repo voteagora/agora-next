@@ -16,7 +16,8 @@ import DraftProposalTransaction from "./DraftProposalTransaction";
 import DraftProposalCreateButton from "./DraftProposalCreateButton";
 import DraftProposalTitleInput from "./DraftProposalTitleInput";
 import DraftProposalDescriptionInput from "./DraftProposalDescriptionInput";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import { ProposalDraftWithTransactions } from "./types";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -41,16 +42,29 @@ interface DraftProposalFormCreateProps {
   setStage: React.Dispatch<
     React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
   >;
-  proposal: ProposalDraft;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
+  getProposal: (
+    proposal_id: string
+  ) => Promise<ProposalDraftWithTransactions | null>;
   updateProposal: (
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
-  ) => void;
+  ) => Promise<ProposalDraft>;
+  addTransaction: (proposalId: number) => Promise<ProposalDraftTransaction>;
+  updateTransaction: (
+    transactionId: number,
+    data: Partial<ProposalDraftTransaction>
+  ) => Promise<ProposalDraftTransaction>;
 }
 
 const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
   props
 ) => {
+  const { proposalState, setProposalState, updateProposal } = props;
+
   return (
     <div className="">
       <AccordionItem
@@ -67,36 +81,41 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           <DraftProposalTypeChoice
             label="Proposal type"
             explanation={staticText.proposalTypeExplanation}
-            proposal={props.proposal}
-            updateProposal={props.updateProposal}
+            proposalState={proposalState}
+            setProposalState={setProposalState}
+            updateProposal={updateProposal}
           />
           <DraftProposalTitleInput
             label="Title"
             placeholder={staticText.proposalTitlePlaceholder}
-            proposal={props.proposal}
+            proposal={props.proposalState}
             updateProposal={props.updateProposal}
           />
           <DraftProposalDescriptionInput
             label="Description"
             placeholder={staticText.proposalDescriptionPlaceholder}
-            proposal={props.proposal}
+            proposal={props.proposalState}
             updateProposal={props.updateProposal}
           />
           <DraftProposalAbstract
             label="Abstract"
             placeholder={staticText.proposalAbstractPlaceholder}
-            proposal={props.proposal}
+            proposal={props.proposalState}
             updateProposal={props.updateProposal}
           />
           <DraftProposalTransaction
             label="Proposed transaction"
             description={staticText.proposedTransactionDescription}
+            proposalState={proposalState}
+            setProposalState={setProposalState}
+            addTransaction={props.addTransaction}
+            updateTransaction={props.updateTransaction}
           />
           <DraftProposalCreateButton
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
             setStage={props.setStage}
-            proposal={props.proposal}
+            proposal={props.proposalState}
             updateProposal={props.updateProposal}
           />
         </AccordionContent>

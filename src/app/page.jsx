@@ -39,7 +39,7 @@ async function fetchVotableSupply() {
   return getVotableSupply();
 }
 
-async function createProposal() {
+async function createDraftProposal() {
   "use server";
 
   const proposal = await prisma.proposalDraft.create({
@@ -106,7 +106,7 @@ export default async function Home({ searchParams }) {
           return getProposals({ filter, page });
         }}
         votableSupply={votableSupply}
-        createProposal={createProposal}
+        createDraftProposal={createDraftProposal}
       />
     </VStack>
   );
