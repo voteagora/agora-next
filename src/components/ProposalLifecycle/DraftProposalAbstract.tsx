@@ -6,6 +6,7 @@ import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraft
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { ProposalDraft } from "@prisma/client";
 import { DebounceInput } from "react-debounce-input";
+import { ProposalDraftWithTransactions } from "./types";
 
 // example markdown to test with for the developer convenience :)
 
@@ -24,32 +25,39 @@ import { DebounceInput } from "react-debounce-input";
 interface DraftProposalAbstractProps {
   label: string;
   placeholder: string;
-  proposal: ProposalDraft;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
   updateProposal: (
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
-  ) => void;
+  ) => Promise<ProposalDraft>;
 }
 
 const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
-  const { label, placeholder, proposal, updateProposal } = props;
+  const {
+    label,
+    placeholder,
+    proposalState,
+    setProposalState,
+    updateProposal,
+  } = props;
 
-  // can be markdown
-  const { proposalState, updateAbstract } = useContext(
-    ProposalLifecycleDraftContext
-  );
   const [selectedMode, setSelectedMode] = useState<"write" | "preview">(
     "write"
   );
 
   async function handleAbstractUpdate(abstract: string) {
-    updateAbstract(abstract);
-    updateProposal(proposal, { abstract: abstract });
-  }
+    const updatedProposal = await updateProposal(proposalState, {
+      abstract: abstract,
+    });
 
-  useEffect(() => {
-    updateAbstract(proposal.abstract);
-  }, [proposal]);
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
+  }
 
   return (
     <div className="flex flex-col px-6 mb-5">
@@ -59,10 +67,10 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
           /* @ts-expect-error Server Component */
           <DebounceInput
             element="textarea"
-            debounceTimeout={1000}
+            debounceTimeout={500}
             className="py-3 px-4 border-0 placeholder-gray-af w-full bg-gray-fa rounded-t-lg focus:outline-none focus:ring-0 resize-none"
             placeholder={placeholder}
-            value={proposal.abstract}
+            value={proposalState.abstract}
             onChange={(e) => handleAbstractUpdate(e.target.value)}
             rows={8}
             forceNotifyByEnter={false}

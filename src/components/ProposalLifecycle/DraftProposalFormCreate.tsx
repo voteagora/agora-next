@@ -88,20 +88,21 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           <DraftProposalTitleInput
             label="Title"
             placeholder={staticText.proposalTitlePlaceholder}
-            proposal={props.proposalState}
-            updateProposal={props.updateProposal}
+            proposalState={proposalState}
+            updateProposal={updateProposal}
           />
           <DraftProposalDescriptionInput
             label="Description"
             placeholder={staticText.proposalDescriptionPlaceholder}
-            proposal={props.proposalState}
-            updateProposal={props.updateProposal}
+            proposalState={proposalState}
+            updateProposal={updateProposal}
           />
           <DraftProposalAbstract
             label="Abstract"
             placeholder={staticText.proposalAbstractPlaceholder}
-            proposal={props.proposalState}
-            updateProposal={props.updateProposal}
+            proposalState={proposalState}
+            setProposalState={setProposalState}
+            updateProposal={updateProposal}
           />
           <DraftProposalTransaction
             label="Proposed transaction"
@@ -115,8 +116,9 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
             setStage={props.setStage}
-            proposal={props.proposalState}
-            updateProposal={props.updateProposal}
+            proposalState={proposalState}
+            setProposalState={setProposalState}
+            updateProposal={updateProposal}
           />
         </AccordionContent>
       </AccordionItem>

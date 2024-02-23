@@ -7,11 +7,18 @@ import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraft
 import { useEnsAddress, useEnsAvatar } from "wagmi";
 import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";
-import { Proposal } from "@prisma/client";
+import { ProposalDraft } from "@prisma/client";
+import { ProposalDraftWithTransactions } from "./types";
 
 interface DraftProposalReviewProps {
-  proposal: Proposal;
-  updateProposal: (proposal: Proposal, updateData: Partial<Proposal>) => void;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
+  updateProposal: (
+    proposal: ProposalDraft,
+    updateData: Partial<ProposalDraft>
+  ) => Promise<ProposalDraft>;
 }
 
 const staticText = {
@@ -20,11 +27,7 @@ const staticText = {
 };
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { proposalState, updateProposalStatus } = useContext(
-    ProposalLifecycleDraftContext
-  );
-
-  const { proposal, updateProposal } = props;
+  const { proposalState, setProposalState, updateProposal } = props;
 
   const [sponsorInput, setSponsorInput] = useState<string>("");
 
@@ -47,14 +50,17 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     name: sponsorInput,
   });
 
-  const handleSubmitProposal = () => {
+  const handleSubmitProposal = async () => {
     // TODO unify states and names across frontend state and database
     const updateData = {
       proposal_status: "sponsor_requested",
     };
-    updateProposal(proposal, updateData);
+    const updatedProposal = await updateProposal(proposalState, updateData);
 
-    updateProposalStatus("awaiting_sponsor");
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
   };
 
   return (
@@ -86,7 +92,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
           <p className="text-gray-4f max-w-[620px]">
             {staticText.submitRequirement}
           </p>
-          <DraftProposalFormSubmitChecklist />
+          <DraftProposalFormSubmitChecklist proposalState={proposalState} />
           <div className="flex flex-row w-full gap-x-16">
             <div className="flex flex-col w-full">
               <label className="font-medium text-sm mb-1">Select sponsor</label>

@@ -1,21 +1,22 @@
 import React, { useContext } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { ProposalLifecycleDraftContext } from "@/contexts/ProposalLifecycleDraftContext";
+import { ProposalDraftWithTransactions } from "./types";
 
 interface DraftProposalFormSubmitChecklistProps {
-  // Define your component's props here
+  proposalState: ProposalDraftWithTransactions;
 }
 
 const DraftProposalFormSubmitChecklist: React.FC<
   DraftProposalFormSubmitChecklistProps
 > = (props) => {
-  const { proposalState } = useContext(ProposalLifecycleDraftContext);
+  const { proposalState } = props;
 
   return (
     <ul className="border border-gray-eo rounded-lg w-full divide-y divide-gray-eo">
       <DraftProposalFormSubmitChecklistRow
         title="Discourse Temp Check"
-        status={proposalState.tempCheckLink !== ""}
+        status={proposalState.temp_check_link !== ""}
       />
       <DraftProposalFormSubmitChecklistRow
         title="Transaction simulation"
