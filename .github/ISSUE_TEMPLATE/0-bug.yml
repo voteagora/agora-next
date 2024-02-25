@@ -20,6 +20,8 @@ body:
   - type: input
     attributes:
       label: Please attach a screenshot or a video
+      placeholder: |
+        Images or video
       description: |
 
         Tip: You can attach images or videos by clicking this area to highlight it and then dragging files in.
@@ -29,6 +31,8 @@ body:
     id: browsers
     attributes:
       label: What browser are you using?
+      placeholder: |
+        Browser
       multiple: true
       options:
         - Chrome
