@@ -14,7 +14,7 @@ body:
     attributes:
       label: Describe your issue or feedback
       placeholder: |
-        Your answer
+        Your issue or feedback
     validations:
       required: true
   - type: input
@@ -41,12 +41,58 @@ body:
         - Firefox
         - Microsoft Edge
         - Other
+      default: 0
     validations:
       required: true
   - type: input
     attributes:
       label: If none of the above options apply, please specify your browser here
       placeholder: |
-        Your answer
+        Your browser
+    validations:
+      required: false
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: What is your operating system?
+      multiple: false
+      options:
+        - Desktop Windows
+        - Desktop Macos
+        - Mobile iOS
+        - Mobile Android
+        - Other
+      default: 0
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: If none of the above options apply, please specify your operating system here
+      placeholder: |
+        Your operating system
+    validations:
+      required: false
+  - type: dropdown
+    id: wallet
+    attributes:
+      label: What wallet are you using?
+      multiple: false
+      options:
+        - Metamask
+        - Coinbase Wallet
+        - Rainbow
+        - Rabby
+        - SAFE multisig
+        - Trezor
+        - Ledger
+        - Other
+      default: 0
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: If none of the above options apply, please specify your wallet here
+      placeholder: |
+        Your wallet
     validations:
       required: false
