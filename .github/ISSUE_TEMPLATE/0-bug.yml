@@ -5,18 +5,14 @@ labels: ["bug: unconfirmed"]
 body:
   - type: input
     attributes:
-      label: Wallet Address
-      description: |
-        What is your wallet address?
+      label: What is your wallet address?
       placeholder: |
         0x0000000000000000000000000000000000000000
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Description
-      description: |
-        Describe your issue or feedback
+      label: Describe your issue or feedback
       placeholder: |
         Your answer
     validations:
@@ -24,7 +20,7 @@ body:
   - type: dropdown
     id: browsers
     attributes:
-      label: What browsers are you seeing the problem on?
+      label: What browser are you using?
       multiple: true
       options:
         - Chrome
@@ -35,7 +31,6 @@ body:
         - Microsoft Edge
   - type: input
     attributes:
-      label: Browser other
       description: |
         If none of the above options apply, please specify your browser here
       placeholder: |
