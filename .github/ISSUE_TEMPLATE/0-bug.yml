@@ -31,9 +31,8 @@ body:
     id: browsers
     attributes:
       label: What browser are you using?
-      placeholder: |
-        Browser
-      multiple: true
+      multiple: false
+      default: 1
       options:
         - Chrome
         - Safari
@@ -41,6 +40,9 @@ body:
         - Arc
         - Firefox
         - Microsoft Edge
+        - Other
+      validations:
+        required: true
   - type: input
     attributes:
       label: If none of the above options apply, please specify your browser here
