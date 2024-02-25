@@ -31,8 +31,7 @@ body:
         - Microsoft Edge
   - type: input
     attributes:
-      description: |
-        If none of the above options apply, please specify your browser here
+      label: If none of the above options apply, please specify your browser here
       placeholder: |
         Your answer
     validations:
