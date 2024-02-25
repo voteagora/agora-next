@@ -1,0 +1,51 @@
+name: "🐛 Report a bug or feedback"
+description: "Report a problem or feedback about the website."
+title: "[Bug]: "
+labels: ["bug: unconfirmed"]
+body:
+  - type: input
+    attributes:
+      label: Wallet Address
+      description: |
+        What is your wallet address?
+      placeholder: |
+        0x0000000000000000000000000000000000000000
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Description
+      description: |
+        Describe your issue or feedback
+      placeholder: |
+        Your answer
+    validations:
+      required: true
+  - type: file
+    attributes:
+      label: Screenshot
+      description: |
+        Please attach a screenshot or a video
+    validations:
+      required: false
+  - type: select
+    attributes:
+      label: Browser
+      description: |
+        What browser are you using?
+      options:
+        - Chrome
+        - Safari
+        - Brave
+        - Arc
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Browser other
+      description: |
+        If none of the above options apply, please specify your browser here
+      placeholder: |
+        Your answer
+    validations:
+      required: false
