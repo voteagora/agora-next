@@ -41,8 +41,8 @@ body:
         - Firefox
         - Microsoft Edge
         - Other
-      validations:
-        required: true
+    validations:
+      required: true
   - type: input
     attributes:
       label: If none of the above options apply, please specify your browser here
