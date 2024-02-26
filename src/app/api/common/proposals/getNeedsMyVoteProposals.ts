@@ -5,6 +5,7 @@ import Tenant from "@/lib/tenant";
 import { ProposalPayload } from "./proposal";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import {contracts} from "@/lib/contracts/contracts";
 
 export async function getNeedsMyVoteProposals(
   address:string
@@ -42,7 +43,7 @@ export async function getNeedsMyVoteProposals(
       `,
     latestBlock,
     address.toLowerCase(),
-    tenant.contracts().governor.address.toLowerCase()
+    contracts(tenant.namespace).governor.address.toLowerCase()
   );
 
   const resolvedProposals = Promise.all(

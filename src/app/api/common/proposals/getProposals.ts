@@ -6,6 +6,7 @@ import provider from "@/app/lib/provider";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant";
+import {contracts} from "@/lib/contracts/contracts";
 
 export async function getProposals({
                                      filter,
@@ -19,7 +20,7 @@ export async function getProposals({
 
   const tenant = Tenant.getInstance();
   const prodDataOnly = tenant.isProd && {
-    contract: tenant.contracts().governor.address,
+    contract: contracts(tenant.namespace).governor.address.toLowerCase(),
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
@@ -104,7 +105,7 @@ export async function getProposalTypes() {
 
   return prisma[`${tenant.namespace}ProposalTypes`].findMany({
     where: {
-      contract: tenant.contracts().proposalTypesConfigurator.address,
+      contract: contracts(tenant.namespace).proposalTypesConfigurator.address.toLowerCase(),
     },
   });
 }

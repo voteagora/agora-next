@@ -45,8 +45,6 @@ export default class Tenant implements ITenant {
 
 
 
-
-
 // TODO: Move this out of here
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 
