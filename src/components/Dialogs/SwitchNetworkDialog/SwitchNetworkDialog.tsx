@@ -30,7 +30,7 @@ export function SwitchNetwork({
       <p>Wrong network detected, switch to Optimism to continue.</p>
       <Button
         variant="outline"
-        className="font-bold"
+        className="font-bold cursor-pointer"
         onClick={() => {
           switchNetwork?.(chainId);
           closeDialog();
