@@ -6,6 +6,7 @@ import provider from "@/app/lib/provider";
 import { contracts } from "@/lib/contracts/contracts";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import Tenant from "@/lib/tenant";
 
 export async function getProposalsForNamespace({
   filter,
@@ -16,15 +17,19 @@ export async function getProposalsForNamespace({
   namespace: "optimism";
   page: number;
 }) {
+
   const pageSize = 10;
-  const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
-    contract: contracts(namespace).governor.address.toLowerCase(),
+
+  const tenant = Tenant.getInstance();
+
+  const prodDataOnly = tenant.isProd && {
+    contract: tenant.contracts().governor.address.toLowerCase(),
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
-        return prisma[`${namespace}Proposals`].findMany({
+        return prisma[`${tenant.namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -36,7 +41,7 @@ export async function getProposalsForNamespace({
           },
         });
       } else {
-        return prisma[`${namespace}Proposals`].findMany({
+        return prisma[`${tenant.namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -83,6 +88,7 @@ export async function getProposalForNamespace({
   proposal_id: string;
   namespace: "optimism";
 }) {
+
   const proposal = await prisma[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });

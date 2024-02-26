@@ -1,3 +1,23 @@
+import { BaseContract } from "ethers";
+
+export type TenantNamespace = "optimism";
+
+export type TenantContracts = {
+    alligator?: TenantContract;
+    governor: TenantContract;
+    proposalTypesConfigurator: TenantContract;
+    token: TenantContract;
+}
+
+export type TenantContract = {
+    abi: any;
+    address: `0x${string}`;
+    chainId: number;
+    contract: BaseContract;
+    v6UpgradeBlock?: number;
+}
+
+
 export type RetroPGFProject = {
     id: string;
     bio: string;
