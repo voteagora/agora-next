@@ -25,9 +25,9 @@ const useConnectedDelegate = () => {
     if (address) {
       const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address);
       /**
-       * Assuming delegator and delegatee data update at the same time in the db, since we are revalidating 
+       * Assuming delegator and delegatee voting power update at the same time in the db, since we are revalidating 
        * the delegatee until the delegator voting power is updated in the DB. If delegatee is updated later than 
-       * delegator after a delegation this solution does not work
+       * delegator after a delegation this solution would fail
        */
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate);
