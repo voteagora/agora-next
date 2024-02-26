@@ -16,6 +16,7 @@ import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 
 type Props = {
   ensName: string | undefined;
@@ -35,7 +36,7 @@ const MobileValueWrapper = ({ children }: { children: ReactNode }) => (
 export const MobileProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
-  const { delegate, balance } = useConnectedDelegate();
+  const { isLoading, delegate, balance } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;
 
   return (
@@ -70,115 +71,125 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                   variants={variants}
                   transition={{ duration: 0.2 }}
                 >
-                  <VStack gap={3}>
-                    <HStack gap={2} alignItems="items-center" className="mb-1">
-                      <div className={"relative aspect-square"}>
-                        <ENSAvatar ensName={ensName} />
-                      </div>
-                      <VStack className={"flex-1"}>
-                        {ensName ? (
-                          <>
-                            <span className={styles.mobile__ens}>
-                              {ensName}
-                            </span>
-                            <span className={styles.mobile__address}>
-                              {shortAddress(address!)}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className={styles.mobile__ens}>
-                              {shortAddress(address!)}
-                            </span>
-                          </>
-                        )}
-                      </VStack>
-                      <Image
-                        src={icons.power}
-                        onClick={() => disconnect()}
-                        alt="Disconnect Wallet"
-                        className="cursor-pointer"
-                      />
-                    </HStack>
-
-                    <PanelRow
-                      title="My token balance"
-                      detail={
-                        <MobileValueWrapper>
-                          <TokenAmountDisplay
-                            amount={balance || BigInt(0)}
-                            decimals={18}
-                            currency={"OP"}
-                          />
-                        </MobileValueWrapper>
-                      }
-                    />
-
-                    <PanelRow
-                      title="Delegated to"
-                      detail={
-                        <MobileValueWrapper>
-                          <Link
-                            href={`/delegates/${delegate?.address}`}
-                            onClick={() => close()}
-                            className="underline"
-                          >
-                            View more
-                          </Link>
-                        </MobileValueWrapper>
-                      }
-                    />
-
-                    <PanelRow
-                      title="My voting power"
-                      detail={
-                        <MobileValueWrapper>
-                          <TokenAmountDisplay
-                            amount={delegate?.votingPower || BigInt(0)}
-                            decimals={18}
-                            currency={"OP"}
-                          />
-                        </MobileValueWrapper>
-                      }
-                    />
-
-                    <PanelRow
-                      title="Delegated from"
-                      detail={
-                        <MobileValueWrapper>
-                          {pluralizeAddresses(
-                            Number(delegate?.numOfDelegators || 0)
-                          )}
-                        </MobileValueWrapper>
-                      }
-                    />
-
-                    {hasStatement ? (
-                      <Link
-                        href={`/delegates/edit`}
-                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                        onClick={() => close()}
-                      >
-                        Edit delegate statement
-                      </Link>
+                  <VStack gap={3} className="min-h-[325px] justify-center">
+                    {isLoading ? (
+                      <AgoraLoaderSmall />
                     ) : (
-                      <Link
-                        href={`/delegates/create`}
-                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                        onClick={() => close()}
-                      >
-                        Create delegate statement
-                      </Link>
-                    )}
+                      <>
+                        <HStack
+                          gap={2}
+                          alignItems="items-center"
+                          className="mb-1"
+                        >
+                          <div className={"relative aspect-square"}>
+                            <ENSAvatar ensName={ensName} />
+                          </div>
+                          <VStack className={"flex-1"}>
+                            {ensName ? (
+                              <>
+                                <span className={styles.mobile__ens}>
+                                  {ensName}
+                                </span>
+                                <span className={styles.mobile__address}>
+                                  {shortAddress(address!)}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className={styles.mobile__ens}>
+                                  {shortAddress(address!)}
+                                </span>
+                              </>
+                            )}
+                          </VStack>
+                          <Image
+                            src={icons.power}
+                            onClick={() => disconnect()}
+                            alt="Disconnect Wallet"
+                            className="cursor-pointer"
+                          />
+                        </HStack>
 
-                    {hasStatement && (
-                      <Link
-                        href={`/delegates/${ensName ?? address}`}
-                        onClick={() => close()}
-                        className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
-                      >
-                        View my profile
-                      </Link>
+                        <PanelRow
+                          title="My token balance"
+                          detail={
+                            <MobileValueWrapper>
+                              <TokenAmountDisplay
+                                amount={balance || BigInt(0)}
+                                decimals={18}
+                                currency={"OP"}
+                              />
+                            </MobileValueWrapper>
+                          }
+                        />
+
+                        <PanelRow
+                          title="Delegated to"
+                          detail={
+                            <MobileValueWrapper>
+                              <Link
+                                href={`/delegates/${delegate?.address}`}
+                                onClick={() => close()}
+                                className="underline"
+                              >
+                                View more
+                              </Link>
+                            </MobileValueWrapper>
+                          }
+                        />
+
+                        <PanelRow
+                          title="My voting power"
+                          detail={
+                            <MobileValueWrapper>
+                              <TokenAmountDisplay
+                                amount={delegate?.votingPower || BigInt(0)}
+                                decimals={18}
+                                currency={"OP"}
+                              />
+                            </MobileValueWrapper>
+                          }
+                        />
+
+                        <PanelRow
+                          title="Delegated from"
+                          detail={
+                            <MobileValueWrapper>
+                              {pluralizeAddresses(
+                                Number(delegate?.numOfDelegators || 0)
+                              )}
+                            </MobileValueWrapper>
+                          }
+                        />
+
+                        {hasStatement ? (
+                          <Link
+                            href={`/delegates/edit`}
+                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                            onClick={() => close()}
+                          >
+                            Edit delegate statement
+                          </Link>
+                        ) : (
+                          <Link
+                            href={`/delegates/create`}
+                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                            onClick={() => close()}
+                          >
+                            Create delegate statement
+                          </Link>
+                        )}
+
+                        {hasStatement && (
+                          <Link
+                            href={`/delegates/${ensName ?? address}`}
+                            onClick={() => close()}
+                            className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
+                          >
+                            View my profile
+                          </Link>
+                        )}
+                      </>
                     )}
                   </VStack>
                 </motion.div>
