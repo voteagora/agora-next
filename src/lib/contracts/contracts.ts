@@ -7,6 +7,17 @@ import {
 } from "./generated";
 import provider from "@/app/lib/provider";
 
+export const contracts = (namespace: "optimism") => {
+  switch (namespace) {
+    case "optimism": {
+      return OptimismContracts;
+    }
+    default: {
+      throw new Error(`Can't find contracts for namespace: ${namespace}`);
+    }
+  }
+};
+
 export const OptimismContracts = {
   governor: {
     contract: OptimismGovernor__factory.connect(

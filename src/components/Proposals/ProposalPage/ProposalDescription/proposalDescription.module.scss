@@ -2,7 +2,7 @@
 
 .proposal_description {
   width: $max-width-3xl;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     width: auto;
   }
 }

@@ -5,20 +5,15 @@ import styles from "./header.module.scss";
 import Image from "next/image";
 import walletIcon from "@/icons/wallet.svg";
 import { MobileProfileDropDown } from "./MobileProfileDropDown";
-import { Delegate } from "@/app/api/delegates/delegate";
 
-type Props = {
-  delegate: Delegate | undefined;
-};
-
-export function MobileConnectButton({ delegate }: Props) {
+export function MobileConnectButton() {
   return (
     <ConnectKitButton.Custom>
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
         return (
           <div className={styles.mobile_connect_button}>
             {isConnected ? (
-              <MobileProfileDropDown ensName={ensName} delegate={delegate} />
+              <MobileProfileDropDown ensName={ensName} />
             ) : (
               <div onClick={show}>
                 <Image

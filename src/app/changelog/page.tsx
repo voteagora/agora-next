@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
   return {
-    title: "Agora - Optimism Changelog",
+    title: "Optimism Gov Client Changelog - Agora",
     description:
       "Stay up to date with the latest changes with Agora's development for the Optimism community.",
   };
@@ -13,9 +13,9 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-full py-20 sm:pt-32 lg:py-12">
-        <div className="flex flex-col lg:flex-row lg:gap-32 ">
-          <div className="lg:flex-1 lg:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
+      <div className="mx-auto max-w-full py-20 sm:py-12">
+        <div className="flex flex-col sm:flex-row sm:gap-32 ">
+          <div className="sm:flex-1 sm:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
             <h2 className="mt-1 font-semibold text-stone-900">
               Agora Changelog
             </h2>
@@ -34,9 +34,440 @@ export default function Page() {
           <div
             className={cn(
               styles.changelogContainer,
-              "lg:flex-1 lg:basis-2/3 mt-10 lg:mt-0 border-l pl-8 relative"
+              "sm:flex-1 sm:basis-2/3 mt-10 sm:mt-0 border-l pl-8 relative"
             )}
           >
+            <div className="flex items-center bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4">
+              <div>
+                <p className="font-semibold">Agora Optimism Office Hours</p>
+                <p className="text-sm">
+                  Join us for a monthly Google Meet where we discuss all things
+                  OP governance related. <br />
+                  <a
+                    target="_blank"
+                    href="https://calendar.google.com/calendar/embed?src=c_03628eb023f9d4248847ce6758abb80aec7d6a1c9b20bb7ef939c45054963437%40group.calendar.google.com&ctz=America%2FToronto"
+                  >
+                    <u>View Google Calendar link.</u>
+                  </a>
+                </p>
+              </div>
+            </div>
+            <div className="space-y-12">
+              <div className={styles.changelogItem}>
+                <p id="changelogfeb2024" className={styles.changelogDate}>
+                  {formatFullDate(new Date(2024, 1, 23))}
+                </p>
+                <h3 className={styles.changelogTitle}>
+                  Governance Client Changlelog #1
+                </h3>
+                <p>Good morning OP collective,</p>
+                <p>
+                  We have been hard at work making this app worthy of the
+                  community we serve and hopefully from the list of changes and
+                  bugs that we have fixed, hopefully you will agree.
+                </p>
+                <p>
+                  We will be providing these updates each week. Sometimes we
+                  will have much to say and sometimes less, but always the
+                  latest commits and areas of improvements we are looking to
+                  make better in the coming week.
+                </p>
+                <p>
+                  Since the launch, most of our time has been centered around
+                  one thing, hardening our advanced delegation beta and advanced
+                  voting. This allows for our beta users to break their
+                  delegations into fractional pieces and then vote with those
+                  pieces. We are still looking to make that process even easier
+                  and bring down the number of transactions for delegates with
+                  advanced delegations to vote from 2 to 1, and that will come
+                  soon.
+                </p>
+                <p>
+                  We have also been making small updates to performance issues
+                  we noticed in the delegation and proposal rendering pipelines,
+                  along with some improvements to how we handle delegate cards.
+                </p>
+                <p>
+                  Finally, we have robust new preview image support for X,
+                  Farcaster, LinkedIn and other social platforms.{" "}
+                </p>
+                <p>
+                  Don&apos;t forget to follow us and tag us in the chats on
+                  Discord.
+                </p>
+                <p>All the best,</p>
+                <p>
+                  <a href="https://twitter.com/kentf">Kent</a>, Co-founder at{" "}
+                  <a href="https://voteagora.com">Agora</a>
+                </p>
+                <br />
+                <br />
+                <h4>Major updates</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/pull/41"
+                        target="_blank"
+                      >
+                        Tracked and displayed Recent Activity of past 10 votes
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/920f949fb8dfde39f2525578a0ad2321c6afedeb"
+                        target="_blank"
+                      >
+                        Added Profile Dropdown Dialog and Button in header
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/67cdbb7dda224995823327c610940190dbbd9e70"
+                        target="_blank"
+                      >
+                        Optimistic proposals in Home Page
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/6750476f446545a631b428fadd27b8c58d43795c"
+                        target="_blank"
+                      >
+                        Optimistic Proposal Creation
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/2c6f292dc524374b793b14a8abc53ad2efca09fd"
+                        target="_blank"
+                      >
+                        Optimistic Proposal Page
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/b9b14058fcae51f7a80e1133f33c12ff1383fde0"
+                        target="_blank"
+                      >
+                        OP delegate should be able to vote on an approval
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/pull/56"
+                        target="_blank"
+                      >
+                        Added RetroPGF Summary Page to Next
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/pull/51"
+                        target="_blank"
+                      >
+                        Added Hovercard over delegate on Vote Table View
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/f7678e7b3b073544d9035b43e7afc542b07e15ed"
+                        target="_blank"
+                      >
+                        Added WalletConnect Domain Verification Code
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/d324e6494f2998af339d4c290939ec354eb559bf"
+                        target="_blank"
+                      >
+                        Added Link to view Transaction on EtherScan
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/cbbed40291f9a8b46c8bf274ac37168f65c48622"
+                        target="_blank"
+                      >
+                        Built Results Page for RetroPGF
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/pull/93"
+                        target="_blank"
+                      >
+                        Needs My Vote Feature
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/pull/109"
+                        target="_blank"
+                      >
+                        Implement Multi-DOA Database Architecture with Dedicated
+                        Namespaces V1.1
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+                <br />
+                <h4>Minor updates</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/f725d71d14ee1aad9520be9943aeaa9a2ffe0d56"
+                      >
+                        Improved Sub-delegation Display to 2 Decimals
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/f2067b85dd4802e6ef9d05501ca79677d4353775"
+                      >
+                        Handle Proposal Option with No Transaction
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/e56ae1dbf112052b40ed378930203c92c6aae874"
+                      >
+                        Changed Design for Direct Delegation
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/58"
+                      >
+                        Proposals Display their Type
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/52"
+                      >
+                        Updated Rounding issues in Advanced Delegation
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/61"
+                      >
+                        Added You Badge next to your Vote
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/70"
+                      >
+                        Added Styling to Votes
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/80"
+                      >
+                        Improved Proposal Copy
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/71"
+                      >
+                        Improved Voting Flow UI
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/74"
+                      >
+                        Improved Wallet Display
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/100"
+                      >
+                        Add your Vote goes on the top of proposal vote list
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/127"
+                      >
+                        Harden Partial Delegation
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/123"
+                      >
+                        Dynamic Image Graphic to preview images
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+                <br />
+                <h4>Bug fixes</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/04e8a6fee9660883f954d278e02bc35e7c795800"
+                      >
+                        OP Proposal Page Bug
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/62395e473263890bd5c6d2f449b46f25accfa27a"
+                      >
+                        Small Standard Vote Bug
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/776190bfcd5b716e00144ef9cce232459e55d223"
+                      >
+                        Fixed Link to View My Profile Button
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/64"
+                      >
+                        Fixed Non-reactive Clicking Issue on Lower part of
+                        Delegate Card
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/73"
+                      >
+                        Fixed Wallet Images when switching Wallets
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/88"
+                      >
+                        Fixed Tablet Responsiveness
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/101"
+                      >
+                        Fixed Infinite Loading After Voting
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/d7d9d7fdbf4c9d663f0a639469467fa9722b6641"
+                      >
+                        Do not Allow Lookup for Invalid ETH Address
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/pull/102"
+                      >
+                        Cache Reset on Client for Proposals
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="my-8 border-t border-gray-300"></div>
             <div className="space-y-12">
               <div className={styles.changelogItem}>
                 <p className={styles.changelogDate}>

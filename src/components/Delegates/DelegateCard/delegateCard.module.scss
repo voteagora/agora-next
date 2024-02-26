@@ -6,11 +6,11 @@
   flex-shrink: 0;
   width: $max-width-xs;
 
-  @media (max-width: $max-width-6xl) {
+  @media (max-width: $screen-sm) {
     position: static;
   }
 
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     width: 100%;
   }
 }

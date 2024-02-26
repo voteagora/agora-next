@@ -4,14 +4,14 @@
   margin-top: $spacing-12;
   margin-bottom: $spacing-12;
   width: $max-width-6xl;
-  @media (max-width: $max-width-md) {
+  @media (max-width: $screen-sm) {
     flex-direction: column;
     max-width: 100%;
     margin-bottom: 0;
   }
   .content_container {
     max-width: $max-width-xl;
-    @media (max-width: $max-width-md) {
+    @media (max-width: $screen-sm) {
       margin-top: 0;
       margin-bottom: $spacing-8;
     }
@@ -30,7 +30,7 @@
     position: relative;
     height: 100%;
     width: 100%;
-    @media (max-width: $max-width-xl) {
+    @media (max-width: $screen-sm) {
       display: none;
     }
     .spark1 {

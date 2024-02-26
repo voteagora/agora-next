@@ -11,7 +11,12 @@ import {
   optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import {
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+  useContractRead,
+} from "wagmi";
 import { useModal } from "connectkit";
 import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
@@ -27,18 +32,31 @@ export default function SubmitButton({
   formTarget: React.RefObject<HTMLFormElement>;
   form: Form;
 }) {
-  const { governorFunction, inputData } = getInputData(form);
-  const { isConnected } = useAccount();
+  const {
+    governorFunction,
+    inputData,
+    error: inputDataError,
+  } = getInputData(form);
+  const { address, isConnected } = useAccount();
   const { setOpen } = useModal();
   const [isClient, setIsClient] = useState(false);
 
-  const { config, isError: onPrepareError } = usePrepareContractWrite({
-    address: governorContract.address as any,
+  const {
+    config,
+    isError: onPrepareError,
+    error,
+  } = usePrepareContractWrite({
+    address: governorContract.address,
     abi: governorContract.abi,
     functionName: governorFunction,
     args: inputData as any,
   });
 
+  const { data: manager } = useContractRead({
+    address: governorContract.address,
+    abi: governorContract.abi,
+    functionName: "manager",
+  });
   const { data, isLoading, isSuccess, isError, write } =
     useContractWrite(config);
 
@@ -78,26 +96,48 @@ export default function SubmitButton({
   }, []);
 
   return (
-    <Button
-      type="submit"
-      variant={"outline"}
-      disabled={isLoading || onPrepareError}
-      className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
-      onClick={(e) => {
-        e.preventDefault();
-        if (!isConnected) {
-          setOpen(true);
-          return;
-        }
-        if (formTarget.current?.checkValidity() && !onPrepareError) {
-          formTarget.current?.reportValidity();
-          submitProposal();
-        }
-      }}
-    >
-      {/* hack to suppress Suspense boundary error */}
-      {isClient && isConnected ? "Submit proposal" : "Connect wallet"}
-    </Button>
+    <>
+      {manager && manager !== address ? (
+        <p className="text-gray-700 text-sm max-w-[420px] break-words">
+          Only the Optimism Foundation manager address can create proposals for
+          the time being.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {!!inputDataError && (
+            <p className="text-gray-700 text-sm max-w-[420px] break-words">
+              {(inputDataError as { message?: string })?.message ||
+                JSON.stringify(inputDataError)}
+            </p>
+          )}
+          {onPrepareError && (
+            <p className="text-gray-700 text-sm max-w-[420px] break-words">
+              {error?.message || JSON.stringify(error)}
+            </p>
+          )}
+        </div>
+      )}
+      <Button
+        type="submit"
+        variant={"outline"}
+        disabled={isLoading || onPrepareError || !!inputDataError}
+        className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
+        onClick={(e) => {
+          e.preventDefault();
+          if (!isConnected) {
+            setOpen(true);
+            return;
+          }
+          if (formTarget.current?.checkValidity() && !onPrepareError) {
+            formTarget.current?.reportValidity();
+            submitProposal();
+          }
+        }}
+      >
+        {/* hack to suppress Suspense boundary error */}
+        {isClient && isConnected ? "Submit proposal" : "Connect wallet"}
+      </Button>
+    </>
   );
 }
 
@@ -108,7 +148,9 @@ type InputData = BasicInputData | ApprovalInputData;
 function getInputData(form: Form): {
   governorFunction: "propose" | "proposeWithModule";
   inputData: InputData;
+  error: unknown;
 } {
+  let error = null;
   const description = "# " + form.state.title + "\n" + form.state.description;
   let governorFunction: "propose" | "proposeWithModule" = "propose";
 
@@ -217,9 +259,10 @@ function getInputData(form: Form): {
     }
   } catch (e) {
     console.error(e);
+    error = e;
   }
 
-  return { governorFunction, inputData };
+  return { governorFunction, inputData, error };
 }
 
 function encodeTransfer(to: string, amount: number): string {

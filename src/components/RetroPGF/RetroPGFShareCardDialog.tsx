@@ -64,8 +64,8 @@ export default function RetroPGFShareCardDialog({
           <div className="text-red-200">→</div>
         </HStack>
         <VStack className="absolute z-20 top-[270px] left-[250px]">
-          <h3 className="text-2xl hidden md:block">{displayName} received:</h3>
-          <HStack className="gap-2 hidden md:inline-flex text-6xl">
+          <h3 className="text-2xl hidden sm:block">{displayName} received:</h3>
+          <HStack className="gap-2 hidden sm:inline-flex text-6xl">
             <h1 className="font-bold text-black">
               {formatNumber(Number(awarded))}
             </h1>

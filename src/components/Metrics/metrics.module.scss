@@ -1,6 +1,6 @@
 @import "@/styles/variables";
 .metric_card_container_link {
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     width: 100%;
   }
 }
@@ -13,7 +13,7 @@
   border-color: $gray-300;
   box-shadow: $box-shadow-newDefault;
   transition: all 0.2s ease-in-out;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     width: 100%;
     border: 0px;
     box-shadow: none;
@@ -50,12 +50,12 @@
   }
 }
 .metric_card_container:last-child {
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     padding-bottom: $spacing-3;
   }
 }
 .metric_card_container:first-child {
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     padding-top: $spacing-3;
   }
 }

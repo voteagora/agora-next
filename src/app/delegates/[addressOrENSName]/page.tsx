@@ -5,31 +5,71 @@
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import DelegatesVotesSort from "@/components/Delegates/DelegateVotes/DelegatesVotesSort";
-import DelegatesVotesType from "@/components/Delegates/DelegateVotes/DelegatesVotesType";
 import { VStack } from "@/components/Layout/Stack";
-import { VotesSortOrder, Vote } from "@/app/api/votes/vote";
+import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { Delegation } from "@/app/api/delegations/delegation";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
 import TopIssues from "@/components/Delegates/DelegateStatement/TopIssues";
 import {
-  fetchDelegateStatement,
-  fetchDelegate,
-  fetchVotesForDelegate,
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
+  fetchDelegate,
+  fetchDelegateStatement,
+  fetchVotesForDelegate,
 } from "@/app/delegates/actions";
+import { formatNumber } from "@/lib/tokenUtils";
+import {
+  processAddressOrEnsName,
+  resolveENSProfileImage,
+} from "@/app/lib/ENSUtils";
 
 export async function generateMetadata(
-  { params }: { params: any },
+  { params }: { params: { addressOrENSName: string } },
   parent: any
 ) {
+  const [delegate, delegateStatement, address] = await Promise.all([
+    fetchDelegate(params.addressOrENSName),
+    fetchDelegateStatement(params.addressOrENSName),
+    processAddressOrEnsName(params.addressOrENSName),
+  ]);
+
+  const avatar = await resolveENSProfileImage(
+    address || params.addressOrENSName
+  );
+
+  const statement = (
+    delegateStatement?.payload as { delegateStatement: string }
+  )?.delegateStatement;
+
+  const imgParams = [
+    delegate.votingPower &&
+      `votes=${encodeURIComponent(
+        `${formatNumber(delegate.votingPower || "0")} OP`
+      )}`,
+    avatar && `avatar=${encodeURIComponent(avatar)}`,
+    statement && `statement=${encodeURIComponent(statement)}`,
+  ].filter(Boolean);
+
+  const preview = `/api/images/og/delegate?${imgParams.join(
+    "&"
+  )}&address=${address}`;
+  const title = `${address} on Agora`;
+  const description = `See what ${address} believes and how they vote on Optimism governance.`;
+
   return {
-    title: `Agora - OP Voter`,
-    description: `See what ${params.addressOrENSName} believes and how they vote on Optimism governance.`,
+    title: title,
+    description: description,
+    openGraph: {
+      images: preview,
+    },
+    other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
+    },
   };
 }
 
@@ -38,7 +78,7 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const [delegate, delegateVotes, statement, delegatees, delegators] =
+  const [delegate, delegateVotes, statement, delegates, delegators] =
     await Promise.all([
       fetchDelegate(addressOrENSName),
       fetchVotesForDelegate(addressOrENSName),
@@ -54,26 +94,26 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 justify-between mt-12 w-full max-w-full">
-      <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
       </VStack>
 
-      <VStack className="xl:ml-12 min-w-0 flex-1 max-w-full gap-8">
+      <VStack className="sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <DelegateStatementContainer
           addressOrENSName={addressOrENSName}
           statement={statement}
         />
         {statement && <TopIssues statement={statement} />}
-        <DelegationsContainer delegatees={delegatees} delegators={delegators} />
+        <DelegationsContainer delegatees={delegates} delegators={delegators} />
 
         {/* TODO: -> this could be refactor with revalidatePath */}
         <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col justify-between gap-2 md:flex-row">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
-                {/* <div className="flex flex-col justify-between gap-2 md:flex-row">
+                {/* <div className="flex flex-col justify-between gap-2 sm:flex-row">
                   <DelegatesVotesSort
                     fetchDelegateVotes={async (page, sortOrder) => {
                       "use server";

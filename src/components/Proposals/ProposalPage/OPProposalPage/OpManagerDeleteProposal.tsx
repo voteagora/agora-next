@@ -1,6 +1,6 @@
 "use client";
 
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import useIsOpManager from "@/app/lib/hooks/useIsOpManager";
 import { Button } from "@/components/ui/button";
 import {

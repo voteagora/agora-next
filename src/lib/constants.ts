@@ -1,3 +1,13 @@
+export const proposalsFilterOptions = {
+  relevant: {
+    value: "Relevant",
+    filter: "relevant",
+  },
+  everything: {
+    value: "Everything",
+    filter: "everything",
+  },
+};
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",
@@ -15,8 +25,10 @@ export const delegatesFilterOptions = {
 export const citizensFilterOptions = {
   mostVotingPower: {
     value: "Most voting power",
+    sort: "most_voting_power",
   },
   shuffle: {
+    sort: "shuffle",
     value: "Shuffle",
   },
 };
@@ -33,24 +45,24 @@ export const delegatesVotesSortOptions = {
 
 export const retroPGFCategories = {
   ALL: {
-    filter: "All projects"
+    filter: "All projects",
   },
   COLLECTIVE_GOVERNANCE: {
     text: "Collective Governance",
-    filter: "Collective Governance (104)"
+    filter: "Collective Governance (104)",
   },
   DEVELOPER_ECOSYSTEM: {
     text: "Developer Ecosystem",
-    filter: "Developer Ecosystem (304)"
+    filter: "Developer Ecosystem (304)",
   },
   END_USER_EXPERIENCE_AND_ADOPTION: {
     text: "End UX & Adoption",
-    filter: "End User Experience & Adoption (472)"
+    filter: "End User Experience & Adoption (472)",
   },
   OP_STACK: {
     text: "OP Stack",
-    filter: "OP Stack (165)"
-  }
+    filter: "OP Stack (165)",
+  },
 };
 
 export const retroPGFSort = {

@@ -99,10 +99,6 @@ export default function CreateProposalForm({
             alignItems="items-center"
             className={styles.create_prop_form__submit_container}
           >
-            <p className={styles.create_prop_form__submit_text}>
-              Only the Optimism Foundation manager address can create proposals
-              for the time being.
-            </p>
             <SubmitButton formTarget={formTarget} form={form} />
           </HStack>
         </VStack>

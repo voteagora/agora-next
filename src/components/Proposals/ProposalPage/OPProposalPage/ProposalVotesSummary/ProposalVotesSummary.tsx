@@ -2,10 +2,9 @@ import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./proposalVotesSummary.module.scss";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
-import { Proposal } from "@/app/api/proposals/proposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
-import { formatDistanceToNowStrict } from "date-fns";
 
 export default function ProposalVotesSummary({
   proposal,
@@ -82,22 +81,10 @@ export default function ProposalVotesSummary({
             )}
           </div>
           <div>
-            {proposal.end_time && proposal.status === "ACTIVE" && (
-              <HStack gap={1}>
-                <p>{`Ends in ${formatDistanceToNowStrict(
-                  proposal.end_time
-                )} at ${proposal.end_time.toLocaleTimeString("en-US")}`}</p>
-              </HStack>
-            )}
-            {proposal.end_time &&
-              proposal.status !== "PENDING" &&
-              proposal.status !== "ACTIVE" && (
-                <HStack gap={1}>
-                  <p>{`Ended ${formatDistanceToNowStrict(
-                    proposal.end_time
-                  )} ago on ${proposal.end_time.toLocaleDateString()}`}</p>
-                </HStack>
-              )}
+            <ProposalTimeStatus
+              proposalStatus={proposal.status}
+              proposalEndTime={proposal.end_time}
+            />
           </div>
         </HStack>
       </VStack>

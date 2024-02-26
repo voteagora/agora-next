@@ -12,8 +12,7 @@ const bedrockBlockNumber = 105235062;
  */
 export function getHumanBlockTime(
   blockNumber: number | string | bigint,
-  latestBlockNumber: number | string | bigint,
-  latestBlockTimestamp: number | string | bigint
+  latestBlockNumber: number | string | bigint
 ) {
   const timeBeforeBedrock =
     Math.max(bedrockBlockNumber - Number(blockNumber), 0) *
@@ -25,7 +24,7 @@ export function getHumanBlockTime(
     ) * secondsPerBlock;
 
   const timestamp = new Date(
-    (Number(latestBlockTimestamp) - timeBeforeBedrock - timeAfterBedrock) * 1000
+    (Date.now() / 1000 - timeBeforeBedrock - timeAfterBedrock) * 1000
   );
 
   return timestamp;

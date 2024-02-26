@@ -1,4 +1,4 @@
-import { type DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
+import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 
 export type Delegate = {
   address: string;

@@ -2,7 +2,7 @@
 
 .proposal_container {
   max-width: $max-width-6xl;
-  @media (max-width: $max-width-2xl) {
+  @media (max-width: $screen-sm) {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-end;
@@ -12,7 +12,7 @@
 .proposal_votes_container {
   position: sticky;
   top: $spacing-20;
-  max-height: calc(100vh - 188px);
+  max-height: calc(100vh - 162px);
   flex-shrink: 0;
   width: $max-width-sm;
   background-color: $white;
@@ -20,7 +20,7 @@
   border-radius: $border-radius-xl;
   box-shadow: $box-shadow-newDefault;
   margin-bottom: $spacing-8;
-  @media (max-width: $max-width-2xl) {
+  @media (max-width: $screen-sm) {
     align-items: stretch;
     justify-content: flex-end;
     width: 100%;
@@ -28,7 +28,7 @@
   }
 
   .proposal_votes_summary_container {
-    padding: $spacing-2 $spacing-4 $spacing-3 $spacing-4;
+    padding: $spacing-4 $spacing-4 0 $spacing-4;
     border-radius: $border-radius-md;
     font-weight: $font-weight-bold;
     flex-shrink: 0;
@@ -36,6 +36,9 @@
     border: 1px solid $gray-300;
     margin: 0 $spacing-4;
     box-shadow: $box-shadow-newDefault;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .proposal_actions_panel {

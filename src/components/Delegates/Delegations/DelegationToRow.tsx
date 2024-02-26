@@ -1,6 +1,6 @@
 "use client";
 
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { TokenAmountDisplay } from "@/lib/utils";

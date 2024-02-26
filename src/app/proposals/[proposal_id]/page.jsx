@@ -1,9 +1,10 @@
-import React from "react";
-import { HStack, VStack } from "@/components/Layout/Stack";
-import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
-import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
-import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import { getProposal } from "@/app/api/proposals/getProposals";
+import { cleanString, truncateString } from "@/app/lib/utils/text";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
+import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
+import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
+import React from "react";
 
 async function fetchProposal(proposal_id) {
   "use server";
@@ -15,26 +16,25 @@ async function fetchProposal(proposal_id) {
 
 export async function generateMetadata({ params }, parent) {
   const { proposal } = await fetchProposal(params.proposal_id);
+  const title = truncateString(cleanString(proposal.markdowntitle), 40);
+  const description = truncateString(cleanString(proposal.description), 80);
 
-  const cleanText = (text) => {
-    return text
-      .replace(/#{1,6}\s/g, "") // Removes Markdown headings
-      .replace(/\n/g, " "); // Replaces newlines with space
-  };
-
-  const cleanTitle = cleanText(proposal.markdowntitle);
-  const truncatedTitle =
-    cleanTitle.length > 60 ? cleanTitle.substring(0, 57) + "..." : cleanTitle;
-
-  const cleanDescription = cleanText(proposal.description);
-  const truncatedDescription =
-    cleanDescription.length > 160
-      ? cleanDescription.substring(0, 157) + "..."
-      : cleanDescription;
+  const preview = `/api/images/og/proposal?title=${encodeURIComponent(
+    title
+  )}&description=${encodeURIComponent(description)}`;
 
   return {
-    title: `Agora - OP Proposal: ${truncatedTitle}`,
-    description: truncatedDescription,
+    title: title,
+    description: description,
+    openGraph: {
+      images: preview,
+    },
+    other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+      ["twitter:image"]: preview,
+    },
   };
 }
 

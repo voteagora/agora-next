@@ -30,7 +30,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
       defaultValue={tabParam || "delegates"}
       onValueChange={(value) => handleTabChange(value)}
     >
-      <div className="flex flex-col md:flex-row justify-between items-baseline gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
         <TabsList>
           <TabsTrigger className="text-2xl" value="delegates">
             Delegates
@@ -39,7 +39,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
             Citizens
           </TabsTrigger>
         </TabsList>
-        <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />
           {selectedTab === "citizens" ? (
             <CitizensFilter />

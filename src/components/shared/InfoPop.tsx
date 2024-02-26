@@ -13,11 +13,7 @@ export default function InfoPop({ children }: { children: React.ReactNode }) {
       onMouseLeave={() => setIsOpen(false)}
     >
       <QuestionMarkCircleIcon className={styles.info_pop} />
-      {isOpen && (
-        <div className={styles.info_pop__tooltip}>
-          <div className={styles.info_pop__tooltip}>{children}</div>
-        </div>
-      )}
+      {isOpen && <div className={styles.info_pop__tooltip}>{children}</div>}
     </div>
   );
 }

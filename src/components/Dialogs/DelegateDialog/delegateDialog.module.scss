@@ -44,7 +44,7 @@
   .token_amount_container {
     color: $black;
     font-size: $font-size-4xl;
-    @media (max-width: $max-width-md) {
+    @media (max-width: $screen-sm) {
       font-size: $font-size-3xl;
     }
   }
@@ -77,7 +77,7 @@
   font-weight: $font-weight-medium;
   color: $black;
 
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     max-width: $spacing-24;
   }
 }

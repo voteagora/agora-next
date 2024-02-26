@@ -1,4 +1,4 @@
-import { Delegation } from "@/app/api/delegations/delegation";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 import DelegationToRow from "./DelegationToRow";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import DelegationFromRow from "./DelegationFromRow";
@@ -21,7 +21,7 @@ function DelegationsContainer({
 }) {
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
-      <div className="p-8 align-middle text-center rounded-md bg-gray-100">
+      <div className="p-8 text-center align-middle bg-gray-100 rounded-md">
         No advanced delegations found
       </div>
     );
@@ -29,8 +29,8 @@ function DelegationsContainer({
 
   return (
     <div className="max-w-full">
-      <Tabs className="mb-8 max-w-full" defaultValue="delegatedFrom">
-        <HStack className="justify-between items-center">
+      <Tabs className="max-w-full mb-8" defaultValue="delegatedFrom">
+        <HStack className="items-center justify-between">
           <TabsList>
             <TabsTrigger className="text-2xl" value="delegatedFrom">
               Delegated from
@@ -39,14 +39,14 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="text-slate-700 text-xs px-3 py-1 font-medium bg-slate-100 rounded-full lg:block hidden">
+          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-slate-700 bg-slate-100 sm:block">
             Advanced delegation beta
           </div>
         </HStack>
         <TabsContent value="delegatedFrom" className="max-w-full">
           <VStack
             gap={3}
-            className="rounded-xl border border-gray-eb shadow-sm"
+            className="border shadow-sm rounded-xl border-gray-eb"
           >
             <Table>
               <TableHeader className="text-xs text-slate-700">
@@ -76,7 +76,7 @@ function DelegationsContainer({
         <TabsContent value="delegatedTo">
           <VStack
             gap={3}
-            className="rounded-xl border border-gray-eb shadow-sm"
+            className="border shadow-sm rounded-xl border-gray-eb"
           >
             <Table>
               <TableHeader className="text-xs text-slate-700">

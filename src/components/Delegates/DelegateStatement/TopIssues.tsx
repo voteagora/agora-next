@@ -1,4 +1,4 @@
-import { type DelegateStatement as DelegateStatementType } from "@/app/api/delegateStatement/delegateStatement";
+import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";

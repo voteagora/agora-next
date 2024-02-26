@@ -8,38 +8,29 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { Proposal } from "@/app/api/proposals/proposal";
-import { Delegate } from "@/app/api/delegates/delegate";
-import { Vote } from "@/app/api/votes/vote";
-import { VotingPowerData } from "@/app/api/voting-power/votingPower";
-import { fetchAndSetAll } from "@/lib/utils";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Vote } from "@/app/api/common/votes/vote";
+import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 
 type Props = {
   proposal: Proposal;
-  fetchVotingPower: (
-    addressOrENSName: string | `0x${string}`,
-    blockNumber: number
-  ) => Promise<VotingPowerData>;
-  fetchAuthorityChains: (
+  fetchAllForVoting: (
     address: string | `0x${string}`,
-    blockNumber: number
-  ) => Promise<{ chains: string[][] }>;
-  fetchDelegate: (
-    addressOrENSName: string | `0x${string}`
-  ) => Promise<Delegate>;
-  fetchVotesForProposalAndDelegate: (
-    proposal_id: string,
-    address: string | `0x${string}`
-  ) => Promise<Vote[]>;
+    blockNumber: number,
+    proposal_id: string
+  ) => Promise<{
+    votingPower: VotingPowerData;
+    authorityChains: string[][];
+    delegate: Delegate;
+    votesForProposalAndDelegate: Vote[];
+  }>;
 };
 
 export default function ApprovalCastVoteButton({
   proposal,
-  fetchVotingPower,
-  fetchAuthorityChains,
-  fetchDelegate,
-  fetchVotesForProposalAndDelegate,
+  fetchAllForVoting,
 }: Props) {
   const [votingPower, setVotingPower] = useState<VotingPowerData>({
     directVP: "0",
@@ -55,32 +46,28 @@ export default function ApprovalCastVoteButton({
   const { address } = useAccount();
 
   const fetchData = useCallback(async () => {
+    setIsReady(false);
     try {
-      await fetchAndSetAll(
-        [
-          () => fetchVotingPower(address!, proposal.snapshotBlockNumber),
-          () => fetchDelegate(address!),
-          async () =>
-            (
-              await fetchAuthorityChains(address!, proposal.snapshotBlockNumber)
-            ).chains,
-          () => fetchVotesForProposalAndDelegate(proposal.id, address!),
-        ],
-        [setVotingPower, setDelegate, setChains, setVotes]
+      const {
+        votingPower,
+        authorityChains,
+        delegate,
+        votesForProposalAndDelegate,
+      } = await fetchAllForVoting(
+        address!,
+        proposal.snapshotBlockNumber,
+        proposal.id
       );
 
+      setVotingPower(votingPower);
+      setDelegate(delegate);
+      setChains(authorityChains);
+      setVotes(votesForProposalAndDelegate);
       setIsReady(true);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [
-    fetchVotingPower,
-    fetchDelegate,
-    fetchAuthorityChains,
-    address,
-    proposal,
-    fetchVotesForProposalAndDelegate,
-  ]);
+  }, [address, proposal, fetchAllForVoting]);
 
   useEffect(() => {
     if (address && proposal.snapshotBlockNumber) {
