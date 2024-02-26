@@ -11,6 +11,8 @@ function timeout(ms: number) {
 // TODO: think about strategy to fetchConnectedDelegate, since balance and voting power can change on every block, 
 // also to prevent additional unnecessary fetches being done right now
 const useConnectedDelegate = () => {
+  // TODO: frh -> what if there are wallet address change or refetches?
+  const [isLoading, setIsLoading] = useState(true);
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const { address } = useAccount();
   const [delegate, setDelegate] = useState<Delegate | null>(null);
@@ -32,6 +34,7 @@ const useConnectedDelegate = () => {
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate);
       }
+      setIsLoading(false);
       setLastVotingPower(delegate.votingPower);
       setDelegate(delegate);
       setAdvancedDelegators(advancedDelegators);
@@ -60,7 +63,7 @@ const useConnectedDelegate = () => {
     }
   }, [address, fetchDelegateAndSet]);
 
-  return { delegate, advancedDelegators, balance };
+  return { delegate, advancedDelegators, balance, isLoading };
 };
 
 export default useConnectedDelegate;
