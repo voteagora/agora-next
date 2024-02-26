@@ -106,7 +106,7 @@ export async function getProposalTypes() {
   return prisma[`${tenant.namespace}ProposalTypes`].findMany({
     where: {
       contract:
-        contracts(tenant.namespace).proposalTypesConfigurator.address,
+      contracts(tenant.namespace).proposalTypesConfigurator.address,
     },
   });
 }
