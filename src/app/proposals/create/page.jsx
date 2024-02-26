@@ -1,12 +1,12 @@
+import { getProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { HStack } from "@/components/Layout/Stack";
 import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
 import styles from "./styles.module.scss";
 import CreateProposalForm from "@/components/Proposals/ProposalCreation/CreateProposalForm";
-import { getProposalTypes } from "@/app/api/proposals/getProposals";
+
 
 async function getProposalSettingsList() {
   "use server";
-
   return await getProposalTypes();
 }
 

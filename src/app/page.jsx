@@ -1,3 +1,5 @@
+import { getNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
+import { getProposals } from "@/app/api/common/proposals/getProposals";
 import Hero from "@/components/Hero/Hero";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
@@ -7,8 +9,7 @@ import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 import { getMetrics } from "./api/metrics/getMetrics";
-import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
-import { getProposals } from "./api/proposals/getProposals";
+
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -20,19 +21,16 @@ async function fetchProposals(filter, page = 1) {
 
 async function fetchNeedsMyVoteProposals(address) {
   "use server";
-
-  return getNeedsMyVoteProposals({ address });
+  return getNeedsMyVoteProposals(address);
 }
 
 async function fetchDaoMetrics() {
   "use server";
-
   return getMetrics();
 }
 
 async function fetchVotableSupply() {
   "use server";
-
   return getVotableSupply();
 }
 
