@@ -5,6 +5,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { tokens } from "@/lib/tokenUtils";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -37,7 +38,7 @@ export default function OptionsResultsPanel({
   })();
 
   let availableBudget = BigInt(proposalSettings.budgetAmount);
-  let isExeeded = false;
+  let isExceeded = false;
 
   const mutableOptions = [...options];
   const sortedOptions = mutableOptions
@@ -57,22 +58,28 @@ export default function OptionsResultsPanel({
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);
-        const optionBudget = parseUnits(
-          option?.budgetTokensSpent?.toString() || "0",
-          tokens.get(proposalData.proposalSettings.budgetToken)?.decimals ?? 18
-        );
+
+        const optionBudget =
+          (proposal?.created_time as Date) >
+          OptimismContracts.governor.optionBudgetChangeDate
+            ? BigInt(option?.budgetTokensSpent || 0)
+            : parseUnits(
+                option?.budgetTokensSpent?.toString() || "0",
+                tokens.get(proposalData.proposalSettings.budgetToken)
+                  ?.decimals ?? 18
+              );
         if (proposalSettings.criteria === "TOP_CHOICES") {
           isApproved = index < Number(proposalSettings.criteriaValue);
         } else if (proposalSettings.criteria === "THRESHOLD") {
           const threshold = BigInt(proposalSettings.criteriaValue);
           isApproved =
-            !isExeeded &&
+            !isExceeded &&
             votesAmountBN >= threshold &&
             availableBudget >= optionBudget;
           if (isApproved) {
             availableBudget = availableBudget - optionBudget;
           } else {
-            isExeeded = true;
+            isExceeded = true;
           }
         }
 
