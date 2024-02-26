@@ -44,7 +44,7 @@ export const OptimismContracts = {
     ),
     address: (process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
       ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
-      : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7").toLowerCase(),
+      : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7") as `0x${string}`,
     chainId: 10,
     abi: ProposalTypesConfigurator__factory.abi,
   },
