@@ -23,7 +23,7 @@ export default function Page() {
               Stay up to date with the latest changes with Agora&apos;s
               development. Please report bugs and feedback{" "}
               <a
-                href="https://github.com/voteagora/agora-next/issues/new?template=0-bug.yml"
+                href="https://github.com/voteagora/agora-next/issues/new?assignees=&labels=bug%3A+unconfirmed&projects=&template=0-bug.yml&title=%5BBug%5D%3A+"
                 className="font-semibold text-indigo-600 hover:text-indigo-500"
               >
                 using this form

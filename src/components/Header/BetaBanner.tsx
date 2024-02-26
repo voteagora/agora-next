@@ -9,7 +9,7 @@ export default function BetaBanner() {
           feedback{" "}
           <a
             rel="noopener"
-            href="https://github.com/voteagora/agora-next/issues/new?template=0-bug.yml"
+            href="https://github.com/voteagora/agora-next/issues/new?assignees=&labels=bug%3A+unconfirmed&projects=&template=0-bug.yml&title=%5BBug%5D%3A+"
             target="_blank"
             className="underline"
           >
