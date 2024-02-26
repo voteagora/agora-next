@@ -3,7 +3,6 @@ import { paginatePrismaResult } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { contracts } from "@/lib/contracts/contracts";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant";
@@ -105,8 +104,7 @@ export async function getProposalTypes() {
 
   return prisma[`${tenant.namespace}ProposalTypes`].findMany({
     where: {
-      contract:
-      contracts(tenant.namespace).proposalTypesConfigurator.address,
+      contract: tenant.contracts().proposalTypesConfigurator.address,
     },
   });
 }
