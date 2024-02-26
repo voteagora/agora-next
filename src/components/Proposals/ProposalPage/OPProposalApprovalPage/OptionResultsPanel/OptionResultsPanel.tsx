@@ -5,6 +5,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { tokens } from "@/lib/tokenUtils";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -57,11 +58,10 @@ export default function OptionsResultsPanel({
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);
-        // Date in which optionBudget was being sent correctly to chain, all other past proposals optionBudget is in
-        // ether unit instead of wei
-        const changeDate = new Date("2024-02-21T12:00:00");
+
         const optionBudget =
-          (proposal?.created_time as Date) > changeDate
+          (proposal?.created_time as Date) >
+          OptimismContracts.governor.optionBudgetChangeDate
             ? BigInt(option?.budgetTokensSpent || 0)
             : parseUnits(
                 option?.budgetTokensSpent?.toString() || "0",
