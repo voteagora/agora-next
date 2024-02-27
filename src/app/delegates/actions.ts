@@ -7,20 +7,20 @@ import {
   isDelegatingToProxy,
 } from "@/app/api/voting-power/getVotingPower";
 import {
-  getDirectDelegatee,
+  getAllDelegatorsInChainsForAddress,
+  getAllForAForAdvancedDelegation,
   getCurrentDelegatees,
   getCurrentDelegators,
-  getAllForAForAdvancedDelegation,
-  getAllDelegatorsInChainsForAddress,
+  getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
-import { getVotesForDelegate } from "@/app/api/votes/getVotes";
 import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import { revalidatePath } from "next/cache";
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -81,14 +81,11 @@ export async function fetchDelegateStatement(addressOrENSName: string) {
 
 export async function fetchVotesForDelegate(
   addressOrENSName: string,
-  page = 1,
-  sortOrder?: VotesSortOrder
+  page = 1
 ) {
   return getVotesForDelegate({
     addressOrENSName,
     page,
-    sort: undefined,
-    sortOrder,
   });
 }
 
@@ -113,9 +110,7 @@ export async function fetchAllDelegatorsInChainsForAddress(
   return getAllDelegatorsInChainsForAddress({ addressOrENSName });
 }
 
-export async function balanceOf(
-  address: string
-) {
+export async function balanceOf(address: string) {
   return OptimismContracts.token.contract.balanceOf(address);
 }
 
@@ -123,6 +118,6 @@ export const fetchConnectedDelegate = async (address: string) => {
   return await Promise.all([
     fetchDelegate(address),
     fetchAllDelegatorsInChainsForAddress(address),
-    balanceOf(address)
+    balanceOf(address),
   ]);
 };

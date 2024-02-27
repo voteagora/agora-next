@@ -1,22 +1,22 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
-import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import styles from "./OPProposalPage.module.scss";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import {
-  getVotesForProposal,
-  getAllForVoting,
   getUserVotesForProposal,
-} from "@/app/api/votes/getVotes";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
+  getVotesForProposal,
+} from "@/app/api/common/votes/getVotes";
 import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
-import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
-import { formatNumber } from "@/lib/utils";
-import { disapprovalThreshold } from "@/lib/constants";
 import { getCurrentDelegators } from "@/app/api/delegations/getDelegations";
-import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
-import { formatUnits } from "ethers";
+import { getAllForVoting } from "@/app/api/votes/getVotes";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
+import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import { disapprovalThreshold } from "@/lib/constants";
+import { formatNumber } from "@/lib/utils";
+import { formatUnits } from "ethers";
+import ProposalDescription from "../ProposalDescription/ProposalDescription";
+import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
+import styles from "./OPProposalPage.module.scss";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
