@@ -18,7 +18,7 @@ export default function DraftProposalsList(props: DraftProposalsListProps) {
   const { fetchDraftProposals } = props;
 
   const getProposals = async () => {
-    if (address) {
+    if (!!address) {
       const proposals = await fetchDraftProposals(address);
 
       setProposals(proposals);
@@ -28,6 +28,8 @@ export default function DraftProposalsList(props: DraftProposalsListProps) {
   useEffect(() => {
     // reset when changing wallets
     // setProposals([]);
+
+    console.log("address", address);
 
     getProposals();
   }, [address]);

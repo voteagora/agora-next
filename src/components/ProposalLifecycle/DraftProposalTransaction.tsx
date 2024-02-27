@@ -20,6 +20,9 @@ interface DraftProposalTransactionProps {
     transactionId: number,
     data: Partial<ProposalDraftTransaction>
   ) => Promise<ProposalDraftTransaction>;
+  deleteTransaction: (
+    transactionId: number
+  ) => Promise<ProposalDraftTransaction[]>;
 }
 
 const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
@@ -32,6 +35,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
     setProposalState,
     addTransaction,
     updateTransaction,
+    deleteTransaction,
   } = props;
 
   const [transactions, setTransactions] = useState<ProposalDraftTransaction[]>(
@@ -41,6 +45,11 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
   async function handleAddTransaction() {
     const newTransaction = await addTransaction(proposalState.id);
     setTransactions([...transactions, newTransaction]);
+  }
+
+  async function handleDeleteTransaction(transactionId: number) {
+    const updatedTransactions = await deleteTransaction(transactionId);
+    setTransactions(updatedTransactions);
   }
 
   return (
@@ -88,7 +97,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 }`}</p>
                 <button
                   className="rounded-full bg-stone-100 p-2 hover:bg-stone-200"
-                  onClick={() => {}}
+                  onClick={() => handleDeleteTransaction(transaction.id)}
                 >
                   <XMarkIcon className="w-4 h-4" />
                 </button>
