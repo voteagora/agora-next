@@ -9,6 +9,9 @@ import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 import { getMetrics } from "./api/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
 import { getProposals } from "./api/proposals/getProposals";
+import { ProposalDraft } from "@prisma/client";
+import prisma from "@/app/lib/prisma";
+import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsList";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -24,6 +27,18 @@ async function fetchNeedsMyVoteProposals(address) {
   return getNeedsMyVoteProposals({ address });
 }
 
+async function fetchDraftProposals(address) {
+  "use server";
+
+  const draftProposals = await prisma.proposalDraft.findMany({
+    take: 3,
+  });
+
+  console.log(draftProposals);
+
+  return draftProposals;
+}
+
 async function fetchDaoMetrics() {
   "use server";
 
@@ -34,6 +49,28 @@ async function fetchVotableSupply() {
   "use server";
 
   return getVotableSupply();
+}
+
+async function createDraftProposal(address) {
+  "use server";
+
+  const proposal = await prisma.proposalDraft.create({
+    data: {
+      temp_check_link: "",
+      proposal_type: "executable",
+      title: "",
+      description: "",
+      abstract: "",
+      audit_url: "",
+      update_ens_docs_status: true,
+      post_on_discourse_status: true,
+      dao: "ens",
+      proposal_status: "draft",
+      author_address: address,
+    },
+  });
+
+  return proposal;
 }
 
 export async function generateMetadata({}, parent) {
@@ -70,6 +107,7 @@ export default async function Home({ searchParams }) {
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
       <PageDivider />
+      <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
@@ -81,6 +119,7 @@ export default async function Home({ searchParams }) {
           return getProposals({ filter, page });
         }}
         votableSupply={votableSupply}
+        createDraftProposal={createDraftProposal}
       />
     </VStack>
   );
