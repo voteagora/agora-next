@@ -257,7 +257,7 @@ const getDirectDelegateeForAddress = async ({
   namespace: "optimism";
 }) => {
   const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address, namespace),
+    getProxyAddress(address),
     prisma[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),

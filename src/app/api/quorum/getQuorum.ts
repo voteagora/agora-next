@@ -5,6 +5,6 @@ import {
 } from "../common/quorum/getQuorum";
 
 export const getQuorumForProposal = (proposal: ProposalPayload) =>
-  getQuorumForProposalForNamespace({ proposal, namespace: "optimism" });
+  getQuorumForProposalForNamespace(proposal);
 
 export const getCurrentQuorum = () => getCurrentQuorumForNamespace("optimism");
