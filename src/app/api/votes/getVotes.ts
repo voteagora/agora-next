@@ -1,7 +1,7 @@
-import { getVotingPowerForProposal } from "../voting-power/getVotingPower";
 import { getAuthorityChains } from "../authority-chains/getAuthorityChains";
 import { getDelegate } from "../delegates/getDelegates";
 import { getVotesForProposalAndDelegate } from "../common/votes/getVotes";
+import { getVotingPowerForProposal } from "@/app/api/common/voting-power/getVotingPower";
 
 export async function getAllForVoting(
   address: string | `0x${string}`,

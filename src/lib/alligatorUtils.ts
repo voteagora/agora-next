@@ -6,8 +6,11 @@ import {
 } from "@/app/api/common/authority-chains/authorityChains";
 import { OptimismContracts, contracts } from "./contracts/contracts";
 import { bigIntMax, bigIntMin } from "./bigintUtils";
+import Tenant from "@/lib/tenant";
 
-export async function getProxyAddress(address: string, namespace: "optimism") {
+export async function getProxyAddress(address: string) {
+  const { namespace } = Tenant.getInstance();
+
   switch (namespace) {
     case "optimism": {
       return OptimismContracts.alligator.contract.proxyAddress(address);

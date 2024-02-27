@@ -1,12 +1,6 @@
 "use server";
 
 import {
-  getProxy,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
-} from "@/app/api/voting-power/getVotingPower";
-import {
   getAllDelegatorsInChainsForAddress,
   getAllForAForAdvancedDelegation,
   getCurrentDelegatees,
@@ -17,10 +11,15 @@ import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
-import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import { revalidatePath } from "next/cache";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
+import {
+  getProxy,
+  getVotingPowerAvailableForDirectDelegation,
+  getVotingPowerAvailableForSubdelegation,
+  isDelegatingToProxy,
+} from "@/app/api/common/voting-power/getVotingPower";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
