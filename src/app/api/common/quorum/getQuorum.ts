@@ -2,14 +2,13 @@ import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { contracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "../proposals/proposal";
+import Tenant from "@/lib/tenant";
 
-export async function getQuorumForProposalForNamespace({
-  proposal,
-  namespace,
-}: {
-  proposal: ProposalPayload;
-  namespace: "optimism";
-}) {
+export async function getQuorumForProposalForNamespace(
+  proposal: ProposalPayload
+) {
+  const { namespace } = Tenant.getInstance();
+
   switch (namespace) {
     case "optimism": {
       const contractQuorum = contracts(namespace).governor.contract.quorum(

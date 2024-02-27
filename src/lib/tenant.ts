@@ -21,7 +21,9 @@ export default class Tenant implements ITenant {
 
   private constructor() {
     this.isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-    this.namespace = (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) || "optimism";
+    this.namespace =
+      (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) ||
+      "optimism";
   }
 
   public static getInstance(): Tenant {
@@ -33,19 +35,18 @@ export default class Tenant implements ITenant {
 
   public contracts(): TenantContracts {
     switch (this.namespace) {
-
       case "optimism":
         return opContracts;
 
       default:
-        throw new Error(`Can't find contracts for namespace: ${this.namespace}`);
+        throw new Error(
+          `Can't find contracts for namespace: ${this.namespace}`
+        );
     }
   }
 }
 
-
-
-// TODO: Move this out of here
+// TODO: Refactor this to a fa
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 
 const opContracts: TenantContracts = {
@@ -54,7 +55,7 @@ const opContracts: TenantContracts = {
       isProd
         ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
         : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-      provider,
+      provider
     ),
     mainnetAddress: "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10",
     testnetAddress: "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
@@ -64,13 +65,12 @@ const opContracts: TenantContracts = {
       process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114995000 : 114615036,
   }),
 
-
   proposalTypesConfigurator: new TenantContract({
     contract: OptimismGovernor__factory.connect(
       isProd
         ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
         : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
-      provider,
+      provider
     ),
     mainnetAddress: "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f",
     testnetAddress: "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
@@ -81,7 +81,7 @@ const opContracts: TenantContracts = {
   token: new TenantContract({
     contract: OptimismToken__factory.connect(
       "0x4200000000000000000000000000000000000042",
-      provider,
+      provider
     ),
     mainnetAddress: "0x4200000000000000000000000000000000000042",
     chainId: 10,
@@ -94,7 +94,7 @@ const opContracts: TenantContracts = {
         ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
         : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6",
 
-      provider,
+      provider
     ),
     mainnetAddress: "0x7f08F3095530B67CdF8466B7a923607944136Df0",
     testnetAddress: "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6",

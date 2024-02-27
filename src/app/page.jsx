@@ -7,9 +7,8 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
-import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
+import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { getMetrics } from "./api/metrics/getMetrics";
-
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
