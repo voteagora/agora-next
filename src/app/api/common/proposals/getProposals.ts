@@ -6,6 +6,7 @@ import provider from "@/app/lib/provider";
 import { contracts } from "@/lib/contracts/contracts";
 import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import { Logger } from "next-axiom";
 
 export async function getProposalsForNamespace({
   filter,
@@ -20,6 +21,7 @@ export async function getProposalsForNamespace({
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: contracts(namespace).governor.address.toLowerCase(),
   };
+  const log = new Logger();
 
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) => {
@@ -69,7 +71,8 @@ export async function getProposalsForNamespace({
       );
     })
   );
-
+  log.debug("Fetched proposals", { namespace: namespace });
+  await log.flush();
   return {
     meta,
     proposals: await resolvedProposals,
