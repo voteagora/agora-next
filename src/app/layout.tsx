@@ -1,5 +1,6 @@
 import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
+import { AxiomWebVitals } from "next-axiom";
 import Header from "@/components/Header/Header";
 
 declare global {
@@ -31,6 +32,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
+      <AxiomWebVitals />
       <ClientLayout>
         <Header />
         {children}
