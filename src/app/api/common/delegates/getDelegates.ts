@@ -13,7 +13,7 @@ import { contracts } from "@/lib/contracts/contracts";
 import { getDelegateStatement } from "../../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../../quorum/getQuorum";
-import { isCitizenForNamespace } from "../citizens/isCitizen";
+import { isCitizen } from "../citizens/isCitizen";
 
 type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
 
@@ -78,7 +78,7 @@ export async function getDelegatesForNamespace({
   const _delegates = await Promise.all(
     delegates.map(async (delegate) => {
       return {
-        citizen: await isCitizenForNamespace(delegate.delegate, namespace),
+        citizen: await isCitizen(delegate.delegate),
         statement: await getDelegateStatement({
           addressOrENSName: delegate.delegate,
         }),
@@ -162,7 +162,7 @@ export async function getDelegateForNamespace({
       prisma[`${namespace}VotableSupply`].findFirst({}),
       getDelegateStatement({ addressOrENSName }),
       getCurrentQuorum(),
-      isCitizenForNamespace(address, namespace),
+      isCitizen(address),
     ]);
 
   const numOfDelegatesQuery = prisma.$queryRawUnsafe<

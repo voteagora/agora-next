@@ -7,6 +7,7 @@ import {
 } from "@/lib/contracts/generated";
 import provider from "@/app/lib/provider";
 import { TenantContract } from "@/lib/tenantContract";
+import { DaoSlug } from "@prisma/client";
 
 interface ITenant {
   isProd: boolean;
@@ -16,14 +17,29 @@ interface ITenant {
 
 export default class Tenant implements ITenant {
   private static instance: Tenant;
-  readonly isProd: boolean;
-  readonly namespace: TenantNamespace;
+
+  private readonly _slug: string;
+  private readonly _isProd: boolean;
+  private readonly _namespace: TenantNamespace;
 
   private constructor() {
-    this.isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-    this.namespace =
+    this._namespace =
       (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) ||
       "optimism";
+    this._slug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN || "OP";
+    this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+  }
+
+  public get slug(): DaoSlug {
+    return this._slug as DaoSlug;
+  }
+
+  public get namespace(): TenantNamespace {
+    return this._namespace;
+  }
+
+  public get isProd(): boolean {
+    return this._isProd;
   }
 
   public static getInstance(): Tenant {
@@ -34,13 +50,13 @@ export default class Tenant implements ITenant {
   }
 
   public contracts(): TenantContracts {
-    switch (this.namespace) {
+    switch (this._namespace) {
       case "optimism":
         return opContracts;
 
       default:
         throw new Error(
-          `Can't find contracts for namespace: ${this.namespace}`
+          `Can't find contracts for namespace: ${this._namespace}`
         );
     }
   }
