@@ -23,6 +23,8 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
+// Logging via Axiom
+import { useLogger } from "next-axiom";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -45,6 +47,7 @@ export function AdvancedDelegateDialog({
   const [opBalance, setOpBalance] = useState<bigint>(0n);
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
+  const log = useLogger();
 
   const getOpBalance = async (address: `0x${string}`) => {
     const balance = await OptimismContracts.token.contract.balanceOf(address);
@@ -142,6 +145,7 @@ export function AdvancedDelegateDialog({
     };
 
     track("Advanced Delegation", trackingData);
+    log.info("User Advanced Delegated", { trackingData });
 
     write();
   };
