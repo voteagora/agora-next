@@ -5,26 +5,23 @@ import { DesktopConnectButton } from "./DesktopConnectButton";
 import { useNetwork } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect } from "react";
-import { useModal } from "connectkit";
+import { OptimismContracts } from "@/lib/contracts/contracts";
 
 export function ConnectButton() {
-  const chainIdMainnet = 1;
-  const chainIdOP = 10;
+  const { chainId } = OptimismContracts.governor;
   const { chain } = useNetwork();
   const openDialog = useOpenDialog();
-  const { setOpen } = useModal();
 
   useEffect(() => {
-    if (chain?.id === chainIdMainnet) {
-      setOpen(false);
+    if (chain?.id && chain.id !== chainId) {
       openDialog({
         type: "SWITCH_NETWORK",
         params: {
-          chainId: chainIdOP,
+          chainId,
         },
       });
     }
-  }, [chain?.id, openDialog]);
+  }, [chain?.id, chainId, openDialog]);
 
   return (
     <div>

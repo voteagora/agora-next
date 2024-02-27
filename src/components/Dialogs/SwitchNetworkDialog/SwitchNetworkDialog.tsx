@@ -13,15 +13,14 @@ export function SwitchNetwork({
   chainId: number;
   closeDialog: () => void;
 }) {
-  const chainIdMainnet = 1;
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
 
   useEffect(() => {
-    if (chain?.id !== chainIdMainnet) {
+    if (chain?.id === chainId) {
       closeDialog();
     }
-  }, [chain?.id, closeDialog]);
+  }, [chain?.id, chainId, closeDialog]);
 
   return (
     <div className="flex flex-col gap-4">

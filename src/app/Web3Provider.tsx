@@ -41,7 +41,7 @@ const config = createConfig(
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
-    <ConnectKitProvider>
+    <ConnectKitProvider options={{ enforceSupportedChains: false }}>
       <body className={inter.variable}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <BetaBanner />
