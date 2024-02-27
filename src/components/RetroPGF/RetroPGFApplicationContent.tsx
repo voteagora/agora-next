@@ -45,7 +45,7 @@ export default function RetroPGFApplicationContent({
           </div>
         </VStack>
       </div>
-      <div className="flex flex-col sm:flex-row gap-0 sm:gap-16 items-stretch sm:items-start justify-end sm:justify-between px-4 py-8 max-w-6xl">
+      <div className="flex flex-col sm:flex-row gap-0 sm:gap-16 items-stretch sm:items-start justify-end sm:justify-between sm:px-4 py-8 max-w-6xl">
         <VStack>
           <h2 className="font-inter  font-black text-2xl leading-[29px] text-black mb-[14px]">
             Impact
