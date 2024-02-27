@@ -52,7 +52,7 @@ async function fetchVotableSupply() {
   return getVotableSupply();
 }
 
-async function createDraftProposal() {
+async function createDraftProposal(address) {
   "use server";
 
   const proposal = await prisma.proposalDraft.create({
@@ -67,7 +67,7 @@ async function createDraftProposal() {
       post_on_discourse_status: true,
       dao: "ens",
       proposal_status: "draft",
-      author_address: "",
+      author_address: address,
     },
   });
 
