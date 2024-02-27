@@ -2,10 +2,6 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 
-/**
- * Function openSwitchNetworks from connectkit should not work here since we need mainnet to resolve ENS names.
- * However, mainnet should not be allowed for other write transactions and therefore this component.
- */
 export function SwitchNetwork({
   chainId,
   closeDialog,
