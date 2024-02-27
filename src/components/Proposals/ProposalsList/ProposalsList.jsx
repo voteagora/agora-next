@@ -38,8 +38,7 @@ export default function ProposalsList({
   return (
     <VStack className={styles.proposals_list_container}>
       {/* {address && <NonVotedProposalsList address={address} />} */}
-
-      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <ProposalsFilter />
