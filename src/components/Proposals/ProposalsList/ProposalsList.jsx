@@ -10,6 +10,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
 import CreateProposalButton from "@/components/ProposalLifecycle/CreateProposalButton";
+import { useAccount } from "wagmi";
 
 export default function ProposalsList({
   initialProposals,
@@ -20,6 +21,7 @@ export default function ProposalsList({
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialProposals] || []);
   const [meta, setMeta] = useState(initialProposals.meta);
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
     setPages([initialProposals]);
@@ -50,7 +52,12 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
           <ProposalsFilter />
-          <CreateProposalButton createProposal={createDraftProposal} />
+          {!!address && (
+            <CreateProposalButton
+              createProposal={createDraftProposal}
+              address={address}
+            />
+          )}
         </div>
       </div>
 
