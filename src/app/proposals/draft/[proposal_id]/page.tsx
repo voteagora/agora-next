@@ -45,16 +45,22 @@ async function addTransaction(
 ): Promise<ProposalDraftTransaction> {
   "use server";
 
-  const count = await prisma.proposalDraftTransaction.count({
+  // instead of count, get the highest order and add 1
+  const transactions = await prisma.proposalDraftTransaction.findMany({
     where: {
       proposal_id: proposalId,
     },
+    orderBy: {
+      order: "desc",
+    },
   });
+
+  const newOrder = transactions.length > 0 ? transactions[0].order + 1 : 0;
 
   const transaction = await prisma.proposalDraftTransaction.create({
     data: {
       proposal_id: proposalId,
-      order: count,
+      order: newOrder,
       target: "",
       value: "",
       calldata: "",
@@ -86,6 +92,26 @@ async function updateTransaction(
   return transaction;
 }
 
+async function deleteTransaction(
+  transactionId: number
+): Promise<ProposalDraftTransaction[]> {
+  "use server";
+
+  const transaction = await prisma.proposalDraftTransaction.delete({
+    where: {
+      id: transactionId,
+    },
+  });
+
+  const transactions = await prisma.proposalDraftTransaction.findMany({
+    where: {
+      proposal_id: transaction.proposal_id,
+    },
+  });
+
+  return transactions;
+}
+
 export default async function DraftProposalPage({
   params: { proposal_id },
 }: {
@@ -107,6 +133,7 @@ export default async function DraftProposalPage({
         updateProposal={updateProposal}
         addTransaction={addTransaction}
         updateTransaction={updateTransaction}
+        deleteTransaction={deleteTransaction}
       />
       <DraftProposalChecklist />
     </div>

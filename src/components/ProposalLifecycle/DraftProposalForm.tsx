@@ -29,6 +29,9 @@ interface DraftProposalFormProps {
     transactionId: number,
     data: Partial<ProposalDraftTransaction>
   ) => Promise<ProposalDraftTransaction>;
+  deleteTransaction: (
+    transactionId: number
+  ) => Promise<ProposalDraftTransaction[]>;
 }
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
@@ -38,6 +41,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
     updateProposal,
     addTransaction,
     updateTransaction,
+    deleteTransaction,
   } = props;
 
   const [proposalState, setProposalState] =
@@ -71,6 +75,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           updateProposal={updateProposal}
           addTransaction={addTransaction}
           updateTransaction={updateTransaction}
+          deleteTransaction={deleteTransaction}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit
