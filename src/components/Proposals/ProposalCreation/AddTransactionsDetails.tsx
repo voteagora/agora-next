@@ -10,6 +10,7 @@ import InputBox from "@/components/shared/InputBox";
 import styles from "./styles.module.scss";
 import { MultiButtons } from "@/components/shared/MultiButtons";
 import SimulateTransaction from "@/components/shared/SimulateTransaction";
+import { formatEther, parseUnits } from "viem";
 
 export default function AddTransactionsDetails({
   form,
@@ -31,7 +32,7 @@ export default function AddTransactionsDetails({
                 target: "",
                 value: 0,
                 calldata: "",
-                transferAmount: 0,
+                transferAmount: 0n,
                 transferTo: "",
               },
             ],
@@ -118,11 +119,13 @@ export default function AddTransactionsDetails({
                     </label>
                     <InputBox
                       placeholder={"3 000 000 OP"}
-                      value={transaction.transferAmount}
+                      value={formatEther(transaction.transferAmount)}
                       type="number"
                       onChange={(next) =>
                         form.onChange.options(
-                          update(index, { transferAmount: next })
+                          update(index, {
+                            transferAmount: parseUnits(next, 18),
+                          })
                         )
                       }
                       required
