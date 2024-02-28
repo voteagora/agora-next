@@ -11,7 +11,7 @@ export default function RetroPGFApplicationContentFundingSource({
   }[];
 }) {
   return (
-    <VStack className="pt-4 px-4">
+    <VStack className="pt-4 sm:px-4">
       <h2 className="font-inter font-black text-2xl leading-[29px] text-black">
         Funding sources
       </h2>

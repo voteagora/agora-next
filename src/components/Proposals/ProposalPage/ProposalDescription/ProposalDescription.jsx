@@ -1,7 +1,6 @@
 "use client";
 
 import { VStack } from "@/components/Layout/Stack";
-import { getTitleFromProposalDescription } from "@/lib/proposalUtils";
 import ReactMarkdown from "react-markdown";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
