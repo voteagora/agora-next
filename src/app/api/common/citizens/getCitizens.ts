@@ -3,7 +3,7 @@ import "server-only";
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-import { getDelegateStatementForNamespace } from "../delegateStatement/getDelegateStatement";
+import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
 import Tenant from "@/lib/tenant";
 
 type citizen = {
@@ -72,10 +72,7 @@ export async function getCitizens({
 
   const citizens = await Promise.all(
     _citizens.map(async (citizen) => {
-      const statement = await getDelegateStatementForNamespace({
-        addressOrENSName: citizen.address,
-        namespace,
-      });
+      const statement = await getDelegateStatement(citizen.address);
       const { address, metadata } = citizen;
       return {
         address,

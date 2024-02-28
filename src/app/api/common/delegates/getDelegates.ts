@@ -10,11 +10,11 @@ import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { contracts } from "@/lib/contracts/contracts";
-import { getDelegateStatement } from "../../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../../quorum/getQuorum";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant";
+import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
 
@@ -79,9 +79,7 @@ export async function getDelegates({
     delegates.map(async (delegate) => {
       return {
         citizen: await isCitizen(delegate.delegate),
-        statement: await getDelegateStatement({
-          addressOrENSName: delegate.delegate,
-        }),
+        statement: await getDelegateStatement( delegate.delegate),
       };
     })
   );
@@ -159,7 +157,7 @@ export async function getDelegate({
     await Promise.all([
       (await delegateQuery)?.[0] || undefined,
       prisma[`${namespace}VotableSupply`].findFirst({}),
-      getDelegateStatement({ addressOrENSName }),
+      getDelegateStatement( addressOrENSName ),
       getCurrentQuorum(),
       isCitizen(address),
     ]);

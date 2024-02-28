@@ -3,32 +3,24 @@ import "server-only";
 import prisma from "@/app/lib/prisma";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { deploymentToDaoSlug } from "@/lib/config";
+import Tenant from "@/lib/tenant";
 
-export const getDelegateStatementForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
+export const getDelegateStatement = (addressOrENSName: string) =>
   addressOrEnsNameWrap(
-    getDelegateStatementForAddressForNamespace,
+    getDelegateStatementForAddress,
     addressOrENSName,
-    { namespace }
   );
 
-async function getDelegateStatementForAddressForNamespace({
-  address,
-  namespace,
-}: {
+async function getDelegateStatementForAddress({
+                                                            address,
+                                                          }: {
   address: string;
-  namespace: "optimism";
 }) {
-  const daoSlug = deploymentToDaoSlug(namespace);
+
+  const { slug } = Tenant.getInstance();
 
   const postgreqsqlData = await prisma.delegateStatements
-    .findFirst({ where: { address: address.toLowerCase(), dao_slug: daoSlug } })
+    .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
@@ -36,8 +28,8 @@ async function getDelegateStatementForAddressForNamespace({
 }
 
 async function getDelegateStatementForAddressDynamo({
-  address,
-}: {
+                                                      address,
+                                                    }: {
   address: string;
 }) {
   const dynamoDBClient = makeDynamoClient();
@@ -64,10 +56,10 @@ async function getDelegateStatementForAddressDynamo({
         email: null,
         payload: {
           leastValuableProposals:
-            delegateStatementObject.leastValuableProposals,
+          delegateStatementObject.leastValuableProposals,
           mostValuableProposals: delegateStatementObject.mostValuableProposals,
           openToSponsoringProposals:
-            delegateStatementObject.openToSponsoringProposals,
+          delegateStatementObject.openToSponsoringProposals,
           delegateStatement: delegateStatementObject.delegateStatement,
           topIssues: delegateStatementObject.topIssues,
         },

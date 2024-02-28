@@ -9,7 +9,6 @@ import {
 } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
-import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { revalidatePath } from "next/cache";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
@@ -20,6 +19,7 @@ import {
   isDelegatingToProxy,
 } from "@/app/api/common/voting-power/getVotingPower";
 import { getDelegate } from "@/app/api/common/delegates/getDelegates";
+import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -75,7 +75,7 @@ export async function submitDelegateStatement({
 }
 
 export async function fetchDelegateStatement(addressOrENSName: string) {
-  return getDelegateStatement({ addressOrENSName });
+  return getDelegateStatement( addressOrENSName );
 }
 
 export async function fetchVotesForDelegate(
