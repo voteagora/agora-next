@@ -1,8 +1,11 @@
 import { getDelegate } from "@/app/api/common/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { getCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
 import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import { getUserVotesForProposal, getVotesForProposal } from "@/app/api/common/votes/getVotes";
-import { getCurrentDelegators } from "@/app/api/delegations/getDelegations";
+import {
+  getUserVotesForProposal,
+  getVotesForProposal,
+} from "@/app/api/common/votes/getVotes";
 import { getAllForVoting } from "@/app/api/votes/getVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
@@ -53,7 +56,7 @@ async function fetchDelegateStatement(addressOrENSName) {
 async function getDelegators(addressOrENSName) {
   "use server";
 
-  return getCurrentDelegators({ addressOrENSName });
+  return getCurrentDelegators(addressOrENSName);
 }
 
 async function fetchAllForVoting(address, blockNumber, proposal_id) {
@@ -67,19 +70,19 @@ export default async function OPProposalPage({ proposal }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
 
   const formattedVotableSupply = Number(
-    BigInt(votableSupply) / BigInt(10 ** 18),
+    BigInt(votableSupply) / BigInt(10 ** 18)
   );
   const againstLengthString = formatNumber(
     proposal.proposalResults.against,
     18,
-    0,
+    0
   );
   const againstLength = Number(
-    formatUnits(proposal.proposalResults.against, 18),
+    formatUnits(proposal.proposalResults.against, 18)
   );
 
   const againstRelativeAmount = parseFloat(
-    ((againstLength / formattedVotableSupply) * 100).toFixed(2),
+    ((againstLength / formattedVotableSupply) * 100).toFixed(2)
   );
   const status =
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
@@ -128,8 +131,7 @@ export default async function OPProposalPage({ proposal }) {
                     </p>
                   </div>
                 )}
-                <HStack
-                  className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md justify-end font-medium">
+                <HStack className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md justify-end font-medium">
                   <ProposalTimeStatus
                     proposalStatus={proposal.status}
                     proposalEndTime={proposal.end_time}
