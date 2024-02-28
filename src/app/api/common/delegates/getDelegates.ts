@@ -14,21 +14,21 @@ import { getDelegateStatement } from "../../delegateStatement/getDelegateStateme
 import { Delegate } from "./delegate";
 import { getCurrentQuorum } from "../../quorum/getQuorum";
 import { isCitizen } from "../citizens/isCitizen";
+import Tenant from "@/lib/tenant";
 
 type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
 
-export async function getDelegatesForNamespace({
+export async function getDelegates({
   page = 1,
   sort = "weighted_random",
   seed,
-  namespace,
 }: {
   page: number;
   sort: string;
   seed?: number;
-  namespace: "optimism";
 }) {
   const pageSize = 20;
+  const { namespace } = Tenant.getInstance();
 
   const { meta, data: delegates } = await paginatePrismaResult(
     async (skip: number, take: number) => {
@@ -111,13 +111,12 @@ type DelegateStats = {
   num_of_delegators: OptimismDelegates["num_of_delegators"];
 };
 
-export async function getDelegateForNamespace({
+export async function getDelegate({
   addressOrENSName,
-  namespace,
 }: {
   addressOrENSName: string;
-  namespace: "optimism";
 }): Promise<Delegate> {
+  const { namespace } = Tenant.getInstance();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);

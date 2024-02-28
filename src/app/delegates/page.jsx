@@ -1,4 +1,5 @@
 import { getCitizens } from "@/app/api/common/citizens/getCitizens";
+import { getDelegates } from "@/app/api/common/delegates/getDelegates";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import Hero from "@/components/Hero/Hero";
@@ -7,7 +8,6 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { TabsContent } from "@/components/ui/tabs";
 import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import React from "react";
-import { getDelegates } from "../api/delegates/getDelegates";
 import { getCurrentDelegators } from "../api/delegations/getDelegations";
 import { getMetrics } from "../api/metrics/getMetrics";
 

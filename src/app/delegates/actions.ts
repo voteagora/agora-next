@@ -7,7 +7,6 @@ import {
   getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/delegations/getDelegations";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
@@ -20,6 +19,7 @@ import {
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
 } from "@/app/api/common/voting-power/getVotingPower";
+import { getDelegate } from "@/app/api/common/delegates/getDelegates";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(

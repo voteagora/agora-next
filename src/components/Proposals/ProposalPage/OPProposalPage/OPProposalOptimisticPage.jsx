@@ -1,9 +1,9 @@
+import { getDelegate } from "@/app/api/common/delegates/getDelegates";
 import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import {
   getUserVotesForProposal,
   getVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
 import { getCurrentDelegators } from "@/app/api/delegations/getDelegations";
 import { getAllForVoting } from "@/app/api/votes/getVotes";

@@ -3,13 +3,13 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { getAllForVoting } from "@/app/api/votes/getVotes";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 import {
   getUserVotesForProposal,
   getVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
+import { getDelegate } from "@/app/api/common/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
