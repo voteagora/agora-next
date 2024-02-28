@@ -193,6 +193,16 @@ view OptimismVoterStats {
   @@schema("optimism")
 }
 
+view OptimismDelegatees {
+  delegator    String   @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal  @db.Decimal
+
+  @@map("delegatees")
+  @@schema("optimism")
+}
+
 view ENSDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -526,18 +536,6 @@ view ens_proposals_wrapper {
   @@map("proposals_wrapper")
   @@ignore
   @@schema("ens")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view delegatees {
-  delegator    String?
-  delegatee    String?
-  block_number BigInt?
-  balance      Decimal? @db.Decimal
-
-  @@ignore
-  @@schema("optimism")
 }
 
 enum DaoSlug {
