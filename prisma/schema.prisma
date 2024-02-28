@@ -257,14 +257,18 @@ view ENSVoterStats {
 }
 
 view ENSVotes {
-  transaction_hash String  @unique @db.VarChar(66)
+  transaction_hash String        @unique @db.VarChar(66)
   proposal_id      String
   voter            String
   support          String
-  weight           Decimal @db.Decimal
+  weight           Decimal       @db.Decimal
   reason           String?
   block_number     BigInt
   params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json?
+  proposal_type    ProposalType?
 
   @@map("votes")
   @@schema("ens")
