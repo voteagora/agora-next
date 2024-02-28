@@ -11,7 +11,7 @@ export async function isCitizen(address: string) {
     }[]
   >(
     Prisma.sql`
-    SELECT address”
+    SELECT address
     FROM agora.address_metadata
     WHERE kind = 'citizen' 
     AND dao_slug = ${slug}::config.dao_slug
