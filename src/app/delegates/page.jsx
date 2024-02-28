@@ -1,5 +1,6 @@
 import { getCitizens } from "@/app/api/common/citizens/getCitizens";
 import { getDelegates } from "@/app/api/common/delegates/getDelegates";
+import { getMetrics } from "@/app/api/common/metrics/getMetrics";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import Hero from "@/components/Hero/Hero";
@@ -9,7 +10,6 @@ import { TabsContent } from "@/components/ui/tabs";
 import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import React from "react";
 import { getCurrentDelegators } from "../api/delegations/getDelegations";
-import { getMetrics } from "../api/metrics/getMetrics";
 
 async function fetchCitizens(sort, seed, page = 1) {
   "use server";
