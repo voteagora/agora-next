@@ -4,7 +4,7 @@ import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
-import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import { getQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant";
 import { contracts } from "@/lib/contracts/contracts";
 
@@ -58,7 +58,7 @@ export async function getProposals({
 
   const resolvedProposals = Promise.all(
     proposals.map(async (proposal) => {
-      const quorum = await getQuorumForProposalForNamespace(proposal);
+      const quorum = await getQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,
@@ -85,7 +85,7 @@ export async function getProposal(proposal_id: string) {
   }
 
   const latestBlock = await provider.getBlockNumber();
-  const quorum = await getQuorumForProposalForNamespace(proposal);
+  const quorum = await getQuorumForProposal(proposal);
   const votableSupply = await getVotableSupply();
 
   return parseProposal(proposal, latestBlock, quorum, BigInt(votableSupply));

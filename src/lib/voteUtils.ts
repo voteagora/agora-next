@@ -8,8 +8,8 @@ import {
 import { getHumanBlockTime } from "./blockTimes";
 import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { isOldApprovalModule } from "./contracts/contracts";
-import { DEPLOYMENT_NAME } from "./config";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import Tenant from "@/lib/tenant";
 
 /**
  * Vote primitives
@@ -29,8 +29,10 @@ export function parseSupport(
    *      note that block number is indicative but works
    */
 
+  const { namespace } = Tenant.getInstance();
+
   if (
-    DEPLOYMENT_NAME === "optimism" &&
+    namespace === "optimism" &&
     start_block &&
     isOldApprovalModule(start_block)
   ) {

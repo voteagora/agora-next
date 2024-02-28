@@ -14,7 +14,7 @@ import { Delegate } from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
-import { getCurrentQuorumForNamespace } from "@/app/api/common/quorum/getQuorum";
+import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 
 type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
@@ -158,7 +158,7 @@ export async function getDelegate({
       (await delegateQuery)?.[0] || undefined,
       prisma[`${namespace}VotableSupply`].findFirst({}),
       getDelegateStatement(addressOrENSName),
-      getCurrentQuorumForNamespace(),
+      getCurrentQuorum(),
       isCitizen(address),
     ]);
 

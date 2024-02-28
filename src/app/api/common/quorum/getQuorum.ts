@@ -4,9 +4,7 @@ import { contracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant";
 
-export async function getQuorumForProposalForNamespace(
-  proposal: ProposalPayload
-) {
+export async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace } = Tenant.getInstance();
 
   switch (namespace) {
@@ -28,7 +26,7 @@ export async function getQuorumForProposalForNamespace(
   }
 }
 
-export async function getCurrentQuorumForNamespace() {
+export async function getCurrentQuorum() {
   const { namespace } = Tenant.getInstance();
 
   switch (namespace) {

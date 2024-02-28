@@ -1,16 +1,19 @@
-import { HStack } from "../Layout/Stack";
-import MetricContainer from "./MetricContainer";
-import { TOKEN, formatNumber } from "@/lib/tokenUtils";
+import Tenant from "@/lib/tenant";
+import { formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 import styles from "./daometrics.module.scss";
+import MetricContainer from "./MetricContainer";
 
 const defaultMetrics = {
   votableSupply: 0,
   totalSupply: 0,
   quorum: 0,
-};
+};  
 
 export default function DAOMetricsHeader({ metrics }) {
+
+  const {token} = Tenant.getInstance()
+
   const formattedMetrics = useMemo(() => {
     if (!metrics) return defaultMetrics;
     return {
@@ -27,8 +30,8 @@ export default function DAOMetricsHeader({ metrics }) {
         title="Delegated / Total supply"
         body={
           <>
-            {formattedMetrics.votableSupply} {TOKEN.symbol} /{" "}
-            {formattedMetrics.totalSupply} {TOKEN.symbol}
+            {formattedMetrics.votableSupply} {token.symbol} /{" "}
+            {formattedMetrics.totalSupply} {token.symbol}
           </>
         }
       />
@@ -37,7 +40,7 @@ export default function DAOMetricsHeader({ metrics }) {
         title="Quorum"
         body={
           <>
-            {formattedMetrics.quorum} {TOKEN.symbol}
+            {formattedMetrics.quorum} {token.symbol}
           </>
         }
       />

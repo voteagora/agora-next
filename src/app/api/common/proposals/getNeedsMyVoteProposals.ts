@@ -4,7 +4,7 @@ import provider from "@/app/lib/provider";
 import Tenant from "@/lib/tenant";
 import { ProposalPayload } from "./proposal";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
-import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import { getQuorumForProposal } from "../quorum/getQuorum";
 import { contracts } from "@/lib/contracts/contracts";
 
 export async function getNeedsMyVoteProposals(address: string) {
@@ -45,7 +45,7 @@ export async function getNeedsMyVoteProposals(address: string) {
 
   const resolvedProposals = Promise.all(
     proposals.map(async (proposal) => {
-      const quorum = await getQuorumForProposalForNamespace(proposal);
+      const quorum = await getQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,
