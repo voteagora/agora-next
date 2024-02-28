@@ -9,6 +9,7 @@ import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
+import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 
 export default function ProposalsList({
   initialProposals,
@@ -45,6 +46,7 @@ export default function ProposalsList({
         </div>
       </div>
 
+      <CurrentGovernanceStage />
       <VStack className={styles.proposals_table_container}>
         <div className={styles.proposals_table}>
           <InfiniteScroll
