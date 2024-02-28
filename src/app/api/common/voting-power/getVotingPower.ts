@@ -280,7 +280,6 @@ async function getProxyAddressForAddress({
   address,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<string> {
   return getProxyAddress(address);
 }

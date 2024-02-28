@@ -28,7 +28,9 @@ export async function getQuorumForProposalForNamespace(
   }
 }
 
-export async function getCurrentQuorumForNamespace(namespace: "optimism") {
+export async function getCurrentQuorumForNamespace() {
+  const { namespace } = Tenant.getInstance();
+
   switch (namespace) {
     case "optimism": {
       const latestBlock = await provider.getBlockNumber();

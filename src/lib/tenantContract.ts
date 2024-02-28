@@ -1,7 +1,6 @@
 import { BaseContract } from "ethers";
 import { Address } from "viem";
 
-
 interface ITenantContract {
   abi: any;
   chainId: number;
@@ -12,7 +11,6 @@ interface ITenantContract {
 }
 
 export class TenantContract {
-
   private _isProd: boolean;
   readonly abi: any;
   readonly chainId: number;
@@ -37,6 +35,10 @@ export class TenantContract {
    * lover case transformation.
    */
   get address(): string {
-    return (this._isProd || !this.testnetAddress ? this.mainnetAddress : this.testnetAddress).toLowerCase();
+    return (
+      this._isProd || !this.testnetAddress
+        ? this.mainnetAddress
+        : this.testnetAddress
+    ).toLowerCase();
   }
 }

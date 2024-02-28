@@ -1,8 +1,11 @@
 import { ethers } from "ethers";
 import { OptimismContracts } from "./contracts/contracts";
 import { DEPLOYMENT_NAME, Deployments } from "./config";
+import Tenant from "@/lib/tenant";
 
 // TODO: This file seems messy -- consider refactoring
+
+const { namespace } = Tenant.getInstance();
 
 export const tokens: Map<
   Deployments | string,

@@ -2,7 +2,6 @@
 
 import { getAllForAForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
 import { revalidatePath } from "next/cache";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
@@ -20,6 +19,7 @@ import {
   getCurrentDelegators,
   getDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
+import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(

@@ -7,7 +7,12 @@ export type TenantContracts = {
   governor: ITenantContract;
   proposalTypesConfigurator: ITenantContract;
   token: ITenantContract;
-}
+};
+export type TenantToken = {
+  name: string;
+  symbol: string;
+  decimals: number;
+};
 
 export type RetroPGFProject = {
   id: string;
@@ -46,4 +51,4 @@ export type RetroPGFProject = {
     amount: number;
     description: string;
   }[];
-}
+};

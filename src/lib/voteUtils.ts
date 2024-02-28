@@ -1,13 +1,11 @@
 import * as theme from "@/styles/theme";
-import { Prisma, ProposalType } from "@prisma/client";
+import { ProposalType } from "@prisma/client";
 import {
-  ParsedProposalData,
   getProposalTotalValue,
   getTitleFromProposalDescription,
-  parseProposalData,
+  ParsedProposalData,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
-import { Block } from "ethers";
 import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { isOldApprovalModule } from "./contracts/contracts";
 import { DEPLOYMENT_NAME } from "./config";
