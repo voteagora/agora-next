@@ -16,7 +16,7 @@ import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
-type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
+type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
 export async function getDelegates({
   page = 1,
@@ -48,7 +48,7 @@ export async function getDelegates({
           });
         case "weighted_random":
           await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-          return prisma.$queryRawUnsafe<DelegatesGetPaylod[]>(
+          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
             `
             SELECT *
             FROM ${namespace + ".delegates"}
