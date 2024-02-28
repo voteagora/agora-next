@@ -168,6 +168,7 @@ view OptimismAuthorityChainsSnaps {
   balance_block_number BigInt
   allowance            Decimal  @db.Decimal
   contract             String?  @db.VarChar(42)
+  balance_ordinal      Decimal? @db.Decimal
 
   @@map("authority_chains_snaps")
   @@schema("optimism")
@@ -197,7 +198,9 @@ view subdelegations_snaps {
   block_number         BigInt?
   balance              String?
   balance_block_number BigInt?
-  contract             String? @db.VarChar(42)
+  contract             String?  @db.VarChar(42)
+  ordinal              Decimal? @db.Decimal
+  balance_ordinal      Decimal? @db.Decimal
 
   @@ignore
   @@schema("optimism")
@@ -299,6 +302,7 @@ view direct_chains_snaps {
   balance_block_number BigInt?
   allowance            Decimal? @db.Decimal
   contract             String?  @db.VarChar(42)
+  balance_ordinal      Decimal? @db.Decimal
 
   @@ignore
   @@schema("optimism")
@@ -345,6 +349,7 @@ view authority_chains_snaps_wrapper {
   balance_block_number BigInt?
   allowance            Decimal? @db.Decimal
   contract             String?  @db.VarChar(42)
+  balance_ordinal      Decimal? @db.Decimal
 
   @@ignore
   @@schema("optimism")
@@ -394,7 +399,8 @@ view subdelegation_events {
   from                String?
   subdelegation_rules String?
   block_number        BigInt?
-  contract            String? @db.VarChar(42)
+  contract            String?  @db.VarChar(42)
+  ordinal             Decimal? @db.Decimal
 
   @@ignore
   @@schema("optimism")
@@ -413,6 +419,7 @@ enum DaoSlug {
 
 enum Chain {
   optimism_mainnet @map("optimism-mainnet")
+  ethereum_mainnet @map("ethereum-mainnet")
 
   @@map("chain")
   @@schema("config")
