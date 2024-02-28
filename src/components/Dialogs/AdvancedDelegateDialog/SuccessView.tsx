@@ -1,10 +1,11 @@
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Image from "next/image";
 import successfulDelegation from "public/images/successfulDelegation.svg";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { useEffect, useState } from "react";
 
 // TODO: Add notion link in "Learn more"
-
 export function SuccessView({
   closeDialog,
   data,
@@ -15,6 +16,23 @@ export function SuccessView({
     subdelegateData: { hash: string } | undefined;
   };
 }) {
+  const { refetchDelegate } = useConnectButtonContext();
+  const [waitingSeconds, setWaitingSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!refetchDelegate) {
+      closeDialog();
+    }
+  }, [refetchDelegate, closeDialog]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWaitingSeconds((prevSeconds) => prevSeconds + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
       <div className="w-full">
@@ -42,7 +60,7 @@ export function SuccessView({
         in calculation.
       </p>
       <Button className="w-full mt-6" onClick={() => closeDialog()}>
-        Got it
+        Waiting for updated voting power {waitingSeconds}s...
       </Button>
       <BlockScanUrls
         hash1={data.delegateToProxyData?.hash}

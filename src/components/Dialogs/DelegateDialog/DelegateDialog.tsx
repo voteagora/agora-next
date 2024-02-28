@@ -37,7 +37,7 @@ export function DelegateDialog({
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { setRefetchDelegate } = useConnectButtonContext();
+  const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee = delegate.address === delegatee?.delegatee;
 
   const writeWithTracking = async () => {
@@ -54,8 +54,14 @@ export function DelegateDialog({
 
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });
+
+    if (Number(votingPower) > 0) {
+      setRefetchDelegate({
+        address: trackingData.delegateAddress,
+        prevVotingPowerDelegatee: delegate.votingPower,
+      });
+    }
     setIsLoading(false);
-    setRefetchDelegate(trackingData.delegateAddress);
   };
 
   const { data: delegateEnsName } = useEnsName({
@@ -210,7 +216,7 @@ export function DelegateDialog({
             <Button disabled={false} onClick={() => writeWithTracking()}>
               Delegation failed - try again
             </Button>
-          ) : isLoading ? (
+          ) : isLoading || refetchDelegate ? (
             <Button disabled={false}>Submitting your delegation...</Button>
           ) : isSuccess ? (
             <div>
