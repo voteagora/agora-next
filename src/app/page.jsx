@@ -82,7 +82,10 @@ export default async function Home({ searchParams }) {
         initRelevantProposals={relevalntProposals}
         initAllProposals={allProposals}
         filter={filter}
-        fetchProposals={(page) => getProposals({ filter, page })}
+        fetchProposals={async (page) => {
+          "use server";
+          return getProposals({ filter, page });
+        }}
         votableSupply={votableSupply}
       />
     </VStack>
