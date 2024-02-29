@@ -100,7 +100,7 @@ async function getVotingPowerForProposalByAddress({
         WHERE chain_str=s.chain_str 
           AND contract = $2
           AND block_number <= $3
-        ORDER BY block_number DESC
+        ORDER BY ordinal DESC
         LIMIT 1
       ) AS a ON TRUE
     ) t
