@@ -11,7 +11,7 @@ type citizen = {
   dao_slug: string;
   metadata: object | null;
   created_at: Date;
-  voting_power: Prisma.Decimal;
+  voting_power?: Prisma.Decimal;
 };
 
 export async function getCitizensForNamespace({
@@ -34,7 +34,8 @@ export async function getCitizensForNamespace({
           `
           SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
           FROM agora.address_metadata address_metadata
-          JOIN ${namespace + ".delegates"
+          LEFT JOIN ${
+            namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
           WHERE address_metadata.kind = 'citizen' 
           AND address_metadata.dao_slug = 'OP'
@@ -51,8 +52,9 @@ export async function getCitizensForNamespace({
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM agora.address_metadata address_metadata
-            JOIN ${namespace + ".delegates"
-          } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+            LEFT JOIN ${
+              namespace + ".delegates"
+            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
             ORDER BY delegate.voting_power DESC
@@ -78,7 +80,7 @@ export async function getCitizensForNamespace({
       return {
         address,
         metadata,
-        votingPower: citizen.voting_power?.toFixed(0),
+        votingPower: citizen.voting_power?.toFixed(0) || "0",
         // Mark as citizen to display badge
         citizen: true,
         statement,
