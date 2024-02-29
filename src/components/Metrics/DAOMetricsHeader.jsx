@@ -3,6 +3,7 @@
 import MetricContainer from "./MetricContainer";
 import { formatNumber } from "@/lib/tokenUtils";
 import styles from "./daometrics.module.scss";
+import Tenant from "@/lib/tenant";
 
 export default async function DAOMetricsHeader({ metrics }) {
 
