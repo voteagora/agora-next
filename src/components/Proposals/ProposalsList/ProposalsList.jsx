@@ -21,15 +21,15 @@ export default function ProposalsList({
   const [pages, setPages] = useState([initRelevantProposals] || []);
   const [meta, setMeta] = useState(initRelevantProposals.meta);
 
-  // useEffect(() => {
-  //   if (filter === "relevant") {
-  //     setPages([initRelevantProposals]);
-  //     setMeta(initRelevantProposals.meta);
-  //   } else {
-  //     setPages([initAllProposals]);
-  //     setMeta(initAllProposals.meta);
-  //   }
-  // }, [initRelevantProposals, initAllProposals, filter]);
+  useEffect(() => {
+    if (filter === "relevant") {
+      setPages([initRelevantProposals]);
+      setMeta(initRelevantProposals.meta);
+    } else {
+      setPages([initAllProposals]);
+      setMeta(initAllProposals.meta);
+    }
+  }, [initRelevantProposals, initAllProposals, filter]);
 
   const loadMore = async () => {
     if (fetching.current || !meta.hasNextPage) return;
