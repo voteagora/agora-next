@@ -1,24 +1,15 @@
-import { HStack } from "../Layout/Stack";
+"use server";
+
 import MetricContainer from "./MetricContainer";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";
-import { useMemo } from "react";
 import styles from "./daometrics.module.scss";
 
-const defaultMetrics = {
-  votableSupply: 0,
-  totalSupply: 0,
-  quorum: 0,
-};
-
-export default function DAOMetricsHeader({ metrics }) {
-  const formattedMetrics = useMemo(() => {
-    if (!metrics) return defaultMetrics;
-    return {
-      votableSupply: formatNumber(metrics.votableSupply),
-      totalSupply: formatNumber(metrics.totalSupply),
-      quorum: formatNumber(metrics.quorum),
-    };
-  }, [metrics]);
+export default async function DAOMetricsHeader({ metrics }) {
+  const formattedMetrics = {
+    votableSupply: formatNumber(metrics.votableSupply),
+    totalSupply: formatNumber(metrics.totalSupply),
+    quorum: formatNumber(metrics.quorum),
+  };
 
   return (
     <div className={styles.metrics_container}>
