@@ -1,3 +1,5 @@
+"use server";
+
 import Image from "next/image";
 import { HStack, VStack } from "../Layout/Stack";
 import sunnyFace from "@/assets/optimism/sunny-face-sticker.svg";
