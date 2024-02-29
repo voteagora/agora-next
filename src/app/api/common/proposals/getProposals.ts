@@ -16,7 +16,7 @@ export async function getProposalsForNamespace({
   namespace: "optimism";
   page: number;
 }) {
-  const pageSize = 15;
+  const pageSize = 10;
   const prodDataOnly = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" && {
     contract: contracts(namespace).governor.address.toLowerCase(),
   };
