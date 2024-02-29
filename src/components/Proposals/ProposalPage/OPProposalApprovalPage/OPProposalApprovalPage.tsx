@@ -33,9 +33,7 @@ async function fetchAllForVoting(
 async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   "use server";
 
-  return await getDelegate({
-    addressOrENSName,
-  });
+  return await getDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(

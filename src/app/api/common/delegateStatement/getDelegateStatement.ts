@@ -6,17 +6,9 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant";
 
 export const getDelegateStatement = (addressOrENSName: string) =>
-  addressOrEnsNameWrap(
-    getDelegateStatementForAddress,
-    addressOrENSName,
-  );
+  addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
 
-async function getDelegateStatementForAddress({
-                                                            address,
-                                                          }: {
-  address: string;
-}) {
-
+async function getDelegateStatementForAddress(address: string) {
   const { slug } = Tenant.getInstance();
 
   const postgreqsqlData = await prisma.delegateStatements
@@ -24,14 +16,10 @@ async function getDelegateStatementForAddress({
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
-    : await getDelegateStatementForAddressDynamo({ address });
+    : await getDelegateStatementForAddressDynamo(address);
 }
 
-async function getDelegateStatementForAddressDynamo({
-                                                      address,
-                                                    }: {
-  address: string;
-}) {
+async function getDelegateStatementForAddressDynamo(address: string) {
   const dynamoDBClient = makeDynamoClient();
 
   try {
@@ -56,10 +44,10 @@ async function getDelegateStatementForAddressDynamo({
         email: null,
         payload: {
           leastValuableProposals:
-          delegateStatementObject.leastValuableProposals,
+            delegateStatementObject.leastValuableProposals,
           mostValuableProposals: delegateStatementObject.mostValuableProposals,
           openToSponsoringProposals:
-          delegateStatementObject.openToSponsoringProposals,
+            delegateStatementObject.openToSponsoringProposals,
           delegateStatement: delegateStatementObject.delegateStatement,
           topIssues: delegateStatementObject.topIssues,
         },

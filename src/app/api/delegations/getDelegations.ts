@@ -11,11 +11,11 @@ import {
 
 export const getAllForAForAdvancedDelegation = async (address: string) => {
   return await Promise.all([
-    getVotingPowerAvailableForSubdelegation({ addressOrENSName: address }),
-    isDelegatingToProxy({ addressOrENSName: address }),
+    getVotingPowerAvailableForSubdelegation(address),
+    isDelegatingToProxy(address),
     getCurrentDelegatees(address),
-    getProxy({ addressOrENSName: address }),
+    getProxy(address),
     getCurrentDelegators(address),
-    getVotingPowerAvailableForDirectDelegation({ addressOrENSName: address }),
+    getVotingPowerAvailableForDirectDelegation(address),
   ]);
 };

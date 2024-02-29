@@ -27,9 +27,7 @@ async function fetchProposalVotes(proposal_id, page = 1) {
 async function fetchDelegate(addressOrENSName) {
   "use server";
 
-  return await getDelegate({
-    addressOrENSName,
-  });
+  return await getDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(proposal_id, address) {

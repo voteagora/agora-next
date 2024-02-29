@@ -16,7 +16,7 @@ export async function getAllForVoting(
         proposalId: proposal_id,
       }),
       getAuthorityChains({ address, blockNumber }),
-      getDelegate({ addressOrENSName: address }),
+      getDelegate(address),
       getVotesForProposalAndDelegate({ proposal_id, address }),
     ]);
 

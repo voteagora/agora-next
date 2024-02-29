@@ -25,19 +25,19 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 export async function fetchVotingPowerForSubdelegation(
   addressOrENSName: string
 ) {
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+  return getVotingPowerAvailableForSubdelegation(addressOrENSName);
 }
 
 // Pass address of the connected wallet
 export async function checkIfDelegatingToProxy(addressOrENSName: string) {
-  return isDelegatingToProxy({ addressOrENSName });
+  return isDelegatingToProxy(addressOrENSName);
 }
 
 // Pass address of the connected wallet
 export async function fetchBalanceForDirectDelegation(
   addressOrENSName: string
 ) {
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+  return getVotingPowerAvailableForDirectDelegation(addressOrENSName);
 }
 
 export async function fetchDirectDelegatee(addressOrENSName: string) {
@@ -46,11 +46,11 @@ export async function fetchDirectDelegatee(addressOrENSName: string) {
 
 // Pass address of the connected wallet
 export async function getProxyAddress(addressOrENSName: string) {
-  return getProxy({ addressOrENSName });
+  return getProxy(addressOrENSName);
 }
 
 export async function fetchDelegate(addressOrENSName: string) {
-  return getDelegate({ addressOrENSName });
+  return getDelegate(addressOrENSName);
 }
 
 export async function submitDelegateStatement({

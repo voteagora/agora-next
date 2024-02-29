@@ -109,11 +109,7 @@ type DelegateStats = {
   num_of_delegators: OptimismDelegates["num_of_delegators"];
 };
 
-export async function getDelegate({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}): Promise<Delegate> {
+export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace } = Tenant.getInstance();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
