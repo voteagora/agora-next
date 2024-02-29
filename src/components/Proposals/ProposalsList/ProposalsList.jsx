@@ -9,25 +9,33 @@ import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
+import { useSearchParams } from "next/navigation";
 
 export default function ProposalsList({
-  initialProposals,
+  initRelevantProposals,
+  initAllProposals,
   fetchProposals,
   votableSupply,
 }) {
+  const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialProposals] || []);
-  const [meta, setMeta] = useState(initialProposals.meta);
+  const [pages, setPages] = useState([initRelevantProposals] || []);
+  const [meta, setMeta] = useState(initRelevantProposals.meta);
 
   useEffect(() => {
-    setPages([initialProposals]);
-    setMeta(initialProposals.meta);
-  }, [initialProposals]);
+    if (filter === "relevant") {
+      setPages([initRelevantProposals]);
+      setMeta(initRelevantProposals.meta);
+    } else {
+      setPages([initAllProposals]);
+      setMeta(initAllProposals.meta);
+    }
+  }, [initRelevantProposals, initAllProposals, filter]);
 
   const loadMore = async () => {
     if (fetching.current || !meta.hasNextPage) return;
     fetching.current = true;
-    const data = await fetchProposals(meta.currentPage + 1);
+    const data = await fetchProposals(meta.currentPage + 1, filter);
     setPages((prev) => [...prev, { ...data, proposals: data.proposals }]);
     setMeta(data.meta);
     fetching.current = false;

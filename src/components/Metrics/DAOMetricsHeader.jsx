@@ -1,27 +1,18 @@
-import Tenant from "@/lib/tenant";
-import { formatNumber } from "@/lib/tokenUtils";
-import { useMemo } from "react";
-import styles from "./daometrics.module.scss";
+"use server";
+
 import MetricContainer from "./MetricContainer";
+import { formatNumber } from "@/lib/tokenUtils";
+import styles from "./daometrics.module.scss";
 
-const defaultMetrics = {
-  votableSupply: 0,
-  totalSupply: 0,
-  quorum: 0,
-};  
+export default async function DAOMetricsHeader({ metrics }) {
 
-export default function DAOMetricsHeader({ metrics }) {
+  const {token}  = Tenant.getInstance();
 
-  const {token} = Tenant.getInstance()
-
-  const formattedMetrics = useMemo(() => {
-    if (!metrics) return defaultMetrics;
-    return {
-      votableSupply: formatNumber(metrics.votableSupply),
-      totalSupply: formatNumber(metrics.totalSupply),
-      quorum: formatNumber(metrics.quorum),
-    };
-  }, [metrics]);
+  const formattedMetrics = {
+    votableSupply: formatNumber(metrics.votableSupply),
+    totalSupply: formatNumber(metrics.totalSupply),
+    quorum: formatNumber(metrics.quorum),
+  };
 
   return (
     <div className={styles.metrics_container}>
