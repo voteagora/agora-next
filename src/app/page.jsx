@@ -56,11 +56,13 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Home({ searchParams }) {
-  const filter = searchParams?.filter
-    ? proposalsFilterOptions.everything.filter
-    : proposalsFilterOptions.relevant.filter;
-  const proposals = await fetchProposals(filter);
+export default async function Home() {
+  const relevalntProposals = await fetchProposals(
+    proposalsFilterOptions.relevant.filter
+  );
+  const allProposals = await fetchProposals(
+    proposalsFilterOptions.everything.filter
+  );
 
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
@@ -75,8 +77,9 @@ export default async function Home({ searchParams }) {
         votableSupply={votableSupply}
       />
       <ProposalsList
-        initialProposals={proposals}
-        fetchProposals={async (page) => {
+        initRelevantProposals={relevalntProposals}
+        initAllProposals={allProposals}
+        fetchProposals={async (page, filter) => {
           "use server";
           return getProposals({ filter, page });
         }}
