@@ -34,10 +34,6 @@ export async function getNeedsMyVoteProposalsForNamespace({
         WHERE CAST(start_block AS INTEGER) < $1
           AND CAST(end_block AS INTEGER) > $1
           AND cancelled_block IS NULL
-          AND proposal_id NOT IN (
-            '27821243076957305012707713934587003414742773107891806047636636540352925014010',
-            '62092202168195773894923954988192064013015536031851396683038331347078793897464'
-          )
           ${prodDataOnly}
       ) AS p
       LEFT JOIN ${
