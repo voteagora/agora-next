@@ -33,14 +33,6 @@ export async function getProposalsForNamespace({
           where: {
             ...(prodDataOnly || {}),
             cancelled_block: null,
-            proposal_id: {
-              not: {
-                in: [
-                  "27821243076957305012707713934587003414742773107891806047636636540352925014010",
-                  "62092202168195773894923954988192064013015536031851396683038331347078793897464",
-                ],
-              },
-            },
           },
         });
       } else {
