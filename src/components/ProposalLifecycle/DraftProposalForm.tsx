@@ -56,7 +56,8 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
         type="single"
         collapsible
         className="flex flex-col min-h-screen"
-        value={proposalState.proposal_status == "draft" ? stage : ""}
+        // TODO don't hard code this
+        value={proposalState.proposal_status_id == 1 ? stage : ""}
         onValueChange={(value) =>
           setStage(value as ProposalLifecycleDraftStage)
         }

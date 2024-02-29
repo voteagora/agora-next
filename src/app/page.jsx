@@ -63,10 +63,16 @@ async function createDraftProposal(address) {
       description: "",
       abstract: "",
       audit_url: "",
-      update_ens_docs_status: true,
-      post_on_discourse_status: true,
-      dao: "ens",
-      proposal_status: "draft",
+      dao: {
+        connect: {
+          id: 1,
+        },
+      },
+      proposal_status: {
+        connect: {
+          id: 1,
+        },
+      },
       author_address: address,
     },
   });
