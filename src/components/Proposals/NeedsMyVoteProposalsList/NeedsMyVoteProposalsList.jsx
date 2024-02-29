@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import styles from "./needsMyVoteProposalLists.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -9,27 +9,29 @@ import Proposal from "../Proposal/Proposal";
 
 import { useAccount } from "wagmi";
 
-export default function ProposalsList({
+export default function NeedsMyVoteProposalsList({
   fetchNeedsMyVoteProposals,
   votableSupply,
 }) {
   const [proposals, setProposals] = useState([]);
   const { address, isConnected } = useAccount();
 
-  const getProposals = async () => {
+  const getProposals = useCallback(async () => {
     if (address) {
       const proposals = await fetchNeedsMyVoteProposals(address);
 
       setProposals(proposals.proposals);
     }
-  };
+  }, [address, fetchNeedsMyVoteProposals]);
 
   useEffect(() => {
     // reset when changing wallets
     setProposals([]);
 
     getProposals();
-  }, [address]);
+  }, [getProposals, address]);
+
+  console.log(proposals);
 
   return (
     <>
