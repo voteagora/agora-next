@@ -57,13 +57,17 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Home({ searchParams }) {
-  const filter = searchParams?.filter
-    ? proposalsFilterOptions.everything.filter
-    : proposalsFilterOptions.relevant.filter;
-  const proposals = await fetchProposals(filter);
+  const relevalntProposals = await fetchProposals(
+    proposalsFilterOptions.relevant.filter
+  );
+  const allProposals = await fetchProposals(
+    proposalsFilterOptions.everything.filter
+  );
 
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
+
+  const filter = searchParams.filter || proposalsFilterOptions.relevant.filter;
 
   return (
     <VStack>
@@ -75,7 +79,9 @@ export default async function Home({ searchParams }) {
         votableSupply={votableSupply}
       />
       <ProposalsList
-        initialProposals={proposals}
+        initRelevantProposals={relevalntProposals}
+        initAllProposals={allProposals}
+        filter={filter}
         fetchProposals={async (page) => {
           "use server";
           return getProposals({ filter, page });
