@@ -317,6 +317,7 @@ view advanced_voting_power_raw_snaps {
   block_number        BigInt?
   proxy               String?
   contract            String?  @db.VarChar(42)
+  ordinal             Decimal? @db.Decimal
 
   @@ignore
   @@schema("optimism")
