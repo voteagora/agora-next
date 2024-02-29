@@ -9,14 +9,15 @@ import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
+import { useSearchParams } from "next/navigation";
 
 export default function ProposalsList({
   initRelevantProposals,
   initAllProposals,
   fetchProposals,
   votableSupply,
-  filter,
 }) {
+  const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
   const [meta, setMeta] = useState(initRelevantProposals.meta);
@@ -34,7 +35,7 @@ export default function ProposalsList({
   const loadMore = async () => {
     if (fetching.current || !meta.hasNextPage) return;
     fetching.current = true;
-    const data = await fetchProposals(meta.currentPage + 1);
+    const data = await fetchProposals(meta.currentPage + 1, filter);
     setPages((prev) => [...prev, { ...data, proposals: data.proposals }]);
     setMeta(data.meta);
     fetching.current = false;
@@ -48,7 +49,7 @@ export default function ProposalsList({
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
-          {/* <ProposalsFilter /> */}
+          <ProposalsFilter />
         </div>
       </div>
 

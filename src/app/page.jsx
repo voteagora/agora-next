@@ -56,7 +56,7 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Home({ searchParams }) {
+export default async function Home() {
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter
   );
@@ -66,8 +66,6 @@ export default async function Home({ searchParams }) {
 
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
-
-  const filter = searchParams.filter || proposalsFilterOptions.relevant.filter;
 
   return (
     <VStack>
@@ -81,8 +79,7 @@ export default async function Home({ searchParams }) {
       <ProposalsList
         initRelevantProposals={relevalntProposals}
         initAllProposals={allProposals}
-        filter={filter}
-        fetchProposals={async (page) => {
+        fetchProposals={async (page, filter) => {
           "use server";
           return getProposals({ filter, page });
         }}
