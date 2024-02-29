@@ -25,7 +25,7 @@ export async function getAuthorityChainsForNamespace({
     FROM ${namespace + ".authority_chains_snaps"} ac
     CROSS JOIN LATERAL (
       SELECT
-        MAX(balance_block_number) AS max_block_number
+        MAX(balance_ordinal) AS max_ordinal
       FROM ${namespace + ".authority_chains_snaps"}
       WHERE chain = ac.chain
         AND delegate = $1
@@ -34,7 +34,7 @@ export async function getAuthorityChainsForNamespace({
     ) AS max_blocks
     WHERE ac.delegate = $1
       AND ac.contract = $2
-      AND ac.balance_block_number = max_blocks.max_block_number
+      AND ac.balance_ordinal = max_blocks.max_ordinal
       AND ac.balance > 0
       AND ac.allowance > 0;
     `,
