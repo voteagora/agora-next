@@ -4,7 +4,7 @@ import MetricContainer from "./MetricContainer";
 import { TOKEN, formatNumber } from "@/lib/tokenUtils";
 import styles from "./daometrics.module.scss";
 
-export default function DAOMetricsHeader({ metrics }) {
+export default async function DAOMetricsHeader({ metrics }) {
   const formattedMetrics = {
     votableSupply: formatNumber(metrics.votableSupply),
     totalSupply: formatNumber(metrics.totalSupply),
