@@ -38,20 +38,10 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   };
 
   const handleChangeUpdateENSDocsStatus = () => {
-    setProposalState({
-      ...proposalState,
-      update_ens_docs_status: !proposalState.update_ens_docs_status,
-    });
-
-    // TODO sync with DB after we make the decision with ENS
-  };
-
-  const handleChangePostOnDiscourseStatus = () => {
-    setProposalState({
-      ...proposalState,
-      post_on_discourse_status: !proposalState.post_on_discourse_status,
-    });
-
+    // setProposalState({
+    //   ...proposalState,
+    //   update_ens_docs_status: !proposalState.update_ens_docs_status,
+    // });
     // TODO sync with DB after we make the decision with ENS
   };
 
@@ -66,8 +56,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
             disabled={
               !proposalState.title ||
               !proposalState.description ||
-              !proposalState.abstract ||
-              proposalState.transactions.length === 0
+              !proposalState.abstract
             }
           >
             <span className="text-center">Create draft</span>
@@ -80,16 +69,9 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <p className="text-gray-4f pr-5">Update ENS docs</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
           <Checkbox
-            checked={proposalState.update_ens_docs_status}
+            // checked={proposalState.update_ens_docs_status}
+            checked={true}
             onCheckedChange={() => handleChangeUpdateENSDocsStatus()}
-          />
-        </div>
-        <div className="flex flex-row w-full items-center">
-          <p className="text-gray-4f pr-5">Post draft on discourse</p>
-          <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
-          <Checkbox
-            checked={proposalState.update_ens_docs_status}
-            onCheckedChange={() => handleChangePostOnDiscourseStatus()}
           />
         </div>
       </div>
