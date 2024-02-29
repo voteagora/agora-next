@@ -2,7 +2,7 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 export default function CurrentGovernanceStage() {
   const currentDate = new Date();
-  const targetDate = new Date(currentDate.getFullYear(), 2, 5, 19, 47);
+  const targetDate = new Date(currentDate.getFullYear(), 2, 5, 21, 47);
   const differenceInMilliseconds = targetDate.getTime() - currentDate.getTime();
   const differenceInDays = Math.floor(
     differenceInMilliseconds / (1000 * 60 * 60 * 24)
