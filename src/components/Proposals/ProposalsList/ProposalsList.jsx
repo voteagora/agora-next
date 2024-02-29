@@ -48,7 +48,7 @@ export default function ProposalsList({
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
-          <ProposalsFilter />
+          {/* <ProposalsFilter /> */}
         </div>
       </div>
 
