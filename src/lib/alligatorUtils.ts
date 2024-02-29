@@ -45,8 +45,8 @@ export async function getTotalVotableAllowance({
   subdelegated_amount, // Subdelegated amount is a cumulative value of all absolute subdelegations
   proposalId,
 }: AuhtorityChainsAggregate & { proposalId: string }) {
-  const subdelegatedShare = Number(subdelegated_share.toFixed(5));
-  const subdelegatedAmount = BigInt(subdelegated_amount.toFixed(0));
+  const subdelegatedShare = Number(subdelegated_share?.toFixed(5) ?? 0);
+  const subdelegatedAmount = BigInt(subdelegated_amount?.toFixed(0) ?? 0);
 
   if (subdelegatedShare > 1) {
     return 0n;
@@ -54,22 +54,22 @@ export async function getTotalVotableAllowance({
 
   const latestBlockNumber = await provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(
-    proxies.map((proxy) =>
+    (proxies ?? []).map((proxy) =>
       contracts("optimism").governor.contract.weightCast(
         proposalId,
         proxy.toString()
       )
     )
   );
-  const allowances: bigint[] = new Array(balances.length);
+  const allowances: bigint[] = new Array(balances?.length ?? 0);
 
   const drainedAmount: Map<string, bigint> = new Map();
 
-  chains.forEach((chain, i) => {
-    const chainRules = rules[i].reverse();
+  (chains ?? []).forEach((chain, i) => {
+    const chainRules = (rules ?? [])[i].reverse();
     // This accounts for already casted votes
     allowances[i] =
-      BigInt(balances[i]?.toFixed(0) ?? 0) - weightsCastByProxies[i];
+      BigInt((balances ?? [])[i]?.toFixed(0) ?? 0) - weightsCastByProxies[i];
 
     chain.reverse().forEach((address, j) => {
       const rule = chainRules[j] as AuthorityChainRules;
