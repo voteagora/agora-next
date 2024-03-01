@@ -2,6 +2,14 @@ import { Checkbox } from "../ui/checkbox";
 import { useContext, useState } from "react";
 import { ProposalDraftWithTransactions } from "./types";
 import { ProposalDraft } from "@prisma/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -31,10 +39,14 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     updateProposal,
   } = props;
 
-  const saveAndContinue = async () => {
+  const handleContinue = async () => {
     // TODO save / run validation etc
 
     setStage("draft-submit");
+  };
+
+  const saveAndUpdateDocs = async () => {
+    // TODO save / run validation etc
   };
 
   const handleChangeUpdateENSDocsStatus = () => {
@@ -50,17 +62,39 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
       <div className="flex flex-col px-6 pt-6 pb-9 bg-white border-gray-eb rounded-b-lg shadow">
         <div className="flex flex-row w-full justify-between items-center">
           <p className="text-gray-4f max-w-[400px]">{description}</p>
-          <button
-            className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
-            onClick={() => saveAndContinue()}
-            disabled={
-              !proposalState.title ||
-              !proposalState.description ||
-              !proposalState.abstract
-            }
-          >
-            <span className="text-center">Create draft</span>
-          </button>
+          <Dialog onOpenChange={(open) => open && saveAndUpdateDocs()}>
+            <DialogTrigger>
+              <button
+                className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
+                disabled={
+                  !proposalState.title ||
+                  !proposalState.description ||
+                  !proposalState.abstract
+                }
+              >
+                <span className="text-center">Create draft</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <div className="px-6 py-8">
+                <p className="font-medium mb-4 text-stone-900">
+                  Draft successfully created!
+                </p>
+                <div className="flex flex-row justify-between mb-8">
+                  <p className="text-stone-700">Update ENS docs</p>
+                  <div className="text-green-600">
+                    <p>Completed</p>
+                  </div>
+                </div>
+                <button
+                  className={`w-full py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
+                  onClick={handleContinue}
+                >
+                  Continue
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <div className="flex flex-col gap-y-2 p-6">
