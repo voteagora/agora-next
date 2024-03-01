@@ -50,17 +50,50 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     name: sponsorInput,
   });
 
+  const [sponsorAddress, setSponsorAddress] = useState<string>("");
+  const [canSponsor, setCanSponsor] = useState<boolean>(false);
+
+  const hasVotingPower = (address: string) => {
+    // TODO implement voting power check
+    // State for today: Andrei is working on the infra
+    // right now only nick.eth can sponsor
+    return address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5";
+  };
+
+  useEffect(() => {
+    if (!!ensResolvedAddress) {
+      setSponsorAddress(ensResolvedAddress);
+    }
+  }, [ensResolvedAddress]);
+
+  useEffect(() => {
+    // check if ethereum address
+    const isEthereumAddress = /^(0x)?[0-9a-fA-F]{40}$/i.test(sponsorInput);
+    if (isEthereumAddress) {
+      setSponsorAddress(sponsorInput);
+    } else {
+      if (!ensResolvedAddress) {
+        setSponsorAddress("");
+      }
+    }
+  }, [sponsorInput]);
+
+  useEffect(() => {
+    if (!!sponsorAddress) {
+      setCanSponsor(hasVotingPower(sponsorAddress));
+    }
+  }, [sponsorAddress]);
+
   const handleSubmitProposal = async () => {
     // TODO unify states and names across frontend state and database
-    const updateData = {
-      proposal_status: "sponsor_requested",
-    };
-    const updatedProposal = await updateProposal(proposalState, updateData);
-
-    setProposalState({
-      ...updatedProposal,
-      transactions: proposalState.transactions,
-    });
+    // const updateData = {
+    //   proposal_status: "sponsor_requested",
+    // };
+    // const updatedProposal = await updateProposal(proposalState, updateData);
+    // setProposalState({
+    //   ...updatedProposal,
+    //   transactions: proposalState.transactions,
+    // });
   };
 
   return (
@@ -145,13 +178,13 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
                   )}
                   {!!ensResolvedAddress && <p>{sponsorInput}</p>}
                 </div>
-                {!!ensResolvedAddress && true && (
+                {!!sponsorAddress && canSponsor && (
                   <div className="flex flex-row items-center gap-x-1.5">
                     <CheckmarkIcon className="w-5 h-5" />
                     <p className="text-green-600">Can sponsor</p>
                   </div>
                 )}
-                {!!ensResolvedAddress && false && (
+                {!!sponsorAddress && !canSponsor && (
                   <div className="flex flex-row items-center gap-x-1.5">
                     <p className="text-red-600">Cannot sponsor</p>
                   </div>
