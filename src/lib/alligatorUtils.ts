@@ -61,6 +61,7 @@ export async function getTotalVotableAllowance({
       )
     )
   );
+
   const allowances: bigint[] = new Array(balances?.length ?? 0);
 
   const drainedAmount: Map<string, bigint> = new Map();
@@ -68,8 +69,10 @@ export async function getTotalVotableAllowance({
   (chains ?? []).forEach((chain, i) => {
     const chainRules = (rules ?? [])[i].reverse();
     // This accounts for already casted votes
-    allowances[i] =
+    const totalAvailableBalance =
       BigInt((balances ?? [])[i]?.toFixed(0) ?? 0) - weightsCastByProxies[i];
+
+    allowances[i] = BigInt((balances ?? [])[i]?.toFixed(0) ?? 0);
 
     chain.reverse().forEach((address, j) => {
       const rule = chainRules[j] as AuthorityChainRules;
@@ -115,6 +118,9 @@ export async function getTotalVotableAllowance({
         drainedAmount.set(address.toString(), allowances[i] + drained);
       }
     });
+
+    // Only allow the total available balance to be used
+    allowances[i] = bigIntMin(allowances[i], totalAvailableBalance);
   });
 
   const totalAllowance =
