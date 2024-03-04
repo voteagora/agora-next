@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { OptimismContracts } from "./contracts/contracts";
 import Tenant from "@/lib/tenant";
+import TenantTokenFactory from "@/lib/tenantTokenFactory";
 
 // TODO: This file seems messy -- consider refactoring
 
@@ -9,6 +10,18 @@ const format = new Intl.NumberFormat("en", {
   maximumSignificantDigits: 3,
   notation: "compact",
 });
+
+export const tokenForContractAddress = (address: string) => {
+
+  switch (address) {
+    case "0x42000000000000000000000000000000000000420":
+      return TenantTokenFactory.create("optimism");
+
+    default:
+      return TenantTokenFactory.create("optimism");
+  }
+
+};
 
 export function pluralizeVote(count: BigInt) {
   const { token } = Tenant.getInstance();
@@ -26,7 +39,7 @@ export function pluralizeVote(count: BigInt) {
 
 export function formatNumber(
   amount: string | BigInt,
-  maximumSignificantDigits = 4
+  maximumSignificantDigits = 4,
 ) {
   const { token } = Tenant.getInstance();
   const number = Number(ethers.formatUnits(amount.toString(), token.decimals));
