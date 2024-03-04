@@ -8,7 +8,11 @@ import Tenant from "@/lib/tenant";
 export const getDelegateStatement = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
 
-async function getDelegateStatementForAddress(address: string) {
+async function getDelegateStatementForAddress({
+  address,
+}: {
+  address: string;
+}) {
   const { slug } = Tenant.getInstance();
 
   const postgreqsqlData = await prisma.delegateStatements

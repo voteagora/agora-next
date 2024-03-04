@@ -132,9 +132,11 @@ async function getVotingPowerForProposalByAddress({
 export const getCurrentVotingPowerForNamespace = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentVotingPowerForAddress, addressOrENSName);
 
-async function getCurrentVotingPowerForAddress(
-  address: string
-): Promise<VotingPowerData> {
+async function getCurrentVotingPowerForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<VotingPowerData> {
   const { namespace } = Tenant.getInstance();
   const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
     where: {
@@ -174,9 +176,11 @@ export const getVotingPowerAvailableForSubdelegation = (
     addressOrENSName
   );
 
-async function getVotingPowerAvailableForSubdelegationForAddress(
-  address: string
-): Promise<string> {
+async function getVotingPowerAvailableForSubdelegationForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<string> {
   const { namespace } = Tenant.getInstance();
   const advancedVotingPower = await prisma[
     `${namespace}AdvancedVotingPower`
@@ -189,7 +193,7 @@ async function getVotingPowerAvailableForSubdelegationForAddress(
 
   const undelegatedVotingPower = (async () => {
     const [isBalanceAccountedFor, balance] = await Promise.all([
-      isAddressDelegatingToProxy(address),
+      isAddressDelegatingToProxy({ address }),
       contracts(namespace).token.contract.balanceOf(address),
     ]);
     return isBalanceAccountedFor ? 0n : balance;
@@ -214,9 +218,11 @@ export const getVotingPowerAvailableForDirectDelegation = (
     addressOrENSName
   );
 
-async function getVotingPowerAvailableForDirectDelegationForAddress(
-  address: string
-): Promise<bigint> {
+async function getVotingPowerAvailableForDirectDelegationForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<bigint> {
   const { namespace } = Tenant.getInstance();
   return contracts(namespace).token.contract.balanceOf(address); // TODO: update based on namespace
 }
@@ -228,7 +234,11 @@ async function getVotingPowerAvailableForDirectDelegationForAddress(
 export const isDelegatingToProxy = (addressOrENSName: string) =>
   addressOrEnsNameWrap(isAddressDelegatingToProxy, addressOrENSName);
 
-async function isAddressDelegatingToProxy(address: string): Promise<boolean> {
+async function isAddressDelegatingToProxy({
+  address,
+}: {
+  address: string;
+}): Promise<boolean> {
   const { namespace } = Tenant.getInstance();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
@@ -255,6 +265,10 @@ async function isAddressDelegatingToProxy(address: string): Promise<boolean> {
 export const getProxy = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getProxyAddressForAddress, addressOrENSName);
 
-async function getProxyAddressForAddress(address: string): Promise<string> {
+async function getProxyAddressForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<string> {
   return getProxyAddress(address);
 }

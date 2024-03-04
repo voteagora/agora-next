@@ -14,9 +14,11 @@ import Tenant from "@/lib/tenant";
 export const getCurrentDelegatees = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName);
 
-async function getCurrentDelegateesForAddress(
-  address: string
-): Promise<Delegation[]> {
+async function getCurrentDelegateesForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<Delegation[]> {
   const { namespace } = Tenant.getInstance();
 
   const advancedDelegatees = await prisma[
