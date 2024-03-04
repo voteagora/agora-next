@@ -34,8 +34,7 @@ export async function getCitizensForNamespace({
           `
           SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
           FROM agora.address_metadata address_metadata
-          LEFT JOIN ${
-            namespace + ".delegates"
+          LEFT JOIN ${namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
           WHERE address_metadata.kind = 'citizen' 
           AND address_metadata.dao_slug = 'OP'
@@ -52,12 +51,12 @@ export async function getCitizensForNamespace({
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM agora.address_metadata address_metadata
-            LEFT JOIN ${
-              namespace + ".delegates"
-            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+            LEFT JOIN ${namespace + ".delegates"
+          } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
-            ORDER BY delegate.voting_power DESC
+            ORDER BY COALESCE(delegate.voting_power, 0) DESC,
+            address_metadata.address ASC 
             OFFSET $1
             LIMIT $2;
           `,
