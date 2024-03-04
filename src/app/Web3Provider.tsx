@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
-import { WagmiConfig, createConfig } from "wagmi";
+import { WagmiConfig, createConfig, sepolia } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
@@ -12,7 +12,7 @@ import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const chains = [optimism, mainnet];
+const chains = [optimism, mainnet, sepolia];
 const metadata = {
   name: "Agora Next",
   description: "The on-chain governance company",

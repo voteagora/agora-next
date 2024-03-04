@@ -57,7 +57,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     // TODO implement voting power check
     // State for today: Andrei is working on the infra
     // right now only nick.eth can sponsor
-    return address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5";
+    return (
+      address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" ||
+      address === "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd"
+    );
   };
 
   useEffect(() => {
@@ -86,14 +89,15 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
 
   const handleSubmitProposal = async () => {
     // TODO unify states and names across frontend state and database
-    // const updateData = {
-    //   proposal_status: "sponsor_requested",
-    // };
-    // const updatedProposal = await updateProposal(proposalState, updateData);
-    // setProposalState({
-    //   ...updatedProposal,
-    //   transactions: proposalState.transactions,
-    // });
+    const updateData = {
+      sponsor_address: sponsorAddress,
+    };
+    const updatedProposal = await updateProposal(proposalState, updateData);
+
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
   };
 
   return (

@@ -10,10 +10,7 @@ const DraftProposalsListRow: React.FC<DraftProposalsListRowProps> = (props) => {
   const { proposal } = props;
 
   return (
-    <Link
-      href={`/proposals/draft/${proposal.id}`}
-      className="bg-stone-100 border border-stone-200 rounded-2xl p-2 shadow-sm"
-    >
+    <div className="bg-stone-100 border border-stone-200 rounded-2xl p-2 shadow-sm">
       <div className="bg-white border border-stone-200 rounded-2xl px-6 py-5 shadow-sm">
         <p className="font-semibold text-gray-800 text-xs">{`Prop ${proposal.id} - by ${proposal.author_address}`}</p>
         <p className="font-medium">{proposal.title}</p>
@@ -26,7 +23,7 @@ const DraftProposalsListRow: React.FC<DraftProposalsListRowProps> = (props) => {
         <p className="text-xs font-medium text-gray-800">Queue proposal</p>
         <p className="text-xs font-medium text-gray-800">Execute proposal</p>
       </div>
-    </Link>
+    </div>
   );
 };
 

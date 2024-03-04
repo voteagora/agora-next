@@ -10,12 +10,12 @@ import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
 import { getMetrics } from "./api/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
 import { getProposals } from "./api/proposals/getProposals";
-import { ProposalDraft } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsList";
+import SponsorshipRequestList from "@/components/ProposalLifecycle/SponsorshipRequestList";
 
 // Revalidate cache every 60 seconds
-export const revalidate = 60;
+// export const revalidate = 60;
 
 async function fetchProposals(filter, page = 1) {
   "use server";
@@ -32,10 +32,22 @@ async function fetchDraftProposals(address) {
   "use server";
 
   const draftProposals = await prisma.proposalDraft.findMany({
-    take: 3,
+    where: {
+      author_address: address,
+    },
   });
 
-  console.log(draftProposals);
+  return draftProposals;
+}
+
+async function fetchSponsorshipRequests(address) {
+  "use server";
+
+  const draftProposals = await prisma.proposalDraft.findMany({
+    where: {
+      sponsor_address: address,
+    },
+  });
 
   return draftProposals;
 }
@@ -115,6 +127,9 @@ export default async function Home({ searchParams }) {
       <DAOMetricsHeader metrics={metrics} />
       <PageDivider />
       <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
+      <SponsorshipRequestList
+        fetchSponsorshipRequests={fetchSponsorshipRequests}
+      />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
