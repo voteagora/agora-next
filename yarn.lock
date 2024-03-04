@@ -6589,6 +6589,14 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
+next-axiom@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/next-axiom/-/next-axiom-1.1.1.tgz#2dc16e7a1b3752bfdd6402cad753967e989d21b7"
+  integrity sha512-0r/TJ+/zetD+uDc7B+2E7WpC86hEtQ1U+DuWYrP/JNmUz+ZdPFbrZgzOSqaZ6TwYbXP56VVlPfYwq1YsKHTHYQ==
+  dependencies:
+    remeda "^1.29.0"
+    whatwg-fetch "^3.6.2"
+
 next@^14.0.1:
   version "14.0.3"
   resolved "https://registry.yarnpkg.com/next/-/next-14.0.3.tgz#8d801a08eaefe5974203d71092fccc463103a03f"
@@ -7469,6 +7477,11 @@ remark-rehype@^10.0.0:
     "@types/mdast" "^3.0.0"
     mdast-util-to-hast "^12.1.0"
     unified "^10.0.0"
+
+remeda@^1.29.0:
+  version "1.44.1"
+  resolved "https://registry.yarnpkg.com/remeda/-/remeda-1.44.1.tgz#91266f8448e32d2a3f457c0c5c457283065b5639"
+  integrity sha512-IzUxPZbhLIq7duT2xEjLD5s+lA+J5Qq12dDmgmW8PsQAKsCU5rdydTZEYiiklgg53Lo363/q99dOxq4hnsaJ7A==
 
 request-progress@^3.0.0:
   version "3.0.0"
@@ -8660,6 +8673,11 @@ webidl-conversions@^3.0.0:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
+
+whatwg-fetch@^3.6.2:
+  version "3.6.20"
+  resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-3.6.20.tgz#580ce6d791facec91d37c72890995a0b48d31c70"
+  integrity sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==
 
 whatwg-url@^5.0.0:
   version "5.0.0"

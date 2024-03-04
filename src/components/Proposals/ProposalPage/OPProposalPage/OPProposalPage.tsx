@@ -7,6 +7,8 @@ import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 import { fetchAllForVoting, fetchProposalVotes } from "@/app/proposals/actions";
+// Logging to Axiom
+import { Logger } from "next-axiom";
 
 export default async function OPProposalPage({
   proposal,
@@ -14,7 +16,9 @@ export default async function OPProposalPage({
   proposal: Proposal;
 }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
-
+  const log = new Logger();
+  log.info("Proposal loaded", { proposalId: proposal.id });
+  await log.flush();
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
     <HStack

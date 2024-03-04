@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+const { withAxiom } = require("next-axiom");
+
 const path = require("path");
 module.exports = {
   sassOptions: {
@@ -7,15 +9,15 @@ module.exports = {
   },
 };
 
-const nextConfig = {
+const nextConfig = withAxiom({
   async redirects() {
     return [
       {
-        source: '/delegate/:addressOrENSName',
-        destination: '/delegates/:addressOrENSName',
+        source: "/delegate/:addressOrENSName",
+        destination: "/delegates/:addressOrENSName",
         permanent: true,
       },
-    ]
+    ];
   },
   async headers() {
     return [
@@ -62,7 +64,7 @@ const nextConfig = {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     return config;
   },
-};
+});
 
 module.exports = nextConfig;
 
