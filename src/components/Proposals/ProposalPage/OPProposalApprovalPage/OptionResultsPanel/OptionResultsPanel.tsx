@@ -20,7 +20,6 @@ export default function OptionsResultsPanel({
 
   const { decimals: contractTokenDecimals } = tokenForContractAddress(proposalData.proposalSettings.budgetToken)
 
-
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["APPROVAL"]["kind"];
   const proposalSettings = proposalData.proposalSettings;
