@@ -55,7 +55,8 @@ export async function getCitizensForNamespace({
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
-            ORDER BY COALESCE(delegate.voting_power, 0) DESC
+            ORDER BY COALESCE(delegate.voting_power, 0) DESC,
+            address_metadata.address ASC 
             OFFSET $1
             LIMIT $2;
           `,
