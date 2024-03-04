@@ -1,26 +1,26 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import PageHeader from "@/components/Layout/PageHeader/PageHeader";
-
 import { useAccount } from "wagmi";
 import { ProposalDraft } from "@prisma/client";
 import DraftProposalsListRow from "./DraftProposalsListRow";
 import Link from "next/link";
 
-interface DraftProposalsListProps {
-  fetchDraftProposals: (address: string) => Promise<ProposalDraft[]>;
+interface SponsorshipRequestListProps {
+  fetchSponsorshipRequests: (address: string) => Promise<ProposalDraft[]>;
 }
 
-export default function DraftProposalsList(props: DraftProposalsListProps) {
+export default function SponsorshipRequestList(
+  props: SponsorshipRequestListProps
+) {
   const [proposals, setProposals] = useState<ProposalDraft[]>([]);
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
 
-  const { fetchDraftProposals } = props;
+  const { fetchSponsorshipRequests } = props;
 
   const getProposals = async (authorAddress: string) => {
     if (!!authorAddress) {
-      const proposals = await fetchDraftProposals(authorAddress);
+      const proposals = await fetchSponsorshipRequests(authorAddress);
 
       setProposals(proposals);
     }
@@ -29,6 +29,7 @@ export default function DraftProposalsList(props: DraftProposalsListProps) {
   useEffect(() => {
     // reset when changing wallets
     // setProposals([]);
+    console.log("address HEREss", address);
     if (!!address) {
       getProposals(address);
     }
@@ -39,12 +40,15 @@ export default function DraftProposalsList(props: DraftProposalsListProps) {
       {proposals.length > 0 && (
         <div className={""}>
           <h1 className="text-2xl font-black mt-12 sm:mt-6 mb-4">
-            My proposals
+            Requests for Sponsorship
           </h1>
           <div className={"flex flex-col gap-y-4"}>
             {proposals.map((proposal) => (
-              <Link key={proposal.id} href={`/proposals/draft/${proposal.id}`}>
-                <DraftProposalsListRow proposal={proposal} />
+              <Link
+                key={proposal.id}
+                href={`/proposals/sponsor/${proposal.id}`}
+              >
+                <DraftProposalsListRow key={proposal.id} proposal={proposal} />
               </Link>
             ))}
           </div>

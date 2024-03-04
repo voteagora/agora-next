@@ -6,6 +6,13 @@ import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist
 import { ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import {
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import ENSGovernorABI from "@/lib/contracts/abis/ENSGovernor.json";
 
 interface DraftProposalReviewProps {
   proposal: ProposalDraftWithTransactions;
@@ -17,6 +24,105 @@ interface DraftProposalReviewProps {
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   const { proposal } = props;
+
+  type BasicInputData = [string[], number[], string[], string];
+
+  function getInputData(proposal: ProposalDraft): {
+    inputData: BasicInputData;
+  } {
+    const description =
+      "# " +
+      proposal.title +
+      "\n\n" +
+      proposal.description +
+      "\n" +
+      // `${
+      //   form.state.draftLink &&
+      //   "[Draft Discourse link](" + form.state.draftLink + ")\n"
+      // }` +
+      `${
+        proposal.temp_check_link &&
+        "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
+      }` +
+      "\n\n ## Abstract \n" +
+      proposal.abstract;
+    // "\n\n ## Specification \n" +
+    // form.state.specification;
+
+    // provide default values for basic proposal
+    let targets: string[] = [];
+    let values: number[] = [];
+    let calldatas: string[] = [];
+    let inputData: BasicInputData = [targets, values, calldatas, description];
+
+    // TODO add transactions
+
+    targets.push("0x0000000000000000000000000000000000000000");
+    values.push(0);
+    calldatas.push("0x");
+
+    // try {
+    //   if (form.state.transactions.length === 0) {
+    //     targets.push(ethers.constants.AddressZero);
+    //     values.push(BigNumber.from(0));
+    //     calldatas.push("0x");
+    //   } else {
+    //     form.state.transactions.forEach((t) => {
+    //       if (t.type === "Transfer") {
+    //         if (t.token.address === ethers.constants.AddressZero) {
+    //           targets.push(t.transferTo);
+    //           values.push(
+    //             ethers.utils.parseUnits(
+    //               t.transferAmount.toString() || "0",
+    //               t.token.decimals
+    //             )
+    //           );
+    //           calldatas.push("0x");
+    //         } else {
+    //           targets.push(t.token.address);
+    //           values.push(BigNumber.from(0));
+    //           calldatas.push(
+    //             encodeTransfer(t.transferTo, t.transferAmount, t.token.decimals)
+    //           );
+    //         }
+    //       } else {
+    //         targets.push(ethers.utils.getAddress(t.target));
+    //         values.push(ethers.utils.parseEther(t.value.toString() || "0"));
+    //         calldatas.push(t.calldata);
+    //       }
+    //     });
+    //   }
+    // } catch (e) {
+    //   Sentry.captureException(e);
+    //   console.error(e);
+    // }
+
+    return { inputData };
+  }
+
+  const { inputData } = getInputData(proposal);
+
+  const {
+    config,
+    isError: onPrepareError,
+    error,
+  } = usePrepareContractWrite({
+    address: "0x630A6A268191c654ce084aAd2D7910fF651e0797",
+    abi: ENSGovernorABI,
+    functionName: "propose",
+    args: inputData,
+    chainId: 11155111,
+  });
+
+  const { data, write } = useContractWrite(config);
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  useEffect(() => {
+    console.log("data", data);
+  }, [data]);
 
   return (
     <div className="flex-grow">
@@ -75,7 +181,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
                 edited once submitted.
               </p>
 
-              <button className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4">
+              <button
+                onClick={() => {
+                  write?.();
+                }}
+                className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4"
+              >
                 Approve
               </button>
             </div>
