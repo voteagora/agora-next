@@ -32,7 +32,7 @@ export async function getCitizensForNamespace({
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
-          SELECT address_metadata.address, address_metadata.metadata,
+          SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
           FROM agora.address_metadata address_metadata
           LEFT JOIN ${namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
