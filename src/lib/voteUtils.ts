@@ -162,8 +162,20 @@ export function checkMissingVoteForDelegate(
     (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
   );
 
+  // Direct vote is always going to match the vp of the vote
+
   // Case where delegate voted with both advanced and direct voting power.
   if (hasMultipleVotes) {
+    if (
+      delegateVotes.some(
+        (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
+      )
+    ) {
+      return "NONE";
+    }
+    if (hasDirectVP) {
+      return "DIRECT";
+    }
     return "NONE";
   }
 

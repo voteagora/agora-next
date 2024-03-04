@@ -12,7 +12,7 @@ type citizen = {
   dao_slug: string;
   metadata: object | null;
   created_at: Date;
-  voting_power: Prisma.Decimal;
+  voting_power?: Prisma.Decimal;
 };
 
 export async function getCitizens({
@@ -34,7 +34,7 @@ export async function getCitizens({
           `
           SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
           FROM agora.address_metadata address_metadata
-          JOIN ${
+          LEFT JOIN ${
             namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
           WHERE address_metadata.kind = 'citizen' 
@@ -52,7 +52,7 @@ export async function getCitizens({
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM agora.address_metadata address_metadata
-            JOIN ${
+            LEFT JOIN ${
               namespace + ".delegates"
             } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
@@ -77,7 +77,7 @@ export async function getCitizens({
       return {
         address,
         metadata,
-        votingPower: citizen.voting_power?.toFixed(0),
+        votingPower: citizen.voting_power?.toFixed(0) || "0",
         // Mark as citizen to display badge
         citizen: true,
         statement,
