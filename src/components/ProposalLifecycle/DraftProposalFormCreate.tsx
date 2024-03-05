@@ -37,9 +37,6 @@ const staticText = {
 };
 
 interface DraftProposalFormCreateProps {
-  setStage: React.Dispatch<
-    React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
-  >;
   proposalState: ProposalDraftWithTransactions;
   setProposalState: React.Dispatch<
     React.SetStateAction<ProposalDraftWithTransactions>
@@ -117,7 +114,6 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           <DraftProposalCreateButton
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
-            setStage={props.setStage}
             proposalState={proposalState}
             setProposalState={setProposalState}
             updateProposal={updateProposal}

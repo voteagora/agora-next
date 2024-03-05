@@ -18,10 +18,10 @@ const staticText = {
 };
 
 interface DraftProposalFormTempCheckProps {
-  setStage: React.Dispatch<
-    React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
-  >;
   proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
   updateProposal: (
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
@@ -31,7 +31,7 @@ interface DraftProposalFormTempCheckProps {
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   props
 ) => {
-  const { setStage, proposalState, updateProposal } = props;
+  const { proposalState, setProposalState, updateProposal } = props;
 
   const validateTempCheckLink = (link: string) => {
     // check if starts with "https://discuss.ens.domains/"
@@ -48,15 +48,26 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   );
 
   const saveAndContinue = async () => {
-    // currently updates optimistically, notice no await
-    const updateData = {
+    const updatedProposal = await updateProposal(proposalState, {
       temp_check_link: tempCheckInput,
-    };
-    updateProposal(proposalState, updateData);
+      proposal_status_id: 2,
+    });
 
-    if (isValidDiscourseLink) {
-      setStage("draft-create");
-    }
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
+  };
+
+  const skip = async () => {
+    const updatedProposal = await updateProposal(proposalState, {
+      proposal_status_id: 2,
+    });
+
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
   };
 
   function handleNewTempCheckLink(link: string) {
@@ -91,8 +102,8 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
             ></input>
             <div className="flex flex-row gap-x-6">
               <button
+                onClick={() => skip()}
                 className="py-3 px-5 border border-gray-eo rounded-lg"
-                onClick={() => setStage("draft-create")}
               >
                 Skip
               </button>

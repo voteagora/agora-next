@@ -23,7 +23,7 @@ interface DraftProposalReviewProps {
 }
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { proposal } = props;
+  const { proposal, updateProposal } = props;
 
   type BasicInputData = [string[], number[], string[], string];
 
@@ -124,6 +124,24 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     console.log("data", data);
   }, [data]);
 
+  const handleApprove = async () => {
+    write?.();
+  };
+
+  const handleProposalSubmitted = async () => {
+    const updatedProposal = await updateProposal(proposal, {
+      proposal_status_id: 5,
+      onchain_transaction_hash: data?.hash,
+    });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      alert("Proposal submitted");
+      handleProposalSubmitted();
+    }
+  }, [isSuccess]);
+
   return (
     <div className="flex-grow">
       <div className="bg-[#FAFAF2] rounded-2xl ring-inset ring-1 ring-[#ECE3CA] z-10 mx-6">
@@ -182,9 +200,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               </p>
 
               <button
-                onClick={() => {
-                  write?.();
-                }}
+                onClick={() => handleApprove()}
                 className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4"
               >
                 Approve

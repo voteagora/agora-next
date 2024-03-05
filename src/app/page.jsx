@@ -15,7 +15,7 @@ import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsLis
 import SponsorshipRequestList from "@/components/ProposalLifecycle/SponsorshipRequestList";
 
 // Revalidate cache every 60 seconds
-// export const revalidate = 60;
+export const revalidate = 60;
 
 async function fetchProposals(filter, page = 1) {
   "use server";

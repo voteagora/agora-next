@@ -19,6 +19,7 @@ export default function DraftProposalsList(props: DraftProposalsListProps) {
   const { fetchDraftProposals } = props;
 
   const getProposals = async (authorAddress: string) => {
+    alert("getProposals");
     if (!!authorAddress) {
       const proposals = await fetchDraftProposals(authorAddress);
 
