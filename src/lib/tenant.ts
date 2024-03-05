@@ -1,12 +1,15 @@
 import { type TenantNamespace, type TenantToken } from "./types";
 import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenantTokenFactory";
+import { TenantContract, TenantContractType } from "@/lib/tenantContract";
+import TenantContractFactory from "@/lib/tenantContractFactory";
 
 interface ITenant {
   isProd: boolean;
   namespace: TenantNamespace;
   slug: DaoSlug;
   token: TenantToken;
+  contract(type: TenantContractType): TenantContract | undefined;
 }
 
 export default class Tenant implements ITenant {
@@ -16,18 +19,29 @@ export default class Tenant implements ITenant {
   private readonly _namespace: TenantNamespace;
   private readonly _slug: string;
   private readonly _token: TenantToken;
+  private readonly _contracts: TenantContract[];
 
   private constructor() {
+    const {
+      NEXT_PUBLIC_AGORA_INSTANCE_NAME,
+      NEXT_PUBLIC_AGORA_ENV,
+      NEXT_PUBLIC_AGORA_INSTANCE_TOKEN,
+    } = process.env;
     this._namespace =
-      (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) ||
-      "optimism";
-    this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-    this._slug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN || "OP";
+      (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) || "optimism";
+    this._isProd = NEXT_PUBLIC_AGORA_ENV === "prod";
+    this._slug = NEXT_PUBLIC_AGORA_INSTANCE_TOKEN || "OP";
     this._token = TenantTokenFactory.create(this._namespace);
+    this._contracts = TenantContractFactory.create(
+      this._namespace,
+      this._isProd
+    );
   }
+
   public get namespace(): TenantNamespace {
     return this._namespace;
   }
+
   public get isProd(): boolean {
     return this._isProd;
   }
@@ -38,6 +52,14 @@ export default class Tenant implements ITenant {
 
   public get token(): TenantToken {
     return this._token;
+  }
+
+  public contract(type: TenantContractType): TenantContract {
+    const contract = this._contracts.find((contract) => contract.type === type);
+    if (!contract) {
+      throw new Error(`Contract of type ${type} not found`);
+    }
+    return contract;
   }
 
   public static getInstance(): Tenant {

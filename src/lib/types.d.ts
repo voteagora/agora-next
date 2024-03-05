@@ -1,13 +1,5 @@
-import { type ITenantContract } from "@retro-pgf/contracts";
-
 export type TenantNamespace = "optimism";
 
-export type TenantContracts = {
-  alligator?: ITenantContract;
-  governor: ITenantContract;
-  proposalTypesConfigurator: ITenantContract;
-  token: ITenantContract;
-};
 export type TenantToken = {
   name: string;
   symbol: string;
