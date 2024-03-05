@@ -3,7 +3,8 @@ import "server-only";
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-import { getDelegateStatementForNamespace } from "../delegateStatement/getDelegateStatement";
+import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
+import Tenant from "@/lib/tenant";
 
 type citizen = {
   address: string;
@@ -14,18 +15,17 @@ type citizen = {
   voting_power?: Prisma.Decimal;
 };
 
-export async function getCitizensForNamespace({
+export async function getCitizens({
   page = 1,
   sort = "shuffle",
   seed,
-  namespace,
 }: {
   page: number;
   sort: string;
   seed?: number;
-  namespace: "optimism";
 }) {
   const pageSize = 20;
+  const { namespace } = Tenant.getInstance();
 
   const { meta, data: _citizens } = await paginatePrismaResult(
     (skip: number, take: number) => {
@@ -71,10 +71,7 @@ export async function getCitizensForNamespace({
 
   const citizens = await Promise.all(
     _citizens.map(async (citizen) => {
-      const statement = await getDelegateStatementForNamespace({
-        addressOrENSName: citizen.address,
-        namespace,
-      });
+      const statement = await getDelegateStatement(citizen.address);
       const { address, metadata } = citizen;
       return {
         address,

@@ -1,15 +1,15 @@
-import React from "react";
-import Hero from "@/components/Hero/Hero";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
-import { PageDivider } from "@/components/Layout/PageDivider";
-import { getMetrics } from "../api/metrics/getMetrics";
-import { getDelegates } from "../api/delegates/getDelegates";
-import { getCitizens } from "../api/citizens/getCitizens";
+import { getCitizens } from "@/app/api/common/citizens/getCitizens";
+import { getDelegates } from "@/app/api/common/delegates/getDelegates";
+import { getCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
+import { getMetrics } from "@/app/api/common/metrics/getMetrics";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
-import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
-import { getCurrentDelegators } from "../api/delegations/getDelegations";
+import Hero from "@/components/Hero/Hero";
+import { PageDivider } from "@/components/Layout/PageDivider";
+import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { TabsContent } from "@/components/ui/tabs";
+import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
+import React from "react";
 
 async function fetchCitizens(sort, seed, page = 1) {
   "use server";

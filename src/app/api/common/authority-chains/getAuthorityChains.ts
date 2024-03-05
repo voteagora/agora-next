@@ -3,16 +3,16 @@ import provider from "@/app/lib/provider";
 import { contracts } from "@/lib/contracts/contracts";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
+import Tenant from "@/lib/tenant";
 
-export async function getAuthorityChainsForNamespace({
+export async function getAuthorityChains({
   address,
   blockNumber,
-  namespace,
 }: {
   address: string;
   blockNumber: number;
-  namespace: "optimism";
 }): Promise<Array<string[]>> {
+  const { namespace } = Tenant.getInstance();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
