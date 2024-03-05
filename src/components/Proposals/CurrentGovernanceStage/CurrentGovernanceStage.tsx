@@ -1,9 +1,14 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
-export default function CurrentGovernanceStage() {
+export default function CurrentGovernanceStage({
+  title,
+  endDate,
+}: {
+  title: string;
+  endDate: Date;
+}) {
   const currentDate = new Date();
-  const targetDate = new Date(currentDate.getFullYear(), 2, 5, 21, 47);
-  const differenceInMilliseconds = targetDate.getTime() - currentDate.getTime();
+  const differenceInMilliseconds = endDate.getTime() - currentDate.getTime();
   const differenceInDays = Math.floor(
     differenceInMilliseconds / (1000 * 60 * 60 * 24)
   );
@@ -12,7 +17,7 @@ export default function CurrentGovernanceStage() {
       <div className="flex flex-col sm:flex-row">
         <div className="flex">
           <span className="hidden sm:block">Currently in&nbsp;</span>
-          <span>Voting Cycle #19 Voting Period</span>
+          <span>{title}</span>
         </div>
         <span className="hidden sm:block">&nbsp;·&nbsp;</span>
         <span>Voting ends in around {differenceInDays + 1} days</span>
