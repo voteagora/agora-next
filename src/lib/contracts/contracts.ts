@@ -7,17 +7,6 @@ import {
 } from "./generated";
 import provider from "@/app/lib/provider";
 
-export const contracts = (namespace: "optimism") => {
-  switch (namespace) {
-    case "optimism": {
-      return OptimismContracts;
-    }
-    default: {
-      throw new Error(`Can't find contracts for namespace: ${namespace}`);
-    }
-  }
-};
-
 export const OptimismContracts = {
   governor: {
     contract: OptimismGovernor__factory.connect(
@@ -35,7 +24,7 @@ export const OptimismContracts = {
       process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114995000 : 114615036,
     // Date in which optionBudget was being sent correctly to chain, in all other past proposals optionBudget is in
     // ether unit instead of wei
-    optionBudgetChangeDate: new Date("2024-02-21T12:00:00")
+    optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
   },
 
   proposalTypesConfigurator: {

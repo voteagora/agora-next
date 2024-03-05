@@ -7,7 +7,8 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData } from "./votingPower";
 import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
 import Tenant from "@/lib/tenant";
-import { TenantContractType } from "@/lib/tenantContract";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
+import { IToken } from "@/lib/contracts/interfaces/IToken";
 
 /**
  * Voting Power for a given block
@@ -38,9 +39,11 @@ async function getVotingPowerForProposalByAddress({
   blockNumber: number;
   proposalId: string;
 }): Promise<VotingPowerData> {
-  const { namespace, contract } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
 
-  const votingPowerQuery = prisma[`${namespace}VotingPowerSnaps`].findFirst({
+  const votingPowerQuery = prisma[
+    `${tenant.namespace}VotingPowerSnaps`
+  ].findFirst({
     where: {
       delegate: address,
       block_number: {
@@ -76,7 +79,7 @@ async function getVotingPowerForProposalByAddress({
         proxy
       FROM (
         SELECT chain_str
-        FROM ${namespace + ".advanced_voting_power_raw_snaps"}
+        FROM ${tenant.namespace + ".advanced_voting_power_raw_snaps"}
         WHERE contract = $2
           AND block_number <= $3
           AND delegate = $1
@@ -93,7 +96,7 @@ async function getVotingPowerForProposalByAddress({
           balance,
           proxy,
           block_number
-        FROM ${namespace + ".advanced_voting_power_raw_snaps"}
+        FROM ${tenant.namespace + ".advanced_voting_power_raw_snaps"}
         WHERE chain_str=s.chain_str 
           AND contract = $2
           AND block_number <= $3
@@ -104,7 +107,7 @@ async function getVotingPowerForProposalByAddress({
     WHERE allowance > 0;
     `,
     address,
-    contract(TenantContractType.ALLIGATOR).address,
+    tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
     blockNumber
   );
 
@@ -137,8 +140,8 @@ async function getCurrentVotingPowerForAddress({
 }: {
   address: string;
 }): Promise<VotingPowerData> {
-  const { namespace, contract } = Tenant.getInstance();
-  const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
+  const tenant = Tenant.getInstance();
+  const votingPower = await prisma[`${tenant.namespace}VotingPower`].findFirst({
     where: {
       delegate: address,
     },
@@ -146,11 +149,11 @@ async function getCurrentVotingPowerForAddress({
 
   // This query pulls only partially delegated voting power
   const advancedVotingPower = await prisma[
-    `${namespace}AdvancedVotingPower`
+    `${tenant.namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
       delegate: address,
-      contract: contract(TenantContractType.ALLIGATOR).address,
+      contract: tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
     },
   });
 
@@ -181,20 +184,22 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
 }: {
   address: string;
 }): Promise<string> {
-  const { namespace, contract } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
   const advancedVotingPower = await prisma[
-    `${namespace}AdvancedVotingPower`
+    `${tenant.namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
       delegate: address,
-      contract: contract(TenantContractType.ALLIGATOR).address,
+      contract: tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
     },
   });
 
   const undelegatedVotingPower = (async () => {
     const [isBalanceAccountedFor, balance] = await Promise.all([
       isAddressDelegatingToProxy({ address }),
-      contract(TenantContractType.TOKEN).contract.balanceOf(address),
+      (
+        tenant.contractDefinition(TenantContractType.TOKEN).contract as IToken
+      ).balanceOf(address),
     ]);
     return isBalanceAccountedFor ? 0n : balance;
   })();
@@ -223,8 +228,10 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
 }: {
   address: string;
 }): Promise<bigint> {
-  const { namespace, contract } = Tenant.getInstance();
-  return contract(TenantContractType.TOKEN).contract.balanceOf(address);
+  const tenant = Tenant.getInstance();
+  return (
+    tenant.contractDefinition(TenantContractType.TOKEN).contract as IToken
+  ).balanceOf(address);
 }
 
 /**

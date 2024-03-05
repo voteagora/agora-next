@@ -14,7 +14,7 @@ import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
-import { TenantContractType } from "@/lib/tenantContract";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
 
 type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
@@ -110,7 +110,7 @@ type DelegateStats = {
 };
 
 export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  const { namespace, contract } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -131,28 +131,30 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
-        (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1) a ON TRUE
+        (SELECT * FROM ${
+          tenant.namespace + ".voter_stats"
+        } WHERE voter = $1) a ON TRUE
     LEFT JOIN 
       ${
-        namespace + ".advanced_voting_power"
+        tenant.namespace + ".advanced_voting_power"
       } av ON av.delegate = $1 AND contract = $2
     LEFT JOIN 
         (SELECT num_of_delegators FROM ${
-          namespace + ".delegates"
+          tenant.namespace + ".delegates"
         } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN 
         (SELECT * FROM ${
-          namespace + ".voting_power"
+          tenant.namespace + ".voting_power"
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
-    contract(TenantContractType.ALLIGATOR).address
+    tenant.contractDefinition(TenantContractType.ALLIGATOR).address
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
       (await delegateQuery)?.[0] || undefined,
-      prisma[`${namespace}VotableSupply`].findFirst({}),
+      prisma[`${tenant.namespace}VotableSupply`].findFirst({}),
       getDelegateStatement(addressOrENSName),
       getCurrentQuorum(),
       isCitizen(address),
@@ -176,7 +178,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     ) t;
     `,
     address,
-    contract(TenantContractType.ALLIGATOR).address
+    tenant.contractDefinition(TenantContractType.ALLIGATOR).address
   );
 
   const totalVotingPower =

@@ -4,9 +4,11 @@ import {
   AuthorityChainRules,
   AuthorityChainsSnaps,
 } from "@/app/api/common/authority-chains/authorityChains";
-import { OptimismContracts, contracts } from "./contracts/contracts";
+import { OptimismContracts } from "./contracts/contracts";
 import { bigIntMax, bigIntMin } from "./bigintUtils";
 import Tenant from "@/lib/tenant";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
+import { IGovernor } from "@/lib/contracts/interfaces/IGovernor";
 
 export async function getProxyAddress(address: string) {
   const { namespace } = Tenant.getInstance();
@@ -55,13 +57,14 @@ export async function getTotalVotableAllowance({
     return 0n;
   }
 
+  const tenant = Tenant.getInstance();
+  const contract = tenant.contractDefinition(TenantContractType.GOVERNOR)
+    .contract as IGovernor;
+
   const latestBlockNumber = await provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(
     (proxies ?? []).map((proxy) =>
-      contracts("optimism").governor.contract.weightCast(
-        proposalId,
-        proxy.toString()
-      )
+      contract.weightCast(proposalId, proxy.toString())
     )
   );
 

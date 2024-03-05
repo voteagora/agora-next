@@ -1,25 +1,21 @@
 import { type TenantNamespace, type TenantToken } from "./types";
 import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenantTokenFactory";
-import { TenantContract, TenantContractType } from "@/lib/tenantContract";
+import {
+  TenantContractDefinition,
+  TenantContractType,
+} from "@/lib/tenantContractDefinition";
 import TenantContractFactory from "@/lib/tenantContractFactory";
+import { BaseContract } from "ethers";
 
-interface ITenant {
-  isProd: boolean;
-  namespace: TenantNamespace;
-  slug: DaoSlug;
-  token: TenantToken;
-  contract(type: TenantContractType): TenantContract | undefined;
-}
-
-export default class Tenant implements ITenant {
+export default class Tenant {
   private static instance: Tenant;
 
   private readonly _isProd: boolean;
   private readonly _namespace: TenantNamespace;
   private readonly _slug: string;
   private readonly _token: TenantToken;
-  private readonly _contracts: TenantContract[];
+  private readonly _contracts: TenantContractDefinition<BaseContract>[];
 
   private constructor() {
     const {
@@ -27,6 +23,7 @@ export default class Tenant implements ITenant {
       NEXT_PUBLIC_AGORA_ENV,
       NEXT_PUBLIC_AGORA_INSTANCE_TOKEN,
     } = process.env;
+
     this._namespace =
       (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) || "optimism";
     this._isProd = NEXT_PUBLIC_AGORA_ENV === "prod";
@@ -54,8 +51,10 @@ export default class Tenant implements ITenant {
     return this._token;
   }
 
-  public contract(type: TenantContractType): TenantContract {
-    const contract = this._contracts.find((contract) => contract.type === type);
+  public contractDefinition(
+    type: TenantContractType
+  ): TenantContractDefinition<BaseContract> {
+    const contract = this._contracts.find((def) => def.type === type);
     if (!contract) {
       throw new Error(`Contract of type ${type} not found`);
     }

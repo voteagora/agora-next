@@ -1,9 +1,9 @@
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { contracts } from "@/lib/contracts/contracts";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
 import Tenant from "@/lib/tenant";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
 
 export async function getAuthorityChains({
   address,
@@ -12,7 +12,7 @@ export async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const { namespace } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
@@ -22,11 +22,11 @@ export async function getAuthorityChains({
       ac.balance,
       ac.balance_block_number,
       ac.allowance
-    FROM ${namespace + ".authority_chains_snaps"} ac
+    FROM ${tenant.namespace + ".authority_chains_snaps"} ac
     CROSS JOIN LATERAL (
       SELECT
         MAX(balance_ordinal) AS max_ordinal
-      FROM ${namespace + ".authority_chains_snaps"}
+      FROM ${tenant.namespace + ".authority_chains_snaps"}
       WHERE chain = ac.chain
         AND delegate = $1
         AND contract = $2
@@ -39,7 +39,7 @@ export async function getAuthorityChains({
       AND ac.allowance > 0;
     `,
     address.toLowerCase(),
-    contracts(namespace).alligator.address.toLowerCase(),
+    tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
     blockNumber
   );
 

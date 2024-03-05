@@ -7,19 +7,19 @@ export enum TenantContractType {
   "TYPES_CONFIGURATOR",
 }
 
-type TenantContractParams<T> = {
+type TenantContractParams<ContractType> = {
   abi: any;
   chainId: number;
-  contract: T;
+  contract: ContractType;
   address: Address;
   type: TenantContractType;
   v6UpgradeBlock?: number;
 };
 
-export class TenantContract<T> {
+export class TenantContractDefinition<ContractType> {
   public abi: any;
   public chainId: number;
-  public contract: T;
+  public contract: ContractType;
   private _address: Address;
   public type: TenantContractType;
   public v6UpgradeBlock?: number;
@@ -31,7 +31,7 @@ export class TenantContract<T> {
     address,
     type,
     v6UpgradeBlock,
-  }: TenantContractParams<T>) {
+  }: TenantContractParams<ContractType>) {
     this.abi = abi;
     this.chainId = chainId;
     this.contract = contract;

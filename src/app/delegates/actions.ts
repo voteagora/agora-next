@@ -3,7 +3,6 @@
 import { getAllForAForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { revalidatePath } from "next/cache";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   getProxy,
@@ -20,6 +19,9 @@ import {
   getDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
+import Tenant from "@/lib/tenant";
+import { IToken } from "@/lib/contracts/interfaces/IToken";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -110,7 +112,10 @@ export async function fetchAllDelegatorsInChainsForAddress(
 }
 
 export async function balanceOf(address: string) {
-  return OptimismContracts.token.contract.balanceOf(address);
+  const tenant = Tenant.getInstance();
+  return (
+    tenant.contractDefinition(TenantContractType.TOKEN).contract as IToken
+  ).balanceOf(address);
 }
 
 export const fetchConnectedDelegate = async (address: string) => {

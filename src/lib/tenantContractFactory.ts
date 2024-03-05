@@ -1,6 +1,9 @@
 import { type TenantNamespace } from "@/lib/types";
 
-import { TenantContract, TenantContractType } from "@/lib/tenantContract";
+import {
+  TenantContractDefinition,
+  TenantContractType,
+} from "@/lib/tenantContractDefinition";
 import {
   AlligatorOPV5__factory,
   OptimismGovernor__factory,
@@ -15,7 +18,7 @@ export default class TenantContractFactory {
   public static create(
     namespace: TenantNamespace,
     isProd: boolean
-  ): TenantContract<BaseContract>[] {
+  ): TenantContractDefinition<BaseContract>[] {
     switch (namespace) {
       case "optimism":
         return optimismContracts(isProd);
@@ -25,9 +28,11 @@ export default class TenantContractFactory {
   }
 }
 
-const optimismContracts = (isProd: boolean): TenantContract<BaseContract>[] => {
+const optimismContracts = (
+  isProd: boolean
+): TenantContractDefinition<BaseContract>[] => {
   return [
-    new TenantContract<BaseContract>({
+    new TenantContractDefinition<BaseContract>({
       type: TenantContractType.GOVERNOR,
       contract: OptimismGovernor__factory.connect(
         isProd
@@ -42,7 +47,7 @@ const optimismContracts = (isProd: boolean): TenantContract<BaseContract>[] => {
       abi: OptimismGovernor__factory.abi,
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
     }),
-    new TenantContract<BaseContract>({
+    new TenantContractDefinition<BaseContract>({
       type: TenantContractType.TYPES_CONFIGURATOR,
       contract: OptimismGovernor__factory.connect(
         isProd
@@ -56,7 +61,7 @@ const optimismContracts = (isProd: boolean): TenantContract<BaseContract>[] => {
       chainId: 10,
       abi: ProposalTypesConfigurator__factory.abi,
     }),
-    new TenantContract<OptimismToken>({
+    new TenantContractDefinition<OptimismToken>({
       type: TenantContractType.TOKEN,
       contract: OptimismToken__factory.connect(
         "0x4200000000000000000000000000000000000042",
@@ -66,7 +71,7 @@ const optimismContracts = (isProd: boolean): TenantContract<BaseContract>[] => {
       chainId: 10,
       abi: OptimismToken__factory.abi,
     }),
-    new TenantContract<BaseContract>({
+    new TenantContractDefinition<BaseContract>({
       type: TenantContractType.ALLIGATOR,
       contract: AlligatorOPV5__factory.connect(
         isProd

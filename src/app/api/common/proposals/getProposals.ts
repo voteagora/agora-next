@@ -6,7 +6,7 @@ import provider from "@/app/lib/provider";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant";
-import { TenantContractType } from "@/lib/tenantContract";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
 
 export async function getProposals({
   filter,
@@ -17,15 +17,15 @@ export async function getProposals({
 }) {
   const pageSize = 10;
 
-  const { namespace, isProd, contract } = Tenant.getInstance();
-  const prodDataOnly = isProd && {
-    contract: contract(TenantContractType.GOVERNOR).address,
+  const tenant = Tenant.getInstance();
+  const prodDataOnly = tenant.isProd && {
+    contract: tenant.contractDefinition(TenantContractType.GOVERNOR).address,
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
-        return prisma[`${namespace}Proposals`].findMany({
+        return prisma[`${tenant.namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -37,7 +37,7 @@ export async function getProposals({
           },
         });
       } else {
-        return prisma[`${namespace}Proposals`].findMany({
+        return prisma[`${tenant.namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -92,11 +92,12 @@ export async function getProposal(proposal_id: string) {
 }
 
 export async function getProposalTypes() {
-  const { namespace, contract } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
 
-  return prisma[`${namespace}ProposalTypes`].findMany({
+  return prisma[`${tenant.namespace}ProposalTypes`].findMany({
     where: {
-      contract: contract(TenantContractType.TYPES_CONFIGURATOR).address,
+      contract: tenant.contractDefinition(TenantContractType.TYPES_CONFIGURATOR)
+        .address,
     },
   });
 }

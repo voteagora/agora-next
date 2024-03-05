@@ -5,7 +5,7 @@ import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant";
-import { TenantContractType } from "@/lib/tenantContract";
+import { TenantContractType } from "@/lib/tenantContractDefinition";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -19,15 +19,15 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace, contract } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
 
   const advancedDelegatees = await prisma[
-    `${namespace}AdvancedDelegatees`
+    `${tenant.namespace}AdvancedDelegatees`
   ].findMany({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contract(TenantContractType.ALLIGATOR).address,
+      contract: tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
     },
   });
 
@@ -129,12 +129,15 @@ async function getCurrentDelegatorsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace, contract } = Tenant.getInstance();
-  const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
+  const tenant = Tenant.getInstance();
+
+  const advancedDelegators = prisma[
+    `${tenant.namespace}AdvancedDelegatees`
+  ].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contract(TenantContractType.ALLIGATOR).address,
+      contract: tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
     },
   });
 
@@ -251,15 +254,15 @@ async function getAllDelegatorsInChainsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace, contract } = Tenant.getInstance();
+  const tenant = Tenant.getInstance();
   const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
     `
     SELECT array_agg(DISTINCT u.element) AS addresses
-    FROM ${namespace + ".authority_chains"}, unnest(chain) as u(element)
+    FROM ${tenant.namespace + ".authority_chains"}, unnest(chain) as u(element)
     WHERE delegate=$1 AND contract=$2 AND allowance > 0;
     `,
     address,
-    contract(TenantContractType.ALLIGATOR).address
+    tenant.contractDefinition(TenantContractType.ALLIGATOR).address
   );
 
   return allAddresess[0].addresses;
