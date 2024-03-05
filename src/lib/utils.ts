@@ -184,6 +184,7 @@ export async function fetchAndSetAll<
   values.forEach((value, index) => setters[index](value));
 }
 
+// TODO: Move this into tenant.ts
 export function getBlockScanUrl(hash: string | `0x${string}`) {
   switch (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME) {
     case "optimism":

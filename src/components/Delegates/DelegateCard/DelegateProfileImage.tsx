@@ -4,11 +4,12 @@ import ENSAvatar from "../../shared/ENSAvatar";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "../../shared/HumanAddress";
 import { useEnsName } from "wagmi";
-import { TOKEN, formatNumber } from "@/lib/tokenUtils";
+import { formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 import styles from "./delegateCard.module.scss";
 import Image from "next/image";
 import badge from "@/icons/badge.svg";
+import Tenant from "@/lib/tenant";
 
 export function DelegateProfileImage({
   address,
@@ -19,6 +20,8 @@ export function DelegateProfileImage({
   votingPower: string;
   citizen?: boolean;
 }) {
+  const { token } = Tenant.getInstance();
+
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
@@ -46,7 +49,7 @@ export function DelegateProfileImage({
           <HumanAddress address={address} />
         </div>
         <div className={styles.token}>
-          {formattedNumber} {TOKEN.symbol}
+          {formattedNumber} {token.symbol}
         </div>
       </VStack>
     </HStack>
