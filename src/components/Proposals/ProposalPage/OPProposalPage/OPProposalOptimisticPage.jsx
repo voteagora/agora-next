@@ -1,22 +1,22 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
-import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import styles from "./OPProposalPage.module.scss";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import { getDelegate } from "@/app/api/common/delegates/getDelegates";
+import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { getCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
+import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import {
-  getVotesForProposal,
-  getAllForVoting,
   getUserVotesForProposal,
-} from "@/app/api/votes/getVotes";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
-import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
-import { formatNumber } from "@/lib/utils";
-import { disapprovalThreshold } from "@/lib/constants";
-import { getCurrentDelegators } from "@/app/api/delegations/getDelegations";
-import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
-import { formatUnits } from "ethers";
+  getVotesForProposal,
+} from "@/app/api/common/votes/getVotes";
+import { getAllForVoting } from "@/app/api/votes/getVotes";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
+import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import { disapprovalThreshold } from "@/lib/constants";
+import { formatNumber } from "@/lib/utils";
+import { formatUnits } from "ethers";
+import ProposalDescription from "../ProposalDescription/ProposalDescription";
+import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
+import styles from "./OPProposalPage.module.scss";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -27,9 +27,7 @@ async function fetchProposalVotes(proposal_id, page = 1) {
 async function fetchDelegate(addressOrENSName) {
   "use server";
 
-  return await getDelegate({
-    addressOrENSName,
-  });
+  return await getDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(proposal_id, address) {
@@ -50,15 +48,13 @@ async function fetchVotableSupply() {
 async function fetchDelegateStatement(addressOrENSName) {
   "use server";
 
-  return await getDelegateStatement({
-    addressOrENSName,
-  });
+  return await getDelegateStatement(addressOrENSName);
 }
 
 async function getDelegators(addressOrENSName) {
   "use server";
 
-  return getCurrentDelegators({ addressOrENSName });
+  return getCurrentDelegators(addressOrENSName);
 }
 
 async function fetchAllForVoting(address, blockNumber, proposal_id) {

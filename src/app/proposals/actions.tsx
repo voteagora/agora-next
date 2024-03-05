@@ -1,14 +1,16 @@
 "use server";
 
+import { getAllForVoting } from "@/app/api/votes/getVotes";
 import {
-  getVotesForProposal,
   getUserVotesForProposal,
-  getAllForVoting,
-} from "@/app/api/votes/getVotes";
-import { getVotableSupply } from "@/app/api/votableSupply/getVotableSupply";
+  getVotesForProposal,
+} from "@/app/api/common/votes/getVotes";
 
 export const fetchProposalVotes = (proposal_id: string, page = 1) =>
-  getVotesForProposal({ proposal_id, page });
+  getVotesForProposal({
+    proposal_id,
+    page,
+  });
 
 export const fetchUserVotesForProposal = (
   proposal_id: string,
@@ -24,5 +26,3 @@ export const fetchAllForVoting = (
   blockNumber: number,
   proposal_id: string
 ) => getAllForVoting(address, blockNumber, proposal_id);
-
-export const fetchVotableSupply = () => getVotableSupply();
