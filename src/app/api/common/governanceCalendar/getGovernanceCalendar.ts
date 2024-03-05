@@ -50,9 +50,11 @@ function parseICS(icsData: string) {
                     (currentEvent as Event)["DTEND;VALUE=DATE"]
                 );
                 if (isCurrentEvent(startDate, endDate)) {
+                    console.log('currentEvent', currentEvent);
                     event = {
                         title: (currentEvent as Event).SUMMARY.trim(),
-                        endDate
+                        endDate,
+                        reviewPeriod: (currentEvent as Event).SUMMARY.includes("Review Period")
                     };
                     currentEvent = {};
                     break;

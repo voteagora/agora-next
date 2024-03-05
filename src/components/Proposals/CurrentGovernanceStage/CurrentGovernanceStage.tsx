@@ -3,9 +3,11 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 export default function CurrentGovernanceStage({
   title,
   endDate,
+  reviewPeriod,
 }: {
   title: string;
   endDate: Date;
+  reviewPeriod: boolean;
 }) {
   const currentDate = new Date();
   const differenceInMilliseconds = endDate.getTime() - currentDate.getTime();
@@ -21,7 +23,7 @@ export default function CurrentGovernanceStage({
         </div>
         <span className="hidden sm:block">&nbsp;·&nbsp;</span>
         <span>
-          Voting ends in around {differenceInDays}{" "}
+          Voting {reviewPeriod ? "starts" : "ends"} in around {differenceInDays}{" "}
           {differenceInDays === 1 ? "day" : "days"}
         </span>
       </div>

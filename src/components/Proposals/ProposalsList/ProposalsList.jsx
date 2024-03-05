@@ -59,6 +59,7 @@ export default function ProposalsList({
         <CurrentGovernanceStage
           title={governanceCalendar.title}
           endDate={governanceCalendar.endDate}
+          reviewPeriod={governanceCalendar.reviewPeriod}
         />
       )}
       <VStack className={styles.proposals_table_container}>
