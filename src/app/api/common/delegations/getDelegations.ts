@@ -3,9 +3,9 @@ import { getHumanBlockTime } from "@/lib/blockTimes";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
-import { contracts } from "@/lib/contracts/contracts";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant";
+import { TenantContractType } from "@/lib/tenantContract";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -19,7 +19,7 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contract } = Tenant.getInstance();
 
   const advancedDelegatees = await prisma[
     `${namespace}AdvancedDelegatees`
@@ -27,7 +27,7 @@ async function getCurrentDelegateesForAddress({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts(namespace).alligator.address.toLowerCase(),
+      contract: contract(TenantContractType.ALLIGATOR).address,
     },
   });
 
@@ -129,12 +129,12 @@ async function getCurrentDelegatorsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contract } = Tenant.getInstance();
   const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts(namespace).alligator.address.toLowerCase(),
+      contract: contract(TenantContractType.ALLIGATOR).address,
     },
   });
 
@@ -251,7 +251,7 @@ async function getAllDelegatorsInChainsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contract } = Tenant.getInstance();
   const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
     `
     SELECT array_agg(DISTINCT u.element) AS addresses
@@ -259,7 +259,7 @@ async function getAllDelegatorsInChainsForAddress({
     WHERE delegate=$1 AND contract=$2 AND allowance > 0;
     `,
     address,
-    contracts(namespace).alligator.address.toLowerCase()
+    contract(TenantContractType.ALLIGATOR).address
   );
 
   return allAddresess[0].addresses;

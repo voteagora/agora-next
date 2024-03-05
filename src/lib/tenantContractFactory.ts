@@ -4,16 +4,18 @@ import { TenantContract, TenantContractType } from "@/lib/tenantContract";
 import {
   AlligatorOPV5__factory,
   OptimismGovernor__factory,
+  type OptimismToken,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import provider from "@/app/lib/provider";
+import { BaseContract } from "ethers";
 
 export default class TenantContractFactory {
   public static create(
     namespace: TenantNamespace,
     isProd: boolean
-  ): TenantContract[] {
+  ): TenantContract<BaseContract>[] {
     switch (namespace) {
       case "optimism":
         return optimismContracts(isProd);
@@ -23,9 +25,9 @@ export default class TenantContractFactory {
   }
 }
 
-const optimismContracts = (isProd: boolean): TenantContract[] => {
+const optimismContracts = (isProd: boolean): TenantContract<BaseContract>[] => {
   return [
-    new TenantContract({
+    new TenantContract<BaseContract>({
       type: TenantContractType.GOVERNOR,
       contract: OptimismGovernor__factory.connect(
         isProd
@@ -40,7 +42,7 @@ const optimismContracts = (isProd: boolean): TenantContract[] => {
       abi: OptimismGovernor__factory.abi,
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
     }),
-    new TenantContract({
+    new TenantContract<BaseContract>({
       type: TenantContractType.TYPES_CONFIGURATOR,
       contract: OptimismGovernor__factory.connect(
         isProd
@@ -54,7 +56,7 @@ const optimismContracts = (isProd: boolean): TenantContract[] => {
       chainId: 10,
       abi: ProposalTypesConfigurator__factory.abi,
     }),
-    new TenantContract({
+    new TenantContract<OptimismToken>({
       type: TenantContractType.TOKEN,
       contract: OptimismToken__factory.connect(
         "0x4200000000000000000000000000000000000042",
@@ -64,7 +66,7 @@ const optimismContracts = (isProd: boolean): TenantContract[] => {
       chainId: 10,
       abi: OptimismToken__factory.abi,
     }),
-    new TenantContract({
+    new TenantContract<BaseContract>({
       type: TenantContractType.ALLIGATOR,
       contract: AlligatorOPV5__factory.connect(
         isProd

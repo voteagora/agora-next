@@ -9,12 +9,12 @@ import {
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { contracts } from "@/lib/contracts/contracts";
 import { Delegate } from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
+import { TenantContractType } from "@/lib/tenantContract";
 
 type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
@@ -110,7 +110,7 @@ type DelegateStats = {
 };
 
 export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contract } = Tenant.getInstance();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -146,7 +146,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
-    contracts(namespace).alligator.address.toLowerCase()
+    contract(TenantContractType.ALLIGATOR).address
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
@@ -176,7 +176,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     ) t;
     `,
     address,
-    contracts(namespace).alligator.address.toLowerCase()
+    contract(TenantContractType.ALLIGATOR).address
   );
 
   const totalVotingPower =
