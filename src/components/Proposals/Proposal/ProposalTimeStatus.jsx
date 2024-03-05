@@ -1,3 +1,6 @@
+// Use client for local timezone
+"use client";
+
 import { HStack } from "@/components/Layout/Stack";
 import { formatDistanceToNowStrict } from "date-fns";
 
@@ -11,8 +14,8 @@ export default function ProposalTimeStatus({
     hour: "numeric",
     minute: "numeric",
     timeZoneName: "short",
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   };
+
   console.log(
     "Intl.DateTimeFormat().resolvedOptions().timeZone: ",
     Intl.DateTimeFormat().resolvedOptions().timeZone
