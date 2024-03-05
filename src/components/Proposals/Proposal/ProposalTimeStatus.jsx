@@ -13,6 +13,10 @@ export default function ProposalTimeStatus({
     timeZoneName: "short",
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   };
+  console.log(
+    "Intl.DateTimeFormat().resolvedOptions().timeZone: ",
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  );
 
   const activeProposalEndTime = new Intl.DateTimeFormat(
     "en-US",
