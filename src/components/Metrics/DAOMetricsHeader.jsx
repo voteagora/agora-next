@@ -1,10 +1,14 @@
 "use server";
 
 import MetricContainer from "./MetricContainer";
-import { TOKEN, formatNumber } from "@/lib/tokenUtils";
+import { formatNumber } from "@/lib/tokenUtils";
 import styles from "./daometrics.module.scss";
+import Tenant from "@/lib/tenant";
 
 export default async function DAOMetricsHeader({ metrics }) {
+
+  const {token}  = Tenant.getInstance();
+
   const formattedMetrics = {
     votableSupply: formatNumber(metrics.votableSupply),
     totalSupply: formatNumber(metrics.totalSupply),
@@ -18,8 +22,8 @@ export default async function DAOMetricsHeader({ metrics }) {
         title="Delegated / Total supply"
         body={
           <>
-            {formattedMetrics.votableSupply} {TOKEN.symbol} /{" "}
-            {formattedMetrics.totalSupply} {TOKEN.symbol}
+            {formattedMetrics.votableSupply} {token.symbol} /{" "}
+            {formattedMetrics.totalSupply} {token.symbol}
           </>
         }
       />
@@ -28,7 +32,7 @@ export default async function DAOMetricsHeader({ metrics }) {
         title="Quorum"
         body={
           <>
-            {formattedMetrics.quorum} {TOKEN.symbol}
+            {formattedMetrics.quorum} {token.symbol}
           </>
         }
       />

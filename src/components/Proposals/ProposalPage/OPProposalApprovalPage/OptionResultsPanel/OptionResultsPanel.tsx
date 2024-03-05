@@ -4,16 +4,22 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
-import { tokens } from "@/lib/tokenUtils";
 import { OptimismContracts } from "@/lib/contracts/contracts";
+import { tokenForContractAddress } from "@/lib/tokenUtils";
 
 export default function OptionsResultsPanel({
   proposal,
 }: {
   proposal: Proposal;
 }) {
+  // Note: Defaulting to optimism token for now since the contract-scoped token
+  // was exactly the same as the optimism token.
+
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
+
+  const { decimals: contractTokenDecimals } = tokenForContractAddress(proposalData.proposalSettings.budgetToken)
+
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["APPROVAL"]["kind"];
   const proposalSettings = proposalData.proposalSettings;
@@ -65,8 +71,7 @@ export default function OptionsResultsPanel({
             ? BigInt(option?.budgetTokensSpent || 0)
             : parseUnits(
                 option?.budgetTokensSpent?.toString() || "0",
-                tokens.get(proposalData.proposalSettings.budgetToken)
-                  ?.decimals ?? 18
+              contractTokenDecimals
               );
         if (proposalSettings.criteria === "TOP_CHOICES") {
           isApproved = index < Number(proposalSettings.criteriaValue);
