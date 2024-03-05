@@ -11,7 +11,7 @@ export default function ProposalTimeStatus({
     hour: "numeric",
     minute: "numeric",
     timeZoneName: "short",
-    timeZone: "UTC",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   };
 
   const activeProposalEndTime = new Intl.DateTimeFormat(
