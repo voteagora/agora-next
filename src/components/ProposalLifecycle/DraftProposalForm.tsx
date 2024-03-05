@@ -9,11 +9,14 @@ import DraftProposalFormSubmit from "./DraftProposalFormSubmit";
 
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
+import DraftProposalContactVoters from "./DraftProposalFormContactVoters";
 
 type ProposalLifecycleDraftStage =
   | "draft-temp-check"
   | "draft-create"
-  | "draft-submit";
+  | "draft-submit"
+  | "awaiting-sponsor"
+  | "contact-voters";
 
 interface DraftProposalFormProps {
   proposal: ProposalDraftWithTransactions;
@@ -47,8 +50,24 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
   const [proposalState, setProposalState] =
     useState<ProposalDraftWithTransactions>(proposal);
 
-  const [stage, setStage] =
-    useState<ProposalLifecycleDraftStage>("draft-temp-check");
+  function getCurrentStage(
+    proposal_status_id: number
+  ): ProposalLifecycleDraftStage {
+    switch (proposal_status_id) {
+      case 1:
+        return "draft-temp-check";
+      case 2:
+        return "draft-create";
+      case 3:
+        return "draft-submit";
+      case 4:
+        return "awaiting-sponsor";
+      case 5:
+        return "contact-voters";
+      default:
+        return "draft-temp-check";
+    }
+  }
 
   return (
     <div className="flex-grow">
@@ -56,20 +75,15 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
         type="single"
         collapsible
         className="flex flex-col min-h-screen"
-        // TODO don't hard code this
-        value={proposalState.proposal_status_id == 1 ? stage : ""}
-        onValueChange={(value) =>
-          setStage(value as ProposalLifecycleDraftStage)
-        }
+        value={getCurrentStage(proposalState.proposal_status_id)}
       >
         <DraftProposalFormTempCheck
-          setStage={setStage}
           proposalState={proposalState}
+          setProposalState={setProposalState}
           updateProposal={updateProposal}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormCreate
-          setStage={setStage}
           proposalState={proposalState}
           setProposalState={setProposalState}
           getProposal={getProposal}
@@ -80,6 +94,12 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit
+          proposalState={proposalState}
+          setProposalState={setProposalState}
+          updateProposal={updateProposal}
+        />
+        <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
+        <DraftProposalContactVoters
           proposalState={proposalState}
           setProposalState={setProposalState}
           updateProposal={updateProposal}

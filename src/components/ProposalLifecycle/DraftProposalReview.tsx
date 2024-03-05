@@ -89,10 +89,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
 
   const handleSubmitProposal = async () => {
     // TODO unify states and names across frontend state and database
-    const updateData = {
+    const updatedProposal = await updateProposal(proposalState, {
+      proposal_status_id: 4,
       sponsor_address: sponsorAddress,
-    };
-    const updatedProposal = await updateProposal(proposalState, updateData);
+    });
 
     setProposalState({
       ...updatedProposal,

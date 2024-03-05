@@ -14,9 +14,6 @@ import {
 interface DraftProposalCreateButtonProps {
   description: string;
   checkmarkInfo: string;
-  setStage: React.Dispatch<
-    React.SetStateAction<"draft-temp-check" | "draft-create" | "draft-submit">
-  >;
   proposalState: ProposalDraftWithTransactions;
   setProposalState: React.Dispatch<
     React.SetStateAction<ProposalDraftWithTransactions>
@@ -33,16 +30,20 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   const {
     description,
     checkmarkInfo,
-    setStage,
     proposalState,
     setProposalState,
     updateProposal,
   } = props;
 
   const handleContinue = async () => {
-    // TODO save / run validation etc
+    const updatedProposal = await updateProposal(proposalState, {
+      proposal_status_id: 3,
+    });
 
-    setStage("draft-submit");
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+    });
   };
 
   const saveAndUpdateDocs = async () => {
