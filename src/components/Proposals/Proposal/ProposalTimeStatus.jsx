@@ -1,4 +1,4 @@
-// Use client for local timezone
+// Use client for local timezone instead of server timezone
 "use client";
 
 import { HStack } from "@/components/Layout/Stack";
