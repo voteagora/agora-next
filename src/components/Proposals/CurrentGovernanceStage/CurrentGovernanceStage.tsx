@@ -20,7 +20,7 @@ export default function CurrentGovernanceStage({
           <span>{title}</span>
         </div>
         <span className="hidden sm:block">&nbsp;·&nbsp;</span>
-        <span>Voting ends in around {differenceInDays + 1} days</span>
+        <span>Voting ends in around {differenceInDays} days</span>
       </div>
       <a
         href="https://calendar.google.com/calendar/embed?src=c_fnmtguh6noo6qgbni2gperid4k%40group.calendar.google.com"
