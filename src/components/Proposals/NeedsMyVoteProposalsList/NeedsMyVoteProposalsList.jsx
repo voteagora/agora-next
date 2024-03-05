@@ -31,8 +31,6 @@ export default function NeedsMyVoteProposalsList({
     getProposals();
   }, [getProposals, address]);
 
-  console.log(proposals);
-
   return (
     <>
       {isConnected && proposals.length > 0 && (
