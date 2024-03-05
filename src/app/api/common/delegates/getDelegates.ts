@@ -158,7 +158,7 @@ export async function getDelegateForNamespace({
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
-      (await delegateQuery)?.[0] || undefined,
+      delegateQuery.then(result => result?.[0] || undefined),
       prisma[`${namespace}VotableSupply`].findFirst({}),
       getDelegateStatement({ addressOrENSName }),
       getCurrentQuorum(),
