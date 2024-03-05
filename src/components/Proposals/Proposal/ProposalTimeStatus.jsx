@@ -13,10 +13,9 @@ export default function ProposalTimeStatus({
     timeZoneName: "short",
   };
 
-  const activeProposalEndTime = new Intl.DateTimeFormat(
-    "en-US",
-    options
-  ).format(proposalEndTime);
+  const activeProposalEndTime = new Intl.DateTimeFormat("UTC", options).format(
+    proposalEndTime
+  );
 
   switch (proposalStatus) {
     case "PENDING":
