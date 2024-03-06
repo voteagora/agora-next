@@ -50,8 +50,16 @@ function parseICS(icsData: string) {
                     (currentEvent as Event)["DTEND;VALUE=DATE"]
                 );
                 if (isCurrentEvent(startDate, endDate)) {
-                    // Calendar ends one day later that it is supposed to
-                    endDate.setDate(endDate.getDate() - 1);
+                    const reviewPeriod = (currentEvent as Event).SUMMARY.includes("Review Period");
+                    if (!reviewPeriod) {
+                        /**
+                         * On voting period we should display the last day (the day voting ends). On review period we 
+                         * should display the next day (the day voting starts).
+                         * 
+                         * Calendar provides one day extra
+                         */
+                        endDate.setDate(endDate.getDate() - 1);
+                    }
                     const day = endDate.getDate();
                     const suffix = (day >= 11 && day <= 13) ? 'th' : ['st', 'nd', 'rd'][day % 10 - 1] || 'th';
 
