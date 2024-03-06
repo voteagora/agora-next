@@ -4,12 +4,12 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import useIsOpManager from "@/app/lib/hooks/useIsOpManager";
 import { Button } from "@/components/ui/button";
 import {
-  OptimismContracts,
   approvalModuleAddress,
   optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { keccak256, toHex } from "viem";
 import { useContractWrite } from "wagmi";
+import Tenant from "@/lib/tenant";
 
 export default function OpManagerDeleteProposal({
   proposal,
@@ -18,6 +18,7 @@ export default function OpManagerDeleteProposal({
 }) {
   const { isOpManager } = useIsOpManager();
 
+  const { contracts } = Tenant.getInstance();
   const proposalType = proposal.proposalType;
 
   const getArgs = () => {
@@ -46,8 +47,8 @@ export default function OpManagerDeleteProposal({
   };
 
   const { write, isLoading, isError, isSuccess } = useContractWrite({
-    address: OptimismContracts.governor.address as any,
-    abi: OptimismContracts.governor.abi,
+    address: contracts.governor.address as any,
+    abi: contracts.governor.abi,
     functionName: proposalType === "STANDARD" ? "cancel" : "cancelWithModule",
     // @ts-ignore
     args: getArgs(),

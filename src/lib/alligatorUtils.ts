@@ -4,20 +4,15 @@ import {
   AuthorityChainRules,
   AuthorityChainsSnaps,
 } from "@/app/api/common/authority-chains/authorityChains";
-import { OptimismContracts } from "./contracts/contracts";
 import { bigIntMax, bigIntMin } from "./bigintUtils";
 import Tenant from "@/lib/tenant";
 
 export async function getProxyAddress(address: string) {
-  const { namespace } = Tenant.getInstance();
-
-  switch (namespace) {
-    case "optimism": {
-      return OptimismContracts.alligator.contract.proxyAddress(address);
-    }
-    default: {
-      throw new Error("Can't find Agora Instance token");
-    }
+  const { contracts } = Tenant.getInstance();
+  if (contracts.alligator) {
+    return contracts.alligator.contract.proxyAddress(address);
+  } else {
+    throw new Error("Can't find Agora Instance token");
   }
 }
 

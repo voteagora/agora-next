@@ -4,6 +4,7 @@ import { TenantContractDefinition } from "@/lib/tenantContractDefinition";
 
 import {
   AlligatorOPV5__factory,
+  NounsGovernor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
@@ -13,11 +14,12 @@ import provider from "@/app/lib/provider";
 import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/interfaces/ITokenContract";
 import { IGovernorContract } from "@/lib/contracts/interfaces/IGovernorContract";
+import { IAlligatorContract } from "@/lib/contracts/interfaces/IAlligatorContract";
 
 export type TenantContractDefinitions = {
   token: TenantContractDefinition<ITokenContract>;
   governor: TenantContractDefinition<IGovernorContract>;
-  alligator?: TenantContractDefinition<BaseContract>;
+  alligator?: TenantContractDefinition<IAlligatorContract>;
   proposalTypesConfigurator?: TenantContractDefinition<BaseContract>;
 };
 export default class TenantContractFactory {
@@ -60,9 +62,10 @@ const opContracts = (isProd: boolean): TenantContractDefinitions => {
       chainId: 10,
       abi: OptimismGovernor__factory.abi,
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
     }),
     // ALLIGATOR ---------------------------------------------------------------
-    alligator: new TenantContractDefinition<BaseContract>({
+    alligator: new TenantContractDefinition<IAlligatorContract>({
       contract: AlligatorOPV5__factory.connect(
         isProd
           ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
@@ -90,4 +93,16 @@ const opContracts = (isProd: boolean): TenantContractDefinitions => {
       abi: ProposalTypesConfigurator__factory.abi,
     }),
   };
+};
+
+export const NounsContracts = {
+  governor: {
+    contract: NounsGovernor__factory.connect(
+      "0x6f3e6272a167e8accb32072d08e0957f9c79223d",
+      provider
+    ),
+    address: "0x6f3e6272a167e8accb32072d08e0957f9c79223d" as `0x${string}`,
+    chainId: 1,
+    abi: NounsGovernor__factory.abi,
+  },
 };
