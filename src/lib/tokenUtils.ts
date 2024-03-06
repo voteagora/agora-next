@@ -80,12 +80,3 @@ export function formatNumberForAdvancedDelegation(amount: string) {
     .map((part) => part.value)
     .join("");
 }
-
-/**
- * Contract calls
- *
- */
-export async function getTokenSupply() {
-  const { contracts } = Tenant.getInstance();
-  return contracts.token.contract.totalSupply();
-}

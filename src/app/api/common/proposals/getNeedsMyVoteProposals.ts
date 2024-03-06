@@ -7,7 +7,7 @@ import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
 
 export async function getNeedsMyVoteProposals(address: string) {
-  const tenant = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
   const [latestBlock, votableSupply] = await Promise.all([
     provider.getBlockNumber(),
     getVotableSupply(),
@@ -25,21 +25,21 @@ export async function getNeedsMyVoteProposals(address: string) {
       SELECT p.*
       FROM (
         SELECT *
-        FROM ${tenant.namespace + ".proposals"}
+        FROM ${namespace + ".proposals"}
         WHERE CAST(start_block AS INTEGER) < $1
           AND CAST(end_block AS INTEGER) > $1
           AND cancelled_block IS NULL
           ${prodDataOnly}
       ) AS p
       LEFT JOIN ${
-        tenant.namespace + ".votes"
+        namespace + ".votes"
       } v ON p.proposal_id = v.proposal_id AND v.voter = $2
       WHERE v.proposal_id IS NULL
       ORDER BY p.ordinal DESC;
       `,
     latestBlock,
     address.toLowerCase(),
-    tenant.contracts.governor.address
+    contracts.governor.address
   );
 
   const resolvedProposals = Promise.all(
