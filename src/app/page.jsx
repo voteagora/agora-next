@@ -1,3 +1,7 @@
+import { getMetrics } from "@/app/api/common/metrics/getMetrics";
+import { getNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
+import { getProposals } from "@/app/api/common/proposals/getProposals";
+import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import Hero from "@/components/Hero/Hero";
 import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
@@ -5,10 +9,6 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
-import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
-import { getMetrics } from "./api/metrics/getMetrics";
-import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
-import { getProposals } from "./api/proposals/getProposals";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -20,19 +20,16 @@ async function fetchProposals(filter, page = 1) {
 
 async function fetchNeedsMyVoteProposals(address) {
   "use server";
-
-  return getNeedsMyVoteProposals({ address });
+  return getNeedsMyVoteProposals(address);
 }
 
 async function fetchDaoMetrics() {
   "use server";
-
   return getMetrics();
 }
 
 async function fetchVotableSupply() {
   "use server";
-
   return getVotableSupply();
 }
 
@@ -56,11 +53,13 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Home({ searchParams }) {
-  const filter = searchParams?.filter
-    ? proposalsFilterOptions.everything.filter
-    : proposalsFilterOptions.relevant.filter;
-  const proposals = await fetchProposals(filter);
+export default async function Home() {
+  const relevalntProposals = await fetchProposals(
+    proposalsFilterOptions.relevant.filter
+  );
+  const allProposals = await fetchProposals(
+    proposalsFilterOptions.everything.filter
+  );
 
   const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
@@ -75,8 +74,9 @@ export default async function Home({ searchParams }) {
         votableSupply={votableSupply}
       />
       <ProposalsList
-        initialProposals={proposals}
-        fetchProposals={async (page) => {
+        initRelevantProposals={relevalntProposals}
+        initAllProposals={allProposals}
+        fetchProposals={async (page, filter) => {
           "use server";
           return getProposals({ filter, page });
         }}

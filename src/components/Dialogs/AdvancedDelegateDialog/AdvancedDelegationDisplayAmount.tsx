@@ -1,15 +1,18 @@
 import { HStack } from "@/components/Layout/Stack";
-import { TOKEN, formatNumberForAdvancedDelegation } from "@/lib/tokenUtils";
+import { formatNumberForAdvancedDelegation } from "@/lib/tokenUtils";
 import Image from "next/image";
 import { useMemo } from "react";
 import tokenIcon from "@/icons/tokenIcon.svg";
 import styles from "./advancedDelegateDialog.module.scss";
+import Tenant from "@/lib/tenant";
 
 export function AdvancedDelegationDisplayAmount({
   amount,
 }: {
   amount: string;
 }) {
+  const { token } = Tenant.getInstance();
+
   const formattedNumber = useMemo(() => {
     return formatNumberForAdvancedDelegation(amount);
   }, [amount]);
@@ -21,7 +24,7 @@ export function AdvancedDelegationDisplayAmount({
       alignItems="items-center"
     >
       {formattedNumber}
-      <Image src={tokenIcon} alt={TOKEN.symbol} width={36} height={36} />
+      <Image src={tokenIcon} alt={token.symbol} width={36} height={36} />
     </HStack>
   );
 }
