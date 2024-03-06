@@ -50,10 +50,19 @@ function parseICS(icsData: string) {
                     (currentEvent as Event)["DTEND;VALUE=DATE"]
                 );
                 if (isCurrentEvent(startDate, endDate)) {
-                    console.log('currentEvent', currentEvent);
+                    const day = endDate.getDate();
+                    const suffix = (day >= 11 && day <= 13) ? 'th' : ['st', 'nd', 'rd'][day % 10 - 1] || 'th';
+
+                    const options: Intl.DateTimeFormatOptions = {
+                        month: "long",
+                        day: "numeric"
+                    };
+
+                    const _endDate = new Intl.DateTimeFormat("en-US", options).format(endDate);
+
                     event = {
                         title: (currentEvent as Event).SUMMARY.trim(),
-                        endDate,
+                        endDate: _endDate.replace(/\d+/, (day + suffix)),
                         reviewPeriod: (currentEvent as Event).SUMMARY.includes("Review Period")
                     };
                     currentEvent = {};
