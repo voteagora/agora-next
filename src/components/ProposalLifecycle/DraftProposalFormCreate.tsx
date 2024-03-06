@@ -56,12 +56,20 @@ interface DraftProposalFormCreateProps {
   deleteTransaction: (
     transactionId: number
   ) => Promise<ProposalDraftTransaction[]>;
+  createGithubProposal: (
+    proposal: ProposalDraftWithTransactions
+  ) => Promise<string>;
 }
 
 const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
   props
 ) => {
-  const { proposalState, setProposalState, updateProposal } = props;
+  const {
+    proposalState,
+    setProposalState,
+    updateProposal,
+    createGithubProposal,
+  } = props;
 
   return (
     <div className="">
@@ -117,6 +125,7 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
             proposalState={proposalState}
             setProposalState={setProposalState}
             updateProposal={updateProposal}
+            createGithubProposal={createGithubProposal}
           />
         </AccordionContent>
       </AccordionItem>
