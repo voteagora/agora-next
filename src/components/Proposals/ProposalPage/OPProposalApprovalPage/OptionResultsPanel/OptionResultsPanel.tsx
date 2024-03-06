@@ -5,7 +5,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { tokenForContractAddress } from "@/lib/tokenUtils";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function OptionsResultsPanel({
   proposal,

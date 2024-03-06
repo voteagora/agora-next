@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import Tenant from "@/lib/tenant";
-import TenantTokenFactory from "@/lib/tenantTokenFactory";
+import Tenant from "@/lib/tenant/tenant";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 
 // TODO: This file seems messy -- consider refactoring
 

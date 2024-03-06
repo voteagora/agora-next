@@ -5,7 +5,7 @@ import {
   AuthorityChainsSnaps,
 } from "@/app/api/common/authority-chains/authorityChains";
 import { bigIntMax, bigIntMin } from "./bigintUtils";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getProxyAddress(address: string) {
   const { contracts } = Tenant.getInstance();

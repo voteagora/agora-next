@@ -3,7 +3,7 @@
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const useIsOpManager = () => {
   const { isConnected } = useAgoraContext();

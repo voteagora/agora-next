@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { formatUnits } from "viem";
 import { optimism } from "viem/chains";
 import { useContractWrite } from "wagmi";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const allowanceType = 1; // 1 - relative; 0 - absolute
 

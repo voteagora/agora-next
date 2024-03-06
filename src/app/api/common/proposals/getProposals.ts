@@ -5,7 +5,7 @@ import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getProposals({
   filter,

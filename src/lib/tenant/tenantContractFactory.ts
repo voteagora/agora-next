@@ -1,10 +1,8 @@
-import { type TenantNamespace } from "@/lib/types";
-
-import { TenantContractDefinition } from "@/lib/tenantContractDefinition";
+import { TenantContracts, type TenantNamespace } from "@/lib/types";
+import { TenantContract } from "@/lib/tenant/tenantContract";
 
 import {
   AlligatorOPV5__factory,
-  NounsGovernor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
@@ -12,21 +10,16 @@ import {
 
 import provider from "@/app/lib/provider";
 import { BaseContract } from "ethers";
-import { ITokenContract } from "@/lib/contracts/interfaces/ITokenContract";
-import { IGovernorContract } from "@/lib/contracts/interfaces/IGovernorContract";
-import { IAlligatorContract } from "@/lib/contracts/interfaces/IAlligatorContract";
+import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
+import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
+import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 
-export type TenantContractDefinitions = {
-  token: TenantContractDefinition<ITokenContract>;
-  governor: TenantContractDefinition<IGovernorContract>;
-  alligator?: TenantContractDefinition<IAlligatorContract>;
-  proposalTypesConfigurator?: TenantContractDefinition<BaseContract>;
-};
+
 export default class TenantContractFactory {
   public static create(
     namespace: TenantNamespace,
     isProd: boolean
-  ): TenantContractDefinitions {
+  ): TenantContracts {
     switch (namespace) {
       case "optimism":
         return opContracts(isProd);
@@ -36,10 +29,10 @@ export default class TenantContractFactory {
   }
 }
 
-const opContracts = (isProd: boolean): TenantContractDefinitions => {
+const opContracts = (isProd: boolean): TenantContracts => {
   return {
-    // TOKEN    ----------------------------------------------------------------
-    token: new TenantContractDefinition<ITokenContract>({
+    // TOKEN
+    token: new TenantContract<ITokenContract>({
       contract: OptimismToken__factory.connect(
         "0x4200000000000000000000000000000000000042",
         provider
@@ -48,8 +41,8 @@ const opContracts = (isProd: boolean): TenantContractDefinitions => {
       chainId: 10,
       abi: OptimismToken__factory.abi,
     }),
-    // GOVERNOR ----------------------------------------------------------------
-    governor: new TenantContractDefinition<IGovernorContract>({
+    // GOVERNOR
+    governor: new TenantContract<IGovernorContract>({
       contract: OptimismGovernor__factory.connect(
         isProd
           ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
@@ -64,8 +57,8 @@ const opContracts = (isProd: boolean): TenantContractDefinitions => {
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
     }),
-    // ALLIGATOR ---------------------------------------------------------------
-    alligator: new TenantContractDefinition<IAlligatorContract>({
+    // ALLIGATOR
+    alligator: new TenantContract<IAlligatorContract>({
       contract: AlligatorOPV5__factory.connect(
         isProd
           ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
@@ -78,8 +71,8 @@ const opContracts = (isProd: boolean): TenantContractDefinitions => {
       chainId: 10,
       abi: AlligatorOPV5__factory.abi,
     }),
-    // TYPES ----------------------------------------------------------------
-    proposalTypesConfigurator: new TenantContractDefinition<BaseContract>({
+    // TYPES
+    proposalTypesConfigurator: new TenantContract<BaseContract>({
       contract: OptimismGovernor__factory.connect(
         isProd
           ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
@@ -93,16 +86,4 @@ const opContracts = (isProd: boolean): TenantContractDefinitions => {
       abi: ProposalTypesConfigurator__factory.abi,
     }),
   };
-};
-
-export const NounsContracts = {
-  governor: {
-    contract: NounsGovernor__factory.connect(
-      "0x6f3e6272a167e8accb32072d08e0957f9c79223d",
-      provider
-    ),
-    address: "0x6f3e6272a167e8accb32072d08e0957f9c79223d" as `0x${string}`,
-    chainId: 1,
-    abi: NounsGovernor__factory.abi,
-  },
 };

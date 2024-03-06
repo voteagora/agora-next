@@ -4,7 +4,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useContractRead } from "wagmi";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const useIsAdvancedUser = () => {
   const { contracts, isProd } = Tenant.getInstance();

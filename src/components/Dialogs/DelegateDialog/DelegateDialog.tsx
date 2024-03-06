@@ -14,7 +14,7 @@ import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/Advan
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateDialog({
   delegate,

@@ -9,7 +9,7 @@ import {
 } from "@/lib/contracts/contracts";
 import { keccak256, toHex } from "viem";
 import { useContractWrite } from "wagmi";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function OpManagerDeleteProposal({
   proposal,

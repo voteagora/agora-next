@@ -1,14 +1,12 @@
-import { type TenantNamespace, type TenantToken } from "./types";
+import { type TenantNamespace, type TenantToken, type TenantContracts } from "../types";
 import { DaoSlug } from "@prisma/client";
-import TenantTokenFactory from "@/lib/tenantTokenFactory";
-import TenantContractFactory, {
-  type TenantContractDefinitions,
-} from "@/lib/tenantContractFactory";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 
 export default class Tenant {
   private static instance: Tenant;
 
-  private readonly _contracts: TenantContractDefinitions;
+  private readonly _contracts: TenantContracts;
   private readonly _isProd: boolean;
   private readonly _namespace: TenantNamespace;
   private readonly _slug: string;
@@ -31,7 +29,7 @@ export default class Tenant {
       this._isProd
     );
   }
-  public get contracts(): TenantContractDefinitions {
+  public get contracts(): TenantContracts {
     return this._contracts;
   }
 

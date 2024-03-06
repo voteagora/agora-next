@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
 import { optimism } from "viem/chains";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const useAdvancedVoting = ({
   proposalId,

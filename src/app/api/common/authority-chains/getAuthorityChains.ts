@@ -2,7 +2,7 @@ import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getAuthorityChains({
   address,

@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import styles from "./delegateCard.module.scss";
 import Image from "next/image";
 import badge from "@/icons/badge.svg";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateProfileImage({
   address,

@@ -1,6 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import { getTokenSupply } from "@/lib/tokenUtils";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getMetrics() {
   const { namespace } = Tenant.getInstance();

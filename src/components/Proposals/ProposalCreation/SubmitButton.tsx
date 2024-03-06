@@ -19,7 +19,7 @@ import {
 import { useModal } from "connectkit";
 import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const { contracts } = Tenant.getInstance();
 

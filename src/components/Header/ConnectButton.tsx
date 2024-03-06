@@ -5,7 +5,7 @@ import { DesktopConnectButton } from "./DesktopConnectButton";
 import { useNetwork } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect } from "react";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export function ConnectButton() {
   const { contracts } = Tenant.getInstance();

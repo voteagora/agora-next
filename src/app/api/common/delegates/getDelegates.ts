@@ -11,7 +11,7 @@ import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { Delegate } from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 

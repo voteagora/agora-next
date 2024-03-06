@@ -12,7 +12,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const secondsPerBlock = 2;
 

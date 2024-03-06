@@ -19,7 +19,7 @@ import {
   getDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(

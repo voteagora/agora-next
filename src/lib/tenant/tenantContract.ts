@@ -9,7 +9,7 @@ type TenantContractParams<ContractType> = {
   optionBudgetChangeDate?: Date;
 };
 
-export class TenantContractDefinition<ContractType> {
+export class TenantContract<ContractType> {
   public abi: any;
   public chainId: number;
   public contract: ContractType;
@@ -36,4 +36,5 @@ export class TenantContractDefinition<ContractType> {
   get address(): string {
     return this._address.toLowerCase();
   }
+
 }

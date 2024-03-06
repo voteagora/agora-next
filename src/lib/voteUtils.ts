@@ -8,7 +8,7 @@ import {
 import { getHumanBlockTime } from "./blockTimes";
 import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 /**
  * Vote primitives

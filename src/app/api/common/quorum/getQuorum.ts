@@ -1,7 +1,7 @@
 import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getQuorumForProposal(proposal: ProposalPayload) {
   const tenant = Tenant.getInstance();

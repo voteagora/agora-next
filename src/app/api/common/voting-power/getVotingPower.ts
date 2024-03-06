@@ -6,7 +6,7 @@ import {
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData } from "./votingPower";
 import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 /**
  * Voting Power for a given block

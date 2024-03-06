@@ -1,7 +1,7 @@
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
