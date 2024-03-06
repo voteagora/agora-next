@@ -46,8 +46,8 @@ export default function OpManagerDeleteProposal({
     }
   };
 
-  const { write, isLoading, isError, isSuccess } = useContractWrite({
-    address: contracts.governor.address as any,
+  const { write, isLoading, isSuccess } = useContractWrite({
+    address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: proposalType === "STANDARD" ? "cancel" : "cancelWithModule",
     // @ts-ignore

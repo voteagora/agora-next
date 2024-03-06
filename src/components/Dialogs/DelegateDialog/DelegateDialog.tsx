@@ -63,7 +63,7 @@ export function DelegateDialog({
   });
 
   const { isLoading, isSuccess, isError, write, data } = useContractWrite({
-    address: contracts.token.address as any,
+    address: contracts.token.address as `0x${string}`,
     abi: contracts.token.abi,
     functionName: "delegate",
     args: [delegate.address as any],

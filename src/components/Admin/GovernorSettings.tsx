@@ -53,6 +53,7 @@ export default function GovernorSettings() {
 
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState<number>();
+  
   const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
     usePrepareContractWrite({
       ...contracts.governor,

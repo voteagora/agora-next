@@ -14,7 +14,7 @@ const useIsOpManager = () => {
   const governorContract = {
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
-    chainId: 10,
+    chainId: contracts.governor.chainId,
   };
 
   const { data } = useContractRead({

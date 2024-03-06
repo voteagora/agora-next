@@ -47,10 +47,8 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { contracts } = Tenant.getInstance();
 
-  const getOpBalance = async (address: `0x${string}`) => {
-    const balance = await contracts.token.contract.balanceOf(address);
-
-    return balance;
+  const getTokenBalance = async (address: `0x${string}`) => {
+    return await contracts.token.contract.balanceOf(address);
   };
 
   const fetchData = useCallback(async () => {
@@ -59,7 +57,7 @@ export function AdvancedDelegateDialog({
       const promises = [
         // TODO temporary fetch all query - optimization via API needed
         fetchAllForAdvancedDelegation(address),
-        getOpBalance(address),
+        getTokenBalance(address),
       ];
 
       const [getAll, delegateOpBalance] = await Promise.all(promises);

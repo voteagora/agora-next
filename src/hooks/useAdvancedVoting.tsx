@@ -35,7 +35,7 @@ const useAdvancedVoting = ({
     isSuccess: advancedVoteIsSuccess,
     data: advancedVoteData,
   } = useContractWrite({
-    address: contracts.alligator!.address as any,
+    address: contracts.alligator!.address as `0x${string}`,
     abi: contracts.alligator!.abi,
     functionName: "limitedCastVoteWithReasonAndParamsBatched",
     args: [
@@ -56,7 +56,7 @@ const useAdvancedVoting = ({
     isSuccess: standardVoteIsSuccess,
     data: standardVoteData,
   } = useContractWrite({
-    address: contracts.governor.address as any,
+    address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: reason
       ? params

@@ -37,7 +37,7 @@ const useAdvancedDelegation = ({
     isSuccess: subdelegateIsSuccess,
     data: subdelegateData,
   } = useContractWrite({
-    address: contracts.alligator!.address as any,
+    address: contracts.alligator!.address as `0x${string}`,
     abi: contracts.alligator!.abi,
     functionName: Array.isArray(target) ? "subdelegateBatched" : "subdelegate",
     args: [
@@ -54,7 +54,7 @@ const useAdvancedDelegation = ({
     isSuccess: delegateToProxyIsSuccess,
     data: delegateToProxyData,
   } = useContractWrite({
-    address: contracts.token.address as any,
+    address: contracts.token.address as `0x${string}`,
     abi: contracts.token.abi,
     functionName: "delegate",
     args: [proxyAddress as any],
