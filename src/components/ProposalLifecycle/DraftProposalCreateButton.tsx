@@ -22,6 +22,9 @@ interface DraftProposalCreateButtonProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
+  createGithubProposal: (
+    proposal: ProposalDraftWithTransactions
+  ) => Promise<string>;
 }
 
 const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
@@ -33,6 +36,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     proposalState,
     setProposalState,
     updateProposal,
+    createGithubProposal,
   } = props;
 
   const handleContinue = async () => {
@@ -48,14 +52,9 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
 
   const saveAndUpdateDocs = async () => {
     // TODO save / run validation etc
-  };
+    const prLink = await createGithubProposal(proposalState);
 
-  const handleChangeUpdateENSDocsStatus = () => {
-    // setProposalState({
-    //   ...proposalState,
-    //   update_ens_docs_status: !proposalState.update_ens_docs_status,
-    // });
-    // TODO sync with DB after we make the decision with ENS
+    console.log("prLink", prLink);
   };
 
   return (
@@ -103,11 +102,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
         <div className="flex flex-row w-full items-center">
           <p className="text-gray-4f pr-5">Update ENS docs</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
-          <Checkbox
-            // checked={proposalState.update_ens_docs_status}
-            checked={true}
-            onCheckedChange={() => handleChangeUpdateENSDocsStatus()}
-          />
+          <Checkbox checked={true} />
         </div>
       </div>
     </div>

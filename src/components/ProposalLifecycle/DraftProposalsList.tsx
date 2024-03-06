@@ -15,15 +15,17 @@ interface DraftProposalsListProps {
 export default function DraftProposalsList(props: DraftProposalsListProps) {
   const [proposals, setProposals] = useState<ProposalDraft[]>([]);
   const { address, isConnected } = useAccount();
+  const [loading, setLoading] = useState(false);
 
   const { fetchDraftProposals } = props;
 
   const getProposals = async (authorAddress: string) => {
-    alert("getProposals");
-    if (!!authorAddress) {
+    if (!!authorAddress && !loading) {
+      setLoading(true);
       const proposals = await fetchDraftProposals(authorAddress);
 
       setProposals(proposals);
+      setLoading(false);
     }
   };
 

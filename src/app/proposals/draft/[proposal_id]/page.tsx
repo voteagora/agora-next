@@ -4,6 +4,7 @@ import React from "react";
 import prisma from "@/app/lib/prisma";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
+import { createGithubProposal as handleCreateGithubProposal } from "@/components/ProposalLifecycle/github";
 
 async function getProposal(
   proposal_id: string
@@ -112,6 +113,16 @@ async function deleteTransaction(
   return transactions;
 }
 
+async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
+  "use server";
+
+  const result = await handleCreateGithubProposal(proposal);
+
+  console.log("createGithubProposal", proposal);
+
+  return "https://github.com";
+}
+
 export default async function DraftProposalPage({
   params: { proposal_id },
 }: {
@@ -134,6 +145,7 @@ export default async function DraftProposalPage({
         addTransaction={addTransaction}
         updateTransaction={updateTransaction}
         deleteTransaction={deleteTransaction}
+        createGithubProposal={createGithubProposal}
       />
       <DraftProposalChecklist />
     </div>
