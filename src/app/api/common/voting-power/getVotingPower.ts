@@ -7,8 +7,6 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData } from "./votingPower";
 import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
 import Tenant from "@/lib/tenant";
-import { TenantContractType } from "@/lib/tenantContractDefinition";
-import { IToken } from "@/lib/contracts/interfaces/IToken";
 
 /**
  * Voting Power for a given block
@@ -39,11 +37,9 @@ async function getVotingPowerForProposalByAddress({
   blockNumber: number;
   proposalId: string;
 }): Promise<VotingPowerData> {
-  const tenant = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
 
-  const votingPowerQuery = prisma[
-    `${tenant.namespace}VotingPowerSnaps`
-  ].findFirst({
+  const votingPowerQuery = prisma[`${namespace}VotingPowerSnaps`].findFirst({
     where: {
       delegate: address,
       block_number: {
@@ -79,7 +75,7 @@ async function getVotingPowerForProposalByAddress({
         proxy
       FROM (
         SELECT chain_str
-        FROM ${tenant.namespace + ".advanced_voting_power_raw_snaps"}
+        FROM ${namespace + ".advanced_voting_power_raw_snaps"}
         WHERE contract = $2
           AND block_number <= $3
           AND delegate = $1
@@ -96,7 +92,7 @@ async function getVotingPowerForProposalByAddress({
           balance,
           proxy,
           block_number
-        FROM ${tenant.namespace + ".advanced_voting_power_raw_snaps"}
+        FROM ${namespace + ".advanced_voting_power_raw_snaps"}
         WHERE chain_str=s.chain_str 
           AND contract = $2
           AND block_number <= $3
@@ -107,7 +103,7 @@ async function getVotingPowerForProposalByAddress({
     WHERE allowance > 0;
     `,
     address,
-    tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
+    contracts.alligator!.address,
     blockNumber
   );
 
@@ -140,8 +136,8 @@ async function getCurrentVotingPowerForAddress({
 }: {
   address: string;
 }): Promise<VotingPowerData> {
-  const tenant = Tenant.getInstance();
-  const votingPower = await prisma[`${tenant.namespace}VotingPower`].findFirst({
+  const { namespace, contracts } = Tenant.getInstance();
+  const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
     where: {
       delegate: address,
     },
@@ -149,11 +145,11 @@ async function getCurrentVotingPowerForAddress({
 
   // This query pulls only partially delegated voting power
   const advancedVotingPower = await prisma[
-    `${tenant.namespace}AdvancedVotingPower`
+    `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
       delegate: address,
-      contract: tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
+      contract: contracts.alligator!.address,
     },
   });
 
@@ -184,22 +180,20 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
 }: {
   address: string;
 }): Promise<string> {
-  const tenant = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
   const advancedVotingPower = await prisma[
-    `${tenant.namespace}AdvancedVotingPower`
+    `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
       delegate: address,
-      contract: tenant.contractDefinition(TenantContractType.ALLIGATOR).address,
+      contract: contracts.alligator!.address,
     },
   });
 
   const undelegatedVotingPower = (async () => {
     const [isBalanceAccountedFor, balance] = await Promise.all([
       isAddressDelegatingToProxy({ address }),
-      (
-        tenant.contractDefinition(TenantContractType.TOKEN).contract as IToken
-      ).balanceOf(address),
+      contracts.token.contract.balanceOf(address),
     ]);
     return isBalanceAccountedFor ? 0n : balance;
   })();
@@ -228,10 +222,8 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
 }: {
   address: string;
 }): Promise<bigint> {
-  const tenant = Tenant.getInstance();
-  return (
-    tenant.contractDefinition(TenantContractType.TOKEN).contract as IToken
-  ).balanceOf(address);
+  const { contracts } = Tenant.getInstance();
+  return contracts.token.contract.balanceOf(address);
 }
 
 /**

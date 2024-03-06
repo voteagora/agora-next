@@ -1,21 +1,18 @@
 import { type TenantNamespace, type TenantToken } from "./types";
 import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenantTokenFactory";
-import {
-  TenantContractDefinition,
-  TenantContractType,
-} from "@/lib/tenantContractDefinition";
-import TenantContractFactory from "@/lib/tenantContractFactory";
-import { BaseContract } from "ethers";
+import TenantContractFactory, {
+  type TenantContractDefinitions,
+} from "@/lib/tenantContractFactory";
 
 export default class Tenant {
   private static instance: Tenant;
 
+  private readonly _contracts: TenantContractDefinitions;
   private readonly _isProd: boolean;
   private readonly _namespace: TenantNamespace;
   private readonly _slug: string;
   private readonly _token: TenantToken;
-  private readonly _contracts: TenantContractDefinition<BaseContract>[];
 
   private constructor() {
     const {
@@ -34,13 +31,16 @@ export default class Tenant {
       this._isProd
     );
   }
-
-  public get namespace(): TenantNamespace {
-    return this._namespace;
+  public get contracts(): TenantContractDefinitions {
+    return this._contracts;
   }
 
   public get isProd(): boolean {
     return this._isProd;
+  }
+
+  public get namespace(): TenantNamespace {
+    return this._namespace;
   }
 
   public get slug(): DaoSlug {
@@ -49,16 +49,6 @@ export default class Tenant {
 
   public get token(): TenantToken {
     return this._token;
-  }
-
-  public contractDefinition(
-    type: TenantContractType
-  ): TenantContractDefinition<BaseContract> {
-    const contract = this._contracts.find((def) => def.type === type);
-    if (!contract) {
-      throw new Error(`Contract of type ${type} not found`);
-    }
-    return contract;
   }
 
   public static getInstance(): Tenant {

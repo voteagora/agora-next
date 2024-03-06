@@ -19,9 +19,7 @@ import {
   getDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
-import { TenantContractType } from "@/lib/tenantContractDefinition";
 import Tenant from "@/lib/tenant";
-import { IToken } from "@/lib/contracts/interfaces/IToken";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -112,10 +110,8 @@ export async function fetchAllDelegatorsInChainsForAddress(
 }
 
 export async function balanceOf(address: string) {
-  const tenant = Tenant.getInstance();
-  return (
-    tenant.contractDefinition(TenantContractType.TOKEN).contract as IToken
-  ).balanceOf(address);
+  const { contracts } = Tenant.getInstance();
+  return contracts.token.contract.balanceOf(address);
 }
 
 export const fetchConnectedDelegate = async (address: string) => {

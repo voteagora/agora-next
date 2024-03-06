@@ -2,18 +2,15 @@ import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant";
-import { TenantContractType } from "@/lib/tenantContractDefinition";
-import { IGovernor } from "@/lib/contracts/interfaces/IGovernor";
 
 export async function getQuorumForProposal(proposal: ProposalPayload) {
   const tenant = Tenant.getInstance();
 
   switch (tenant.namespace) {
     case "optimism": {
-      const contractQuorum = (
-        tenant.contractDefinition(TenantContractType.GOVERNOR)
-          .contract as IGovernor
-      ).quorum(proposal.proposal_id);
+      const contractQuorum = tenant.contracts.governor.contract.quorum(
+        proposal.proposal_id
+      );
 
       // If no quorum is set, calculate it based on votable supply
       if (!contractQuorum) {
@@ -38,10 +35,7 @@ export async function getCurrentQuorum() {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return (
-        tenant.contractDefinition(TenantContractType.GOVERNOR)
-          .contract as IGovernor
-      ).quorum(latestBlock - 1);
+      return tenant.contracts.governor.contract.quorum(latestBlock - 1);
     }
   }
 }

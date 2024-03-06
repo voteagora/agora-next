@@ -40,7 +40,7 @@ export async function getNeedsMyVoteProposals(address: string) {
       `,
     latestBlock,
     address.toLowerCase(),
-    tenant.contractDefinition(TenantContractType.GOVERNOR).address
+    tenant.contracts.governor.address
   );
 
   const resolvedProposals = Promise.all(

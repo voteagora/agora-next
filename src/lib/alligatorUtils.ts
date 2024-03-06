@@ -7,8 +7,6 @@ import {
 import { OptimismContracts } from "./contracts/contracts";
 import { bigIntMax, bigIntMin } from "./bigintUtils";
 import Tenant from "@/lib/tenant";
-import { TenantContractType } from "@/lib/tenantContractDefinition";
-import { IGovernor } from "@/lib/contracts/interfaces/IGovernor";
 
 export async function getProxyAddress(address: string) {
   const { namespace } = Tenant.getInstance();
@@ -57,14 +55,12 @@ export async function getTotalVotableAllowance({
     return 0n;
   }
 
-  const tenant = Tenant.getInstance();
-  const contract = tenant.contractDefinition(TenantContractType.GOVERNOR)
-    .contract as IGovernor;
+  const { contracts } = Tenant.getInstance();
 
   const latestBlockNumber = await provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(
     (proxies ?? []).map((proxy) =>
-      contract.weightCast(proposalId, proxy.toString())
+      contracts.governor.contract.weightCast(proposalId, proxy.toString())
     )
   );
 
