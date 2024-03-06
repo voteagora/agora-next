@@ -5,7 +5,6 @@ import Tenant from "@/lib/tenant";
 import { ProposalPayload } from "./proposal";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
-import { TenantContractType } from "@/lib/tenantContractDefinition";
 
 export async function getNeedsMyVoteProposals(address: string) {
   const tenant = Tenant.getInstance();
