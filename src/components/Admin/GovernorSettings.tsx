@@ -12,30 +12,26 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant";
 
 const secondsPerBlock = 2;
 
-const governorContract = {
-  address: OptimismContracts.governor.address,
-  abi: OptimismContracts.governor.abi,
-  chainId: 10,
-};
-
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
+  const { contracts } = Tenant.getInstance();
+
   const { data, isLoading: isInitializing } = useContractReads({
     contracts: [
       {
-        ...governorContract,
+        ...contracts.governor,
         functionName: "votingPeriod",
       },
       {
-        ...governorContract,
+        ...contracts.governor,
         functionName: "votingDelay",
       },
       {
-        ...governorContract,
+        ...contracts.governor,
         functionName: "manager",
       },
     ],
@@ -59,7 +55,7 @@ export default function GovernorSettings() {
   const [votingPeriod, setVotingPeriod] = useState<number>();
   const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
     usePrepareContractWrite({
-      ...governorContract,
+      ...contracts.governor,
       functionName: "setVotingPeriod",
       args: [
         (votingPeriod
@@ -82,7 +78,7 @@ export default function GovernorSettings() {
   const [votingDelay, setVotingDelay] = useState<number>();
   const { config: setVotingDelayConfig, isError: setVotingDelayError } =
     usePrepareContractWrite({
-      ...governorContract,
+      ...contracts.governor,
       functionName: "setVotingDelay",
       args: [
         (BigInt(Math.floor(votingDelay || 0)) * 3600n) /

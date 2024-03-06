@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { OptimismContracts } from "./contracts/contracts";
 import Tenant from "@/lib/tenant";
 import TenantTokenFactory from "@/lib/tenantTokenFactory";
 
@@ -12,7 +11,6 @@ const format = new Intl.NumberFormat("en", {
 });
 
 export const tokenForContractAddress = (address: string) => {
-
   switch (address) {
     case "0x42000000000000000000000000000000000000420":
       return TenantTokenFactory.create("optimism");
@@ -20,7 +18,6 @@ export const tokenForContractAddress = (address: string) => {
     default:
       return TenantTokenFactory.create("optimism");
   }
-
 };
 
 export function pluralizeVote(count: BigInt) {
@@ -39,7 +36,7 @@ export function pluralizeVote(count: BigInt) {
 
 export function formatNumber(
   amount: string | BigInt,
-  maximumSignificantDigits = 4,
+  maximumSignificantDigits = 4
 ) {
   const { token } = Tenant.getInstance();
   const number = Number(ethers.formatUnits(amount.toString(), token.decimals));
@@ -88,10 +85,7 @@ export function formatNumberForAdvancedDelegation(amount: string) {
  * Contract calls
  *
  */
-export async function getTokenSupply(dao: "optimism") {
-  switch (dao) {
-    case "optimism": {
-      return OptimismContracts.token.contract.totalSupply();
-    }
-  }
+export async function getTokenSupply() {
+  const { contracts } = Tenant.getInstance();
+  return contracts.token.contract.totalSupply();
 }

@@ -20,9 +20,9 @@ import { track } from "@vercel/analytics";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
+import Tenant from "@/lib/tenant";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -45,9 +45,10 @@ export function AdvancedDelegateDialog({
   const [opBalance, setOpBalance] = useState<bigint>(0n);
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
+  const { contracts } = Tenant.getInstance();
 
   const getOpBalance = async (address: `0x${string}`) => {
-    const balance = await OptimismContracts.token.contract.balanceOf(address);
+    const balance = await contracts.token.contract.balanceOf(address);
 
     return balance;
   };

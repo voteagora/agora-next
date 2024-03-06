@@ -6,6 +6,7 @@ import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { OptimismContracts } from "@/lib/contracts/contracts";
 import { tokenForContractAddress } from "@/lib/tokenUtils";
+import Tenant from "@/lib/tenant";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -15,6 +16,7 @@ export default function OptionsResultsPanel({
   // Note: Defaulting to optimism token for now since the contract-scoped token
   // was exactly the same as the optimism token.
 
+  const {contracts} = Tenant.getInstance();
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
 

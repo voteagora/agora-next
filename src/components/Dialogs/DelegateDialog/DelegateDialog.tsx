@@ -1,7 +1,6 @@
-import { useAccount, useBalance, useContractWrite, useEnsName } from "wagmi";
+import { useAccount, useContractWrite, useEnsName } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
 import { useModal } from "connectkit";
@@ -11,11 +10,11 @@ import { useCallback, useEffect, useState } from "react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
-import { InfoIcon } from "lucide-react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
+import Tenant from "@/lib/tenant";
 
 export function DelegateDialog({
   delegate,
@@ -37,6 +36,7 @@ export function DelegateDialog({
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const { contracts } = Tenant.getInstance();
 
   const writeWithTracking = () => {
     const trackingData = {
@@ -63,8 +63,8 @@ export function DelegateDialog({
   });
 
   const { isLoading, isSuccess, isError, write, data } = useContractWrite({
-    address: OptimismContracts.token.address as any,
-    abi: OptimismContracts.token.abi,
+    address: contracts.token.address as any,
+    abi: contracts.token.abi,
     functionName: "delegate",
     args: [delegate.address as any],
   });
