@@ -123,7 +123,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
       <DelegateDialog
         delegate={delegate}
         fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-        completeDelegation={closeDialog}
         fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );
