@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "optimism"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism"]
 }
 
 model DelegateStatements {
@@ -304,6 +304,53 @@ view ENSVotingPowerSnaps {
   @@schema("ens")
 }
 
+view EtherfiDelegatees {
+  delegator    String  @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal @db.Decimal
+
+  @@map("delegatees")
+  @@schema("etherfi")
+}
+
+view EtherfiDelegates {
+  delegate          String  @unique
+  num_of_delegators BigInt
+  direct_vp         Decimal @db.Decimal
+  advanced_vp       String
+  voting_power      Decimal @db.Decimal
+
+  @@map("delegates")
+  @@schema("etherfi")
+}
+
+view EtherfiVotableSupply {
+  votable_supply String @unique
+
+  @@map("votable_supply")
+  @@schema("etherfi")
+}
+
+view EtherfiVotingPower {
+  delegate     String  @unique
+  voting_power String?
+
+  @@map("voting_power")
+  @@schema("etherfi")
+}
+
+view EtherfiVotingPowerSnaps {
+  id           String   @id
+  delegate     String?
+  balance      String?
+  block_number BigInt?
+  ordinal      Decimal? @db.Decimal
+
+  @@map("voting_power_snaps")
+  @@schema("etherfi")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_voting_power_raw_snaps {
   chain_str           String?
@@ -543,6 +590,20 @@ view ens_proposals_wrapper {
   @@map("proposals_wrapper")
   @@ignore
   @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+view etherfi_delegates_wrapper {
+  delegate          String?
+  num_of_delegators BigInt?
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       String?
+  voting_power      Decimal? @db.Decimal
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("etherfi")
 }
 
 enum DaoSlug {
