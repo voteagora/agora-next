@@ -1,4 +1,8 @@
-import { type TenantNamespace, type TenantToken, type TenantContracts } from "../types";
+import {
+  type TenantNamespace,
+  type TenantToken,
+  type TenantContracts,
+} from "../types";
 import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import TenantContractFactory from "@/lib/tenant/tenantContractFactory";

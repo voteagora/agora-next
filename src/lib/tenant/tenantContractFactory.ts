@@ -13,7 +13,7 @@ import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
-
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default class TenantContractFactory {
   public static create(
@@ -21,7 +21,7 @@ export default class TenantContractFactory {
     isProd: boolean
   ): TenantContracts {
     switch (namespace) {
-      case "optimism":
+      case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

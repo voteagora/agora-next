@@ -3,9 +3,9 @@ import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { BaseContract } from "ethers";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
-export type TenantNamespace = "optimism";
-
+export type TenantNamespace = TENANT_NAMESPACES.OPTIMISM;
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;
