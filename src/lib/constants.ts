@@ -1,5 +1,5 @@
 export const TENANT_NAMESPACES = {
-  OPTIMISM: "optimism" as const,
+  OPTIMISM: "optimism",
 };
 export const proposalsFilterOptions = {
   relevant: {
