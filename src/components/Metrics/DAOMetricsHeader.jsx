@@ -34,6 +34,10 @@ export default async function DAOMetricsHeader({ metrics }) {
     uniqueVotersCount: formatUniqueVoters(metrics.uniqueVotersCount),
   };
 
+  if (!document) {
+    return null;
+  }
+
   return (
     <>
       {createPortal(
