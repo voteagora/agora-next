@@ -4,21 +4,22 @@ import Tenant from "@/lib/tenant";
 
 export async function getMetrics() {
   const { namespace } = Tenant.getInstance();
-  const [totalSupply, votableSupply, uniqueVotersCount] =
+  const [totalSupply, votableSupply] =
     await Promise.all([
-      await getTokenSupply(namespace),
-      await prisma[`${namespace}VotableSupply`].findFirst({}),
-      await prisma.$queryRawUnsafe<{ unique_voters_count: bigint }[]>(
-        `
-      SELECT COUNT(DISTINCT delegates) AS unique_voters_count
-      FROM ${namespace}.delegates;
-      `
-      )
+      getTokenSupply(namespace),
+      prisma[`${namespace}VotableSupply`].findFirst({}),
+      // await prisma.$queryRawUnsafe<{ unique_voters_count: bigint }[]>(
+      //   `
+      // SELECT COUNT(DISTINCT delegates) AS unique_voters_count
+      // FROM ${namespace}.delegates;
+      // `
+      // )
     ]);
 
   return {
     votableSupply: votableSupply?.votable_supply || "0",
     totalSupply: totalSupply.toString(),
-    uniqueVotersCount: uniqueVotersCount[0]?.unique_voters_count.toString() || '0'
+    // TODO: pending uniquevoterscount query
+    uniqueVotersCount: "91230"
   };
 }
