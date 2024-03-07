@@ -26,6 +26,7 @@ export async function getFeedLogs({
     const pageSize = 20;
     // TODO: frh -> this type and see if address or rest of params is needed
     // TODO: frh -> make sure there are only two subdelegations
+    // TODO: frh -> proposal creation events are left
     switch (event) {
         case 'votes': return await prisma.$queryRaw<Log[]>(
             Prisma.sql
