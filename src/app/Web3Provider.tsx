@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
+import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -45,10 +46,13 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
       <body className={inter.variable}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <BetaBanner />
-        <PageContainer>
-          <Toaster />
-          <AgoraProvider>{children}</AgoraProvider>
-        </PageContainer>
+        {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+        <ConnectButtonProvider>
+          <PageContainer>
+            <Toaster />
+            <AgoraProvider>{children}</AgoraProvider>
+          </PageContainer>
+        </ConnectButtonProvider>
         <Footer />
         <SpeedInsights />
       </body>
