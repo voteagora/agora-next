@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { useAccount } from "wagmi";
 import { ProposalDraft } from "@prisma/client";
@@ -18,22 +18,15 @@ export default function SponsorshipRequestList(
 
   const { fetchSponsorshipRequests } = props;
 
-  const getProposals = async (authorAddress: string) => {
-    if (!!authorAddress) {
-      const proposals = await fetchSponsorshipRequests(authorAddress);
-
-      setProposals(proposals);
-    }
-  };
+  const getProposalsAndSet = useCallback(async (authorAddress: string) => {
+    const proposals = await fetchSponsorshipRequests(authorAddress);
+    setProposals(proposals);
+  }, []);
 
   useEffect(() => {
-    // reset when changing wallets
-    // setProposals([]);
-    console.log("address HEREss", address);
-    if (!!address) {
-      getProposals(address);
-    }
-  }, [address]);
+    if (!address) return;
+    getProposalsAndSet(address);
+  }, [fetchSponsorshipRequests, address]);
 
   return (
     <>

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 
@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { ProposalDraft } from "@prisma/client";
 import DraftProposalsListRow from "./DraftProposalsListRow";
 import Link from "next/link";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 interface DraftProposalsListProps {
   fetchDraftProposals: (address: string) => Promise<ProposalDraft[]>;
@@ -14,28 +15,20 @@ interface DraftProposalsListProps {
 
 export default function DraftProposalsList(props: DraftProposalsListProps) {
   const [proposals, setProposals] = useState<ProposalDraft[]>([]);
-  const { address, isConnected } = useAccount();
-  const [loading, setLoading] = useState(false);
+  const { isConnected } = useAgoraContext();
+  const { address } = useAccount();
 
   const { fetchDraftProposals } = props;
 
-  const getProposals = async (authorAddress: string) => {
-    if (!!authorAddress && !loading) {
-      setLoading(true);
-      const proposals = await fetchDraftProposals(authorAddress);
-
-      setProposals(proposals);
-      setLoading(false);
-    }
-  };
+  const getProposalsAndSet = useCallback(async (authorAddress: string) => {
+    const proposals = await fetchDraftProposals(authorAddress);
+    setProposals(proposals);
+  }, []);
 
   useEffect(() => {
-    // reset when changing wallets
-    // setProposals([]);
-    if (!!address) {
-      getProposals(address);
-    }
-  }, [address]);
+    if (!address) return;
+    getProposalsAndSet(address);
+  }, [fetchDraftProposals, address]);
 
   return (
     <>
