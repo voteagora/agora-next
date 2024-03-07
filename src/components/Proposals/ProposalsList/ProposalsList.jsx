@@ -17,6 +17,7 @@ export default function ProposalsList({
   initAllProposals,
   fetchProposals,
   votableSupply,
+  governanceCalendar,
 }) {
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
@@ -54,7 +55,13 @@ export default function ProposalsList({
         </div>
       </div>
 
-      <CurrentGovernanceStage />
+      {governanceCalendar && (
+        <CurrentGovernanceStage
+          title={governanceCalendar.title}
+          endDate={governanceCalendar.endDate}
+          reviewPeriod={governanceCalendar.reviewPeriod}
+        />
+      )}
       <VStack className={styles.proposals_table_container}>
         <div className={styles.proposals_table}>
           <InfiniteScroll

@@ -13,6 +13,8 @@ import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { waitForTransaction } from "wagmi/actions";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -20,7 +22,6 @@ export function DelegateDialog({
   delegate,
   fetchBalanceForDirectDelegation,
   fetchDirectDelegatee,
-  completeDelegation,
 }: {
   delegate: DelegateChunk;
   fetchBalanceForDirectDelegation: (
@@ -29,16 +30,19 @@ export function DelegateDialog({
   fetchDirectDelegatee: (
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
-  completeDelegation: () => void;
 }) {
   const { address: accountAddress } = useAccount();
+  const [isLoading, setIsLoading] = useState(false);
   const { setOpen } = useModal();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { contracts } = Tenant.getInstance();
+  const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
+  const sameDelegatee = delegate.address === delegatee?.delegatee;
+  const {contracts} = Tenant.getInstance();
 
-  const writeWithTracking = () => {
+  const writeWithTracking = async () => {
+    setIsLoading(true);
     const trackingData = {
       dao_slug: "OP",
       delegateAddress: delegate.address || "unknown",
@@ -49,7 +53,16 @@ export function DelegateDialog({
 
     track("Delegate", trackingData);
 
-    write();
+    const tx = await writeAsync();
+    await waitForTransaction({ hash: tx.hash });
+
+    if (Number(votingPower) > 0) {
+      setRefetchDelegate({
+        address: trackingData.delegateAddress,
+        prevVotingPowerDelegatee: delegate.votingPower,
+      });
+    }
+    setIsLoading(false);
   };
 
   const { data: delegateEnsName } = useEnsName({
@@ -62,8 +75,8 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isLoading, isSuccess, isError, write, data } = useContractWrite({
-    address: contracts.token.address as `0x${string}`,
+  const { isSuccess, isError, writeAsync, data } = useContractWrite({
+    address: contracts.token.address as any,
     abi: contracts.token.abi,
     functionName: "delegate",
     args: [delegate.address as any],
@@ -195,30 +208,32 @@ export function DelegateDialog({
             </VStack>
           </VStack>
         )}
-        {!accountAddress && (
+        {accountAddress ? (
+          sameDelegatee ? (
+            <ShadcnButton variant="outline" className="cursor-not-allowed">
+              You cannot delegate to the same address again
+            </ShadcnButton>
+          ) : isError ? (
+            <Button disabled={false} onClick={() => writeWithTracking()}>
+              Delegation failed - try again
+            </Button>
+          ) : isLoading || refetchDelegate ? (
+            <Button disabled={false}>Submitting your delegation...</Button>
+          ) : isSuccess ? (
+            <div>
+              <Button className="w-full" disabled={false}>
+                Delegation completed!
+              </Button>
+              <BlockScanUrls hash1={data?.hash} />
+            </div>
+          ) : (
+            <ShadcnButton onClick={() => writeWithTracking()}>
+              Delegate
+            </ShadcnButton>
+          )
+        ) : (
           <ShadcnButton variant="outline" onClick={() => setOpen(true)}>
             Connect wallet to delegate
-          </ShadcnButton>
-        )}
-        {isLoading && (
-          <Button disabled={false}>Submitting your delegation...</Button>
-        )}
-        {isSuccess && (
-          <div>
-            <Button className="w-full" disabled={false}>
-              Delegation completed!
-            </Button>
-            <BlockScanUrls hash1={data?.hash} />
-          </div>
-        )}
-        {isError && (
-          <Button disabled={false} onClick={() => writeWithTracking()}>
-            Delegation failed - try again
-          </Button>
-        )}
-        {!isError && !isSuccess && !isLoading && accountAddress && (
-          <ShadcnButton onClick={() => writeWithTracking()}>
-            Delegate
           </ShadcnButton>
         )}
       </VStack>

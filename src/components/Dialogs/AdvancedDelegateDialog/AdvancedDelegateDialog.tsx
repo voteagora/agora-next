@@ -17,11 +17,18 @@ import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
 import { track } from "@vercel/analytics";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { waitForTransaction } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
+import { useModal } from "connectkit";
+import { useParams } from "next/navigation";
+import { resolveENSName } from "@/app/lib/ENSUtils";
+import { formatEther } from "viem";
+import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 
 type Params = AdvancedDelegateDialogType["params"] & {
@@ -42,12 +49,16 @@ export function AdvancedDelegateDialog({
   const [isReady, setIsReady] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const { address } = useAccount();
+  const { setRefetchDelegate } = useConnectButtonContext();
+  const [isLoading, setIsLoading] = useState(false);
   const [opBalance, setOpBalance] = useState<bigint>(0n);
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
-  const { contracts } = Tenant.getInstance();
+  const { setOpen } = useModal();
+  const params = useParams<{ addressOrENSName: string }>();
+  const {contracts} = Tenant.getInstance();
 
-  const getTokenBalance = async (address: `0x${string}`) => {
+  const getOpBalance = async (address: `0x${string}`) => {
     return await contracts.token.contract.balanceOf(address);
   };
 
@@ -57,7 +68,7 @@ export function AdvancedDelegateDialog({
       const promises = [
         // TODO temporary fetch all query - optimization via API needed
         fetchAllForAdvancedDelegation(address),
-        getTokenBalance(address),
+        getOpBalance(address),
       ];
 
       const [getAll, delegateOpBalance] = await Promise.all(promises);
@@ -120,7 +131,7 @@ export function AdvancedDelegateDialog({
     fetchData();
   }, [fetchData]);
 
-  const { write, isLoading, isError, isSuccess, data } = useAdvancedDelegation({
+  const { writeAsync, isError, isSuccess, data } = useAdvancedDelegation({
     availableBalance,
     isDelegatingToProxy,
     proxyAddress,
@@ -130,7 +141,28 @@ export function AdvancedDelegateDialog({
     allocation: allowance, // (value / 100000) 100% = 100000
   });
 
-  const writeWithTracking = () => {
+  const getVotingPowerPageDelegatee = async () => {
+    const pageDelegateeAddress = await resolveENSName(
+      params?.addressOrENSName as string
+    );
+    const pageDelegateeIndex = delegatees.findIndex(
+      (delegatee) => delegatee.to === pageDelegateeAddress
+    );
+    const prevVotingPower = Number(
+      formatEther(BigInt(delegatees[pageDelegateeIndex].allowance))
+    ).toFixed(2);
+    const postVotingPower = allowance[pageDelegateeIndex].toFixed(2);
+
+    return {
+      pageDelegateeAddress,
+      prevVotingPower,
+      postVotingPower,
+    };
+  };
+
+  const writeWithTracking = async () => {
+    setIsLoading(true);
+
     const trackingData = {
       dao_slug: "OP",
       userAddress: address || "unknown",
@@ -142,7 +174,27 @@ export function AdvancedDelegateDialog({
 
     track("Advanced Delegation", trackingData);
 
-    write();
+    const tx = await writeAsync();
+    await waitForTransaction({ hash: tx.hash });
+
+    const { prevVotingPower, postVotingPower, pageDelegateeAddress } =
+      await getVotingPowerPageDelegatee();
+
+    if (prevVotingPower !== postVotingPower) {
+      const delegatee = await fetchDelegate(pageDelegateeAddress);
+      setRefetchDelegate({
+        address: pageDelegateeAddress,
+        prevVotingPowerDelegatee: delegatee.votingPower,
+      });
+    } else {
+      /**
+       * No need to revalidate the delegate page since there were no changes, only the profile dropdown needs to be updated
+       */
+      setRefetchDelegate({
+        address: pageDelegateeAddress,
+      });
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -155,7 +207,7 @@ export function AdvancedDelegateDialog({
         <Message setShowMessage={setShowMessage} />
       </div>
       <div className={showMessage ? "hidden" : "block w-full"}>
-        {isSuccess ? (
+        {!isLoading && isSuccess ? (
           <SuccessView closeDialog={completeDelegation} data={data} />
         ) : isReady &&
           availableBalance !== "" &&
@@ -195,17 +247,21 @@ export function AdvancedDelegateDialog({
                 directDelegatedVP={directDelegatedVP}
               />
             )}
-            {isLoading && (
-              <Button disabled={false}>Submitting your delegation...</Button>
-            )}
-            {isError && (
-              <Button disabled={false} onClick={() => writeWithTracking()}>
-                Delegation failed
-              </Button>
-            )}
-            {!isError && !isLoading && (
-              <Button disabled={false} onClick={() => writeWithTracking()}>
-                Delegate your votes
+            {address ? (
+              isError ? (
+                <Button disabled={false} onClick={() => writeWithTracking()}>
+                  Delegation failed
+                </Button>
+              ) : isLoading ? (
+                <Button disabled={false}>Submitting your delegation...</Button>
+              ) : (
+                <Button disabled={false} onClick={() => writeWithTracking()}>
+                  Delegate your votes
+                </Button>
+              )
+            ) : (
+              <Button onClick={() => setOpen(true)}>
+                Connect wallet to delegate
               </Button>
             )}
           </VStack>
