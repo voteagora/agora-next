@@ -11,7 +11,7 @@ export async function getMetrics() {
       await prisma.$queryRawUnsafe<{ unique_voters_count: bigint }[]>(
         `
       SELECT COUNT(DISTINCT delegates) AS unique_voters_count
-      FROM optimism.delegates;
+      FROM ${namespace}.delegates;
       `
       )
     ]);
