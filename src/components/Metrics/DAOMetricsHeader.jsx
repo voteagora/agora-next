@@ -58,7 +58,6 @@ export default async function DAOMetricsHeader({ metrics }) {
             </div>
             <div className="bg-gray-eo h-full w-[1px]"></div>
             <div className="w-1/2 sm:w-1/5 flex justify-center items-center px-3 sm:px-8 gap-4">
-              {/* TODO: sticky or fixed only on y axis for ipad, investigate fixed in other parts of app */}
               <a
                 href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
                 rel="noreferrer nonopener"
