@@ -1,9 +1,8 @@
 import AdminForm from "@/components/Admin/AdminForm";
-import { getVotableSupply } from "../api/votableSupply/getVotableSupply";
+import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
 async function fetchVotableSupply() {
   "use server";
-
   return getVotableSupply();
 }
 

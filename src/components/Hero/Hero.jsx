@@ -1,3 +1,5 @@
+"use server";
+
 import Image from "next/image";
 import { HStack, VStack } from "../Layout/Stack";
 import sunnyFace from "@/assets/optimism/sunny-face-sticker.svg";
@@ -9,7 +11,7 @@ import opToken from "@/assets/optimism/op-token-sticker.svg";
 import thumb from "@/assets/optimism/thumb-sticker.svg";
 import styles from "./hero.module.scss";
 
-export default function Hero() {
+export default async function Hero() {
   const tab = "delegates";
   return (
     <HStack justifyContent="justify-between" className={styles.hero_container}>

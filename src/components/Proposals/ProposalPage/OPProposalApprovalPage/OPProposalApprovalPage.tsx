@@ -2,19 +2,22 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
+import { getAllForVoting } from "@/app/api/votes/getVotes";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 import {
   getUserVotesForProposal,
   getVotesForProposal,
-  getAllForVoting,
-} from "@/app/api/votes/getVotes";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
+} from "@/app/api/common/votes/getVotes";
+import { getDelegate } from "@/app/api/common/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
 
-  return getVotesForProposal({ proposal_id, page });
+  return getVotesForProposal({
+    proposal_id,
+    page,
+  });
 }
 
 async function fetchAllForVoting(
@@ -30,9 +33,7 @@ async function fetchAllForVoting(
 async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   "use server";
 
-  return await getDelegate({
-    addressOrENSName,
-  });
+  return await getDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(

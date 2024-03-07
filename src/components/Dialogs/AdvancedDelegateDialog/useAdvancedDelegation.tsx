@@ -29,7 +29,7 @@ const useAdvancedDelegation = ({
   );
 
   const {
-    write: subdelegate,
+    writeAsync: subdelegate,
     isLoading: subdelegateIsLoading,
     isError: subdelegateIsError,
     isSuccess: subdelegateIsSuccess,
@@ -46,7 +46,7 @@ const useAdvancedDelegation = ({
   });
 
   const {
-    write: delegateToProxy,
+    writeAsync: delegateToProxy,
     isLoading: delegateToProxyIsLoading,
     isError: delegateToProxyIsError,
     isSuccess: delegateToProxyIsSuccess,
@@ -59,19 +59,15 @@ const useAdvancedDelegation = ({
     chainId: optimism.id,
   });
 
-  const write = useCallback(() => {
-    const delegate = async () => {
-      setIsLoading(true);
-      setIsError(false);
-      setIsSuccess(false);
+  const writeAsync = useCallback(async () => {
+    setIsLoading(true);
+    setIsError(false);
+    setIsSuccess(false);
 
-      if (!isDelegatingToProxy) {
-        delegateToProxy();
-      }
-      subdelegate();
-    };
-
-    delegate();
+    if (!isDelegatingToProxy) {
+      await delegateToProxy();
+    }
+    return await subdelegate();
   }, [isDelegatingToProxy, delegateToProxy, subdelegate]);
 
   useEffect(() => {
@@ -103,7 +99,7 @@ const useAdvancedDelegation = ({
     isLoading,
     isError,
     isSuccess,
-    write,
+    writeAsync,
     data: {
       delegateToProxyData,
       subdelegateData,

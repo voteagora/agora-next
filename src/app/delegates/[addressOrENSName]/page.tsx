@@ -129,17 +129,10 @@ export default async function Page({
                 </div> */}
               </div>
               <DelegateVotes
-                fetchDelegateVotes={async (
-                  page: number,
-                  sortOrder: VotesSortOrder
-                ) => {
+                fetchDelegateVotes={async (page: number) => {
                   "use server";
 
-                  return fetchVotesForDelegate(
-                    addressOrENSName,
-                    page,
-                    sortOrder
-                  );
+                  return fetchVotesForDelegate(addressOrENSName, page);
                 }}
               />
             </div>

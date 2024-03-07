@@ -10,25 +10,25 @@ import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { contracts } from "@/lib/contracts/contracts";
-import { getDelegateStatement } from "../../delegateStatement/getDelegateStatement";
 import { Delegate } from "./delegate";
-import { getCurrentQuorum } from "../../quorum/getQuorum";
-import { isCitizenForNamespace } from "../citizens/isCitizen";
+import { isCitizen } from "../citizens/isCitizen";
+import Tenant from "@/lib/tenant";
+import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 
-type DelegatesGetPaylod = Prisma.OptimismDelegatesGetPayload<true>;
+type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
-export async function getDelegatesForNamespace({
+export async function getDelegates({
   page = 1,
   sort = "weighted_random",
   seed,
-  namespace,
 }: {
   page: number;
   sort: string;
   seed?: number;
-  namespace: "optimism";
 }) {
   const pageSize = 20;
+  const { namespace } = Tenant.getInstance();
 
   const { meta, data: delegates } = await paginatePrismaResult(
     async (skip: number, take: number) => {
@@ -48,7 +48,7 @@ export async function getDelegatesForNamespace({
           });
         case "weighted_random":
           await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-          return prisma.$queryRawUnsafe<DelegatesGetPaylod[]>(
+          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
             `
             SELECT *
             FROM ${namespace + ".delegates"}
@@ -78,10 +78,8 @@ export async function getDelegatesForNamespace({
   const _delegates = await Promise.all(
     delegates.map(async (delegate) => {
       return {
-        citizen: await isCitizenForNamespace(delegate.delegate, namespace),
-        statement: await getDelegateStatement({
-          addressOrENSName: delegate.delegate,
-        }),
+        citizen: await isCitizen(delegate.delegate),
+        statement: await getDelegateStatement(delegate.delegate),
       };
     })
   );
@@ -111,13 +109,8 @@ type DelegateStats = {
   num_of_delegators: OptimismDelegates["num_of_delegators"];
 };
 
-export async function getDelegateForNamespace({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}): Promise<Delegate> {
+export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
+  const { namespace } = Tenant.getInstance();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -160,9 +153,9 @@ export async function getDelegateForNamespace({
     await Promise.all([
       (await delegateQuery)?.[0] || undefined,
       prisma[`${namespace}VotableSupply`].findFirst({}),
-      getDelegateStatement({ addressOrENSName }),
+      getDelegateStatement(addressOrENSName),
       getCurrentQuorum(),
-      isCitizenForNamespace(address, namespace),
+      isCitizen(address),
     ]);
 
   const numOfDelegatesQuery = prisma.$queryRawUnsafe<

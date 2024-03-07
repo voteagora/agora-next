@@ -4,29 +4,27 @@ import prisma from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { Prisma } from "@prisma/client";
 import verifyMessage from "@/lib/serverVerifyMessage";
-import { deploymentToDaoSlug } from "@/lib/config";
+import Tenant from "@/lib/tenant";
 
-export async function createDelegateStatementForNamespace({
+export async function createDelegateStatement({
   address,
   delegateStatement,
   signature,
   message,
-  namespace,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
-  namespace: "optimism";
 }) {
   const { twitter, discord, email } = delegateStatement;
-  const daoSlug = deploymentToDaoSlug(namespace);
+  const { slug } = Tenant.getInstance();
 
   const valid = await verifyMessage({
     address,
     message,
     signature,
-    daoSlug: daoSlug,
+    daoSlug: slug,
   });
 
   if (!valid) {
@@ -35,7 +33,7 @@ export async function createDelegateStatementForNamespace({
 
   const data = {
     address: address.toLowerCase(),
-    dao_slug: daoSlug,
+    dao_slug: slug,
     signature,
     payload: delegateStatement as Prisma.InputJsonValue,
     twitter,
@@ -47,7 +45,7 @@ export async function createDelegateStatementForNamespace({
     where: {
       address_dao_slug: {
         address: address.toLowerCase(),
-        dao_slug: daoSlug,
+        dao_slug: slug,
       },
     },
     update: data,

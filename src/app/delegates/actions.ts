@@ -1,57 +1,56 @@
 "use server";
 
+import { getAllForAForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
+import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
+import { revalidatePath } from "next/cache";
+import { OptimismContracts } from "@/lib/contracts/contracts";
+import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   getProxy,
   getVotingPowerAvailableForDirectDelegation,
   getVotingPowerAvailableForSubdelegation,
   isDelegatingToProxy,
-} from "@/app/api/voting-power/getVotingPower";
+} from "@/app/api/common/voting-power/getVotingPower";
+import { getDelegate } from "@/app/api/common/delegates/getDelegates";
+import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import {
-  getDirectDelegatee,
+  getAllDelegatorsInChains,
   getCurrentDelegatees,
   getCurrentDelegators,
-  getAllForAForAdvancedDelegation,
-  getAllDelegatorsInChainsForAddress,
-} from "@/app/api/delegations/getDelegations";
-import { getDelegate } from "@/app/api/delegates/getDelegates";
-import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { createDelegateStatement } from "@/app/api/delegateStatement/createDelegateStatement";
-import { getDelegateStatement } from "@/app/api/delegateStatement/getDelegateStatement";
-import { getVotesForDelegate } from "@/app/api/votes/getVotes";
-import { VotesSortOrder } from "@/app/api/common/votes/vote";
-import { revalidatePath } from "next/cache";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+  getDirectDelegatee,
+} from "@/app/api/common/delegations/getDelegations";
+import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
   addressOrENSName: string
 ) {
-  return getVotingPowerAvailableForSubdelegation({ addressOrENSName });
+  return getVotingPowerAvailableForSubdelegation(addressOrENSName);
 }
 
 // Pass address of the connected wallet
 export async function checkIfDelegatingToProxy(addressOrENSName: string) {
-  return isDelegatingToProxy({ addressOrENSName });
+  return isDelegatingToProxy(addressOrENSName);
 }
 
 // Pass address of the connected wallet
 export async function fetchBalanceForDirectDelegation(
   addressOrENSName: string
 ) {
-  return getVotingPowerAvailableForDirectDelegation({ addressOrENSName });
+  return getVotingPowerAvailableForDirectDelegation(addressOrENSName);
 }
 
 export async function fetchDirectDelegatee(addressOrENSName: string) {
-  return getDirectDelegatee({ addressOrENSName });
+  return getDirectDelegatee(addressOrENSName);
 }
 
 // Pass address of the connected wallet
 export async function getProxyAddress(addressOrENSName: string) {
-  return getProxy({ addressOrENSName });
+  return getProxy(addressOrENSName);
 }
 
 export async function fetchDelegate(addressOrENSName: string) {
-  return getDelegate({ addressOrENSName });
+  return getDelegate(addressOrENSName);
 }
 
 export async function submitDelegateStatement({
@@ -76,29 +75,26 @@ export async function submitDelegateStatement({
 }
 
 export async function fetchDelegateStatement(addressOrENSName: string) {
-  return getDelegateStatement({ addressOrENSName });
+  return getDelegateStatement(addressOrENSName);
 }
 
 export async function fetchVotesForDelegate(
   addressOrENSName: string,
-  page = 1,
-  sortOrder?: VotesSortOrder
+  page = 1
 ) {
   return getVotesForDelegate({
     addressOrENSName,
     page,
-    sort: undefined,
-    sortOrder,
   });
 }
 
 // Pass address of the connected wallet
 export async function fetchCurrentDelegatees(addressOrENSName: string) {
-  return getCurrentDelegatees({ addressOrENSName });
+  return getCurrentDelegatees(addressOrENSName);
 }
 
 export async function fetchCurrentDelegators(addressOrENSName: string) {
-  return getCurrentDelegators({ addressOrENSName });
+  return getCurrentDelegators(addressOrENSName);
 }
 
 // TODO temporary fetch all query - optimization via API needed
@@ -110,12 +106,10 @@ export async function fetchAllForAdvancedDelegation(address: string) {
 export async function fetchAllDelegatorsInChainsForAddress(
   addressOrENSName: string
 ) {
-  return getAllDelegatorsInChainsForAddress({ addressOrENSName });
+  return getAllDelegatorsInChains(addressOrENSName);
 }
 
-export async function balanceOf(
-  address: string
-) {
+export async function balanceOf(address: string) {
   return OptimismContracts.token.contract.balanceOf(address);
 }
 
@@ -123,6 +117,10 @@ export const fetchConnectedDelegate = async (address: string) => {
   return await Promise.all([
     fetchDelegate(address),
     fetchAllDelegatorsInChainsForAddress(address),
-    balanceOf(address)
+    balanceOf(address),
   ]);
+};
+
+export const revalidateDelegateAddressPage = async (delegateAddress: string) => {
+  revalidatePath(`/delegates/${delegateAddress}`, "page");
 };

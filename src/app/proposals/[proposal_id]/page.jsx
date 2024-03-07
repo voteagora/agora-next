@@ -1,4 +1,4 @@
-import { getProposal } from "@/app/api/proposals/getProposals";
+import { getProposal } from "@/app/api/common/proposals/getProposals";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
@@ -8,9 +8,8 @@ import React from "react";
 
 async function fetchProposal(proposal_id) {
   "use server";
-
   return {
-    proposal: await getProposal({ proposal_id }),
+    proposal: await getProposal(proposal_id)
   };
 }
 

@@ -3,43 +3,27 @@ import "server-only";
 import prisma from "@/app/lib/prisma";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { deploymentToDaoSlug } from "@/lib/config";
+import Tenant from "@/lib/tenant";
 
-export const getDelegateStatementForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(
-    getDelegateStatementForAddressForNamespace,
-    addressOrENSName,
-    { namespace }
-  );
+export const getDelegateStatement = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
 
-async function getDelegateStatementForAddressForNamespace({
+async function getDelegateStatementForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }) {
-  const daoSlug = deploymentToDaoSlug(namespace);
+  const { slug } = Tenant.getInstance();
 
   const postgreqsqlData = await prisma.delegateStatements
-    .findFirst({ where: { address: address.toLowerCase(), dao_slug: daoSlug } })
+    .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
-    : await getDelegateStatementForAddressDynamo({ address });
+    : await getDelegateStatementForAddressDynamo(address);
 }
 
-async function getDelegateStatementForAddressDynamo({
-  address,
-}: {
-  address: string;
-}) {
+async function getDelegateStatementForAddressDynamo(address: string) {
   const dynamoDBClient = makeDynamoClient();
 
   try {

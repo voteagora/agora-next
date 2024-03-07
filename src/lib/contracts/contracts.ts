@@ -33,6 +33,9 @@ export const OptimismContracts = {
     abi: OptimismGovernor__factory.abi,
     v6UpgradeBlock:
       process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? 114995000 : 114615036,
+    // Date in which optionBudget was being sent correctly to chain, in all other past proposals optionBudget is in
+    // ether unit instead of wei
+    optionBudgetChangeDate: new Date("2024-02-21T12:00:00")
   },
 
   proposalTypesConfigurator: {

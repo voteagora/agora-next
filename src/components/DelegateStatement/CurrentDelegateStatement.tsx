@@ -11,12 +11,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { initialTopIssues } from "@/components/DelegateStatement/TopIssuesFormSection";
-import { DaoSlug } from "@prisma/client";
+import Tenant from "@/lib/tenant";
 
-const daoSlug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
-if (!(daoSlug && daoSlug in DaoSlug)) {
-  throw new Error("Can't find Agora Instance token");
-}
+const { slug: daoSlug } = Tenant.getInstance();
 
 export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 

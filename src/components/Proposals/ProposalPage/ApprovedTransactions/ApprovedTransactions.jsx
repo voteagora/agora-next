@@ -2,7 +2,7 @@ import { VStack } from "@/components/Layout/Stack";
 import OptionDescription from "./OptionDescription";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 
 export default function ApprovedTransactions({ proposalData }) {
   const [displayedOptions, setDisplayedOptions] = useState(1);

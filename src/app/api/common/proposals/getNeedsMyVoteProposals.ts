@@ -1,21 +1,17 @@
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { contracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant";
 import { ProposalPayload } from "./proposal";
-import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
-import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import { getVotableSupply } from "../votableSupply/getVotableSupply";
+import { getQuorumForProposal } from "../quorum/getQuorum";
+import { contracts } from "@/lib/contracts/contracts";
 
-export async function getNeedsMyVoteProposalsForNamespace({
-  address,
-  namespace,
-}: {
-  address: string;
-  namespace: "optimism";
-}) {
+export async function getNeedsMyVoteProposals(address: string) {
+  const { namespace } = Tenant.getInstance();
   const [latestBlock, votableSupply] = await Promise.all([
     provider.getBlockNumber(),
-    getVotableSupplyForNamespace({ namespace }),
+    getVotableSupply(),
   ]);
 
   if (!latestBlock) {
@@ -49,10 +45,7 @@ export async function getNeedsMyVoteProposalsForNamespace({
 
   const resolvedProposals = Promise.all(
     proposals.map(async (proposal) => {
-      const quorum = await getQuorumForProposalForNamespace({
-        proposal,
-        namespace,
-      });
+      const quorum = await getQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,

@@ -1,5 +1,5 @@
-import { getDefaultProvider, Provider } from "ethers";
-import { MulticallWrapper, MulticallProvider } from "ethers-multicall-provider";
+import { getDefaultProvider } from "ethers";
+import { MulticallProvider, MulticallWrapper } from "ethers-multicall-provider";
 
 declare global {
   var provider: MulticallProvider;

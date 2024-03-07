@@ -1,8 +1,8 @@
 "use server";
 
-import { getProposalTypes } from "../api/proposals/getProposals";
+
+import { getProposalTypes } from "@/app/api/common/proposals/getProposals";
 
 export async function fetchProposalTypes() {
-
-    return getProposalTypes();
+    return getProposalTypes()
 }

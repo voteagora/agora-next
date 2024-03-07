@@ -1,10 +1,11 @@
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Image from "next/image";
 import successfulDelegation from "public/images/successfulDelegation.svg";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { useEffect } from "react";
 
 // TODO: Add notion link in "Learn more"
-
 export function SuccessView({
   closeDialog,
   data,
@@ -15,6 +16,14 @@ export function SuccessView({
     subdelegateData: { hash: string } | undefined;
   };
 }) {
+  const { refetchDelegate } = useConnectButtonContext();
+
+  useEffect(() => {
+    if (!refetchDelegate) {
+      closeDialog();
+    }
+  }, [refetchDelegate, closeDialog]);
+
   return (
     <div>
       <div className="w-full">
@@ -29,8 +38,9 @@ export function SuccessView({
         You&apos;ve delegated your votes!
       </h1>
       <p className="text-gray-700">
-        It might take up to a minute for the changes to be reflected. Actual
-        amount of tokens delegated can be slightly different due to{" "}
+        Your delegation has been submitted successfully and now being indexed...
+        (this can take up to 2 minutes). Actual amount of tokens delegated can
+        be slightly different due to{" "}
         <a
           className="underline"
           href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c?pvs=4"

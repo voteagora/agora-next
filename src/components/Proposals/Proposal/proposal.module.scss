@@ -28,7 +28,7 @@
   }
 }
 .cell_status {
-  width: 15%;
+  width: 20%;
   align-items: flex-start;
   justify-content: center;
   @media (max-width: $screen-sm) {
@@ -36,7 +36,7 @@
   }
 }
 .cell_result {
-  width: 30%;
+  width: 25%;
   align-items: flex-end;
   justify-content: center;
   @media (max-width: $screen-sm) {
