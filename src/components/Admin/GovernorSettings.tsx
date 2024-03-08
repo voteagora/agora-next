@@ -20,18 +20,24 @@ const secondsPerBlock = 2;
 export default function GovernorSettings() {
   const { contracts } = Tenant.getInstance();
 
+  const govContract = {
+    address: contracts.governor.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    chainId: contracts.governor.chainId,
+  };
+
   const { data, isLoading: isInitializing } = useContractReads({
     contracts: [
       {
-        ...contracts.governor,
+        ...govContract,
         functionName: "votingPeriod",
       },
       {
-        ...contracts.governor,
+        ...govContract,
         functionName: "votingDelay",
       },
       {
-        ...contracts.governor,
+        ...govContract,
         functionName: "manager",
       },
     ],
@@ -53,7 +59,7 @@ export default function GovernorSettings() {
 
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState<number>();
-  
+
   const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
     usePrepareContractWrite({
       ...contracts.governor,
@@ -79,7 +85,7 @@ export default function GovernorSettings() {
   const [votingDelay, setVotingDelay] = useState<number>();
   const { config: setVotingDelayConfig, isError: setVotingDelayError } =
     usePrepareContractWrite({
-      ...contracts.governor,
+      ...govContract,
       functionName: "setVotingDelay",
       args: [
         (BigInt(Math.floor(votingDelay || 0)) * 3600n) /
