@@ -3,6 +3,7 @@
 import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant";
 import discord from "@/icons/discord.svg";
+import infoTransparent from "@/icons/info-transparent.svg";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
@@ -12,6 +13,7 @@ import Link from "next/link";
 export default function DAOMetricsHeader({ metrics }) {
   const { token } = Tenant.getInstance();
   const [isClient, setIsClient] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -29,21 +31,41 @@ export default function DAOMetricsHeader({ metrics }) {
           <div className="sm:min-w-desktop sticky z-50 bottom-0 left-0 flex justify-center">
             <div
               className={cn(
-                "flex items-center w-full sm:w-[1268px] h-10 bg-gray-fa shadow-newDefault",
+                "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-gray-fa shadow-newDefault",
                 "border-t border-r border-l border-gray-eo rounded-tl-2xl rounded-tr-2xl",
                 "text-xs text-gray-4f font-inter font-semibold"
               )}
             >
-              <div className="w-2/5 sm:w-2/3 flex px-3 sm:px-8 gap-8 justify-center sm:justify-start">
-                <span className="hidden sm:inline">
-                  {formattedMetrics.totalSupply} {token.symbol} total supply
-                </span>
-                <span>
-                  {formattedMetrics.votableSupply} {token.symbol} votable supply
-                </span>
+              <div
+                className="w-full sm:w-2/3 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10"
+                onClick={() => setVisible(!visible)}
+              >
+                <div className="flex gap-6 sm:gap-8">
+                  <span>
+                    {formattedMetrics.totalSupply} {token.symbol} total
+                    <span className="hidden sm:inline">&nbsp;supply</span>
+                  </span>
+                  <span>
+                    {formattedMetrics.votableSupply} {token.symbol} votable
+                    <span className="hidden sm:inline">&nbsp;supply</span>
+                  </span>
+                </div>
+                <Image
+                  src={infoTransparent}
+                  alt="Info"
+                  className="inline sm:hidden"
+                />
               </div>
-              <div className="bg-gray-eo h-full w-[1px]"></div>
-              <div className="w-3/5 sm:w-1/3 flex justify-center items-center px-3 sm:px-8 gap-4">
+              <div
+                className={`${
+                  visible ? "block" : "hidden"
+                } sm:block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10`}
+              ></div>
+              <div
+                className={`w-full sm:w-1/3 ${
+                  visible ? "flex" : "hidden"
+                } sm:flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10`}
+              >
                 <a
                   href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
                   rel="noreferrer nonopener"
@@ -63,6 +85,7 @@ export default function DAOMetricsHeader({ metrics }) {
                   href="https://discord.gg/GsNyzbcZ"
                   rel="noreferrer nonopener"
                   target="_blank"
+                  className="hidden sm:inline"
                 >
                   <Image src={discord} alt="Discord" />
                 </a>
