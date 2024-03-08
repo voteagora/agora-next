@@ -3,6 +3,8 @@ import { ProposalDraft } from "@prisma/client";
 import { markdownTable } from "markdown-table";
 import { ProposalDraftWithTransactions } from "./types";
 
+import { ethers } from "ethers";
+
 const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
 const AGORA_ENS_FORK = "governance-docs";
 const ENS_REPO_OWNER = "ensdomains";
@@ -10,78 +12,72 @@ const ENS_REPO_NAME = "governance-docs";
 const BASE_BRANCH = "main"; // Base branch to create the new branch from
 const BASE_PATH = "governance-proposals";
 
-// TODO add transactions to the proposal
-// function getFormattedTransactionTable(proposal: ProposalDraftWithTransactions) {
-//   const markDownArray = [["Address", "Value", "Function", "Argument", "Value"]];
+function getFormattedTransactionTable(proposal: ProposalDraftWithTransactions) {
+  const markDownArray = [["Address", "Value", "Function", "Argument", "Value"]];
 
-//   proposal.transactions.forEach((transaction) => {
-//     const {
-//       type,
-//       target,
-//       value,
-//       calldata,
-//       transferAmount,
-//       transferTo,
-//       signature,
-//       token,
-//     } = transaction;
+  proposal.transactions.forEach((transaction) => {
+    const { type, target, value, calldata, function_details } = transaction;
 
-//     if (type === "Transfer") {
-//       if (token.name === "ETH") {
-//         markDownArray.push([transferTo, transferAmount + " ETH", "", "", ""]);
-//       } else {
-//         markDownArray.push([token.address, "", "transfer", "to", transferTo]);
-//         markDownArray.push([
-//           "",
-//           "",
-//           "",
-//           "amount",
-//           ethers.utils
-//             .parseUnits(transferAmount.toString() || "0", token.decimals)
-//             .toString(),
-//         ]);
-//       }
-//     } else {
-//       // Decode custom transaction
-//       const args = signature.split("(")[1].split(")")[0].split(",");
-//       const functionName = signature.split("(")[0];
-//       const functionArgs = args.map((arg) => arg.trim().split(" ")[1]);
-//       const functionTypes = args.map((arg) => arg.trim().split(" ")[0]);
-//       const callDataToDecode = "0x" + calldata.slice(10);
+    if (type === "transfer") {
+      if (target === "0x") {
+        markDownArray.push([function_details, value + " ETH", "", "", ""]);
+      } else {
+        markDownArray.push([target, "", "transfer", "to", function_details]);
+        markDownArray.push([
+          "",
+          "",
+          "",
+          "amount",
+          // ethers.utils
+          //   .parseUnits(transferAmount.toString() || "0", token.decimals)
+          //   .toString(),
+          value.toString(),
+        ]);
+      }
+    } else {
+      // Decode custom transaction
+      // const args = signature.split("(")[1].split(")")[0].split(",");
+      // const functionName = signature.split("(")[0];
+      // const functionArgs = args.map((arg) => arg.trim().split(" ")[1]);
+      // const functionTypes = args.map((arg) => arg.trim().split(" ")[0]);
+      // const callDataToDecode = "0x" + calldata.slice(10);
 
-//       const decodedValues = ethers.utils.defaultAbiCoder.decode(
-//         functionTypes,
-//         callDataToDecode
-//       );
+      // const decodedValues = ethers.utils.defaultAbiCoder.decode(
+      //   functionTypes,
+      //   callDataToDecode
+      // );
 
-//       functionArgs.forEach((arg, index) => {
-//         if (index === 0) {
-//           markDownArray.push([
-//             target,
-//             value + " ETH",
-//             functionName,
-//             arg,
-//             decodedValues[index].toString(),
-//           ]);
-//         } else {
-//           markDownArray.push([
-//             "",
-//             "",
-//             "",
-//             arg,
-//             decodedValues[index].toString(),
-//           ]);
-//         }
-//       });
-//     }
-//   });
+      // functionArgs.forEach((arg, index) => {
+      //   if (index === 0) {
+      //     markDownArray.push([
+      //       target,
+      //       value + " ETH",
+      //       functionName,
+      //       arg,
+      //       decodedValues[index].toString(),
+      //     ]);
+      //   } else {
+      //     markDownArray.push([
+      //       "",
+      //       "",
+      //       "",
+      //       arg,
+      //       decodedValues[index].toString(),
+      //     ]);
+      //   }
+      // });
+      markDownArray.push(["failed to decode transaction", "", "", "", ""]);
+    }
+  });
 
-//   const table = markdownTable(markDownArray);
+  const table = markdownTable(markDownArray);
 
-//   return table;
-// }
+  return table;
+}
 
-export default function formatGithubProposal(proposal: ProposalDraft) {
+export default function formatGithubProposal(
+  proposal: ProposalDraftWithTransactions
+) {
   const descriptionTable = markdownTable([
     ["description"],
     [proposal.description],
@@ -103,7 +99,7 @@ export default function formatGithubProposal(proposal: ProposalDraft) {
       : "N/A"
   }                                                                                              |
   | **Votes**             | ${
-    proposal.proposal_type === "Executable"
+    proposal.proposal_type === "executable"
       ? "[Agora](https://agora.ensdao.org/proposals/" + proposal.id + ")"
       : "[Snapshot](https://snapshot.org/#/ens.eth/proposal/" +
         proposal.id +
@@ -113,12 +109,10 @@ export default function formatGithubProposal(proposal: ProposalDraft) {
 
   const abstract = `# Abstract \n ${proposal.abstract}`;
   // const specification = `# Specification \n ${proposal.specification}`;
-  // const transactions =
-  //   proposal.proposal_type === "Executable"
-  //     ? `# Transactions \n ${getFormattedTransactionTable(form)}`
-  //     : "";
-
-  // TODO add transactions
+  const transactions =
+    proposal.proposal_type === "executable"
+      ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
+      : "";
 
   const content =
     descriptionTable +
@@ -127,17 +121,17 @@ export default function formatGithubProposal(proposal: ProposalDraft) {
     "\n\n" +
     statusTable +
     "\n\n" +
-    abstract;
-  // "\n\n" +
-  // specification +
-  // "\n\n" +
-  // transactions;
+    abstract +
+    // "\n\n" +
+    // specification +
+    "\n\n" +
+    transactions;
 
   return content;
 }
 
 export async function createGithubProposal(
-  proposal: ProposalDraft
+  proposal: ProposalDraftWithTransactions
 ): Promise<string> {
   const octokit = new Octokit({
     auth: process.env.PR_BOT_TOKEN || "",
@@ -146,8 +140,6 @@ export async function createGithubProposal(
   const content = Buffer.from(formatGithubProposal(proposal)).toString(
     "base64"
   );
-
-  console.log("titleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", proposal.title);
 
   try {
     // Sync the forked branch
@@ -243,7 +235,7 @@ export async function createGithubProposal(
       body: proposal.description,
     });
 
-    return pullRequest.data.url;
+    return pullRequest.data.html_url;
   } catch (error) {
     console.error("Error creating PR:", error);
     throw new Error("Error creating PR");

@@ -118,11 +118,11 @@ async function deleteTransaction(
 async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
   "use server";
 
-  const result = await handleCreateGithubProposal(proposal);
+  const result = await handleCreateGithubProposal(
+    proposal as ProposalDraftWithTransactions
+  );
 
-  console.log("createGithubProposal", proposal);
-
-  return "https://github.com";
+  return result;
 }
 
 export default async function DraftProposalPage({

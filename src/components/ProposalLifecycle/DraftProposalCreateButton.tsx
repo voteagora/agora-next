@@ -54,7 +54,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     // TODO save / run validation etc
     const prLink = await createGithubProposal(proposalState);
 
-    console.log("prLink", prLink);
+    alert("Proposal created! " + prLink);
   };
 
   return (
