@@ -33,7 +33,7 @@ export default function DAOMetricsHeader({ metrics }) {
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-gray-fa shadow-newDefault",
                 "border-t border-r border-l border-gray-eo rounded-tl-2xl rounded-tr-2xl",
-                "text-xs text-gray-4f font-inter font-semibold"
+                "text-xs text-gray-4f font-inter font-medium"
               )}
             >
               <div
@@ -82,7 +82,7 @@ export default function DAOMetricsHeader({ metrics }) {
                   FAQ
                 </a>
                 <a
-                  href="https://discord.gg/GsNyzbcZ"
+                  href="https://discord.gg/vBJkUYBuwX"
                   rel="noreferrer nonopener"
                   target="_blank"
                   className="hidden sm:inline"
