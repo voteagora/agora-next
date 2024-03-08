@@ -62,7 +62,7 @@ export default function GovernorSettings() {
 
   const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
     usePrepareContractWrite({
-      ...contracts.governor,
+      ...govContract,
       functionName: "setVotingPeriod",
       args: [
         (votingPeriod
