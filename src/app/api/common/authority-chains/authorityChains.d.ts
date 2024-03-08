@@ -13,10 +13,10 @@ export type AuthorityChainRules = {
 };
 
 export type AuhtorityChainsAggregate = {
-  chains: String[][];
-  rules: Prisma.JsonValue[][];
-  balances: Decimal[];
-  proxies: String[];
-  subdelegated_share: Decimal;
-  subdelegated_amount: Decimal;
+  chains?: String[][];
+  rules?: Prisma.JsonValue[][];
+  balances?: Decimal[];
+  proxies?: String[];
+  subdelegated_share?: Decimal;
+  subdelegated_amount?: Decimal;
 };

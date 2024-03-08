@@ -1,6 +1,5 @@
 import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
-import { Block } from "ethers";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
 
@@ -210,12 +209,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-          proposal,
-          proposalResuts,
-          latestBlock,
-          quorum,
-          votableSupply
-        )
+        proposal,
+        proposalResuts,
+        latestBlock,
+        quorum,
+        votableSupply
+      )
       : null,
   };
 }

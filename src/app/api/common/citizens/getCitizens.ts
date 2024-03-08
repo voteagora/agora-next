@@ -3,7 +3,8 @@ import "server-only";
 import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-import { getDelegateStatementForNamespace } from "../delegateStatement/getDelegateStatement";
+import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
+import Tenant from "@/lib/tenant";
 
 type citizen = {
   address: string;
@@ -11,21 +12,20 @@ type citizen = {
   dao_slug: string;
   metadata: object | null;
   created_at: Date;
-  voting_power: Prisma.Decimal;
+  voting_power?: Prisma.Decimal;
 };
 
-export async function getCitizensForNamespace({
+export async function getCitizens({
   page = 1,
   sort = "shuffle",
   seed,
-  namespace,
 }: {
   page: number;
   sort: string;
   seed?: number;
-  namespace: "optimism";
 }) {
   const pageSize = 20;
+  const { namespace } = Tenant.getInstance();
 
   const { meta, data: _citizens } = await paginatePrismaResult(
     (skip: number, take: number) => {
@@ -34,7 +34,7 @@ export async function getCitizensForNamespace({
           `
           SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
           FROM agora.address_metadata address_metadata
-          JOIN ${namespace + ".delegates"
+          LEFT JOIN ${namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
           WHERE address_metadata.kind = 'citizen' 
           AND address_metadata.dao_slug = 'OP'
@@ -51,11 +51,12 @@ export async function getCitizensForNamespace({
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM agora.address_metadata address_metadata
-            JOIN ${namespace + ".delegates"
+            LEFT JOIN ${namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
-            ORDER BY delegate.voting_power DESC
+            ORDER BY COALESCE(delegate.voting_power, 0) DESC,
+            address_metadata.address ASC 
             OFFSET $1
             LIMIT $2;
           `,
@@ -70,15 +71,12 @@ export async function getCitizensForNamespace({
 
   const citizens = await Promise.all(
     _citizens.map(async (citizen) => {
-      const statement = await getDelegateStatementForNamespace({
-        addressOrENSName: citizen.address,
-        namespace,
-      });
+      const statement = await getDelegateStatement(citizen.address);
       const { address, metadata } = citizen;
       return {
         address,
         metadata,
-        votingPower: citizen.voting_power?.toFixed(0),
+        votingPower: citizen.voting_power?.toFixed(0) || "0",
         // Mark as citizen to display badge
         citizen: true,
         statement,

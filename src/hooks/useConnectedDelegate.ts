@@ -3,6 +3,7 @@ import { useAccount } from "wagmi";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { useState, useCallback, useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -26,32 +27,34 @@ const useConnectedDelegate = () => {
     if (address) {
       setIsLoading(true);
       const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address);
-      /**
-       * Assuming delegator and delegatee voting power update at the same time in the db, since we are revalidating 
-       * the delegatee until the delegator voting power is updated in the DB. If delegatee is updated later than 
-       * delegator after a delegation this solution would fail
-       */
       if (refetchDelegate) {
-        revalidateDelegateAddressPage(refetchDelegate);
+        revalidateDelegateAddressPage(refetchDelegate.address);
       }
       setLastVotingPower(delegate.votingPower);
       setDelegate(delegate);
       setAdvancedDelegators(advancedDelegators);
       setBalance(balance);
-      // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the	
-      // new voting power	
-      if (
-        refetchDelegate &&
-        retries < 3
-      ) {
+      // If refetchDelegate?.votingPower we are looking for a revalidation on the page of the delegatee
+      if (refetchDelegate?.prevVotingPowerDelegatee) {
+        const delegatee = await fetchDelegate(refetchDelegate.address);
+        /**
+         * Materialized view that brings the new voting power takes one minute to sync
+         * Refetch delegate will be set to null by the delegateProfileImage
+         */
+        if (delegatee.votingPower === refetchDelegate.prevVotingPowerDelegatee) {
+          await timeout(2000);
+          const _retries = retries + 1;
+          setRetries(_retries);
+        }
+      } else if (refetchDelegate) {
+        // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the
+        // new voting power
         if (delegate.votingPower === lastVotingPower) {
-          await timeout(3000);
+          await timeout(2000);
           const _retries = retries + 1;
           setRetries(_retries);
         } else {
-          setIsLoading(false);
           setRefetchDelegate(null);
-          setRetries(0);
         }
       } else {
         setIsLoading(false);

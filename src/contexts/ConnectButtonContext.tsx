@@ -6,9 +6,14 @@ import {
   SetStateAction,
 } from "react";
 
+type RefetchDelegate = {
+  address: string;
+  prevVotingPowerDelegatee?: string;
+};
+
 type ConnectButtonContextType = {
-  refetchDelegate: string | null;
-  setRefetchDelegate: Dispatch<SetStateAction<string | null>>;
+  refetchDelegate: RefetchDelegate | null;
+  setRefetchDelegate: Dispatch<SetStateAction<RefetchDelegate | null>>;
 };
 
 const ConnectButtonContext = createContext<ConnectButtonContextType>({
@@ -21,7 +26,8 @@ export function useConnectButtonContext() {
 }
 
 const ConnectButtonProvider = ({ children }: { children: React.ReactNode }) => {
-  const [refetchDelegate, setRefetchDelegate] = useState<string | null>(null);
+  const [refetchDelegate, setRefetchDelegate] =
+    useState<RefetchDelegate | null>(null);
 
   return (
     <ConnectButtonContext.Provider

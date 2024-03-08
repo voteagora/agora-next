@@ -27,6 +27,9 @@ import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "next/navigation";
+import { resolveENSName } from "@/app/lib/ENSUtils";
+import { formatEther } from "viem";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -139,6 +142,24 @@ export function AdvancedDelegateDialog({
     allocation: allowance, // (value / 100000) 100% = 100000
   });
 
+  const getVotingPowerPageDelegatee = async () => {
+    const pageDelegateeAddress = await resolveENSName(
+      params?.addressOrENSName as string
+    );
+    const pageDelegateeIndex = delegatees.findIndex(
+      (delegatee) => delegatee.to === pageDelegateeAddress
+    );
+    const prevVotingPower = Number(
+      formatEther(BigInt(delegatees[pageDelegateeIndex].allowance))
+    ).toFixed(2);
+    const postVotingPower = allowance[pageDelegateeIndex].toFixed(2);
+
+    return {
+      pageDelegateeAddress,
+      prevVotingPower,
+      postVotingPower,
+    };
+  };
   const writeWithTracking = async () => {
     setIsLoading(true);
 
@@ -155,10 +176,25 @@ export function AdvancedDelegateDialog({
 
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });
+
+    const { prevVotingPower, postVotingPower, pageDelegateeAddress } =
+      await getVotingPowerPageDelegatee();
+
+    if (prevVotingPower !== postVotingPower) {
+      const delegatee = await fetchDelegate(pageDelegateeAddress);
+      setRefetchDelegate({
+        address: pageDelegateeAddress,
+        prevVotingPowerDelegatee: delegatee.votingPower,
+      });
+    } else {
+      /**
+       * No need to revalidate the delegate page since there were no changes, only the profile dropdown needs to be updated
+       */
+      setRefetchDelegate({
+        address: pageDelegateeAddress,
+      });
+    }
     setIsLoading(false);
-    setRefetchDelegate(
-      params?.addressOrENSName ? params?.addressOrENSName : (address as string)
-    );
   };
 
   return (
