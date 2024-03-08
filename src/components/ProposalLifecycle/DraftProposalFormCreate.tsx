@@ -48,7 +48,10 @@ interface DraftProposalFormCreateProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
-  addTransaction: (proposalId: number) => Promise<ProposalDraftTransaction>;
+  addTransaction: (
+    proposalId: number,
+    transactionType: "transfer" | "custom"
+  ) => Promise<ProposalDraftTransaction>;
   updateTransaction: (
     transactionId: number,
     data: Partial<ProposalDraftTransaction>

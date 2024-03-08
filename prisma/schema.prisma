@@ -313,6 +313,7 @@ model ProposalDraftTransaction {
   contract_abi     String
   description      String
   is_valid         Boolean
+  type             String
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)

@@ -8,6 +8,14 @@ import Image from "next/image";
 import { useContext, useState } from "react";
 import { DebounceInput } from "react-debounce-input";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 interface DraftProposalTransactionProps {
   label: string;
   description: string;
@@ -15,7 +23,10 @@ interface DraftProposalTransactionProps {
   setProposalState: React.Dispatch<
     React.SetStateAction<ProposalDraftWithTransactions>
   >;
-  addTransaction: (proposalId: number) => Promise<ProposalDraftTransaction>;
+  addTransaction: (
+    proposalId: number,
+    transactionType: "transfer" | "custom"
+  ) => Promise<ProposalDraftTransaction>;
   updateTransaction: (
     transactionId: number,
     data: Partial<ProposalDraftTransaction>
@@ -42,8 +53,11 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
     proposalState.transactions
   );
 
-  async function handleAddTransaction() {
-    const newTransaction = await addTransaction(proposalState.id);
+  async function handleAddTransaction(transactionType: "transfer" | "custom") {
+    const newTransaction = await addTransaction(
+      proposalState.id,
+      transactionType
+    );
     setTransactions([...transactions, newTransaction]);
   }
 
@@ -58,31 +72,20 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
       <p className="text-xs max-w-[620px] text-gray-4f mb-6">{description}</p>
       {transactions.length === 0 && (
         <div className="flex flex-row w-full gap-x-5">
-          <button className="w-full flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm">
+          <button
+            onClick={() => handleAddTransaction("transfer")}
+            className="w-full flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm"
+          >
             <span className="flex flex-row items-center">
-              <Image
-                src={icons.uploadTransaction}
-                alt="Upload icon"
-                width={16}
-                height={16}
-                className="mr-2"
-              />
-              Upload payload
+              Transfer from the treasury
             </span>
           </button>
           <button
             className="w-full flex flex-row justify-center py-3 font-medium rounded-lg border border-gray-eo shadow-sm"
-            onClick={() => handleAddTransaction()}
+            onClick={() => handleAddTransaction("custom")}
           >
             <span className="flex flex-row items-center">
-              <Image
-                src={icons.createTransaction}
-                alt="Upload icon"
-                width={16}
-                height={16}
-                className="mr-2"
-              />
-              Create transactions
+              Custom transaction
             </span>
           </button>
         </div>
@@ -103,18 +106,32 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 </button>
               </div>
               <div className="flex flex-row gap-x-10">
+                {transactions[index].type === "custom" ? (
+                  <DraftProposalTransactionInput
+                    id={transactions[index].id}
+                    label="Target"
+                    placeholder="address"
+                    updateTransaction={updateTransaction}
+                    setProposalState={setProposalState}
+                    value={transactions[index].target}
+                    field="target"
+                  />
+                ) : (
+                  <DraftProposalTransactionInputTransferToken
+                    id={transactions[index].id}
+                    label="Token"
+                    placeholder="Token"
+                    updateTransaction={updateTransaction}
+                    setProposalState={setProposalState}
+                    value={transactions[index].target}
+                    field="target"
+                  />
+                )}
                 <DraftProposalTransactionInput
                   id={transactions[index].id}
-                  label="Target"
-                  placeholder="address"
-                  updateTransaction={updateTransaction}
-                  setProposalState={setProposalState}
-                  value={transactions[index].target}
-                  field="target"
-                />
-                <DraftProposalTransactionInput
-                  id={transactions[index].id}
-                  label="Value"
+                  label={
+                    transactions[index].type === "custom" ? "Value" : "Amount"
+                  }
                   placeholder="ETH amount"
                   updateTransaction={updateTransaction}
                   setProposalState={setProposalState}
@@ -123,43 +140,71 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 />
               </div>
               <div className="flex flex-row gap-x-10">
-                <DraftProposalTransactionInput
-                  id={transactions[index].id}
-                  label="Calldata"
-                  placeholder="bytes"
-                  updateTransaction={updateTransaction}
-                  setProposalState={setProposalState}
-                  value={transactions[index].calldata}
-                  field="calldata"
-                />
-                <DraftProposalTransactionInput
-                  id={transactions[index].id}
-                  label="Function details"
-                  placeholder="transfer(to, amount)"
-                  updateTransaction={updateTransaction}
-                  setProposalState={setProposalState}
-                  value={transactions[index].function_details}
-                  field="function_details"
-                />
+                {transactions[index].type === "custom" ? (
+                  <DraftProposalTransactionInput
+                    id={transactions[index].id}
+                    label="Calldata"
+                    placeholder="bytes"
+                    updateTransaction={updateTransaction}
+                    setProposalState={setProposalState}
+                    value={transactions[index].calldata}
+                    field="calldata"
+                  />
+                ) : (
+                  <DraftProposalTransactionInput
+                    id={transactions[index].id}
+                    label="Recipient"
+                    placeholder="address"
+                    updateTransaction={updateTransaction}
+                    setProposalState={setProposalState}
+                    value={transactions[index].function_details}
+                    field="function_details"
+                  />
+                )}
+                {transactions[index].type === "custom" ? (
+                  <DraftProposalTransactionInput
+                    id={transactions[index].id}
+                    label="Function details"
+                    placeholder="transfer(to, amount)"
+                    updateTransaction={updateTransaction}
+                    setProposalState={setProposalState}
+                    value={transactions[index].function_details}
+                    field="function_details"
+                  />
+                ) : (
+                  <DraftProposalTransactionInput
+                    id={transactions[index].id}
+                    label="Transaction description"
+                    placeholder="Transfer tokens to the vendor"
+                    updateTransaction={updateTransaction}
+                    setProposalState={setProposalState}
+                    value={transactions[index].description}
+                    field="description"
+                  />
+                )}
               </div>
-              <DraftProposalTransactionInput
-                id={transactions[index].id}
-                label="Contract ABI"
-                placeholder="ABI"
-                updateTransaction={updateTransaction}
-                setProposalState={setProposalState}
-                value={transactions[index].contract_abi}
-                field="contract_abi"
-              />
-              <DraftProposalTransactionInput
-                id={transactions[index].id}
-                label="Transaction description"
-                placeholder="Permits depositing ETH on Compound v3"
-                updateTransaction={updateTransaction}
-                setProposalState={setProposalState}
-                value={transactions[index].description}
-                field="description"
-              />
+              {transactions[index].type === "custom" && (
+                <DraftProposalTransactionInput
+                  id={transactions[index].id}
+                  label="Contract ABI"
+                  placeholder="ABI"
+                  updateTransaction={updateTransaction}
+                  setProposalState={setProposalState}
+                  value={transactions[index].contract_abi}
+                  field="contract_abi"
+                />
+              )}
+              {transactions[index].type === "custom" && (
+                <DraftProposalTransactionInput
+                  id={transactions[index].id}
+                  label="Transaction description"
+                  placeholder="Permits depositing ETH on Compound v3"
+                  updateTransaction={updateTransaction}
+                  setProposalState={setProposalState}
+                  value={transactions[index].description}
+                  field="description"
+                />
+              )}
             </div>
           ))}
           <DraftProposalAddAnotherTransaction
@@ -238,6 +283,110 @@ const DraftProposalTransactionInput: React.FC<
         value={value}
         onChange={(e) => handleUpdateTransaction(e.target.value)}
       />
+    </div>
+  );
+};
+
+const DraftProposalTransactionInputTransferRecipient: React.FC<
+  DraftProposalTransactionInputProps
+> = (props) => {
+  const {
+    id,
+    label,
+    placeholder,
+    updateTransaction,
+    setProposalState,
+    value,
+    field,
+  } = props;
+
+  async function handleUpdateTransaction(newValue: string) {
+    const updatedTransaction = await updateTransaction(id, {
+      [field]: newValue,
+    });
+
+    setProposalState((prevState) => {
+      const newTransactions = prevState.transactions.map((transaction) => {
+        if (transaction.id === id) {
+          return updatedTransaction;
+        }
+        return transaction;
+      });
+
+      return {
+        ...prevState,
+        transactions: newTransactions,
+      };
+    });
+  }
+
+  return (
+    <div className="flex flex-col w-full">
+      <label className="font-medium text-sm mb-1">{label}</label>
+      {/* @ts-expect-error Server Component */}
+      <DebounceInput
+        debounceTimeout={1000}
+        className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => handleUpdateTransaction(e.target.value)}
+      />
+    </div>
+  );
+};
+
+const DraftProposalTransactionInputTransferToken: React.FC<
+  DraftProposalTransactionInputProps
+> = (props) => {
+  const {
+    id,
+    label,
+    placeholder,
+    updateTransaction,
+    setProposalState,
+    value,
+    field,
+  } = props;
+
+  async function handleUpdateTransaction(newValue: string) {
+    const updatedTransaction = await updateTransaction(id, {
+      [field]: newValue,
+    });
+
+    setProposalState((prevState) => {
+      const newTransactions = prevState.transactions.map((transaction) => {
+        if (transaction.id === id) {
+          return updatedTransaction;
+        }
+        return transaction;
+      });
+
+      return {
+        ...prevState,
+        transactions: newTransactions,
+      };
+    });
+  }
+
+  const CONTRACT_ADDRESSES = {
+    ETH: "0x",
+    USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    ENS: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
+  };
+
+  return (
+    <div className="flex flex-col w-full">
+      <label className="font-medium text-sm mb-1">{label}</label>
+      <Select onValueChange={(value) => handleUpdateTransaction(value)}>
+        <SelectTrigger className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent">
+          <SelectValue placeholder="Token" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={CONTRACT_ADDRESSES["ETH"]}>ETH</SelectItem>
+          <SelectItem value={CONTRACT_ADDRESSES["USDC"]}>USDC</SelectItem>
+          <SelectItem value={CONTRACT_ADDRESSES["ENS"]}>ENS</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 };
@@ -327,7 +476,7 @@ const DraftProposalTransactionValidity: React.FC<
 };
 
 interface DraftProposalAddAnotherTransactionProps {
-  handleAddTransaction: () => void;
+  handleAddTransaction: (transactionType: "transfer" | "custom") => void;
 }
 
 const DraftProposalAddAnotherTransaction = (
@@ -341,13 +490,13 @@ const DraftProposalAddAnotherTransaction = (
       <div className="flex flex-row gap-x-5">
         <button
           className="py-3 w-full border border-gray-eo rounded-lg text-center font-semibold focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-          onClick={() => alert("Transfer from the treasury")}
+          onClick={() => handleAddTransaction("transfer")}
         >
           Transfer from the treasury
         </button>
         <button
           className="py-3 w-full border border-gray-eo rounded-lg text-center font-semibold focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-          onClick={() => handleAddTransaction()}
+          onClick={() => handleAddTransaction("custom")}
         >
           Custom transaction
         </button>
