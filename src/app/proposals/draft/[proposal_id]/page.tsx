@@ -42,7 +42,8 @@ async function updateProposal(
 }
 
 async function addTransaction(
-  proposalId: number
+  proposalId: number,
+  transactionType: "transfer" | "custom"
 ): Promise<ProposalDraftTransaction> {
   "use server";
 
@@ -61,6 +62,7 @@ async function addTransaction(
   const transaction = await prisma.proposalDraftTransaction.create({
     data: {
       proposal_id: proposalId,
+      type: transactionType,
       order: newOrder,
       target: "",
       value: "",
