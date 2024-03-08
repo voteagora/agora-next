@@ -8,18 +8,10 @@ export async function getMetrics() {
     await Promise.all([
       getTokenSupply(namespace),
       prisma[`${namespace}VotableSupply`].findFirst({}),
-      // await prisma.$queryRawUnsafe<{ unique_voters_count: bigint }[]>(
-      //   `
-      // SELECT COUNT(DISTINCT delegates) AS unique_voters_count
-      // FROM ${namespace}.delegates;
-      // `
-      // )
     ]);
 
   return {
     votableSupply: votableSupply?.votable_supply || "0",
     totalSupply: totalSupply.toString(),
-    // TODO: pending uniquevoterscount query
-    uniqueVotersCount: "91230"
   };
 }
