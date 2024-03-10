@@ -5,10 +5,11 @@ import { DesktopConnectButton } from "./DesktopConnectButton";
 import { useNetwork } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect } from "react";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant/tenant";
 
 export function ConnectButton() {
-  const { chainId } = OptimismContracts.governor;
+  const { contracts } = Tenant.getInstance();
+  const { chainId } = contracts.governor;
   const { chain } = useNetwork();
   const openDialog = useOpenDialog();
 
