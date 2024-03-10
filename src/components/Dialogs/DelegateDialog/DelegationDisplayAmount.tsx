@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useMemo } from "react";
 import tokenIcon from "@/icons/tokenIcon.svg";
 import styles from "./delegateDialog.module.scss";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegationDisplayAmount({
   amount,
