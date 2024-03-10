@@ -20,7 +20,7 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   proposalType: ProposalType;
@@ -46,6 +46,8 @@ export default function ProposalType({
   index,
   votableSupply,
 }: Props) {
+  const { contracts } = Tenant.getInstance();
+
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
     defaultValues: {
@@ -61,8 +63,8 @@ export default function ProposalType({
   );
 
   const { config: deleteProposalTypeConfig } = usePrepareContractWrite({
-    address: OptimismContracts.proposalTypesConfigurator.address,
-    abi: OptimismContracts.proposalTypesConfigurator.abi,
+    address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
+    abi: contracts.proposalTypesConfigurator!.abi,
     functionName: "setProposalType",
     args: [BigInt(index), 0, 0, ""],
   });
@@ -79,8 +81,8 @@ export default function ProposalType({
   const formValues = form.watch();
   const { config: setProposalTypeConfig, isError: setProposalTypeError } =
     usePrepareContractWrite({
-      address: OptimismContracts.proposalTypesConfigurator.address,
-      abi: OptimismContracts.proposalTypesConfigurator.abi,
+      address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
+      abi: contracts.proposalTypesConfigurator!.abi,
       functionName: "setProposalType",
       args: [
         BigInt(index),
