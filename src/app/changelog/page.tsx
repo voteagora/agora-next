@@ -81,7 +81,7 @@ export default function Page() {
                   better documentation too.
                 </p>
                 <p>
-                  One of the client side, the biggest changes we added were
+                  One the client side, the biggest changes we added were
                   Proposal list filtering and some date and time sugar to make
                   it easier to know when a vote is starting and when it&apos;s
                   ending.
