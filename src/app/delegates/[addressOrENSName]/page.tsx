@@ -2,7 +2,8 @@
  * Show page for a single delegate
  * Takes in the delegate address as a parameter
  */
-
+import { Metadata, ResolvingMetadata } from 'next'
+import { cache } from 'react'
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { VStack } from "@/components/Layout/Stack";
@@ -22,25 +23,34 @@ import {
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
+  resolveENSName,
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
 
+// TODO: -> see if react cache can be used in fetchDelegate
+const getCachedDelegate = cache(
+  (address: string) => fetchDelegate(address)
+);
+
+const getCachedAddress = cache(
+  (addressOrENSName: string) => resolveENSName(addressOrENSName)
+);
+
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
-  parent: any
-) {
-  const [delegate, delegateStatement, address] = await Promise.all([
-    fetchDelegate(params.addressOrENSName),
-    fetchDelegateStatement(params.addressOrENSName),
-    processAddressOrEnsName(params.addressOrENSName),
+  parent: ResolvingMetadata 
+): Promise<Metadata> {
+  // cache ENS address upfront for all subsequent queries
+  // TODO: change subqueries to use react cache
+  const address = await getCachedAddress(params.addressOrENSName);
+  const ensOrTruncatedAddress = await processAddressOrEnsName(params.addressOrENSName);
+  const [delegate, avatar] = await Promise.all([
+    getCachedDelegate(address || params.addressOrENSName),
+    resolveENSProfileImage(address || params.addressOrENSName),
   ]);
 
-  const avatar = await resolveENSProfileImage(
-    address || params.addressOrENSName
-  );
-
   const statement = (
-    delegateStatement?.payload as { delegateStatement: string }
+    delegate.statement?.payload as { delegateStatement: string }
   )?.delegateStatement;
 
   const imgParams = [
@@ -54,9 +64,9 @@ export async function generateMetadata(
 
   const preview = `/api/images/og/delegate?${imgParams.join(
     "&"
-  )}&address=${address}`;
-  const title = `${address} on Agora`;
-  const description = `See what ${address} believes and how they vote on Optimism governance.`;
+  )}&address=${ensOrTruncatedAddress}`;
+  const title = `${ensOrTruncatedAddress} on Agora`;
+  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on Optimism governance.`;
 
   return {
     title: title,
