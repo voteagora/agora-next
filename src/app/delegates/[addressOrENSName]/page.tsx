@@ -7,7 +7,6 @@ import { cache } from 'react'
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { VStack } from "@/components/Layout/Stack";
-import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
@@ -17,7 +16,6 @@ import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
   fetchDelegate,
-  fetchDelegateStatement,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -88,14 +86,16 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const [delegate, delegateVotes, statement, delegates, delegators] =
+  const address = await getCachedAddress(addressOrENSName) || addressOrENSName;
+  const [delegate, delegateVotes, delegates, delegators] =
     await Promise.all([
-      fetchDelegate(addressOrENSName),
-      fetchVotesForDelegate(addressOrENSName),
-      fetchDelegateStatement(addressOrENSName),
-      fetchCurrentDelegatees(addressOrENSName),
-      fetchCurrentDelegators(addressOrENSName),
+      getCachedDelegate(address),
+      fetchVotesForDelegate(address),
+      fetchCurrentDelegatees(address),
+      fetchCurrentDelegators(address),
     ]);
+
+  const statement = delegate.statement;
 
   if (!delegate) {
     return (
