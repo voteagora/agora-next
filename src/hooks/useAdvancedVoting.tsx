@@ -1,9 +1,9 @@
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
 import { optimism } from "viem/chains";
+import Tenant from "@/lib/tenant/tenant";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -27,7 +27,7 @@ const useAdvancedVoting = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
+  const { contracts } = Tenant.getInstance();
   const {
     write: advancedVote,
     isLoading: advancedVoteIsLoading,
@@ -35,8 +35,8 @@ const useAdvancedVoting = ({
     isSuccess: advancedVoteIsSuccess,
     data: advancedVoteData,
   } = useContractWrite({
-    address: OptimismContracts.alligator.address as any,
-    abi: OptimismContracts.alligator.abi,
+    address: contracts.alligator!.address as `0x${string}`,
+    abi: contracts.alligator!.abi,
     functionName: "limitedCastVoteWithReasonAndParamsBatched",
     args: [
       advancedVP,
@@ -56,8 +56,8 @@ const useAdvancedVoting = ({
     isSuccess: standardVoteIsSuccess,
     data: standardVoteData,
   } = useContractWrite({
-    address: OptimismContracts.governor.address as any,
-    abi: OptimismContracts.governor.abi,
+    address: contracts.governor.address as `0x${string}`,
+    abi: contracts.governor.abi,
     functionName: reason
       ? params
         ? "castVoteWithReasonAndParams"

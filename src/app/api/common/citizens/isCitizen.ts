@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function isCitizen(address: string) {
   const { slug } = Tenant.getInstance();

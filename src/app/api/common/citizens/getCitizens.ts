@@ -4,7 +4,7 @@ import { paginatePrismaResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 type citizen = {
   address: string;

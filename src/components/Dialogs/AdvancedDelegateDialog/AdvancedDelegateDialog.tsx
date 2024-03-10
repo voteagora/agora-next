@@ -22,7 +22,6 @@ import { waitForTransaction } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
@@ -30,6 +29,7 @@ import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { formatEther } from "viem";
 import { fetchDelegate } from "@/app/delegates/actions";
+import Tenant from "@/lib/tenant/tenant";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -56,11 +56,10 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
+  const {contracts} = Tenant.getInstance();
 
   const getOpBalance = async (address: `0x${string}`) => {
-    const balance = await OptimismContracts.token.contract.balanceOf(address);
-
-    return balance;
+    return await contracts.token.contract.balanceOf(address);
   };
 
   const fetchData = useCallback(async () => {
