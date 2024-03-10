@@ -2,8 +2,11 @@ import { ethProvider } from "@/app/lib/provider";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { isAddress } from "viem";
 
-export async function resolveENSName(name: string) {
-  const address = await ethProvider.resolveName(name);
+export async function resolveENSName(nameOrAddress: string) {
+  if (isAddress(nameOrAddress)) {
+    return nameOrAddress;
+  }
+  const address = await ethProvider.resolveName(nameOrAddress);
   if (!address) {
     throw new Error("No address found for ENS name");
   }
@@ -44,6 +47,9 @@ export async function resolveENSProfileImage(
   }
 }
 
+/*
+  Returns the ENS name for the address if it exists, otherwise truncates address
+*/
 export async function processAddressOrEnsName(addressOrENSName: string) {
   // Assume resolved ens name
   if (!isAddress(addressOrENSName)) {
