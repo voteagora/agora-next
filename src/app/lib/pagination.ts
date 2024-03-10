@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation";
-
 type PaginatedResult<T> = {
   meta: {
     currentPage: number;

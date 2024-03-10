@@ -1,13 +1,18 @@
-import { type ITenantContract } from "@retro-pgf/contracts";
+import { TenantContract } from "@/lib/tenant/tenantContract";
+import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
+import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
+import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
+import { BaseContract } from "ethers";
 
 export type TenantNamespace = "optimism";
 
 export type TenantContracts = {
-  alligator?: ITenantContract;
-  governor: ITenantContract;
-  proposalTypesConfigurator: ITenantContract;
-  token: ITenantContract;
+  token: TenantContract<ITokenContract>;
+  governor: TenantContract<IGovernorContract>;
+  alligator?: TenantContract<IAlligatorContract>;
+  proposalTypesConfigurator?: TenantContract<BaseContract>;
 };
+
 export type TenantToken = {
   name: string;
   symbol: string;

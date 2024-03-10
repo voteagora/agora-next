@@ -11,7 +11,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { initialTopIssues } from "@/components/DelegateStatement/TopIssuesFormSection";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 const { slug: daoSlug } = Tenant.getInstance();
 

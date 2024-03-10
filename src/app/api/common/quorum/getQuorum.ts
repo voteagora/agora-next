@@ -1,15 +1,14 @@
 import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
-import { contracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "../proposals/proposal";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getQuorumForProposal(proposal: ProposalPayload) {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
 
   switch (namespace) {
     case "optimism": {
-      const contractQuorum = contracts(namespace).governor.contract.quorum(
+      const contractQuorum = contracts.governor.contract.quorum(
         proposal.proposal_id
       );
 
@@ -27,7 +26,7 @@ export async function getQuorumForProposal(proposal: ProposalPayload) {
 }
 
 export async function getCurrentQuorum() {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
 
   switch (namespace) {
     case "optimism": {
@@ -36,7 +35,7 @@ export async function getCurrentQuorum() {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return contracts(namespace).governor.contract.quorum(latestBlock - 1);
+      return contracts.governor.contract.quorum(latestBlock - 1);
     }
   }
 }
