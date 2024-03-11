@@ -18,7 +18,7 @@ export default function OpManagerDeleteProposal({
 }) {
   const { isOpManager } = useIsOpManager();
 
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   const proposalType = proposal.proposalType;
 
   const getArgs = () => {

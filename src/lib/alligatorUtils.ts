@@ -8,7 +8,7 @@ import { bigIntMax, bigIntMin } from "./bigintUtils";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function getProxyAddress(address: string) {
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   if (contracts.alligator) {
     return contracts.alligator.contract.proxyAddress(address);
   } else {
@@ -50,7 +50,7 @@ export async function getTotalVotableAllowance({
     return 0n;
   }
 
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
 
   const latestBlockNumber = await provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(

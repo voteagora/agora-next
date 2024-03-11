@@ -16,7 +16,7 @@ export async function getProposals({
 }) {
   const pageSize = 10;
 
-  const { namespace, contracts, isProd } = Tenant.getInstance();
+  const { namespace, contracts, isProd } = Tenant.current();
   const prodDataOnly = isProd && {
     contract: contracts.governor.address,
   };
@@ -74,7 +74,7 @@ export async function getProposals({
 }
 
 export async function getProposal(proposal_id: string) {
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
   const proposal = await prisma[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });
@@ -91,7 +91,7 @@ export async function getProposal(proposal_id: string) {
 }
 
 export async function getProposalTypes() {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
   return prisma[`${namespace}ProposalTypes`].findMany({
     where: {

@@ -39,7 +39,7 @@ export function DelegateDialog({
   const [isReady, setIsReady] = useState(false);
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee = delegate.address === delegatee?.delegatee;
-  const {contracts} = Tenant.getInstance();
+  const {contracts} = Tenant.current();
 
   const writeWithTracking = async () => {
     setIsLoading(true);

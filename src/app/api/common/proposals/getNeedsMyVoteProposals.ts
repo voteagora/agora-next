@@ -7,7 +7,7 @@ import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
 
 export async function getNeedsMyVoteProposals(address: string) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const [latestBlock, votableSupply] = await Promise.all([
     provider.getBlockNumber(),
     getVotableSupply(),

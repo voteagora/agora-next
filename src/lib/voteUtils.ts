@@ -28,7 +28,7 @@ export function parseSupport(
    *      note that block number is indicative but works
    */
 
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
   if (
     namespace === "optimism" &&

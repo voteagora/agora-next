@@ -46,7 +46,7 @@ export default function ProposalType({
   index,
   votableSupply,
 }: Props) {
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),

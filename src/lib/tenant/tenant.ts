@@ -9,6 +9,7 @@ import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
+import { TenantUI } from "@/lib/tenant/tenantUI";
 
 export default class Tenant {
   private static instance: Tenant;
@@ -18,7 +19,7 @@ export default class Tenant {
   private readonly _namespace: TenantNamespace;
   private readonly _slug: string;
   private readonly _token: TenantToken;
-  private readonly _ui: any;
+  private readonly _ui: TenantUI;
 
   private constructor() {
     const { NEXT_PUBLIC_AGORA_INSTANCE_NAME, NEXT_PUBLIC_AGORA_ENV } =
@@ -32,7 +33,7 @@ export default class Tenant {
 
     this._contracts = TenantContractFactory.create(
       this._namespace,
-      this._isProd
+      this._isProd,
     );
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);
@@ -63,7 +64,7 @@ export default class Tenant {
     return this._ui;
   }
 
-  public static getInstance(): Tenant {
+  public static current(): Tenant {
     if (!Tenant.instance) {
       Tenant.instance = new Tenant();
     }

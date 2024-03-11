@@ -24,7 +24,7 @@ const useAdvancedDelegation = ({
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
 
   const availableBalanceNumber = Number(
     formatUnits(BigInt(availableBalance), 18)

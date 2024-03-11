@@ -18,7 +18,7 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
   const advancedDelegatees = await prisma[
     `${namespace}AdvancedDelegatees`
@@ -128,7 +128,7 @@ async function getCurrentDelegatorsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
   const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
     where: {
@@ -224,7 +224,7 @@ const getDirectDelegateeForAddress = async ({
 }: {
   address: string;
 }) => {
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
     prisma[`${namespace}Delegatees`].findFirst({
@@ -251,7 +251,7 @@ async function getAllDelegatorsInChainsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
     `
     SELECT array_agg(DISTINCT u.element) AS addresses

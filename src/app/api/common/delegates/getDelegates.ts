@@ -27,7 +27,7 @@ export async function getDelegates({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
 
   const { meta, data: delegates } = await paginatePrismaResult(
     async (skip: number, take: number) => {
@@ -109,7 +109,7 @@ type DelegateStats = {
 };
 
 export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);

@@ -6,7 +6,7 @@ import Image from "next/image";
 import styles from "./header.module.scss";
 
 export default function LogoLink() {
-  const { namespace, ui } = Tenant.getInstance();
+  const { namespace, ui } = Tenant.current();
 
   return (
     <HStack justifyContent="justify-between" className={styles.logo_link}>
@@ -20,7 +20,7 @@ export default function LogoLink() {
             className="hidden sm:block"
           />
           <div className="h-3 w-[2px] bg-stone-200 rounded-full hidden sm:block"></div>
-          <Image src={ui.logos.svg} alt="logo" width="18" height="18" />
+          <Image src={ui.logo} alt="logo" width="18" height="18" />
           <span className="hidden sm:block font-medium capitalize">{`${namespace} Agora`}</span>
         </HStack>
       </Link>
