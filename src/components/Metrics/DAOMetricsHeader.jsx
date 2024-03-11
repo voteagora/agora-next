@@ -1,7 +1,7 @@
 "use client";
 
 import { formatNumber } from "@/lib/tokenUtils";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 import discord from "@/icons/discord.svg";
 import infoTransparent from "@/icons/info-transparent.svg";
 import Image from "next/image";
@@ -33,7 +33,10 @@ export default function DAOMetricsHeader({ metrics }) {
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-gray-fa shadow-newDefault",
                 "border-t border-r border-l border-gray-eo rounded-tl-2xl rounded-tr-2xl",
-                "text-xs text-gray-4f font-inter font-medium"
+                "text-xs text-gray-4f font-inter font-medium",
+                `transition-all duration-200 ease-in-out transform ${
+                  visible ? "translate-y-0" : "translate-y-10"
+                } sm:transition-none sm:translate-y-0`
               )}
             >
               <div
@@ -56,16 +59,8 @@ export default function DAOMetricsHeader({ metrics }) {
                   className="inline sm:hidden"
                 />
               </div>
-              <div
-                className={`${
-                  visible ? "block" : "hidden"
-                } sm:block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10`}
-              ></div>
-              <div
-                className={`w-full sm:w-1/3 ${
-                  visible ? "flex" : "hidden"
-                } sm:flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10`}
-              >
+              <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
+              <div className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
                 <a
                   href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
                   rel="noreferrer nonopener"
