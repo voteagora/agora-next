@@ -1,11 +1,12 @@
 import {
+  type TenantContracts,
   type TenantNamespace,
   type TenantToken,
-  type TenantContracts,
 } from "../types";
 import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
+import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 
 export default class Tenant {
   private static instance: Tenant;
@@ -17,22 +18,23 @@ export default class Tenant {
   private readonly _token: TenantToken;
 
   private constructor() {
-    const {
-      NEXT_PUBLIC_AGORA_INSTANCE_NAME,
-      NEXT_PUBLIC_AGORA_ENV,
-      NEXT_PUBLIC_AGORA_INSTANCE_TOKEN,
-    } = process.env;
+    const { NEXT_PUBLIC_AGORA_INSTANCE_NAME, NEXT_PUBLIC_AGORA_ENV } =
+      process.env;
 
-    this._namespace =
-      (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) || "optimism";
+    if (!NEXT_PUBLIC_AGORA_INSTANCE_NAME) {
+      throw new Error("Namespace is required");
+    }
+
+    this._namespace = NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
     this._isProd = NEXT_PUBLIC_AGORA_ENV === "prod";
-    this._slug = NEXT_PUBLIC_AGORA_INSTANCE_TOKEN || "OP";
+    this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);
     this._contracts = TenantContractFactory.create(
       this._namespace,
       this._isProd
     );
   }
+
   public get contracts(): TenantContracts {
     return this._contracts;
   }

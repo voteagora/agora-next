@@ -21,6 +21,8 @@ export default class TenantContractFactory {
     isProd: boolean
   ): TenantContracts {
     switch (namespace) {
+      case TENANT_NAMESPACES.ETHERFI:
+      case TENANT_NAMESPACES.ENS:
       case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
       default:
