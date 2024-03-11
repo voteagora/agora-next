@@ -5,7 +5,6 @@ import { getMetrics } from "@/app/api/common/metrics/getMetrics";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import Hero from "@/components/Hero/Hero";
-import { PageDivider } from "@/components/Layout/PageDivider";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { TabsContent } from "@/components/ui/tabs";
 import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
@@ -71,7 +70,6 @@ export default async function Page({ searchParams }) {
     <section>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
-      <PageDivider />
       <DelegateTabs>
         <TabsContent value="delegates">
           <DelegateCardList
