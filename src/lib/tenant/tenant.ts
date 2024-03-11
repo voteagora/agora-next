@@ -7,6 +7,7 @@ import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default class Tenant {
   private static instance: Tenant;
@@ -21,11 +22,8 @@ export default class Tenant {
     const { NEXT_PUBLIC_AGORA_INSTANCE_NAME, NEXT_PUBLIC_AGORA_ENV } =
       process.env;
 
-    if (!NEXT_PUBLIC_AGORA_INSTANCE_NAME) {
-      throw new Error("Namespace is required");
-    }
 
-    this._namespace = NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
+    this._namespace = (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) || TENANT_NAMESPACES.OPTIMISM ;
     this._isProd = NEXT_PUBLIC_AGORA_ENV === "prod";
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);
@@ -61,4 +59,12 @@ export default class Tenant {
     }
     return Tenant.instance;
   }
+}
+
+const ui = {
+
+  title: "Agora is the home of Optimism voters",
+  description: "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf."
+
+
 }
