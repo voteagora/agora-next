@@ -64,7 +64,7 @@ export function DelegateProfileImage({
 
   return (
     <HStack className="gap-4">
-      <div className={styles.profile_image}>
+      <div className="relative aspect-square">
         {citizen && (
           <Image
             className="absolute bottom-[-5px] right-[-7px] z-10"

@@ -4,7 +4,6 @@ import { getProposals } from "@/app/api/common/proposals/getProposals";
 import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { getGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
-import { PageDivider } from "@/components/Layout/PageDivider";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
@@ -76,7 +75,6 @@ export default async function Home() {
     <VStack>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
-      <PageDivider />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}

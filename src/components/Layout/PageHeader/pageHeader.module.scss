@@ -1,13 +1,11 @@
 @import "@/styles/variables";
 
 .page_header_container {
-  margin-top: $spacing-12;
   margin-bottom: $spacing-4;
   @media (max-width: $screen-sm) {
     max-width: 100%;
     flex-direction: column;
     margin-bottom: $spacing-2;
-    margin-top: $spacing-6;
   }
   h1 {
     font-size: $font-size-2xl;

@@ -59,7 +59,7 @@ export default function Page() {
                   {formatFullDate(new Date(2024, 2, 7))}
                 </p>
                 <h3 className={styles.changelogTitle}>
-                  Governance Client Changlelog #2
+                  Governance Client Changelog #2
                 </h3>
                 <p>Morning OP collective,</p>
                 <p>
@@ -207,7 +207,7 @@ export default function Page() {
                   {formatFullDate(new Date(2024, 1, 23))}
                 </p>
                 <h3 className={styles.changelogTitle}>
-                  Governance Client Changlelog #1
+                  Governance Client Changelog #1
                 </h3>
                 <p>Good morning OP collective,</p>
                 <p>
