@@ -26,7 +26,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
 
   return (
     <Tabs
-      className="max-w-full mt-16"
+      className="max-w-full"
       defaultValue={tabParam || "delegates"}
       onValueChange={(value) => handleTabChange(value)}
     >
