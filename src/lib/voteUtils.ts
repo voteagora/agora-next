@@ -7,9 +7,8 @@ import {
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
 import { Vote, VotePayload } from "@/app/api/common/votes/vote";
-import { isOldApprovalModule } from "./contracts/contracts";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 /**
  * Vote primitives
@@ -29,12 +28,13 @@ export function parseSupport(
    *      note that block number is indicative but works
    */
 
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
 
   if (
     namespace === "optimism" &&
     start_block &&
-    isOldApprovalModule(start_block)
+    contracts.governor.v6UpgradeBlock &&
+    Number(start_block) < contracts.governor.v6UpgradeBlock
   ) {
     return parseSupportOldModule(support, proposalType);
   }

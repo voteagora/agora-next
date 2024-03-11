@@ -12,30 +12,32 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
-import { OptimismContracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant/tenant";
 
 const secondsPerBlock = 2;
 
-const governorContract = {
-  address: OptimismContracts.governor.address,
-  abi: OptimismContracts.governor.abi,
-  chainId: 10,
-};
-
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
+  const { contracts } = Tenant.getInstance();
+
+  const govContract = {
+    address: contracts.governor.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    chainId: contracts.governor.chainId,
+  };
+
   const { data, isLoading: isInitializing } = useContractReads({
     contracts: [
       {
-        ...governorContract,
+        ...govContract,
         functionName: "votingPeriod",
       },
       {
-        ...governorContract,
+        ...govContract,
         functionName: "votingDelay",
       },
       {
-        ...governorContract,
+        ...govContract,
         functionName: "manager",
       },
     ],
@@ -57,9 +59,10 @@ export default function GovernorSettings() {
 
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState<number>();
+
   const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
     usePrepareContractWrite({
-      ...governorContract,
+      ...govContract,
       functionName: "setVotingPeriod",
       args: [
         (votingPeriod
@@ -82,7 +85,7 @@ export default function GovernorSettings() {
   const [votingDelay, setVotingDelay] = useState<number>();
   const { config: setVotingDelayConfig, isError: setVotingDelayError } =
     usePrepareContractWrite({
-      ...governorContract,
+      ...govContract,
       functionName: "setVotingDelay",
       args: [
         (BigInt(Math.floor(votingDelay || 0)) * 3600n) /

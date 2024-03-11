@@ -12,7 +12,7 @@ import badge from "@/icons/badge.svg";
 import { useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateProfileImage({
   address,
@@ -64,7 +64,7 @@ export function DelegateProfileImage({
 
   return (
     <HStack className="gap-4">
-      <div className={styles.profile_image}>
+      <div className="relative aspect-square">
         {citizen && (
           <Image
             className="absolute bottom-[-5px] right-[-7px] z-10"
