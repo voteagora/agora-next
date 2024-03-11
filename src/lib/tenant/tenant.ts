@@ -3,11 +3,9 @@ import {
   type TenantNamespace,
   type TenantToken,
 } from "../types";
-import { DaoSlug } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 
@@ -22,18 +20,13 @@ export default class Tenant {
   private readonly _ui: TenantUI;
 
   private constructor() {
-    const { NEXT_PUBLIC_AGORA_INSTANCE_NAME, NEXT_PUBLIC_AGORA_ENV } =
-      process.env;
-
-    // TODO: Remove default case
-    this._namespace =
-      (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) ||
-      TENANT_NAMESPACES.OPTIMISM;
-    this._isProd = NEXT_PUBLIC_AGORA_ENV === "prod";
+    this._namespace = process.env
+      .NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
+    this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 
     this._contracts = TenantContractFactory.create(
       this._namespace,
-      this._isProd,
+      this._isProd
     );
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);
@@ -52,8 +45,8 @@ export default class Tenant {
     return this._namespace;
   }
 
-  public get slug(): DaoSlug {
-    return this._slug as DaoSlug;
+  public get slug(): string {
+    return this._slug;
   }
 
   public get token(): TenantToken {

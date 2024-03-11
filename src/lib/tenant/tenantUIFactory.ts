@@ -24,6 +24,7 @@ const ensUI = new TenantUI(
   {
     title: "Agora is the home of ENS voters",
     description: "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+    hero: undefined,
     logo: ensLogo,
 
     toggles: [
@@ -42,6 +43,7 @@ const ensUI = new TenantUI(
 const optimismUI = new TenantUI({
   title: "Agora is the home of Optimism voters",
   description: "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+  hero:"path_to_the_hero_image",
   logo: optimismLogo,
 
   pages: [
@@ -68,6 +70,10 @@ const optimismUI = new TenantUI({
     },
     {
       name: "retropgf",
+      enabled: true,
+    },
+    {
+      name: "citizens",
       enabled: true,
     },
   ],

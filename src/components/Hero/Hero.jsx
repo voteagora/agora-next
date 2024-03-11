@@ -13,47 +13,55 @@ import { HStack, VStack } from "../Layout/Stack";
 import styles from "./hero.module.scss";
 
 export default async function Hero() {
-
-  const { ui: { title, description } } = Tenant.current();
+  const {
+    ui: { title, description, hero },
+  } = Tenant.current();
 
   return (
     <HStack justifyContent="justify-between" className={styles.hero_container}>
       <VStack className={styles.content_container}>
         <h1>{title}</h1>
-        <p>
-          {" "}
-          {description}
-        </p>
+        <p> {description}</p>
       </VStack>
-      <div className={styles.partner_image_container}>
-        <Image
-          src={spark1}
-          alt="optimism background"
-          className={styles.spark1}
-        />
-        <Image
-          src={spark2}
-          alt="optimism background"
-          className={styles.spark2}
-        />
-        <Image src={agora} alt="optimism background" className={styles.agora} />
-        <Image
-          src={opToken}
-          alt="optimism background"
-          className={styles.opToken}
-        />
-        <Image src={thumb} alt="optimism background" className={styles.thumb} />
-        <Image
-          src={sunnyBg}
-          alt="optimism background"
-          className={styles.sunny_bg}
-        />
-        <Image
-          src={sunnyFace}
-          alt="optimism background"
-          className={styles.sunny_face}
-        />
-      </div>
+      {hero && (
+        <div className={styles.partner_image_container}>
+          <Image
+            src={spark1}
+            alt="optimism background"
+            className={styles.spark1}
+          />
+          <Image
+            src={spark2}
+            alt="optimism background"
+            className={styles.spark2}
+          />
+          <Image
+            src={agora}
+            alt="optimism background"
+            className={styles.agora}
+          />
+          <Image
+            src={opToken}
+            alt="optimism background"
+            className={styles.opToken}
+          />
+          <Image
+            src={thumb}
+            alt="optimism background"
+            className={styles.thumb}
+          />
+          <Image
+            src={sunnyBg}
+            alt="optimism background"
+            className={styles.sunny_bg}
+          />
+          <Image
+            src={sunnyFace}
+            alt="optimism background"
+            className={styles.sunny_face}
+          />
+        </div>
+      )}
     </HStack>
   );
 }

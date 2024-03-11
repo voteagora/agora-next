@@ -11,6 +11,7 @@ type UIPage = {
 
 type TenantUIParams = {
   description: string;
+  hero?: string;
   logo: string;
   title: string;
   pages?: UIPage[];
@@ -20,6 +21,7 @@ type TenantUIParams = {
 export class TenantUI {
 
   private _description: string;
+  private _hero?: string;
   private _logo: string;
   private _title: string;
   private _pages?: UIPage[];
@@ -27,12 +29,14 @@ export class TenantUI {
 
   constructor({
                 description,
+                hero,
                 logo,
                 title,
                 pages,
                 toggles,
               }: TenantUIParams) {
     this._description = description;
+    this._hero = hero;
     this._logo = logo;
     this._title = title;
     this._toggles = toggles;
@@ -45,6 +49,10 @@ export class TenantUI {
 
   public get description(): string {
     return this._description;
+  }
+
+  public get hero(): string | undefined {
+    return this._hero;
   }
 
   public get logo(): string {
