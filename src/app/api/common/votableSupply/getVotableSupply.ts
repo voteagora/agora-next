@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/prisma";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getVotableSupply() {
   const { namespace } = Tenant.getInstance();

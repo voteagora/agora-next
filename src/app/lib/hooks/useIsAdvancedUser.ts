@@ -1,12 +1,13 @@
 "use client";
 
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useContractRead } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
 
 const useIsAdvancedUser = () => {
+  const { contracts, isProd } = Tenant.getInstance();
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
   const [isAdvancedUser, setIsAdvancedUser] = useState(false);
@@ -56,8 +57,8 @@ const useIsAdvancedUser = () => {
   ] as `0x${string}`[];
 
   useContractRead({
-    address: OptimismContracts.token.address as `0x${string}`,
-    abi: OptimismContracts.token.abi,
+    address: contracts.token.address as `0x${string}`,
+    abi: contracts.token.abi,
     functionName: "balanceOf",
     enabled: isConnected && !!address,
     args: [address!],
@@ -66,10 +67,10 @@ const useIsAdvancedUser = () => {
      * PROD: only allowlist
      * TEST: more than 1 token or allowlist
      */
-    onSuccess: (balance) => {
+    onSuccess: (balance: bigint) => {
       const allowedBalance = parseUnits("100000", 18);
       setIsAdvancedUser(
-        process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        isProd
           ? allowList.includes(address!)
           : balance >= allowedBalance || allowList.includes(address!)
       );

@@ -1,9 +1,9 @@
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { formatUnits } from "viem";
 import { optimism } from "viem/chains";
 import { useContractWrite } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
 
 const allowanceType = 1; // 1 - relative; 0 - absolute
 
@@ -24,6 +24,8 @@ const useAdvancedDelegation = ({
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const { contracts } = Tenant.getInstance();
+
   const availableBalanceNumber = Number(
     formatUnits(BigInt(availableBalance), 18)
   );
@@ -35,8 +37,8 @@ const useAdvancedDelegation = ({
     isSuccess: subdelegateIsSuccess,
     data: subdelegateData,
   } = useContractWrite({
-    address: OptimismContracts.alligator.address as any,
-    abi: OptimismContracts.alligator.abi,
+    address: contracts.alligator!.address as `0x${string}`,
+    abi: contracts.alligator!.abi,
     functionName: Array.isArray(target) ? "subdelegateBatched" : "subdelegate",
     args: [
       target as any,
@@ -52,8 +54,8 @@ const useAdvancedDelegation = ({
     isSuccess: delegateToProxyIsSuccess,
     data: delegateToProxyData,
   } = useContractWrite({
-    address: OptimismContracts.token.address as any,
-    abi: OptimismContracts.token.abi,
+    address: contracts.token.address as `0x${string}`,
+    abi: contracts.token.abi,
     functionName: "delegate",
     args: [proxyAddress as any],
     chainId: optimism.id,

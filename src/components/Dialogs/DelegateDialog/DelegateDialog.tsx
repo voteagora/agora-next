@@ -1,7 +1,6 @@
 import { useAccount, useContractWrite, useEnsName } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
 import { useModal } from "connectkit";
@@ -17,6 +16,7 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransaction } from "wagmi/actions";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateDialog({
   delegate,
@@ -39,6 +39,7 @@ export function DelegateDialog({
   const [isReady, setIsReady] = useState(false);
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee = delegate.address === delegatee?.delegatee;
+  const {contracts} = Tenant.getInstance();
 
   const writeWithTracking = async () => {
     setIsLoading(true);
@@ -75,8 +76,8 @@ export function DelegateDialog({
   });
 
   const { isSuccess, isError, writeAsync, data } = useContractWrite({
-    address: OptimismContracts.token.address as any,
-    abi: OptimismContracts.token.abi,
+    address: contracts.token.address as any,
+    abi: contracts.token.abi,
     functionName: "delegate",
     args: [delegate.address as any],
   });

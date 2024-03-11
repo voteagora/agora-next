@@ -12,7 +12,7 @@ import badge from "@/icons/badge.svg";
 import { useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateProfileImage({
   address,

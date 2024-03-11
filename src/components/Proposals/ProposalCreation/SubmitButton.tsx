@@ -2,28 +2,30 @@
 
 import { cx } from "@emotion/css";
 import { Form } from "./CreateProposalForm";
-import { ethers, AbiCoder } from "ethers";
+import { AbiCoder, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  OptimismContracts,
   approvalModuleAddress,
   optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   useAccount,
+  useContractRead,
   useContractWrite,
   usePrepareContractWrite,
-  useContractRead,
 } from "wagmi";
 import { useModal } from "connectkit";
 import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+
+const { contracts } = Tenant.getInstance();
 
 const abiCoder = new AbiCoder();
-const governorContract = OptimismContracts.governor;
-const governanceTokenContract = OptimismContracts.token;
+const governorContract = contracts.governor;
+const governanceTokenContract = contracts.token;
 
 export default function SubmitButton({
   formTarget,
@@ -46,14 +48,14 @@ export default function SubmitButton({
     isError: onPrepareError,
     error,
   } = usePrepareContractWrite({
-    address: governorContract.address,
+    address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: governorFunction,
     args: inputData as any,
   });
 
   const { data: manager } = useContractRead({
-    address: governorContract.address,
+    address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: "manager",
   });
@@ -97,7 +99,7 @@ export default function SubmitButton({
 
   return (
     <>
-      {manager && manager !== address ? (
+      {manager && String(manager) !== address ? (
         <p className="text-gray-700 text-sm max-w-[420px] break-words">
           Only the Optimism Foundation manager address can create proposals for
           the time being.

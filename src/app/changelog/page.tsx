@@ -52,7 +52,156 @@ export default function Page() {
                 </p>
               </div>
             </div>
-            <div className="space-y-12">
+            <div className="my-8 border-t border-gray-300"></div>
+            <div>
+              <div className={styles.changelogItem}>
+                <p id="changelogfeb2024" className={styles.changelogDate}>
+                  {formatFullDate(new Date(2024, 2, 7))}
+                </p>
+                <h3 className={styles.changelogTitle}>
+                  Governance Client Changlelog #2
+                </h3>
+                <p>Morning OP collective,</p>
+                <p>
+                  There was a lot of action behind the scenes this past few
+                  weeks as we identified a few edges cases in advanced voting
+                  that we will need to fix with a contract update. More on that
+                  soon.
+                </p>
+                <p>
+                  We have also been working on making a bunch of backend speed
+                  improvements. We aren&apos;t quite done yet but you should see
+                  the Proposals page load 10% faster and we are looking to take
+                  that down to 50% faster soon.
+                </p>
+                <p>
+                  Behind the scenes our team has been connecting with dozens of
+                  individuals and teams that have questions about pulling data
+                  from the chain. We have been working with them and setting up
+                  better documentation too.
+                </p>
+                <p>
+                  One the client side, the biggest changes we added were
+                  Proposal list filtering and some date and time sugar to make
+                  it easier to know when a vote is starting and when it&apos;s
+                  ending.
+                </p>
+                <p>
+                  Keep letting us know if you have any other feedback or run
+                  into any issues. We are here to serve.
+                </p>
+                <p>All the best,</p>
+                <p>
+                  <a href="https://twitter.com/kentf">Kent</a>, Co-founder at{" "}
+                  <a href="https://voteagora.com">Agora</a>
+                </p>
+                <br />
+                <br />
+                <h4>Major updates</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/510df82d354a2f690710d7f3dbb162594e64c663"
+                        target="_blank"
+                      >
+                        Proposal Filtering on Index
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/b8157659a89149c897efbcf5b895d768d4b0d9dd"
+                        target="_blank"
+                      >
+                        Fixed Date & Proposal Time for Proposal Details
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+                <br />
+                <h4>Minor updates</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/826eb8defd2e453cc2f2247f73e334bfe930faaa"
+                      >
+                        Create Proposal UI fix
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/7b81fb61f7fa9bdeb23093915b1ae563184836c0"
+                      >
+                        Fixed Error Display Loud on Proposal Creation
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/0230f088825164a4aaf35711d051b7751b7fc927"
+                      >
+                        Fix Responsive Design edge cases
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/34fca3ce5e2875bbd947bd2c734686ec23ad6ffa"
+                      >
+                        Added tx Hash explorer url to every vote
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/226fdc56959b3c02a52e28b697ace8750ce76cfa"
+                      >
+                        Fixed Infinite Scroll Clean up
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+                <br />
+                <h4>Bug fixes</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/35e5946a6a9d349ba34d76653236761d089d5cdf"
+                      >
+                        Fixed BudgetTokenSpent & BudgetAmount Format
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        target="_blank"
+                        href="https://github.com/voteagora/agora-next/commit/19a1a8601274adb8d9dc92152d6e0e44aae59f89"
+                      >
+                        Mobile UI Fix
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="my-8 border-t border-gray-300"></div>
+            <div>
               <div className={styles.changelogItem}>
                 <p id="changelogfeb2024" className={styles.changelogDate}>
                   {formatFullDate(new Date(2024, 1, 23))}
