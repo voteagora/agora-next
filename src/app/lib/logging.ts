@@ -6,15 +6,19 @@ const time_this = async <T>(
   log_fields: Record<string, any>
 ) => {
   const start = performance.now();
-  const result = await fn();
-  const end = performance.now();
-  console.log(
-    util.inspect(
-      { ...log_fields, time: end - start },
-      { showHidden: false, depth: null, colors: true }
-    )
-  );
-  return result;
+  try {
+    return await fn();
+  } catch (error) {
+    throw error;
+  } finally {
+    const end = performance.now();
+    console.log(
+      util.inspect(
+        { ...log_fields, time: end - start },
+        { showHidden: false, depth: null, colors: true }
+      )
+    );
+  }
 };
 
 const time_this_sync = <T>(
@@ -22,15 +26,19 @@ const time_this_sync = <T>(
   log_fields: Record<string, any>
 ) => {
   const start = performance.now();
-  const result = fn();
-  const end = performance.now();
-  console.log(
-    util.inspect(
-      { ...log_fields, time: end - start },
-      { showHidden: false, depth: null, colors: true }
-    )
-  );
-  return result;
+  try {
+    return fn();
+  } catch (error) {
+    throw error;
+  } finally {
+    const end = performance.now();
+    console.log(
+      util.inspect(
+        { ...log_fields, time: end - start },
+        { showHidden: false, depth: null, colors: true }
+      )
+    );
+  }
 };
 
 export { time_this, time_this_sync };
