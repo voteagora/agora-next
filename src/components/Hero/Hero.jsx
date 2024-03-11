@@ -1,14 +1,14 @@
 "use server";
 
-import Image from "next/image";
-import { HStack, VStack } from "../Layout/Stack";
-import sunnyFace from "@/assets/optimism/sunny-face-sticker.svg";
-import sunnyBg from "@/assets/optimism/sunny-bg-sticker.svg";
 import agora from "@/assets/optimism/agora-sticker.svg";
+import opToken from "@/assets/optimism/op-token-sticker.svg";
 import spark1 from "@/assets/optimism/spark1-sticker.svg";
 import spark2 from "@/assets/optimism/spark2-sticker.svg";
-import opToken from "@/assets/optimism/op-token-sticker.svg";
+import sunnyBg from "@/assets/optimism/sunny-bg-sticker.svg";
+import sunnyFace from "@/assets/optimism/sunny-face-sticker.svg";
 import thumb from "@/assets/optimism/thumb-sticker.svg";
+import Image from "next/image";
+import { HStack, VStack } from "../Layout/Stack";
 import styles from "./hero.module.scss";
 
 export default async function Hero() {

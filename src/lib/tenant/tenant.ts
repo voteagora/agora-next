@@ -8,6 +8,7 @@ import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 
 export default class Tenant {
   private static instance: Tenant;
@@ -17,20 +18,25 @@ export default class Tenant {
   private readonly _namespace: TenantNamespace;
   private readonly _slug: string;
   private readonly _token: TenantToken;
+  private readonly _ui: any;
 
   private constructor() {
     const { NEXT_PUBLIC_AGORA_INSTANCE_NAME, NEXT_PUBLIC_AGORA_ENV } =
       process.env;
 
-
-    this._namespace = (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) || TENANT_NAMESPACES.OPTIMISM ;
+    // TODO: Remove default case
+    this._namespace =
+      (NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace) ||
+      TENANT_NAMESPACES.OPTIMISM;
     this._isProd = NEXT_PUBLIC_AGORA_ENV === "prod";
-    this._slug = TenantSlugFactory.create(this._namespace);
-    this._token = TenantTokenFactory.create(this._namespace);
+
     this._contracts = TenantContractFactory.create(
       this._namespace,
       this._isProd
     );
+    this._slug = TenantSlugFactory.create(this._namespace);
+    this._token = TenantTokenFactory.create(this._namespace);
+    this._ui = TenantUIFactory.create(this._namespace);
   }
 
   public get contracts(): TenantContracts {
@@ -53,18 +59,14 @@ export default class Tenant {
     return this._token;
   }
 
+  public get ui(): any {
+    return this._ui;
+  }
+
   public static getInstance(): Tenant {
     if (!Tenant.instance) {
       Tenant.instance = new Tenant();
     }
     return Tenant.instance;
   }
-}
-
-const ui = {
-
-  title: "Agora is the home of Optimism voters",
-  description: "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf."
-
-
 }
