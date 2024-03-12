@@ -291,12 +291,16 @@ model ProposalDraft {
   created_at                  DateTime                   @default(now())
   updated_at                  DateTime                   @updatedAt
   onchain_transaction_hash    String?
+  voting_strategy_social      String?
+  start_date_social           DateTime?
+  end_date_social             DateTime?
   proposal_status_id          Int
   transactions                ProposalDraftTransaction[]
   ProposalDaoAttributes       ProposalDaoAttributes[]
   // ProposalEventLog             ProposalEventLog[]
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
   proposal_status             DaoProposalStatus          @relation(fields: [proposal_status_id], references: [id], onDelete: Restrict)
+  ProposalDraftOption         ProposalDraftOption[]
 
   @@map("proposals")
   @@schema("test")
@@ -319,6 +323,18 @@ model ProposalDraftTransaction {
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
 
   @@map("proposal_transactions")
+  @@schema("test")
+}
+
+model ProposalDraftOption {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  text        String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+
+  @@map("proposal_options")
   @@schema("test")
 }
 

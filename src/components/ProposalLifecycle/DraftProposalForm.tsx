@@ -41,6 +41,10 @@ interface DraftProposalFormProps {
   createGithubProposal: (
     proposal: ProposalDraftWithTransactions
   ) => Promise<string>;
+  saveSocialProposalOptions: (
+    proposal: ProposalDraft,
+    options: string[]
+  ) => Promise<void>;
 }
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
@@ -52,6 +56,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
     updateTransaction,
     deleteTransaction,
     createGithubProposal,
+    saveSocialProposalOptions,
   } = props;
 
   const [proposalState, setProposalState] =
@@ -99,6 +104,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           updateTransaction={updateTransaction}
           deleteTransaction={deleteTransaction}
           createGithubProposal={createGithubProposal}
+          saveSocialProposalOptions={saveSocialProposalOptions}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit

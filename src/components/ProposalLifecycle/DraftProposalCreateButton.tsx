@@ -25,6 +25,11 @@ interface DraftProposalCreateButtonProps {
   createGithubProposal: (
     proposal: ProposalDraftWithTransactions
   ) => Promise<string>;
+  options: { index: number; value: string }[];
+  saveSocialProposalOptions: (
+    proposal: ProposalDraft,
+    options: string[]
+  ) => Promise<void>;
 }
 
 const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
@@ -37,6 +42,8 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     setProposalState,
     updateProposal,
     createGithubProposal,
+    saveSocialProposalOptions,
+    options,
   } = props;
 
   const handleContinue = async () => {
@@ -51,6 +58,16 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   };
 
   const saveAndUpdateDocs = async () => {
+    if (proposalState.proposal_type === "social") {
+      await saveSocialProposalOptions(
+        proposalState,
+        options.map((option) => option.value)
+      );
+
+      handleContinue();
+      return;
+    }
+
     // TODO save / run validation etc
     const prLink = await createGithubProposal(proposalState);
 
