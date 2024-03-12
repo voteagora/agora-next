@@ -122,8 +122,8 @@ export async function getTotalVotableAllowance({
 
   const totalAllowance =
     (allowances.reduce((a, b) => a + b, 0n) *
-      BigInt((1 - subdelegatedShare) * 100000)) /
-      100000n -
+      BigInt(Math.trunc((1 - subdelegatedShare) * 100000))) /
+    100000n -
     subdelegatedAmount;
   return bigIntMax(totalAllowance, 0n);
 }
