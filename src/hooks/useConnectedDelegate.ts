@@ -4,6 +4,7 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { useState, useCallback, useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { fetchDelegate } from "@/app/delegates/actions";
+import { useQuery } from "@tanstack/react-query";
 
 function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -21,6 +22,11 @@ const useConnectedDelegate = () => {
   const [balance, setBalance] = useState<bigint | null>(null);
   const [retries, setRetries] = useState<number>(0);
   const [lastVotingPower, setLastVotingPower] = useState<string | null>(null);
+  useQuery({
+    enabled: !!address,
+    queryKey: ['useConnectedDelegate', address],
+    queryFn: async () => fetchDelegateAndSet(address!)
+  });
 
   const fetchDelegateAndSet = useCallback(async (address: string) => {
     if (address) {
@@ -59,11 +65,6 @@ const useConnectedDelegate = () => {
     }
   }, [lastVotingPower, refetchDelegate, retries, setRefetchDelegate]);
 
-  useEffect(() => {
-    if (address) {
-      fetchDelegateAndSet(address);
-    }
-  }, [address, fetchDelegateAndSet]);
 
   return { delegate, advancedDelegators, balance };
 };
