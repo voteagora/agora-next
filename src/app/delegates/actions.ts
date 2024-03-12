@@ -2,6 +2,7 @@
 
 import { getAllForAForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
+import { cache } from "react";
 import { revalidatePath } from "next/cache";
 import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
@@ -50,7 +51,9 @@ export async function getProxyAddress(addressOrENSName: string) {
 }
 
 export async function fetchDelegate(addressOrENSName: string) {
-  return getDelegate(addressOrENSName);
+  return cache(
+    (address: string) => getDelegate(address)
+  )(addressOrENSName);
 }
 
 export async function submitDelegateStatement({
@@ -75,7 +78,9 @@ export async function submitDelegateStatement({
 }
 
 export async function fetchDelegateStatement(addressOrENSName: string) {
-  return getDelegateStatement(addressOrENSName);
+  return cache(
+      (addressOrENS: string) => getDelegateStatement(addressOrENS)
+  )(addressOrENSName);
 }
 
 export async function fetchVotesForDelegate(
