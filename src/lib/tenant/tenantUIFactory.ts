@@ -2,8 +2,8 @@ import { TenantNamespace } from "@/lib/types";
 
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import optimismLogo from "@/assets/tenant/optimism.svg";
-import ensLogo from "@/assets/tenant/ens.svg";
+import optimismLogo from "@/assets/tenant/optimism_logo.svg";
+import ensLogo from "@/assets/tenant/ens_logo.svg";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 
 export default class TenantUIFactory {

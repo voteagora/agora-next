@@ -214,7 +214,7 @@ view ensDelegatees {
   @@schema("ens")
 }
 
-view ensENSDelegates {
+view ensDelegates {
   delegate          String  @unique
   num_of_delegators BigInt
   direct_vp         Decimal @db.Decimal

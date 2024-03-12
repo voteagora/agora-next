@@ -61,7 +61,7 @@ export async function getDelegates({
             take
           );
         default:
-          return prisma[`${namespace}Delegates`].findMany({
+          return (prisma as any)[`${namespace}Delegates`].findMany({
             skip,
             take,
             orderBy: {
