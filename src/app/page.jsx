@@ -80,6 +80,7 @@ async function createDraftProposal(address) {
           id: 1,
         },
       },
+      voting_strategy_social: "basic",
       proposal_status: {
         connect: {
           id: 1,

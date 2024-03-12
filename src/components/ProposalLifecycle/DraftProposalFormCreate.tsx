@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import {
   AccordionContent,
@@ -16,6 +16,7 @@ import DraftProposalTitleInput from "./DraftProposalTitleInput";
 import DraftProposalDescriptionInput from "./DraftProposalDescriptionInput";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
+import DraftProposalSocialVotingStrategy from "./DraftProposalSocialVotingStrategy";
 
 const staticText = {
   heading: "Create proposal draft",
@@ -62,6 +63,10 @@ interface DraftProposalFormCreateProps {
   createGithubProposal: (
     proposal: ProposalDraftWithTransactions
   ) => Promise<string>;
+  saveSocialProposalOptions: (
+    proposal: ProposalDraft,
+    options: string[]
+  ) => Promise<void>;
 }
 
 const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
@@ -72,7 +77,16 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
     setProposalState,
     updateProposal,
     createGithubProposal,
+    saveSocialProposalOptions,
   } = props;
+
+  type Option = {
+    index: number;
+    value: string;
+  };
+
+  const [socialVotingStrategyOptions, setSocialVotingStrategyOptions] =
+    useState<Option[]>([]);
 
   return (
     <div className="">
@@ -113,15 +127,27 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
             setProposalState={setProposalState}
             updateProposal={updateProposal}
           />
-          <DraftProposalTransaction
-            label="Proposed transaction"
-            description={staticText.proposedTransactionDescription}
-            proposalState={proposalState}
-            setProposalState={setProposalState}
-            addTransaction={props.addTransaction}
-            updateTransaction={props.updateTransaction}
-            deleteTransaction={props.deleteTransaction}
-          />
+          {proposalState.proposal_type === "executable" ? (
+            <DraftProposalTransaction
+              label="Proposed transaction"
+              description={staticText.proposedTransactionDescription}
+              proposalState={proposalState}
+              setProposalState={setProposalState}
+              addTransaction={props.addTransaction}
+              updateTransaction={props.updateTransaction}
+              deleteTransaction={props.deleteTransaction}
+            />
+          ) : (
+            <DraftProposalSocialVotingStrategy
+              label="Voting strategy and choices"
+              description="Choose the voting strategy and options for your proposal"
+              proposalState={proposalState}
+              setProposalState={setProposalState}
+              updateProposal={updateProposal}
+              options={socialVotingStrategyOptions}
+              setOptions={setSocialVotingStrategyOptions}
+            />
+          )}
           <DraftProposalCreateButton
             description={staticText.createButtonExplanation}
             checkmarkInfo={staticText.checkmarkInfo}
@@ -129,6 +155,8 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
             setProposalState={setProposalState}
             updateProposal={updateProposal}
             createGithubProposal={createGithubProposal}
+            saveSocialProposalOptions={saveSocialProposalOptions}
+            options={socialVotingStrategyOptions}
           />
         </AccordionContent>
       </AccordionItem>

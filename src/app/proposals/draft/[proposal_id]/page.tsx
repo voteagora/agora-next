@@ -2,7 +2,11 @@ import DraftProposalChecklist from "@/components/ProposalLifecycle/DraftProposal
 import DraftProposalForm from "@/components/ProposalLifecycle/DraftProposalForm";
 import React from "react";
 import prisma from "@/app/lib/prisma";
-import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import {
+  ProposalDraft,
+  ProposalDraftOption,
+  ProposalDraftTransaction,
+} from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import { createGithubProposal as handleCreateGithubProposal } from "@/components/ProposalLifecycle/github";
 
@@ -115,6 +119,23 @@ async function deleteTransaction(
   return transactions;
 }
 
+async function saveSocialProposalOptions(
+  proposal: ProposalDraft,
+  options: string[]
+): Promise<void> {
+  "use server";
+
+  // take an array of options and save into ProposalDraftOptions
+  const proposalOptions = await prisma.proposalDraftOption.createMany({
+    data: options.map((option) => {
+      return {
+        proposal_id: proposal.id,
+        text: option,
+      };
+    }),
+  });
+}
+
 async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
   "use server";
 
@@ -148,6 +169,7 @@ export default async function DraftProposalPage({
         updateTransaction={updateTransaction}
         deleteTransaction={deleteTransaction}
         createGithubProposal={createGithubProposal}
+        saveSocialProposalOptions={saveSocialProposalOptions}
       />
       <DraftProposalChecklist />
     </div>
