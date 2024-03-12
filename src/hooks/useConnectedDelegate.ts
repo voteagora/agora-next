@@ -30,7 +30,6 @@ const useConnectedDelegate = () => {
 
       // If refetchDelegate?.votingPower we are looking for a revalidation on the page of the delegatee
       if (refetchDelegate?.prevVotingPowerDelegatee) {
-        console.log('refetchDelegate?.prevVotingPowerDelegatee: ', refetchDelegate?.prevVotingPowerDelegatee);
         const delegatee = await fetchDelegate(refetchDelegate.address);
         /**
          * Materialized view that brings the new voting power takes one minute to sync
