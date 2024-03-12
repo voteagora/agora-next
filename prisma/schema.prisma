@@ -612,6 +612,7 @@ enum DaoSlug {
   UNI
   NOUNS
   LYRA
+  ETHERFI
 
   @@map("dao_slug")
   @@schema("config")
