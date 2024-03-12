@@ -1,12 +1,17 @@
 import { ethProvider } from "@/app/lib/provider";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { isAddress } from "viem";
+import { cache } from "react"; 
 
 export async function resolveENSName(nameOrAddress: string) {
   if (isAddress(nameOrAddress)) {
     return nameOrAddress;
   }
-  const address = await ethProvider.resolveName(nameOrAddress);
+
+  const address = await cache(
+    (name: string) => ethProvider.resolveName(name)
+  )(nameOrAddress);
+
   if (!address) {
     throw new Error("No address found for ENS name");
   }

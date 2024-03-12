@@ -3,7 +3,6 @@
  * Takes in the delegate address as a parameter
  */
 import { Metadata, ResolvingMetadata } from 'next'
-import { cache } from 'react'
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { VStack } from "@/components/Layout/Stack";
@@ -25,25 +24,16 @@ import {
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
 
-// TODO: -> see if react cache can be used in fetchDelegate
-const getCachedDelegate = cache(
-  (address: string) => fetchDelegate(address)
-);
-
-const getCachedAddress = cache(
-  (addressOrENSName: string) => resolveENSName(addressOrENSName)
-);
-
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
   parent: ResolvingMetadata 
 ): Promise<Metadata> {
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
-  const address = await getCachedAddress(params.addressOrENSName);
+  const address = await resolveENSName(params.addressOrENSName);
   const ensOrTruncatedAddress = await processAddressOrEnsName(params.addressOrENSName);
   const [delegate, avatar] = await Promise.all([
-    getCachedDelegate(address || params.addressOrENSName),
+    fetchDelegate(address || params.addressOrENSName),
     resolveENSProfileImage(address || params.addressOrENSName),
   ]);
 
@@ -86,10 +76,10 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const address = await getCachedAddress(addressOrENSName) || addressOrENSName;
+  const address = await resolveENSName(addressOrENSName) || addressOrENSName;
   const [delegate, delegateVotes, delegates, delegators] =
     await Promise.all([
-      getCachedDelegate(address),
+      fetchDelegate(address),
       fetchVotesForDelegate(address),
       fetchCurrentDelegatees(address),
       fetchCurrentDelegators(address),
