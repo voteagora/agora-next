@@ -15,32 +15,22 @@ function timeout(ms: number) {
 const useConnectedDelegate = () => {
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const { address } = useAccount();
-  const [delegate, setDelegate] = useState<Delegate | null>(null);
-  const [advancedDelegators, setAdvancedDelegators] = useState<string[] | null>(
-    null
-  );
-  const [balance, setBalance] = useState<bigint | null>(null);
   const [retries, setRetries] = useState<number>(0);
   const [lastVotingPower, setLastVotingPower] = useState<string | null>(null);
-  useQuery({
-    enabled: !!address,
-    queryKey: ['useConnectedDelegate', address],
-    queryFn: async () => fetchDelegateAndSet(address!)
-  });
 
-  const fetchDelegateAndSet = useCallback(async (address: string) => {
-    if (address) {
-      const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address);
+  const { data } = useQuery({
+    enabled: !!address,
+    queryKey: ['useConnectedDelegate', address, lastVotingPower, refetchDelegate, retries],
+    queryFn: async () => {
+      const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address!);
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate.address);
       }
       setLastVotingPower(delegate.votingPower);
-      setDelegate(delegate);
-      setAdvancedDelegators(advancedDelegators);
-      setBalance(balance);
 
       // If refetchDelegate?.votingPower we are looking for a revalidation on the page of the delegatee
       if (refetchDelegate?.prevVotingPowerDelegatee) {
+        console.log('refetchDelegate?.prevVotingPowerDelegatee: ', refetchDelegate?.prevVotingPowerDelegatee);
         const delegatee = await fetchDelegate(refetchDelegate.address);
         /**
          * Materialized view that brings the new voting power takes one minute to sync
@@ -51,6 +41,7 @@ const useConnectedDelegate = () => {
           const _retries = retries + 1;
           setRetries(_retries);
         }
+        return { delegate, advancedDelegators, balance };
       } else if (refetchDelegate) {
         // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the	
         // new voting power	
@@ -61,12 +52,17 @@ const useConnectedDelegate = () => {
         } else {
           setRefetchDelegate(null);
         }
+        return { delegate, advancedDelegators, balance };
+      } else {
+        return { delegate, advancedDelegators, balance };
       }
     }
-  }, [lastVotingPower, refetchDelegate, retries, setRefetchDelegate]);
-
-
-  return { delegate, advancedDelegators, balance };
+  });
+  return data || {
+    balance: null,
+    delegate: null,
+    advancedDelegators: null
+  };
 };
 
 export default useConnectedDelegate;
