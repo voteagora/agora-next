@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { time_this } from "@/app/lib/logging";
 
 declare global {
   var prisma: PrismaClient;
@@ -6,29 +7,55 @@ declare global {
 
 let prisma: PrismaClient;
 
+// Logging middleware
+const makePrismaClient = () => {
+  const execRaw = async (query: (args: any) => Promise<any>, args:any, operation: string) => {
+    return await time_this(
+      async () => await query(args),
+      {
+        operation,
+        args,
+      }
+    );
+  };
+  return new PrismaClient().$extends({
+    query: {
+      $allModels: {
+        async $allOperations({ operation, model, args, query }) {
+          return await time_this(
+            async () => await query(args),
+            {
+              model,
+              operation,
+              args,
+            }
+          )
+        },
+      },
+      async $queryRaw({ args, query, operation }) {
+        return await execRaw(query, args, operation);
+      },
+      async $executeRaw({ args, query, operation }) {
+        return await execRaw(query, args, operation);
+      },
+      async $queryRawUnsafe({ args, query, operation }) {
+        return await execRaw(query, args, operation);
+      },
+      async $executeRawUnsafe({ args, query, operation }) {
+        return await execRaw(query, args, operation);
+      },
+    },
+  });
+};
+
 if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient();
+  prisma = makePrismaClient() as PrismaClient;
 } else {
   if (!global.prisma) {
-    global.prisma = new PrismaClient();
+    global.prisma = makePrismaClient() as PrismaClient;
   }
   prisma = global.prisma;
 }
-
-// Logging middleware
-prisma.$use(async (params, next) => {
-  console.log(params);
-
-  const before = Date.now();
-  const result = await next(params);
-  const after = Date.now();
-
-  console.log(
-    `Query ${params.model}.${params.action} took ${after - before}ms`
-  );
-
-  return result;
-});
 
 export default prisma;
 
