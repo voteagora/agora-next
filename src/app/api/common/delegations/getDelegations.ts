@@ -20,34 +20,33 @@ async function getCurrentDelegateesForAddress({
 }): Promise<Delegation[]> {
   const { namespace, contracts } = Tenant.getInstance();
 
-  const advancedDelegatees = await prisma[
-    `${namespace}AdvancedDelegatees`
-  ].findMany({
-    where: {
-      from: address.toLowerCase(),
-      delegated_amount: { gt: 0 },
-      contract: contracts.alligator!.address,
-    },
-  });
+  const [advancedDelegatees, directDelegatee] = await Promise.all([
+    prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        from: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator!.address,
+      },
+    }),
+    (async () => {
+      const [proxyAddress, delegatee] = await Promise.all([
+        getProxyAddress(address),
+        prisma[`${namespace}Delegatees`].findFirst({
+          where: { delegator: address.toLowerCase() },
+        }),
+      ]);
 
-  const directDelegatee = await (async () => {
-    const [proxyAddress, delegatee] = await Promise.all([
-      getProxyAddress(address),
-      prisma[`${namespace}Delegatees`].findFirst({
-        where: { delegator: address.toLowerCase() },
-      }),
-    ]);
+      if (
+        proxyAddress &&
+        delegatee &&
+        delegatee.delegatee === proxyAddress.toLowerCase()
+      ) {
+        return null;
+      }
 
-    if (
-      proxyAddress &&
-      delegatee &&
-      delegatee.delegatee === proxyAddress.toLowerCase()
-    ) {
-      return null;
-    }
-
-    return delegatee;
-  })();
+      return delegatee;
+    })(),
+  ]);
 
   const latestBlock = await provider.getBlockNumber();
 
