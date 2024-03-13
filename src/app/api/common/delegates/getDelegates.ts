@@ -17,6 +17,13 @@ import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 
 type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
+type DelegatePayload = {
+  address: string;
+  delegate: any;
+  voting_power: number;
+  citizen: boolean;
+}
+
 export async function getDelegates({
   page = 1,
   sort = "weighted_random",
@@ -33,7 +40,7 @@ export async function getDelegates({
     async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
-          return prisma[`${namespace}Delegates`].findMany({
+          return (prisma as any)[`${namespace}Delegates`].findMany({
             skip,
             take,
             orderBy: {
@@ -75,7 +82,7 @@ export async function getDelegates({
   );
 
   const _delegates = await Promise.all(
-    delegates.map(async (delegate) => {
+    delegates.map(async (delegate:DelegatePayload) => {
       return {
         citizen: await isCitizen(delegate.delegate),
         statement: await getDelegateStatement(delegate.delegate),
@@ -85,7 +92,7 @@ export async function getDelegates({
 
   return {
     meta,
-    delegates: delegates.map((delegate, index) => ({
+    delegates: delegates.map((delegate:DelegatePayload, index:number) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: _delegates[index].citizen.length > 0,
@@ -151,7 +158,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
       delegateQuery.then(result => result?.[0] || undefined),
-      prisma[`${namespace}VotableSupply`].findFirst({}),
+      (prisma as any)[`${namespace}VotableSupply`].findFirst({}),
       getDelegateStatement(addressOrENSName),
       getCurrentQuorum(),
       isCitizen(address),
