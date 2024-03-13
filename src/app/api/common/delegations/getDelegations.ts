@@ -30,76 +30,42 @@ async function getCurrentDelegateesForAddress({
     },
   });
 
-  // const directDelegatee = await (async () => {
-  //   const [proxyAddress, delegatee] = await Promise.all([
-  //     getProxyAddress(address),
-  //     prisma.delegatees.findFirst({
-  //       where: { delegator: address.toLowerCase() },
-  //     }),
-  //   ]);
+  const directDelegatee = await (async () => {
+    const [proxyAddress, delegatee] = await Promise.all([
+      getProxyAddress(address),
+      prisma[`${namespace}Delegatees`].findFirst({
+        where: { delegator: address.toLowerCase() },
+      }),
+    ]);
 
-  //   if (
-  //     proxyAddress &&
-  //     delegatee &&
-  //     delegatee.delegatee === proxyAddress.toLowerCase()
-  //   ) {
-  //     return null;
-  //   }
+    if (
+      proxyAddress &&
+      delegatee &&
+      delegatee.delegatee === proxyAddress.toLowerCase()
+    ) {
+      return null;
+    }
 
-  //   return delegatee;
-  // })();
+    return delegatee;
+  })();
 
   const latestBlock = await provider.getBlockNumber();
 
-  // const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
-  //   where: {
-  //     delegate: address.toLowerCase(),
-  //   },
-  // });
-
-  // // TODO: These needs to be ordered by timestamp
-
-  // console.log(address);
-  // console.log({
-  //   advancedVotingPower,
-  //   advancedDelegatees,
-  //   directDelegatee,
-  // });
-
   return [
-    // ...(advancedVotingPower
-    //   ? [
-    //       {
-    //         from: address,
-    //         to: address,
-    //         allowance: advancedVotingPower.advanced_vp.toFixed(0),
-    //         timestamp: null,
-    //         type: "ADVANCED",
-    //         amount:
-    //           BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
-    //             ? "PARTIAL"
-    //             : "FULL",
-    //       },
-    //     ]
-    //   : []),
-    // ...(directDelegatee
-    //   ? [
-    //       {
-    //         from: directDelegatee.delegator,
-    //         to: directDelegatee.delegatee,
-    //         allowance: directDelegatee.balance.toFixed(),
-    //         timestamp: latestBlock
-    //           ? getHumanBlockTime(
-    //               directDelegatee.block_number,
-    //               latestBlock.number,
-    //               latestBlock.timestamp
-    //             )
-    //           : null,
-    //         type: "DIRECT",
-    //         amount: "FULL",
-    //       },
-    //     ]
-    //   : []),
+    ...(directDelegatee
+      ? [
+          {
+            from: directDelegatee.delegator,
+            to: directDelegatee.delegatee,
+            allowance: directDelegatee.balance.toFixed(),
+            timestamp: latestBlock
+              ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
+              : null,
+            type: "DIRECT",
+            amount: "FULL",
+          },
+        ]
+      : []),
     ...advancedDelegatees.map((advancedDelegatee) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
