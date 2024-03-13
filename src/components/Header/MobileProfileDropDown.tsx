@@ -1,7 +1,5 @@
 "use client";
 
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 import React, { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
@@ -28,14 +26,23 @@ const variants = {
   exit: { y: "100%" },
 };
 
-const MobileValueWrapper = ({ children }: { children: ReactNode }) => (
-  <div className={css(`font-size: ${theme.fontSize.base}`)}>{children}</div>
-);
+const MobileValueWrapper = ({
+  children,
+  isLoading,
+}: {
+  children: ReactNode;
+  isLoading: boolean;
+}) =>
+  isLoading ? (
+    <div className="animate-pulse bg-gray-af h-5 w-[90px] rounded-2xl"></div>
+  ) : (
+    <div className="text-base">{children}</div>
+  );
 
 export const MobileProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
-  const { delegate, balance } = useConnectedDelegate();
+  const { isLoading, delegate, balance } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;
 
   return (
@@ -43,7 +50,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
       {({ open }) => (
         <>
           <Popover.Button className="mt-1 outline-none">
-            <div className={styles.testing}>
+            <div className="w-6 h-6 shadow-newDefault rounded-full">
               <ENSAvatar ensName={ensName} />
             </div>
           </Popover.Button>
@@ -70,9 +77,16 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                   variants={variants}
                   transition={{ duration: 0.2 }}
                 >
-                  <VStack gap={3}>
+                  <VStack
+                    gap={3}
+                    className="min-h-[325px] justify-center mb-10"
+                  >
                     <HStack gap={2} alignItems="items-center" className="mb-1">
-                      <div className={"relative aspect-square"}>
+                      <div
+                        className={`relative aspect-square ${
+                          isLoading && "animate-pulse"
+                        }`}
+                      >
                         <ENSAvatar ensName={ensName} />
                       </div>
                       <VStack className={"flex-1"}>
@@ -104,7 +118,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="My token balance"
                       detail={
-                        <MobileValueWrapper>
+                        <MobileValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
                             amount={balance || BigInt(0)}
                             decimals={18}
@@ -117,7 +131,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="Delegated to"
                       detail={
-                        <MobileValueWrapper>
+                        <MobileValueWrapper isLoading={isLoading}>
                           <Link
                             href={`/delegates/${delegate?.address}`}
                             onClick={() => close()}
@@ -132,7 +146,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="My voting power"
                       detail={
-                        <MobileValueWrapper>
+                        <MobileValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
                             amount={delegate?.votingPower || BigInt(0)}
                             decimals={18}
@@ -145,7 +159,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="Delegated from"
                       detail={
-                        <MobileValueWrapper>
+                        <MobileValueWrapper isLoading={isLoading}>
                           {pluralizeAddresses(
                             Number(delegate?.numOfDelegators || 0)
                           )}
@@ -153,32 +167,38 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       }
                     />
 
-                    {hasStatement ? (
-                      <Link
-                        href={`/delegates/edit`}
-                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                        onClick={() => close()}
-                      >
-                        Edit delegate statement
-                      </Link>
+                    {isLoading ? (
+                      <div className="animate-pulse bg-gray-af h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
-                      <Link
-                        href={`/delegates/create`}
-                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                        onClick={() => close()}
-                      >
-                        Create delegate statement
-                      </Link>
-                    )}
+                      <>
+                        {hasStatement ? (
+                          <Link
+                            href={`/delegates/edit`}
+                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                            onClick={() => close()}
+                          >
+                            Edit delegate statement
+                          </Link>
+                        ) : (
+                          <Link
+                            href={`/delegates/create`}
+                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                            onClick={() => close()}
+                          >
+                            Create delegate statement
+                          </Link>
+                        )}
 
-                    {hasStatement && (
-                      <Link
-                        href={`/delegates/${ensName ?? address}`}
-                        onClick={() => close()}
-                        className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
-                      >
-                        View my profile
-                      </Link>
+                        {hasStatement && (
+                          <Link
+                            href={`/delegates/${ensName ?? address}`}
+                            onClick={() => close()}
+                            className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
+                          >
+                            View my profile
+                          </Link>
+                        )}
+                      </>
                     )}
                   </VStack>
                 </motion.div>

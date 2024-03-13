@@ -159,7 +159,6 @@ export function AdvancedDelegateDialog({
       postVotingPower,
     };
   };
-
   const writeWithTracking = async () => {
     setIsLoading(true);
 

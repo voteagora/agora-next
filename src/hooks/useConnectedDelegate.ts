@@ -1,7 +1,6 @@
 import { fetchConnectedDelegate, revalidateDelegateAddressPage } from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
-import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +17,7 @@ const useConnectedDelegate = () => {
   const [retries, setRetries] = useState<number>(0);
   const [lastVotingPower, setLastVotingPower] = useState<string | null>(null);
 
-  const { data } = useQuery({
+  const data = useQuery({
     enabled: !!address,
     queryKey: ['useConnectedDelegate', address, lastVotingPower, refetchDelegate, retries],
     queryFn: async () => {
@@ -42,8 +41,8 @@ const useConnectedDelegate = () => {
         }
         return { delegate, advancedDelegators, balance };
       } else if (refetchDelegate) {
-        // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the	
-        // new voting power	
+        // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the
+        // new voting power
         if (delegate.votingPower === lastVotingPower) {
           await timeout(2000);
           const _retries = retries + 1;
@@ -57,10 +56,15 @@ const useConnectedDelegate = () => {
       }
     }
   });
-  return data || {
+
+  return data.data ? {
+    ...data.data,
+    isLoading: data.isLoading
+  } : {
     balance: null,
     delegate: null,
-    advancedDelegators: null
+    advancedDelegators: null,
+    isLoading: data.isLoading
   };
 };
 

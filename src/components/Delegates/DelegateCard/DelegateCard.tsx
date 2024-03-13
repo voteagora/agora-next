@@ -79,11 +79,7 @@ export const PanelRow = ({
   detail: string | JSX.Element;
 }) => {
   return (
-    <HStack
-      gap={2}
-      justifyContent="justify-between"
-      alignItems="items-baseline"
-    >
+    <HStack gap={2} className="justify-between items-center">
       <span className="whitespace-nowrap">{title}</span>
 
       <span className={styles.row}>{detail}</span>
