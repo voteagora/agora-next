@@ -1,7 +1,5 @@
 "use client";
 
-import { css } from "@emotion/css";
-import * as theme from "@/styles/theme";
 import React, { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
@@ -16,7 +14,6 @@ import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 
 type Props = {
   ensName: string | undefined;
@@ -29,9 +26,18 @@ const variants = {
   exit: { y: "100%" },
 };
 
-const MobileValueWrapper = ({ children }: { children: ReactNode }) => (
-  <div className={css(`font-size: ${theme.fontSize.base}`)}>{children}</div>
-);
+const MobileValueWrapper = ({
+  children,
+  isLoading,
+}: {
+  children: ReactNode;
+  isLoading: boolean;
+}) =>
+  isLoading ? (
+    <div className="animate-pulse bg-gray-af h-5 w-[90px] rounded-2xl"></div>
+  ) : (
+    <div className="text-base">{children}</div>
+  );
 
 export const MobileProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
@@ -44,7 +50,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
       {({ open }) => (
         <>
           <Popover.Button className="mt-1 outline-none">
-            <div className={styles.testing}>
+            <div className="w-6 h-6 shadow-newDefault rounded-full">
               <ENSAvatar ensName={ensName} />
             </div>
           </Popover.Button>
@@ -71,97 +77,100 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                   variants={variants}
                   transition={{ duration: 0.2 }}
                 >
-                  <VStack gap={3} className="min-h-[325px] justify-center">
+                  <VStack
+                    gap={3}
+                    className="min-h-[325px] justify-center mb-10"
+                  >
+                    <HStack gap={2} alignItems="items-center" className="mb-1">
+                      <div
+                        className={`relative aspect-square ${
+                          isLoading && "animate-pulse"
+                        }`}
+                      >
+                        <ENSAvatar ensName={ensName} />
+                      </div>
+                      <VStack className={"flex-1"}>
+                        {ensName ? (
+                          <>
+                            <span className={styles.mobile__ens}>
+                              {ensName}
+                            </span>
+                            <span className={styles.mobile__address}>
+                              {shortAddress(address!)}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className={styles.mobile__ens}>
+                              {shortAddress(address!)}
+                            </span>
+                          </>
+                        )}
+                      </VStack>
+                      <Image
+                        src={icons.power}
+                        onClick={() => disconnect()}
+                        alt="Disconnect Wallet"
+                        className="cursor-pointer"
+                      />
+                    </HStack>
+
+                    <PanelRow
+                      title="My token balance"
+                      detail={
+                        <MobileValueWrapper isLoading={isLoading}>
+                          <TokenAmountDisplay
+                            amount={balance || BigInt(0)}
+                            decimals={18}
+                            currency={"OP"}
+                          />
+                        </MobileValueWrapper>
+                      }
+                    />
+
+                    <PanelRow
+                      title="Delegated to"
+                      detail={
+                        <MobileValueWrapper isLoading={isLoading}>
+                          <Link
+                            href={`/delegates/${delegate?.address}`}
+                            onClick={() => close()}
+                            className="underline"
+                          >
+                            View more
+                          </Link>
+                        </MobileValueWrapper>
+                      }
+                    />
+
+                    <PanelRow
+                      title="My voting power"
+                      detail={
+                        <MobileValueWrapper isLoading={isLoading}>
+                          <TokenAmountDisplay
+                            amount={delegate?.votingPower || BigInt(0)}
+                            decimals={18}
+                            currency={"OP"}
+                          />
+                        </MobileValueWrapper>
+                      }
+                    />
+
+                    <PanelRow
+                      title="Delegated from"
+                      detail={
+                        <MobileValueWrapper isLoading={isLoading}>
+                          {pluralizeAddresses(
+                            Number(delegate?.numOfDelegators || 0)
+                          )}
+                        </MobileValueWrapper>
+                      }
+                    />
+
                     {isLoading ? (
-                      <AgoraLoaderSmall />
+                      <div className="animate-pulse bg-gray-af h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
                       <>
-                        <HStack
-                          gap={2}
-                          alignItems="items-center"
-                          className="mb-1"
-                        >
-                          <div className={"relative aspect-square"}>
-                            <ENSAvatar ensName={ensName} />
-                          </div>
-                          <VStack className={"flex-1"}>
-                            {ensName ? (
-                              <>
-                                <span className={styles.mobile__ens}>
-                                  {ensName}
-                                </span>
-                                <span className={styles.mobile__address}>
-                                  {shortAddress(address!)}
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span className={styles.mobile__ens}>
-                                  {shortAddress(address!)}
-                                </span>
-                              </>
-                            )}
-                          </VStack>
-                          <Image
-                            src={icons.power}
-                            onClick={() => disconnect()}
-                            alt="Disconnect Wallet"
-                            className="cursor-pointer"
-                          />
-                        </HStack>
-
-                        <PanelRow
-                          title="My token balance"
-                          detail={
-                            <MobileValueWrapper>
-                              <TokenAmountDisplay
-                                amount={balance || BigInt(0)}
-                                decimals={18}
-                                currency={"OP"}
-                              />
-                            </MobileValueWrapper>
-                          }
-                        />
-
-                        <PanelRow
-                          title="Delegated to"
-                          detail={
-                            <MobileValueWrapper>
-                              <Link
-                                href={`/delegates/${delegate?.address}`}
-                                onClick={() => close()}
-                                className="underline"
-                              >
-                                View more
-                              </Link>
-                            </MobileValueWrapper>
-                          }
-                        />
-
-                        <PanelRow
-                          title="My voting power"
-                          detail={
-                            <MobileValueWrapper>
-                              <TokenAmountDisplay
-                                amount={delegate?.votingPower || BigInt(0)}
-                                decimals={18}
-                                currency={"OP"}
-                              />
-                            </MobileValueWrapper>
-                          }
-                        />
-
-                        <PanelRow
-                          title="Delegated from"
-                          detail={
-                            <MobileValueWrapper>
-                              {pluralizeAddresses(
-                                Number(delegate?.numOfDelegators || 0)
-                              )}
-                            </MobileValueWrapper>
-                          }
-                        />
-
                         {hasStatement ? (
                           <Link
                             href={`/delegates/edit`}

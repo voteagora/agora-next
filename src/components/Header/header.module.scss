@@ -65,12 +65,6 @@
     align-items: center;
   }
 }
-.testing {
-  width: $spacing-6;
-  height: $spacing-6;
-  box-shadow: $box-shadow-newDefault;
-  border-radius: $border-radius-full;
-}
 
 .mobile_connect_button {
   display: none;
@@ -161,10 +155,6 @@
       background: $gray-800;
       color: $white;
     }
-  }
-
-  &__wrapper {
-    font-size: $font-size-base;
   }
 }
 
