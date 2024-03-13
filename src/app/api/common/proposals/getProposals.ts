@@ -5,8 +5,7 @@ import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getVotableSupply } from "../votableSupply/getVotableSupply";
 import { getQuorumForProposal } from "../quorum/getQuorum";
-import Tenant from "@/lib/tenant";
-import { contracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getProposals({
   filter,
@@ -17,9 +16,9 @@ export async function getProposals({
 }) {
   const pageSize = 10;
 
-  const { namespace, isProd } = Tenant.getInstance();
+  const { namespace, contracts, isProd } = Tenant.getInstance();
   const prodDataOnly = isProd && {
-    contract: contracts(namespace).governor.address.toLowerCase(),
+    contract: contracts.governor.address,
   };
 
   const { meta, data: proposals } = await paginatePrismaResult(
@@ -92,12 +91,11 @@ export async function getProposal(proposal_id: string) {
 }
 
 export async function getProposalTypes() {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
 
   return prisma[`${namespace}ProposalTypes`].findMany({
     where: {
-      contract:
-        contracts(namespace).proposalTypesConfigurator.address.toLowerCase(),
+      contract: contracts.proposalTypesConfigurator!.address,
     },
   });
 }

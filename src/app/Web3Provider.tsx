@@ -12,6 +12,9 @@ import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const chains = [optimism, mainnet];
 const metadata = {
@@ -42,21 +45,23 @@ const config = createConfig(
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
-    <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-      <body className={inter.variable}>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <BetaBanner />
-        {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-        <ConnectButtonProvider>
-          <PageContainer>
-            <Toaster />
-            <AgoraProvider>{children}</AgoraProvider>
-          </PageContainer>
-        </ConnectButtonProvider>
-        <Footer />
-        <SpeedInsights />
-      </body>
-    </ConnectKitProvider>
+    <QueryClientProvider client={queryClient}>
+      <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+        <body className={inter.variable}>
+          <noscript>You need to enable JavaScript to run this app.</noscript>
+          <BetaBanner />
+          {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+          <ConnectButtonProvider>
+            <PageContainer>
+              <Toaster />
+              <AgoraProvider>{children}</AgoraProvider>
+            </PageContainer>
+          </ConnectButtonProvider>
+          <Footer />
+          <SpeedInsights />
+        </body>
+      </ConnectKitProvider>
+    </QueryClientProvider>
   </WagmiConfig>
 );
 

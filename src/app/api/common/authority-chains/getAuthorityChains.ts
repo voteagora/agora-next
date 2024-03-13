@@ -1,9 +1,8 @@
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { contracts } from "@/lib/contracts/contracts";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function getAuthorityChains({
   address,
@@ -12,7 +11,7 @@ export async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const { namespace } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.getInstance();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
@@ -39,7 +38,7 @@ export async function getAuthorityChains({
       AND ac.allowance > 0;
     `,
     address.toLowerCase(),
-    contracts(namespace).alligator.address.toLowerCase(),
+    contracts.alligator!.address,
     blockNumber
   );
 

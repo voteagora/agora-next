@@ -3,7 +3,7 @@ import "server-only";
 import prisma from "@/app/lib/prisma";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export const getDelegateStatement = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);

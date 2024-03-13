@@ -5,7 +5,7 @@ import { VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import Tenant from "@/lib/tenant";
+import Tenant from "@/lib/tenant/tenant";
 
 export const getVotesForDelegate = ({
   addressOrENSName,

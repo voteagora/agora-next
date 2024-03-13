@@ -2,8 +2,8 @@
 
 import { getAllForAForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
+import { cache } from "react";
 import { revalidatePath } from "next/cache";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { getVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   getProxy,
@@ -20,6 +20,7 @@ import {
   getDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import Tenant from "@/lib/tenant/tenant";
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -50,7 +51,9 @@ export async function getProxyAddress(addressOrENSName: string) {
 }
 
 export async function fetchDelegate(addressOrENSName: string) {
-  return getDelegate(addressOrENSName);
+  return cache(
+    (address: string) => getDelegate(address)
+  )(addressOrENSName);
 }
 
 export async function submitDelegateStatement({
@@ -75,7 +78,9 @@ export async function submitDelegateStatement({
 }
 
 export async function fetchDelegateStatement(addressOrENSName: string) {
-  return getDelegateStatement(addressOrENSName);
+  return cache(
+      (addressOrENS: string) => getDelegateStatement(addressOrENS)
+  )(addressOrENSName);
 }
 
 export async function fetchVotesForDelegate(
@@ -110,7 +115,8 @@ export async function fetchAllDelegatorsInChainsForAddress(
 }
 
 export async function balanceOf(address: string) {
-  return OptimismContracts.token.contract.balanceOf(address);
+  const { contracts } = Tenant.getInstance();
+  return contracts.token.contract.balanceOf(address);
 }
 
 export const fetchConnectedDelegate = async (address: string) => {
