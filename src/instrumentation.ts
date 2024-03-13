@@ -1,5 +1,12 @@
 import { registerOTel } from '@vercel/otel'
- 
-export function register() {
-  registerOTel({ serviceName: 'next-app' })
+
+export const SERVICE_NAME = 'agora-app';
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./instrumentation.node');
+  } else {
+    registerOTel({ serviceName: SERVICE_NAME });
+  }
 }
+
