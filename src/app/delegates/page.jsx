@@ -40,7 +40,9 @@ export async function generateMetadata({}, parent) {
   const page = tenant.ui.page("delegates");
   const { title, description } = page.meta;
 
-  const preview = `/api/images/og/delegates?title=${title}&description=${description}`;
+  const preview = `/api/images/og/delegates?title=${encodeURIComponent(
+    title
+  )}&description=${encodeURIComponent(description)}`;
 
   return {
     title: title,
