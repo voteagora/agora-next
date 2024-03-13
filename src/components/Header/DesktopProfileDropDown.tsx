@@ -18,23 +18,32 @@ type Props = {
   ensName: string | undefined;
 };
 
-const ValueWrapper = ({ children }: { children: ReactNode }) => (
-  <div className={styles.desktop__wrapper}>{children}</div>
-);
+const ValueWrapper = ({
+  children,
+  isLoading,
+}: {
+  children: ReactNode;
+  isLoading: boolean;
+}) =>
+  isLoading ? (
+    <div className="animate-pulse bg-gray-af h-5 w-[90px] rounded-2xl"></div>
+  ) : (
+    <div className="text-base">{children}</div>
+  );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
-  const { delegate, balance } = useConnectedDelegate();
+  const { isLoading, delegate, balance } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;
 
   return (
     <Popover className="relative cursor-auto">
       {({ open }) => (
         <>
-          <Popover.Button className="flex">
+          <Popover.Button className="flex outline-none">
             <div className={styles.desktop_connect_button_inner}>
-              <div className={styles.testing}>
+              <div className="w-6 h-6 shadow-newDefault rounded-full">
                 <ENSAvatar ensName={ensName} />
               </div>
 
@@ -65,9 +74,13 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             <Popover.Panel>
               {({ close }) => (
                 <div className={styles.desktop__popover_container}>
-                  <VStack gap={3}>
+                  <VStack gap={3} className="min-h-[250px] justify-center">
                     <HStack className={styles.desktop__popover_inside}>
-                      <div className="relative aspect-square mr-4">
+                      <div
+                        className={`relative aspect-square mr-4 ${
+                          isLoading && "animate-pulse"
+                        }`}
+                      >
                         <ENSAvatar
                           className={styles.desktop__avatar}
                           ensName={ensName}
@@ -106,7 +119,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="My token balance"
                       detail={
-                        <ValueWrapper>
+                        <ValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
                             amount={balance || BigInt(0)}
                             decimals={18}
@@ -119,7 +132,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="Delegated to"
                       detail={
-                        <ValueWrapper>
+                        <ValueWrapper isLoading={isLoading}>
                           <Link
                             href={`/delegates/${delegate?.address}`}
                             onClick={() => close()}
@@ -134,7 +147,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="My voting power"
                       detail={
-                        <ValueWrapper>
+                        <ValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
                             amount={delegate?.votingPower || BigInt(0)}
                             decimals={18}
@@ -147,38 +160,44 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="Delegated from"
                       detail={
-                        <ValueWrapper>
+                        <ValueWrapper isLoading={isLoading}>
                           {pluralizeAddresses(
                             Number(delegate?.numOfDelegators || 0)
                           )}
                         </ValueWrapper>
                       }
                     />
-                    {hasStatement ? (
-                      <Link
-                        href={`/delegates/edit`}
-                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                        onClick={() => close()}
-                      >
-                        Edit delegate statement
-                      </Link>
+                    {isLoading ? (
+                      <div className="animate-pulse bg-gray-af h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
-                      <Link
-                        href={`/delegates/create`}
-                        className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                        onClick={() => close()}
-                      >
-                        Create delegate statement
-                      </Link>
-                    )}
-                    {hasStatement && (
-                      <Link
-                        href={`/delegates/${ensName ?? address}`}
-                        className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
-                        onClick={() => close()}
-                      >
-                        View my profile
-                      </Link>
+                      <>
+                        {hasStatement ? (
+                          <Link
+                            href={`/delegates/edit`}
+                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                            onClick={() => close()}
+                          >
+                            Edit delegate statement
+                          </Link>
+                        ) : (
+                          <Link
+                            href={`/delegates/create`}
+                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                            onClick={() => close()}
+                          >
+                            Create delegate statement
+                          </Link>
+                        )}
+                        {hasStatement && (
+                          <Link
+                            href={`/delegates/${ensName ?? address}`}
+                            className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
+                            onClick={() => close()}
+                          >
+                            View my profile
+                          </Link>
+                        )}
+                      </>
                     )}
                   </VStack>
                 </div>
