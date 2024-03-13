@@ -1,4 +1,4 @@
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import {
   OptimismAdvancedVotingPower,
   OptimismDelegates,
@@ -29,7 +29,7 @@ export async function getDelegates({
   const pageSize = 20;
   const { namespace } = Tenant.getInstance();
 
-  const { meta, data: delegates } = await paginatePrismaResult(
+  const { meta, data: delegates } = await paginateResult(
     async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":

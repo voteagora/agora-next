@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
@@ -21,7 +21,7 @@ export async function getProposals({
     contract: contracts.governor.address,
   };
 
-  const { meta, data: proposals } = await paginatePrismaResult(
+  const { meta, data: proposals } = await paginateResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
         return prisma[`${namespace}Proposals`].findMany({

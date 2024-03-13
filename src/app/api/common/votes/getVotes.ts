@@ -1,4 +1,4 @@
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { VotePayload, VotesSort } from "./vote";
@@ -28,7 +28,7 @@ async function getVotesForDelegateForAddress({
   const { namespace } = Tenant.getInstance();
   const pageSize = 10;
 
-  const { meta, data: votes } = await paginatePrismaResult(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -112,7 +112,7 @@ export async function getVotesForProposal({
   const { namespace } = Tenant.getInstance();
   const pageSize = 50;
 
-  const { meta, data: votes } = await paginatePrismaResult(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `

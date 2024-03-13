@@ -1,6 +1,6 @@
 import "server-only";
 
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
@@ -27,7 +27,7 @@ export async function getCitizens({
   const pageSize = 20;
   const { namespace } = Tenant.getInstance();
 
-  const { meta, data: _citizens } = await paginatePrismaResult(
+  const { meta, data: _citizens } = await paginateResult(
     (skip: number, take: number) => {
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<citizen[]>(
