@@ -53,7 +53,6 @@ const etherfiUI = new TenantUI({
 
 const ensUI = new TenantUI({
   title: "ENS Agora",
-  hero: etherfiHero,
   logo: ensLogo,
 
   pages: [
