@@ -3,7 +3,9 @@ import { TenantNamespace } from "@/lib/types";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import optimismLogo from "@/assets/tenant/optimism_logo.svg";
+import optimismHero from "@/assets/tenant/optimism_hero.svg";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
+import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 
 export default class TenantUIFactory {
@@ -11,6 +13,7 @@ export default class TenantUIFactory {
     switch (namespace) {
       case TENANT_NAMESPACES.OPTIMISM:
         return optimismUI;
+
       case TENANT_NAMESPACES.ETHERFI:
         return etherfiUI;
 
@@ -23,10 +26,22 @@ export default class TenantUIFactory {
 }
 
 const etherfiUI = new TenantUI({
-
-  title: "Agora is the home of ETHER.FI delegates",
-  description: "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+  title: "ETHER.FI Agora",
   hero: etherfiHero,
+  logo: etherfiLogo,
+
+  pages: [
+    {
+      route: "delegates",
+      title: "Agora is the home of ETHER.FI delegates",
+      description:
+        "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
+      },
+    },
+  ],
 
   toggles: [
     {
@@ -36,42 +51,71 @@ const etherfiUI = new TenantUI({
   ],
 });
 
-const ensUI = new TenantUI(
-  {
-    title: "Agora is the home of ENS voters",
-    description: "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
-    hero: etherfiHero,
-    logo: ensLogo,
+const ensUI = new TenantUI({
+  title: "ENS Agora",
+  hero: etherfiHero,
+  logo: ensLogo,
 
-    toggles: [
-      {
-        name: "proposals",
-        enabled: true,
+  pages: [
+    {
+      route: "proposals",
+      title: "Agora is the home of ENS voters",
+      description:
+        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "ENS Agora",
+        description: "Home of token governance",
       },
-      {
-        name: "delegates",
-        enabled: true,
+    },
+    {
+      route: "delegates",
+      title: "Agora is the home of ENS voters",
+      description:
+        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
       },
-    ],
-  },
-);
+    },
+  ],
+
+  toggles: [
+    {
+      name: "proposals",
+      enabled: true,
+    },
+    {
+      name: "delegates",
+      enabled: true,
+    },
+  ],
+});
 
 const optimismUI = new TenantUI({
-  title: "Agora is the home of Optimism voters",
-  description: "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
-  hero: "path_to_the_hero_image",
+  title: "Optimism Agora",
+  hero: optimismHero,
   logo: optimismLogo,
 
   pages: [
     {
-      route: "citizens",
+      route: "proposals",
       title: "Agora is the home of Optimism voters",
-      description: "OP Citizens are the stewards of the Optimism Citizens' House, selected based on the reputation as the Optimism Collective members.",
+      description:
+        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Optimism Agora",
+        description: "Home of token house governance and RPGF",
+      },
     },
     {
       route: "delegates",
       title: "Agora is the home of Optimism voters",
-      description: "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      description:
+        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
+      },
     },
   ],
 

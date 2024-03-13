@@ -12,7 +12,7 @@ export default class TenantTokenFactory {
         };
       case TENANT_NAMESPACES.ENS:
         return {
-          name: "Ethereum Names Service",
+          name: "ENS",
           symbol: "ENS",
           decimals: 18,
         };

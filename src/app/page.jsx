@@ -1,14 +1,15 @@
+import { getGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import { getMetrics } from "@/app/api/common/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { getProposals } from "@/app/api/common/proposals/getProposals";
 import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import { getGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -40,9 +41,11 @@ async function fetchGovernanceCalendar() {
 }
 
 export async function generateMetadata({}, parent) {
-  const preview = `/api/images/og/proposals`;
-  const title = "Optimism Agora";
-  const description = "Home of token house governance and RPGF";
+  const tenant = Tenant.current();
+  const page = tenant.ui.page("proposals");
+  const { title, description } = page.meta;
+
+  const preview = `/api/images/og/proposals?title=${title}&description=${description}`;
 
   return {
     title: title,

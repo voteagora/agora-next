@@ -1,8 +1,8 @@
+import logo from "@/assets/agora_logo.svg";
 import Tenant from "@/lib/tenant/tenant";
-import Link from "next/link";
-import logo from "@/assets/logo.svg";
-import { HStack } from "../Layout/Stack";
 import Image from "next/image";
+import Link from "next/link";
+import { HStack } from "../Layout/Stack";
 import styles from "./header.module.scss";
 
 export default function LogoLink() {
@@ -21,7 +21,7 @@ export default function LogoLink() {
           />
           <div className="h-3 w-[2px] bg-stone-200 rounded-full hidden sm:block"></div>
           <Image src={ui.logo} alt="logo" width="18" height="18" />
-          <span className="hidden sm:block font-medium capitalize">{`${namespace} Agora`}</span>
+          <span className="hidden sm:block font-medium capitalize">{`${ui.title}`}</span>
         </HStack>
       </Link>
     </HStack>
