@@ -95,73 +95,56 @@ async function getCurrentDelegatorsForAddress({
 }) {
   const { namespace, contracts } = Tenant.getInstance();
 
-  const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
-    where: {
-      to: address.toLowerCase(),
-      delegated_amount: { gt: 0 },
-      contract: contracts.alligator!.address,
-    },
-  });
-
-  // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
-  // const directDelegators = (async () => {
-  //   const proxyAddress = await getProxyAddress(address);
-  //   if (!proxyAddress) {
-  //     return [];
-  //   }
-  //   return prisma.$queryRaw<Prisma.DelegateesGetPayload<true>[]>(
-  //     Prisma.sql`
-  //     SELECT *
-  //     FROM (
-  //     SELECT
-  //       delegator,
-  //       delegatee,
-  //       block_number
-  //     FROM (
-  //       SELECT
-  //           delegator,
-  //           to_delegate as delegatee,
-  //           block_number,
-  //           ROW_NUMBER() OVER (PARTITION BY delegator ORDER BY block_number DESC, log_index DESC, transaction_index DESC) as rn
-  //       FROM optimism.delegate_changed_events
-  //       WHERE to_delegate=${address.toLowerCase()}
-  //     ) t1
-  //     WHERE rn=1
-  //     ) t2
-  //     LEFT JOIN LATERAL (
-  //       SELECT
-  //         COALESCE(SUM(
-  //           CASE WHEN "from"=delegator THEN -"value"::NUMERIC ELSE "value"::NUMERIC END
-  //         ), 0) AS balance
-  //       FROM optimism.transfer_events
-  //       WHERE "from"=delegator OR "to"=delegator
-  //     ) t3 ON TRUE
-  //     `
-  //   );
-  // })();
+  const [advancedDelegators, directDelegators] = await Promise.all([
+    prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        to: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator!.address,
+      },
+    }),
+    (async () => {
+      return prisma.$queryRawUnsafe<
+        {
+          delegator: string;
+          delegatee: string;
+          block_number: bigint;
+        }[]
+      >(
+        `
+        SELECT
+          t1.delegator,
+          t1.to_delegate AS delegatee,
+          t1.block_number
+        FROM
+          center.optimism_delegate_changed_events t1
+        WHERE
+          t1.to_delegate = $1
+          AND NOT EXISTS (
+            SELECT
+              1
+            FROM
+              center.optimism_delegate_changed_events t2
+            WHERE
+              t2.delegator = t1.delegator
+              AND t2.block_number > t1.block_number
+              OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index))
+        ORDER BY
+          t1.block_number DESC,
+          t1.log_index DESC,
+          t1.transaction_index DESC
+        `,
+        address
+      );
+    })(),
+  ]);
 
   const latestBlock = await provider.getBlockNumber();
 
   // TODO: These needs to be ordered by timestamp
 
   return [
-    // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
-    // ...(await directDelegators).map((directDelegator) => ({
-    //   from: directDelegator.delegator,
-    //   to: directDelegator.delegatee,
-    //   allowance: directDelegator.balance.toFixed(0),
-    //   timestamp: latestBlock
-    //     ? getHumanBlockTime(
-    //         directDelegator.block_number,
-    //         latestBlock.number,
-    //         latestBlock.timestamp
-    //       )
-    //     : null,
-    //   type: "DIRECT",
-    //   amount: "FULL",
-    // })),
-
-    ...(await advancedDelegators).map((advancedDelegator) => ({
+    ...advancedDelegators.map((advancedDelegator) => ({
       from: advancedDelegator.from,
       to: advancedDelegator.to,
       allowance: advancedDelegator.delegated_amount.toFixed(0),
@@ -174,6 +157,22 @@ async function getCurrentDelegatorsForAddress({
           ? "FULL"
           : "PARTIAL",
     })),
+    ...(
+      await Promise.all(
+        directDelegators.map(async (directDelegator) => ({
+          from: directDelegator.delegator,
+          to: directDelegator.delegatee,
+          allowance: await contracts.token.contract.balanceOf(
+            directDelegator.delegator
+          ),
+          timestamp: latestBlock
+            ? getHumanBlockTime(directDelegator.block_number, latestBlock)
+            : null,
+          type: "DIRECT",
+          amount: "FULL",
+        }))
+      )
+    ).filter((delegator) => delegator.allowance > BigInt(0)),
   ] as Delegation[];
 }
 
