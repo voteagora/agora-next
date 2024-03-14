@@ -17,13 +17,9 @@ export default class Tenant {
   private readonly _token: TenantToken;
 
   private constructor() {
-    const {
-      NEXT_PUBLIC_AGORA_INSTANCE_TOKEN,
-    } = process.env;
-
     this._namespace = process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
     this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-    this._slug = NEXT_PUBLIC_AGORA_INSTANCE_TOKEN || "OP";
+    this._slug = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN || "OP";
     this._token = TenantTokenFactory.create(this._namespace);
     this._contracts = TenantContractFactory.create(
       this._namespace,
