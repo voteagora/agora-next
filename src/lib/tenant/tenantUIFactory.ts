@@ -32,6 +32,16 @@ const etherfiUI = new TenantUI({
 
   pages: [
     {
+      route: "/",
+      title: "Agora is the home of ETHER.FI delegates",
+      description:
+        "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
+      },
+    },
+    {
       route: "delegates",
       title: "Agora is the home of ETHER.FI delegates",
       description:
@@ -42,7 +52,7 @@ const etherfiUI = new TenantUI({
       },
     },
     {
-      route: "/",
+      route: "proposals",
       title: "Agora is the home of ETHER.FI delegates",
       description:
         "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
@@ -56,6 +66,10 @@ const etherfiUI = new TenantUI({
   toggles: [
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "proposals",
       enabled: true,
     },
   ],
