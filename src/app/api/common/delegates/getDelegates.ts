@@ -33,18 +33,18 @@ export async function getDelegates({
     async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
-          return prisma[`${namespace}Delegates`].findMany({
+          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+            `
+            SELECT *
+            FROM ${namespace + ".delegates"}
+            WHERE num_of_delegators IS NOT NULl
+            ORDER BY num_of_delegators DESC
+            OFFSET $1
+            LIMIT $2;
+            `,
             skip,
-            take,
-            orderBy: {
-              num_of_delegators: "desc",
-            },
-            where: {
-              num_of_delegators: {
-                not: null,
-              },
-            },
-          });
+            take
+          );
         case "weighted_random":
           await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
           return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
@@ -150,7 +150,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
-      delegateQuery.then(result => result?.[0] || undefined),
+      delegateQuery.then((result) => result?.[0] || undefined),
       prisma[`${namespace}VotableSupply`].findFirst({}),
       getDelegateStatement(addressOrENSName),
       getCurrentQuorum(),
