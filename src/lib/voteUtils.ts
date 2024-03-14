@@ -9,6 +9,7 @@ import { getHumanBlockTime } from "./blockTimes";
 import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
  * Vote primitives
@@ -31,7 +32,7 @@ export function parseSupport(
   const { namespace, contracts } = Tenant.current();
 
   if (
-    namespace === "optimism" &&
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
     start_block &&
     contracts.governor.v6UpgradeBlock &&
     Number(start_block) < contracts.governor.v6UpgradeBlock

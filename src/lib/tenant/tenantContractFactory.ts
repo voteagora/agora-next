@@ -72,7 +72,6 @@ const opContracts = (isProd: boolean): TenantContracts => {
         : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6",
       chainId: 10,
       abi: AlligatorOPV5__factory.abi,
-
     }),
     // TYPES
     proposalTypesConfigurator: new TenantContract<BaseContract>({

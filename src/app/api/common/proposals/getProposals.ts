@@ -8,9 +8,9 @@ import { getQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function getProposals({
-                                     filter,
-                                     page = 1,
-                                   }: {
+  filter,
+  page = 1,
+}: {
   filter: string;
   page: number;
 }) {
@@ -49,7 +49,7 @@ export async function getProposals({
       }
     },
     page,
-    pageSize,
+    pageSize
   );
 
   const latestBlock = await provider.getBlockNumber();
@@ -62,9 +62,9 @@ export async function getProposals({
         proposal,
         latestBlock,
         quorum ?? null,
-        BigInt(votableSupply),
+        BigInt(votableSupply)
       );
-    }),
+    })
   );
 
   return {
@@ -87,7 +87,12 @@ export async function getProposal(proposal_id: string) {
   const quorum = await getQuorumForProposal(proposal);
   const votableSupply = await getVotableSupply();
 
-  return parseProposal(proposal, latestBlock, quorum ?? null, BigInt(votableSupply));
+  return parseProposal(
+    proposal,
+    latestBlock,
+    quorum ?? null,
+    BigInt(votableSupply)
+  );
 }
 
 export async function getProposalTypes() {
