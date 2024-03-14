@@ -23,7 +23,6 @@ export default class Tenant {
   private constructor() {
     this._namespace = process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
     this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-
     this._contracts = TenantContractFactory.create(
       this._namespace,
       this._isProd,
