@@ -610,7 +610,6 @@ enum DaoSlug {
   OP
   ENS
   UNI
-  ETHFI
   NOUNS
   LYRA
   ETHERFI
