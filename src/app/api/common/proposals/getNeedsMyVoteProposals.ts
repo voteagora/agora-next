@@ -48,7 +48,7 @@ export async function getNeedsMyVoteProposals(address: string) {
       return parseProposal(
         proposal,
         latestBlock,
-        quorum !== undefined ? quorum : null,
+        quorum ?? null,
         BigInt(votableSupply),
       );
     }),

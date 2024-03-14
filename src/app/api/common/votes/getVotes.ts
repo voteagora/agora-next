@@ -7,6 +7,7 @@ import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
+
 export const getVotesForDelegate = ({
   addressOrENSName,
   page,
@@ -231,13 +232,13 @@ export async function getVotesForProposalAndDelegate({
   address: string;
 }) {
   const { namespace } = Tenant.current();
-  const votes = await prisma[`${namespace}Votes`].findMany({
+  const votes = await (prisma as any)[`${namespace}Votes`].findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
   const latestBlock = await provider.getBlockNumber();
 
-  return votes.map((vote) =>
+  return votes.map((vote: VotePayload) =>
     parseVote(
       vote,
       parseProposalData(

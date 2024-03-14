@@ -8,9 +8,9 @@ import { getQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function getProposals({
-  filter,
-  page = 1,
-}: {
+                                     filter,
+                                     page = 1,
+                                   }: {
   filter: string;
   page: number;
 }) {
@@ -24,7 +24,7 @@ export async function getProposals({
   const { meta, data: proposals } = await paginatePrismaResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
-        return prisma[`${namespace}Proposals`].findMany({
+        return (prisma as any)[`${namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -36,7 +36,7 @@ export async function getProposals({
           },
         });
       } else {
-        return prisma[`${namespace}Proposals`].findMany({
+        return (prisma as any)[`${namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -49,7 +49,7 @@ export async function getProposals({
       }
     },
     page,
-    pageSize
+    pageSize,
   );
 
   const latestBlock = await provider.getBlockNumber();
@@ -61,10 +61,10 @@ export async function getProposals({
       return parseProposal(
         proposal,
         latestBlock,
-        quorum,
-        BigInt(votableSupply)
+        quorum ?? null,
+        BigInt(votableSupply),
       );
-    })
+    }),
   );
 
   return {
@@ -75,7 +75,7 @@ export async function getProposals({
 
 export async function getProposal(proposal_id: string) {
   const { namespace } = Tenant.current();
-  const proposal = await prisma[`${namespace}Proposals`].findFirst({
+  const proposal = await (prisma as any)[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });
 
@@ -87,13 +87,13 @@ export async function getProposal(proposal_id: string) {
   const quorum = await getQuorumForProposal(proposal);
   const votableSupply = await getVotableSupply();
 
-  return parseProposal(proposal, latestBlock, quorum, BigInt(votableSupply));
+  return parseProposal(proposal, latestBlock, quorum ?? null, BigInt(votableSupply));
 }
 
 export async function getProposalTypes() {
   const { namespace, contracts } = Tenant.current();
 
-  return prisma[`${namespace}ProposalTypes`].findMany({
+  return (prisma as any)[`${namespace}ProposalTypes`].findMany({
     where: {
       contract: contracts.proposalTypesConfigurator!.address,
     },
