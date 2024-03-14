@@ -5,6 +5,7 @@ import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { paginatePrismaResult } from "@/app/lib/pagination";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -85,15 +86,20 @@ async function getCurrentDelegateesForAddress({
  * Delegators for a given address (addresses delegating to the given address)
  * @param addressOrENSName
  */
-export const getCurrentDelegators = (addressOrENSName: string) =>
-  addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName);
+export const getCurrentDelegators = (addressOrENSName: string, page?: number) =>
+  addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName, {
+    page,
+  });
 
 async function getCurrentDelegatorsForAddress({
   address,
+  page = 1,
 }: {
   address: string;
+  page?: number;
 }) {
   const { namespace, contracts } = Tenant.getInstance();
+  const pageSize = 20;
 
   const [advancedDelegators, directDelegators] = await Promise.all([
     prisma[`${namespace}AdvancedDelegatees`].findMany({
@@ -104,76 +110,89 @@ async function getCurrentDelegatorsForAddress({
       },
     }),
     (async () => {
-      return prisma.$queryRawUnsafe<
-        {
-          delegator: string;
-          delegatee: string;
-          block_number: bigint;
-        }[]
-      >(
-        `
-        SELECT
-          t1.delegator,
-          t1.to_delegate AS delegatee,
-          t1.block_number
-        FROM
-          center.optimism_delegate_changed_events t1
-        WHERE
-          t1.to_delegate = $1
-          AND NOT EXISTS (
+      return paginatePrismaResult(
+        async (skip: number, take: number) => {
+          return prisma.$queryRawUnsafe<
+            {
+              delegator: string;
+              delegatee: string;
+              block_number: bigint;
+            }[]
+          >(
+            `
             SELECT
-              1
+              t1.delegator,
+              t1.to_delegate AS delegatee,
+              t1.block_number
             FROM
-              center.optimism_delegate_changed_events t2
+              center.optimism_delegate_changed_events t1
             WHERE
-              t2.delegator = t1.delegator
-              AND t2.block_number > t1.block_number
-              OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index))
-        ORDER BY
-          t1.block_number DESC,
-          t1.log_index DESC,
-          t1.transaction_index DESC
-        `,
-        address
+              t1.to_delegate = $1
+              AND NOT EXISTS (
+                SELECT
+                  1
+                FROM
+                  center.optimism_delegate_changed_events t2
+                WHERE
+                  t2.delegator = t1.delegator
+                  AND t2.block_number > t1.block_number
+                  OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index))
+            ORDER BY
+              t1.block_number DESC,
+              t1.log_index DESC,
+              t1.transaction_index DESC
+            OFFSET $2
+            LIMIT $3;
+            `,
+            address,
+            skip,
+            take
+          );
+        },
+        page,
+        pageSize
       );
     })(),
   ]);
 
   const latestBlock = await provider.getBlockNumber();
 
-  // TODO: These needs to be ordered by timestamp
-
-  return [
-    ...advancedDelegators.map((advancedDelegator) => ({
-      from: advancedDelegator.from,
-      to: advancedDelegator.to,
-      allowance: advancedDelegator.delegated_amount.toFixed(0),
-      timestamp: latestBlock
-        ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
-        : null,
-      type: "ADVANCED",
-      amount:
-        Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-          ? "FULL"
-          : "PARTIAL",
-    })),
-    ...(
-      await Promise.all(
-        directDelegators.map(async (directDelegator) => ({
-          from: directDelegator.delegator,
-          to: directDelegator.delegatee,
-          allowance: await contracts.token.contract.balanceOf(
-            directDelegator.delegator
-          ),
-          timestamp: latestBlock
-            ? getHumanBlockTime(directDelegator.block_number, latestBlock)
-            : null,
-          type: "DIRECT",
-          amount: "FULL",
-        }))
-      )
-    ).filter((delegator) => delegator.allowance > BigInt(0)),
-  ] as Delegation[];
+  return {
+    meta: directDelegators.meta,
+    data: [
+      ...(page == 1
+        ? advancedDelegators.map((advancedDelegator) => ({
+            from: advancedDelegator.from,
+            to: advancedDelegator.to,
+            allowance: advancedDelegator.delegated_amount.toFixed(0),
+            timestamp: latestBlock
+              ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+              : null,
+            type: "ADVANCED",
+            amount:
+              Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+                ? "FULL"
+                : "PARTIAL",
+          }))
+        : []),
+      ...(
+        await Promise.all(
+          directDelegators.data.map(async (directDelegator) => ({
+            from: directDelegator.delegator,
+            to: directDelegator.delegatee,
+            allowance: await contracts.token.contract.balanceOf(
+              directDelegator.delegator
+            ),
+            timestamp: latestBlock
+              ? getHumanBlockTime(directDelegator.block_number, latestBlock)
+              : null,
+            type: "DIRECT",
+            amount: "FULL",
+          }))
+        )
+      ).filter((delegator) => delegator.allowance > BigInt(1e15)), // filter out delegators with 0 (or close to 0) balance
+    ] as Delegation[],
+  };
 }
 
 /**

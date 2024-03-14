@@ -51,9 +51,7 @@ export async function getProxyAddress(addressOrENSName: string) {
 }
 
 export async function fetchDelegate(addressOrENSName: string) {
-  return cache(
-    (address: string) => getDelegate(address)
-  )(addressOrENSName);
+  return cache((address: string) => getDelegate(address))(addressOrENSName);
 }
 
 export async function submitDelegateStatement({
@@ -78,9 +76,9 @@ export async function submitDelegateStatement({
 }
 
 export async function fetchDelegateStatement(addressOrENSName: string) {
-  return cache(
-      (addressOrENS: string) => getDelegateStatement(addressOrENS)
-  )(addressOrENSName);
+  return cache((addressOrENS: string) => getDelegateStatement(addressOrENS))(
+    addressOrENSName
+  );
 }
 
 export async function fetchVotesForDelegate(
@@ -98,8 +96,11 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
   return getCurrentDelegatees(addressOrENSName);
 }
 
-export async function fetchCurrentDelegators(addressOrENSName: string) {
-  return getCurrentDelegators(addressOrENSName);
+export async function fetchCurrentDelegators(
+  addressOrENSName: string,
+  page = 1
+) {
+  return getCurrentDelegators(addressOrENSName, page);
 }
 
 // TODO temporary fetch all query - optimization via API needed
@@ -127,6 +128,8 @@ export const fetchConnectedDelegate = async (address: string) => {
   ]);
 };
 
-export const revalidateDelegateAddressPage = async (delegateAddress: string) => {
+export const revalidateDelegateAddressPage = async (
+  delegateAddress: string
+) => {
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };

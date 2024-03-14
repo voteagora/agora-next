@@ -1,4 +1,4 @@
-type PaginatedResult<T> = {
+export type PaginatedResult<T> = {
   meta: {
     currentPage: number;
     pageSize: number;

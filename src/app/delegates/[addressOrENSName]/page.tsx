@@ -2,7 +2,7 @@
  * Show page for a single delegate
  * Takes in the delegate address as a parameter
  */
-import { Metadata, ResolvingMetadata } from 'next'
+import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { VStack } from "@/components/Layout/Stack";
@@ -23,15 +23,18 @@ import {
   resolveENSName,
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
+import { getCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
-  parent: ResolvingMetadata 
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
   const address = await resolveENSName(params.addressOrENSName);
-  const ensOrTruncatedAddress = await processAddressOrEnsName(params.addressOrENSName);
+  const ensOrTruncatedAddress = await processAddressOrEnsName(
+    params.addressOrENSName
+  );
   const [delegate, avatar] = await Promise.all([
     fetchDelegate(address || params.addressOrENSName),
     resolveENSProfileImage(address || params.addressOrENSName),
@@ -76,14 +79,13 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const address = await resolveENSName(addressOrENSName) || addressOrENSName;
-  const [delegate, delegateVotes, delegates, delegators] =
-    await Promise.all([
-      fetchDelegate(address),
-      fetchVotesForDelegate(address),
-      fetchCurrentDelegatees(address),
-      fetchCurrentDelegators(address),
-    ]);
+  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+  const [delegate, delegateVotes, delegates, delegators] = await Promise.all([
+    fetchDelegate(address),
+    fetchVotesForDelegate(address),
+    fetchCurrentDelegatees(address),
+    fetchCurrentDelegators(address),
+  ]);
 
   const statement = delegate.statement;
 
@@ -105,7 +107,15 @@ export default async function Page({
           statement={statement}
         />
         {statement && <TopIssues statement={statement} />}
-        <DelegationsContainer delegatees={delegates} delegators={delegators} />
+        <DelegationsContainer
+          delegatees={delegates}
+          initialDelegators={delegators}
+          fetchDelegators={async (page: number) => {
+            "use server";
+
+            return getCurrentDelegators(addressOrENSName, page);
+          }}
+        />
 
         {/* TODO: -> this could be refactor with revalidatePath */}
         <DelegateVotesProvider initialVotes={delegateVotes}>

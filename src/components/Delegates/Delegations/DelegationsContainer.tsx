@@ -1,3 +1,5 @@
+"use client";
+
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import DelegationToRow from "./DelegationToRow";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -11,18 +13,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PaginatedResult } from "@/app/lib/pagination";
+import { useEffect, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroller";
 
 function DelegationsContainer({
   delegatees,
-  delegators,
+  initialDelegators,
+  fetchDelegators,
 }: {
   delegatees: Delegation[];
-  delegators: Delegation[];
+  initialDelegators: PaginatedResult<Delegation[]>;
+  fetchDelegators: (page: number) => Promise<PaginatedResult<Delegation[]>>;
 }) {
+  const fetching = useRef(false);
+  const [meta, setMeta] = useState(initialDelegators.meta);
+  const [delegators, setDelegates] = useState(initialDelegators.data);
+  // const { advancedDelegators } = useConnectedDelegate();
+
+  useEffect(() => {
+    setDelegates(initialDelegators.data);
+    setMeta(initialDelegators.meta);
+  }, [initialDelegators]);
+
+  const loadMore = async () => {
+    if (!fetching.current && meta.hasNextPage) {
+      fetching.current = true;
+      const data = await fetchDelegators(meta.currentPage + 1);
+      setDelegates(delegators.concat(data.data));
+      setMeta(data.meta);
+      fetching.current = false;
+    }
+  };
+
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
       <div className="p-8 text-center align-middle bg-gray-100 rounded-md">
-        No advanced delegations found
+        No delegations found
       </div>
     );
   }
@@ -59,16 +86,34 @@ function DelegationsContainer({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {delegators.length === 0 ? (
-                  <div className="w-full p-4">None found</div>
-                ) : (
-                  delegators.map((delegation) => (
-                    <DelegationFromRow
-                      key={delegation.from}
-                      delegation={delegation}
-                    />
-                  ))
-                )}
+                {/* @ts-ignore */}
+                <InfiniteScroll
+                  hasMore={meta.hasNextPage}
+                  pageStart={1}
+                  loadMore={loadMore}
+                  loader={
+                    <TableRow key={0}>
+                      <TableCell
+                        key="loader"
+                        className="gl_loader justify-center py-6 text-sm text-stone-500"
+                      >
+                        Loading...
+                      </TableCell>
+                    </TableRow>
+                  }
+                  element="div"
+                >
+                  {delegators.length === 0 ? (
+                    <div className="w-full p-4">None found</div>
+                  ) : (
+                    delegators.map((delegation) => (
+                      <DelegationFromRow
+                        key={delegation.from}
+                        delegation={delegation}
+                      />
+                    ))
+                  )}
+                </InfiniteScroll>
               </TableBody>
             </Table>
           </VStack>
