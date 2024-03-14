@@ -101,25 +101,29 @@ async function getCurrentDelegatorsForAddress({
   const { namespace, contracts } = Tenant.getInstance();
   const pageSize = 20;
 
-  const [advancedDelegators, directDelegators] = await Promise.all([
-    prisma[`${namespace}AdvancedDelegatees`].findMany({
-      where: {
-        to: address.toLowerCase(),
-        delegated_amount: { gt: 0 },
-        contract: contracts.alligator!.address,
-      },
-    }),
-    (async () => {
-      return paginatePrismaResult(
-        async (skip: number, take: number) => {
-          return prisma.$queryRawUnsafe<
-            {
-              delegator: string;
-              delegatee: string;
-              block_number: bigint;
-            }[]
-          >(
-            `
+  const [advancedDelegators, directDelegators, latestBlock] = await Promise.all(
+    [
+      (() =>
+        page == 1
+          ? prisma[`${namespace}AdvancedDelegatees`].findMany({
+              where: {
+                to: address.toLowerCase(),
+                delegated_amount: { gt: 0 },
+                contract: contracts.alligator!.address,
+              },
+            })
+          : [])(),
+      (async () => {
+        return paginatePrismaResult(
+          async (skip: number, take: number) => {
+            return prisma.$queryRawUnsafe<
+              {
+                delegator: string;
+                delegatee: string;
+                block_number: bigint;
+              }[]
+            >(
+              `
             SELECT
               t1.delegator,
               t1.to_delegate AS delegatee,
@@ -144,37 +148,35 @@ async function getCurrentDelegatorsForAddress({
             OFFSET $2
             LIMIT $3;
             `,
-            address,
-            skip,
-            take
-          );
-        },
-        page,
-        pageSize
-      );
-    })(),
-  ]);
-
-  const latestBlock = await provider.getBlockNumber();
+              address,
+              skip,
+              take
+            );
+          },
+          page,
+          pageSize
+        );
+      })(),
+      provider.getBlockNumber(),
+    ]
+  );
 
   return {
     meta: directDelegators.meta,
     data: [
-      ...(page == 1
-        ? advancedDelegators.map((advancedDelegator) => ({
-            from: advancedDelegator.from,
-            to: advancedDelegator.to,
-            allowance: advancedDelegator.delegated_amount.toFixed(0),
-            timestamp: latestBlock
-              ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
-              : null,
-            type: "ADVANCED",
-            amount:
-              Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-                ? "FULL"
-                : "PARTIAL",
-          }))
-        : []),
+      ...advancedDelegators.map((advancedDelegator) => ({
+        from: advancedDelegator.from,
+        to: advancedDelegator.to,
+        allowance: advancedDelegator.delegated_amount.toFixed(0),
+        timestamp: latestBlock
+          ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+          : null,
+        type: "ADVANCED",
+        amount:
+          Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+            ? "FULL"
+            : "PARTIAL",
+      })),
       ...(
         await Promise.all(
           directDelegators.data.map(async (directDelegator) => ({
