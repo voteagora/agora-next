@@ -4,22 +4,19 @@ import {
   OptimismDelegates,
   OptimismVoterStats,
   OptimismVotingPower,
-  Prisma,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { Delegate } from "./delegate";
+import {
+  type Delegate,
+  type DelegatePayload,
+  type DelegatesGetPayload,
+} from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
-
-type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
-type DelegatePayload = Delegate & {
-  delegate: string;
-  voting_power: number;
-};
 
 export async function getDelegates({
   page = 1,
@@ -79,7 +76,7 @@ export async function getDelegates({
   );
 
   const _delegates = await Promise.all(
-    delegates.map(async (delegate:DelegatePayload) => {
+    delegates.map(async (delegate: DelegatePayload) => {
       return {
         citizen: await isCitizen(delegate.delegate),
         statement: await getDelegateStatement(delegate.delegate),
@@ -89,7 +86,7 @@ export async function getDelegates({
 
   return {
     meta,
-    delegates: delegates.map((delegate:DelegatePayload, index:number) => ({
+    delegates: delegates.map((delegate: DelegatePayload, index: number) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: _delegates[index].citizen.length > 0,
