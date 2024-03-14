@@ -1,12 +1,10 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./approvalProposalVotesList.module.scss";
-import { VStack, HStack } from "@/components/Layout/Stack";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import Image from "next/image";
 import { useAccount } from "wagmi";
 import { Vote } from "@/app/api/common/votes/vote";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
@@ -41,10 +39,10 @@ export default function ApprovalProposalVotesList({
   fetchUserVotes,
   proposal_id,
 }: Props) {
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialProposalVotes] || []);
-  const [meta, setMeta] = React.useState(initialProposalVotes.meta);
-  const [userVotes, setUserVotes] = React.useState<Vote[]>([]);
+  const fetching = useRef(false);
+  const [pages, setPages] = useState([initialProposalVotes] || []);
+  const [meta, setMeta] = useState(initialProposalVotes.meta);
+  const [userVotes, setUserVotes] = useState<Vote[]>([]);
   const { address: connectedAddress } = useAccount();
 
   const proposalVotes = pages.reduce(
@@ -76,13 +74,13 @@ export default function ApprovalProposalVotesList({
     setUserVotes(fetchedUserVotes);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (connectedAddress) {
       fetchUserVoteAndSet(proposal_id, connectedAddress);
     } else {
       setUserVotes([]);
     }
-  }, [connectedAddress]);
+  }, [connectedAddress, proposal_id]);
 
   return (
     <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
