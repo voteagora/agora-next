@@ -216,7 +216,7 @@ view ENSDelegatees {
 
 view ENSDelegates {
   delegate          String  @unique
-  num_of_delegators BigInt
+  num_of_delegators Decimal @db.Decimal
   direct_vp         Decimal @db.Decimal
   advanced_vp       String
   voting_power      Decimal @db.Decimal
@@ -316,7 +316,7 @@ view EtherfiDelegatees {
 
 view EtherfiDelegates {
   delegate          String  @unique
-  num_of_delegators BigInt
+  num_of_delegators Decimal @db.Decimal
   direct_vp         Decimal @db.Decimal
   advanced_vp       String
   voting_power      Decimal @db.Decimal
@@ -558,7 +558,7 @@ view subdelegation_events {
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view ens_delegates_wrapper {
   delegate          String?
-  num_of_delegators BigInt?
+  num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       String?
   voting_power      Decimal? @db.Decimal
@@ -596,7 +596,7 @@ view ens_proposals_wrapper {
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view etherfi_delegates_wrapper {
   delegate          String?
-  num_of_delegators BigInt?
+  num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       String?
   voting_power      Decimal? @db.Decimal
