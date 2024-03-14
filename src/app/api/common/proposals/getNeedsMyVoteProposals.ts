@@ -39,7 +39,7 @@ export async function getNeedsMyVoteProposals(address: string) {
       `,
     latestBlock,
     address.toLowerCase(),
-    contracts.governor.address
+    contracts.governor.address,
   );
 
   const resolvedProposals = Promise.all(
@@ -48,10 +48,10 @@ export async function getNeedsMyVoteProposals(address: string) {
       return parseProposal(
         proposal,
         latestBlock,
-        quorum,
-        BigInt(votableSupply)
+        quorum !== undefined ? quorum : null,
+        BigInt(votableSupply),
       );
-    })
+    }),
   );
 
   return {

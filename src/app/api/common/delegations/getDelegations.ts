@@ -6,6 +6,14 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
+type AdvancedDelegatorPayload = {
+  block_number: number;
+  delegated_amount: number;
+  delegated_share:number;
+  from: number;
+  to: string;
+};
+
 /**
  * Delegations for a given address (addresses the given address is delegating to)
  * @param addressOrENSName
@@ -100,7 +108,7 @@ async function getCurrentDelegateesForAddress({
     //       },
     //     ]
     //   : []),
-    ...advancedDelegatees.map((advancedDelegatee) => ({
+    ...advancedDelegatees.map((advancedDelegatee: AdvancedDelegatorPayload) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
@@ -196,7 +204,7 @@ async function getCurrentDelegatorsForAddress({
     //   amount: "FULL",
     // })),
 
-    ...(await advancedDelegators).map((advancedDelegator) => ({
+    ...(await advancedDelegators).map((advancedDelegator:AdvancedDelegatorPayload) => ({
       from: advancedDelegator.from,
       to: advancedDelegator.to,
       allowance: advancedDelegator.delegated_amount.toFixed(0),
