@@ -72,7 +72,7 @@ export default async function Home() {
   if (namespace === TENANT_NAMESPACES.ETHERFI) {
     return <Hero />;
   }
-  
+
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter,

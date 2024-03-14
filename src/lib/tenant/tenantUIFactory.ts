@@ -27,6 +27,7 @@ export default class TenantUIFactory {
 
 const etherfiUI = new TenantUI({
   title: "ETHER.FI Agora",
+  color: "#2F38FF",
   hero: etherfiHero,
   logo: etherfiLogo,
 
@@ -77,6 +78,7 @@ const etherfiUI = new TenantUI({
 
 const ensUI = new TenantUI({
   title: "ENS Agora",
+  color: "#5BAAF4",
   logo: ensLogo,
 
   pages: [
@@ -126,8 +128,9 @@ const ensUI = new TenantUI({
 
 const optimismUI = new TenantUI({
   title: "Optimism Agora",
-  hero: optimismHero,
+  color: "#FF0420",
   logo: optimismLogo,
+  hero: optimismHero,
 
   pages: [
     {

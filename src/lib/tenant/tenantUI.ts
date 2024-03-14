@@ -14,6 +14,7 @@ type UIPage = {
 };
 
 type TenantUIParams = {
+  color: string;
   hero?: string;
   logo: string;
   title: string;
@@ -22,18 +23,24 @@ type TenantUIParams = {
 };
 
 export class TenantUI {
+  private _color: string;
   private _hero?: string;
   private _logo: string;
   private _title: string;
   private _pages?: UIPage[];
   private _toggles?: UIToggle[];
 
-  constructor({ hero, logo, title, pages, toggles }: TenantUIParams) {
+  constructor({ color, hero, logo, title, pages, toggles }: TenantUIParams) {
+    this._color = color;
     this._hero = hero;
     this._logo = logo;
     this._title = title;
     this._toggles = toggles;
     this._pages = pages;
+  }
+
+  public get color(): string {
+    return this._color;
   }
 
   public get title(): string {
