@@ -55,7 +55,6 @@ export function DelegateDialog({
 
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });
-
     if (Number(votingPower) > 0) {
       setRefetchDelegate({
         address: trackingData.delegateAddress,
