@@ -1,6 +1,6 @@
 import {
+  getCurrentAdvancedDelegators,
   getCurrentDelegatees,
-  getCurrentDelegators,
 } from "../common/delegations/getDelegations";
 import {
   getProxy,
@@ -15,7 +15,7 @@ export const getAllForAForAdvancedDelegation = async (address: string) => {
     isDelegatingToProxy(address),
     getCurrentDelegatees(address),
     getProxy(address),
-    getCurrentDelegators(address),
+    getCurrentAdvancedDelegators(address),
     getVotingPowerAvailableForDirectDelegation(address),
   ]);
 };

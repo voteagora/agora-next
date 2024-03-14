@@ -196,6 +196,48 @@ async function getCurrentDelegatorsForAddress({
 }
 
 /**
+ * Advanced delegators for a given address (addresses delegating to the given address)
+ * @param addressOrENSName
+ */
+
+export const getCurrentAdvancedDelegators = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(
+    getCurrentAdvancedDelegatorsForAddress,
+    addressOrENSName
+  );
+
+async function getCurrentAdvancedDelegatorsForAddress(
+  address: string
+): Promise<Delegation[]> {
+  const { namespace, contracts } = Tenant.getInstance();
+
+  const [advancedDelegators, latestBlock] = await Promise.all([
+    prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        to: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator!.address,
+      },
+    }),
+    provider.getBlockNumber(),
+  ]);
+
+  return advancedDelegators.map((advancedDelegator) => ({
+    from: advancedDelegator.from,
+    to: advancedDelegator.to,
+    allowance: advancedDelegator.delegated_amount.toFixed(0),
+    timestamp: latestBlock
+      ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+      : null,
+    type: "ADVANCED",
+    amount:
+      Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+        ? "FULL"
+        : "PARTIAL",
+  }));
+}
+
+/**
  * Get the direct delegatee for a given address
  * @param addressOrENSName
  */
