@@ -41,6 +41,16 @@ const etherfiUI = new TenantUI({
         description: "Delegate your voting power to a trusted representative",
       },
     },
+    {
+      route: "/",
+      title: "Agora is the home of ETHER.FI delegates",
+      description:
+        "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
+      },
+    },
   ],
 
   toggles: [
@@ -56,6 +66,16 @@ const ensUI = new TenantUI({
   logo: ensLogo,
 
   pages: [
+    {
+      route: "/",
+      title: "Agora is the home of ENS voters",
+      description:
+        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "ENS Agora",
+        description: "Home of token governance",
+      },
+    },
     {
       route: "proposals",
       title: "Agora is the home of ENS voters",
@@ -96,6 +116,16 @@ const optimismUI = new TenantUI({
   logo: optimismLogo,
 
   pages: [
+    {
+      route: "/",
+      title: "Agora is the home of Optimism voters",
+      description:
+        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Optimism Agora",
+        description: "Home of token house governance and RPGF",
+      },
+    },
     {
       route: "proposals",
       title: "Agora is the home of Optimism voters",

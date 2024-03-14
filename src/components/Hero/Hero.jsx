@@ -7,7 +7,7 @@ import styles from "./hero.module.scss";
 
 export default async function Hero() {
   const { namespace, ui } = Tenant.current();
-  const { title, description } = ui.page("proposals");
+  const { title, description } = ui.page("/");
 
   return (
     <HStack justifyContent="justify-between" className={styles.hero_container}>

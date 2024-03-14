@@ -20,7 +20,7 @@ async function getCurrentDelegateesForAddress({
 }): Promise<Delegation[]> {
   const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegatees = await prisma[
+  const advancedDelegatees = await (prisma as any)[
     `${namespace}AdvancedDelegatees`
   ].findMany({
     where: {
@@ -130,7 +130,7 @@ async function getCurrentDelegatorsForAddress({
 }) {
   const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
+  const advancedDelegators = (prisma as any)[`${namespace}AdvancedDelegatees`].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
@@ -227,7 +227,7 @@ const getDirectDelegateeForAddress = async ({
   const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
+    (prisma as any)[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);

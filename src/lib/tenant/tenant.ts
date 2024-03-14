@@ -8,6 +8,7 @@ import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
+import { type DaoSlug } from "@prisma/client";
 
 export default class Tenant {
   private static instance: Tenant;
@@ -15,7 +16,7 @@ export default class Tenant {
   private readonly _contracts: TenantContracts;
   private readonly _isProd: boolean;
   private readonly _namespace: TenantNamespace;
-  private readonly _slug: string;
+  private readonly _slug: DaoSlug;
   private readonly _token: TenantToken;
   private readonly _ui: TenantUI;
 
@@ -45,7 +46,7 @@ export default class Tenant {
     return this._namespace;
   }
 
-  public get slug(): string {
+  public get slug(): DaoSlug {
     return this._slug;
   }
 
