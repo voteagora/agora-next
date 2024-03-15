@@ -134,7 +134,7 @@ function SubdelegationToRow({
           </div>
         </div>
       </div>
-      {allowances[index] === 0 && amountToAllocateRaw < 0 && (
+      {allowances[index] === 0 && amountToAllocateRaw <= 0 && (
         <span className="pt-2">Total delegatable votes reached</span>
       )}
     </div>
