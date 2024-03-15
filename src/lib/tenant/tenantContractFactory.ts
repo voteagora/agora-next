@@ -2,7 +2,8 @@ import { TenantContracts, type TenantNamespace } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 
 import {
-  AlligatorOPV5__factory, EtherfiToken__factory,
+  AlligatorOPV5__factory,
+  EtherfiToken__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
@@ -38,7 +39,7 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
     token: new TenantContract<ITokenContract>({
       contract: EtherfiToken__factory.connect(
         "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
-        provider
+        global.ethProvider
       ),
       address: "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB" as `0x${string}`,
       chainId: 1,
@@ -50,7 +51,7 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
         isProd
           ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
           : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-        provider
+        global.provider
       ),
       address: isProd
         ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
@@ -61,7 +62,7 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
     }),
   };
-}
+};
 
 const opContracts = (isProd: boolean): TenantContracts => {
   return {
