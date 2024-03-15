@@ -9,7 +9,7 @@ export default function Header() {
     <VStack>
       <HStack className="flex flex-row w-full items-center gap-1">
         <div className="sm:w-full flex justify-start">
-          <LogoLink instance_name="Optimism" />
+          <LogoLink />
         </div>
         <div className="w-full flex justify-center">
           <Navbar />

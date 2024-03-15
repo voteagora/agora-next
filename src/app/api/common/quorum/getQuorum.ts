@@ -11,7 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
   @dev: only supports optimisim
 */
 async function getQuorumForProposal(proposal: ProposalPayload) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
   switch (namespace) {
     case "optimism": {
@@ -21,7 +21,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
       // If no quorum is set, calculate it based on votable supply
       if (!contractQuorum) {
-        const votableSupply = await prisma[
+        const votableSupply = await (prisma as any)[
           `${namespace}VotableSupply`
         ].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
@@ -36,7 +36,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
   Retrieve the current quorum based on block number
 */
 async function getCurrentQuorum() {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
   switch (namespace) {
     case "optimism": {

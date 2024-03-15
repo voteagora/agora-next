@@ -2,7 +2,7 @@
  * Show page for a single delegate
  * Takes in the delegate address as a parameter
  */
-import { Metadata, ResolvingMetadata } from 'next'
+import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { VStack } from "@/components/Layout/Stack";
@@ -23,19 +23,24 @@ import {
   resolveENSName,
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
-  parent: ResolvingMetadata 
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
   const address = await resolveENSName(params.addressOrENSName);
-  const ensOrTruncatedAddress = await processAddressOrEnsName(params.addressOrENSName);
+  const ensOrTruncatedAddress = await processAddressOrEnsName(
+    params.addressOrENSName
+  );
   const [delegate, avatar] = await Promise.all([
     fetchDelegate(address || params.addressOrENSName),
     resolveENSProfileImage(address || params.addressOrENSName),
   ]);
+
+  const { token } = Tenant.current();
 
   const statement = (
     delegate.statement?.payload as { delegateStatement: string }
@@ -44,7 +49,7 @@ export async function generateMetadata(
   const imgParams = [
     delegate.votingPower &&
       `votes=${encodeURIComponent(
-        `${formatNumber(delegate.votingPower || "0")} OP`
+        `${formatNumber(delegate.votingPower || "0")} ${token.symbol}`
       )}`,
     avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
@@ -54,7 +59,7 @@ export async function generateMetadata(
     "&"
   )}&address=${ensOrTruncatedAddress}`;
   const title = `${ensOrTruncatedAddress} on Agora`;
-  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on Optimism governance.`;
+  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on ${token.name} governance.`;
 
   return {
     title: title,
@@ -76,14 +81,13 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const address = await resolveENSName(addressOrENSName) || addressOrENSName;
-  const [delegate, delegateVotes, delegates, delegators] =
-    await Promise.all([
-      fetchDelegate(address),
-      fetchVotesForDelegate(address),
-      fetchCurrentDelegatees(address),
-      fetchCurrentDelegators(address),
-    ]);
+  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+  const [delegate, delegateVotes, delegates, delegators] = await Promise.all([
+    fetchDelegate(address),
+    fetchVotesForDelegate(address),
+    fetchCurrentDelegatees(address),
+    fetchCurrentDelegators(address),
+  ]);
 
   const statement = delegate.statement;
 

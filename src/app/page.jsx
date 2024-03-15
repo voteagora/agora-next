@@ -8,7 +8,8 @@ import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions } from "@/lib/constants";
+import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -39,9 +40,13 @@ async function fetchGovernanceCalendar() {
 }
 
 export async function generateMetadata({}, parent) {
-  const preview = `/api/images/og/proposals`;
-  const title = "Optimism Agora";
-  const description = "Home of token house governance and RPGF";
+  const tenant = Tenant.current();
+  const page = tenant.ui.page("proposals");
+  const { title, description } = page.meta;
+
+  const preview = `/api/images/og/proposals?title=${encodeURIComponent(
+    title,
+  )}&description=${encodeURIComponent(description)}`;
 
   return {
     title: title,
@@ -58,13 +63,21 @@ export async function generateMetadata({}, parent) {
   };
 }
 
+
 export default async function Home() {
+
+  // NOTE: This is a temporary placeholder for Ether.fi
+  const { namespace } = Tenant.current();
+  if (namespace === TENANT_NAMESPACES.ETHERFI) {
+    return <Hero />;
+  }
+
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
-    proposalsFilterOptions.relevant.filter
+    proposalsFilterOptions.relevant.filter,
   );
   const allProposals = await fetchProposals(
-    proposalsFilterOptions.everything.filter
+    proposalsFilterOptions.everything.filter,
   );
 
   const metrics = await fetchDaoMetrics();

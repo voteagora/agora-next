@@ -12,7 +12,7 @@ async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT

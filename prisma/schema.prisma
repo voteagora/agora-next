@@ -204,7 +204,7 @@ view OptimismDelegatees {
   @@schema("optimism")
 }
 
-view ENSDelegatees {
+view ensDelegatees {
   delegator    String  @unique
   delegatee    String
   block_number BigInt
@@ -214,7 +214,7 @@ view ENSDelegatees {
   @@schema("ens")
 }
 
-view ENSDelegates {
+view ensDelegates {
   delegate          String  @unique
   num_of_delegators Decimal @db.Decimal
   direct_vp         Decimal @db.Decimal
@@ -225,7 +225,7 @@ view ENSDelegates {
   @@schema("ens")
 }
 
-view ENSProposals {
+view ensProposals {
   proposal_id        String       @unique
   contract           String?      @db.VarChar(42)
   proposer           String
@@ -246,14 +246,14 @@ view ENSProposals {
   @@schema("ens")
 }
 
-view ENSVotableSupply {
+view ensVotableSupply {
   votable_supply String @unique
 
   @@map("votable_supply")
   @@schema("ens")
 }
 
-view ENSVoterStats {
+view ensVoterStats {
   voter              String   @unique
   proposals_proposed BigInt?
   proposals_voted    BigInt?
@@ -267,7 +267,7 @@ view ENSVoterStats {
   @@schema("ens")
 }
 
-view ENSVotes {
+view ensVotes {
   transaction_hash String        @unique @db.VarChar(66)
   proposal_id      String
   voter            String
@@ -285,7 +285,7 @@ view ENSVotes {
   @@schema("ens")
 }
 
-view ENSVotingPower {
+view ensVotingPower {
   delegate     String  @unique
   voting_power String?
 
@@ -293,7 +293,7 @@ view ENSVotingPower {
   @@schema("ens")
 }
 
-view ENSVotingPowerSnaps {
+view ensVotingPowerSnaps {
   id           String   @id
   delegate     String?
   balance      String?
@@ -304,7 +304,7 @@ view ENSVotingPowerSnaps {
   @@schema("ens")
 }
 
-view EtherfiDelegatees {
+view etherfiDelegatees {
   delegator    String  @unique
   delegatee    String
   block_number BigInt
@@ -314,7 +314,7 @@ view EtherfiDelegatees {
   @@schema("etherfi")
 }
 
-view EtherfiDelegates {
+view etherfiDelegates {
   delegate          String  @unique
   num_of_delegators Decimal @db.Decimal
   direct_vp         Decimal @db.Decimal
@@ -325,14 +325,14 @@ view EtherfiDelegates {
   @@schema("etherfi")
 }
 
-view EtherfiVotableSupply {
+view etherfiVotableSupply {
   votable_supply String @unique
 
   @@map("votable_supply")
   @@schema("etherfi")
 }
 
-view EtherfiVotingPower {
+view etherfiVotingPower {
   delegate     String  @unique
   voting_power String?
 
@@ -340,7 +340,7 @@ view EtherfiVotingPower {
   @@schema("etherfi")
 }
 
-view EtherfiVotingPowerSnaps {
+view etherfiVotingPowerSnaps {
   id           String   @id
   delegate     String?
   balance      String?

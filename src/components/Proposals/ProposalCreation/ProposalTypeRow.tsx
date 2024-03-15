@@ -46,7 +46,12 @@ function ProposalTypeRow({
     ) {
       form.onChange.proposalSettings("0");
     }
-  }, [proposalType]);
+  }, [
+    proposalType,
+    optimisticProposalSettingsIndex,
+    proposalSettings,
+    form.onChange,
+  ]);
 
   return (
     <VStack className={styles.type_row}>

@@ -8,6 +8,7 @@ import Hero from "@/components/Hero/Hero";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { TabsContent } from "@/components/ui/tabs";
 import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 import React from "react";
 
 async function fetchCitizens(sort, seed, page = 1) {
@@ -35,9 +36,13 @@ async function fetchDelegators(address) {
 }
 
 export async function generateMetadata({}, parent) {
-  const preview = `/api/images/og/delegates`;
-  const title = "Voter on Agora";
-  const description = "Delegate your voting power to a trusted representative";
+  const tenant = Tenant.current();
+  const page = tenant.ui.page("delegates");
+  const { title, description } = page.meta;
+
+  const preview = `/api/images/og/delegates?title=${encodeURIComponent(
+    title
+  )}&description=${encodeURIComponent(description)}`;
 
   return {
     title: title,

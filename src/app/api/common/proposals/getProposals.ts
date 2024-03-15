@@ -17,7 +17,7 @@ async function getProposals({
 }) {
   const pageSize = 10;
 
-  const { namespace, contracts, isProd } = Tenant.getInstance();
+  const { namespace, contracts, isProd } = Tenant.current();
   const prodDataOnly = isProd && {
     contract: contracts.governor.address,
   };
@@ -25,7 +25,7 @@ async function getProposals({
   const { meta, data: proposals } = await paginateResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
-        return prisma[`${namespace}Proposals`].findMany({
+        return (prisma as any)[`${namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -37,7 +37,7 @@ async function getProposals({
           },
         });
       } else {
-        return prisma[`${namespace}Proposals`].findMany({
+        return (prisma as any)[`${namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -62,7 +62,7 @@ async function getProposals({
       return parseProposal(
         proposal,
         latestBlock,
-        quorum,
+        quorum ?? null,
         BigInt(votableSupply)
       );
     })
@@ -75,8 +75,8 @@ async function getProposals({
 }
 
 async function getProposal(proposal_id: string) {
-  const { namespace } = Tenant.getInstance();
-  const proposal = await prisma[`${namespace}Proposals`].findFirst({
+  const { namespace } = Tenant.current();
+  const proposal = await (prisma as any)[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });
 
@@ -88,13 +88,18 @@ async function getProposal(proposal_id: string) {
   const quorum = await fetchQuorumForProposal(proposal);
   const votableSupply = await fetchVotableSupply();
 
-  return parseProposal(proposal, latestBlock, quorum, BigInt(votableSupply));
+  return parseProposal(
+    proposal,
+    latestBlock,
+    quorum ?? null,
+    BigInt(votableSupply)
+  );
 }
 
 async function getProposalTypes() {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
-  return prisma[`${namespace}ProposalTypes`].findMany({
+  return (prisma as any)[`${namespace}ProposalTypes`].findMany({
     where: {
       contract: contracts.proposalTypesConfigurator!.address,
     },

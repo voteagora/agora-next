@@ -3,7 +3,7 @@ import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function isCitizen(address: string) {
-  const { slug } = Tenant.getInstance();
+  const { slug } = Tenant.current();
 
   return prisma.$queryRaw<
     {

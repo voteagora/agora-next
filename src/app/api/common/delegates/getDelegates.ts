@@ -4,20 +4,21 @@ import {
   OptimismDelegates,
   OptimismVoterStats,
   OptimismVotingPower,
-  Prisma,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { Delegate } from "./delegate";
+import {
+  type Delegate,
+  type DelegatePayload,
+  type DelegatesGetPayload,
+} from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-
-type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
 async function getDelegates({
   page = 1,
@@ -29,7 +30,7 @@ async function getDelegates({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
 
   const { meta, data: delegates } = await paginateResult(
     async (skip: number, take: number) => {
@@ -63,7 +64,7 @@ async function getDelegates({
             take
           );
         default:
-          return prisma[`${namespace}Delegates`].findMany({
+          return (prisma as any)[`${namespace}Delegates`].findMany({
             skip,
             take,
             orderBy: {
@@ -77,7 +78,7 @@ async function getDelegates({
   );
 
   const _delegates = await Promise.all(
-    delegates.map(async (delegate) => {
+    delegates.map(async (delegate: DelegatePayload) => {
       return {
         citizen: await isCitizen(delegate.delegate),
         statement: await fetchDelegateStatement(delegate.delegate),
@@ -87,7 +88,7 @@ async function getDelegates({
 
   return {
     meta,
-    delegates: delegates.map((delegate, index) => ({
+    delegates: delegates.map((delegate: DelegatePayload, index: number) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: _delegates[index].citizen.length > 0,
@@ -111,7 +112,7 @@ type DelegateStats = {
 };
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -147,7 +148,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
@@ -177,7 +178,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     ) t;
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   const totalVotingPower =

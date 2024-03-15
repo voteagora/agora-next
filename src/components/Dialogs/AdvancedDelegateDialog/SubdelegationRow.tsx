@@ -99,7 +99,7 @@ function SubdelegationToRow({
     if (allowance !== 0 && newAllowanceInput === "") {
       setNewAllowanceInput(allowance.toLocaleString("en-US"));
     }
-  }, [allowance]);
+  }, [allowance, newAllowanceInput]);
 
   return (
     <div className={styles.sub_row}>

@@ -20,7 +20,7 @@ export function SwitchNetwork({
 
   return (
     <div className="flex flex-col gap-4">
-      <img src="/images/action-pending.svg" className="w-full" />
+      <img src="/images/action-pending.svg" className="w-full" alt="Switch netwrok"/>
       <h1 className="text-2xl font-extrabold">Switch Networks</h1>
       <p>Wrong network detected, switch to Optimism to continue.</p>
       <Button

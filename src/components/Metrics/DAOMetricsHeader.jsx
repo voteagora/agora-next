@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function DAOMetricsHeader({ metrics }) {
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);
 

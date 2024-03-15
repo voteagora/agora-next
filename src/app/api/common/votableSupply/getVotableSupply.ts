@@ -3,8 +3,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 
 async function getVotableSupply() {
-  const { namespace } = Tenant.getInstance();
-  const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
+  const { namespace } = Tenant.current();
+  const votableSupply = await (prisma as any)[`${namespace}VotableSupply`].findFirst({});
   if (!votableSupply) {
     throw new Error("No votable supply found");
   }

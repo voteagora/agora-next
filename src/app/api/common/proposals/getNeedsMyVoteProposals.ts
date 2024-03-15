@@ -8,7 +8,7 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 
 async function getNeedsMyVoteProposals(address: string) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const [latestBlock, votableSupply] = await Promise.all([
     provider.getBlockNumber(),
     fetchVotableSupply(),
@@ -40,7 +40,7 @@ async function getNeedsMyVoteProposals(address: string) {
       `,
     latestBlock,
     address.toLowerCase(),
-    contracts.governor.address
+    contracts.governor.address,
   );
 
   const resolvedProposals = Promise.all(
@@ -49,10 +49,10 @@ async function getNeedsMyVoteProposals(address: string) {
       return parseProposal(
         proposal,
         latestBlock,
-        quorum,
-        BigInt(votableSupply)
+        quorum ?? null,
+        BigInt(votableSupply),
       );
-    })
+    }),
   );
 
   return {
