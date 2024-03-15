@@ -73,10 +73,10 @@ function DelegationsContainer({
         <TabsContent value="delegatedFrom" className="max-w-full">
           <VStack
             gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
+            className="border shadow-sm rounded-xl border-gray-eb overflow-auto max-h-[500px]"
           >
-            <Table>
-              <TableHeader className="text-xs text-slate-700">
+            <Table className="min-w-full">
+              <TableHeader className="text-xs text-slate-700 sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
