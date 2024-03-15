@@ -2,8 +2,9 @@ import { fetchVotesForProposalAndDelegate } from "../common/votes/getVotes";
 import { fetchVotingPowerForProposal } from "@/app/api/common/voting-power/getVotingPower";
 import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 import { fetchAuthorityChains } from "@/app/api/common/authority-chains/getAuthorityChains";
+import { cache } from "react";
 
-export async function getAllForVoting(
+async function getAllForVoting(
   address: string | `0x${string}`,
   blockNumber: number,
   proposal_id: string
@@ -26,4 +27,15 @@ export async function getAllForVoting(
     delegate,
     votesForProposalAndDelegate,
   };
+}
+
+export async function fetchAllForVoting(
+  address: string | `0x${string}`,
+  blockNumber: number,
+  proposal_id: string
+){
+  return cache(
+    (address: string, blockNumber: number, proposal_id: string) =>
+      getAllForVoting(address, blockNumber, proposal_id)
+  )(address, blockNumber, proposal_id);
 }
