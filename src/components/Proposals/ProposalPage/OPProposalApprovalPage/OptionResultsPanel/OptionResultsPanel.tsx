@@ -15,7 +15,7 @@ export default function OptionsResultsPanel({
   // Note: Defaulting to optimism token for now since the contract-scoped token
   // was exactly the same as the optimism token.
 
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
 

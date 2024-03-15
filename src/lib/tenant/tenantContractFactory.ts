@@ -21,12 +21,46 @@ export default class TenantContractFactory {
     isProd: boolean
   ): TenantContracts {
     switch (namespace) {
+      case TENANT_NAMESPACES.ETHERFI:
+        return ethfiContracts(isProd);
+      case TENANT_NAMESPACES.ENS:
       case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
   }
+}
+
+const ethfiContracts = (isProd: boolean): TenantContracts => {
+  return {
+    // TOKEN
+    token: new TenantContract<ITokenContract>({
+      contract: OptimismToken__factory.connect(
+        "0x4200000000000000000000000000000000000042",
+        provider
+      ),
+      address: "0x4200000000000000000000000000000000000042" as `0x${string}`,
+      chainId: 1,
+      abi: OptimismToken__factory.abi,
+    }),
+    // GOVERNOR
+    governor: new TenantContract<IGovernorContract>({
+      contract: OptimismGovernor__factory.connect(
+        isProd
+          ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+          : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+        provider
+      ),
+      address: isProd
+        ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+        : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+      chainId: 1,
+      abi: OptimismGovernor__factory.abi,
+      v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
+    }),
+  };
 }
 
 const opContracts = (isProd: boolean): TenantContracts => {

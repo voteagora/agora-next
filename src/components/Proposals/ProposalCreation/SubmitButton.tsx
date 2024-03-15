@@ -21,7 +21,7 @@ import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
-const { contracts } = Tenant.getInstance();
+const { contracts } = Tenant.current();
 
 const abiCoder = new AbiCoder();
 const governorContract = contracts.governor;

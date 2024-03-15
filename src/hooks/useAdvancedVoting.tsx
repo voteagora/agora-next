@@ -27,7 +27,7 @@ const useAdvancedVoting = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   const {
     write: advancedVote,
     isLoading: advancedVoteIsLoading,

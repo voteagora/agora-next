@@ -21,7 +21,7 @@ export const tokenForContractAddress = (address: string) => {
 };
 
 export function pluralizeVote(count: BigInt) {
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
 
   const votes = Number(ethers.formatUnits(count.toString(), token.decimals));
 
@@ -38,7 +38,7 @@ export function formatNumber(
   amount: string | BigInt,
   maximumSignificantDigits = 4
 ) {
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
   const number = Number(ethers.formatUnits(amount.toString(), token.decimals));
 
   const numberFormat = new Intl.NumberFormat("en", {
@@ -61,7 +61,7 @@ export function formatNumberForAdvancedDelegation(amount: string) {
   // Advanced delegation needs a precision up to 3 decimal places,
   // which is bit different from the formatNumber function used everywhere else and requires for max 4 significant digits
 
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
 
   const number = Number(ethers.formatUnits(amount.toString(), token.decimals));
 

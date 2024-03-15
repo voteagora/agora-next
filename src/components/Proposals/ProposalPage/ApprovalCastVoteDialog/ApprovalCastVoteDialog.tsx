@@ -108,7 +108,7 @@ export function ApprovalCastVoteDialog({
     ) {
       setLocalMissingVote("ADVANCED");
     }
-  }, [data]);
+  }, [data, missingVote]);
   if (
     missingVote === "BOTH" &&
     !data.advancedVoteData &&

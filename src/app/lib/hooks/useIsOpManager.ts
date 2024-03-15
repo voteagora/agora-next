@@ -9,7 +9,7 @@ const useIsOpManager = () => {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
   const [isOpManager, setIsOpManager] = useState(false);
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
 
   const governorContract = {
     address: contracts.governor.address as `0x${string}`,

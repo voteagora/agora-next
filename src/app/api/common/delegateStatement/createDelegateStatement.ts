@@ -18,7 +18,7 @@ export async function createDelegateStatement({
   message: string;
 }) {
   const { twitter, discord, email } = delegateStatement;
-  const { slug } = Tenant.getInstance();
+  const { slug } = Tenant.current();
 
   const valid = await verifyMessage({
     address,

@@ -4,7 +4,10 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { BaseContract } from "ethers";
 
-export type TenantNamespace = "optimism";
+export type TenantNamespace =
+  | TENANT_NAMESPACES.ENS
+  | TENANT_NAMESPACES.ETHERFI
+  | TENANT_NAMESPACES.OPTIMISM;
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;
