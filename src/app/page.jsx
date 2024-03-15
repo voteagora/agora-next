@@ -1,5 +1,5 @@
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
-import { fetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
+import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
@@ -16,7 +16,7 @@ export const revalidate = 60;
 
 async function fetchProposals(filter, page = 1) {
   "use server";
-  return fetchProposals({filter, page});
+  return apiFetchProposals({filter, page});
 }
 
 async function fetchNeedsMyVoteProposals(address) {
