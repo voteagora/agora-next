@@ -1,21 +1,21 @@
 import {
-  getCurrentDelegatees,
-  getCurrentDelegators,
+  fetchCurrentDelegatees,
+  fetchCurrentDelegators,
 } from "../common/delegations/getDelegations";
 import {
-  getProxy,
-  getVotingPowerAvailableForDirectDelegation,
-  getVotingPowerAvailableForSubdelegation,
-  isDelegatingToProxy,
+  fetchProxy,
+  fetchVotingPowerAvailableForDirectDelegation,
+  fetchVotingPowerAvailableForSubdelegation,
+  fetchIsDelegatingToProxy,
 } from "@/app/api/common/voting-power/getVotingPower";
 
-export const getAllForAForAdvancedDelegation = async (address: string) => {
+export const fetchAllForAdvancedDelegation = async (address: string) => {
   return await Promise.all([
-    getVotingPowerAvailableForSubdelegation(address),
-    isDelegatingToProxy(address),
-    getCurrentDelegatees(address),
-    getProxy(address),
-    getCurrentDelegators(address),
-    getVotingPowerAvailableForDirectDelegation(address),
+    fetchVotingPowerAvailableForSubdelegation(address),
+    fetchIsDelegatingToProxy(address),
+    fetchCurrentDelegatees(address),
+    fetchProxy(address),
+    fetchCurrentDelegators(address),
+    fetchVotingPowerAvailableForDirectDelegation(address),
   ]);
 };

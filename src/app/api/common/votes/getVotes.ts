@@ -261,9 +261,9 @@ export async function fetchVotesForDelegate(data: {
 
 export async function fetchVotesForProposal(data: {
   proposal_id: string;
-  address: string;
+  page: number;
 }) {
-  return cache((data: { proposal_id: string; address: string }) =>
+  return cache((data: { proposal_id: string; page: number }) =>
     getVotesForProposal(data)
   )(data);
 }

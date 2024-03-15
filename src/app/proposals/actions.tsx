@@ -2,12 +2,12 @@
 
 import { getAllForVoting } from "@/app/api/votes/getVotes";
 import {
-  getUserVotesForProposal,
-  getVotesForProposal,
+  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
+  fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 
 export const fetchProposalVotes = (proposal_id: string, page = 1) =>
-  getVotesForProposal({
+  apiFetchVotesForProposal({
     proposal_id,
     page,
   });
@@ -16,7 +16,7 @@ export const fetchUserVotesForProposal = (
   proposal_id: string,
   address: string | `0x${string}`
 ) =>
-  getUserVotesForProposal({
+  apiFetchUserVotesForProposal({
     proposal_id,
     address,
   });
