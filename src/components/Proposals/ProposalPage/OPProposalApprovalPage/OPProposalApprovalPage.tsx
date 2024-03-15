@@ -2,7 +2,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
-import { getAllForVoting } from "@/app/api/votes/getVotes";
+import { fetchAllForVoting as apiFetchAllForVoting} from "@/app/api/votes/getVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 import {
@@ -27,7 +27,7 @@ async function fetchAllForVoting(
 ) {
   "use server";
 
-  return await getAllForVoting(address, blockNumber, proposal_id);
+  return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
 async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
