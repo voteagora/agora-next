@@ -2,7 +2,7 @@ import { TenantContracts, type TenantNamespace } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 
 import {
-  AlligatorOPV5__factory,
+  AlligatorOPV5__factory, EtherfiToken__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
@@ -36,13 +36,13 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
   return {
     // TOKEN
     token: new TenantContract<ITokenContract>({
-      contract: OptimismToken__factory.connect(
-        "0x4200000000000000000000000000000000000042",
+      contract: EtherfiToken__factory.connect(
+        "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
         provider
       ),
-      address: "0x4200000000000000000000000000000000000042" as `0x${string}`,
+      address: "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB" as `0x${string}`,
       chainId: 1,
-      abi: OptimismToken__factory.abi,
+      abi: EtherfiToken__factory.abi,
     }),
     // GOVERNOR
     governor: new TenantContract<IGovernorContract>({
