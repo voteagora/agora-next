@@ -85,36 +85,38 @@ function DelegationsContainer({
                   <TableHead className="h-10">From</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {/* @ts-ignore */}
-                <InfiniteScroll
-                  hasMore={meta.hasNextPage}
-                  pageStart={1}
-                  loadMore={loadMore}
-                  loader={
-                    <TableRow key={0}>
-                      <TableCell
-                        key="loader"
-                        className="gl_loader justify-center py-6 text-sm text-stone-500"
-                      >
-                        Loading...
-                      </TableCell>
-                    </TableRow>
-                  }
-                  element="div"
-                >
-                  {delegators.length === 0 ? (
-                    <div className="w-full p-4">None found</div>
-                  ) : (
-                    delegators.map((delegation) => (
-                      <DelegationFromRow
-                        key={delegation.from}
-                        delegation={delegation}
-                      />
-                    ))
-                  )}
-                </InfiniteScroll>
-              </TableBody>
+              {/* @ts-ignore */}
+              <InfiniteScroll
+                hasMore={meta.hasNextPage}
+                pageStart={1}
+                loadMore={loadMore}
+                loader={
+                  <TableRow key={0}>
+                    <TableCell
+                      key="loader"
+                      className="gl_loader justify-center py-6 text-sm text-stone-500"
+                    >
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                }
+                // References styles of TableBody
+                className="[&_tr:last-child]:border-0"
+                element="tbody"
+              >
+                {delegators.length === 0 ? (
+                  <TableRow>
+                    <TableCell>None found</TableCell>
+                  </TableRow>
+                ) : (
+                  delegators.map((delegation) => (
+                    <DelegationFromRow
+                      key={delegation.from}
+                      delegation={delegation}
+                    />
+                  ))
+                )}
+              </InfiniteScroll>
             </Table>
           </VStack>
         </TabsContent>
