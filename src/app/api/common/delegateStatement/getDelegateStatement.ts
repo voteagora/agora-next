@@ -13,7 +13,7 @@ async function getDelegateStatementForAddress({
 }: {
   address: string;
 }) {
-  const { slug } = Tenant.getInstance();
+  const { slug } = Tenant.current();
 
   const postgreqsqlData = await prisma.delegateStatements
     .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
