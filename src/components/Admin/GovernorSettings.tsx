@@ -18,7 +18,7 @@ const secondsPerBlock = 2;
 
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
 
   const govContract = {
     address: contracts.governor.address as `0x${string}`,

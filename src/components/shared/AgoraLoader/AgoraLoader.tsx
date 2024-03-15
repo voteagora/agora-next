@@ -1,4 +1,4 @@
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/agora_logo.svg";
 import Image from "next/image";
 import { VStack } from "@/components/Layout/Stack";
 import styles from "./agoraLoader.module.scss";

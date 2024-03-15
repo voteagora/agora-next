@@ -10,6 +10,19 @@ export default class TenantTokenFactory {
           symbol: "OP",
           decimals: 18,
         };
+      case TENANT_NAMESPACES.ENS:
+        return {
+          name: "ENS",
+          symbol: "ENS",
+          decimals: 18,
+        };
+
+      case TENANT_NAMESPACES.ETHERFI:
+        return {
+          name: "Ether.fi",
+          symbol: "ETHFI",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

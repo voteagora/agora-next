@@ -2,8 +2,6 @@
 
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl } from "@/lib/utils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 type Props = {
@@ -64,7 +62,11 @@ export function SuccessMessage({
 }) {
   return (
     <VStack className={styles.full_width}>
-      <img src={`/images/congrats.svg`} className="w-full mb-3" />
+      <img
+        src={`/images/congrats.svg`}
+        className="w-full mb-3"
+        alt="Proposal successfully created!"
+      />
       <div className="mb-2 text-2xl font-black">
         Proposal successfully created!
       </div>
@@ -84,7 +86,11 @@ export function SuccessMessage({
 export function Loading() {
   return (
     <VStack className={styles.full_width}>
-      <img src={`/images/action-pending.svg`} className="w-full mb-3" />
+      <img
+        src={`/images/action-pending.svg`}
+        className="w-full mb-3"
+        alt="Pending"
+      />
       <div className="mb-2 text-2xl font-black">Creating your proposal ...</div>
       <div className="mb-5 text-base font-medium text-gray-4f">
         It might take up to a minute for the changes to be reflected.

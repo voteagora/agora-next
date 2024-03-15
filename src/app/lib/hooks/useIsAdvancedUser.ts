@@ -7,7 +7,7 @@ import { useAccount, useContractRead } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
 const useIsAdvancedUser = () => {
-  const { contracts, isProd } = Tenant.getInstance();
+  const { contracts, isProd } = Tenant.current();
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
   const [isAdvancedUser, setIsAdvancedUser] = useState(false);

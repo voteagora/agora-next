@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { Listbox } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 export default function ProposalsFilter() {
@@ -22,7 +22,7 @@ export default function ProposalsFilter() {
     };
 
     handleChanges(selected);
-  }, [router, selected]);
+  }, [router, selected, isRecentFilter]);
 
   return (
     <div className="relative">

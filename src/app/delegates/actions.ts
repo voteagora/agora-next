@@ -115,7 +115,7 @@ export async function fetchAllDelegatorsInChainsForAddress(
 }
 
 export async function balanceOf(address: string) {
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   return contracts.token.contract.balanceOf(address);
 }
 
