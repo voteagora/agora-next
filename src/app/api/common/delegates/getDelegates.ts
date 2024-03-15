@@ -146,7 +146,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
@@ -176,7 +176,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     ) t;
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   const totalVotingPower =

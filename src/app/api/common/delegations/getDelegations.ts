@@ -26,7 +26,7 @@ async function getCurrentDelegateesForAddress({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts.alligator!.address,
+      contract: contracts.alligator?.address,
     },
   });
 
@@ -138,7 +138,7 @@ async function getCurrentDelegatorsForAddress({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts.alligator!.address,
+      contract: contracts.alligator?.address,
     },
   });
 
@@ -265,7 +265,7 @@ async function getAllDelegatorsInChainsForAddress({
     WHERE delegate=$1 AND contract=$2 AND allowance > 0;
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   return allAddresess[0].addresses;
