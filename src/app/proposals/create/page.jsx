@@ -13,7 +13,6 @@ async function getProposalSettingsList() {
 
 export default async function CreateProposalPage() {
 
-
   const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals/create")) {

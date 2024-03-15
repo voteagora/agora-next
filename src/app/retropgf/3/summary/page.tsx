@@ -34,6 +34,13 @@ export async function generateMetadata() {
 }
 
 export default function Page() {
+
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("retropgf")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
   return (
     <VStack className="w-full items-stretch max-w-6xl pb-16 mt-12">
       <div className="mb-16 justify-between items-center flex flex-col gap-8 sm:flex-row sm:gap-0">
