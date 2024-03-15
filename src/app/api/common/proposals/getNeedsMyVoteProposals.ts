@@ -1,16 +1,17 @@
 import { parseProposal } from "@/lib/proposalUtils";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
-import { getVotableSupply } from "../votableSupply/getVotableSupply";
-import { getQuorumForProposal } from "../quorum/getQuorum";
+import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
+import { fetchQuorumForProposal } from "../quorum/getQuorum";
 
-export async function getNeedsMyVoteProposals(address: string) {
+async function getNeedsMyVoteProposals(address: string) {
   const { namespace, contracts } = Tenant.getInstance();
   const [latestBlock, votableSupply] = await Promise.all([
     provider.getBlockNumber(),
-    getVotableSupply(),
+    fetchVotableSupply(),
   ]);
 
   if (!latestBlock) {
@@ -44,7 +45,7 @@ export async function getNeedsMyVoteProposals(address: string) {
 
   const resolvedProposals = Promise.all(
     proposals.map(async (proposal) => {
-      const quorum = await getQuorumForProposal(proposal);
+      const quorum = await fetchQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,
@@ -57,4 +58,10 @@ export async function getNeedsMyVoteProposals(address: string) {
   return {
     proposals: await resolvedProposals,
   };
+}
+
+export async function fetchNeedsMyVoteProposals(address: string) {
+  return cache(
+    (address: string) => getNeedsMyVoteProposals(address)
+  )(address);
 }

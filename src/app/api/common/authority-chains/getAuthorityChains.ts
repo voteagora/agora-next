@@ -3,8 +3,9 @@ import provider from "@/app/lib/provider";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
-export async function getAuthorityChains({
+async function getAuthorityChains({
   address,
   blockNumber,
 }: {
@@ -65,4 +66,13 @@ export async function getAuthorityChains({
   }
 
   return reversedChains;
+}
+
+export async function fetchAuthorityChains(data: {
+  address: string;
+  blockNumber: number;
+}) {
+  return cache((data: { address: string; blockNumber: number }) =>
+    getAuthorityChains(data)
+  )(data);
 }

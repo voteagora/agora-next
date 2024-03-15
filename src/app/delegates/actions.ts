@@ -50,12 +50,6 @@ export async function getProxyAddress(addressOrENSName: string) {
   return getProxy(addressOrENSName);
 }
 
-export async function fetchDelegate(addressOrENSName: string) {
-  return cache(
-    (address: string) => getDelegate(address)
-  )(addressOrENSName);
-}
-
 export async function submitDelegateStatement({
   address,
   delegateStatement,
@@ -75,12 +69,6 @@ export async function submitDelegateStatement({
   });
   revalidatePath("/delegates/create", "page");
   return response;
-}
-
-export async function fetchDelegateStatement(addressOrENSName: string) {
-  return cache(
-      (addressOrENS: string) => getDelegateStatement(addressOrENS)
-  )(addressOrENSName);
 }
 
 export async function fetchVotesForDelegate(

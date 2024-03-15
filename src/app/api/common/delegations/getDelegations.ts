@@ -1,5 +1,6 @@
 import { Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
@@ -10,7 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
  * Delegations for a given address (addresses the given address is delegating to)
  * @param addressOrENSName
  */
-export const getCurrentDelegatees = (addressOrENSName: string) =>
+const getCurrentDelegatees = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName);
 
 async function getCurrentDelegateesForAddress({
@@ -216,7 +217,7 @@ async function getCurrentDelegatorsForAddress({
  * Get the direct delegatee for a given address
  * @param addressOrENSName
  */
-export const getDirectDelegatee = (addressOrENSName: string) =>
+const getDirectDelegatee = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDirectDelegateeForAddress, addressOrENSName);
 
 const getDirectDelegateeForAddress = async ({
@@ -243,7 +244,7 @@ const getDirectDelegateeForAddress = async ({
  * Get all addresses that are in the delegation chain for a given address
  * @param addressOrENSName
  */
-export const getAllDelegatorsInChains = (addressOrENSName: string) =>
+const getAllDelegatorsInChains = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getAllDelegatorsInChainsForAddress, addressOrENSName);
 
 async function getAllDelegatorsInChainsForAddress({
@@ -263,4 +264,28 @@ async function getAllDelegatorsInChainsForAddress({
   );
 
   return allAddresess[0].addresses;
+}
+
+export async function fetchCurrentDelegatees(addressOrENSName: string) {
+  return cache(
+    (addressOrENSName: string) => getCurrentDelegatees(addressOrENSName)
+  )(addressOrENSName);
+}
+
+export async function fetchCurrentDelegators(addressOrENSName: string) {
+  return cache(
+    (addressOrENSName: string) => getCurrentDelegators(addressOrENSName)
+  )(addressOrENSName);
+}
+
+export async function fetchDirectDelegatee(addressOrENSName: string) {
+  return cache(
+    (addressOrENSName: string) => getDirectDelegatee(addressOrENSName)
+  )(addressOrENSName);
+}
+
+export async function fetchAllDelegatorsInChains(addressOrENSName: string) {
+  return cache(
+    (addressOrENSName: string) => getAllDelegatorsInChains(addressOrENSName)
+  )(addressOrENSName);
 }

@@ -1,13 +1,14 @@
 import { paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
+import { cache } from "react";
 import { VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
-export const getVotesForDelegate = ({
+const getVotesForDelegate = ({
   addressOrENSName,
   page,
 }: {
@@ -100,7 +101,7 @@ async function getVotesForDelegateForAddress({
   };
 }
 
-export async function getVotesForProposal({
+async function getVotesForProposal({
   proposal_id,
   page = 1,
   sort = "weight",
@@ -180,7 +181,7 @@ export async function getVotesForProposal({
   };
 }
 
-export async function getUserVotesForProposal({
+async function getUserVotesForProposal({
   proposal_id,
   address,
 }: {
@@ -223,7 +224,7 @@ export async function getUserVotesForProposal({
   );
 }
 
-export async function getVotesForProposalAndDelegate({
+async function getVotesForProposalAndDelegate({
   proposal_id,
   address,
 }: {
@@ -247,4 +248,40 @@ export async function getVotesForProposalAndDelegate({
       latestBlock
     )
   );
+}
+
+export async function fetchVotesForDelegate(data: {
+  addressOrENSName: string;
+  page: number;
+}) {
+  return cache((data: { addressOrENSName: string; page: number }) =>
+    getVotesForDelegate(data)
+  )(data);
+}
+
+export async function fetchVotesForProposal(data: {
+  proposal_id: string;
+  address: string;
+}) {
+  return cache((data: { proposal_id: string; address: string }) =>
+    getVotesForProposal(data)
+  )(data);
+}
+
+export async function fetchUserVotesForProposal(data: {
+  proposal_id: string;
+  address: string;
+}) {
+  return cache((data: { proposal_id: string; address: string }) =>
+    getUserVotesForProposal(data)
+  )(data);
+}
+
+export async function fetchVotesForProposalAndDelegate(data: {
+  proposal_id: string;
+  address: string;
+}) {
+  return cache((data: { proposal_id: string; address: string }) =>
+    getVotesForProposalAndDelegate(data)
+  )(data);
 }

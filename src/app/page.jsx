@@ -2,7 +2,7 @@ import { getMetrics } from "@/app/api/common/metrics/getMetrics";
 import { getNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { getProposals } from "@/app/api/common/proposals/getProposals";
 import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import { getGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
+import { fetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
@@ -36,7 +36,7 @@ async function fetchVotableSupply() {
 async function fetchGovernanceCalendar() {
   "use server";
 
-  return getGovernanceCalendar();
+  return fetchGovernanceCalendar();
 }
 
 export async function generateMetadata({}, parent) {

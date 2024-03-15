@@ -7,17 +7,19 @@ import {
   Prisma,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
+import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { Delegate } from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
-import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
-import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
+import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
+import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
 type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
-export async function getDelegates({
+async function getDelegates({
   page = 1,
   sort = "weighted_random",
   seed,
@@ -78,7 +80,7 @@ export async function getDelegates({
     delegates.map(async (delegate) => {
       return {
         citizen: await isCitizen(delegate.delegate),
-        statement: await getDelegateStatement(delegate.delegate),
+        statement: await fetchDelegateStatement(delegate.delegate),
       };
     })
   );
@@ -108,7 +110,7 @@ type DelegateStats = {
   num_of_delegators: OptimismDelegates["num_of_delegators"];
 };
 
-export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
+async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace, contracts } = Tenant.getInstance();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
@@ -151,9 +153,9 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
       delegateQuery.then((result) => result?.[0] || undefined),
-      prisma[`${namespace}VotableSupply`].findFirst({}),
-      getDelegateStatement(addressOrENSName),
-      getCurrentQuorum(),
+      fetchVotableSupply(),
+      fetchDelegateStatement(addressOrENSName),
+      fetchCurrentQuorum(),
       isCitizen(address),
     ]);
 
@@ -192,7 +194,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     citizen: _isCitizen.length > 0,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
-      totalVotingPower / BigInt(votableSupply?.votable_supply || 0)
+      totalVotingPower / BigInt(votableSupply || 0)
     ),
     votingPowerRelativeToQuorum:
       quorum && quorum > 0n
@@ -215,4 +217,18 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         : cachedNumOfDelegators,
     statement: delegateStatement,
   };
+}
+
+export async function fetchDelegates(data: {
+  page: number;
+  sort: string;
+  seed?: number;
+}) {
+  return cache((data: { page: number; sort: string; seed?: number }) =>
+    getDelegates(data)
+  )(data);
+}
+
+export async function fetchDelegate(addressOrENSName: string) {
+  return cache((address: string) => getDelegate(address))(addressOrENSName);
 }

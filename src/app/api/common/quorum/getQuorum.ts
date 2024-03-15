@@ -1,9 +1,16 @@
+import { cache } from "react";
 import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 
-export async function getQuorumForProposal(proposal: ProposalPayload) {
+/*
+  Retrieve quorum from the governor contract for the supplied proposal,
+  calculating it if not specified
+
+  @dev: only supports optimisim
+*/
+async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace, contracts } = Tenant.getInstance();
 
   switch (namespace) {
@@ -25,7 +32,10 @@ export async function getQuorumForProposal(proposal: ProposalPayload) {
   }
 }
 
-export async function getCurrentQuorum() {
+/*
+  Retrieve the current quorum based on block number
+*/
+async function getCurrentQuorum() {
   const { namespace, contracts } = Tenant.getInstance();
 
   switch (namespace) {
@@ -38,4 +48,22 @@ export async function getCurrentQuorum() {
       return contracts.governor.contract.quorum(latestBlock - 1);
     }
   }
+}
+
+/*
+  Gets and caches the quorum for the supplied proposal
+*/
+export async function fetchQuorumForProposal(proposal: ProposalPayload) {
+  return cache(
+    (proposal: ProposalPayload) => getQuorumForProposal(proposal)
+  )(proposal);
+}
+
+/*
+  Gets and caches quorum based on current block number
+*/
+export async function fetchCurrentQuorum() {
+  return cache(
+    () => getCurrentQuorum()
+  )();
 }
