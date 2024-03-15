@@ -37,9 +37,9 @@ async function getVotingPowerForProposalByAddress({
   blockNumber: number;
   proposalId: string;
 }): Promise<VotingPowerData> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
-  const votingPowerQuery = prisma[`${namespace}VotingPowerSnaps`].findFirst({
+  const votingPowerQuery = (prisma as any)[`${namespace}VotingPowerSnaps`].findFirst({
     where: {
       delegate: address,
       block_number: {
@@ -136,15 +136,15 @@ async function getCurrentVotingPowerForAddress({
 }: {
   address: string;
 }): Promise<VotingPowerData> {
-  const { namespace, contracts } = Tenant.getInstance();
-  const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
+  const { namespace, contracts } = Tenant.current();
+  const votingPower = await (prisma as any)[`${namespace}VotingPower`].findFirst({
     where: {
       delegate: address,
     },
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPower = await prisma[
+  const advancedVotingPower = await (prisma as any)[
     `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
@@ -180,8 +180,8 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
 }: {
   address: string;
 }): Promise<string> {
-  const { namespace, contracts } = Tenant.getInstance();
-  const advancedVotingPower = await prisma[
+  const { namespace, contracts } = Tenant.current();
+  const advancedVotingPower = await (prisma as any)[
     `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
@@ -222,7 +222,7 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
 }: {
   address: string;
 }): Promise<bigint> {
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   return contracts.token.contract.balanceOf(address);
 }
 
@@ -238,10 +238,10 @@ async function isAddressDelegatingToProxy({
 }: {
   address: string;
 }): Promise<boolean> {
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
+    (prisma as any)[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);

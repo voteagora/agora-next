@@ -11,7 +11,7 @@ export function AdvancedDelegationDisplayAmount({
 }: {
   amount: string;
 }) {
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
 
   const formattedNumber = useMemo(() => {
     return formatNumberForAdvancedDelegation(amount);

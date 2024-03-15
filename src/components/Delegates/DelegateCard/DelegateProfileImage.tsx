@@ -24,7 +24,7 @@ export function DelegateProfileImage({
   citizen?: boolean;
 }) {
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);

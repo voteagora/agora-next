@@ -71,7 +71,7 @@ export default function ProposalVotesList({
       setMeta(data.meta);
       fetching.current = false;
     }
-  }, [proposal_id, meta, proposalVotes]);
+  }, [proposal_id, meta]);
 
   const { isAdvancedUser } = useIsAdvancedUser();
 

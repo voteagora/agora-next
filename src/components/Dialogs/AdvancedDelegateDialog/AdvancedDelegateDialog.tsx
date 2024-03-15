@@ -56,7 +56,7 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const {contracts} = Tenant.getInstance();
+  const { contracts } = Tenant.current();
 
   const getOpBalance = async (address: `0x${string}`) => {
     return await contracts.token.contract.balanceOf(address);
