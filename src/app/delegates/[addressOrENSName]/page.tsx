@@ -24,7 +24,6 @@ import {
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -82,19 +81,13 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const { namespace } = Tenant.current();
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const [delegate, delegates, delegators] = await Promise.all([
+  const [delegate, delegateVotes, delegates, delegators] = await Promise.all([
     fetchDelegate(address),
+    fetchVotesForDelegate(address),
     fetchCurrentDelegatees(address),
     fetchCurrentDelegators(address),
   ]);
-
-  // TODO: Remove this when the etherfi.vote_cast_events has a ghost view
-  let delegateVotes;
-  if (namespace !== TENANT_NAMESPACES.ETHERFI) {
-    delegateVotes = await fetchVotesForDelegate(addressOrENSName, 1);
-  }
 
   const statement = delegate.statement;
 
@@ -119,13 +112,12 @@ export default async function Page({
         <DelegationsContainer delegatees={delegates} delegators={delegators} />
 
         {/* TODO: -> this could be refactor with revalidatePath */}
-        {namespace !== TENANT_NAMESPACES.ETHERFI && (
-          <DelegateVotesProvider initialVotes={delegateVotes}>
-            {delegateVotes && delegateVotes.votes.length > 0 ? (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col justify-between gap-2 sm:flex-row">
-                  <h2 className="text-2xl font-bold">Past Votes</h2>
-                  {/* <div className="flex flex-col justify-between gap-2 sm:flex-row">
+        <DelegateVotesProvider initialVotes={delegateVotes}>
+          {delegateVotes && delegateVotes.votes.length > 0 ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row">
+                <h2 className="text-2xl font-bold">Past Votes</h2>
+                {/* <div className="flex flex-col justify-between gap-2 sm:flex-row">
                   <DelegatesVotesSort
                     fetchDelegateVotes={async (page, sortOrder) => {
                       "use server";
@@ -139,22 +131,21 @@ export default async function Page({
                   />
                   <DelegatesVotesType />
                 </div> */}
-                </div>
-                <DelegateVotes
-                  fetchDelegateVotes={async (page: number) => {
-                    "use server";
+              </div>
+              <DelegateVotes
+                fetchDelegateVotes={async (page: number) => {
+                  "use server";
 
-                    return fetchVotesForDelegate(addressOrENSName, page);
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="default-message-class">
-                <p>No past votes available.</p>
-              </div>
-            )}
-          </DelegateVotesProvider>
-        )}
+                  return fetchVotesForDelegate(addressOrENSName, page);
+                }}
+              />
+            </div>
+          ) : (
+            <div className="default-message-class">
+              <p>No past votes available.</p>
+            </div>
+          )}
+        </DelegateVotesProvider>
       </VStack>
     </div>
   );
