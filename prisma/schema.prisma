@@ -811,6 +811,70 @@ view etherfi_authority_chains {
   @@schema("etherfi")
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfi_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("etherfi")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfi_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("etherfi")
+}
+
 enum DaoSlug {
   OP
   ENS
