@@ -3,7 +3,7 @@
 import { FC, PropsWithChildren } from "react";
 import { WagmiConfig, createConfig } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet, optimism } from "wagmi/chains";
+import { mainnet, optimism, sepolia } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
@@ -13,10 +13,11 @@ import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const queryClient = new QueryClient();
 
-const chains = [optimism, mainnet];
 const metadata = {
   name: "Agora Next",
   description: "The on-chain governance company",
@@ -26,11 +27,10 @@ const metadata = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 
-// const wagmiConfig = defaultWagmiConfig({
-//   chains,
-//   projectId,
-//   metadata,
-// });
+const { namespace } = Tenant.current();
+
+const chains =
+  namespace === TENANT_NAMESPACES.OPTIMISM ? [optimism, mainnet] : [mainnet];
 
 const config = createConfig(
   getDefaultConfig({
