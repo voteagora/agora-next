@@ -38,12 +38,16 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
     // TOKEN
     token: new TenantContract<ITokenContract>({
       contract: EtherfiToken__factory.connect(
-        "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
-        global.ethProvider
+        isProd
+          ? "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB"
+          : "0x7092023d650f0DB6f60E921b0ba6891474B3aA63",
+        isProd ? global.ethProvider : global.sepoliaProvider
       ),
-      address: "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB" as `0x${string}`,
-      chainId: 1,
-      chainName: "Ethereum Mainnet",
+      address: isProd
+        ? "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB"
+        : "0x7092023d650f0DB6f60E921b0ba6891474B3aA63",
+      chainId: isProd ? 1 : 11155111,
+      chainName: isProd ? "Ethereum Mainnet" : "Sepolia Testnet",
       abi: EtherfiToken__factory.abi,
     }),
     // GOVERNOR
@@ -57,8 +61,8 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
       address: isProd
         ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
         : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-      chainId: 1,
-      chainName: "Ethereum Mainnet",
+      chainId: isProd ? 1 : 11155111,
+      chainName: "Sepolia Testnet",
       abi: OptimismGovernor__factory.abi,
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),

@@ -30,7 +30,9 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 const { namespace } = Tenant.current();
 
 const chains =
-  namespace === TENANT_NAMESPACES.OPTIMISM ? [optimism, mainnet] : [mainnet];
+  namespace === TENANT_NAMESPACES.OPTIMISM
+    ? [optimism, mainnet]
+    : [sepolia, mainnet];
 
 const config = createConfig(
   getDefaultConfig({
