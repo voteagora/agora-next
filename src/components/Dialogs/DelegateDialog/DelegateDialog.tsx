@@ -20,31 +20,19 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export function DelegateDialog({
-  delegate,
-  fetchBalanceForDirectDelegation,
-  fetchDirectDelegatee,
-}: {
+                                 delegate,
+                                 fetchBalanceForDirectDelegation,
+                                 fetchDirectDelegatee,
+                               }: {
   delegate: DelegateChunk;
   fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
+    addressOrENSName: string,
   ) => Promise<bigint>;
   fetchDirectDelegatee: (
-    addressOrENSName: string
+    addressOrENSName: string,
   ) => Promise<DelegateePayload | null>;
 }) {
   const { contracts, namespace } = Tenant.current();
-
-  if (namespace === TENANT_NAMESPACES.ETHERFI) {
-    return (
-      <VStack
-        className="w-full h-[318px]"
-        alignItems="items-center"
-        justifyContent="justify-center"
-      >
-        Ether.fi delegation coming soon
-      </VStack>
-    );
-  }
 
   const { address: accountAddress } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
@@ -109,8 +97,22 @@ export function DelegateDialog({
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (namespace !== TENANT_NAMESPACES.ETHERFI) {
+      fetchData();
+    }
+  }, [fetchData, namespace]);
+
+  if (namespace === TENANT_NAMESPACES.ETHERFI) {
+    return (
+      <VStack
+        className="w-full h-[318px]"
+        alignItems="items-center"
+        justifyContent="justify-center"
+      >
+        Ether.fi delegation coming soon
+      </VStack>
+    );
+  }
 
   if (!isReady) {
     return (
@@ -123,6 +125,7 @@ export function DelegateDialog({
       </VStack>
     );
   }
+
 
   return (
     <VStack alignItems="items-center" className={styles.dialog_container}>
@@ -159,7 +162,8 @@ export function DelegateDialog({
                   </div>
                 </VStack>
               </HStack>
-              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full right-1/2 top-1/2">
+              <div
+                className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full right-1/2 top-1/2">
                 <ArrowDownIcon className="w-4 h-4 text-black" />
               </div>
               <HStack
@@ -204,7 +208,8 @@ export function DelegateDialog({
                   </div>
                 </VStack>
               </HStack>
-              <div className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
+              <div
+                className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
                 <ArrowDownIcon className="w-4 h-4 text-black" />
               </div>
               <HStack gap={3} alignItems="items-center" className="p-2">
