@@ -17,6 +17,7 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransaction } from "wagmi/actions";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export function DelegateDialog({
   delegate,
@@ -31,6 +32,20 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
+  const { contracts, namespace } = Tenant.current();
+
+  if (namespace === TENANT_NAMESPACES.ETHERFI) {
+    return (
+      <VStack
+        className="w-full h-[318px]"
+        alignItems="items-center"
+        justifyContent="justify-center"
+      >
+        Ether.fi delegation coming soon
+      </VStack>
+    );
+  }
+
   const { address: accountAddress } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
   const { setOpen } = useModal();
@@ -39,7 +54,6 @@ export function DelegateDialog({
   const [isReady, setIsReady] = useState(false);
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee = delegate.address === delegatee?.delegatee;
-  const {contracts} = Tenant.current();
 
   const writeWithTracking = async () => {
     setIsLoading(true);

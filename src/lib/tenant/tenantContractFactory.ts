@@ -56,13 +56,13 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
         isProd
           ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
           : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-        global.provider
+        isProd ? global.ethProvider : global.sepoliaProvider
       ),
       address: isProd
         ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
         : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
       chainId: isProd ? 1 : 11155111,
-      chainName: "Sepolia Testnet",
+      chainName: isProd ? "Ethereum Mainnet" : "Sepolia Testnet",
       abi: OptimismGovernor__factory.abi,
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
