@@ -87,23 +87,26 @@ export default async function Home() {
               </div>
               <div>
                 <div className="text-sm text-stone-600 font-medium">
-                  Phase 1 – Full governance deployment
+                  Phase 1 – Governance initiation
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
                 <div>
-                  Over the next months, we will be bringing voters into
-                  Ether.fi’s governance by fully deploying Agora governor and
-                  granting the community access control to Ether.fi’s protocol
-                  and treasury.
+                  Over the next weeks, we will be gradually bringing voters into
+                  Ether.fi’s governance by launching offchain voting on
+                  Snapshot, delegate elections, our security council, and
+                  discourse groups.
                 </div>
               </div>
               <div>
                 <div className="text-sm text-stone-600 font-medium">
-                  Phase 2 – Community stewardship
+                  Phase 2 – Transition to onchain governance
                 </div>
                 <div>
                   <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
-                  Over the next years, Ether.fi’s team and the community will
+                  As the community grows over the next months, we will be fully
+                  deploying the Agora onchain governor, and granting the
+                  community access control to Ether.fi’s protocol and treasury.
+                  This is allow Ether.fi’s team and the community to fully
                   collaborate in steering the protocol.
                 </div>
               </div>
