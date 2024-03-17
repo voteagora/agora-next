@@ -7,7 +7,6 @@ import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
-
 export const getVotesForDelegate = ({
   addressOrENSName,
   page,
@@ -59,14 +58,14 @@ async function getVotesForDelegateForAddress({
           ) av
           LEFT JOIN LATERAL (
             SELECT
-              proposals_mat.start_block,
-              proposals_mat.description,
-              proposals_mat.proposal_data,
-              proposals_mat.proposal_type::config.proposal_type AS proposal_type
+              proposals.start_block,
+              proposals.description,
+              proposals.proposal_data,
+              proposals.proposal_type::config.proposal_type AS proposal_type
             FROM
-              ${namespace + ".proposals_mat"} proposals_mat
+              ${namespace + ".proposals"} proposals
             WHERE
-              proposals_mat.proposal_id = av.proposal_id) p ON TRUE
+              proposals.proposal_id = av.proposal_id) p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET $2
@@ -143,12 +142,12 @@ export async function getVotesForProposal({
           ) av
           LEFT JOIN LATERAL (
             SELECT
-              proposals_mat.start_block,
-              proposals_mat.description,
-              proposals_mat.proposal_data,
-              proposals_mat.proposal_type::config.proposal_type AS proposal_type
-            FROM ${namespace + ".proposals_mat"} proposals_mat
-            WHERE proposals_mat.proposal_id = $1) p ON TRUE
+              proposals.start_block,
+              proposals.description,
+              proposals.proposal_data,
+              proposals.proposal_type::config.proposal_type AS proposal_type
+            FROM ${namespace + ".proposals"} proposals
+            WHERE proposals.proposal_id = $1) p ON TRUE
         ) q
         ORDER BY ${sort} DESC
         OFFSET $2
