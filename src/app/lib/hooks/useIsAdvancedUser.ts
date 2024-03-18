@@ -54,7 +54,8 @@ const useIsAdvancedUser = () => {
     "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd", // Woj Test 1
     "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Agora manager throwaway
     "0xC776cBDDeA014889E8BaB4323C894C5c34DB214D", // Fernando
-    "0xE61E4B3e1ADf8a2735976c83a3f44C28E952bc8D"  // QA 3
+    "0xE61E4B3e1ADf8a2735976c83a3f44C28E952bc8D",  // QA 3
+    "0x58e3C48952F39616Dfe46b997ad32DAd12D0bfaE"
   ] as `0x${string}`[];
 
   useContractRead({
