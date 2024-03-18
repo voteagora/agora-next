@@ -1,4 +1,5 @@
 import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
+import { Prisma } from "@prisma/client";
 
 export type Delegate = {
   address: string;
@@ -16,3 +17,10 @@ export type Delegate = {
   numOfDelegators: bigint;
   statement: DelegateStatement | null;
 };
+
+export type DelegatePayload = Delegate & {
+  delegate: string;
+  voting_power: number;
+};
+
+export type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;

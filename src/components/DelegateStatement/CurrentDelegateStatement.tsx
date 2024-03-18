@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { initialTopIssues } from "@/components/DelegateStatement/TopIssuesFormSection";
 import Tenant from "@/lib/tenant/tenant";
 
-const { slug: daoSlug } = Tenant.getInstance();
+const { slug: daoSlug } = Tenant.current();
 
 export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 

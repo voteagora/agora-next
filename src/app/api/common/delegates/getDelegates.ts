@@ -4,18 +4,19 @@ import {
   OptimismDelegates,
   OptimismVoterStats,
   OptimismVotingPower,
-  Prisma,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { Delegate } from "./delegate";
+import {
+  type Delegate,
+  type DelegatePayload,
+  type DelegatesGetPayload,
+} from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
-
-type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
 
 export async function getDelegates({
   page = 1,
@@ -27,24 +28,24 @@ export async function getDelegates({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
 
   const { meta, data: delegates } = await paginatePrismaResult(
     async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
-          return prisma[`${namespace}Delegates`].findMany({
+          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+            `
+            SELECT *
+            FROM ${namespace + ".delegates"}
+            WHERE num_of_delegators IS NOT NULl
+            ORDER BY num_of_delegators DESC
+            OFFSET $1
+            LIMIT $2;
+            `,
             skip,
-            take,
-            orderBy: {
-              num_of_delegators: "desc",
-            },
-            where: {
-              num_of_delegators: {
-                not: null,
-              },
-            },
-          });
+            take
+          );
         case "weighted_random":
           await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
           return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
@@ -61,7 +62,7 @@ export async function getDelegates({
             take
           );
         default:
-          return prisma[`${namespace}Delegates`].findMany({
+          return (prisma as any)[`${namespace}Delegates`].findMany({
             skip,
             take,
             orderBy: {
@@ -75,7 +76,7 @@ export async function getDelegates({
   );
 
   const _delegates = await Promise.all(
-    delegates.map(async (delegate) => {
+    delegates.map(async (delegate: DelegatePayload) => {
       return {
         citizen: await isCitizen(delegate.delegate),
         statement: await getDelegateStatement(delegate.delegate),
@@ -85,7 +86,7 @@ export async function getDelegates({
 
   return {
     meta,
-    delegates: delegates.map((delegate, index) => ({
+    delegates: delegates.map((delegate: DelegatePayload, index: number) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: _delegates[index].citizen.length > 0,
@@ -109,7 +110,7 @@ type DelegateStats = {
 };
 
 export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -145,13 +146,13 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
-      delegateQuery.then(result => result?.[0] || undefined),
-      prisma[`${namespace}VotableSupply`].findFirst({}),
+      delegateQuery.then((result) => result?.[0] || undefined),
+      (prisma as any)[`${namespace}VotableSupply`].findFirst({}),
       getDelegateStatement(addressOrENSName),
       getCurrentQuorum(),
       isCitizen(address),
@@ -175,7 +176,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     ) t;
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   const totalVotingPower =

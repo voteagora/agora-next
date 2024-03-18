@@ -57,7 +57,7 @@ function CastVoteDialogContents({
     ) {
       setLocalMissingVote("ADVANCED");
     }
-  }, [data]);
+  }, [data, missingVote, setLocalMissingVote]);
 
   if (!delegate) {
     // todo: log
@@ -232,7 +232,7 @@ export function SuccessMessage({
 export function LoadingVote() {
   return (
     <VStack className={styles.full_width}>
-      <img src={`/images/action-pending.svg`} className="w-full mb-3" />
+      <img src={`/images/action-pending.svg`} className="w-full mb-3" alt="Vote pending" />
       <div className="mb-2 text-2xl font-black">Casting your vote</div>
       <div className="mb-5 text-sm text-gray-700">
         It might take up to a minute for the changes to be reflected.

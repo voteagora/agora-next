@@ -1,11 +1,13 @@
-import Link from "next/link";
-import logo from "@/assets/logo.svg";
-import oplogo from "@/assets/optimism/op-logo.svg";
-import { HStack } from "../Layout/Stack";
+import logo from "@/assets/agora_logo.svg";
+import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
+import Link from "next/link";
+import { HStack } from "../Layout/Stack";
 import styles from "./header.module.scss";
 
-export default function LogoLink({ instance_name }) {
+export default function LogoLink() {
+  const { namespace, ui } = Tenant.current();
+
   return (
     <HStack justifyContent="justify-between" className={styles.logo_link}>
       <Link href="/">
@@ -18,8 +20,8 @@ export default function LogoLink({ instance_name }) {
             className="hidden sm:block"
           />
           <div className="h-3 w-[2px] bg-stone-200 rounded-full hidden sm:block"></div>
-          <Image src={oplogo} alt="logo" width="18" height="18" />
-          <span className="hidden sm:block font-medium">{`${instance_name} Agora`}</span>
+          <Image src={ui.logo} alt="logo" width="18" height="18" />
+          <span className="hidden sm:block font-medium capitalize">{`${ui.title}`}</span>
         </HStack>
       </Link>
     </HStack>

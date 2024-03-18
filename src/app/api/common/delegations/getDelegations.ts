@@ -1,4 +1,4 @@
-import { Delegation } from "./delegation";
+import { type AdvancedDelegationPayload, type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
@@ -18,15 +18,15 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegatees = await prisma[
+  const advancedDelegatees = await (prisma as any)[
     `${namespace}AdvancedDelegatees`
   ].findMany({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts.alligator!.address,
+      contract: contracts.alligator?.address,
     },
   });
 
@@ -100,19 +100,21 @@ async function getCurrentDelegateesForAddress({
     //       },
     //     ]
     //   : []),
-    ...advancedDelegatees.map((advancedDelegatee) => ({
-      from: advancedDelegatee.from,
-      to: advancedDelegatee.to,
-      allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      timestamp: latestBlock
-        ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
-        : null,
-      type: "ADVANCED",
-      amount:
-        Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
-          ? "FULL"
-          : "PARTIAL",
-    })),
+    ...advancedDelegatees.map(
+      (advancedDelegatee: AdvancedDelegationPayload) => ({
+        from: advancedDelegatee.from,
+        to: advancedDelegatee.to,
+        allowance: advancedDelegatee.delegated_amount.toFixed(0),
+        timestamp: latestBlock
+          ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
+          : null,
+        type: "ADVANCED",
+        amount:
+          Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
+            ? "FULL"
+            : "PARTIAL",
+      })
+    ),
   ] as Delegation[];
 }
 
@@ -128,13 +130,15 @@ async function getCurrentDelegatorsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
+  const advancedDelegators = (prisma as any)[
+    `${namespace}AdvancedDelegatees`
+  ].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts.alligator!.address,
+      contract: contracts.alligator?.address,
     },
   });
 
@@ -196,19 +200,21 @@ async function getCurrentDelegatorsForAddress({
     //   amount: "FULL",
     // })),
 
-    ...(await advancedDelegators).map((advancedDelegator) => ({
-      from: advancedDelegator.from,
-      to: advancedDelegator.to,
-      allowance: advancedDelegator.delegated_amount.toFixed(0),
-      timestamp: latestBlock
-        ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
-        : null,
-      type: "ADVANCED",
-      amount:
-        Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-          ? "FULL"
-          : "PARTIAL",
-    })),
+    ...(await advancedDelegators).map(
+      (advancedDelegator: AdvancedDelegationPayload) => ({
+        from: advancedDelegator.from,
+        to: advancedDelegator.to,
+        allowance: advancedDelegator.delegated_amount.toFixed(0),
+        timestamp: latestBlock
+          ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+          : null,
+        type: "ADVANCED",
+        amount:
+          Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+            ? "FULL"
+            : "PARTIAL",
+      })
+    ),
   ] as Delegation[];
 }
 
@@ -224,10 +230,10 @@ const getDirectDelegateeForAddress = async ({
 }: {
   address: string;
 }) => {
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
+    (prisma as any)[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);
@@ -251,7 +257,7 @@ async function getAllDelegatorsInChainsForAddress({
 }: {
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
     `
     SELECT array_agg(DISTINCT u.element) AS addresses
@@ -259,7 +265,7 @@ async function getAllDelegatorsInChainsForAddress({
     WHERE delegate=$1 AND contract=$2 AND allowance > 0;
     `,
     address,
-    contracts.alligator!.address
+    contracts.alligator?.address
   );
 
   return allAddresess[0].addresses;

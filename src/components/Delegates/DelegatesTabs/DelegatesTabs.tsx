@@ -6,11 +6,15 @@ import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFil
 import CitizensFilter from "@/components/Delegates/DelegatesFilter/CitizensFilter";
 import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
 import { useState, type ReactNode } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get("tab");
   const [selectedTab, setSelectedTab] = useState(tabParam || "delegates");
+  const { ui } = Tenant.current();
+
+  const hasCitizens = ui.toggle("citizens")?.enabled;
 
   // NOTE: Using window.history.pushState instead of router.push since router.push is waiting for API calls to resolve
   // in order to push the url
@@ -35,9 +39,11 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
           <TabsTrigger className="text-2xl" value="delegates">
             Delegates
           </TabsTrigger>
-          <TabsTrigger className="text-2xl" value="citizens">
-            Citizens
-          </TabsTrigger>
+          {hasCitizens && (
+            <TabsTrigger className="text-2xl" value="citizens">
+              Citizens
+            </TabsTrigger>
+          )}
         </TabsList>
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />

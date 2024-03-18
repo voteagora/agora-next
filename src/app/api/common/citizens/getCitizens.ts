@@ -25,7 +25,7 @@ export async function getCitizens({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
 
   const { meta, data: _citizens } = await paginatePrismaResult(
     (skip: number, take: number) => {
