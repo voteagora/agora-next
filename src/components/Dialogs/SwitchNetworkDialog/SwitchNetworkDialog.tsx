@@ -29,7 +29,7 @@ export function SwitchNetwork({
       />
       <h1 className="text-2xl font-extrabold">Switch Networks</h1>
       <p>
-        Wrong network detected, switch to {contracts.governor.chainName} to
+        Wrong network detected, switch to {contracts.token.chainName} to
         continue.
       </p>
       <Button
@@ -40,7 +40,7 @@ export function SwitchNetwork({
           closeDialog();
         }}
       >
-        Switch to {contracts.governor.chainName}
+        Switch to {contracts.token.chainName}
       </Button>
     </div>
   );

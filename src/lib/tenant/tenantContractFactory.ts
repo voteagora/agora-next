@@ -49,12 +49,16 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
     // GOVERNOR
     governor: new TenantContract<IGovernorContract>({
       contract: OptimismGovernor__factory.connect(
-        "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10",
-        global.ethProvider,
+        isProd
+          ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+          : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+        provider,
       ),
-      address: "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10",
-      chainId: 1,
-      chainName: "Ethereum Mainnet",
+      address: isProd
+        ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+        : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+      chainId: 10,
+      chainName: "Optimism",
       abi: OptimismGovernor__factory.abi,
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
