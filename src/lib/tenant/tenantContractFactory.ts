@@ -9,7 +9,8 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 
-import provider from "@/app/lib/provider";
+import provider, {ethProvider} from "@/app/lib/provider";
+
 import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
@@ -39,7 +40,7 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
     token: new TenantContract<ITokenContract>({
       contract: EtherfiToken__factory.connect(
         "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
-        global.ethProvider
+        ethProvider
       ),
       address: "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB" as `0x${string}`,
       chainId: 1,
