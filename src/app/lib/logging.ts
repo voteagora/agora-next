@@ -1,6 +1,8 @@
 import { performance } from "perf_hooks";
 import * as util from "util";
 
+const prod = process.env.NODE_ENV === "production";
+
 const time_this = async <T>(
   fn: () => Promise<T>,
   log_fields: Record<string, any>
@@ -15,7 +17,7 @@ const time_this = async <T>(
     console.log(
       util.inspect(
         { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: true }
+        { showHidden: false, depth: null, colors: !prod }
       )
     );
   }
@@ -35,7 +37,7 @@ const time_this_sync = <T>(
     console.log(
       util.inspect(
         { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: true }
+        { showHidden: false, depth: null, colors: !prod }
       )
     );
   }
