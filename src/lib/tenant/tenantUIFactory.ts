@@ -38,8 +38,8 @@ const etherfiUI = new TenantUI({
       description:
         "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
+        title: "Ether.fi Agora",
+        description: "Home of token governance",
       },
     },
     {
@@ -58,8 +58,8 @@ const etherfiUI = new TenantUI({
       description:
         "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
+        title: "Ether.fi Agora",
+        description: "Home of token governance",
       },
     },
   ],
@@ -67,11 +67,11 @@ const etherfiUI = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "proposals",
-      enabled: true,
+      enabled: false,
     },
   ],
 });

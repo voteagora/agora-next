@@ -13,6 +13,7 @@ import styles from "./header.module.scss";
 import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   ensName: string | undefined;
@@ -32,6 +33,7 @@ const ValueWrapper = ({
   );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
+  const { token } = Tenant.current();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const { isLoading, delegate, balance } = useConnectedDelegate();
@@ -123,7 +125,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           <TokenAmountDisplay
                             amount={balance || BigInt(0)}
                             decimals={18}
-                            currency={"OP"}
+                            currency={token.symbol}
                           />
                         </ValueWrapper>
                       }
@@ -151,7 +153,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           <TokenAmountDisplay
                             amount={delegate?.votingPower || BigInt(0)}
                             decimals={18}
-                            currency={"OP"}
+                            currency={token.symbol}
                           />
                         </ValueWrapper>
                       }

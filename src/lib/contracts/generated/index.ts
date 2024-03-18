@@ -3,6 +3,7 @@
 /* eslint-disable */
 export type { AlligatorOPV5 } from "./AlligatorOPV5";
 export type { ApprovalVotingModule } from "./ApprovalVotingModule";
+export type { EtherfiToken } from "./EtherfiToken";
 export type { NounsGovernor } from "./NounsGovernor";
 export type { OptimismGovernor } from "./OptimismGovernor";
 export type { OptimismToken } from "./OptimismToken";
@@ -11,6 +12,7 @@ export type { VotableSupplyOracle } from "./VotableSupplyOracle";
 export * as factories from "./factories";
 export { AlligatorOPV5__factory } from "./factories/AlligatorOPV5__factory";
 export { ApprovalVotingModule__factory } from "./factories/ApprovalVotingModule__factory";
+export { EtherfiToken__factory } from "./factories/EtherfiToken__factory";
 export { NounsGovernor__factory } from "./factories/NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./factories/OptimismGovernor__factory";
 export { OptimismToken__factory } from "./factories/OptimismToken__factory";

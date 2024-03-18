@@ -1,5 +1,6 @@
 "use client";
 
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
 import discord from "@/icons/discord.svg";
@@ -11,9 +12,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function DAOMetricsHeader({ metrics }) {
-  const { token } = Tenant.current();
+  const { token, namespace } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -36,7 +38,7 @@ export default function DAOMetricsHeader({ metrics }) {
                 "text-xs text-gray-4f font-inter font-medium",
                 `transition-all duration-200 ease-in-out transform ${
                   visible ? "translate-y-0" : "translate-y-10"
-                } sm:transition-none sm:translate-y-0`
+                } sm:transition-none sm:translate-y-0`,
               )}
             >
               <div
@@ -60,22 +62,27 @@ export default function DAOMetricsHeader({ metrics }) {
                 />
               </div>
               <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
-                <a
-                  href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
-                  rel="noreferrer nonopener"
-                  target="_blank"
-                >
-                  Report bugs & feedback
-                </a>
-                <Link href="/changelog">Change log</Link>
-                <a
-                  href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
-                  rel="noreferrer nonopener"
-                  target="_blank"
-                >
-                  FAQ
-                </a>
+              <div
+                className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+                {namespace === TENANT_NAMESPACES.OPTIMISM && (
+                  <>
+                    <a
+                      href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                    >
+                      Report bugs & feedback
+                    </a>
+                    <Link href="/changelog">Change log</Link>
+                    <a
+                      href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                    >
+                      FAQ
+                    </a>
+                  </>
+                )}
                 <a
                   href="https://discord.gg/vBJkUYBuwX"
                   rel="noreferrer nonopener"
@@ -87,7 +94,7 @@ export default function DAOMetricsHeader({ metrics }) {
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
       </>
     );
