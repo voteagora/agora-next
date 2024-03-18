@@ -3,7 +3,7 @@ import * as util from "util";
 
 // 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
 // for emission and ingestion of logs into datadog
-const log_emission = process.env.NEXT_PUBLIC_AGORA_ENV === "production" || process.env.NEXT_PUBLIC_AGORA_ENV === "dev";
+const log_emission = process.env.NEXT_PUBLIC_AGORA_ENV === "prod" || process.env.NEXT_PUBLIC_AGORA_ENV === "dev";
 
 const time_this = async <T>(
   fn: () => Promise<T>,
