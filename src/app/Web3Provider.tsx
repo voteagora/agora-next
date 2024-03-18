@@ -27,29 +27,13 @@ const metadata = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 
-const { namespace, isProd } = Tenant.current();
-
-let chains = [];
-
-switch (namespace) {
-  case TENANT_NAMESPACES.OPTIMISM:
-    chains = [optimism, mainnet];
-    break;
-
-  case TENANT_NAMESPACES.ENS:
-  case TENANT_NAMESPACES.ETHERFI:
-    chains = [mainnet];
-    break;
-
-  default:
-    chains = [mainnet];
-}
+const { namespace } = Tenant.current();
 
 const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: chains,
+    chains: [optimism, mainnet],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
