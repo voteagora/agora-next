@@ -4,8 +4,6 @@ import { MulticallProvider, MulticallWrapper } from "ethers-multicall-provider";
 declare global {
   var provider: MulticallProvider;
   var ethProvider: MulticallProvider;
-
-  var sepoliaProvider: MulticallProvider;
 }
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
@@ -43,15 +41,6 @@ if (isProd) {
     );
   }
   ethProvider = global.ethProvider;
-
-  if (!global.sepoliaProvider) {
-    global.sepoliaProvider = MulticallWrapper.wrap(
-      getDefaultProvider("sepolia", {
-        alchemy: alchemyId,
-      })
-    );
-  }
-  sepoliaProvider = global.sepoliaProvider;
 }
 
 export default provider;
