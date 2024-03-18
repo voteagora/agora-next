@@ -1,7 +1,9 @@
 import { performance } from "perf_hooks";
 import * as util from "util";
 
-const prod = process.env.NODE_ENV === "production";
+// 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
+// for emission and ingestion of logs into datadog
+const log_emission = process.env.NEXT_PUBLIC_AGORA_ENV === "production" || process.env.NEXT_PUBLIC_AGORA_ENV === "dev";
 
 const time_this = async <T>(
   fn: () => Promise<T>,
@@ -17,7 +19,7 @@ const time_this = async <T>(
     console.log(
       util.inspect(
         { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: !prod }
+        { showHidden: false, depth: null, colors: !log_emission }
       )
     );
   }
@@ -37,7 +39,7 @@ const time_this_sync = <T>(
     console.log(
       util.inspect(
         { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: !prod }
+        { showHidden: false, depth: null, colors: !log_emission }
       )
     );
   }
