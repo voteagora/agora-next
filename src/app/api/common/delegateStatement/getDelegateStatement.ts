@@ -4,6 +4,7 @@ import prisma from "@/app/lib/prisma";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { DaoSlug } from "@prisma/client";
 
 export const getDelegateStatement = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
@@ -20,7 +21,9 @@ async function getDelegateStatementForAddress({
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
-    : await getDelegateStatementForAddressDynamo(address);
+    : slug === DaoSlug.OP // Only fetch from Dynamo for optimism
+    ? await getDelegateStatementForAddressDynamo(address)
+    : null;
 }
 
 async function getDelegateStatementForAddressDynamo(address: string) {
