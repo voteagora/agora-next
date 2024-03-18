@@ -71,7 +71,7 @@ const etherfiUI = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: true,
+      enabled: false,
     },
   ],
 });
