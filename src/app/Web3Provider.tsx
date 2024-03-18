@@ -1,9 +1,9 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
-import { WagmiConfig, createConfig } from "wagmi";
+import { createConfig, WagmiConfig } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet, optimism, sepolia } from "wagmi/chains";
+import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
@@ -12,7 +12,7 @@ import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
@@ -36,6 +36,7 @@ switch (namespace) {
     chains = [optimism, mainnet];
     break;
 
+  case TENANT_NAMESPACES.ENS:
   case TENANT_NAMESPACES.ETHERFI:
     chains = [mainnet];
     break;

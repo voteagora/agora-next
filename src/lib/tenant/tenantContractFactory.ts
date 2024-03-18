@@ -38,10 +38,10 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
     // TOKEN
     token: new TenantContract<ITokenContract>({
       contract: EtherfiToken__factory.connect(
-        "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
+        isProd ? "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB" : "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
         global.ethProvider,
       ),
-      address: "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
+      address: isProd ? "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB" : "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
       chainId: 1,
       chainName: "Ethereum Mainnet",
       abi: EtherfiToken__factory.abi,
