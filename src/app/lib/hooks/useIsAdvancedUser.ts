@@ -62,6 +62,7 @@ const useIsAdvancedUser = () => {
     "0xa919348b2e20a7AAa33a41e04E7286E4eeD8889e", // QA 9
     "0x30b6e0b4f29FA72E8C7D014B6309668024ceB881", // QA 10
     "0x9b3d738C07Cd0E45eE98a792bA48ba67Bb5dAbca", // QA 11
+    "0x416a0343470ac6694D39e2fCd6C494eeEF39BeEB", // SAFE QA 3
   ] as `0x${string}`[];
 
   useContractRead({
