@@ -22,9 +22,9 @@ function ProposalTypeRow({
   proposalSettingsList: any[];
 }) {
   const { proposalType, proposalSettings } = form.state;
-  const optimisticProposalSettingsIndex = proposalSettingsList.findIndex(
+  const optimisticProposalSettingsIndex = proposalSettingsList.find(
     (item) => item.name === "Optimistic"
-  );
+  ).proposal_type_id;
   const infoText = () => {
     switch (proposalType) {
       case "Basic":
