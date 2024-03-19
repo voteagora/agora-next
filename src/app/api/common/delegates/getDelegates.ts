@@ -22,10 +22,14 @@ import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSup
 
 async function getDelegates({
   page = 1,
+  limit = 20,
+  offset = 0,
   sort = "weighted_random",
   seed,
 }: {
   page: number;
+  limit: number;
+  offset: number;
   sort: string;
   seed?: number;
 }) {
