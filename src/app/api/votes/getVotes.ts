@@ -29,13 +29,4 @@ async function getAllForVoting(
   };
 }
 
-export async function fetchAllForVoting(
-  address: string | `0x${string}`,
-  blockNumber: number,
-  proposal_id: string
-){
-  return cache(
-    (address: string, blockNumber: number, proposal_id: string) =>
-      getAllForVoting(address, blockNumber, proposal_id)
-  )(address, blockNumber, proposal_id);
-}
+export const fetchAllForVoting = cache(getAllForVoting);

@@ -13,8 +13,4 @@ async function getMetrics() {
   };
 }
 
-export async function fetchMetrics() {
-  return cache(
-    () => getMetrics()
-  )();
-}
+export const fetchMetrics = cache(getMetrics);

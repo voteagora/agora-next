@@ -230,6 +230,4 @@ export async function fetchDelegates(data: {
   )(data);
 }
 
-export async function fetchDelegate(addressOrENSName: string) {
-  return cache((address: string) => getDelegate(address))(addressOrENSName);
-}
+export const fetchDelegate = cache(getDelegate);

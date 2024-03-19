@@ -68,11 +68,4 @@ async function getAuthorityChains({
   return reversedChains;
 }
 
-export async function fetchAuthorityChains(data: {
-  address: string;
-  blockNumber: number;
-}) {
-  return cache((data: { address: string; blockNumber: number }) =>
-    getAuthorityChains(data)
-  )(data);
-}
+export const fetchAuthorityChains = cache(getAuthorityChains);

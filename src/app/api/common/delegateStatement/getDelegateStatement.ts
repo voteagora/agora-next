@@ -77,11 +77,4 @@ async function getDelegateStatementForAddressDynamo(address: string) {
   }
 }
 
-/*
-  Gets and caches delegate statement
-*/
-export async function fetchDelegateStatement(addressOrENSName: string) {
-  return cache(
-      (addressOrENS: string) => getDelegateStatement(addressOrENS)
-  )(addressOrENSName);
-}
+export const fetchDelegateStatement = cache(getDelegateStatement);

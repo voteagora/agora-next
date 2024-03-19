@@ -250,38 +250,7 @@ async function getVotesForProposalAndDelegate({
   );
 }
 
-export async function fetchVotesForDelegate(data: {
-  addressOrENSName: string;
-  page: number;
-}) {
-  return cache((data: { addressOrENSName: string; page: number }) =>
-    getVotesForDelegate(data)
-  )(data);
-}
-
-export async function fetchVotesForProposal(data: {
-  proposal_id: string;
-  page: number;
-}) {
-  return cache((data: { proposal_id: string; page: number }) =>
-    getVotesForProposal(data)
-  )(data);
-}
-
-export async function fetchUserVotesForProposal(data: {
-  proposal_id: string;
-  address: string;
-}) {
-  return cache((data: { proposal_id: string; address: string }) =>
-    getUserVotesForProposal(data)
-  )(data);
-}
-
-export async function fetchVotesForProposalAndDelegate(data: {
-  proposal_id: string;
-  address: string;
-}) {
-  return cache((data: { proposal_id: string; address: string }) =>
-    getVotesForProposalAndDelegate(data)
-  )(data);
-}
+export const fetchVotesForDelegate = cache(getVotesForDelegate);
+export const fetchVotesForProposal = cache(getVotesForProposal);
+export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
+export const fetchVotesForProposalAndDelegate = cache(getVotesForProposalAndDelegate);

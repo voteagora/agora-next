@@ -94,12 +94,4 @@ async function getCitizens({
   };
 }
 
-export async function fetchCitizens(data: {
-  page: number;
-  sort: string;
-  seed?: number;
-}) {
-  return cache((data: { page: number; sort: string; seed?: number }) =>
-    getCitizens(data)
-  )(data);
-}
+export const fetchCitizens = cache(getCitizens);

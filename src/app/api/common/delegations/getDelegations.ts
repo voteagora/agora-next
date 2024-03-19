@@ -272,26 +272,7 @@ async function getAllDelegatorsInChainsForAddress({
   return allAddresess[0].addresses;
 }
 
-export async function fetchCurrentDelegatees(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getCurrentDelegatees(addressOrENSName)
-  )(addressOrENSName);
-}
-
-export async function fetchCurrentDelegators(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getCurrentDelegators(addressOrENSName)
-  )(addressOrENSName);
-}
-
-export async function fetchDirectDelegatee(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getDirectDelegatee(addressOrENSName)
-  )(addressOrENSName);
-}
-
-export async function fetchAllDelegatorsInChains(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getAllDelegatorsInChains(addressOrENSName)
-  )(addressOrENSName);
-}
+export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
+export const fetchCurrentDelegators = cache(getCurrentDelegators);
+export const fetchDirectDelegatee = cache(getDirectDelegatee);
+export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains); 

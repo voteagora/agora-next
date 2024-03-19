@@ -273,42 +273,9 @@ async function getProxyAddressForAddress({
   return getProxyAddress(address);
 }
 
-export async function fetchVotingPowerForProposal(data: {
-  addressOrENSName: string;
-  blockNumber: number;
-  proposalId: string;
-}) {
-  return cache(
-    (data: { addressOrENSName: string; blockNumber: number; proposalId: string; }) => getVotingPowerForProposal(data)
-  )(data);
-}
-
-export async function fetchCurrentVotingPowerForNamespace(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getCurrentVotingPowerForNamespace(addressOrENSName)
-  )(addressOrENSName);
-}
-
-export async function fetchVotingPowerAvailableForSubdelegation(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getVotingPowerAvailableForSubdelegation(addressOrENSName)
-  )(addressOrENSName);
-}
-
-export async function fetchVotingPowerAvailableForDirectDelegation(address: string) {
-  return cache(
-    (address: string) => getVotingPowerAvailableForDirectDelegation(address)
-  )(address);
-}
-
-export async function fetchIsDelegatingToProxy(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => isDelegatingToProxy(addressOrENSName)
-  )(addressOrENSName);
-}
-
-export async function fetchProxy(addressOrENSName: string) {
-  return cache(
-    (addressOrENSName: string) => getProxy(addressOrENSName)
-  )(addressOrENSName);
-}
+export const fetchVotingPowerForProposal = cache(getVotingPowerForProposal);
+export const fetchCurrentVotingPowerForNamespace = cache(getCurrentVotingPowerForNamespace);
+export const fetchVotingPowerAvailableForSubdelegation = cache(getVotingPowerAvailableForSubdelegation);
+export const fetchVotingPowerAvailableForDirectDelegation = cache(getVotingPowerAvailableForDirectDelegation);
+export const fetchIsDelegatingToProxy = cache(isDelegatingToProxy);
+export const fetchProxy = cache(getProxy);

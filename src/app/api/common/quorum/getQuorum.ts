@@ -53,17 +53,9 @@ async function getCurrentQuorum() {
 /*
   Gets and caches the quorum for the supplied proposal
 */
-export async function fetchQuorumForProposal(proposal: ProposalPayload) {
-  return cache(
-    (proposal: ProposalPayload) => getQuorumForProposal(proposal)
-  )(proposal);
-}
+export const fetchQuorumForProposal = cache(getQuorumForProposal);
 
 /*
   Gets and caches quorum based on current block number
 */
-export async function fetchCurrentQuorum() {
-  return cache(
-    () => getCurrentQuorum()
-  )();
-}
+export const fetchCurrentQuorum = cache(getCurrentQuorum);

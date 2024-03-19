@@ -106,25 +106,6 @@ async function getProposalTypes() {
   });
 }
 
-export async function fetchProposals(
-  meta : {
-    filter: string;
-    page: number;
-  }) 
-{
-  return cache(
-    (meta: {filter: string; page: number;}) => getProposals(meta)
-  )(meta);
-}
-
-export async function fetchProposal(proposal_id: string) {
-  return cache(
-    (proposal_id: string) => getProposal(proposal_id)
-  )(proposal_id);
-}
-
-export async function fetchProposalTypes() {
-  return cache(
-    () => getProposalTypes()
-  )();
-}
+export const fetchProposals = cache(getProposals);
+export const fetchProposal = cache(getProposal);
+export const fetchProposalTypes = cache(getProposalTypes);

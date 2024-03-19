@@ -11,8 +11,4 @@ async function getVotableSupply() {
   return votableSupply.votable_supply;
 }
 
-export async function fetchVotableSupply() {
-  return cache(
-    () => getVotableSupply()
-  )();
-}
+export const fetchVotableSupply = cache(getVotableSupply);

@@ -60,8 +60,4 @@ async function getNeedsMyVoteProposals(address: string) {
   };
 }
 
-export async function fetchNeedsMyVoteProposals(address: string) {
-  return cache(
-    (address: string) => getNeedsMyVoteProposals(address)
-  )(address);
-}
+export const fetchNeedsMyVoteProposals = cache(getNeedsMyVoteProposals);
