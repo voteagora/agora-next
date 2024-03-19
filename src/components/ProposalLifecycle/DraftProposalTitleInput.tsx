@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useContext } from "react";
-
+import React from "react";
 import { ProposalDraft } from "@prisma/client";
 import { DebounceInput } from "react-debounce-input";
 import { ProposalDraftWithTransactions } from "./types";
 
 interface DraftProposalTitleInputProps {
   label: string;
-  placeholder: string;
   proposalState: ProposalDraftWithTransactions;
   updateProposal: (
     proposal: ProposalDraft,
@@ -16,10 +14,21 @@ interface DraftProposalTitleInputProps {
   ) => Promise<ProposalDraft>;
 }
 
-const DraftProposalTitleInput: React.FC<DraftProposalTitleInputProps> = (
-  props
-) => {
-  const { label, placeholder, proposalState, updateProposal } = props;
+const DraftProposalTitleInput: React.FC<DraftProposalTitleInputProps> = ({
+  label,
+  proposalState,
+  updateProposal,
+}) => {
+  const getPlaceholderText = (proposalType: string | undefined) => {
+    switch (proposalType) {
+      case "executable":
+        return "[EPx.x][Executable] My proposal title...";
+      case "social":
+        return "[EPx.x][Social] My social proposal title...";
+      default:
+        return "Enter a title";
+    }
+  };
 
   async function handleUpdateTitle(title: string) {
     updateProposal(proposalState, { title: title });
@@ -32,7 +41,7 @@ const DraftProposalTitleInput: React.FC<DraftProposalTitleInputProps> = (
       <DebounceInput
         debounceTimeout={1000}
         className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-        placeholder={placeholder}
+        placeholder={getPlaceholderText(proposalState.proposal_type)}
         value={proposalState.title}
         onChange={(e) => handleUpdateTitle(e.target.value)}
       />
