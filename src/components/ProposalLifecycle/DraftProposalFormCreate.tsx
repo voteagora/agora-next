@@ -103,14 +103,12 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           </p>
           <DraftProposalTypeChoice
             label="Proposal type"
-            explanation={staticText.proposalTypeExplanation}
             proposalState={proposalState}
             setProposalState={setProposalState}
             updateProposal={updateProposal}
           />
           <DraftProposalTitleInput
             label="Title"
-            placeholder={staticText.proposalTitlePlaceholder}
             proposalState={proposalState}
             updateProposal={updateProposal}
           />
