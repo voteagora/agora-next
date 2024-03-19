@@ -8,30 +8,37 @@ type PaginatedResult<T> = {
 };
 
 export async function paginateResult<T extends Array<any>>(
-  result: (skip: number, take: number) => Promise<T>,
+  query: (skip: number, take: number) => Promise<T>,
   page: number,
   pageSize: number
 ): Promise<PaginatedResult<T>> {
   const skip = (page - 1) * pageSize;
   const take = pageSize + 1;
 
-  const data = await result(skip, take);
+  return await paginateResultEx<T>(query, take, skip);
+}
+
+export async function paginateResultEx<T extends Array<any>>(
+  query: (skip: number, take: number) => Promise<T>,
+  limit: number,
+  offest: number
+): Promise<PaginatedResult<T>> {
+  const data = await query(offest, limit);
 
   if (!data || data.length === 0) {
-    // return notFound();
     return {
       meta: { currentPage: 0, pageSize: 0, hasNextPage: false },
       data: [] as any as T,
     };
   }
 
-  const hasNextPage = data.length > pageSize;
-  const theData = data.slice(0, pageSize) as T;
+  const hasNextPage = data.length > limit;
+  const theData = data.slice(0, limit) as T;
 
   return {
     meta: {
-      currentPage: page,
-      pageSize,
+      currentPage: 1,
+      pageSize: limit,
       hasNextPage,
     },
     data: theData,
