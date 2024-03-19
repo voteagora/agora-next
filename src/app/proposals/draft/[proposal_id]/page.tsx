@@ -171,7 +171,9 @@ export default async function DraftProposalPage({
         createGithubProposal={createGithubProposal}
         saveSocialProposalOptions={saveSocialProposalOptions}
       />
-      <DraftProposalChecklist />
+      <DraftProposalChecklist
+        proposalStatusId={proposalDraft.proposal_status_id}
+      />
     </div>
   );
 }
