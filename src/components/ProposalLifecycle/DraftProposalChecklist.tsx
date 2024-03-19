@@ -10,6 +10,12 @@ import {
 interface DraftProposalChecklistRowProps {
   title: string;
   description: string;
+  isCompleted: boolean;
+  isCurrent: boolean;
+}
+
+interface DraftProposalChecklistProps {
+  proposalStatusId: number;
 }
 
 const checklistItems = [
@@ -45,16 +51,20 @@ const checklistItems = [
   },
 ];
 
-const DraftProposalChecklist: React.FC = () => {
+const DraftProposalChecklist: React.FC<DraftProposalChecklistProps> = ({
+  proposalStatusId,
+}) => {
   return (
     <div className="w-[350px] flex-shrink-0 bg-gray-fa border border-gray-eo rounded-2xl px-6 pt-6 pb-9">
       <h2 className="font-black text-2xl mb-7">Proposal checklist</h2>
       <Accordion type="single" collapsible>
-        {checklistItems.map((item) => (
+        {checklistItems.map((item, index) => (
           <DraftProposalChecklistRow
             key={item.title}
             title={item.title}
             description={item.description}
+            isCompleted={index < proposalStatusId - 1}
+            isCurrent={index === proposalStatusId - 1}
           />
         ))}
       </Accordion>
@@ -62,24 +72,45 @@ const DraftProposalChecklist: React.FC = () => {
   );
 };
 
-const DraftProposalChecklistRow: React.FC<DraftProposalChecklistRowProps> = (
-  props
-) => {
-  const { title, description } = props;
+const DraftProposalChecklistRow: React.FC<DraftProposalChecklistRowProps> = ({
+  title,
+  description,
+  isCompleted,
+  isCurrent,
+}) => {
+  const baseCircleStyle = {
+    border: "2px solid #4B5563",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  const completedCircleStyle = {
+    ...baseCircleStyle,
+    backgroundColor: "#4B5563",
+  };
+
+  const circleStyle = isCompleted ? completedCircleStyle : baseCircleStyle;
 
   return (
     <AccordionItem value={title} className="flex flex-col mb-4">
       <AccordionTrigger>
         <div className="w-full flex flex-row justify-between items-center">
-          <h3 className="font-medium">{title}</h3>
-          <div className="w-4 h-4 border-2 border-gray-eo rounded-full"></div>
+          <h3
+            className={`font-medium ${
+              isCurrent ? "underline text-gray-900" : "text-gray-900"
+            }`}
+          >
+            {title}
+          </h3>
+          <div className="w-4 h-4 rounded-full" style={circleStyle}></div>
         </div>
       </AccordionTrigger>
       <AccordionContent>
         <div className="w-full flex flex-row justify-between pt-2">
           <p className="text-gray-4f text-xs max-w-[280px]">{description}</p>
           <div className="w-4 flex justify-center">
-            <div className="h-[100px] w-0.5 bg-gray-eo"></div>
+            <div className={`h-[100px] w-0.5 bg-gray-eo`}></div>
           </div>
         </div>
       </AccordionContent>
