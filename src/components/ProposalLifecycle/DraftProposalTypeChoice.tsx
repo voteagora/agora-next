@@ -6,7 +6,6 @@ import { ProposalDraftWithTransactions } from "./types";
 
 interface DraftProposalTypeChoiceProps {
   label: string;
-  explanation: string;
   proposalState: ProposalDraftWithTransactions;
   setProposalState: React.Dispatch<
     React.SetStateAction<ProposalDraftWithTransactions>
@@ -20,13 +19,7 @@ interface DraftProposalTypeChoiceProps {
 const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
   props
 ) => {
-  const {
-    label,
-    explanation,
-    proposalState,
-    setProposalState,
-    updateProposal,
-  } = props;
+  const { label, proposalState, setProposalState, updateProposal } = props;
 
   async function handleUpdateProposalType(
     proposalType: "executable" | "social"
@@ -67,7 +60,11 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
             Social
           </button>
         </div>
-        <p className="text-xs max-w-[390px] text-gray-4f">{explanation}</p>
+        <p className="text-xs max-w-[390px] text-gray-4f">
+          {proposalState.proposal_type === "executable"
+            ? "Passed on-chain, Executable Proposals execute code related to ENS and ENS DAO contracts, as voted on by the DAO."
+            : "Social proposal goes here"}
+        </p>
       </div>
     </div>
   );
