@@ -224,14 +224,5 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
-export async function fetchDelegates(data: {
-  page: number;
-  sort: string;
-  seed?: number;
-}) {
-  return cache((data: { page: number; sort: string; seed?: number }) =>
-    getDelegates(data)
-  )(data);
-}
-
+export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
