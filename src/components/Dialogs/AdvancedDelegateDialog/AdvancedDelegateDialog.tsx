@@ -3,7 +3,13 @@ import styles from "./advancedDelegateDialog.module.scss";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import useAdvancedDelegation from "./useAdvancedDelegation";
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
@@ -64,10 +70,10 @@ export function AdvancedDelegateDialog({
         proxyAddress,
         delegatorsRes,
         directDelegatedVP,
-      ] = await fetchAllForAdvancedDelegation(address)
+      ] = await fetchAllForAdvancedDelegation(address);
 
       setDirectDelegatedVP(directDelegatedVP);
-      setAvailableBalance((BigInt(subdelegateBalance) + directDelegatedVP).toString());
+      setAvailableBalance(subdelegateBalance);
       setIsDelegatingToProxy(isDelegating);
       setOpBalance(directDelegatedVP);
       setDelegators(delegatorsRes);
