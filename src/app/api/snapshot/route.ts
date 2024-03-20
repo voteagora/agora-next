@@ -1,5 +1,13 @@
 import prisma from "@/app/lib/prisma";
 
+/**
+ * This is a basic snapshot indexer. It fetches all proposals from the ENS space
+ * and upserts them into the database.
+ *
+ * Snapshot API has a limit of 1000 items per request
+ * There's currently no pagination as there's a lot less than 1000 proposals in the ENS space
+ */
+
 const url = "https://hub.snapshot.org/graphql";
 
 async function fetchProposals() {
@@ -47,15 +55,15 @@ async function fetchProposals() {
 }
 
 export async function GET() {
+  // TODO: only run for ENS namespace
   try {
     const proposals = await fetchProposals();
 
     for await (const proposal of proposals) {
-      console.log(proposal);
       await prisma.snapshotProposal.upsert({
         where: { id: proposal.id },
-        update: proposal,
-        create: proposal,
+        update: { ...proposal, dao_slug: "ENS" },
+        create: { ...proposal, dao_slug: "ENS" },
       });
     }
 
