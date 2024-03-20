@@ -28,9 +28,9 @@ async function getDelegates({
   sort = "weighted_random",
   seed,
 }: {
-  page: number;
-  limit: number;
-  offset: number;
+  page?: number;
+  limit?: number;
+  offset?: number;
   sort: string;
   seed?: number;
 }) {
