@@ -1,4 +1,4 @@
-import { paginateResult } from "@/app/lib/pagination";
+import { paginateResult, paginateResultEx } from "@/app/lib/pagination";
 import {
   OptimismAdvancedVotingPower,
   OptimismDelegates,
@@ -13,7 +13,7 @@ import {
   type Delegate,
   type DelegatePayload,
   type DelegatesGetPayload,
-  type DelegateStats
+  type DelegateStats,
 } from "./delegate";
 import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
@@ -21,10 +21,19 @@ import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDe
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
+/*
+  * Fetches a list of delegates
+  * @param page - the page number to fetch; limit/offset ignored if this is supplied
+  * @param limit - the number of delegates to fetch; offset must also be supplied if limit is
+  * @param offset - the offset to fetch; limit must also be supplied if offset is
+  * @param sort - the sort order
+  * @param seed - the seed for random sorting
+  * @returns - a list of delegates
+*/
 async function getDelegates({
   page = 1,
-  limit = 20,
-  offset = 0,
+  limit,
+  offset,
   sort = "weighted_random",
   seed,
 }: {
@@ -37,12 +46,11 @@ async function getDelegates({
   const pageSize = 20;
   const { namespace } = Tenant.current();
 
-  const { meta, data: delegates } = await paginateResult(
-    async (skip: number, take: number) => {
-      switch (sort) {
-        case "most_delegators":
-          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-            `
+  const paginatedQuery = async (skip: number, take: number) => {
+    switch (sort) {
+      case "most_delegators":
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
             SELECT *
             FROM ${namespace + ".delegates"}
             WHERE num_of_delegators IS NOT NULl
@@ -50,13 +58,13 @@ async function getDelegates({
             OFFSET $1
             LIMIT $2;
             `,
-            skip,
-            take
-          );
-        case "weighted_random":
-          await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-            `
+          skip,
+          take
+        );
+      case "weighted_random":
+        await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
             SELECT *
             FROM ${namespace + ".delegates"}
             WHERE voting_power > 0
@@ -64,23 +72,25 @@ async function getDelegates({
             OFFSET $2
             LIMIT $3;
             `,
-            seed,
-            skip,
-            take
-          );
-        default:
-          return (prisma as any)[`${namespace}Delegates`].findMany({
-            skip,
-            take,
-            orderBy: {
-              voting_power: "desc",
-            },
-          });
-      }
-    },
-    page,
-    pageSize
-  );
+          seed,
+          skip,
+          take
+        );
+      default:
+        return (prisma as any)[`${namespace}Delegates`].findMany({
+          skip,
+          take,
+          orderBy: {
+            voting_power: "desc",
+          },
+        });
+    }
+  };
+
+  // Note: This will error if limit is supplied without offset and vice versa
+  const { meta, data: delegates } = page
+    ? await paginateResult(paginatedQuery, page, pageSize)
+    : await paginateResultEx(paginatedQuery, limit as number, offset as number);
 
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatePayload) => {
@@ -91,11 +101,18 @@ async function getDelegates({
     })
   );
 
+  // Voting power detail added for use with API, so as to not break existing
+  // components
   return {
     meta,
     delegates: delegates.map((delegate: DelegatePayload, index: number) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
+      votingPowerDetail: {
+        total: delegate.voting_power?.toFixed(0),
+        advanced: delegate.advanced_vp?.toFixed(0),
+        direct: delegate.direct_vp?.toFixed(0),
+      },
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
     })),
