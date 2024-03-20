@@ -23,6 +23,8 @@ export default function CastVoteInput({
   proposal,
   isOptimistic = false,
 }: Props) {
+  const { isConnected } = useAgoraContext();
+  const { setOpen } = useModal();
   const [reason, setReason] = useState("");
   const openDialog = useOpenDialog();
   const { chains, delegate, isSuccess, votes, votingPower } =
@@ -30,7 +32,16 @@ export default function CastVoteInput({
       proposal,
     });
 
-  // TODO: when no wallet it should not be this
+  if (!isConnected) {
+    return (
+      <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
+        <Button variant={"outline"} onClick={() => setOpen(true)}>
+          Connect wallet to vote
+        </Button>
+      </div>
+    );
+  }
+
   if (!isSuccess || !chains || !delegate || !votes || !votingPower) {
     return (
       <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
@@ -96,19 +107,8 @@ function VoteButtons({
   isOptimistic: boolean;
   votingPower: VotingPowerData;
 }) {
-  const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
-
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
-  }
-
-  if (!isConnected) {
-    return (
-      <Button variant={"outline"} onClick={() => setOpen(true)}>
-        Connect wallet to vote
-      </Button>
-    );
   }
 
   const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
