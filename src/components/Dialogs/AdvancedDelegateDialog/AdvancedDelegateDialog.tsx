@@ -64,7 +64,7 @@ export function AdvancedDelegateDialog({
 
       // @ts-ignore
       const [
-        subdelegateBalance,
+        balance,
         isDelegating,
         delegatees,
         proxyAddress,
@@ -73,7 +73,7 @@ export function AdvancedDelegateDialog({
       ] = await fetchAllForAdvancedDelegation(address);
 
       setDirectDelegatedVP(directDelegatedVP);
-      setAvailableBalance(subdelegateBalance);
+      setAvailableBalance(balance);
       setIsDelegatingToProxy(isDelegating);
       setOpBalance(directDelegatedVP);
       setDelegators(delegatorsRes);
