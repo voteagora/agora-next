@@ -57,12 +57,6 @@ async function getDelegators(addressOrENSName) {
   return getCurrentDelegators(addressOrENSName);
 }
 
-async function fetchAllForVoting(address, blockNumber, proposal_id) {
-  "use server";
-
-  return await getAllForVoting(address, blockNumber, proposal_id);
-}
-
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
   const proposalVotes = await fetchProposalVotes(proposal.id);
@@ -148,11 +142,7 @@ export default async function OPProposalPage({ proposal }) {
               getDelegators={getDelegators}
             />
             {/* Show the input for the user to vote on a proposal if allowed */}
-            <CastVoteInput
-              proposal={proposal}
-              fetchAllForVoting={fetchAllForVoting}
-              isOptimistic
-            />
+            <CastVoteInput proposal={proposal} isOptimistic />
             <p className="mx-4 text-xs text-gray-4f">
               If you agree with this proposal, you don’t need to vote. Only vote
               against if you oppose this proposal.

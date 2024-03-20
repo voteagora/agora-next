@@ -19,7 +19,7 @@ const useConnectedDelegate = () => {
 
   const data = useQuery({
     enabled: !!address,
-    queryKey: ['useConnectedDelegate', address, lastVotingPower, refetchDelegate, retries],
+    queryKey: ['useConnectedDelegate', address, refetchDelegate, retries],
     queryFn: async () => {
       const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address!);
       if (refetchDelegate) {
