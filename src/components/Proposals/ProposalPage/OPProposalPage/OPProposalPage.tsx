@@ -6,7 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
-import { fetchAllForVoting, fetchProposalVotes } from "@/app/proposals/actions";
+import { fetchProposalVotes } from "@/app/proposals/actions";
 
 export default async function OPProposalPage({
   proposal,
@@ -44,10 +44,7 @@ export default async function OPProposalPage({
               proposal_id={proposal.id}
             />
             {/* Show the input for the user to vote on a proposal if allowed */}
-            <CastVoteInput
-              proposal={proposal}
-              fetchAllForVoting={fetchAllForVoting}
-            />
+            <CastVoteInput proposal={proposal} />
           </VStack>
         </VStack>
       </div>
