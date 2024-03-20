@@ -59,35 +59,24 @@ export function AdvancedDelegateDialog({
   const params = useParams<{ addressOrENSName: string }>();
   const { contracts, slug } = Tenant.current();
 
-  const getOpBalance = async (address: `0x${string}`) => {
-    return await contracts.token.contract.balanceOf(address);
-  };
-
   const fetchData = useCallback(async () => {
     try {
       if (!address) return;
-      const promises = [
-        // TODO temporary fetch all query - optimization via API needed
-        fetchAllForAdvancedDelegation(address),
-        getOpBalance(address),
-      ];
-
-      const [getAll, delegateOpBalance] = await Promise.all(promises);
 
       // @ts-ignore
       const [
-        balance,
+        subdelegateBalance,
         isDelegating,
         delegatees,
         proxyAddress,
         delegatorsRes,
         directDelegatedVP,
-      ] = getAll;
+      ] = await fetchAllForAdvancedDelegation(address)
 
       setDirectDelegatedVP(directDelegatedVP);
-      setAvailableBalance(balance);
+      setAvailableBalance((BigInt(subdelegateBalance) + directDelegatedVP).toString());
       setIsDelegatingToProxy(isDelegating);
-      setOpBalance(delegateOpBalance as bigint);
+      setOpBalance(directDelegatedVP);
       setDelegators(delegatorsRes);
 
       let isTargetDelegated = false;
@@ -111,7 +100,7 @@ export function AdvancedDelegateDialog({
         delegatees.push({
           from: address,
           to: target,
-          allowance: 0,
+          allowance: "0",
           timestamp: null,
           type: "ADVANCED",
           amount: "PARTIAL",
