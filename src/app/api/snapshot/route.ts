@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import Tenant from "@/lib/tenant/tenant";
 
 /**
  * This is a basic snapshot indexer. It fetches all proposals from the ENS space
@@ -9,12 +10,15 @@ import prisma from "@/app/lib/prisma";
  */
 
 const url = "https://hub.snapshot.org/graphql";
+const namespaces = {
+  ENS: "ens.eth",
+};
 
-async function fetchProposals() {
+async function fetchProposals(slug: string) {
   const query = `
       query {
         items: proposals(
-          where: { space: "ens.eth", flagged: false }
+          where: { space: "${slug}", flagged: false }
           orderBy: "created"
           orderDirection: asc
         ) {
@@ -55,26 +59,34 @@ async function fetchProposals() {
 }
 
 export async function GET() {
-  // TODO: only run for ENS namespace
-  try {
-    const proposals = await fetchProposals();
+  // Only allow this route to be accessed from the ENS namespace
+  const slug = Tenant.current().slug;
+  if (slug === "ENS") {
+    try {
+      const proposals = await fetchProposals(namespaces[slug]);
 
-    for await (const proposal of proposals) {
-      await prisma.snapshotProposal.upsert({
-        where: { id: proposal.id },
-        update: { ...proposal, dao_slug: "ENS" },
-        create: { ...proposal, dao_slug: "ENS" },
+      for await (const proposal of proposals) {
+        await prisma.snapshotProposal.upsert({
+          where: { id: proposal.id },
+          update: { ...proposal, dao_slug: slug },
+          create: { ...proposal, dao_slug: slug },
+        });
+      }
+
+      return new Response(`Updated: ${proposals.length} proposals`, {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error }), {
+        headers: { "Content-Type": "application/json" },
+        status: 500,
       });
     }
-
-    return new Response(`Updated: ${proposals.length} proposals`, {
+  } else {
+    return new Response("Route not supported for namespace", {
       headers: { "Content-Type": "application/json" },
-      status: 200,
-    });
-  } catch (error) {
-    return new Response(JSON.stringify({ error }), {
-      headers: { "Content-Type": "application/json" },
-      status: 500,
+      status: 404,
     });
   }
 }
