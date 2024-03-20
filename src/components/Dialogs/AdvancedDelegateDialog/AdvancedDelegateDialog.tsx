@@ -3,18 +3,12 @@ import styles from "./advancedDelegateDialog.module.scss";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import useAdvancedDelegation from "./useAdvancedDelegation";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { formatUnits } from "viem";
+import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
 import { track } from "@vercel/analytics";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
@@ -27,7 +21,6 @@ import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { formatEther } from "viem";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 
