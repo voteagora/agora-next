@@ -2,82 +2,42 @@
 
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./castVoteInput.module.scss";
-import { useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useState } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 
 type Props = {
   proposal: Proposal;
   isOptimistic?: boolean;
-  fetchAllForVoting: (
-    address: string | `0x${string}`,
-    blockNumber: number,
-    proposal_id: string
-  ) => Promise<{
-    votingPower: VotingPowerData;
-    authorityChains: string[][];
-    delegate: Delegate;
-    votesForProposalAndDelegate: Vote[];
-  }>;
 };
 
 export default function CastVoteInput({
   proposal,
   isOptimistic = false,
-  fetchAllForVoting,
 }: Props) {
   const [reason, setReason] = useState("");
-  const [votingPower, setVotingPower] = useState<VotingPowerData>({
-    directVP: "0",
-    advancedVP: "0",
-    totalVP: "0",
-  });
-  const [delegate, setDelegate] = useState({});
-  const [chains, setChains] = useState<string[][]>([]);
-  const [votes, setVotes] = useState<Vote[]>([]);
-  const [isReady, setIsReady] = useState(false);
   const openDialog = useOpenDialog();
+  const { chains, delegate, isSuccess, votes, votingPower } =
+    useFetchAllForVoting({
+      proposal,
+    });
 
-  const { address } = useAccount();
-
-  const fetchData = useCallback(async () => {
-    setIsReady(false);
-    try {
-      const {
-        votingPower,
-        authorityChains,
-        delegate,
-        votesForProposalAndDelegate,
-      } = await fetchAllForVoting(
-        address!,
-        proposal.snapshotBlockNumber,
-        proposal.id
-      );
-
-      setVotingPower(votingPower);
-      setDelegate(delegate);
-      setChains(authorityChains);
-      setVotes(votesForProposalAndDelegate);
-      setIsReady(true);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [address, proposal, fetchAllForVoting]);
-
-  useEffect(() => {
-    if (address && proposal.snapshotBlockNumber) {
-      fetchData();
-    }
-  }, [fetchData, address, proposal.snapshotBlockNumber]);
+  // TODO: when no wallet it should not be this
+  if (!isSuccess || !chains || !delegate || !votes || !votingPower) {
+    return (
+      <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
+        <DisabledVoteButton reason="Loading..." />
+      </div>
+    );
+  }
 
   return (
     <VStack className={styles.cast_vote_container}>
@@ -112,7 +72,6 @@ export default function CastVoteInput({
           }
           proposalStatus={proposal.status}
           delegateVotes={votes}
-          isReady={isReady}
           isOptimistic={isOptimistic}
           votingPower={votingPower}
         />
@@ -125,7 +84,6 @@ function VoteButtons({
   onClick,
   proposalStatus,
   delegateVotes,
-  isReady,
   isOptimistic,
   votingPower,
 }: {
@@ -135,7 +93,6 @@ function VoteButtons({
   ) => void;
   proposalStatus: Proposal["status"];
   delegateVotes: Vote[];
-  isReady: boolean;
   isOptimistic: boolean;
   votingPower: VotingPowerData;
 }) {
@@ -152,10 +109,6 @@ function VoteButtons({
         Connect wallet to vote
       </Button>
     );
-  }
-
-  if (!isReady) {
-    return <DisabledVoteButton reason="Loading..." />;
   }
 
   const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
