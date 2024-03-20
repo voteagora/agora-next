@@ -34,6 +34,7 @@ import Tenant from "@/lib/tenant/tenant";
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
 };
+
 export function AdvancedDelegateDialog({
   target,
   fetchAllForAdvancedDelegation,
@@ -56,7 +57,7 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { contracts } = Tenant.current();
+  const { contracts, slug } = Tenant.current();
 
   const getOpBalance = async (address: `0x${string}`) => {
     return await contracts.token.contract.balanceOf(address);
@@ -163,7 +164,7 @@ export function AdvancedDelegateDialog({
     setIsLoading(true);
 
     const trackingData = {
-      dao_slug: "OP",
+      dao_slug: slug,
       userAddress: address || "unknown",
       proxyAddress: proxyAddress || "unknown",
       targetDelegation: target || "unknown",
@@ -292,6 +293,7 @@ function InfoDialog({
   directDelegatedVP: bigint;
 }) {
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
+  const { token } = Tenant.current();
   return (
     <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
       <VStack className={styles.amount_container + " !pb-0 !px-0"}>
@@ -319,8 +321,8 @@ function InfoDialog({
             <p>You own</p>
             <TokenAmountDisplay
               amount={balance}
-              decimals={18}
-              currency={"OP"}
+              decimals={token.decimals}
+              currency={token.symbol}
             />
           </HStack>
           {delegators?.map((delegator, index) => (
@@ -336,8 +338,8 @@ function InfoDialog({
               </p>
               <TokenAmountDisplay
                 amount={BigInt(delegator.allowance)}
-                decimals={18}
-                currency={"OP"}
+                decimals={token.decimals}
+                currency={token.symbol}
               />
             </HStack>
           ))}
@@ -347,8 +349,8 @@ function InfoDialog({
             You’ve been delegated an additional{" "}
             <TokenAmountDisplay
               amount={directDelegatedFromOthers}
-              decimals={18}
-              currency={"OP"}
+              decimals={token.decimals}
+              currency={token.symbol}
             />{" "}
             without the right to redelegate. You can only vote with this portion
             of votes and cannot pass them to others.
