@@ -18,6 +18,10 @@ export const createOptionalStringValidator = <T extends string>(
     .transform((x) => (x !== null && x !== "") ? x : defaultValue);
 };
 
+/*
+  Creates a zod schema for validating input against min and max number values.
+  If input is null, returns the supplied default value.
+*/
 export const createOptionalNumberValidator = <T extends number>(
   max: T,
   min: T, 
