@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "test2"]
 }
 
 model DelegateStatements {
@@ -46,6 +46,58 @@ model AddressMetadata {
 
   @@id([address, kind, dao_slug])
   @@map("address_metadata")
+  @@schema("agora")
+}
+
+model SnapshotProposal {
+  id             String    @id
+  author         String?
+  body           String?
+  choices        String[]
+  created        Decimal?  @db.Decimal
+  end            Decimal?  @db.Decimal
+  link           String?
+  network        String?
+  scores         Decimal[] @db.Decimal
+  scores_state   String?
+  scores_total   Decimal?  @db.Decimal
+  scores_updated Decimal?  @db.Decimal
+  snapshot       String?
+  start          Decimal?  @db.Decimal
+  state          String?
+  title          String?
+  type           String?
+  votes          Decimal?  @db.Decimal
+
+  @@map("proposals")
+  @@schema("test2")
+}
+
+model api_user {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  api_key     String?   @unique @default(dbgenerated("gen_random_uuid()"))
+  email       String?
+  address     String
+  chain_id    String
+  description String?
+  enabled     Boolean?  @default(true)
+  created_at  DateTime? @default(now()) @db.Date
+  updated_at  DateTime? @default(now()) @db.Date
+  chain       chain     @relation(fields: [chain_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([address, chain_id])
+  @@index([address], map: "idx_api_user_address")
+  @@index([api_key], map: "idx_api_user_api_key")
+  @@schema("agora")
+}
+
+model chain {
+  id         String     @id
+  name       String
+  created_at DateTime?  @default(now()) @db.Date
+  updated_at DateTime?  @default(now()) @db.Date
+  api_user   api_user[]
+
   @@schema("agora")
 }
 
