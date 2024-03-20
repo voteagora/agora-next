@@ -1,8 +1,9 @@
 import { Prisma } from "@prisma/client";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
-export async function isCitizen(address: string) {
+async function isCitizen(address: string) {
   const { slug } = Tenant.current();
 
   return prisma.$queryRaw<
@@ -19,3 +20,5 @@ export async function isCitizen(address: string) {
     `
   );
 }
+
+export const fetchIsCitizen = cache(isCitizen); 
