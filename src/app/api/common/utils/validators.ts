@@ -22,10 +22,10 @@ export const createOptionalStringValidator = <T extends string>(
   Creates a zod schema for validating input against min and max number values.
   If input is null, returns the supplied default value.
 */
-export const createOptionalNumberValidator = <T extends number>(
-  max: T,
-  min: T, 
-  defaultValue: T
+export const createOptionalNumberValidator = (
+  max: number,
+  min: number, 
+  defaultValue: number
 ) => {
   return z
     .union([z.literal(null), z.number().min(min).max(max).default(defaultValue)])
