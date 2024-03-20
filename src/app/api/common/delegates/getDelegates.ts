@@ -13,6 +13,7 @@ import {
   type Delegate,
   type DelegatePayload,
   type DelegatesGetPayload,
+  type DelegateStats
 } from "./delegate";
 import { isCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
@@ -101,19 +102,6 @@ async function getDelegates({
     seed,
   };
 }
-
-type DelegateStats = {
-  voter: OptimismVoterStats["voter"];
-  proposals_voted: OptimismVoterStats["proposals_voted"];
-  for: OptimismVoterStats["for"];
-  against: OptimismVoterStats["against"];
-  abstain: OptimismVoterStats["abstain"];
-  participation_rate: OptimismVoterStats["participation_rate"];
-  last_10_props: OptimismVoterStats["last_10_props"];
-  voting_power: OptimismVotingPower["voting_power"];
-  advanced_vp: OptimismAdvancedVotingPower["advanced_vp"];
-  num_of_delegators: OptimismDelegates["num_of_delegators"];
-};
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace, contracts } = Tenant.current();
