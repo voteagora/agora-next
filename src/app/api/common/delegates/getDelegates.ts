@@ -15,7 +15,7 @@ import {
   type DelegatesGetPayload,
   type DelegateStats
 } from "./delegate";
-import { isCitizen } from "../citizens/isCitizen";
+import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
@@ -85,7 +85,7 @@ async function getDelegates({
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatePayload) => {
       return {
-        citizen: await isCitizen(delegate.delegate),
+        citizen: await fetchIsCitizen(delegate.delegate),
         statement: await fetchDelegateStatement(delegate.delegate),
       };
     })
@@ -149,7 +149,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       fetchVotableSupply(),
       fetchDelegateStatement(addressOrENSName),
       fetchCurrentQuorum(),
-      isCitizen(address),
+      fetchIsCitizen(address),
     ]);
 
   const numOfDelegatesQuery = prisma.$queryRawUnsafe<
