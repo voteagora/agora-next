@@ -190,16 +190,27 @@ export async function parseProposal(
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    created_time: latestBlock
-      ? getHumanBlockTime(proposal.created_block, latestBlock)
-      : null,
-    start_time: latestBlock
-      ? getHumanBlockTime(proposal.start_block, latestBlock)
-      : null,
-    end_time: latestBlock
-      ? getHumanBlockTime(proposal.end_block, latestBlock)
-      : null,
-    markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
+    created_time:
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.created_ts * 1000)
+        : latestBlock
+        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+        : null,
+    start_time:
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.start_ts * 1000)
+        : latestBlock
+        ? getHumanBlockTime(proposal.start_block, latestBlock)
+        : null,
+    end_time:
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.end_ts * 1000)
+        : latestBlock
+        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+        : null,
+    markdowntitle:
+      (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
+      getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
@@ -209,12 +220,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-        proposal,
-        proposalResuts,
-        latestBlock,
-        quorum,
-        votableSupply
-      )
+          proposal,
+          proposalResuts,
+          latestBlock,
+          quorum,
+          votableSupply
+        )
       : null,
   };
 }
@@ -248,6 +259,20 @@ export function getProposalTotalValue(
 }
 
 export type ParsedProposalData = {
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: {
+      title: string;
+      start_ts: number;
+      end_ts: number;
+      created_ts: number;
+      link: string;
+      scores: string[];
+      type: string;
+      votes: string;
+      state: "pending" | "active" | "closed";
+    };
+  };
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -293,6 +318,23 @@ export function parseProposalData(
   proposalType: ProposalType
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
+    case "SNAPSHOT": {
+      const parsedProposalData = JSON.parse(proposalData);
+      return {
+        key: "SNAPSHOT",
+        kind: {
+          title: parsedProposalData.title ?? "",
+          start_ts: parsedProposalData.start_ts ?? 0,
+          end_ts: parsedProposalData.end_ts ?? 0,
+          created_ts: parsedProposalData.created_ts ?? 0,
+          link: parsedProposalData.link ?? "",
+          scores: parsedProposalData.scores ?? [],
+          type: parsedProposalData.type ?? "",
+          votes: parsedProposalData.votes ?? "",
+          state: parsedProposalData.state ?? "",
+        },
+      };
+    }
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
@@ -403,6 +445,13 @@ function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
  */
 
 export type ParsedProposalResults = {
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: {
+      scores: string[];
+      status: "pending" | "active" | "closed";
+    };
+  };
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -447,6 +496,15 @@ export function parseProposalResults(
   proposalData: ParsedProposalData[ProposalType]
 ): ParsedProposalResults[ProposalType] {
   switch (proposalData.key) {
+    case "SNAPSHOT": {
+      return {
+        key: "SNAPSHOT",
+        kind: {
+          scores: JSON.parse(proposalResults).scores ?? [],
+          status: proposalData.kind.state ?? "",
+        },
+      };
+    }
     case "STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 
@@ -510,7 +568,8 @@ export type ProposalStatus =
   | "ACTIVE"
   | "PENDING"
   | "QUEUED"
-  | "EXECUTED";
+  | "EXECUTED"
+  | "CLOSED";
 
 export async function getProposalStatus(
   proposal: ProposalPayload,
@@ -519,6 +578,9 @@ export async function getProposalStatus(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
+  if (proposalResults.key === "SNAPSHOT") {
+    return proposalResults.kind.status.toUpperCase() as ProposalStatus;
+  }
   if (proposal.cancelled_block) {
     return "CANCELLED";
   }

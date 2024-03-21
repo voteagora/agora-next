@@ -97,6 +97,10 @@ type ParsedParams = {
     key: "OPTIMISTIC";
     kind: null;
   };
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: null;
+  };
 };
 
 export function parseParams(
