@@ -6,7 +6,6 @@ import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
 import { useState, SetStateAction, useEffect, type Dispatch } from "react";
-import { useSetOverFlowDelegation } from "../DialogProvider/DialogProvider";
 
 function SubdelegationToRow({
   to,
@@ -14,15 +13,16 @@ function SubdelegationToRow({
   availableBalance,
   allowances,
   index,
+  setOverFlowDelegation,
 }: {
   to: string;
   setAllowance: Dispatch<SetStateAction<number[]>>;
   availableBalance: string;
   allowances: number[];
   index: number;
+  setOverFlowDelegation: Dispatch<SetStateAction<boolean>>;
 }) {
   const [newAllowanceInput, setNewAllowanceInput] = useState("");
-  const setOverFlowDelegation = useSetOverFlowDelegation();
 
   const allowance = allowances[index];
   const { data } = useEnsName({

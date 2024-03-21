@@ -9,10 +9,9 @@ import { dialogs, DialogType } from "./dialogs";
 import styles from "./dialog.module.scss";
 import { motion, AnimatePresence } from "framer-motion";
 
-const DialogContext = createContext({
-  setCurrentDialog: (dialog: DialogType | null) => {},
-  setOverFlowDelegation: (value: boolean) => {},
-});
+const DialogContext = createContext<(dialog: DialogType | null) => void>(
+  () => {}
+);
 
 type Props = {
   children: ReactNode;
@@ -23,9 +22,8 @@ const Modal: FC<
     open: boolean;
     onClose: () => void;
     transparent: boolean | undefined;
-    overFlowDelegation: boolean;
   } & Props
-> = ({ open, children, onClose, transparent, overFlowDelegation }) => {
+> = ({ open, children, onClose, transparent }) => {
   if (!open) return null;
 
   return (
@@ -51,12 +49,6 @@ const Modal: FC<
           >
             {children}
           </motion.div>
-          {overFlowDelegation && (
-            <p className="text-xs bg-gray-fa p-6 pb-3 pt-6 -mt-3 max-w-md rounded-bl-xl rounded-br-xl">
-              You have delegated more than the total delegatable votes you have.
-              Please reduce your current delegation before delegating more
-            </p>
-          )}
         </motion.div>
       )}
     </AnimatePresence>
@@ -65,7 +57,6 @@ const Modal: FC<
 
 export const DialogProvider: FC<Props> = ({ children }) => {
   const [currentDialog, setCurrentDialog] = useState<DialogType | null>(null);
-  const [overFlowDelegation, setOverFlowDelegation] = useState(false);
 
   const renderedDialog =
     currentDialog &&
@@ -74,14 +65,13 @@ export const DialogProvider: FC<Props> = ({ children }) => {
     );
 
   return (
-    <DialogContext.Provider value={{ setCurrentDialog, setOverFlowDelegation }}>
+    <DialogContext.Provider value={setCurrentDialog}>
       <Modal
         open={!!currentDialog}
         onClose={() =>
           currentDialog?.type !== "SWITCH_NETWORK" && setCurrentDialog(null)
         }
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
-        overFlowDelegation={overFlowDelegation}
       >
         {renderedDialog}
       </Modal>
@@ -91,23 +81,11 @@ export const DialogProvider: FC<Props> = ({ children }) => {
 };
 
 export const useOpenDialog = () => {
-  const { setCurrentDialog: openDialog } = useContext(DialogContext);
+  const openDialog = useContext(DialogContext);
   if (!openDialog) {
     throw new Error("useOpenDialog must be used within a DialogProvider");
   }
   return openDialog;
-};
-
-export const useSetOverFlowDelegation = () => {
-  const { setOverFlowDelegation } = useContext(DialogContext);
-
-  if (!setOverFlowDelegation) {
-    throw new Error(
-      "useSetOverFlowDelegation must be used within a DialogProvider"
-    );
-  }
-
-  return setOverFlowDelegation;
 };
 
 export const useOpenDialogOptional = () => useContext(DialogContext);
