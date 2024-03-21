@@ -162,6 +162,12 @@ This is where all of the global styles and themes will live
 
 This is where all of the images, fonts, and other assets will live.
 
+## Instrumentation + Observability
+
+We have integrated [OpenTelemetry](https://opentelemetry.io/) (OTel) to aid in instrumenting the application. OTel is a vendor-agnostic observability providing a single set of APIs, libraries, agents, and instrumentation to capture distributed traces and metrics.
+
+
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
