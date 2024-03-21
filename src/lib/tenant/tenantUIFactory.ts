@@ -132,6 +132,13 @@ const optimismUI = new TenantUI({
   logo: optimismLogo,
   hero: optimismHero,
 
+  links: [
+    {
+      name: "calendar",
+      url: "https://calendar.google.com/calendar/ical/c_fnmtguh6noo6qgbni2gperid4k%40group.calendar.google.com/public/basic.ics",
+    }
+  ],
+
   pages: [
     {
       route: "/",
