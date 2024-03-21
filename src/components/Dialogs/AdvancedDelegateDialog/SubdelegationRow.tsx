@@ -108,9 +108,10 @@ function SubdelegationToRow({
   }, [allowance, newAllowanceInput]);
 
   useEffect(() => {
-    if (amountToAllocateRaw >= 0) {
-      setOverFlowDelegation(false);
-    }
+    amountToAllocateRaw >= 0
+      ? setOverFlowDelegation(false)
+      : setOverFlowDelegation(true);
+
     return () => {
       setOverFlowDelegation(false);
     };
