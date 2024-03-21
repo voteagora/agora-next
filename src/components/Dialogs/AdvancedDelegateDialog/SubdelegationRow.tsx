@@ -108,13 +108,22 @@ function SubdelegationToRow({
   }, [allowance, newAllowanceInput]);
 
   useEffect(() => {
+    if (amountToAllocateRaw >= 0) {
+      setOverFlowDelegation(false);
+    }
     return () => {
       setOverFlowDelegation(false);
     };
-  }, [setOverFlowDelegation]);
+  }, [amountToAllocateRaw, setOverFlowDelegation]);
 
   return (
-    <div className="flex flex-col border-b border-dashed border-gray-300">
+    <div
+      className={`flex flex-col border-b border-dashed border-gray-300 ${
+        amountToAllocateRaw < 0 && allowances.length - 1 === index
+          ? "opacity-30"
+          : ""
+      }`}
+    >
       <div className={styles.sub_row}>
         <HStack gap={3}>
           <div className={styles.avatar}>
