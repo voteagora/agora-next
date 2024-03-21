@@ -9,7 +9,7 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 
-import provider, {ethProvider} from "@/app/lib/provider";
+import provider, { ethProvider } from "@/app/lib/provider";
 
 import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
@@ -35,7 +35,7 @@ export default class TenantContractFactory {
   }
 }
 
-const ensContracts = (isProd:boolean):TenantContracts => {
+const ensContracts = (isProd: boolean): TenantContracts => {
   return {
     // TOKEN
     token: new TenantContract<ITokenContract>({

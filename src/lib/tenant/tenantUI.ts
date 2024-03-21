@@ -7,7 +7,7 @@ type UILink = {
   name: string;
   title: string;
   url: string;
-}
+};
 
 type UIPage = {
   description: string;
@@ -42,7 +42,15 @@ export class TenantUI {
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
-  constructor({ color, hero, logo, title, links, pages, toggles }: TenantUIParams) {
+  constructor({
+    color,
+    hero,
+    logo,
+    title,
+    links,
+    pages,
+    toggles,
+  }: TenantUIParams) {
     this._color = color;
     this._hero = hero;
     this._logo = logo;
