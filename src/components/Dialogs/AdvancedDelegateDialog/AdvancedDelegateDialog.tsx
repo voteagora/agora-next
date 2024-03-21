@@ -14,7 +14,7 @@ import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { formatUnits } from "viem";
+import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
 import { track } from "@vercel/analytics";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
@@ -27,13 +27,13 @@ import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { formatEther } from "viem";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
 };
+
 export function AdvancedDelegateDialog({
   target,
   fetchAllForAdvancedDelegation,
@@ -56,22 +56,11 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { contracts } = Tenant.current();
-
-  const getOpBalance = async (address: `0x${string}`) => {
-    return await contracts.token.contract.balanceOf(address);
-  };
+  const { contracts, slug } = Tenant.current();
 
   const fetchData = useCallback(async () => {
     try {
       if (!address) return;
-      const promises = [
-        // TODO temporary fetch all query - optimization via API needed
-        fetchAllForAdvancedDelegation(address),
-        getOpBalance(address),
-      ];
-
-      const [getAll, delegateOpBalance] = await Promise.all(promises);
 
       // @ts-ignore
       const [
@@ -81,12 +70,12 @@ export function AdvancedDelegateDialog({
         proxyAddress,
         delegatorsRes,
         directDelegatedVP,
-      ] = getAll;
+      ] = await fetchAllForAdvancedDelegation(address);
 
       setDirectDelegatedVP(directDelegatedVP);
       setAvailableBalance(balance);
       setIsDelegatingToProxy(isDelegating);
-      setOpBalance(delegateOpBalance as bigint);
+      setOpBalance(directDelegatedVP);
       setDelegators(delegatorsRes);
 
       let isTargetDelegated = false;
@@ -110,7 +99,7 @@ export function AdvancedDelegateDialog({
         delegatees.push({
           from: address,
           to: target,
-          allowance: 0,
+          allowance: "0",
           timestamp: null,
           type: "ADVANCED",
           amount: "PARTIAL",
@@ -163,7 +152,7 @@ export function AdvancedDelegateDialog({
     setIsLoading(true);
 
     const trackingData = {
-      dao_slug: "OP",
+      dao_slug: slug,
       userAddress: address || "unknown",
       proxyAddress: proxyAddress || "unknown",
       targetDelegation: target || "unknown",
@@ -292,6 +281,7 @@ function InfoDialog({
   directDelegatedVP: bigint;
 }) {
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
+  const { token } = Tenant.current();
   return (
     <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
       <VStack className={styles.amount_container + " !pb-0 !px-0"}>
@@ -319,8 +309,8 @@ function InfoDialog({
             <p>You own</p>
             <TokenAmountDisplay
               amount={balance}
-              decimals={18}
-              currency={"OP"}
+              decimals={token.decimals}
+              currency={token.symbol}
             />
           </HStack>
           {delegators?.map((delegator, index) => (
@@ -336,8 +326,8 @@ function InfoDialog({
               </p>
               <TokenAmountDisplay
                 amount={BigInt(delegator.allowance)}
-                decimals={18}
-                currency={"OP"}
+                decimals={token.decimals}
+                currency={token.symbol}
               />
             </HStack>
           ))}
@@ -347,8 +337,8 @@ function InfoDialog({
             You’ve been delegated an additional{" "}
             <TokenAmountDisplay
               amount={directDelegatedFromOthers}
-              decimals={18}
-              currency={"OP"}
+              decimals={token.decimals}
+              currency={token.symbol}
             />{" "}
             without the right to redelegate. You can only vote with this portion
             of votes and cannot pass them to others.
