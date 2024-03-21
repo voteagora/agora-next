@@ -3,6 +3,7 @@ import { BigNumberish, formatUnits } from "ethers";
 import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
+import { TENANT_NAMESPACES } from "./constants";
 
 const secondsPerBlock = 12;
 
@@ -22,7 +23,7 @@ export function bpsToString(bps: number) {
 }
 
 export const getProposalTypeText = (proposalType: string) => {
-  if (Tenant.current().namespace === "optimism") {
+  if (Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM) {
     switch (proposalType) {
       case "OPTIMISTIC":
         return "Optimistic Proposal";

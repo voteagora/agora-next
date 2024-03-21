@@ -11,6 +11,7 @@ import SnapshotProposalStatus from "./SnapshotProposalStatus";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";
 import HumanAddress from "@/components/shared/HumanAddress";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function Proposal({ proposal, votableSupply }) {
   const proposalText = getProposalTypeText(proposal.proposalType);
@@ -37,7 +38,7 @@ export default function Proposal({ proposal, votableSupply }) {
               <div>
                 {proposalText}{" "}
                 <span className={styles.invisible_on_mobile}>
-                  {Tenant.current().namespace === "optimism" ? (
+                  {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
                     "by The Optimism Foundation"
                   ) : (
                     <>
