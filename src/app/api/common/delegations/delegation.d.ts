@@ -10,3 +10,11 @@ export type Delegation = {
   type: "DIRECT" | "ADVANCED";
   amount: "FULL" | "PARTIAL";
 };
+
+export type AdvancedDelegationPayload = {
+  block_number: number;
+  delegated_amount: number;
+  delegated_share: number;
+  from: number;
+  to: string;
+};

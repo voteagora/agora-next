@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   const avatar = searchParams.get("avatar") || null;
   const votes = searchParams.get("votes") || null;
-  const description = searchParams.get("description") || "Optimism Voter";
+  const description = searchParams.get("description") || "";
   const statement = searchParams.has("statement")
     ? truncateString(searchParams.get("statement") || "", 220)
     : null;

@@ -11,7 +11,7 @@ export function DelegationDisplayAmount({
 }: {
   amount: bigint | string;
 }) {
-  const { token } = Tenant.getInstance();
+  const { token } = Tenant.current();
   const formattedNumber = useMemo(() => {
     return formatNumber(amount);
   }, [amount]);

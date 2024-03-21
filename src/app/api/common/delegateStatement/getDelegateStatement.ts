@@ -1,28 +1,38 @@
 import "server-only";
 
 import prisma from "@/app/lib/prisma";
+import { cache } from "react";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { DaoSlug } from "@prisma/client";
 
 export const getDelegateStatement = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
 
+/*
+  Gets delegate statement from Postgres, or DynamoDB if not found
+*/
 async function getDelegateStatementForAddress({
   address,
 }: {
   address: string;
 }) {
-  const { slug } = Tenant.getInstance();
+  const { slug } = Tenant.current();
 
   const postgreqsqlData = await prisma.delegateStatements
     .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
-    : await getDelegateStatementForAddressDynamo(address);
+    : slug === DaoSlug.OP // Only fetch from Dynamo for optimism
+    ? await getDelegateStatementForAddressDynamo(address)
+    : null;
 }
 
+/*
+  Gets delegate statement from DynamoDB
+*/
 async function getDelegateStatementForAddressDynamo(address: string) {
   const dynamoDBClient = makeDynamoClient();
 
@@ -66,3 +76,5 @@ async function getDelegateStatementForAddressDynamo(address: string) {
     return null;
   }
 }
+
+export const fetchDelegateStatement = cache(getDelegateStatement);

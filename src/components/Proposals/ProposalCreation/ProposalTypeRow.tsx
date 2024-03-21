@@ -22,9 +22,9 @@ function ProposalTypeRow({
   proposalSettingsList: any[];
 }) {
   const { proposalType, proposalSettings } = form.state;
-  const optimisticProposalSettingsIndex = proposalSettingsList.findIndex(
+  const optimisticProposalSettingsIndex = proposalSettingsList.find(
     (item) => item.name === "Optimistic"
-  );
+  ).proposal_type_id;
   const infoText = () => {
     switch (proposalType) {
       case "Basic":
@@ -46,7 +46,12 @@ function ProposalTypeRow({
     ) {
       form.onChange.proposalSettings("0");
     }
-  }, [proposalType]);
+  }, [
+    proposalType,
+    optimisticProposalSettingsIndex,
+    proposalSettings,
+    form.onChange,
+  ]);
 
   return (
     <VStack className={styles.type_row}>

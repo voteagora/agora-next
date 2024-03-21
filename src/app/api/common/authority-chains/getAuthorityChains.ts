@@ -3,15 +3,16 @@ import provider from "@/app/lib/provider";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
-export async function getAuthorityChains({
+async function getAuthorityChains({
   address,
   blockNumber,
 }: {
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
@@ -66,3 +67,5 @@ export async function getAuthorityChains({
 
   return reversedChains;
 }
+
+export const fetchAuthorityChains = cache(getAuthorityChains);

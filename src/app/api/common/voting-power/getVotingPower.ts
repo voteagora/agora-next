@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { cache } from "react";
 import {
   getProxyAddress,
   getTotalVotableAllowance,
@@ -14,7 +15,7 @@ import Tenant from "@/lib/tenant/tenant";
  * @param blockNumber
  * @param proposalId
  */
-export const getVotingPowerForProposal = ({
+const getVotingPowerForProposal = ({
   addressOrENSName,
   blockNumber,
   proposalId,
@@ -37,9 +38,9 @@ async function getVotingPowerForProposalByAddress({
   blockNumber: number;
   proposalId: string;
 }): Promise<VotingPowerData> {
-  const { namespace, contracts } = Tenant.getInstance();
+  const { namespace, contracts } = Tenant.current();
 
-  const votingPowerQuery = prisma[`${namespace}VotingPowerSnaps`].findFirst({
+  const votingPowerQuery = (prisma as any)[`${namespace}VotingPowerSnaps`].findFirst({
     where: {
       delegate: address,
       block_number: {
@@ -128,7 +129,7 @@ async function getVotingPowerForProposalByAddress({
  * Voting Power
  * @param addressOrENSName
  */
-export const getCurrentVotingPowerForNamespace = (addressOrENSName: string) =>
+const getCurrentVotingPowerForNamespace = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentVotingPowerForAddress, addressOrENSName);
 
 async function getCurrentVotingPowerForAddress({
@@ -136,15 +137,15 @@ async function getCurrentVotingPowerForAddress({
 }: {
   address: string;
 }): Promise<VotingPowerData> {
-  const { namespace, contracts } = Tenant.getInstance();
-  const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
+  const { namespace, contracts } = Tenant.current();
+  const votingPower = await (prisma as any)[`${namespace}VotingPower`].findFirst({
     where: {
       delegate: address,
     },
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPower = await prisma[
+  const advancedVotingPower = await (prisma as any)[
     `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
@@ -167,7 +168,7 @@ async function getCurrentVotingPowerForAddress({
  *  Voting Power available for subdelegation
  * @param addressOrENSName
  */
-export const getVotingPowerAvailableForSubdelegation = (
+const getVotingPowerAvailableForSubdelegation = (
   addressOrENSName: string
 ) =>
   addressOrEnsNameWrap(
@@ -180,8 +181,8 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
 }: {
   address: string;
 }): Promise<string> {
-  const { namespace, contracts } = Tenant.getInstance();
-  const advancedVotingPower = await prisma[
+  const { namespace, contracts } = Tenant.current();
+  const advancedVotingPower = await (prisma as any)[
     `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
@@ -209,7 +210,7 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
  * Represents the balance of the user's account
  * @param addressOrENSName
  */
-export const getVotingPowerAvailableForDirectDelegation = (
+const getVotingPowerAvailableForDirectDelegation = (
   addressOrENSName: string
 ) =>
   addressOrEnsNameWrap(
@@ -222,7 +223,7 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
 }: {
   address: string;
 }): Promise<bigint> {
-  const { contracts } = Tenant.getInstance();
+  const { contracts } = Tenant.current();
   return contracts.token.contract.balanceOf(address);
 }
 
@@ -230,7 +231,7 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
  * Checks if a user has delegated to its proxy
  * @param addressOrENSName
  */
-export const isDelegatingToProxy = (addressOrENSName: string) =>
+const isDelegatingToProxy = (addressOrENSName: string) =>
   addressOrEnsNameWrap(isAddressDelegatingToProxy, addressOrENSName);
 
 async function isAddressDelegatingToProxy({
@@ -238,10 +239,10 @@ async function isAddressDelegatingToProxy({
 }: {
   address: string;
 }): Promise<boolean> {
-  const { namespace } = Tenant.getInstance();
+  const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
+    (prisma as any)[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);
@@ -261,7 +262,7 @@ async function isAddressDelegatingToProxy({
  * Gets the proxy address for a given address
  * @param addressOrENSName
  */
-export const getProxy = (addressOrENSName: string) =>
+const getProxy = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getProxyAddressForAddress, addressOrENSName);
 
 async function getProxyAddressForAddress({
@@ -271,3 +272,10 @@ async function getProxyAddressForAddress({
 }): Promise<string> {
   return getProxyAddress(address);
 }
+
+export const fetchVotingPowerForProposal = cache(getVotingPowerForProposal);
+export const fetchCurrentVotingPowerForNamespace = cache(getCurrentVotingPowerForNamespace);
+export const fetchVotingPowerAvailableForSubdelegation = cache(getVotingPowerAvailableForSubdelegation);
+export const fetchVotingPowerAvailableForDirectDelegation = cache(getVotingPowerAvailableForDirectDelegation);
+export const fetchIsDelegatingToProxy = cache(isDelegatingToProxy);
+export const fetchProxy = cache(getProxy);

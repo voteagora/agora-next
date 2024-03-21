@@ -100,7 +100,7 @@ function SubdelegationToRow({
     if (allowance !== 0 && newAllowanceInput === "") {
       setNewAllowanceInput(allowance.toLocaleString("en-US"));
     }
-  }, [allowance]);
+  }, [allowance, newAllowanceInput]);
 
   return (
     <div className="flex flex-col border-b border-dashed border-gray-300 py-4">
