@@ -190,23 +190,26 @@ export async function parseProposal(
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    created_time: proposal.created_ts
-      ? new Date(Number(proposal.created_ts.toFixed(0)) * 1000)
-      : latestBlock
-      ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
-      : null,
-    start_time: proposal.start_ts
-      ? new Date(Number(proposal.start_ts.toFixed(0)) * 1000)
-      : latestBlock
-      ? getHumanBlockTime(proposal.start_block, latestBlock)
-      : null,
-    end_time: proposal.end_ts
-      ? new Date(Number(proposal.end_ts.toFixed(0)) * 1000)
-      : latestBlock
-      ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
-      : null,
+    created_time:
+      (proposalData.key === "SNAPSHOT" &&
+        new Date(Number(proposalData.kind.created_ts.toFixed(0)) * 1000)) ||
+      latestBlock
+        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+        : null,
+    start_time:
+      (proposalData.key === "SNAPSHOT" &&
+        new Date(Number(proposalData.kind.start_ts.toFixed(0)) * 1000)) ||
+      latestBlock
+        ? getHumanBlockTime(proposal.start_block, latestBlock)
+        : null,
+    end_time:
+      (proposalData.key === "SNAPSHOT" &&
+        new Date(Number(proposalData.kind.end_ts.toFixed(0)) * 1000)) ||
+      latestBlock
+        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+        : null,
     markdowntitle:
-      proposal.title ??
+      (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum,
@@ -259,6 +262,10 @@ export type ParsedProposalData = {
   SNAPSHOT: {
     key: "SNAPSHOT";
     kind: {
+      title: string;
+      start_ts: number;
+      end_ts: number;
+      created_ts: number;
       link: string;
       scores: string[];
       type: string;
@@ -316,6 +323,10 @@ export function parseProposalData(
       return {
         key: "SNAPSHOT",
         kind: {
+          title: parsedProposalData.title ?? "",
+          start_ts: parsedProposalData.start ?? 0,
+          end_ts: parsedProposalData.end ?? 0,
+          created_ts: parsedProposalData.created ?? 0,
           link: parsedProposalData.link ?? "",
           scores: parsedProposalData.scores ?? [],
           type: parsedProposalData.type ?? "",

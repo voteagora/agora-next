@@ -266,10 +266,6 @@ view ensProposals {
   proposal_type      ProposalType
   proposal_type_data String?
   proposal_results   Json?
-  created_ts         Decimal?      @db.Decimal
-  start_ts           Decimal?      @db.Decimal
-  end_ts             Decimal?      @db.Decimal
-  title              String?
 
   @@map("proposals_wrap")
   @@schema("test2")
