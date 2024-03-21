@@ -11,7 +11,7 @@ import { TokenAmountDisplay, generateBarsForVote } from "@/lib/utils";
 export default function ProposalVotesBar({ proposal }) {
   return (
     <div>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={10}>
         <Tooltip>
           <TooltipTrigger asChild>
             <HStack
