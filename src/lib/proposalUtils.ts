@@ -190,14 +190,20 @@ export async function parseProposal(
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    created_time: latestBlock
-      ? getHumanBlockTime(proposal.created_block, latestBlock)
+    created_time: proposal.created_ts
+      ? new Date(proposal.created_ts.toFixed(0))
+      : latestBlock
+      ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
       : null,
-    start_time: latestBlock
+    start_time: proposal.start_ts
+      ? new Date(proposal.start_ts.toFixed(0))
+      : latestBlock
       ? getHumanBlockTime(proposal.start_block, latestBlock)
       : null,
-    end_time: latestBlock
-      ? getHumanBlockTime(proposal.end_block, latestBlock)
+    end_time: proposal.end_ts
+      ? new Date(proposal.end_ts.toFixed(0))
+      : latestBlock
+      ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
       : null,
     markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
@@ -209,12 +215,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-        proposal,
-        proposalResuts,
-        latestBlock,
-        quorum,
-        votableSupply
-      )
+          proposal,
+          proposalResuts,
+          latestBlock,
+          quorum,
+          votableSupply
+        )
       : null,
   };
 }
@@ -248,6 +254,15 @@ export function getProposalTotalValue(
 }
 
 export type ParsedProposalData = {
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: {
+      link: string;
+      scores: string[];
+      type: string;
+      votes: string;
+    };
+  };
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -293,6 +308,18 @@ export function parseProposalData(
   proposalType: ProposalType
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
+    case "SNAPSHOT": {
+      const parsedProposalData = JSON.parse(proposalData);
+      return {
+        key: "SNAPSHOT",
+        kind: {
+          link: parsedProposalData.link ?? "",
+          scores: parsedProposalData.scores ?? [],
+          type: parsedProposalData.type ?? "",
+          votes: parsedProposalData.votes ?? "",
+        },
+      };
+    }
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
@@ -403,6 +430,12 @@ function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
  */
 
 export type ParsedProposalResults = {
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: {
+      scores: string[];
+    };
+  };
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -447,6 +480,14 @@ export function parseProposalResults(
   proposalData: ParsedProposalData[ProposalType]
 ): ParsedProposalResults[ProposalType] {
   switch (proposalData.key) {
+    case "SNAPSHOT": {
+      return {
+        key: "SNAPSHOT",
+        kind: {
+          scores: JSON.parse(proposalResults).scores ?? [],
+        },
+      };
+    }
     case "STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 

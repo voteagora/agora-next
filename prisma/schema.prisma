@@ -251,14 +251,14 @@ view ensDelegates {
 }
 
 view ensProposals {
-  proposal_id        String       @unique
-  contract           String?      @db.VarChar(42)
+  proposal_id        String        @unique
+  contract           String       @db.VarChar
   proposer           String
   description        String?
-  ordinal            Decimal?     @db.Decimal
-  created_block      BigInt
+  ordinal            Decimal      @db.Decimal
+  created_block      BigInt?
   start_block        String
-  end_block          String
+  end_block          String?
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
@@ -266,9 +266,13 @@ view ensProposals {
   proposal_type      ProposalType
   proposal_type_data String?
   proposal_results   Json?
+  created_ts         Decimal?      @db.Decimal
+  start_ts           Decimal?      @db.Decimal
+  end_ts             Decimal?      @db.Decimal
+  title              String?
 
-  @@map("proposals")
-  @@schema("ens")
+  @@map("proposals_wrap")
+  @@schema("test2")
 }
 
 view ensVotableSupply {
@@ -949,7 +953,8 @@ enum ProposalType {
   STANDARD
   APPROVAL
   OPTIMISTIC
+  SNAPSHOT
 
   @@map("proposal_type")
-  @@schema("config")
+  @@schema("test2")
 }
