@@ -1,0 +1,22 @@
+name: E2E Tests
+on:
+  deployment_status:
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          NEXT_PUBLIC_AGORA_INSTANCE_NAME: ${{ secrets.NEXT_PUBLIC_AGORA_INSTANCE_NAME }}
