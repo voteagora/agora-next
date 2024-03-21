@@ -7,6 +7,7 @@ import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
 import { cn, getProposalTypeText } from "@/lib/utils";
 import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
+import SnapshotProposalStatus from "./SnapshotProposalStatus";
 
 export default function Proposal({ proposal, votableSupply }) {
   const proposalText = getProposalTypeText(proposal.proposalType);
@@ -46,7 +47,9 @@ export default function Proposal({ proposal, votableSupply }) {
         </VStack>
         <VStack className={cn(styles.cell_content, styles.cell_result)}>
           <div className={styles.cell_content_body}>
-            {proposal.proposalType === "SNAPSHOT" && "Snapshot"}
+            {proposal.proposalType === "SNAPSHOT" && (
+              <SnapshotProposalStatus proposal={proposal} />
+            )}
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
                 <OPStandardProposalStatus proposal={proposal} />
