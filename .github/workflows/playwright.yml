@@ -19,4 +19,4 @@ jobs:
         run: npx playwright test
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
-          NEXT_PUBLIC_AGORA_INSTANCE_NAME: ${{ secrets.NEXT_PUBLIC_AGORA_INSTANCE_NAME }}
+          NEXT_PUBLIC_AGORA_INSTANCE_NAME: ${{ vars.NEXT_PUBLIC_AGORA_INSTANCE_NAME }}
