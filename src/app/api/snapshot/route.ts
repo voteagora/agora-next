@@ -20,7 +20,8 @@ async function fetchProposals(slug: string) {
         items: proposals(
           where: { space: "${slug}", flagged: false }
           orderBy: "created"
-          orderDirection: asc
+          orderDirection: asc,
+          first: 1000
         ) {
           id
           author
