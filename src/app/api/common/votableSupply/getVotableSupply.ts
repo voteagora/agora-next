@@ -1,7 +1,8 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
-export async function getVotableSupply() {
+async function getVotableSupply() {
   const { namespace } = Tenant.current();
   const votableSupply = await (prisma as any)[`${namespace}VotableSupply`].findFirst({});
   if (!votableSupply) {
@@ -9,3 +10,5 @@ export async function getVotableSupply() {
   }
   return votableSupply.votable_supply;
 }
+
+export const fetchVotableSupply = cache(getVotableSupply);

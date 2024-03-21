@@ -1,13 +1,14 @@
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
+import { cache } from "react";
 import { VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
-export const getVotesForDelegate = ({
+const getVotesForDelegate = ({
   addressOrENSName,
   page,
 }: {
@@ -28,7 +29,7 @@ async function getVotesForDelegateForAddress({
   const { namespace } = Tenant.current();
   const pageSize = 10;
 
-  const { meta, data: votes } = await paginatePrismaResult(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -100,7 +101,7 @@ async function getVotesForDelegateForAddress({
   };
 }
 
-export async function getVotesForProposal({
+async function getVotesForProposal({
   proposal_id,
   page = 1,
   sort = "weight",
@@ -112,7 +113,7 @@ export async function getVotesForProposal({
   const { namespace } = Tenant.current();
   const pageSize = 50;
 
-  const { meta, data: votes } = await paginatePrismaResult(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -180,7 +181,7 @@ export async function getVotesForProposal({
   };
 }
 
-export async function getUserVotesForProposal({
+async function getUserVotesForProposal({
   proposal_id,
   address,
 }: {
@@ -223,7 +224,7 @@ export async function getUserVotesForProposal({
   );
 }
 
-export async function getVotesForProposalAndDelegate({
+async function getVotesForProposalAndDelegate({
   proposal_id,
   address,
 }: {
@@ -248,3 +249,8 @@ export async function getVotesForProposalAndDelegate({
     )
   );
 }
+
+export const fetchVotesForDelegate = cache(getVotesForDelegate);
+export const fetchVotesForProposal = cache(getVotesForProposal);
+export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
+export const fetchVotesForProposalAndDelegate = cache(getVotesForProposalAndDelegate);

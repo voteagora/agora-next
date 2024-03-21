@@ -7,7 +7,7 @@ type PaginatedResult<T> = {
   data: T;
 };
 
-export async function paginatePrismaResult<T extends Array<any>>(
+export async function paginateResult<T extends Array<any>>(
   result: (skip: number, take: number) => Promise<T>,
   page: number,
   pageSize: number
