@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
-import { useState, Dispatch, SetStateAction, useEffect } from "react";
+import { useState, SetStateAction, useEffect, type Dispatch } from "react";
+import { useSetOverFlowDelegation } from "../DialogProvider/DialogProvider";
 
 function SubdelegationToRow({
   to,
@@ -21,6 +22,7 @@ function SubdelegationToRow({
   index: number;
 }) {
   const [newAllowanceInput, setNewAllowanceInput] = useState("");
+  const setOverFlowDelegation = useSetOverFlowDelegation();
 
   const allowance = allowances[index];
   const { data } = useEnsName({
@@ -36,6 +38,9 @@ function SubdelegationToRow({
   }, 0);
 
   const amountToAllocateRaw = availableBalanceNumber - sumOtherAllowances;
+  if (amountToAllocateRaw < 0) {
+    setOverFlowDelegation(true);
+  }
   const amountToAllocate = amountToAllocateRaw > 0 ? amountToAllocateRaw : 0;
 
   const percent =
@@ -102,8 +107,14 @@ function SubdelegationToRow({
     }
   }, [allowance, newAllowanceInput]);
 
+  useEffect(() => {
+    return () => {
+      setOverFlowDelegation(false);
+    };
+  }, [setOverFlowDelegation]);
+
   return (
-    <div className="flex flex-col border-b border-dashed border-gray-300 py-4">
+    <div className="flex flex-col border-b border-dashed border-gray-300">
       <div className={styles.sub_row}>
         <HStack gap={3}>
           <div className={styles.avatar}>
@@ -134,9 +145,6 @@ function SubdelegationToRow({
           </div>
         </div>
       </div>
-      {allowances[index] === 0 && amountToAllocateRaw <= 0 && (
-        <span className="pt-2">Total delegatable votes reached</span>
-      )}
     </div>
   );
 }

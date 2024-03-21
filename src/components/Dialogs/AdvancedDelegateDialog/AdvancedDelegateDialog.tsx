@@ -56,7 +56,7 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { contracts, slug } = Tenant.current();
+  const { slug } = Tenant.current();
 
   const fetchData = useCallback(async () => {
     try {
@@ -191,78 +191,91 @@ export function AdvancedDelegateDialog({
       alignItems="items-center"
       className={styles.box}
     >
-      <div className={showMessage ? "block" : "hidden"}>
-        <Message setShowMessage={setShowMessage} />
-      </div>
-      <div className={showMessage ? "hidden" : "block w-full"}>
-        {!isLoading && isSuccess ? (
-          <SuccessView closeDialog={completeDelegation} data={data} />
-        ) : isReady &&
-          availableBalance !== "" &&
-          !!delegatees &&
-          proxyAddress !== "" ? (
-          <VStack className={styles.dialog_container} gap={1}>
-            <VStack className={styles.amount_container}>
-              <HStack alignItems="items-center" gap={1}>
-                Your total delegatable votes{" "}
-                <InfoIcon
-                  size={12}
-                  className="cursor-pointer opacity-70"
-                  onClick={() => setShowInfo(true)}
-                />
-              </HStack>
-              <AdvancedDelegationDisplayAmount amount={availableBalance} />
-            </VStack>
-            <VStack className="max-h-[400px] overflow-y-scroll">
-              {delegatees.map((delegatee, index) => (
-                <SubdelegationToRow
-                  key={index}
-                  to={delegatee.to}
-                  availableBalance={availableBalance}
-                  setAllowance={setAllowance}
-                  allowances={allowance}
-                  index={index}
-                />
-              ))}
-            </VStack>
+      {showMessage ? (
+        <div>
+          <Message setShowMessage={setShowMessage} />
+        </div>
+      ) : (
+        <div className="block w-full">
+          {!isLoading && isSuccess ? (
+            <SuccessView closeDialog={completeDelegation} data={data} />
+          ) : isReady &&
+            availableBalance !== "" &&
+            !!delegatees &&
+            proxyAddress !== "" ? (
+            <VStack className={styles.dialog_container} gap={1}>
+              <VStack className={styles.amount_container}>
+                <HStack alignItems="items-center" gap={1}>
+                  Your total delegatable votes{" "}
+                  <InfoIcon
+                    size={12}
+                    className="cursor-pointer opacity-70"
+                    onClick={() => setShowInfo(true)}
+                  />
+                </HStack>
+                <AdvancedDelegationDisplayAmount amount={availableBalance} />
+              </VStack>
+              <VStack className="max-h-[400px] overflow-y-scroll">
+                {delegatees.map((delegatee, index) => (
+                  <SubdelegationToRow
+                    key={index}
+                    to={delegatee.to}
+                    availableBalance={availableBalance}
+                    setAllowance={setAllowance}
+                    allowances={allowance}
+                    index={index}
+                  />
+                ))}
+              </VStack>
 
-            {showInfo && (
-              <InfoDialog
-                setShowInfo={setShowInfo}
-                availableBalance={availableBalance}
-                balance={opBalance || 0n}
-                delegators={delegators}
-                directDelegatedVP={directDelegatedVP}
-              />
-            )}
-            {address ? (
-              isError ? (
-                <Button disabled={false} onClick={() => writeWithTracking()}>
-                  Delegation failed
-                </Button>
-              ) : isLoading ? (
-                <Button disabled={false}>Submitting your delegation...</Button>
+              {showInfo && (
+                <InfoDialog
+                  setShowInfo={setShowInfo}
+                  availableBalance={availableBalance}
+                  balance={opBalance || 0n}
+                  delegators={delegators}
+                  directDelegatedVP={directDelegatedVP}
+                />
+              )}
+              {address ? (
+                isError ? (
+                  <Button
+                    disabled={false}
+                    className="mt-3"
+                    onClick={() => writeWithTracking()}
+                  >
+                    Delegation failed
+                  </Button>
+                ) : isLoading ? (
+                  <Button disabled={false} className="mt-3">
+                    Submitting your delegation...
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={false}
+                    className="mt-3"
+                    onClick={() => writeWithTracking()}
+                  >
+                    Delegate your votes
+                  </Button>
+                )
               ) : (
-                <Button disabled={false} onClick={() => writeWithTracking()}>
-                  Delegate your votes
+                <Button className="mt-3" onClick={() => setOpen(true)}>
+                  Connect wallet to delegate
                 </Button>
-              )
-            ) : (
-              <Button onClick={() => setOpen(true)}>
-                Connect wallet to delegate
-              </Button>
-            )}
-          </VStack>
-        ) : (
-          <VStack
-            className="w-full h-[318px]"
-            alignItems="items-center"
-            justifyContent="justify-center"
-          >
-            <AgoraLoaderSmall />
-          </VStack>
-        )}
-      </div>
+              )}
+            </VStack>
+          ) : (
+            <VStack
+              className="w-full h-[318px]"
+              alignItems="items-center"
+              justifyContent="justify-center"
+            >
+              <AgoraLoaderSmall />
+            </VStack>
+          )}
+        </div>
+      )}
     </VStack>
   );
 }

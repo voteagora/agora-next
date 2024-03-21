@@ -127,6 +127,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px dashed $gray-300;
+  padding: $spacing-4 0;
 
   &:last-child {
     border-bottom: none;
