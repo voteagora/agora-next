@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "test2"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot"]
 }
 
 model DelegateStatements {
@@ -71,7 +71,7 @@ model SnapshotProposal {
   votes          Decimal?  @db.Decimal
 
   @@map("proposals")
-  @@schema("test2")
+  @@schema("snapshot")
 }
 
 view OptimismVotes {
@@ -251,8 +251,8 @@ view ensDelegates {
 }
 
 view ensProposals {
-  proposal_id        String        @unique
-  contract           String       @db.VarChar
+  proposal_id        String       @unique
+  contract           String       @db.VarChar(42)
   proposer           String
   description        String?
   ordinal            Decimal      @db.Decimal
@@ -267,8 +267,8 @@ view ensProposals {
   proposal_type_data String?
   proposal_results   Json?
 
-  @@map("proposals_wrap")
-  @@schema("test2")
+  @@map("proposals")
+  @@schema("ens")
 }
 
 view ensVotableSupply {
@@ -952,5 +952,5 @@ enum ProposalType {
   SNAPSHOT
 
   @@map("proposal_type")
-  @@schema("test2")
+  @@schema("config")
 }
