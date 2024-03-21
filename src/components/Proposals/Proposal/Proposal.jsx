@@ -13,7 +13,14 @@ export default function Proposal({ proposal, votableSupply }) {
   const proposalText = getProposalTypeText(proposal.proposalType);
 
   return (
-    <Link href={`/proposals/${proposal.id}`}>
+    <Link
+      href={
+        proposal.proposalType === "SNAPSHOT"
+          ? proposal.proposalData.link
+          : `/proposals/${proposal.id}`
+      }
+      target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
+    >
       <HStack alignItems="center" className={styles.proposal_row}>
         <VStack className={cn(styles.cell_content, styles.cell_title)}>
           <HStack className={styles.cell_content_title} gap={1}>
