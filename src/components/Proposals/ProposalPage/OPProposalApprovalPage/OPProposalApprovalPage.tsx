@@ -2,19 +2,19 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
-import { getAllForVoting } from "@/app/api/votes/getVotes";
+import { fetchAllForVoting as apiFetchAllForVoting} from "@/app/api/votes/getVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 import {
-  getUserVotesForProposal,
-  getVotesForProposal,
+  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
+  fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { getDelegate } from "@/app/api/common/delegates/getDelegates";
+import { fetchDelegate as apiFetchDelegate} from "@/app/api/common/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
 
-  return getVotesForProposal({
+  return apiFetchVotesForProposal({
     proposal_id,
     page,
   });
@@ -27,13 +27,13 @@ async function fetchAllForVoting(
 ) {
   "use server";
 
-  return await getAllForVoting(address, blockNumber, proposal_id);
+  return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
 async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
   "use server";
 
-  return await getDelegate(addressOrENSName);
+  return await apiFetchDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(
@@ -42,7 +42,7 @@ async function fetchUserVotesForProposal(
 ) {
   "use server";
 
-  return await getUserVotesForProposal({
+  return await apiFetchUserVotesForProposal({
     proposal_id,
     address,
   });
