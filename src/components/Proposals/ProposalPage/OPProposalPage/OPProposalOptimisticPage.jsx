@@ -145,7 +145,7 @@ export default async function OPProposalPage({ proposal }) {
               fetchDelegateStatement={fetchDelegateStatement}
               fetchUserVotes={fetchUserVotesForProposal}
               proposal_id={proposal.id}
-              getDelegators={getDelegators}
+              getDelegators={fetchCurrentDelegators}
             />
             {/* Show the input for the user to vote on a proposal if allowed */}
             <CastVoteInput
