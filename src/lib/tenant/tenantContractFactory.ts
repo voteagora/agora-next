@@ -52,17 +52,16 @@ const ensContracts = (isProd:boolean):TenantContracts => {
     governor: new TenantContract<IGovernorContract>({
       contract: OptimismGovernor__factory.connect(
         isProd
-          ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
-          : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+          ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
+          : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
         provider
       ),
       address: isProd
-        ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
-        : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
-      chainId: 10,
-      chainName: "Optimism",
+        ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
+        : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+      chainId: 1,
+      chainName: "Ethereum Mainnet",
       abi: OptimismGovernor__factory.abi,
-      v6UpgradeBlock: isProd ? 114995000 : 114615036,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
     }),
   };
