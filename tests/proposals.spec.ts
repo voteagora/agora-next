@@ -3,7 +3,8 @@ import { test, expect } from "@playwright/test";
 // Playwright tests for the Proposals Page.
 // Includes tests for initial proposal load, infinite scroll loading, and filter functionality.
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL =
+  process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
 
 test.describe("Proposals Page", () => {
   test.beforeEach(async ({ page }) => {
