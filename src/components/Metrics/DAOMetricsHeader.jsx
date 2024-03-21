@@ -76,7 +76,7 @@ export default function DAOMetricsHeader({ metrics }) {
                     {bugsLink.title}
                   </a>
                 }
-                {changeLogLink && <Link href={changeLogLink.link}>{changeLogLink.title}</Link>}
+                {changeLogLink && <Link href={changeLogLink.url}>{changeLogLink.title}</Link>}
                 {faqLink &&
                   <a
                     href={faqLink.url}
