@@ -191,21 +191,21 @@ export async function parseProposal(
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
     created_time:
-      (proposalData.key === "SNAPSHOT" &&
-        new Date(Number(proposalData.kind.created_ts.toFixed(0)) * 1000)) ||
-      latestBlock
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.created_ts * 1000)
+        : latestBlock
         ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
         : null,
     start_time:
-      (proposalData.key === "SNAPSHOT" &&
-        new Date(Number(proposalData.kind.start_ts.toFixed(0)) * 1000)) ||
-      latestBlock
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.start_ts * 1000)
+        : latestBlock
         ? getHumanBlockTime(proposal.start_block, latestBlock)
         : null,
     end_time:
-      (proposalData.key === "SNAPSHOT" &&
-        new Date(Number(proposalData.kind.end_ts.toFixed(0)) * 1000)) ||
-      latestBlock
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.end_ts * 1000)
+        : latestBlock
         ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
         : null,
     markdowntitle:
@@ -324,9 +324,9 @@ export function parseProposalData(
         key: "SNAPSHOT",
         kind: {
           title: parsedProposalData.title ?? "",
-          start_ts: parsedProposalData.start ?? 0,
-          end_ts: parsedProposalData.end ?? 0,
-          created_ts: parsedProposalData.created ?? 0,
+          start_ts: parsedProposalData.start_ts ?? 0,
+          end_ts: parsedProposalData.end_ts ?? 0,
+          created_ts: parsedProposalData.created_ts ?? 0,
           link: parsedProposalData.link ?? "",
           scores: parsedProposalData.scores ?? [],
           type: parsedProposalData.type ?? "",
