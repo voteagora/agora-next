@@ -4,7 +4,8 @@ type UIToggle = {
 };
 
 type UILink = {
-  name: string;
+  name:string;
+  title: string;
   url: string;
 }
 

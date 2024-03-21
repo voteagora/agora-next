@@ -148,12 +148,7 @@ const optimismUI = new TenantUI({
     {
       name:"discord",
       url:"https://discord.gg/vBJkUYBuwX",
-    },
-    {
-      name:"bugs",
-      url:"https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
-    },
-
+    }
   ],
 
   pages: [
