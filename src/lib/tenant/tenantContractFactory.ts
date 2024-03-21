@@ -49,6 +49,7 @@ const ensContracts = (isProd:boolean):TenantContracts => {
       abi: EtherfiToken__factory.abi,
     }),
     // GOVERNOR
+    // TODO: Implement Sepolia provider
     governor: new TenantContract<IGovernorContract>({
       contract: OptimismGovernor__factory.connect(
         isProd
