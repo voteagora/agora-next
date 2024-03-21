@@ -1,5 +1,6 @@
 import { type AdvancedDelegationPayload, type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
@@ -10,7 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
  * Delegations for a given address (addresses the given address is delegating to)
  * @param addressOrENSName
  */
-export const getCurrentDelegatees = (addressOrENSName: string) =>
+const getCurrentDelegatees = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName);
 
 async function getCurrentDelegateesForAddress({
@@ -122,7 +123,7 @@ async function getCurrentDelegateesForAddress({
  * Delegators for a given address (addresses delegating to the given address)
  * @param addressOrENSName
  */
-export const getCurrentDelegators = (addressOrENSName: string) =>
+const getCurrentDelegators = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName);
 
 async function getCurrentDelegatorsForAddress({
@@ -222,7 +223,7 @@ async function getCurrentDelegatorsForAddress({
  * Get the direct delegatee for a given address
  * @param addressOrENSName
  */
-export const getDirectDelegatee = (addressOrENSName: string) =>
+const getDirectDelegatee = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDirectDelegateeForAddress, addressOrENSName);
 
 const getDirectDelegateeForAddress = async ({
@@ -249,7 +250,7 @@ const getDirectDelegateeForAddress = async ({
  * Get all addresses that are in the delegation chain for a given address
  * @param addressOrENSName
  */
-export const getAllDelegatorsInChains = (addressOrENSName: string) =>
+const getAllDelegatorsInChains = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getAllDelegatorsInChainsForAddress, addressOrENSName);
 
 async function getAllDelegatorsInChainsForAddress({
@@ -270,3 +271,8 @@ async function getAllDelegatorsInChainsForAddress({
 
   return allAddresess[0].addresses;
 }
+
+export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
+export const fetchCurrentDelegators = cache(getCurrentDelegators);
+export const fetchDirectDelegatee = cache(getDirectDelegatee);
+export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains); 

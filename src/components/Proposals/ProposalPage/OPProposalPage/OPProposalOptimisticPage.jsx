@@ -1,12 +1,11 @@
-import { getDelegate } from "@/app/api/common/delegates/getDelegates";
-import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
-import { getCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
-import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
+import { fetchDelegateStatement as apiFetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
+import { fetchVotableSupply as apiFetchVoteableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import {
-  getUserVotesForProposal,
-  getVotesForProposal,
+  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
+  fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { getAllForVoting } from "@/app/api/votes/getVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -21,19 +20,19 @@ import styles from "./OPProposalPage.module.scss";
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
 
-  return getVotesForProposal({ proposal_id, page });
+  return fetchVotesForProposal({ proposal_id, page });
 }
 
 async function fetchDelegate(addressOrENSName) {
   "use server";
 
-  return await getDelegate(addressOrENSName);
+  return await apiFetchDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(proposal_id, address) {
   "use server";
 
-  return await getUserVotesForProposal({
+  return await apiFetchUserVotesForProposal({
     proposal_id,
     address,
   });
@@ -42,19 +41,19 @@ async function fetchUserVotesForProposal(proposal_id, address) {
 async function fetchVotableSupply() {
   "use server";
 
-  return getVotableSupply();
+  return apiFetchVoteableSupply();
 }
 
 async function fetchDelegateStatement(addressOrENSName) {
   "use server";
 
-  return await getDelegateStatement(addressOrENSName);
+  return await apiFetchDelegateStatement(addressOrENSName);
 }
 
-async function getDelegators(addressOrENSName) {
+async function fetchCurrentDelegators(addressOrENSName) {
   "use server";
 
-  return getCurrentDelegators(addressOrENSName);
+  return apiFetchCurrentDelegators(addressOrENSName);
 }
 
 export default async function OPProposalPage({ proposal }) {
@@ -139,7 +138,7 @@ export default async function OPProposalPage({ proposal }) {
               fetchDelegateStatement={fetchDelegateStatement}
               fetchUserVotes={fetchUserVotesForProposal}
               proposal_id={proposal.id}
-              getDelegators={getDelegators}
+              getDelegators={fetchCurrentDelegators}
             />
             {/* Show the input for the user to vote on a proposal if allowed */}
             <CastVoteInput proposal={proposal} isOptimistic />

@@ -1,7 +1,8 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
-export async function getMetrics() {
+async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
   const totalSupply = await contracts.token.contract.totalSupply();
   const votableSupply = await (prisma as any)[`${namespace}VotableSupply`].findFirst({});
@@ -11,3 +12,5 @@ export async function getMetrics() {
     totalSupply: totalSupply.toString(),
   };
 }
+
+export const fetchMetrics = cache(getMetrics);

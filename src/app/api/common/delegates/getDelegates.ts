@@ -1,4 +1,4 @@
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import {
   OptimismAdvancedVotingPower,
   OptimismDelegates,
@@ -6,6 +6,7 @@ import {
   OptimismVotingPower,
 } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
+import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
@@ -13,12 +14,13 @@ import {
   type DelegatePayload,
   type DelegatesGetPayload,
 } from "./delegate";
-import { isCitizen } from "../citizens/isCitizen";
+import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
-import { getDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
-import { getCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
+import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
+import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
-export async function getDelegates({
+async function getDelegates({
   page = 1,
   sort = "weighted_random",
   seed,
@@ -30,7 +32,7 @@ export async function getDelegates({
   const pageSize = 20;
   const { namespace } = Tenant.current();
 
-  const { meta, data: delegates } = await paginatePrismaResult(
+  const { meta, data: delegates } = await paginateResult(
     async (skip: number, take: number) => {
       switch (sort) {
         case "most_delegators":
@@ -78,8 +80,8 @@ export async function getDelegates({
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatePayload) => {
       return {
-        citizen: await isCitizen(delegate.delegate),
-        statement: await getDelegateStatement(delegate.delegate),
+        citizen: await fetchIsCitizen(delegate.delegate),
+        statement: await fetchDelegateStatement(delegate.delegate),
       };
     })
   );
@@ -109,7 +111,7 @@ type DelegateStats = {
   num_of_delegators: OptimismDelegates["num_of_delegators"];
 };
 
-export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
+async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
@@ -152,10 +154,10 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
     await Promise.all([
       delegateQuery.then((result) => result?.[0] || undefined),
-      (prisma as any)[`${namespace}VotableSupply`].findFirst({}),
-      getDelegateStatement(addressOrENSName),
-      getCurrentQuorum(),
-      isCitizen(address),
+      fetchVotableSupply(),
+      fetchDelegateStatement(addressOrENSName),
+      fetchCurrentQuorum(),
+      fetchIsCitizen(address),
     ]);
 
   const numOfDelegatesQuery = prisma.$queryRawUnsafe<
@@ -193,7 +195,7 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     citizen: _isCitizen.length > 0,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
-      totalVotingPower / BigInt(votableSupply?.votable_supply || 0)
+      totalVotingPower / BigInt(votableSupply || 0)
     ),
     votingPowerRelativeToQuorum:
       quorum && quorum > 0n
@@ -217,3 +219,6 @@ export async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     statement: delegateStatement,
   };
 }
+
+export const fetchDelegates = cache(getDelegates);
+export const fetchDelegate = cache(getDelegate);
