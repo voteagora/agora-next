@@ -6,7 +6,6 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { fetchAllForVoting as apiFetchAllForVoting } from "@/app/api/votes/getVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -55,12 +54,6 @@ async function fetchCurrentDelegators(addressOrENSName) {
   "use server";
 
   return apiFetchCurrentDelegators(addressOrENSName);
-}
-
-async function fetchAllForVoting(address, blockNumber, proposal_id) {
-  "use server";
-
-  return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
 export default async function OPProposalPage({ proposal }) {
@@ -145,14 +138,10 @@ export default async function OPProposalPage({ proposal }) {
               fetchDelegateStatement={fetchDelegateStatement}
               fetchUserVotes={fetchUserVotesForProposal}
               proposal_id={proposal.id}
-              getDelegators={getDelegators}
+              getDelegators={fetchCurrentDelegators}
             />
             {/* Show the input for the user to vote on a proposal if allowed */}
-            <CastVoteInput
-              proposal={proposal}
-              fetchAllForVoting={fetchAllForVoting}
-              isOptimistic
-            />
+            <CastVoteInput proposal={proposal} isOptimistic />
             <p className="mx-4 text-xs text-gray-4f">
               If you agree with this proposal, you don’t need to vote. Only vote
               against if you oppose this proposal.
