@@ -4,7 +4,7 @@ type UIToggle = {
 };
 
 type UILink = {
-  name:string;
+  name: string;
   title: string;
   url: string;
 }
@@ -38,6 +38,10 @@ export class TenantUI {
   private _pages?: UIPage[];
   private _toggles?: UIToggle[];
 
+  private _linksCache: { [key: string]: UILink | undefined } = {};
+  private _pagesCache: { [key: string]: UIPage | undefined } = {};
+  private _togglesCache: { [key: string]: UIToggle | undefined } = {};
+
   constructor({ color, hero, logo, title, links, pages, toggles }: TenantUIParams) {
     this._color = color;
     this._hero = hero;
@@ -65,14 +69,32 @@ export class TenantUI {
   }
 
   public link(name: string): UILink | undefined {
-    return this._links?.find((t) => t.name === name);
+    if (this._linksCache[name] !== undefined) {
+      return this._linksCache[name];
+    }
+
+    const result = this._links?.find((t) => t.name === name);
+    this._linksCache[name] = result;
+    return result;
   }
 
   public toggle(name: string): UIToggle | undefined {
-    return this._toggles?.find((t) => t.name === name);
+    if (this._togglesCache[name] !== undefined) {
+      return this._togglesCache[name];
+    }
+
+    const result = this._toggles?.find((t) => t.name === name);
+    this._togglesCache[name] = result;
+    return result;
   }
 
   public page(route: string): UIPage | undefined {
-    return this._pages?.find((t) => t.route === route);
+    if (this._pagesCache[route] !== undefined) {
+      return this._pagesCache[route];
+    }
+
+    const result = this._pages?.find((t) => t.route === route);
+    this._pagesCache[route] = result;
+    return result;
   }
 }
