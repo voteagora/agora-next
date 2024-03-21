@@ -1,5 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import { DaoSlug } from "@prisma/client";
 
 /**
  * This is a basic snapshot indexer. It fetches all proposals from the ENS space
@@ -62,7 +63,7 @@ async function fetchProposals(slug: string) {
 export async function GET() {
   // Only allow this route to be accessed from the ENS namespace
   const slug = Tenant.current().slug;
-  if (slug === "ENS") {
+  if (slug === DaoSlug.ENS) {
     try {
       const proposals = await fetchProposals(namespaces[slug]);
 
