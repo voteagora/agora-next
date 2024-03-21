@@ -80,16 +80,14 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         {delegateVotes.map(
           (vote) =>
             vote && (
-              <VoteDetailsContainer key={vote.transactionHash}>
+              <VoteDetailsContainer
+                key={vote.transactionHash}
+                proposalId={vote.proposal_id}
+              >
                 <div className={styles.details_container}>
                   <VStack className={styles.details_sub}>
                     <HStack gap={1} className={styles.vote_type}>
-                      <a
-                        href={`/proposals/${vote.proposal_id}`}
-                        title={`Prop ${vote.proposal_id}`}
-                      >
-                        Prop {shortAddress(vote.proposal_id)}
-                      </a>
+                      Prop {shortAddress(vote.proposal_id)}
                       <>
                         {vote.proposalValue != 0n ? (
                           <> asking {formatNumber(vote.proposalValue)} ETH</>
