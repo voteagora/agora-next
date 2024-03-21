@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot"]
 }
 
 model DelegateStatements {
@@ -47,6 +47,31 @@ model AddressMetadata {
   @@id([address, kind, dao_slug])
   @@map("address_metadata")
   @@schema("agora")
+}
+
+model SnapshotProposal {
+  id             String    @id
+  dao_slug       DaoSlug
+  author         String?
+  body           String?
+  choices        String[]
+  created        Decimal?  @db.Decimal
+  end            Decimal?  @db.Decimal
+  link           String?
+  network        String?
+  scores         Decimal[] @db.Decimal
+  scores_state   String?
+  scores_total   Decimal?  @db.Decimal
+  scores_updated Decimal?  @db.Decimal
+  snapshot       String?
+  start          Decimal?  @db.Decimal
+  state          String?
+  title          String?
+  type           String?
+  votes          Decimal?  @db.Decimal
+
+  @@map("proposals")
+  @@schema("snapshot")
 }
 
 view OptimismVotes {
@@ -227,13 +252,13 @@ view ensDelegates {
 
 view ensProposals {
   proposal_id        String       @unique
-  contract           String?      @db.VarChar(42)
+  contract           String       @db.VarChar(42)
   proposer           String
   description        String?
-  ordinal            Decimal?     @db.Decimal
-  created_block      BigInt
+  ordinal            Decimal      @db.Decimal
+  created_block      BigInt?
   start_block        String
-  end_block          String
+  end_block          String?
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
@@ -924,6 +949,7 @@ enum ProposalType {
   STANDARD
   APPROVAL
   OPTIMISTIC
+  SNAPSHOT
 
   @@map("proposal_type")
   @@schema("config")

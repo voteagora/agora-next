@@ -2,6 +2,8 @@ import { type ClassValue, clsx } from "clsx";
 import { BigNumberish, formatUnits } from "ethers";
 import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
+import Tenant from "./tenant/tenant";
+import { TENANT_NAMESPACES } from "./constants";
 
 const secondsPerBlock = 12;
 
@@ -21,16 +23,19 @@ export function bpsToString(bps: number) {
 }
 
 export const getProposalTypeText = (proposalType: string) => {
-  switch (proposalType) {
-    case "OPTIMISTIC":
-      return "Optimistic Proposal";
-    case "STANDARD":
-      return "Standard Proposal";
-    case "APPROVAL":
-      return "Approval Vote Proposal";
-    default:
-      return "Proposal";
+  if (Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM) {
+    switch (proposalType) {
+      case "OPTIMISTIC":
+        return "Optimistic Proposal";
+      case "STANDARD":
+        return "Standard Proposal";
+      case "APPROVAL":
+        return "Approval Vote Proposal";
+      default:
+        return "Proposal";
+    }
   }
+  return "Proposal";
 };
 
 const format = new Intl.NumberFormat("en", {
