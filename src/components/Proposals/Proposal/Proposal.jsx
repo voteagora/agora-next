@@ -46,6 +46,7 @@ export default function Proposal({ proposal, votableSupply }) {
         </VStack>
         <VStack className={cn(styles.cell_content, styles.cell_result)}>
           <div className={styles.cell_content_body}>
+            {proposal.proposalType === "SNAPSHOT" && "Snapshot"}
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
                 <OPStandardProposalStatus proposal={proposal} />

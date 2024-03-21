@@ -191,21 +191,23 @@ export async function parseProposal(
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
     created_time: proposal.created_ts
-      ? new Date(proposal.created_ts.toFixed(0))
+      ? new Date(Number(proposal.created_ts.toFixed(0)) * 1000)
       : latestBlock
       ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
       : null,
     start_time: proposal.start_ts
-      ? new Date(proposal.start_ts.toFixed(0))
+      ? new Date(Number(proposal.start_ts.toFixed(0)) * 1000)
       : latestBlock
       ? getHumanBlockTime(proposal.start_block, latestBlock)
       : null,
     end_time: proposal.end_ts
-      ? new Date(proposal.end_ts.toFixed(0))
+      ? new Date(Number(proposal.end_ts.toFixed(0)) * 1000)
       : latestBlock
       ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
       : null,
-    markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
+    markdowntitle:
+      proposal.title ??
+      getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
@@ -261,6 +263,7 @@ export type ParsedProposalData = {
       scores: string[];
       type: string;
       votes: string;
+      state: "pending" | "active" | "closed";
     };
   };
   STANDARD: {
@@ -317,6 +320,7 @@ export function parseProposalData(
           scores: parsedProposalData.scores ?? [],
           type: parsedProposalData.type ?? "",
           votes: parsedProposalData.votes ?? "",
+          state: parsedProposalData.state ?? "",
         },
       };
     }
@@ -434,6 +438,7 @@ export type ParsedProposalResults = {
     key: "SNAPSHOT";
     kind: {
       scores: string[];
+      status: "pending" | "active" | "closed";
     };
   };
   STANDARD: {
@@ -485,6 +490,7 @@ export function parseProposalResults(
         key: "SNAPSHOT",
         kind: {
           scores: JSON.parse(proposalResults).scores ?? [],
+          status: proposalData.kind.state ?? "",
         },
       };
     }
@@ -551,7 +557,8 @@ export type ProposalStatus =
   | "ACTIVE"
   | "PENDING"
   | "QUEUED"
-  | "EXECUTED";
+  | "EXECUTED"
+  | "CLOSED";
 
 export async function getProposalStatus(
   proposal: ProposalPayload,
@@ -560,6 +567,9 @@ export async function getProposalStatus(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
+  if (proposalResults.key === "SNAPSHOT") {
+    return proposalResults.kind.status.toUpperCase() as ProposalStatus;
+  }
   if (proposal.cancelled_block) {
     return "CANCELLED";
   }
