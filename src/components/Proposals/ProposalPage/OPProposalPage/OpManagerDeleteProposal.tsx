@@ -10,6 +10,7 @@ import {
 import { keccak256, toHex } from "viem";
 import { useContractWrite } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 export default function OpManagerDeleteProposal({
   proposal,
@@ -25,13 +26,11 @@ export default function OpManagerDeleteProposal({
     const descriptionHash = keccak256(toHex(proposal?.description!));
 
     if (proposalType === "STANDARD") {
-      const targets = proposal.proposalData.options[0]
-        ?.targets as `0x${string}`[];
-      const values = proposal.proposalData.options[0]?.values.map((v) =>
-        BigInt(v)
-      );
-      const calldata = proposal.proposalData.options[0]
-        ?.calldatas as `0x${string}`[];
+      const proposalData =
+        proposal.proposalData as ParsedProposalData["STANDARD"]["kind"];
+      const targets = proposalData.options[0]?.targets as `0x${string}`[];
+      const values = proposalData.options[0]?.values.map((v) => BigInt(v));
+      const calldata = proposalData.options[0]?.calldatas as `0x${string}`[];
 
       return [targets, values, calldata, descriptionHash];
     } else {
