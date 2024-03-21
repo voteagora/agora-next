@@ -1,6 +1,7 @@
 import "server-only";
 
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { cache } from "react";
+import { paginateResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
@@ -15,7 +16,7 @@ type citizen = {
   voting_power?: Prisma.Decimal;
 };
 
-export async function getCitizens({
+async function getCitizens({
   page = 1,
   sort = "shuffle",
   seed,
@@ -27,14 +28,15 @@ export async function getCitizens({
   const pageSize = 20;
   const { namespace } = Tenant.current();
 
-  const { meta, data: _citizens } = await paginatePrismaResult(
+  const { meta, data: _citizens } = await paginateResult(
     (skip: number, take: number) => {
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
           SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
           FROM agora.address_metadata address_metadata
-          LEFT JOIN ${namespace + ".delegates"
+          LEFT JOIN ${
+            namespace + ".delegates"
           } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
           WHERE address_metadata.kind = 'citizen' 
           AND address_metadata.dao_slug = 'OP'
@@ -51,8 +53,9 @@ export async function getCitizens({
           `
             SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
             FROM agora.address_metadata address_metadata
-            LEFT JOIN ${namespace + ".delegates"
-          } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
+            LEFT JOIN ${
+              namespace + ".delegates"
+            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
             WHERE address_metadata.kind = 'citizen' 
             AND address_metadata.dao_slug = 'OP'
             ORDER BY COALESCE(delegate.voting_power, 0) DESC,
@@ -90,3 +93,5 @@ export async function getCitizens({
     seed,
   };
 }
+
+export const fetchCitizens = cache(getCitizens);
