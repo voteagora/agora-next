@@ -1,4 +1,9 @@
-import { paginateResult, paginateResultEx } from "@/app/lib/pagination";
+import {
+  paginateResult,
+  paginateResultEx,
+  type PaginatedResultEx,
+  type PaginationParamsEx,
+} from "@/app/lib/pagination";
 import {
   OptimismAdvancedVotingPower,
   OptimismDelegates,
@@ -22,24 +27,26 @@ import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
 /*
-  * Fetches a list of delegates
-  * @param page - the page number to fetch; limit/offset ignored if this is supplied
-  * @param limit - the number of delegates to fetch; offset must also be supplied if limit is
-  * @param offset - the offset to fetch; limit must also be supplied if offset is
-  * @param sort - the sort order
-  * @param seed - the seed for random sorting
-  * @returns - a list of delegates
+async function getDelegatesApi<T>(
+  pagination: PaginationParamsEx
+): Promise<PaginatedResultEx<T>> {
+
+}
 */
+
+/*
+ * Fetches a list of delegates
+ * @param page - the page number to fetch
+ * @param sort - the sort order
+ * @param seed - the seed for random sorting
+ * @returns - a list of delegates
+ */
 async function getDelegates({
   page = 1,
-  limit,
-  offset,
   sort = "weighted_random",
   seed,
 }: {
-  page?: number;
-  limit?: number;
-  offset?: number;
+  page: number;
   sort: string;
   seed?: number;
 }) {
@@ -62,6 +69,7 @@ async function getDelegates({
           take
         );
       case "weighted_random":
+        console.log("SORT: " + sort);
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
@@ -86,12 +94,13 @@ async function getDelegates({
         });
     }
   };
-
-  // Note: This will error if limit is supplied without offset and vice versa
-  const { meta, data: delegates } = page
-    ? await paginateResult(paginatedQuery, page, pageSize)
-    : await paginateResultEx(paginatedQuery, limit as number, offset as number);
-
+  console.log("HERE 97");
+  const { meta, data: delegates } = await paginateResult(
+    paginatedQuery,
+    page,
+    pageSize
+  );
+  console.log("HERE 103");
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatePayload) => {
       return {
@@ -108,11 +117,6 @@ async function getDelegates({
     delegates: delegates.map((delegate: DelegatePayload, index: number) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
-      votingPowerDetail: {
-        total: delegate.voting_power?.toFixed(0),
-        advanced: delegate.advanced_vp?.toFixed(0),
-        direct: delegate.direct_vp?.toFixed(0),
-      },
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
     })),

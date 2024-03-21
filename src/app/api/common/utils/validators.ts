@@ -23,13 +23,14 @@ export const createOptionalStringValidator = <T extends string>(
   If input is null, returns the supplied default value.
 */
 export const createOptionalNumberValidator = (
-  min: number | string, 
-  max: number | string,
+  min: number, 
+  max: number,
   defaultValue: number
 ) => {
   return z
     .union([
       z.literal(null), 
+      z.string().transform(x => parseInt(x)).refine(x => x >= min).refine(x => x <= max),
       z.number().min(min).max(max).default(defaultValue)])
     .transform((x) => (x !== null) ? x : defaultValue);
 };

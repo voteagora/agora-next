@@ -1,10 +1,29 @@
-type PaginatedResult<T> = {
+export type PaginatedResult<T> = {
   meta: {
     currentPage: number;
     pageSize: number;
     hasNextPage: boolean;
   };
   data: T;
+};
+
+export type PaginatedResultEx<T> = {
+  meta: {
+    total_records: number;
+    total_returned: number;
+    next_offset: number;
+  };
+  data: T;
+};
+
+export type PaginationParams = {
+  page: number;
+  pageSize: number;
+};
+
+export type PaginationParamsEx = {
+  limit: number;
+  offset: number;
 };
 
 export async function paginateResult<T extends Array<any>>(
@@ -23,6 +42,7 @@ export async function paginateResultEx<T extends Array<any>>(
   limit: number,
   offest: number
 ): Promise<PaginatedResult<T>> {
+  console.log("offset " + offest + " limit " + limit);
   const data = await query(offest, limit);
 
   if (!data || data.length === 0) {

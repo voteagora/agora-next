@@ -23,16 +23,19 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   try {
     const sort = sortValidator.parse(params.get("sort"));
+    console.log("SORT: " + sort);
     const limit = limitValidator.parse(params.get("limit"));
+    console.log("LIMIT: " + limit);
     const offest = offsetValidator.parse(params.get("offset"));
-    const delegatesResult = await fetchDelegates({ sort: sort, limit: limit, offset: offest});
-    return Response.json(delegatesResult.delegates);
+    console.log("OFFSET: " + offest);
+    const delegatesResult = await fetchDelegates({ sort: sort, page: limit/*, offset: offest*/});
+    return Response.json("{done: true}");
   }
   catch (e: any) {
     if (e instanceof ZodError) {
       return new Response("Invalid query parameters: " + e.toString(), { status: 400 });
     }
 
-    return new Response("Internal server error", { status: 500 });
+    return new Response("Internal server error: " + e.toString(), { status: 500 });
   }
 }
