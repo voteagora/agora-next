@@ -3,6 +3,11 @@ type UIToggle = {
   enabled: boolean;
 };
 
+type UILink = {
+  name: string;
+  url: string;
+}
+
 type UIPage = {
   description: string;
   route: string;
@@ -18,6 +23,7 @@ type TenantUIParams = {
   hero?: string;
   logo: string;
   title: string;
+  links?: UILink[];
   pages?: UIPage[];
   toggles?: UIToggle[];
 };
@@ -27,14 +33,16 @@ export class TenantUI {
   private _hero?: string;
   private _logo: string;
   private _title: string;
+  private _links?: UILink[];
   private _pages?: UIPage[];
   private _toggles?: UIToggle[];
 
-  constructor({ color, hero, logo, title, pages, toggles }: TenantUIParams) {
+  constructor({ color, hero, logo, title, links, pages, toggles }: TenantUIParams) {
     this._color = color;
     this._hero = hero;
     this._logo = logo;
     this._title = title;
+    this._links = links;
     this._toggles = toggles;
     this._pages = pages;
   }
@@ -53,6 +61,10 @@ export class TenantUI {
 
   public get logo(): string {
     return this._logo;
+  }
+
+  public link(name: string): UILink | undefined {
+    return this._links?.find((t) => t.name === name);
   }
 
   public toggle(name: string): UIToggle | undefined {

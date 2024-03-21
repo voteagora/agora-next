@@ -26,6 +26,7 @@ export default class TenantContractFactory {
       case TENANT_NAMESPACES.ETHERFI:
         return ethfiContracts(isProd);
       case TENANT_NAMESPACES.ENS:
+        return ensContracts(isProd);
       case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
       default:
@@ -33,6 +34,39 @@ export default class TenantContractFactory {
     }
   }
 }
+
+const ensContracts = (isProd:boolean):TenantContracts => {
+  return {
+    // TOKEN
+    token: new TenantContract<ITokenContract>({
+      contract: EtherfiToken__factory.connect(
+        "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
+        ethProvider
+      ),
+      address: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72" as `0x${string}`,
+      chainId: 1,
+      chainName: "Ethereum Mainnet",
+      abi: EtherfiToken__factory.abi,
+    }),
+    // GOVERNOR
+    governor: new TenantContract<IGovernorContract>({
+      contract: OptimismGovernor__factory.connect(
+        isProd
+          ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+          : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+        provider
+      ),
+      address: isProd
+        ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
+        : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f",
+      chainId: 10,
+      chainName: "Optimism",
+      abi: OptimismGovernor__factory.abi,
+      v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
+    }),
+  };
+};
 
 const ethfiContracts = (isProd: boolean): TenantContracts => {
   return {
