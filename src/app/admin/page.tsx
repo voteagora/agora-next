@@ -1,11 +1,11 @@
 import AdminForm from "@/components/Admin/AdminForm";
-import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchProposalTypes } from "@/app/admin/actions";
 import Tenant from "@/lib/tenant/tenant";
 
 async function fetchVotableSupply() {
   "use server";
-  return getVotableSupply();
+  return apiFetchVotableSupply();
 }
 
 export default async function Page() {

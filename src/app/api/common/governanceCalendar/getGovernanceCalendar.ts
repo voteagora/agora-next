@@ -92,7 +92,7 @@ function parseICS(icsData: string) {
     return event;
 }
 
-export async function getGovernanceCalendar() {
+export async function fetchGovernanceCalendar() {
     const response = await fetch(
         `https://calendar.google.com/calendar/ical/c_fnmtguh6noo6qgbni2gperid4k%40group.calendar.google.com/public/basic.ics`,
         {

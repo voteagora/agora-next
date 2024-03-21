@@ -1,8 +1,8 @@
-import { getGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
-import { getMetrics } from "@/app/api/common/metrics/getMetrics";
-import { getNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
-import { getProposals } from "@/app/api/common/proposals/getProposals";
-import { getVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
+import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
+import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
+import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
@@ -16,28 +16,27 @@ export const revalidate = 60;
 
 async function fetchProposals(filter, page = 1) {
   "use server";
-  return getProposals({ filter, page });
+  return apiFetchProposals({filter, page});
 }
 
 async function fetchNeedsMyVoteProposals(address) {
   "use server";
-  return getNeedsMyVoteProposals(address);
+  return apiFetchNeedsMyVoteProposals(address);
 }
 
 async function fetchDaoMetrics() {
   "use server";
-  return getMetrics();
+  return fetchMetrics();
 }
 
 async function fetchVotableSupply() {
   "use server";
-  return getVotableSupply();
+  return apiFetchVotableSupply();
 }
 
 async function fetchGovernanceCalendar() {
   "use server";
-
-  return getGovernanceCalendar();
+  return apiFetchGovernanceCalendar();
 }
 
 export async function generateMetadata({}, parent) {
