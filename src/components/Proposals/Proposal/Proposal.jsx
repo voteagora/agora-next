@@ -8,6 +8,9 @@ import ProposalTimeStatus from "./ProposalTimeStatus";
 import { cn, getProposalTypeText } from "@/lib/utils";
 import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
 import SnapshotProposalStatus from "./SnapshotProposalStatus";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import Tenant from "@/lib/tenant/tenant";
+import HumanAddress from "@/components/shared/HumanAddress";
 
 export default function Proposal({ proposal, votableSupply }) {
   const proposalText = getProposalTypeText(proposal.proposalType);
@@ -23,18 +26,31 @@ export default function Proposal({ proposal, votableSupply }) {
     >
       <HStack alignItems="center" className={styles.proposal_row}>
         <VStack className={cn(styles.cell_content, styles.cell_title)}>
-          <HStack className={styles.cell_content_title} gap={1}>
-            {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
-            <div>
-              {proposalText}{" "}
-              <span className={styles.invisible_on_mobile}>
-                by The Optimism Foundation
-              </span>
-            </div>
-            <div className={styles.mobile_status}>
-              <ProposalStatus proposal={proposal} />
-            </div>
-          </HStack>
+          {proposal.proposalType === "SNAPSHOT" ? (
+            <HStack className={styles.cell_content_title} gap={1}>
+              <p>Snapshot Proposal</p>
+              <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />
+            </HStack>
+          ) : (
+            <HStack className={styles.cell_content_title} gap={1}>
+              {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
+              <div>
+                {proposalText}{" "}
+                <span className={styles.invisible_on_mobile}>
+                  {Tenant.current().namespace === "optimism" ? (
+                    "by The Optimism Foundation"
+                  ) : (
+                    <>
+                      by <HumanAddress address={proposal.proposer} />{" "}
+                    </>
+                  )}
+                </span>
+              </div>
+              <div className={styles.mobile_status}>
+                <ProposalStatus proposal={proposal} />
+              </div>
+            </HStack>
+          )}
           <div className={cn(styles.cell_content_body, styles.proposal_title)}>
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`
