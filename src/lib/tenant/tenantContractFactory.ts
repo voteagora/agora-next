@@ -9,7 +9,7 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 
-import provider, {ethProvider} from "@/app/lib/provider";
+import provider, { ethProvider } from "@/app/lib/provider";
 
 import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
@@ -26,6 +26,7 @@ export default class TenantContractFactory {
       case TENANT_NAMESPACES.ETHERFI:
         return ethfiContracts(isProd);
       case TENANT_NAMESPACES.ENS:
+        return ensContracts(isProd);
       case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
       default:
@@ -33,6 +34,39 @@ export default class TenantContractFactory {
     }
   }
 }
+
+const ensContracts = (isProd: boolean): TenantContracts => {
+  return {
+    // TOKEN
+    token: new TenantContract<ITokenContract>({
+      contract: EtherfiToken__factory.connect(
+        "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
+        ethProvider
+      ),
+      address: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72" as `0x${string}`,
+      chainId: 1,
+      chainName: "Ethereum Mainnet",
+      abi: EtherfiToken__factory.abi,
+    }),
+    // GOVERNOR
+    // TODO: Implement Sepolia provider
+    governor: new TenantContract<IGovernorContract>({
+      contract: OptimismGovernor__factory.connect(
+        isProd
+          ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
+          : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+        provider
+      ),
+      address: isProd
+        ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
+        : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+      chainId: 1,
+      chainName: "Ethereum Mainnet",
+      abi: OptimismGovernor__factory.abi,
+      optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
+    }),
+  };
+};
 
 const ethfiContracts = (isProd: boolean): TenantContracts => {
   return {

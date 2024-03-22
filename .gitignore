@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Local prettier config
 .prettierrc
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
