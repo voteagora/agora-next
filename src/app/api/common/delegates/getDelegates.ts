@@ -96,7 +96,11 @@ async function getDelegatesApi(
     meta,
     data: delegates.map((delegate: any, index: number) => ({
       address: delegate.delegate,
-      votingPower: delegate.voting_power?.toFixed(0),
+      votingPower: {
+        total: delegate.voting_power?.toFixed(0),
+        direct: delegate.direct_vp?.toFixed(0),
+        advanced: delegate.advanced_vp?.toFixed(0) || "0",
+      },
       citizen: _delegates[index].citizen.length > 0,
       statement: _delegates[index].statement,
     })),
