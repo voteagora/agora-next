@@ -29,7 +29,9 @@ export default function OptionsResultsPanel({
   const options = proposalResults.options;
 
   const totalVotingPower =
-    BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
+    BigInt(proposalResults.for) +
+    BigInt(proposalResults.abstain) +
+    BigInt(proposalResults.against);
 
   const thresholdPosition = (() => {
     if (proposalSettings.criteria === "THRESHOLD") {
