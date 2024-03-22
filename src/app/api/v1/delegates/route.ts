@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const limit = limitValidator.parse(params.get("limit"));
     const offest = offsetValidator.parse(params.get("offset"));
     const delegatesResult = await fetchDelegatesApi(sort, {limit: limit, offset: offest});
-    return Response.json(delegatesResult);
+    return NextResponse.json(delegatesResult);
   }
   catch (e: any) {
     if (e instanceof ZodError) {
