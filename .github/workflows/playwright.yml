@@ -1,4 +1,4 @@
-name: E2E Tests
+name: E2E Tests (1.1)
 on:
   deployment_status:
 jobs:
@@ -11,22 +11,34 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-      - name: Determine Tenant Name
+      - name: Determine Tenant Name and Skip Tests if Necessary
+        id: check_tenant
         run: |
           if [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next-etherfi" ]]; then
             echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=etherfi" >> $GITHUB_ENV
+            echo "Skipping tests for etherfi"
+            echo "::set-output name=skip_tests::true"
           elif [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next-ens" ]]; then
             echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=ens" >> $GITHUB_ENV
+            echo "Skipping tests for ens"
+            echo "::set-output name=skip_tests::true"
           elif [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next" ]]; then
             echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=optimism" >> $GITHUB_ENV
+            echo "Running tests for optimism"
+            echo "::set-output name=skip_tests::false"
+          else
+            echo "No specific tenant identified. Skipping tests."
+            echo "::set-output name=skip_tests::true"
           fi
-          # You can add more conditions as needed for other environments
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        if: steps.check_tenant.outputs.skip_tests == 'false'
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+        if: steps.check_tenant.outputs.skip_tests == 'false'
       - name: Run Playwright tests
         run: npx playwright test
+        if: steps.check_tenant.outputs.skip_tests == 'false'
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
           VERCEL_ENV: ${{ github.event.deployment_status.environment }}
