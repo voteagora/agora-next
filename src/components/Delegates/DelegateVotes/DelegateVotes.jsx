@@ -80,16 +80,14 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         {delegateVotes.map(
           (vote) =>
             vote && (
-              <VoteDetailsContainer key={vote.transactionHash}>
+              <VoteDetailsContainer
+                key={vote.transactionHash}
+                proposalId={vote.proposal_id}
+              >
                 <div className={styles.details_container}>
                   <VStack className={styles.details_sub}>
                     <HStack gap={1} className={styles.vote_type}>
-                      <a
-                        href={`/proposals/${vote.proposal_id}`}
-                        title={`Prop ${vote.proposal_id}`}
-                      >
-                        Prop {shortAddress(vote.proposal_id)}
-                      </a>
+                      Prop {shortAddress(vote.proposal_id)}
                       <>
                         {vote.proposalValue != 0n ? (
                           <> asking {formatNumber(vote.proposalValue)} ETH</>
@@ -102,9 +100,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                       )}
                     </HStack>
                     <h2 className="px-0 py-1 overflow-hidden text-base text-black text-ellipsis">
-                      <a href={`/proposals/${vote.proposal_id}`}>
-                        {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
-                      </a>
+                      {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                     </h2>
                     {vote.proposalType === "APPROVAL" && (
                       <ApprovalVoteContainer {...vote} />

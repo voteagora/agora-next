@@ -83,7 +83,7 @@ const nextConfig = {
     return config;
   },
   experimental: {
-      instrumentationHook: true,
+    instrumentationHook: true,
   },
 };
 
