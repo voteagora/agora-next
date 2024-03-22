@@ -1,21 +1,24 @@
 "use client";
 
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { formatNumber } from "@/lib/tokenUtils";
-import Tenant from "@/lib/tenant/tenant";
 import discord from "@/icons/discord.svg";
 import infoTransparent from "@/icons/info-transparent.svg";
-import Image from "next/image";
+import Tenant from "@/lib/tenant/tenant";
+import { formatNumber } from "@/lib/tokenUtils";
 import { cn } from "@/lib/utils";
-import { createPortal } from "react-dom";
-import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function DAOMetricsHeader({ metrics }) {
-  const { token, namespace } = Tenant.current();
+  const { token, ui } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  const bugsLink = ui.link("bugs");
+  const changeLogLink = ui.link("changelog");
+  const faqLink = ui.link("faq");
+  const discordLink = ui.link("discord");
 
   useEffect(() => {
     setIsClient(true);
@@ -64,33 +67,36 @@ export default function DAOMetricsHeader({ metrics }) {
               <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
               <div
                 className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
-                {namespace === TENANT_NAMESPACES.OPTIMISM && (
-                  <>
-                    <a
-                      href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
-                      rel="noreferrer nonopener"
-                      target="_blank"
-                    >
-                      Report bugs & feedback
-                    </a>
-                    <Link href="/changelog">Change log</Link>
-                    <a
-                      href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
-                      rel="noreferrer nonopener"
-                      target="_blank"
-                    >
-                      FAQ
-                    </a>
-                  </>
-                )}
-                <a
-                  href="https://discord.gg/vBJkUYBuwX"
-                  rel="noreferrer nonopener"
-                  target="_blank"
-                  className="hidden sm:inline"
-                >
-                  <Image src={discord} alt="Discord" />
-                </a>
+                {bugsLink &&
+                  <a
+                    href={bugsLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                  >
+                    {bugsLink.title}
+                  </a>
+                }
+                {changeLogLink && <Link href={changeLogLink.url}>{changeLogLink.title}</Link>}
+                {faqLink &&
+                  <a
+                    href={faqLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                  >
+                    {faqLink.title}
+                  </a>
+                }
+
+                {discordLink &&
+                  <a
+                    href={discordLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                    className="hidden sm:inline"
+                  >
+                    <Image src={discord} alt={discordLink.title} />
+                  </a>
+                }
               </div>
             </div>
           </div>,
