@@ -152,7 +152,7 @@ export default async function Home() {
         initAllProposals={allProposals}
         fetchProposals={async (page, filter) => {
           "use server";
-          return fetchProposals({ filter, page });
+          return apiFetchProposals({ filter, page });
         }}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
