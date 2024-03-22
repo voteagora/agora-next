@@ -203,7 +203,7 @@ async function getCurrentDelegatorsForAddress({
  * @param addressOrENSName
  */
 
-export const getCurrentAdvancedDelegators = (addressOrENSName: string) =>
+const getCurrentAdvancedDelegators = (addressOrENSName: string) =>
   addressOrEnsNameWrap(
     getCurrentAdvancedDelegatorsForAddress,
     addressOrENSName
@@ -297,3 +297,6 @@ export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
 export const fetchCurrentDelegators = cache(getCurrentDelegators);
 export const fetchDirectDelegatee = cache(getDirectDelegatee);
 export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains);
+export const fetchCurrentAdvancedDelegators = cache(
+  getCurrentAdvancedDelegators
+);
