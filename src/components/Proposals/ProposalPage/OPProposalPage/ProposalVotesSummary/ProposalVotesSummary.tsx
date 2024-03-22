@@ -1,10 +1,10 @@
 import { VStack, HStack } from "@/components/Layout/Stack";
 import styles from "./proposalVotesSummary.module.scss";
-import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
+import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 
 export default function ProposalVotesSummary({
   proposal,
@@ -58,35 +58,10 @@ export default function ProposalVotesSummary({
             )}
           </>
         </HStack>
-        <HStack
-          justifyContent="justify-between"
-          alignItems="items-center"
-          className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md"
-        >
-          <div>
-            {proposal.status === "ACTIVE" && (
-              <p className="text-blue-600 bg-sky-200 rounded-sm px-1 py-0.5 font-semibold">
-                ACTIVE
-              </p>
-            )}
-            {proposal.status === "SUCCEEDED" && (
-              <p className="text-green-600 bg-green-200 rounded-sm px-1 py-0.5 font-semibold">
-                SUCCEEDED
-              </p>
-            )}
-            {proposal.status === "DEFEATED" && (
-              <p className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
-                DEFEATED
-              </p>
-            )}
-          </div>
-          <div>
-            <ProposalTimeStatus
-              proposalStatus={proposal.status}
-              proposalEndTime={proposal.end_time}
-            />
-          </div>
-        </HStack>
+        <ProposalStatusDetail
+          proposalEndTime={proposal.end_time}
+          proposalStatus={proposal.status}
+        />
       </VStack>
     </VStack>
   );
