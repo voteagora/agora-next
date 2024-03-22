@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot"]
 }
 
 model DelegateStatements {
@@ -47,6 +47,31 @@ model AddressMetadata {
   @@id([address, kind, dao_slug])
   @@map("address_metadata")
   @@schema("agora")
+}
+
+model SnapshotProposal {
+  id             String    @id
+  dao_slug       DaoSlug
+  author         String?
+  body           String?
+  choices        String[]
+  created        Decimal?  @db.Decimal
+  end            Decimal?  @db.Decimal
+  link           String?
+  network        String?
+  scores         Decimal[] @db.Decimal
+  scores_state   String?
+  scores_total   Decimal?  @db.Decimal
+  scores_updated Decimal?  @db.Decimal
+  snapshot       String?
+  start          Decimal?  @db.Decimal
+  state          String?
+  title          String?
+  type           String?
+  votes          Decimal?  @db.Decimal
+
+  @@map("proposals")
+  @@schema("snapshot")
 }
 
 view OptimismVotes {
@@ -204,7 +229,7 @@ view OptimismDelegatees {
   @@schema("optimism")
 }
 
-view ENSDelegatees {
+view ensDelegatees {
   delegator    String  @unique
   delegatee    String
   block_number BigInt
@@ -214,9 +239,9 @@ view ENSDelegatees {
   @@schema("ens")
 }
 
-view ENSDelegates {
+view ensDelegates {
   delegate          String  @unique
-  num_of_delegators BigInt
+  num_of_delegators Decimal @db.Decimal
   direct_vp         Decimal @db.Decimal
   advanced_vp       String
   voting_power      Decimal @db.Decimal
@@ -225,15 +250,15 @@ view ENSDelegates {
   @@schema("ens")
 }
 
-view ENSProposals {
+view ensProposals {
   proposal_id        String       @unique
-  contract           String?      @db.VarChar(42)
+  contract           String       @db.VarChar(42)
   proposer           String
   description        String?
-  ordinal            Decimal?     @db.Decimal
-  created_block      BigInt
+  ordinal            Decimal      @db.Decimal
+  created_block      BigInt?
   start_block        String
-  end_block          String
+  end_block          String?
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
@@ -246,14 +271,14 @@ view ENSProposals {
   @@schema("ens")
 }
 
-view ENSVotableSupply {
+view ensVotableSupply {
   votable_supply String @unique
 
   @@map("votable_supply")
   @@schema("ens")
 }
 
-view ENSVoterStats {
+view ensVoterStats {
   voter              String   @unique
   proposals_proposed BigInt?
   proposals_voted    BigInt?
@@ -267,7 +292,7 @@ view ENSVoterStats {
   @@schema("ens")
 }
 
-view ENSVotes {
+view ensVotes {
   transaction_hash String        @unique @db.VarChar(66)
   proposal_id      String
   voter            String
@@ -285,7 +310,7 @@ view ENSVotes {
   @@schema("ens")
 }
 
-view ENSVotingPower {
+view ensVotingPower {
   delegate     String  @unique
   voting_power String?
 
@@ -293,7 +318,7 @@ view ENSVotingPower {
   @@schema("ens")
 }
 
-view ENSVotingPowerSnaps {
+view ensVotingPowerSnaps {
   id           String   @id
   delegate     String?
   balance      String?
@@ -304,7 +329,49 @@ view ENSVotingPowerSnaps {
   @@schema("ens")
 }
 
-view EtherfiDelegatees {
+view ensAdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+  contract         String? @db.VarChar
+
+  @@map("advanced_delegatees")
+  @@schema("ens")
+}
+
+view ensAdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String?  @db.VarChar
+
+  @@map("advanced_voting_power")
+  @@schema("ens")
+}
+
+view ensAuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String?  @db.VarChar
+  balance_block_number BigInt
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("authority_chains_snaps")
+  @@schema("ens")
+}
+
+view etherfiDelegatees {
   delegator    String  @unique
   delegatee    String
   block_number BigInt
@@ -314,9 +381,9 @@ view EtherfiDelegatees {
   @@schema("etherfi")
 }
 
-view EtherfiDelegates {
+view etherfiDelegates {
   delegate          String  @unique
-  num_of_delegators BigInt
+  num_of_delegators Decimal @db.Decimal
   direct_vp         Decimal @db.Decimal
   advanced_vp       String
   voting_power      Decimal @db.Decimal
@@ -325,14 +392,14 @@ view EtherfiDelegates {
   @@schema("etherfi")
 }
 
-view EtherfiVotableSupply {
+view etherfiVotableSupply {
   votable_supply String @unique
 
   @@map("votable_supply")
   @@schema("etherfi")
 }
 
-view EtherfiVotingPower {
+view etherfiVotingPower {
   delegate     String  @unique
   voting_power String?
 
@@ -340,7 +407,7 @@ view EtherfiVotingPower {
   @@schema("etherfi")
 }
 
-view EtherfiVotingPowerSnaps {
+view etherfiVotingPowerSnaps {
   id           String   @id
   delegate     String?
   balance      String?
@@ -348,6 +415,101 @@ view EtherfiVotingPowerSnaps {
   ordinal      Decimal? @db.Decimal
 
   @@map("voting_power_snaps")
+  @@schema("etherfi")
+}
+
+view etherfiProposals {
+  proposal_id        String       @unique
+  contract           String?      @db.VarChar
+  proposer           String
+  description        String?
+  ordinal            Decimal?     @db.Decimal
+  created_block      BigInt
+  start_block        String
+  end_block          String
+  cancelled_block    BigInt?
+  executed_block     BigInt?
+  proposal_data      Json?
+  proposal_data_raw  String?
+  proposal_type      ProposalType
+  proposal_type_data String?
+  proposal_results   Json?
+
+  @@map("proposals")
+  @@schema("etherfi")
+}
+
+view etherfiVoterStats {
+  voter              String   @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+
+  @@map("voter_stats")
+  @@schema("etherfi")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfiVotes {
+  transaction_hash String       @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal      @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    ProposalType
+
+  @@map("votes")
+  @@schema("etherfi")
+}
+
+view etherfiAdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+  contract         String? @db.VarChar
+
+  @@map("advanced_delegatees")
+  @@schema("etherfi")
+}
+
+view etherfiAdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String?  @db.VarChar
+
+  @@map("advanced_voting_power")
+  @@schema("etherfi")
+}
+
+view etherfiAuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String?  @db.VarChar
+  balance_block_number BigInt
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("authority_chains_snaps")
   @@schema("etherfi")
 }
 
@@ -558,7 +720,7 @@ view subdelegation_events {
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view ens_delegates_wrapper {
   delegate          String?
-  num_of_delegators BigInt?
+  num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       String?
   voting_power      Decimal? @db.Decimal
@@ -596,12 +758,144 @@ view ens_proposals_wrapper {
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view etherfi_delegates_wrapper {
   delegate          String?
-  num_of_delegators BigInt?
+  num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       String?
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates_wrapper")
+  @@ignore
+  @@schema("etherfi")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfi_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("etherfi")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfi_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("etherfi")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("ens")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfi_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("etherfi")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view etherfi_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+
+  @@map("vote_cast_with_params_events")
   @@ignore
   @@schema("etherfi")
 }
@@ -655,6 +949,7 @@ enum ProposalType {
   STANDARD
   APPROVAL
   OPTIMISTIC
+  SNAPSHOT
 
   @@map("proposal_type")
   @@schema("config")

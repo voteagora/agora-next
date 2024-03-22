@@ -8,8 +8,8 @@ import { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 export function ConnectButton() {
-  const { contracts } = Tenant.getInstance();
-  const { chainId } = contracts.governor;
+  const { contracts } = Tenant.current();
+  const { chainId } = contracts.token;
   const { chain } = useNetwork();
   const openDialog = useOpenDialog();
 

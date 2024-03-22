@@ -3,12 +3,20 @@ import badge from "@/icons/badge.svg";
 import sunny from "@/icons/sunny.svg";
 import Image from "next/image";
 import Link from "next/link";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata() {
-  const preview = `/api/images/og/proposals`;
+  const { ui } = Tenant.current();
+
   const title = "Agora - Optimism's RetroPGF Round 3 Summary";
   const description =
     "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.";
+
+  const preview = `/api/images/og/proposals?title=${encodeURIComponent(
+    "Optimism Agora"
+  )}&description=${encodeURIComponent(
+    "Home of token house governance and RPGF"
+  )}`;
 
   return {
     title: title,
@@ -26,6 +34,13 @@ export async function generateMetadata() {
 }
 
 export default function Page() {
+
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("retropgf")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
   return (
     <VStack className="w-full items-stretch max-w-6xl pb-16 mt-12">
       <div className="mb-16 justify-between items-center flex flex-col gap-8 sm:flex-row sm:gap-0">

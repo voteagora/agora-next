@@ -1,10 +1,17 @@
+import { cache } from "react";
 import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 
-export async function getQuorumForProposal(proposal: ProposalPayload) {
-  const { namespace, contracts } = Tenant.getInstance();
+/*
+  Retrieve quorum from the governor contract for the supplied proposal,
+  calculating it if not specified
+
+  @dev: only supports optimisim
+*/
+async function getQuorumForProposal(proposal: ProposalPayload) {
+  const { namespace, contracts } = Tenant.current();
 
   switch (namespace) {
     case "optimism": {
@@ -14,7 +21,7 @@ export async function getQuorumForProposal(proposal: ProposalPayload) {
 
       // If no quorum is set, calculate it based on votable supply
       if (!contractQuorum) {
-        const votableSupply = await prisma[
+        const votableSupply = await (prisma as any)[
           `${namespace}VotableSupply`
         ].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
@@ -25,8 +32,11 @@ export async function getQuorumForProposal(proposal: ProposalPayload) {
   }
 }
 
-export async function getCurrentQuorum() {
-  const { namespace, contracts } = Tenant.getInstance();
+/*
+  Retrieve the current quorum based on block number
+*/
+async function getCurrentQuorum() {
+  const { namespace, contracts } = Tenant.current();
 
   switch (namespace) {
     case "optimism": {
@@ -39,3 +49,13 @@ export async function getCurrentQuorum() {
     }
   }
 }
+
+/*
+  Gets and caches the quorum for the supplied proposal
+*/
+export const fetchQuorumForProposal = cache(getQuorumForProposal);
+
+/*
+  Gets and caches quorum based on current block number
+*/
+export const fetchCurrentQuorum = cache(getCurrentQuorum);

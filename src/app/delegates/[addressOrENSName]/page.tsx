@@ -23,7 +23,7 @@ import {
   resolveENSName,
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
-import { getCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -40,6 +40,8 @@ export async function generateMetadata(
     resolveENSProfileImage(address || params.addressOrENSName),
   ]);
 
+  const { token } = Tenant.current();
+
   const statement = (
     delegate.statement?.payload as { delegateStatement: string }
   )?.delegateStatement;
@@ -47,7 +49,7 @@ export async function generateMetadata(
   const imgParams = [
     delegate.votingPower &&
       `votes=${encodeURIComponent(
-        `${formatNumber(delegate.votingPower || "0")} OP`
+        `${formatNumber(delegate.votingPower || "0")} ${token.symbol}`
       )}`,
     avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
@@ -57,7 +59,7 @@ export async function generateMetadata(
     "&"
   )}&address=${ensOrTruncatedAddress}`;
   const title = `${ensOrTruncatedAddress} on Agora`;
-  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on Optimism governance.`;
+  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on ${token.name} governance.`;
 
   return {
     title: title,
@@ -113,7 +115,7 @@ export default async function Page({
           fetchDelegators={async (page: number) => {
             "use server";
 
-            return getCurrentDelegators(addressOrENSName, page);
+            return fetchCurrentDelegators(addressOrENSName, page);
           }}
         />
 
