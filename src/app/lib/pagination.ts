@@ -9,7 +9,7 @@ export type PaginatedResult<T> = {
 
 export type PaginatedResultEx<T> = {
   meta: {
-    total_records: number;
+    has_next: boolean;
     total_returned: number;
     next_offset: number;
   };
@@ -34,32 +34,45 @@ export async function paginateResult<T extends Array<any>>(
   const skip = (page - 1) * pageSize;
   const take = pageSize + 1;
 
-  return await paginateResultEx<T>(query, take, skip);
+  const ex = await paginateResultEx<T>(query, {limit: take, offset: skip});
+
+  return {
+    meta: {
+      currentPage: page,
+      pageSize: pageSize,
+      hasNextPage: ex.meta.has_next,
+    },
+    data: ex.data,
+  };
 }
 
 export async function paginateResultEx<T extends Array<any>>(
   query: (skip: number, take: number) => Promise<T>,
-  limit: number,
-  offest: number
-): Promise<PaginatedResult<T>> {
-  console.log("offset " + offest + " limit " + limit);
-  const data = await query(offest, limit);
+  params: PaginationParamsEx
+): Promise<PaginatedResultEx<T>> {
+  // retrieve one more than requested to see if there is more data
+  // for user to query
+  const data = await query(params.offset, params.limit + 1);
 
   if (!data || data.length === 0) {
     return {
-      meta: { currentPage: 0, pageSize: 0, hasNextPage: false },
+      meta: { 
+        has_next: false,
+        total_returned: 0, 
+        next_offset: 0
+      },
       data: [] as any as T,
     };
   }
 
-  const hasNextPage = data.length > limit;
-  const theData = data.slice(0, limit) as T;
+  const has_next = data.length > params.limit;
+  const theData = data.slice(0, params.limit) as T;
 
   return {
     meta: {
-      currentPage: 1,
-      pageSize: limit,
-      hasNextPage,
+      has_next: has_next,
+      total_returned: data.length,
+      next_offset: has_next ? params.offset + params.limit : 0,
     },
     data: theData,
   };

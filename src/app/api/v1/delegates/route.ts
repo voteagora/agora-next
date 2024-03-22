@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { ZodError, z } from "zod";
 
-import { fetchDelegates } from "@/app/api/common/delegates/getDelegates";
+import { fetchDelegatesApi } from "@/app/api/common/delegates/getDelegates";
 import {
   type Delegate,
   type DelegatePayload,
@@ -23,13 +23,10 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   try {
     const sort = sortValidator.parse(params.get("sort"));
-    console.log("SORT: " + sort);
     const limit = limitValidator.parse(params.get("limit"));
-    console.log("LIMIT: " + limit);
     const offest = offsetValidator.parse(params.get("offset"));
-    console.log("OFFSET: " + offest);
-    const delegatesResult = await fetchDelegates({ sort: sort, page: limit/*, offset: offest*/});
-    return Response.json("{done: true}");
+    const delegatesResult = await fetchDelegatesApi(sort, {limit: limit, offset: offest});
+    return Response.json(delegatesResult);
   }
   catch (e: any) {
     if (e instanceof ZodError) {
