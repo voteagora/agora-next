@@ -11,34 +11,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Determine Tenant Name and Skip Tests if Necessary
-        id: check_tenant
-        run: |
-          if [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next-etherfi" ]]; then
-            echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=etherfi" >> $GITHUB_ENV
-            echo "Skipping tests for etherfi"
-            echo "::set-output name=skip_tests::true"
-          elif [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next-ens" ]]; then
-            echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=ens" >> $GITHUB_ENV
-            echo "Skipping tests for ens"
-            echo "::set-output name=skip_tests::true"
-          elif [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next" ]]; then
-            echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=optimism" >> $GITHUB_ENV
-            echo "Running tests for optimism"
-            echo "::set-output name=skip_tests::false"
-          else
-            echo "No specific tenant identified. Skipping tests."
-            echo "::set-output name=skip_tests::true"
-          fi
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-        if: steps.check_tenant.outputs.skip_tests == 'false'
       - name: Install Playwright
         run: npx playwright install --with-deps
-        if: steps.check_tenant.outputs.skip_tests == 'false'
+      - name: Determine Tenant Name and Control Test Execution
+        id: set_vars
+        run: |
+          echo "PLAYWRIGHT_TEST_BASE_URL=${{ github.event.deployment_status.target_url }}" >> $GITHUB_ENV
+          echo "VERCEL_ENV=${{ github.event.deployment_status.environment }}" >> $GITHUB_ENV
+          if [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next-etherfi" ]]; then
+            echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=etherfi" >> $GITHUB_ENV
+          elif [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next-ens" ]]; then
+            echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=ens" >> $GITHUB_ENV
+          elif [[ "${{ github.event.deployment_status.environment }}" == "Preview – agora-next" ]]; then
+            echo "NEXT_PUBLIC_AGORA_INSTANCE_NAME=optimism" >> $GITHUB_ENV
+          else
+            echo "SKIP_TESTS=true" >> $GITHUB_ENV
+          fi
+      - name: Check if tests should be skipped
+        if: env.SKIP_TESTS == 'true'
+        run: |
+          echo "Skipping tests for tenant $NEXT_PUBLIC_AGORA_INSTANCE_NAME"
+          exit 0
       - name: Run Playwright tests
+        if: env.SKIP_TESTS != 'true'
         run: npx playwright test
-        if: steps.check_tenant.outputs.skip_tests == 'false'
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
           VERCEL_ENV: ${{ github.event.deployment_status.environment }}
