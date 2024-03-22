@@ -100,9 +100,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                       )}
                     </HStack>
                     <h2 className="px-0 py-1 overflow-hidden text-base text-black text-ellipsis">
-                      <a href={`/proposals/${vote.proposal_id}`}>
-                        {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
-                      </a>
+                      {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                     </h2>
                     {vote.proposalType === "APPROVAL" && (
                       <ApprovalVoteContainer {...vote} />
