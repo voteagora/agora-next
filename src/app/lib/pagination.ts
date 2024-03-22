@@ -71,7 +71,7 @@ export async function paginateResultEx<T extends Array<any>>(
   return {
     meta: {
       has_next: has_next,
-      total_returned: data.length,
+      total_returned: data.length - 1,
       next_offset: has_next ? params.offset + params.limit : 0,
     },
     data: theData,

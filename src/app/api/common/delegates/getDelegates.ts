@@ -35,7 +35,12 @@ async function getDelegatesApi(
   const apiDelegatesQuery = (sort: string) =>
   `
     SELECT 
-      *
+      delegates.delegate,
+      num_of_delegators,
+      direct_vp,
+      avp.advanced_vp,
+      voting_power,
+      contract
     FROM 
       ${namespace + ".delegates"}
     LEFT JOIN
@@ -43,7 +48,7 @@ async function getDelegatesApi(
         namespace + ".advanced_voting_power"
       } avp
     ON 
-      avp.delegate = address
+      avp.delegate = delegates.delegate
     WHERE 
       num_of_delegators IS NOT NULl
     ORDER BY 
@@ -76,7 +81,6 @@ async function getDelegatesApi(
     paginatedQuery,
     pagination
   );
-
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatesGetPayload) => {
       return {
