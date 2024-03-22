@@ -16,7 +16,7 @@ export const revalidate = 60;
 
 async function fetchProposals(filter, page = 1) {
   "use server";
-  return apiFetchProposals({filter, page});
+  return apiFetchProposals({ filter, page });
 }
 
 async function fetchNeedsMyVoteProposals(address) {
@@ -152,7 +152,7 @@ export default async function Home() {
         initAllProposals={allProposals}
         fetchProposals={async (page, filter) => {
           "use server";
-          return getProposals({ filter, page });
+          return fetchProposals({ filter, page });
         }}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
