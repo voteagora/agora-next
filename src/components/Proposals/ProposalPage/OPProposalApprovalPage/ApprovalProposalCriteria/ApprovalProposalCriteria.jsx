@@ -11,23 +11,33 @@ export default function ApprovalProposalCriteria({ proposal }) {
 
   return (
     <VStack className="p-4 pb-2 border-t border-gray-200">
-      <HStack
-        justifyContent="justify-between"
-        className="text-xs font-semibold text-gray-700"
-      >
-        <div>
-          QUORUM{" "}
-          <TokenAmountDisplay
-            amount={proposal.quorum}
-            decimals={18}
-            currency="OP"
-          />
-        </div>
-      </HStack>
-      <ProposalStatusDetail
-        proposalStatus={proposal.status}
-        proposalEndTime={proposal.end_time}
-      />
+      <div className="px-4 border border-gray-300 rounded-md">
+        <HStack
+          justifyContent="justify-between"
+          className="text-xs font-semibold text-gray-700 py-2"
+        >
+          <div>
+            Quorum{" "}
+            <TokenAmountDisplay
+              amount={proposal.quorum}
+              decimals={token.decimals}
+              currency={token.symbol}
+            />
+          </div>
+          <div>
+            Current{" "}
+            <TokenAmountDisplay
+              amount={proposalResults.for}
+              decimals={token.decimals}
+              currency={token.symbol}
+            />
+          </div>
+        </HStack>
+        <ProposalStatusDetail
+          proposalStatus={proposal.status}
+          proposalEndTime={proposal.end_time}
+        />
+      </div>
       <div className="pt-2 text-xs font-semibold text-gray-700">
         {/* {totalVotingPower.toString()} */}
         {proposalSettings.criteria === "TOP_CHOICES" && (

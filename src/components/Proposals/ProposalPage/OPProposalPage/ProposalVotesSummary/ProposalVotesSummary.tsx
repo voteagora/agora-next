@@ -5,12 +5,14 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalVotesSummary({
   proposal,
 }: {
   proposal: Proposal;
 }) {
+  const { token } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
   return (
@@ -20,16 +22,16 @@ export default function ProposalVotesSummary({
           FOR{" "}
           <TokenAmountDisplay
             amount={results.for}
-            decimals={18}
-            currency={"OP"}
+            decimals={token.decimals}
+            currency={token.symbol}
           />
         </div>
         <div className="gl_votes_against">
           AGAINST{" "}
           <TokenAmountDisplay
             amount={results.against}
-            decimals={18}
-            currency={"OP"}
+            decimals={token.decimals}
+            currency={token.symbol}
           />
         </div>
       </HStack>
@@ -42,8 +44,8 @@ export default function ProposalVotesSummary({
                 Quorum{" "}
                 <TokenAmountDisplay
                   amount={proposal.quorum}
-                  decimals={18}
-                  currency={"OP"}
+                  decimals={token.decimals}
+                  currency={token.symbol}
                 />
               </div>
             )}
