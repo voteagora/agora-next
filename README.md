@@ -69,7 +69,7 @@ npx prisma db pull
 npx prisma generate
 ```
 
-More information about how to work with the database can be found in the [Database Maunal](https://www.notion.so/argoagora/Database-Manual-7f59ed03bffb4096a2b19e34e2956085)
+More information about how to work with the database can be found in the Database Manual.
 
 ### Typescript vs. Javascript
 
