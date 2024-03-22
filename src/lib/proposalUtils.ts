@@ -2,6 +2,8 @@ import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
+import Tenant from "./tenant/tenant";
+import { TENANT_NAMESPACES } from "./constants";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -180,7 +182,8 @@ export async function parseProposal(
   );
   const proposalResuts = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
-    proposalData
+    proposalData,
+    proposal.start_block
   );
 
   const proposalTypeData =
@@ -473,6 +476,7 @@ export type ParsedProposalResults = {
     kind: {
       for: bigint;
       abstain: bigint;
+      against: bigint;
       options: {
         option: string;
         votes: bigint;
@@ -493,7 +497,8 @@ type ProposalResults = {
 
 export function parseProposalResults(
   proposalResults: string,
-  proposalData: ParsedProposalData[ProposalType]
+  proposalData: ParsedProposalData[ProposalType],
+  startBlock: string
 ): ParsedProposalResults[ProposalType] {
   switch (proposalData.key) {
     case "SNAPSHOT": {
@@ -534,11 +539,34 @@ export function parseProposalResults(
         proposalResults
       ) as ProposalResults;
 
+      const { namespace, contracts } = Tenant.current();
+
+      const standardResults = (() => {
+        if (
+          namespace === TENANT_NAMESPACES.OPTIMISM &&
+          contracts.governor.v6UpgradeBlock &&
+          Number(startBlock) < contracts.governor.v6UpgradeBlock
+        ) {
+          return {
+            for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
+            against: 0n,
+            abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          };
+        }
+
+        return {
+          for: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          against: BigInt(parsedProposalResults.standard?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults.standard?.[2] ?? 0),
+        };
+      })();
+
       return {
         key: "APPROVAL",
         kind: {
-          for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
-          abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          for: standardResults.for,
+          abstain: standardResults.abstain,
+          against: standardResults.against,
           options: proposalData.kind.options.map((option, idx) => {
             return {
               option: option.description,
