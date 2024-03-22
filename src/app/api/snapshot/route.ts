@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { DaoSlug } from "@prisma/client";
+import { NextRequest } from "next/server";
 
 /**
  * This is a basic snapshot indexer. It fetches all proposals from the ENS space
@@ -60,7 +61,15 @@ async function fetchProposals(slug: string) {
   return data.data.items;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get("authorization");
+
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+
   // Only allow this route to be accessed from the ENS namespace
   const slug = Tenant.current().slug;
   if (slug === DaoSlug.ENS) {
@@ -74,6 +83,10 @@ export async function GET() {
           create: { ...proposal, dao_slug: slug },
         });
       }
+
+      console.log(
+        `Snapshot cron executed. Updated: ${proposals.length} proposals`
+      );
 
       return new Response(`Updated: ${proposals.length} proposals`, {
         headers: { "Content-Type": "application/json" },
