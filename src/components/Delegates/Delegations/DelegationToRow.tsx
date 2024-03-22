@@ -5,6 +5,7 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { format } from "date-fns";
+import Link from "next/link";
 
 export default function DelegationToRow({
   delegation,
@@ -20,7 +21,12 @@ export default function DelegationToRow({
       <TableCell>{delegation.type}</TableCell>
       <TableCell>{delegation.amount}</TableCell>
       <TableCell>
-        <HumanAddress address={delegation.to} />
+        <Link
+          href={`/delegates/${delegation.to}`}
+          title={`Address ${delegation.to}`}
+        >
+          <HumanAddress address={delegation.to} />
+        </Link>
       </TableCell>
     </TableRow>
   );
