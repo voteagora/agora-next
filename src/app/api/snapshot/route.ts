@@ -84,6 +84,10 @@ export async function GET(request: NextRequest) {
         });
       }
 
+      console.log(
+        `Snapshot cron executed. Updated: ${proposals.length} proposals`
+      );
+
       return new Response(`Updated: ${proposals.length} proposals`, {
         headers: { "Content-Type": "application/json" },
         status: 200,
