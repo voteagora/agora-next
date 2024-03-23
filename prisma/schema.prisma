@@ -264,7 +264,7 @@ view ensProposals {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType
-  proposal_type_data String?
+  proposal_type_data Json?
   proposal_results   Json?
 
   @@map("proposals")
@@ -371,6 +371,20 @@ view ensAuthorityChainsSnaps {
   @@schema("ens")
 }
 
+view ensProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("ens")
+}
+
 view etherfiDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -432,7 +446,7 @@ view etherfiProposals {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType
-  proposal_type_data String?
+  proposal_type_data Json?
   proposal_results   Json?
 
   @@map("proposals")
@@ -510,6 +524,20 @@ view etherfiAuthorityChainsSnaps {
   balance_ordinal      Decimal? @db.Decimal
 
   @@map("authority_chains_snaps")
+  @@schema("etherfi")
+}
+
+view etherfiProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
   @@schema("etherfi")
 }
 
@@ -746,7 +774,7 @@ view ens_proposals_wrapper {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType?
-  proposal_type_data String?
+  proposal_type_data Json?
   proposal_results   Json?
 
   @@map("proposals_wrapper")
