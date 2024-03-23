@@ -243,7 +243,7 @@ view ensDelegates {
   delegate          String   @unique
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
-  advanced_vp       String?
+  advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates")
@@ -399,7 +399,7 @@ view etherfiDelegates {
   delegate          String   @unique
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
-  advanced_vp       String?
+  advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates")
