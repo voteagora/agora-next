@@ -31,7 +31,7 @@ async function getDelegatesApi(
   pagination: PaginationParamsEx,
   seed?: number
 ): Promise<PaginatedResultEx<any>> {
-  const { namespace } = Tenant.current();
+  const { namespace, slug } = Tenant.current();
   const apiDelegatesQuery = (sort: string) =>
   `
     SELECT 
@@ -40,7 +40,8 @@ async function getDelegatesApi(
       direct_vp,
       avp.advanced_vp,
       voting_power,
-      contract
+      contract,
+      am.address IS NOT NULL as citizen
     FROM 
       ${namespace + ".delegates"}
     LEFT JOIN
@@ -49,8 +50,14 @@ async function getDelegatesApi(
       } avp
     ON 
       avp.delegate = delegates.delegate
+    LEFT JOIN 
+      agora.address_metadata am
+    ON
+      LOWER(am.address) = LOWER(delegates.delegate) AND 
+      am.kind = 'citizen' AND
+      am.dao_slug = $3::config.dao_slug
     WHERE 
-      num_of_delegators IS NOT NULl
+      num_of_delegators IS NOT NULL
     ORDER BY 
       ${sort}
     OFFSET $1
@@ -63,14 +70,16 @@ async function getDelegatesApi(
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           apiDelegatesQuery("num_of_delegators DESC"),
           skip,
-          take
+          take,
+          slug
         );
       case "weighted_random":
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           apiDelegatesQuery("-log(random()) / voting_power"),
           skip,
-          take
+          take,
+          slug
         );
       default:
         throw new Error("Invalid sort order");
@@ -84,7 +93,6 @@ async function getDelegatesApi(
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatesGetPayload) => {
       return {
-        citizen: await fetchIsCitizen(delegate.delegate),
         statement: await fetchDelegateStatement(delegate.delegate),
       };
     })
@@ -101,7 +109,7 @@ async function getDelegatesApi(
         direct: delegate.direct_vp?.toFixed(0),
         advanced: delegate.advanced_vp?.toFixed(0) || "0",
       },
-      citizen: _delegates[index].citizen.length > 0,
+      citizen: delegate.citizen,
       statement: _delegates[index].statement,
     })),
   };    

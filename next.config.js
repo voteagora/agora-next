@@ -27,7 +27,7 @@ const nextConfig = {
       },
       {
         source: '/api/v1/proposals',
-        destination: '404',
+        destination: '/404',
         permanent: true,
       },
     ]
