@@ -1,13 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { ZodError, z } from "zod";
 
+import { authenticateApiUser } from "@/app/lib/middleware/auth";
 import { fetchDelegatesApi } from "@/app/api/common/delegates/getDelegates";
-import {
-  type Delegate,
-  type DelegatePayload,
-  type DelegatesGetPayload,
-} from "@/app/api/common/delegates/delegate";
-
 import { createOptionalNumberValidator, createOptionalStringValidator } from "@/app/api/common/utils/validators";
 
 const DEFAULT_SORT = "most_delegators";
@@ -20,6 +15,12 @@ const limitValidator = createOptionalNumberValidator(1, DEFAULT_MAX_LIMIT, DEFAU
 const offsetValidator = createOptionalNumberValidator(0, Number.MAX_SAFE_INTEGER, DEFAULT_OFFSET);
 
 export async function GET(request: NextRequest) {
+  const authResponse = await authenticateApiUser(request);
+
+  if (!authResponse.authenticated) {
+    return new Response(authResponse.reason, { status: 401 });
+  }
+
   const params = request.nextUrl.searchParams;
   try {
     const sort = sortValidator.parse(params.get("sort"));
