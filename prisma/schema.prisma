@@ -750,7 +750,7 @@ view ens_delegates_wrapper {
   delegate          String?
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
-  advanced_vp       String?
+  advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates_wrapper")
@@ -788,7 +788,7 @@ view etherfi_delegates_wrapper {
   delegate          String?
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
-  advanced_vp       String?
+  advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates_wrapper")
