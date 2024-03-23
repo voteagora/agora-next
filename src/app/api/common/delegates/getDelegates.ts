@@ -40,7 +40,7 @@ async function getDelegatesApi(
       direct_vp,
       avp.advanced_vp,
       voting_power,
-      contract
+      contract,
       am.address IS NOT NULL as citizen
     FROM 
       ${namespace + ".delegates"}
@@ -55,9 +55,9 @@ async function getDelegatesApi(
     ON
       LOWER(am.address) = LOWER(delegates.delegate) AND 
       am.kind = 'citizen' AND
-      am.dao_slug = ${slug}::config.dao_slug
+      am.dao_slug = $3::config.dao_slug
     WHERE 
-      num_of_delegators IS NOT NULl
+      num_of_delegators IS NOT NULL
     ORDER BY 
       ${sort}
     OFFSET $1
@@ -70,14 +70,16 @@ async function getDelegatesApi(
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           apiDelegatesQuery("num_of_delegators DESC"),
           skip,
-          take
+          take,
+          slug
         );
       case "weighted_random":
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           apiDelegatesQuery("-log(random()) / voting_power"),
           skip,
-          take
+          take,
+          slug
         );
       default:
         throw new Error("Invalid sort order");
