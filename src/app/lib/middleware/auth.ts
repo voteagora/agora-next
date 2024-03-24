@@ -11,6 +11,7 @@ const REASON_DISABLED_USER = "User disabled";
 
 export type AuthResponse = {
   authenticated: boolean;
+  userId?: string;
   reason?: string;
 };
 
@@ -71,6 +72,8 @@ export async function authenticateApiUser(request: NextRequest): Promise<AuthRes
       authenticated: false,
       reason: REASON_DISABLED_USER,
     };
+  } else {
+    authResponse.userId = user.id;
   }
 
   return authResponse;
