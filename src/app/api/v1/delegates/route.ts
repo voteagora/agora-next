@@ -23,7 +23,7 @@ const offsetValidator = createOptionalNumberValidator(0, Number.MAX_SAFE_INTEGER
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
-  setCurrentSpanAttributes({ user_id: authResponse.userId })
+  setCurrentSpanAttributes({ "user_id": authResponse.userId })
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.reason, { status: 401 });

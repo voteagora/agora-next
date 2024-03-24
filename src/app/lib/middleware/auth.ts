@@ -42,6 +42,7 @@ function hashApiKey(apiKey: string) {
 
 export async function authenticateApiUser(request: NextRequest): Promise<AuthResponse> {
   let prisma: any;
+  // Needed for Vercel middleware to run in non-node runtime
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     prismaModule = await import("@/app/lib/prisma");
     prisma = prismaModule.default;
