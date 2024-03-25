@@ -9,11 +9,7 @@ import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import {
-  type Delegate,
-  type DelegatePayload,
-  type DelegatesGetPayload,
-} from "./delegate";
+import { type Delegate, type DelegatesGetPayload } from "./delegate";
 import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
@@ -64,7 +60,7 @@ async function getDelegates({
             take
           );
         default:
-          return (prisma as any)[`${namespace}Delegates`].findMany({
+          return prisma[`${namespace}Delegates`].findMany({
             skip,
             take,
             orderBy: {
@@ -78,7 +74,7 @@ async function getDelegates({
   );
 
   const _delegates = await Promise.all(
-    delegates.map(async (delegate: DelegatePayload) => {
+    delegates.map(async (delegate) => {
       return {
         citizen: await fetchIsCitizen(delegate.delegate),
         statement: await fetchDelegateStatement(delegate.delegate),
@@ -88,7 +84,7 @@ async function getDelegates({
 
   return {
     meta,
-    delegates: delegates.map((delegate: DelegatePayload, index: number) => ({
+    delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: _delegates[index].citizen.length > 0,
