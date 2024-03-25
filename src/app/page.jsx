@@ -1,8 +1,12 @@
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
-import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
+import {
+  fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals,
+} from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
+import {
+  fetchGovernanceCalendar as apiFetchGovernanceCalendar,
+} from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
@@ -45,23 +49,46 @@ export async function generateMetadata({}, parent) {
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
-    title
+    title,
   )}&description=${encodeURIComponent(description)}`;
 
   return {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [{
+        url: preview,
+        width: 1200,
+        height: 630,
+      }],
     },
     other: {
       ["twitter:card"]: "summary_large_image",
       ["twitter:title"]: title,
       ["twitter:description"]: description,
-      ["twitter:image"]: preview,
     },
   };
 }
+
+<meta name="description" content="Home of token governance" />;
+<meta name="twitter:card" content="summary_large_image" />;
+<meta name="twitter:title" content="ENS Agora" />;
+
+<meta name="twitter:description" content="Home of token governance" />;
+<meta name="twitter:image"
+      content="/api/images/og/proposals?title=ENS%20Agora&amp;description=Home%20of%20token%20governance" />;
+<meta property="og:title" content="ENS Agora" />;
+<meta property="og:description" content="Home of token governance" />;
+<meta property="og:image"
+      content="http://localhost:3000/api/images/og/proposals?title=ENS%20Agora&amp;description=Home%20of%20token%20governance" />;
+<meta name="twitter:card" content="summary_large_image" />;
+
+<meta name="twitter:title" content="ENS Agora" />;
+<meta name="twitter:description" content="Home of token governance" />;
+<meta name="twitter:image"
+      content="http://localhost:3000/api/images/og/proposals?title=ENS%20Agora&amp;description=Home%20of%20token%20governance" />;
+<link rel="icon" href="/icon.png?024e64dc39023b00" type="image/png" sizes="32x32" />;
+
 
 export default async function Home() {
   // NOTE: This is a temporary placeholder for Ether.fi
@@ -79,7 +106,8 @@ export default async function Home() {
                   Live – ETHFI token launch
                 </div>
                 <div>
-                  <div className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
+                  <div
+                    className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
                   On March 18th, we’re launching the $ETHFI token and taking the
                   first step towards full decentralization.
                 </div>
@@ -111,7 +139,7 @@ export default async function Home() {
               </div>
               <div>
                 <div className="text-sm text-stone-600 font-medium">
-                  Phase 3 – Full Ossification
+                  Phase 3 – Full Ossification
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
                 <div>
@@ -130,10 +158,10 @@ export default async function Home() {
 
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
-    proposalsFilterOptions.relevant.filter
+    proposalsFilterOptions.relevant.filter,
   );
   const allProposals = await fetchProposals(
-    proposalsFilterOptions.everything.filter
+    proposalsFilterOptions.everything.filter,
   );
 
   const metrics = await fetchDaoMetrics();
