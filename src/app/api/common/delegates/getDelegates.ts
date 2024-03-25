@@ -1,4 +1,9 @@
-import { paginateResult } from "@/app/lib/pagination";
+import {
+  paginateResult,
+  paginateResultEx,
+  type PaginatedResultEx,
+  type PaginationParamsEx,
+} from "@/app/lib/pagination";
 import {
   OptimismAdvancedVotingPower,
   OptimismDelegates,
@@ -9,13 +14,114 @@ import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { type Delegate, type DelegatesGetPayload } from "./delegate";
+import {
+  type Delegate,
+  type DelegatePayload,
+  type DelegatesGetPayload,
+  type DelegateStats,
+} from "./delegate";
 import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
+async function getDelegatesApi(
+  sort: string,
+  pagination: PaginationParamsEx,
+  seed?: number
+): Promise<PaginatedResultEx<any>> {
+  const { namespace, slug } = Tenant.current();
+  const apiDelegatesQuery = (sort: string) =>
+  `
+    SELECT 
+      delegates.delegate,
+      num_of_delegators,
+      direct_vp,
+      avp.advanced_vp,
+      voting_power,
+      contract,
+      am.address IS NOT NULL as citizen
+    FROM 
+      ${namespace + ".delegates"}
+    LEFT JOIN
+      ${
+        namespace + ".advanced_voting_power"
+      } avp
+    ON 
+      avp.delegate = delegates.delegate
+    LEFT JOIN 
+      agora.address_metadata am
+    ON
+      LOWER(am.address) = LOWER(delegates.delegate) AND 
+      am.kind = 'citizen' AND
+      am.dao_slug = $3::config.dao_slug
+    WHERE 
+      num_of_delegators IS NOT NULL
+    ORDER BY 
+      ${sort}
+    OFFSET $1
+    LIMIT $2;
+  `;
+  // TODO: voting power sort, others
+  const paginatedQuery = async (skip: number, take: number) => {
+    switch (sort) {
+      case "most_delegators":
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          apiDelegatesQuery("num_of_delegators DESC"),
+          skip,
+          take,
+          slug
+        );
+      case "weighted_random":
+        await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          apiDelegatesQuery("-log(random()) / voting_power"),
+          skip,
+          take,
+          slug
+        );
+      default:
+        throw new Error("Invalid sort order");
+    }
+  };
+
+  const { meta, data: delegates } = await paginateResultEx(
+    paginatedQuery,
+    pagination
+  );
+  const _delegates = await Promise.all(
+    delegates.map(async (delegate: DelegatesGetPayload) => {
+      return {
+        statement: await fetchDelegateStatement(delegate.delegate),
+      };
+    })
+  );
+
+  // Voting power detail added for use with API, so as to not break existing
+  // components
+  return {
+    meta,
+    data: delegates.map((delegate: any, index: number) => ({
+      address: delegate.delegate,
+      votingPower: {
+        total: delegate.voting_power?.toFixed(0),
+        direct: delegate.direct_vp?.toFixed(0),
+        advanced: delegate.advanced_vp?.toFixed(0) || "0",
+      },
+      citizen: delegate.citizen,
+      statement: _delegates[index].statement,
+    })),
+  };    
+}
+
+/*
+ * Fetches a list of delegates
+ * @param page - the page number to fetch
+ * @param sort - the sort order
+ * @param seed - the seed for random sorting
+ * @returns - a list of delegates
+ */
 async function getDelegates({
   page = 1,
   sort = "weighted_random",
@@ -28,12 +134,11 @@ async function getDelegates({
   const pageSize = 20;
   const { namespace } = Tenant.current();
 
-  const { meta, data: delegates } = await paginateResult(
-    async (skip: number, take: number) => {
-      switch (sort) {
-        case "most_delegators":
-          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-            `
+  const paginatedQuery = async (skip: number, take: number) => {
+    switch (sort) {
+      case "most_delegators":
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
             SELECT *
             FROM ${namespace + ".delegates"}
             WHERE num_of_delegators IS NOT NULl
@@ -41,13 +146,13 @@ async function getDelegates({
             OFFSET $1
             LIMIT $2;
             `,
-            skip,
-            take
-          );
-        case "weighted_random":
-          await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-          return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-            `
+          skip,
+          take
+        );
+      case "weighted_random":
+        await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
             SELECT *
             FROM ${namespace + ".delegates"}
             WHERE voting_power > 0
@@ -55,24 +160,26 @@ async function getDelegates({
             OFFSET $2
             LIMIT $3;
             `,
-            seed,
-            skip,
-            take
-          );
-        default:
-          return prisma[`${namespace}Delegates`].findMany({
-            skip,
-            take,
-            orderBy: {
-              voting_power: "desc",
-            },
-          });
-      }
-    },
+          seed,
+          skip,
+          take
+        );
+      // TODO unclear if this schema is actually the same as the others
+      default:
+        return (prisma as any)[`${namespace}Delegates`].findMany({
+          skip,
+          take,
+          orderBy: {
+            voting_power: "desc",
+          },
+        });
+    }
+  };
+  const { meta, data: delegates } = await paginateResult<DelegatesGetPayload[]>(
+    paginatedQuery,
     page,
     pageSize
   );
-
   const _delegates = await Promise.all(
     delegates.map(async (delegate) => {
       return {
@@ -82,6 +189,8 @@ async function getDelegates({
     })
   );
 
+  // Voting power detail added for use with API, so as to not break existing
+  // components
   return {
     meta,
     delegates: delegates.map((delegate, index) => ({
@@ -93,19 +202,6 @@ async function getDelegates({
     seed,
   };
 }
-
-type DelegateStats = {
-  voter: OptimismVoterStats["voter"];
-  proposals_voted: OptimismVoterStats["proposals_voted"];
-  for: OptimismVoterStats["for"];
-  against: OptimismVoterStats["against"];
-  abstain: OptimismVoterStats["abstain"];
-  participation_rate: OptimismVoterStats["participation_rate"];
-  last_10_props: OptimismVoterStats["last_10_props"];
-  voting_power: OptimismVotingPower["voting_power"];
-  advanced_vp: OptimismAdvancedVotingPower["advanced_vp"];
-  num_of_delegators: OptimismDelegates["num_of_delegators"];
-};
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace, contracts } = Tenant.current();
@@ -216,5 +312,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
+export const fetchDelegatesApi = cache(getDelegatesApi);
 export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
