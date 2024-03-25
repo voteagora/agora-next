@@ -9,11 +9,7 @@ import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import {
-  type Delegate,
-  type DelegatePayload,
-  type DelegatesGetPayload,
-} from "./delegate";
+import { type Delegate, type DelegatesGetPayload } from "./delegate";
 import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";

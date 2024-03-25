@@ -1,4 +1,4 @@
-import { type AdvancedDelegationPayload, type Delegation } from "./delegation";
+import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
