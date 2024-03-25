@@ -171,7 +171,7 @@ export default async function DraftProposalPage({
         createGithubProposal={createGithubProposal}
         saveSocialProposalOptions={saveSocialProposalOptions}
       />
-      <DraftProposalChecklist />
+      <DraftProposalChecklist proposal={proposalDraft} />
     </div>
   );
 }
