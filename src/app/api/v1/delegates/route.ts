@@ -3,6 +3,12 @@ import { ZodError, z } from "zod";
 
 import { authenticateApiUser } from "@/app/lib/middleware/auth";
 import { fetchDelegatesApi } from "@/app/api/common/delegates/getDelegates";
+import {
+  type Delegate,
+  type DelegatePayload,
+  type DelegatesGetPayload,
+} from "@/app/api/common/delegates/delegate";
+
 import { createOptionalNumberValidator, createOptionalStringValidator } from "@/app/api/common/utils/validators";
 
 const DEFAULT_SORT = "most_delegators";

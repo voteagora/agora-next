@@ -232,7 +232,7 @@ async function getVotesForProposalAndDelegate({
   address: string;
 }) {
   const { namespace } = Tenant.current();
-  const votes = await (prisma as any)[`${namespace}Votes`].findMany({
+  const votes = await prisma[`${namespace}Votes`].findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
@@ -253,4 +253,6 @@ async function getVotesForProposalAndDelegate({
 export const fetchVotesForDelegate = cache(getVotesForDelegate);
 export const fetchVotesForProposal = cache(getVotesForProposal);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
-export const fetchVotesForProposalAndDelegate = cache(getVotesForProposalAndDelegate);
+export const fetchVotesForProposalAndDelegate = cache(
+  getVotesForProposalAndDelegate
+);
