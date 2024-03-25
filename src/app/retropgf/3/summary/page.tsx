@@ -39,7 +39,6 @@ export async function generateMetadata() {
 }
 
 export default function Page() {
-
   const { ui } = Tenant.current();
 
   if (!ui.toggle("retropgf")) {

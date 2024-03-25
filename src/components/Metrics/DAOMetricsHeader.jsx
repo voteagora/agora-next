@@ -41,7 +41,7 @@ export default function DAOMetricsHeader({ metrics }) {
                 "text-xs text-gray-4f font-inter font-medium",
                 `transition-all duration-200 ease-in-out transform ${
                   visible ? "translate-y-0" : "translate-y-10"
-                } sm:transition-none sm:translate-y-0`,
+                } sm:transition-none sm:translate-y-0`
               )}
             >
               <div
@@ -65,9 +65,8 @@ export default function DAOMetricsHeader({ metrics }) {
                 />
               </div>
               <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div
-                className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
-                {bugsLink &&
+              <div className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+                {bugsLink && (
                   <a
                     href={bugsLink.url}
                     rel="noreferrer nonopener"
@@ -75,9 +74,11 @@ export default function DAOMetricsHeader({ metrics }) {
                   >
                     {bugsLink.title}
                   </a>
-                }
-                {changeLogLink && <Link href={changeLogLink.url}>{changeLogLink.title}</Link>}
-                {faqLink &&
+                )}
+                {changeLogLink && (
+                  <Link href={changeLogLink.url}>{changeLogLink.title}</Link>
+                )}
+                {faqLink && (
                   <a
                     href={faqLink.url}
                     rel="noreferrer nonopener"
@@ -85,9 +86,9 @@ export default function DAOMetricsHeader({ metrics }) {
                   >
                     {faqLink.title}
                   </a>
-                }
+                )}
 
-                {discordLink &&
+                {discordLink && (
                   <a
                     href={discordLink.url}
                     rel="noreferrer nonopener"
@@ -96,11 +97,11 @@ export default function DAOMetricsHeader({ metrics }) {
                   >
                     <Image src={discord} alt={discordLink.title} />
                   </a>
-                }
+                )}
               </div>
             </div>
           </div>,
-          document.body,
+          document.body
         )}
       </>
     );

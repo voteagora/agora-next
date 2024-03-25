@@ -9,7 +9,7 @@ import React from "react";
 async function fetchProposal(proposal_id) {
   "use server";
   return {
-    proposal: await apiFetchProposal(proposal_id)
+    proposal: await apiFetchProposal(proposal_id),
   };
 }
 

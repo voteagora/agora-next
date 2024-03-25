@@ -1,7 +1,6 @@
 import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 
-
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
   const page = tenant.ui.page("delegates");
