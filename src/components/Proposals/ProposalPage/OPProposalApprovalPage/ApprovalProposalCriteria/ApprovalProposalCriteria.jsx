@@ -43,9 +43,9 @@ export default function ApprovalProposalCriteria({ proposal }) {
         {proposalSettings.criteria === "TOP_CHOICES" && (
           <p>
             In this top-choices style proposal, the top{" "}
-            {proposalSettings.maxApprovals} options will be executed. Voters can
-            select up to {proposalSettings.maxApprovals} options. If the quorum
-            is not met, no options will be executed.
+            {proposalSettings.criteriaValue} options will be executed. Voters
+            can select up to {proposalSettings.maxApprovals} options. If the
+            quorum is not met, no options will be executed.
           </p>
         )}
         {proposalSettings.criteria === "THRESHOLD" && (
