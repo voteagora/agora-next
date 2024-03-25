@@ -39,11 +39,12 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
           <TabsTrigger className="text-2xl" value="delegates">
             Delegates
           </TabsTrigger>
-          {hasCitizens && (
-            <TabsTrigger className="text-2xl" value="citizens">
-              Citizens
-            </TabsTrigger>
-          )}
+          <TabsTrigger
+            className={`text-2xl ${hasCitizens ? "flex" : "hidden"}`}
+            value="citizens"
+          >
+            Citizens
+          </TabsTrigger>
         </TabsList>
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />
