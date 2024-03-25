@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion-proposal-draft";
 import DraftProposalReview from "./DraftProposalReview";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { LinkIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ProposalDraftWithTransactions } from "./types";
@@ -25,12 +25,18 @@ interface DraftProposalFormSubmitProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
+  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
 const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
   props
 ) => {
-  const { proposalState, setProposalState, updateProposal } = props;
+  const {
+    proposalState,
+    setProposalState,
+    updateProposal,
+    getProposalChecklist,
+  } = props;
 
   const handleCopySponsorsipLink = () => {
     navigator.clipboard.writeText(
@@ -56,6 +62,7 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
             proposalState={proposalState}
             setProposalState={setProposalState}
             updateProposal={updateProposal}
+            getProposalChecklist={getProposalChecklist}
           />
         </AccordionContent>
       </AccordionItem>

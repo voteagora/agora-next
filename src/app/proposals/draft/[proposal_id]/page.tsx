@@ -3,6 +3,7 @@ import DraftProposalForm from "@/components/ProposalLifecycle/DraftProposalForm"
 import React from "react";
 import prisma from "@/app/lib/prisma";
 import {
+  ProposalChecklist,
   ProposalDraft,
   ProposalDraftOption,
   ProposalDraftTransaction,
@@ -146,6 +147,20 @@ async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
   return result;
 }
 
+async function getProposalChecklist(
+  proposal_id: string
+): Promise<ProposalChecklist[]> {
+  "use server";
+
+  const proposalChecklist = await prisma.proposalChecklist.findMany({
+    where: {
+      proposal_id: Number(proposal_id),
+    },
+  });
+
+  return proposalChecklist;
+}
+
 export default async function DraftProposalPage({
   params: { proposal_id },
 }: {
@@ -170,6 +185,7 @@ export default async function DraftProposalPage({
         deleteTransaction={deleteTransaction}
         createGithubProposal={createGithubProposal}
         saveSocialProposalOptions={saveSocialProposalOptions}
+        getProposalChecklist={getProposalChecklist}
       />
       <DraftProposalChecklist proposal={proposalDraft} />
     </div>

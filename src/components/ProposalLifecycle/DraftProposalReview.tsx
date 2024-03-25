@@ -6,7 +6,7 @@ import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist
 import { useEnsAddress, useEnsAvatar } from "wagmi";
 import { CheckmarkIcon } from "react-hot-toast";
 import { DebounceInput } from "react-debounce-input";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 
@@ -19,6 +19,7 @@ interface DraftProposalReviewProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
+  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
 const staticText = {
@@ -27,7 +28,12 @@ const staticText = {
 };
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { proposalState, setProposalState, updateProposal } = props;
+  const {
+    proposalState,
+    setProposalState,
+    updateProposal,
+    getProposalChecklist,
+  } = props;
 
   const [sponsorInput, setSponsorInput] = useState<string>("");
 
@@ -152,7 +158,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
           <p className="text-gray-4f max-w-[620px]">
             {staticText.submitRequirement}
           </p>
-          <DraftProposalFormSubmitChecklist proposalState={proposalState} />
+          <DraftProposalFormSubmitChecklist
+            proposalState={proposalState}
+            getProposalChecklist={getProposalChecklist}
+          />
           <div className="flex flex-row w-full gap-x-16">
             <div className="flex flex-col w-full">
               <label className="font-medium text-sm mb-1">Select sponsor</label>

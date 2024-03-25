@@ -7,7 +7,11 @@ import DraftProposalFormTempCheck from "./DraftProposalFormTempCheck";
 import DraftProposalFormCreate from "./DraftProposalFormCreate";
 import DraftProposalFormSubmit from "./DraftProposalFormSubmit";
 
-import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import {
+  ProposalChecklist,
+  ProposalDraft,
+  ProposalDraftTransaction,
+} from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import DraftProposalContactVoters from "./DraftProposalFormContactVoters";
 
@@ -45,6 +49,7 @@ interface DraftProposalFormProps {
     proposal: ProposalDraft,
     options: string[]
   ) => Promise<void>;
+  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
@@ -57,6 +62,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
     deleteTransaction,
     createGithubProposal,
     saveSocialProposalOptions,
+    getProposalChecklist,
   } = props;
 
   const [proposalState, setProposalState] =
@@ -111,6 +117,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           proposalState={proposalState}
           setProposalState={setProposalState}
           updateProposal={updateProposal}
+          getProposalChecklist={getProposalChecklist}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalContactVoters

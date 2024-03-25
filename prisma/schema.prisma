@@ -301,6 +301,7 @@ model ProposalDraft {
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
   proposal_status             DaoProposalStatus          @relation(fields: [proposal_status_id], references: [id], onDelete: Restrict)
   ProposalDraftOption         ProposalDraftOption[]
+  ProposalChecklist           ProposalChecklist[]
 
   @@map("proposals")
   @@schema("test")
@@ -344,6 +345,18 @@ model ProposalStatus {
   DaoProposalStatus DaoProposalStatus[]
 
   @@map("proposal_status")
+  @@schema("test")
+}
+
+model ProposalChecklist {
+  id           Int           @id @default(autoincrement())
+  stage        String
+  completed_at DateTime      @default(now())
+  completed_by String
+  proposal_id  Int
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+
+  @@map("proposal_checklist")
   @@schema("test")
 }
 
