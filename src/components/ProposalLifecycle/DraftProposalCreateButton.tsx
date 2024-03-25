@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
+import { useAccount } from "wagmi";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -30,6 +31,11 @@ interface DraftProposalCreateButtonProps {
     proposal: ProposalDraft,
     options: string[]
   ) => Promise<void>;
+  registerChecklistEvent: (
+    proposal_id: string,
+    stage: string,
+    completed_by: string
+  ) => void;
 }
 
 const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
@@ -44,12 +50,22 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     createGithubProposal,
     saveSocialProposalOptions,
     options,
+    registerChecklistEvent,
   } = props;
 
+  const { address } = useAccount();
+
   const handleContinue = async () => {
+    if (!address) return;
     const updatedProposal = await updateProposal(proposalState, {
       proposal_status_id: 3,
     });
+
+    registerChecklistEvent(
+      proposalState.id.toString(),
+      "draft_created",
+      address
+    );
 
     setProposalState({
       ...updatedProposal,
@@ -58,6 +74,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   };
 
   const saveAndUpdateDocs = async () => {
+    if (!address) return;
     if (proposalState.proposal_type === "social") {
       await saveSocialProposalOptions(
         proposalState,
@@ -69,9 +86,12 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     }
 
     // TODO save / run validation etc
-    const prLink = await createGithubProposal(proposalState);
+    // todo bring back, something on GH side broke
+    // const prLink = await createGithubProposal(proposalState);
 
-    alert("Proposal created! " + prLink);
+    registerChecklistEvent(proposalState.id.toString(), "update_docs", address);
+
+    // alert("Proposal created! " + prLink);
   };
 
   return (
@@ -86,7 +106,8 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                 disabled={
                   !proposalState.title ||
                   !proposalState.description ||
-                  !proposalState.abstract
+                  !proposalState.abstract ||
+                  !address
                 }
               >
                 <span className="text-center">Create draft</span>
@@ -106,6 +127,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                 <button
                   className={`w-full py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
                   onClick={handleContinue}
+                  disabled={!address}
                 >
                   Continue
                 </button>

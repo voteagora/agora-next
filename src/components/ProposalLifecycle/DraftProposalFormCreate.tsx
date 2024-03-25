@@ -67,6 +67,11 @@ interface DraftProposalFormCreateProps {
     proposal: ProposalDraft,
     options: string[]
   ) => Promise<void>;
+  registerChecklistEvent: (
+    proposal_id: string,
+    stage: string,
+    completed_by: string
+  ) => void;
 }
 
 const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
@@ -78,6 +83,7 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
     updateProposal,
     createGithubProposal,
     saveSocialProposalOptions,
+    registerChecklistEvent,
   } = props;
 
   type Option = {
@@ -136,6 +142,7 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
               addTransaction={props.addTransaction}
               updateTransaction={props.updateTransaction}
               deleteTransaction={props.deleteTransaction}
+              registerChecklistEvent={registerChecklistEvent}
             />
           ) : (
             <DraftProposalSocialVotingStrategy
@@ -157,6 +164,7 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
             createGithubProposal={createGithubProposal}
             saveSocialProposalOptions={saveSocialProposalOptions}
             options={socialVotingStrategyOptions}
+            registerChecklistEvent={registerChecklistEvent}
           />
         </AccordionContent>
       </AccordionItem>

@@ -10,6 +10,7 @@ import {
 
 import { ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
+import { useAccount } from "wagmi";
 
 const staticText = {
   heading: "Create a temp check on Discourse",
@@ -26,12 +27,24 @@ interface DraftProposalFormTempCheckProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
+  registerChecklistEvent: (
+    proposal_id: string,
+    stage: string,
+    completed_by: string
+  ) => void;
 }
 
 const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   props
 ) => {
-  const { proposalState, setProposalState, updateProposal } = props;
+  const {
+    proposalState,
+    setProposalState,
+    updateProposal,
+    registerChecklistEvent,
+  } = props;
+
+  const { address } = useAccount();
 
   const validateTempCheckLink = (link: string) => {
     // check if starts with "https://discuss.ens.domains/"
@@ -48,10 +61,14 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
   );
 
   const saveAndContinue = async () => {
+    if (!address) return;
+
     const updatedProposal = await updateProposal(proposalState, {
       temp_check_link: tempCheckInput,
       proposal_status_id: 2,
     });
+
+    registerChecklistEvent(proposalState.id.toString(), "temp_check", address);
 
     setProposalState({
       ...updatedProposal,
@@ -109,7 +126,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
               </button>
               <button
                 className={`py-3 px-6 border border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
-                disabled={!isValidDiscourseLink}
+                disabled={!isValidDiscourseLink || !address}
                 onClick={() => saveAndContinue()}
               >
                 Continue

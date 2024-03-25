@@ -50,6 +50,11 @@ interface DraftProposalFormProps {
     options: string[]
   ) => Promise<void>;
   getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
+  registerChecklistEvent: (
+    proposal_id: string,
+    stage: string,
+    completed_by: string
+  ) => void;
 }
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
@@ -63,6 +68,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
     createGithubProposal,
     saveSocialProposalOptions,
     getProposalChecklist,
+    registerChecklistEvent,
   } = props;
 
   const [proposalState, setProposalState] =
@@ -99,6 +105,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           proposalState={proposalState}
           setProposalState={setProposalState}
           updateProposal={updateProposal}
+          registerChecklistEvent={registerChecklistEvent}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormCreate
@@ -111,6 +118,7 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
           deleteTransaction={deleteTransaction}
           createGithubProposal={createGithubProposal}
           saveSocialProposalOptions={saveSocialProposalOptions}
+          registerChecklistEvent={registerChecklistEvent}
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalFormSubmit

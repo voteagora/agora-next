@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAccount } from "wagmi";
 
 interface DraftProposalTransactionProps {
   label: string;
@@ -34,6 +35,11 @@ interface DraftProposalTransactionProps {
   deleteTransaction: (
     transactionId: number
   ) => Promise<ProposalDraftTransaction[]>;
+  registerChecklistEvent: (
+    proposal_id: string,
+    stage: string,
+    completed_by: string
+  ) => void;
 }
 
 const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
@@ -47,6 +53,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
     addTransaction,
     updateTransaction,
     deleteTransaction,
+    registerChecklistEvent,
   } = props;
 
   const [transactions, setTransactions] = useState<ProposalDraftTransaction[]>(
@@ -214,6 +221,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
             label="Transaction validity"
             placeholder="Permits depositing ETH on Compound v3"
             proposalState={proposalState}
+            registerChecklistEvent={registerChecklistEvent}
           />
           <DraftProposalTransactionAuditPayload />
         </div>
@@ -395,18 +403,26 @@ interface DraftProposalTransactionValidityProps {
   label: string;
   placeholder: string;
   proposalState: ProposalDraftWithTransactions;
+  registerChecklistEvent: (
+    proposal_id: string,
+    stage: string,
+    completed_by: string
+  ) => void;
 }
 
 const DraftProposalTransactionValidity: React.FC<
   DraftProposalTransactionValidityProps
 > = (props) => {
-  const { label, placeholder, proposalState } = props;
+  const { label, placeholder, proposalState, registerChecklistEvent } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"Unconfirmed" | "Valid" | "Invalid">(
     "Unconfirmed"
   );
 
+  const { address } = useAccount();
+
   async function simulate() {
+    if (!address) return;
     // call tha backend /simulate endpoint
     setIsLoading(true);
 
@@ -455,6 +471,11 @@ const DraftProposalTransactionValidity: React.FC<
     }
 
     setIsLoading(false);
+    registerChecklistEvent(
+      proposalState.id.toString(),
+      "transaction_simulation",
+      address
+    );
   }
 
   return (
@@ -467,6 +488,7 @@ const DraftProposalTransactionValidity: React.FC<
         <button
           className="py-3 px-5 font-semibold border border-gray-eo placeholder-gray-af bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
           onClick={() => simulate()}
+          disabled={!address}
         >
           Simulate all
         </button>

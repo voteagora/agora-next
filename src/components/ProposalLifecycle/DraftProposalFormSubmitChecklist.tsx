@@ -31,7 +31,7 @@ const DraftProposalFormSubmitChecklist: React.FC<
       (check) => check.stage === "draft_created"
     );
     const ensDocsData = tempProposalChecklist.find(
-      (check) => check.stage === "ens_docs"
+      (check) => check.stage === "update_docs"
     );
     setTempCheckData(tempCheckData);
     setTransactionSimulationData(transactionSimulationData);

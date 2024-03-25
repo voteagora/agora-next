@@ -161,6 +161,23 @@ async function getProposalChecklist(
   return proposalChecklist;
 }
 
+async function registerChecklistEvent(
+  proposal_id: string,
+  stage: string,
+  completed_by: string
+): Promise<void> {
+  "use server";
+
+  await prisma.proposalChecklist.create({
+    data: {
+      proposal_id: Number(proposal_id),
+      stage: stage,
+      completed_by: completed_by,
+      completed_at: new Date(),
+    },
+  });
+}
+
 export default async function DraftProposalPage({
   params: { proposal_id },
 }: {
@@ -186,6 +203,7 @@ export default async function DraftProposalPage({
         createGithubProposal={createGithubProposal}
         saveSocialProposalOptions={saveSocialProposalOptions}
         getProposalChecklist={getProposalChecklist}
+        registerChecklistEvent={registerChecklistEvent}
       />
       <DraftProposalChecklist proposal={proposalDraft} />
     </div>
