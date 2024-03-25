@@ -21,11 +21,19 @@ export default function OPStandardProposalStatus({ proposal }) {
         justifyContent="space-between"
       >
         <div>
-          {TokenAmountDisplay(proposal.proposalResults.for, 18, "")} For
+          {TokenAmountDisplay({
+            amount: proposal.proposalResults.for,
+            currency: "",
+          })}{" "}
+          For
         </div>
         <div>–</div>
         <div>
-          {TokenAmountDisplay(proposal.proposalResults.against, 18, "")} Against
+          {TokenAmountDisplay({
+            amount: proposal.proposalResults.against,
+            currency: "",
+          })}{" "}
+          Against
         </div>
       </HStack>
 

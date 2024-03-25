@@ -146,7 +146,7 @@ function SingleVote({ vote }: { vote: Vote }) {
           {" voted for"}
         </div>
         <div className={"font-semibold text-gray-700"}>
-          <TokenAmountDisplay amount={weight} decimals={18} currency="OP" />
+          <TokenAmountDisplay amount={weight} />
         </div>
       </HStack>
       <VStack className={"text-xs leading-4 mb-2"}>

@@ -7,12 +7,7 @@ export default function OptionDescription({ description, value, target }) {
 
   return (
     <span>
-      {"//"} {description} requesting{" "}
-      <TokenAmountDisplay
-        amount={value}
-        decimals={token.decimals}
-        currency={token.symbol}
-      />{" "}
+      {"//"} {description} requesting <TokenAmountDisplay amount={value} />{" "}
       transfer to {shortAddress(target)}
     </span>
   );

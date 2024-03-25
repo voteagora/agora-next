@@ -86,11 +86,7 @@ function CastVoteDialogContents({
           </VStack>
           <VStack alignItems="items-end">
             <div className={styles.subtitle}>with</div>
-            <TokenAmountDisplay
-              amount={vpToDisplay}
-              decimals={18}
-              currency="OP"
-            />
+            <TokenAmountDisplay amount={vpToDisplay} />
           </VStack>
         </HStack>
         <div className={styles.reason_box}>
@@ -126,11 +122,7 @@ function CastVoteDialogContents({
             </VStack>
             <VStack alignItems="items-end">
               <div className={styles.subtitle}>with</div>
-              <TokenAmountDisplay
-                amount={vpToDisplay}
-                decimals={18}
-                currency="OP"
-              />
+              <TokenAmountDisplay amount={vpToDisplay} />
             </VStack>
           </HStack>
           <div className={styles.reason_box}>
@@ -144,11 +136,7 @@ function CastVoteDialogContents({
             {delegate.statement ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDisplay
-                  amount={vpToDisplay}
-                  decimals={18}
-                  currency="OP"
-                />
+                <TokenAmountDisplay amount={vpToDisplay} />
               </VoteButton>
             ) : (
               <NoStatementView closeDialog={closeDialog} />
@@ -232,7 +220,11 @@ export function SuccessMessage({
 export function LoadingVote() {
   return (
     <VStack className={styles.full_width}>
-      <img src={`/images/action-pending.svg`} className="w-full mb-3" alt="Vote pending" />
+      <img
+        src={`/images/action-pending.svg`}
+        className="w-full mb-3"
+        alt="Vote pending"
+      />
       <div className="mb-2 text-2xl font-black">Casting your vote</div>
       <div className="mb-5 text-sm text-gray-700">
         It might take up to a minute for the changes to be reflected.

@@ -1,16 +1,18 @@
 import { formatNumber } from "@/lib/utils";
 import { BigNumberish } from "ethers";
 import React, { useMemo } from "react";
+import Tenant from "@/lib/tenant/tenant";
+const { token } = Tenant.current();
 
 export default function TokenAmountDisplay({
   amount,
-  decimals,
-  currency,
+  decimals = token.decimals,
+  currency = token.symbol,
   maximumSignificantDigits = 2,
 }: {
   amount: BigNumberish;
-  decimals: number;
-  currency: string;
+  decimals?: number;
+  currency?: string;
   maximumSignificantDigits?: number;
 }) {
   const formattedNumber = useMemo(() => {
