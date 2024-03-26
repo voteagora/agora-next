@@ -90,16 +90,6 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
-  console.log(
-    "data",
-    data,
-    isLoading,
-    isSuccess,
-    isError,
-    missingVote,
-    localMissingVote
-  );
-
   useEffect(() => {
     if (
       missingVote == "BOTH" &&
