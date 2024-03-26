@@ -74,6 +74,34 @@ model SnapshotProposal {
   @@schema("snapshot")
 }
 
+model api_user {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  api_key     String?   @unique @default(dbgenerated("gen_random_uuid()"))
+  email       String?
+  address     String
+  chain_id    String
+  description String?
+  enabled     Boolean?  @default(true)
+  created_at  DateTime? @default(now()) @db.Date
+  updated_at  DateTime? @default(now()) @db.Date
+  chain       chain     @relation(fields: [chain_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([address, chain_id])
+  @@index([address], map: "idx_api_user_address")
+  @@index([api_key], map: "idx_api_user_api_key")
+  @@schema("agora")
+}
+
+model chain {
+  id         String     @id
+  name       String
+  created_at DateTime?  @default(now()) @db.Date
+  updated_at DateTime?  @default(now()) @db.Date
+  api_user   api_user[]
+
+  @@schema("agora")
+}
+
 view OptimismVotes {
   transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
