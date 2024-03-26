@@ -52,13 +52,18 @@ export async function generateMetadata({}, parent) {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
     other: {
       ["twitter:card"]: "summary_large_image",
       ["twitter:title"]: title,
       ["twitter:description"]: description,
-      ["twitter:image"]: preview,
     },
   };
 }
@@ -111,7 +116,7 @@ export default async function Home() {
               </div>
               <div>
                 <div className="text-sm text-stone-600 font-medium">
-                  Phase 3 – Full Ossification
+                  Phase 3 – Full Ossification
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
                 <div>
