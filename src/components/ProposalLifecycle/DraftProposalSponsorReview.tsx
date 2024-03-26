@@ -1,18 +1,25 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import {
-  useContractRead,
+  useAccount,
   useContractWrite,
   usePrepareContractWrite,
+  useSignTypedData,
   useWaitForTransaction,
 } from "wagmi";
 import ENSGovernorABI from "@/lib/contracts/abis/ENSGovernor.json";
+import {
+  SnapshotProposalMessage,
+  createProposal,
+  domain,
+  proposalTypes,
+} from "./snapshot";
 
 interface DraftProposalReviewProps {
   proposal: ProposalDraftWithTransactions;
@@ -20,10 +27,16 @@ interface DraftProposalReviewProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
+  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
-const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { proposal, updateProposal } = props;
+const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
+  proposal,
+  updateProposal,
+  getProposalChecklist,
+}) => {
+  const { address } = useAccount();
+  const { signTypedDataAsync } = useSignTypedData();
 
   type BasicInputData = [string[], number[], string[], string];
 
@@ -102,6 +115,79 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
 
   const { inputData } = getInputData(proposal);
 
+  /**
+   * @dev Snapshot
+   *
+   * @notice snapshot test env is on goerli,
+   *         our on sepolia so we need to use a fixed block number
+   */
+  async function createSnapshot() {
+    if (!address) {
+      throw new Error("address not available");
+    }
+
+    const description =
+      "# " +
+      proposal.title +
+      "\n\n" +
+      proposal.description +
+      "\n" +
+      // `${
+      //   form.state.draftLink &&
+      //   "[Draft Discourse link](" + form.state.draftLink + ")\n"
+      // }` +
+      `${
+        proposal.temp_check_link &&
+        "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
+      }` +
+      "\n\n ## Abstract \n" +
+      proposal.abstract;
+
+    const blockNumber =
+      process.env.REACT_APP_DEPLOY_ENV === "prod"
+        ? await provider.getBlockNumber()
+        : 9244736;
+    const timestamp = Math.floor(new Date().getTime() / 1000);
+    const message: SnapshotProposalMessage & { [key: string]: unknown } = {
+      from: address!,
+      space:
+        process.env.REACT_APP_DEPLOY_ENV === "prod"
+          ? "ens.eth"
+          : "stepandel.eth",
+      timestamp,
+      type: proposal.proposal_type === "basic" ? "single-choice" : "approval",
+      title: proposal.title,
+      body: description,
+      discussion: "",
+      // TODO: add choices based on proposal type
+      choices: ["For", "Against", "Abstain"],
+      start: Math.floor(
+        new Date(proposal.start_date_social ?? new Date()).getTime() / 1000
+      ),
+      end: Math.floor(
+        new Date(
+          proposal.end_date_social ??
+            new Date(Date.now() + 24 * 60 * 60 * 1000 * 5) // add 24 hours
+        ).getTime() / 1000
+      ),
+      snapshot: blockNumber,
+      plugins: JSON.stringify({}),
+    };
+
+    const sig = await signTypedDataAsync({
+      domain,
+      types: proposalTypes,
+      primaryType: "Proposal",
+      message: message,
+    });
+
+    const receipt = (await createProposal(sig, address, message)) as {
+      id: string;
+    };
+
+    return receipt.id;
+  }
+
   const {
     config,
     isError: onPrepareError,
@@ -125,22 +211,33 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   }, [data]);
 
   const handleApprove = async () => {
-    write?.();
+    if (proposal.proposal_type === "executable") {
+      write?.();
+    } else {
+      const proposalId = await createSnapshot();
+
+      const snapshotLink =
+        process.env.REACT_APP_DEPLOY_ENV === "prod"
+          ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
+          : `https://demo.snapshot.org/#/stepandel.eth/proposal/${proposalId}`;
+
+      alert("Snapshot created! " + snapshotLink);
+    }
   };
 
-  const handleProposalSubmitted = async () => {
+  const handleProposalSubmitted = useCallback(async () => {
     const updatedProposal = await updateProposal(proposal, {
       proposal_status_id: 5,
       onchain_transaction_hash: data?.hash,
     });
-  };
+  }, [proposal, updateProposal, data]);
 
   useEffect(() => {
     if (isSuccess) {
       alert("Proposal submitted");
       handleProposalSubmitted();
     }
-  }, [isSuccess]);
+  }, [isSuccess, handleProposalSubmitted]);
 
   return (
     <div className="flex-grow">
@@ -192,7 +289,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
             </div>
           </div>
           <div className="flex flex-col gap-y-5 text-base px-6 pt-6">
-            <DraftProposalFormSubmitChecklist proposalState={proposal} />
+            <DraftProposalFormSubmitChecklist
+              proposalState={proposal}
+              getProposalChecklist={getProposalChecklist}
+            />
             <div className="flex flex-row items-center justify-between">
               <p className="w-[440px] text-stone-700">
                 Please make sure to proofread your proposal as it cannot be
