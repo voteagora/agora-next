@@ -15,7 +15,10 @@ export default function DelegationToRow({
   return (
     <TableRow>
       <TableCell>
-        {TokenAmountDisplay(delegation.allowance, 18, "OP", 3)}
+        {TokenAmountDisplay({
+          amount: delegation.allowance,
+          maximumSignificantDigits: 3,
+        })}{" "}
       </TableCell>
       <TableCell>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</TableCell>
       <TableCell>{delegation.type}</TableCell>
