@@ -39,6 +39,7 @@ export function AdvancedDelegateDialog({
   fetchAllForAdvancedDelegation,
   completeDelegation,
 }: Params) {
+  const [overflowDelegation, setOverFlowDelegation] = useState(false);
   const [allowance, setAllowance] = useState<number[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [availableBalance, setAvailableBalance] = useState<string>("");
@@ -186,84 +187,109 @@ export function AdvancedDelegateDialog({
   };
 
   return (
-    <VStack
-      justifyContent="justify-center"
-      alignItems="items-center"
-      className={styles.box}
-    >
-      <div className={showMessage ? "block" : "hidden"}>
-        <Message setShowMessage={setShowMessage} />
-      </div>
-      <div className={showMessage ? "hidden" : "block w-full"}>
-        {!isLoading && isSuccess ? (
-          <SuccessView closeDialog={completeDelegation} data={data} />
-        ) : isReady &&
-          availableBalance !== "" &&
-          !!delegatees &&
-          proxyAddress !== "" ? (
-          <VStack className={styles.dialog_container} gap={1}>
-            <VStack className={styles.amount_container}>
-              <HStack alignItems="items-center" gap={1}>
-                Your total delegatable votes{" "}
-                <InfoIcon
-                  size={12}
-                  className="cursor-pointer opacity-70"
-                  onClick={() => setShowInfo(true)}
-                />
-              </HStack>
-              <AdvancedDelegationDisplayAmount amount={availableBalance} />
-            </VStack>
-            <VStack className="max-h-[400px] overflow-y-scroll">
-              {delegatees.map((delegatee, index) => (
-                <SubdelegationToRow
-                  key={index}
-                  to={delegatee.to}
-                  availableBalance={availableBalance}
-                  setAllowance={setAllowance}
-                  allowances={allowance}
-                  index={index}
-                />
-              ))}
-            </VStack>
-
-            {showInfo && (
-              <InfoDialog
-                setShowInfo={setShowInfo}
-                availableBalance={availableBalance}
-                balance={opBalance || 0n}
-                delegators={delegators}
-                directDelegatedVP={directDelegatedVP}
-              />
-            )}
-            {address ? (
-              isError ? (
-                <Button disabled={false} onClick={() => writeWithTracking()}>
-                  Delegation failed
-                </Button>
-              ) : isLoading ? (
-                <Button disabled={false}>Submitting your delegation...</Button>
-              ) : (
-                <Button disabled={false} onClick={() => writeWithTracking()}>
-                  Delegate your votes
-                </Button>
-              )
-            ) : (
-              <Button onClick={() => setOpen(true)}>
-                Connect wallet to delegate
-              </Button>
-            )}
-          </VStack>
+    <>
+      <VStack
+        justifyContent="justify-center"
+        alignItems="items-center"
+        className={styles.box}
+      >
+        {showMessage ? (
+          <div>
+            <Message setShowMessage={setShowMessage} />
+          </div>
         ) : (
-          <VStack
-            className="w-full h-[318px]"
-            alignItems="items-center"
-            justifyContent="justify-center"
-          >
-            <AgoraLoaderSmall />
-          </VStack>
+          <div className="block w-full">
+            {!isLoading && isSuccess ? (
+              <SuccessView closeDialog={completeDelegation} data={data} />
+            ) : isReady &&
+              availableBalance !== "" &&
+              !!delegatees &&
+              proxyAddress !== "" ? (
+              <VStack className={styles.dialog_container} gap={1}>
+                <VStack className={styles.amount_container}>
+                  <HStack alignItems="items-center" gap={1}>
+                    Your total delegatable votes{" "}
+                    <InfoIcon
+                      size={12}
+                      className="cursor-pointer opacity-70"
+                      onClick={() => setShowInfo(true)}
+                    />
+                  </HStack>
+                  <AdvancedDelegationDisplayAmount amount={availableBalance} />
+                </VStack>
+                <VStack className="max-h-[400px] overflow-y-scroll">
+                  {delegatees.map((delegatee, index) => (
+                    <SubdelegationToRow
+                      key={index}
+                      to={delegatee.to}
+                      availableBalance={availableBalance}
+                      setAllowance={setAllowance}
+                      allowances={allowance}
+                      index={index}
+                      setOverFlowDelegation={setOverFlowDelegation}
+                    />
+                  ))}
+                </VStack>
+
+                {showInfo && (
+                  <InfoDialog
+                    setShowInfo={setShowInfo}
+                    availableBalance={availableBalance}
+                    balance={opBalance || 0n}
+                    delegators={delegators}
+                    directDelegatedVP={directDelegatedVP}
+                  />
+                )}
+                {address ? (
+                  isError ? (
+                    <Button
+                      disabled={false}
+                      className="mt-3"
+                      onClick={() => writeWithTracking()}
+                    >
+                      Delegation failed
+                    </Button>
+                  ) : isLoading ? (
+                    <Button disabled={false} className="mt-3">
+                      Submitting your delegation...
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled={false}
+                      className="mt-3"
+                      onClick={() => writeWithTracking()}
+                    >
+                      Delegate your votes
+                    </Button>
+                  )
+                ) : (
+                  <Button className="mt-3" onClick={() => setOpen(true)}>
+                    Connect wallet to delegate
+                  </Button>
+                )}
+              </VStack>
+            ) : (
+              <VStack
+                className="w-full h-[318px]"
+                alignItems="items-center"
+                justifyContent="justify-center"
+              >
+                <AgoraLoaderSmall />
+              </VStack>
+            )}
+          </div>
         )}
-      </div>
-    </VStack>
+      </VStack>
+      {overflowDelegation && (
+        <p
+          className="text-xs bg-gray-fa p-6 pb-3 pt-6 mt-3 left-0 max-w-md rounded-bl-xl rounded-br-xl absolute"
+          style={{ transform: "translateZ(-1px)" }}
+        >
+          You have delegated more than the total delegatable votes you have.
+          Please reduce your current delegation before delegating more
+        </p>
+      )}
+    </>
   );
 }
 
