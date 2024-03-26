@@ -12,6 +12,7 @@ import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { cn } from "@/lib/utils";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -26,13 +27,17 @@ interface DelegatePaginated {
 
 interface Props {
   initialDelegates: DelegatePaginated;
+  isCitizens: boolean;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
+  tab: string;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
+  isCitizens,
+  tab,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
@@ -88,7 +93,16 @@ export default function DelegateCardList({
           }
 
           return (
-            <div key={delegate.address} className={styles.link}>
+            <div
+              key={delegate.address}
+              className={cn(
+                styles.link,
+                (isCitizens && tab === "delegates") ||
+                  (!isCitizens && tab === "citizens")
+                  ? "opacity-30"
+                  : "opacity-100"
+              )}
+            >
               <Link href={`/delegates/${delegate.address}`}>
                 <VStack gap={4} className={styles.link_container}>
                   <VStack gap={4} justifyContent="justify-center">
