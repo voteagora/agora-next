@@ -45,10 +45,19 @@ const DraftProposalFormSubmitChecklist: React.FC<
 
   return (
     <ul className="border border-gray-eo rounded-lg w-full divide-y divide-gray-eo">
-      <DraftProposalFormSubmitChecklistRow
-        title="Discourse Temp Check"
-        data={tempCheckData}
-      />
+      {tempCheckData !== undefined ? (
+        <DraftProposalFormSubmitChecklistRow
+          title="Discourse Temp Check"
+          data={tempCheckData}
+        />
+      ) : (
+        <li className="w-full flex flex-row items-center justify-between p-4 font-medium">
+          <p>{`Discourse Temp Check`}</p>
+          <div className="flex flex-row items-center">
+            <p className="text-xs text-gray-af font-medium">skipped</p>
+          </div>
+        </li>
+      )}
       {proposalState.proposal_type === "executable" && (
         <DraftProposalFormSubmitChecklistRow
           title="Transaction simulation"
