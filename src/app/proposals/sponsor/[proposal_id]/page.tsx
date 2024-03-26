@@ -3,7 +3,7 @@ import prisma from "@/app/lib/prisma";
 import DraftProposalSponsorNote from "@/components/ProposalLifecycle/DraftProposalSponsorNote";
 import DraftProposalSponsorReview from "@/components/ProposalLifecycle/DraftProposalSponsorReview";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 
 async function getProposal(
   proposal_id: string
@@ -18,6 +18,20 @@ async function getProposal(
   });
 
   return proposal;
+}
+
+async function getProposalChecklist(
+  proposal_id: string
+): Promise<ProposalChecklist[]> {
+  "use server";
+
+  const proposalChecklist = await prisma.proposalChecklist.findMany({
+    where: {
+      proposal_id: Number(proposal_id),
+    },
+  });
+
+  return proposalChecklist;
 }
 
 async function updateProposal(
@@ -54,6 +68,7 @@ export default async function DraftProposalPage({
       <DraftProposalSponsorReview
         proposal={proposal}
         updateProposal={updateProposal}
+        getProposalChecklist={getProposalChecklist}
       />
       <DraftProposalSponsorNote />
     </div>
