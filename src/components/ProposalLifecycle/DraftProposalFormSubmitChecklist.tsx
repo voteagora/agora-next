@@ -61,10 +61,14 @@ const DraftProposalFormSubmitChecklist: React.FC<
         title="ENS docs updated"
         data={ensDocsData}
       />
-      <DraftProposalFormSubmitChecklistRow
-        title="100k ENS proposal threshold"
-        data={undefined}
-      />
+      <li className="w-full flex flex-row items-center justify-between p-4 font-medium">
+        <p>{`100k ENS proposal threshold`}</p>
+        <div className="flex flex-row items-center">
+          <p className="text-xs text-gray-af font-medium">
+            required for onchain
+          </p>
+        </div>
+      </li>
     </ul>
   );
 };
