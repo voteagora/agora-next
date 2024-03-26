@@ -66,9 +66,12 @@ export default async function Page({ searchParams }) {
   const citizensSort =
     citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
     citizensFilterOptions.shuffle.sort;
+  const tab = searchParams.tab;
   const seed = Math.random();
-  const delegates = await fetchDelegates(sort, seed);
-  const citizens = await fetchCitizens(citizensSort, seed);
+  const delegates =
+    tab === "citizens"
+      ? await fetchCitizens(citizensSort, seed)
+      : await fetchDelegates(sort, seed);
   const metrics = await fetchDaoMetrics();
 
   return (
@@ -89,7 +92,7 @@ export default async function Page({ searchParams }) {
         </TabsContent>
         <TabsContent value="citizens">
           <DelegateCardList
-            initialDelegates={citizens}
+            initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
               "use server";
 

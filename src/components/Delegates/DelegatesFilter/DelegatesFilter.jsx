@@ -15,9 +15,7 @@ export default function DelegatesFilter() {
     orderByParam || delegatesFilterOptions.weightedRandom.value
   );
 
-  // TODO: -> this router.push is super slow but window.history.pushState does not revalidate the query and the
-  // problem using revalidatePath is that it erases searchParams, another idea to optimize this filter is to prefetch
-  // the data, also use hooks useAddSearchParam and useDeleteSearchParam
+  // TODO: -> use addSearchParam and deleteSearchParam hook
   useEffect(() => {
     const handleChanges = (value) => {
       value === delegatesFilterOptions.weightedRandom.value
