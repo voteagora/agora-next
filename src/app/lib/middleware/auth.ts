@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
-
+import { createHash } from "crypto";
 import { validate as validateUuid } from "uuid";
 
 let prismaModule: any;
 
+const HASH_FN = "sha256";
 const REASON_NO_TOKEN = "No token provided in 'authorization' header";
 const REASON_INVALID_API_KEY = "Invalid API Key";
 const REASON_DISABLED_USER = "User disabled";
@@ -32,6 +33,12 @@ export function hasApiKey(request: NextRequest): AuthResponse {
   return authResponse;
 }
 
+function hashApiKey(apiKey: string) {
+  const hash = createHash(HASH_FN);
+  hash.update(apiKey);
+  return hash.digest("hex");
+}
+
 export async function authenticateApiUser(request: NextRequest): Promise<AuthResponse> {
   let prisma: any;
   if (process.env.NEXT_RUNTIME === 'nodejs') {
@@ -41,12 +48,16 @@ export async function authenticateApiUser(request: NextRequest): Promise<AuthRes
 
   let authResponse: AuthResponse = hasApiKey(request);
 
-  const token = request.headers.get("authorization");
+  const key = request.headers.get("authorization");
+
+  if (!key) {
+    return authResponse;
+  }
 
   // TODO: caching logic, rate limiting
   const user = await prisma.api_user.findFirst({
     where: {
-      api_key: token,
+      api_key: hashApiKey(key),
     },
   });
 
