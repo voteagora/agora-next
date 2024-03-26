@@ -27,13 +27,11 @@ interface DraftProposalReviewProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
-  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
 const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
   proposal,
   updateProposal,
-  getProposalChecklist,
 }) => {
   const { address } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
@@ -289,10 +287,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
             </div>
           </div>
           <div className="flex flex-col gap-y-5 text-base px-6 pt-6">
-            <DraftProposalFormSubmitChecklist
-              proposalState={proposal}
-              getProposalChecklist={getProposalChecklist}
-            />
+            <DraftProposalFormSubmitChecklist proposalState={proposal} />
             <div className="flex flex-row items-center justify-between">
               <p className="w-[440px] text-stone-700">
                 Please make sure to proofread your proposal as it cannot be

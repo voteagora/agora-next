@@ -2,16 +2,16 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { ProposalDraftWithTransactions } from "./types";
 import { ProposalChecklist } from "@prisma/client";
+import { getProposalChecklist } from "@/app/proposals/draft/[proposal_id]/page";
 
 interface DraftProposalFormSubmitChecklistProps {
   proposalState: ProposalDraftWithTransactions;
-  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
 const DraftProposalFormSubmitChecklist: React.FC<
   DraftProposalFormSubmitChecklistProps
 > = (props) => {
-  const { proposalState, getProposalChecklist } = props;
+  const { proposalState } = props;
   const [tempCheckData, setTempCheckData] = useState<ProposalChecklist>();
   const [transactionSimulationData, setTransactionSimulationData] =
     useState<ProposalChecklist>();
