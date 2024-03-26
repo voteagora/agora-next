@@ -4,6 +4,7 @@ import DraftProposalSponsorNote from "@/components/ProposalLifecycle/DraftPropos
 import DraftProposalSponsorReview from "@/components/ProposalLifecycle/DraftProposalSponsorReview";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import { ProposalChecklist, ProposalDraft } from "@prisma/client";
+import DraftProposalSponsor from "@/components/ProposalLifecycle/DraftProposalSponsor";
 
 async function getProposal(
   proposal_id: string
@@ -64,13 +65,10 @@ export default async function DraftProposalPage({
   }
 
   return (
-    <div className="flex flex-row gap-x-6 pt-9 items-start max-w-screen-xl mx-auto">
-      <DraftProposalSponsorReview
-        proposal={proposal}
-        updateProposal={updateProposal}
-        getProposalChecklist={getProposalChecklist}
-      />
-      <DraftProposalSponsorNote />
-    </div>
+    <DraftProposalSponsor
+      proposal={proposal}
+      updateProposal={updateProposal}
+      getProposalChecklist={getProposalChecklist}
+    />
   );
 }
