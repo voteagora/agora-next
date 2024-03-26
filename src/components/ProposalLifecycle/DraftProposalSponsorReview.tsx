@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import {
@@ -27,11 +27,16 @@ interface DraftProposalReviewProps {
     proposal: ProposalDraft,
     updateData: Partial<ProposalDraft>
   ) => Promise<ProposalDraft>;
+  getProposalChecklist: (proposal_id: string) => Promise<ProposalChecklist[]>;
 }
 
-const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
-  const { proposal, updateProposal } = props;
-  const [snapshotLink, setSnapshotLink] = useState("");
+const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
+  proposal,
+  updateProposal,
+  getProposalChecklist,
+}) => {
+  const { address } = useAccount();
+  const { signTypedDataAsync } = useSignTypedData();
 
   type BasicInputData = [string[], number[], string[], string];
 
@@ -109,9 +114,6 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   }
 
   const { inputData } = getInputData(proposal);
-
-  const { address } = useAccount();
-  const { signTypedDataAsync } = useSignTypedData();
 
   /**
    * @dev Snapshot
@@ -214,11 +216,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     } else {
       const proposalId = await createSnapshot();
 
-      setSnapshotLink(
+      const snapshotLink =
         process.env.REACT_APP_DEPLOY_ENV === "prod"
           ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
-          : `https://demo.snapshot.org/#/stepandel.eth/proposal/${proposalId}`
-      );
+          : `https://demo.snapshot.org/#/stepandel.eth/proposal/${proposalId}`;
+
+      alert("Snapshot created! " + snapshotLink);
     }
   };
 
@@ -286,7 +289,10 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
             </div>
           </div>
           <div className="flex flex-col gap-y-5 text-base px-6 pt-6">
-            <DraftProposalFormSubmitChecklist proposalState={proposal} />
+            <DraftProposalFormSubmitChecklist
+              proposalState={proposal}
+              getProposalChecklist={getProposalChecklist}
+            />
             <div className="flex flex-row items-center justify-between">
               <p className="w-[440px] text-stone-700">
                 Please make sure to proofread your proposal as it cannot be
