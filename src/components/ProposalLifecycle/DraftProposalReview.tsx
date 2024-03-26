@@ -115,23 +115,27 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
         </div>
         <div className="flex flex-col gap-y-6 px-6 pt-6 pb-9 bg-white border border-gray-eb rounded-2xl z-20">
           <h3 className="text-2xl font-black">{proposalState.title}</h3>
-          <div className="bg-[#F7F7F7] rounded-lg border border-gray-eo w-[620px] break-all">
-            <p className="stone-500 text-xs pt-3 px-6">Proposed transactions</p>
-            {proposalState.transactions.map((transaction, index) => {
-              return (
-                <div
-                  key={index}
-                  className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
-                >
-                  <p>{`// ${transaction.description}`}</p>
-                  <p>{transaction.target}</p>
-                  <p>{transaction.function_details}</p>
-                  <p>{transaction.value}</p>
-                  <p>{transaction.calldata}</p>
-                </div>
-              );
-            })}
-          </div>
+          {proposalState.proposal_type === "executable" && (
+            <div className="bg-[#F7F7F7] rounded-lg border border-gray-eo w-[620px] break-all">
+              <p className="stone-500 text-xs pt-3 px-6">
+                Proposed transactions
+              </p>
+              {proposalState.transactions.map((transaction, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
+                  >
+                    <p>{`// ${transaction.description}`}</p>
+                    <p>{transaction.target}</p>
+                    <p>{transaction.function_details}</p>
+                    <p>{transaction.value}</p>
+                    <p>{transaction.calldata}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="flex flex-col gap-y-1 text-base">
             <label className="font-medium">Description</label>
             <p className="text-gray-4f">{proposalState.description}</p>

@@ -49,10 +49,12 @@ const DraftProposalFormSubmitChecklist: React.FC<
         title="Discourse Temp Check"
         data={tempCheckData}
       />
-      <DraftProposalFormSubmitChecklistRow
-        title="Transaction simulation"
-        data={transactionSimulationData}
-      />
+      {proposalState.proposal_type === "executable" && (
+        <DraftProposalFormSubmitChecklistRow
+          title="Transaction simulation"
+          data={transactionSimulationData}
+        />
+      )}
       <DraftProposalFormSubmitChecklistRow
         title="Draft created and shared on forums"
         data={draftCreatedData}
