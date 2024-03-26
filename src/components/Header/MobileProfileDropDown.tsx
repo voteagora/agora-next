@@ -121,11 +121,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       title="My token balance"
                       detail={
                         <MobileValueWrapper isLoading={isLoading}>
-                          <TokenAmountDisplay
-                            amount={balance || BigInt(0)}
-                            decimals={18}
-                            currency={token.symbol}
-                          />
+                          <TokenAmountDisplay amount={balance || BigInt(0)} />
                         </MobileValueWrapper>
                       }
                     />
@@ -151,8 +147,6 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                         <MobileValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
                             amount={delegate?.votingPower || BigInt(0)}
-                            decimals={18}
-                            currency={token.symbol}
                           />
                         </MobileValueWrapper>
                       }
