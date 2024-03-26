@@ -9,7 +9,8 @@
     "lint": "next lint",
     "cypress": "cypress open",
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json",
-    "typecheck": "tsc --pretty --noEmit"
+    "typecheck": "tsc --pretty --noEmit",
+    "generate-apikey": "ts-node src/scripts/generateApiKey.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
@@ -74,6 +75,7 @@
     "tailwindcss": "3.3.2",
     "tailwindcss-animate": "^1.0.6",
     "utf-8-validate": "^6.0.3",
+    "uuid": "^9.0.1",
     "viem": "^1.19.3",
     "wagmi": "^1.4.7",
     "zod": "^3.22.4"
@@ -86,8 +88,10 @@
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "@types/react-infinite-scroller": "^1.2.5",
+    "@types/uuid": "^9.0.8",
     "cypress": "^12.11.0",
     "sass": "^1.62.1",
+    "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
     "typescript": "5.0.4"
   }
