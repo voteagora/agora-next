@@ -12,15 +12,6 @@ BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
-export const metadata = {
-  metadataBase: new URL("https://vote.optimism.io"),
-  alternates: {
-    canonical: "/",
-  },
-  title: "Agora - Home of Optimism Voters",
-  description: "Agora is the home of Optimism voters.",
-};
-
 export default function RootLayout({
   children,
 }: {
