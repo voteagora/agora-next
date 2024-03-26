@@ -307,11 +307,7 @@ function InfoDialog({
             className="w-full"
           >
             <p>You own</p>
-            <TokenAmountDisplay
-              amount={balance}
-              decimals={token.decimals}
-              currency={token.symbol}
-            />
+            <TokenAmountDisplay amount={balance} />
           </HStack>
           {delegators?.map((delegator, index) => (
             <HStack
@@ -324,24 +320,16 @@ function InfoDialog({
                 <ENSName address={delegator.from} />
                 &apos;s delegation
               </p>
-              <TokenAmountDisplay
-                amount={BigInt(delegator.allowance)}
-                decimals={token.decimals}
-                currency={token.symbol}
-              />
+              <TokenAmountDisplay amount={BigInt(delegator.allowance)} />
             </HStack>
           ))}
         </VStack>
         {directDelegatedFromOthers > 0n && (
           <p className="w-full p-3 text-xs font-medium leading-4 border-t text-gray-af border-gray-eo">
             You’ve been delegated an additional{" "}
-            <TokenAmountDisplay
-              amount={directDelegatedFromOthers}
-              decimals={token.decimals}
-              currency={token.symbol}
-            />{" "}
-            without the right to redelegate. You can only vote with this portion
-            of votes and cannot pass them to others.
+            <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
+            the right to redelegate. You can only vote with this portion of
+            votes and cannot pass them to others.
           </p>
         )}
       </VStack>

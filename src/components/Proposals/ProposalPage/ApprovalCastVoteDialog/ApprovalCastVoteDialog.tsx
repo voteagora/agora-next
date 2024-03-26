@@ -263,13 +263,7 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"} with{"\u00A0"}
-            {
-              <TokenAmountDisplay
-                amount={votingPower}
-                decimals={18}
-                currency="OP"
-              />
-            }
+            {<TokenAmountDisplay amount={votingPower} />}
           </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
@@ -280,11 +274,7 @@ function CastVoteWithReason({
             {!copy ? (
               <>
                 Vote for no options with{"\u00A0"}
-                <TokenAmountDisplay
-                  amount={votingPower}
-                  decimals={18}
-                  currency="OP"
-                />
+                <TokenAmountDisplay amount={votingPower} />
               </>
             ) : (
               copy
