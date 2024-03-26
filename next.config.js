@@ -15,6 +15,26 @@ const nextConfig = {
         destination: '/delegates/:addressOrENSName',
         permanent: true,
       },
+      {
+        source: '/api/v1/delegates/:addressOrENSName',
+        destination: '/404',
+        permanent: true,
+      },
+      {
+        source: '/api/v1/delegates',
+        destination: '/404',
+        permanent: true,
+      },
+      {
+        source: '/api/v1/proposals/:proposalId',
+        destination: '/404',
+        permanent: true,
+      },
+      {
+        source: '/api/v1/proposals',
+        destination: '/404',
+        permanent: true,
+      },
     ]
   },
   async headers() {
