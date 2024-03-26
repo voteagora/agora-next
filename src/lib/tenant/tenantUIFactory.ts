@@ -7,23 +7,76 @@ import optimismHero from "@/assets/tenant/optimism_hero.svg";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
 import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
+import lyraHero from "@/assets/tenant/lyra_hero.svg";
+import lyraLogo from "@/assets/tenant/lyra_logo.svg";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
     switch (namespace) {
+      case TENANT_NAMESPACES.ENS:
+        return ensUI;
+      case TENANT_NAMESPACES.ETHERFI:
+        return etherfiUI;
+      case TENANT_NAMESPACES.LYRA:
+        return lyraUI;
       case TENANT_NAMESPACES.OPTIMISM:
         return optimismUI;
 
-      case TENANT_NAMESPACES.ETHERFI:
-        return etherfiUI;
-
-      case TENANT_NAMESPACES.ENS:
-        return ensUI;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
   }
 }
+
+
+const lyraUI = new TenantUI({
+  title: "Lyra Agora",
+  color: "#25FAB0",
+  hero: lyraHero,
+  logo: lyraLogo,
+
+  pages: [
+    {
+      route: "/",
+      title: "Agora is the home of Lyra delegates",
+      description: "LYRA voters are the stewards for the DAO, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Lyra Agora",
+        description: "Home of token governance",
+      },
+    },
+    {
+      route: "delegates",
+      title: "Agora is the home of Lyra delegates",
+      description: "LYRA voters are the stewards for the DAO, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Lyra Agora",
+        description: "Home of token governance",
+      },
+    },
+    {
+      route: "proposals",
+      title: "Agora is the home of Lyra delegates",
+      description: "LYRA voters are the stewards for the DAO, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Lyra Agora",
+        description: "Home of token governance",
+      },
+    },
+  ],
+
+  toggles: [
+    {
+      name: "delegates",
+      enabled: false,
+    },
+    {
+      name: "proposals",
+      enabled: false,
+    },
+  ],
+});
+
 
 const etherfiUI = new TenantUI({
   title: "ETHER.FI Agora",
