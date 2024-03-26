@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -26,28 +27,28 @@ interface DelegatePaginated {
 }
 
 interface Props {
+  isDelegatesCitizensFetching: boolean;
   initialDelegates: DelegatePaginated;
-  isCitizens: boolean;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
-  tab: string;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  isCitizens,
-  tab,
+  isDelegatesCitizensFetching,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
   const { advancedDelegators } = useConnectedDelegate();
+  const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
+    setIsDelegatesFiltering(false);
     setDelegates(initialDelegates.delegates);
     setMeta(initialDelegates.meta);
-  }, [initialDelegates]);
+  }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
@@ -97,10 +98,9 @@ export default function DelegateCardList({
               key={delegate.address}
               className={cn(
                 styles.link,
-                (isCitizens && tab === "delegates") ||
-                  (!isCitizens && tab === "citizens")
-                  ? "opacity-30"
-                  : "opacity-100"
+                isDelegatesCitizensFetching || isDelegatesFiltering
+                  ? "animate-pulse"
+                  : ""
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>

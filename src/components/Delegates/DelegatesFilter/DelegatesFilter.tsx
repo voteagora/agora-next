@@ -7,6 +7,7 @@ import { Listbox } from "@headlessui/react";
 import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export default function DelegatesFilter() {
   const router = useRouter();
@@ -14,8 +15,10 @@ export default function DelegatesFilter() {
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const orderByParam = searchParams?.get("orderBy");
+  const { setIsDelegatesFiltering } = useAgoraContext();
 
   const handleChange = (value: string) => {
+    setIsDelegatesFiltering(true);
     router.push(
       value === delegatesFilterOptions.weightedRandom.value
         ? deleteSearchParam({ name: "orderBy" })

@@ -7,6 +7,7 @@ import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useRouter } from "next/navigation";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export default function CitizensFilter() {
   const router = useRouter();
@@ -14,8 +15,10 @@ export default function CitizensFilter() {
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const orderByParam = searchParams?.get("citizensOrderBy");
+  const { setIsDelegatesFiltering } = useAgoraContext();
 
   const handleChange = (value: string) => {
+    setIsDelegatesFiltering(true);
     router.push(
       value !== "shuffle"
         ? addSearchParam({ name: "citizensOrderBy", value })

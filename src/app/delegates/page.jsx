@@ -81,8 +81,7 @@ export default async function Page({ searchParams }) {
       <DelegateTabs>
         <TabsContent value="delegates">
           <DelegateCardList
-            tab="delegates"
-            isCitizens={tab === "citizens"}
+            isDelegatesCitizensFetching={tab === "citizens"}
             initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
               "use server";
@@ -94,8 +93,7 @@ export default async function Page({ searchParams }) {
         </TabsContent>
         <TabsContent value="citizens">
           <DelegateCardList
-            tab="citizens"
-            isCitizens={tab === "citizens"}
+            isDelegatesCitizensFetching={tab !== "citizens"}
             initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
               "use server";
