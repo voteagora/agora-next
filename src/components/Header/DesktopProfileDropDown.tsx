@@ -13,7 +13,6 @@ import styles from "./header.module.scss";
 import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   ensName: string | undefined;
@@ -33,7 +32,6 @@ const ValueWrapper = ({
   );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
-  const { token } = Tenant.current();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const { isLoading, delegate, balance } = useConnectedDelegate();

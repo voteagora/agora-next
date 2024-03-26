@@ -1,9 +1,9 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
+import { HStack } from "@/components/Layout/Stack";
 import styles from "./proposal.module.scss";
 import { TokenAmountDisplay } from "@/lib/utils";
-import { BigNumberish, formatUnits } from "ethers";
+import { formatUnits } from "ethers";
 
-function formatNumber(amount, decimals, maximumSignificantDigits = 4) {
+function formatNumber(amount, decimals) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
   return standardUnitAmount;
 }
