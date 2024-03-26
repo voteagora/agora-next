@@ -23,17 +23,55 @@ export default class TenantContractFactory {
     isProd: boolean
   ): TenantContracts {
     switch (namespace) {
-      case TENANT_NAMESPACES.ETHERFI:
-        return ethfiContracts(isProd);
       case TENANT_NAMESPACES.ENS:
         return ensContracts(isProd);
+
+      case TENANT_NAMESPACES.ETHERFI:
+        return ethfiContracts(isProd);
+
+      case TENANT_NAMESPACES.LYRA:
+        return lyraContracts(isProd);
+
       case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
+
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
   }
 }
+const lyraContracts = (isProd: boolean): TenantContracts => {
+  return {
+    // TOKEN
+    token: new TenantContract<ITokenContract>({
+      contract: EtherfiToken__factory.connect(
+        "0x01ba67aac7f75f647d94220cc98fb30fcc5105bf",
+        ethProvider
+      ),
+      address: "0x01ba67aac7f75f647d94220cc98fb30fcc5105bf" as `0x${string}`,
+      chainId: 1,
+      chainName: "Ethereum Mainnet",
+      abi: EtherfiToken__factory.abi,
+    }),
+    // GOVERNOR
+    // TODO: Implement Sepolia provider
+    governor: new TenantContract<IGovernorContract>({
+      contract: OptimismGovernor__factory.connect(
+        isProd
+          ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
+          : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+        provider
+      ),
+      address: isProd
+        ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
+        : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+      chainId: 1,
+      chainName: "Ethereum Mainnet",
+      abi: OptimismGovernor__factory.abi,
+      optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
+    }),
+  };
+};
 
 const ensContracts = (isProd: boolean): TenantContracts => {
   return {
