@@ -1,10 +1,8 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovalProposalCriteria({ proposal }) {
-  const { token } = Tenant.current();
   const proposalData = proposal.proposalData;
   const proposalResults = proposal.proposalResults;
   const proposalSettings = proposalData.proposalSettings;

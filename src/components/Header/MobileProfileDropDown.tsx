@@ -14,7 +14,6 @@ import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   ensName: string | undefined;
@@ -42,7 +41,6 @@ const MobileValueWrapper = ({
 
 export const MobileProfileDropDown = ({ ensName }: Props) => {
   const { disconnect } = useDisconnect();
-  const { token } = Tenant.current();
   const { address } = useAccount();
   const { isLoading, delegate, balance } = useConnectedDelegate();
   const hasStatement = !!delegate?.statement;

@@ -40,7 +40,7 @@ export default function ApprovedTransactions({ proposalData }) {
                 <p className="font-mono text-xs font-medium leading-4 text-gray-af">
                   <OptionDescription
                     description={option.description}
-                    value={option.budgetTokensSpent}
+                    value={option.budgetTokensSpent || BigInt(0)}
                     target={option.targets[0]}
                   />
                 </p>
