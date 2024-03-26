@@ -24,7 +24,9 @@ const staticText = {
     "Use this draft to create and share the proposal you’d like to submit",
   proposalTypeExplanation:
     "Passed on-chain, Executable Proposals execute code related to ENS and ENS DAO contracts, as voted on by the DAO.",
-  proposalTitlePlaceholder: "[EPx.x][Executable] My proposal title...",
+  executableProposalTitlePlaceholder:
+    "[EPx.x][Executable] My proposal title...",
+  socialProposalTitlePlaceholder: "[SPx.x][Social] My proposal title...",
   proposalDescriptionPlaceholder:
     "A short (1-2 sentence) description of the proposal...",
   proposalAbstractPlaceholder:
@@ -116,7 +118,11 @@ const DraftProposalFormCreate: React.FC<DraftProposalFormCreateProps> = (
           />
           <DraftProposalTitleInput
             label="Title"
-            placeholder={staticText.proposalTitlePlaceholder}
+            placeholder={
+              proposalState.proposal_type === "executable"
+                ? staticText.executableProposalTitlePlaceholder
+                : staticText.socialProposalTitlePlaceholder
+            }
             proposalState={proposalState}
             updateProposal={updateProposal}
           />
