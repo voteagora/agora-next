@@ -11,6 +11,7 @@ const REASON_DISABLED_USER = "User disabled";
 
 export type AuthResponse = {
   authenticated: boolean;
+  userId?: string;
   reason?: string;
 };
 
@@ -41,6 +42,7 @@ function hashApiKey(apiKey: string) {
 
 export async function authenticateApiUser(request: NextRequest): Promise<AuthResponse> {
   let prisma: any;
+  // Needed for Vercel middleware to run in non-node runtime
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     prismaModule = await import("@/app/lib/prisma");
     prisma = prismaModule.default;
@@ -71,6 +73,8 @@ export async function authenticateApiUser(request: NextRequest): Promise<AuthRes
       authenticated: false,
       reason: REASON_DISABLED_USER,
     };
+  } else {
+    authResponse.userId = user.id;
   }
 
   return authResponse;
