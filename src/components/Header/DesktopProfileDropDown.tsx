@@ -122,11 +122,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                       title="My token balance"
                       detail={
                         <ValueWrapper isLoading={isLoading}>
-                          <TokenAmountDisplay
-                            amount={balance || BigInt(0)}
-                            decimals={token.decimals}
-                            currency={token.symbol}
-                          />
+                          <TokenAmountDisplay amount={balance || BigInt(0)} />
                         </ValueWrapper>
                       }
                     />
@@ -152,8 +148,6 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         <ValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
                             amount={delegate?.votingPower || BigInt(0)}
-                            decimals={18}
-                            currency={token.symbol}
                           />
                         </ValueWrapper>
                       }

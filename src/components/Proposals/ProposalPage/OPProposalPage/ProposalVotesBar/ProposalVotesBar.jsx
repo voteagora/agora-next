@@ -31,12 +31,9 @@ export default function ProposalVotesBar({ proposal }) {
           </TooltipTrigger>
           <TooltipContent>
             <p>
-              {TokenAmountDisplay(
-                proposal.proposalResults.abstain,
-                18,
-                "OP",
-                2
-              )}{" "}
+              {TokenAmountDisplay({
+                amount: proposal.proposalResults.abstain,
+              })}{" "}
               abstained
             </p>
           </TooltipContent>

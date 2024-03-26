@@ -19,20 +19,10 @@ export default function ProposalVotesSummary({
     <VStack gap={2} className={styles.proposal_votes_summary_container}>
       <HStack justifyContent="justify-between" className="mt-2">
         <div className="gl_votes_for">
-          FOR{" "}
-          <TokenAmountDisplay
-            amount={results.for}
-            decimals={token.decimals}
-            currency={token.symbol}
-          />
+          FOR <TokenAmountDisplay amount={results.for} />
         </div>
         <div className="gl_votes_against">
-          AGAINST{" "}
-          <TokenAmountDisplay
-            amount={results.against}
-            decimals={token.decimals}
-            currency={token.symbol}
-          />
+          AGAINST <TokenAmountDisplay amount={results.against} />
         </div>
       </HStack>
       <ProposalVotesBar proposal={proposal} />
@@ -41,12 +31,7 @@ export default function ProposalVotesSummary({
           <>
             {proposal.quorum && (
               <div>
-                Quorum{" "}
-                <TokenAmountDisplay
-                  amount={proposal.quorum}
-                  decimals={token.decimals}
-                  currency={token.symbol}
-                />
+                Quorum <TokenAmountDisplay amount={proposal.quorum} />
               </div>
             )}
           </>
