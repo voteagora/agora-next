@@ -23,8 +23,8 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
   const handleTabChange = (value: string) => {
     router.push(
       value === "citizens"
-        ? addSearchParam("tab", value)
-        : deleteSearchParam("tab"),
+        ? addSearchParam({ name: "tab", value, clean: true })
+        : deleteSearchParam({ name: "tab", clean: true }),
       { scroll: false }
     );
   };
