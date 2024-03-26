@@ -5,14 +5,12 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalVotesSummary({
   proposal,
 }: {
   proposal: Proposal;
 }) {
-  const { token } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
   return (

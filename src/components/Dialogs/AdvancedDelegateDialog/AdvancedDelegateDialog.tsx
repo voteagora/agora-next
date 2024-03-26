@@ -56,7 +56,7 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { contracts, slug } = Tenant.current();
+  const { slug } = Tenant.current();
 
   const fetchData = useCallback(async () => {
     try {
@@ -281,7 +281,6 @@ function InfoDialog({
   directDelegatedVP: bigint;
 }) {
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
-  const { token } = Tenant.current();
   return (
     <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
       <VStack className={styles.amount_container + " !pb-0 !px-0"}>
