@@ -147,7 +147,7 @@ async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
   return result;
 }
 
-export async function getProposalChecklist(
+async function getProposalChecklist(
   proposal_id: string
 ): Promise<ProposalChecklist[]> {
   "use server";
