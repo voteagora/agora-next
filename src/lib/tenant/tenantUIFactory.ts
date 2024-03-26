@@ -5,7 +5,7 @@ import { TenantUI } from "@/lib/tenant/tenantUI";
 import optimismLogo from "@/assets/tenant/optimism_logo.svg";
 import optimismHero from "@/assets/tenant/optimism_hero.svg";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
-import etherfiLogo from "@/ass ets/tenant/etherfi_logo.svg";
+import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 import lyraHero from "@/assets/tenant/lyra_hero.svg";
 import lyraLogo from "@/assets/tenant/lyra_logo.svg";
