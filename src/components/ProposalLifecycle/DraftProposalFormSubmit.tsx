@@ -69,11 +69,7 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
       {proposalState.proposal_status_id == 4 && (
         <div className="flex flex-col gap-y-2 p-6">
           <p className="text-stone-700">
-            {`Your proposal is awaiting ${
-              proposalState.sponsor_address
-                ? proposalState.sponsor_address
-                : "TODO"
-            }’s sponsorship. Once your sponsor approves, your proposal will be automatically submitted, without needing your input. In the meantime, you can contact your sponsor by copying the link below.`}
+            {`Your proposal is awaiting ${proposalState.sponsor_address}’s sponsorship. Once your sponsor approves, your proposal will be automatically submitted, without needing your input. In the meantime, you can contact your sponsor by copying the link below.`}
           </p>
           <div className="flex flex-row w-full ring-1 ring-inset ring-stone-200 rounded-xl items-center">
             <div className="flex flex-row flex-grow pl-4 gap-x-12 items-center">

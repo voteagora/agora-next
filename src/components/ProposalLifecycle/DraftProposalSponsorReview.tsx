@@ -301,9 +301,15 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
 
               <button
                 onClick={() => handleApprove()}
-                className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4"
+                className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4 disabled:bg-red-500"
+                // TODO read the voting power, for now only nick.eth allowed
+                disabled={
+                  address !== "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5"
+                }
               >
-                Approve
+                {address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5"
+                  ? "Approve"
+                  : "Not enough voting power"}
               </button>
             </div>
           </div>
