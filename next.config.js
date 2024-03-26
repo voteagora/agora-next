@@ -21,11 +21,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/api/v1/delegates',
-        destination: '/404',
-        permanent: true,
-      },
-      {
         source: '/api/v1/proposals/:proposalId',
         destination: '/404',
         permanent: true,
