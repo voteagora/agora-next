@@ -1,30 +1,30 @@
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import {
   SimpleSpanProcessor,
-  ConsoleSpanExporter,
 } from "@opentelemetry/sdk-trace-node";
-import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 import {
   PeriodicExportingMetricReader,
-  ConsoleMetricExporter,
 } from "@opentelemetry/sdk-metrics";
 import { Resource } from "@opentelemetry/resources";
 import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 
 import { SERVICE_NAME } from "./instrumentation";
-// TODO: Use OTLP exporter when we have a supported metrics collector or OTLP endpoint
-// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 
 // NOTE: this instrumentation code will not run on the Vercel edge
 const sdk = new NodeSDK({
   resource: new Resource({
     [SEMRESATTRS_SERVICE_NAME]: SERVICE_NAME,
   }),
-  traceExporter: new ConsoleSpanExporter(),
+  traceExporter: new OTLPTraceExporter(),
   metricReader: new PeriodicExportingMetricReader({
-    exporter: new ConsoleMetricExporter(),
+    exporter: new OTLPMetricExporter(),
   }),
-  spanProcessor: new SimpleSpanProcessor(new ConsoleSpanExporter()),
-  // instrumentations: [getNodeAutoInstrumentations()],
+  spanProcessors: [
+    new SimpleSpanProcessor(
+      new OTLPTraceExporter()
+    )
+  ],
 });
 sdk.start();
