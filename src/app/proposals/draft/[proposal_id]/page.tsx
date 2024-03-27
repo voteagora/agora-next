@@ -10,6 +10,7 @@ import {
 } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import { createGithubProposal as handleCreateGithubProposal } from "@/components/ProposalLifecycle/github";
+import DraftProposal from "@/components/ProposalLifecycle/DraftProposal";
 
 async function getProposal(
   proposal_id: string
@@ -192,20 +193,17 @@ export default async function DraftProposalPage({
   }
 
   return (
-    <div className="flex flex-row gap-x-6 pt-9 items-start max-w-screen-xl mx-auto">
-      <DraftProposalForm
-        proposal={proposalDraft}
-        getProposal={getProposal}
-        updateProposal={updateProposal}
-        addTransaction={addTransaction}
-        updateTransaction={updateTransaction}
-        deleteTransaction={deleteTransaction}
-        createGithubProposal={createGithubProposal}
-        saveSocialProposalOptions={saveSocialProposalOptions}
-        getProposalChecklist={getProposalChecklist}
-        registerChecklistEvent={registerChecklistEvent}
-      />
-      <DraftProposalChecklist proposal={proposalDraft} />
-    </div>
+    <DraftProposal
+      proposal={proposalDraft}
+      getProposal={getProposal}
+      updateProposal={updateProposal}
+      addTransaction={addTransaction}
+      updateTransaction={updateTransaction}
+      deleteTransaction={deleteTransaction}
+      createGithubProposal={createGithubProposal}
+      saveSocialProposalOptions={saveSocialProposalOptions}
+      getProposalChecklist={getProposalChecklist}
+      registerChecklistEvent={registerChecklistEvent}
+    />
   );
 }

@@ -24,6 +24,10 @@ type ProposalLifecycleDraftStage =
 
 interface DraftProposalFormProps {
   proposal: ProposalDraftWithTransactions;
+  proposalState: ProposalDraftWithTransactions;
+  setProposalState: React.Dispatch<
+    React.SetStateAction<ProposalDraftWithTransactions>
+  >;
   getProposal: (
     proposal_id: string
   ) => Promise<ProposalDraftWithTransactions | null>;
@@ -59,7 +63,8 @@ interface DraftProposalFormProps {
 
 const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
   const {
-    proposal,
+    proposalState,
+    setProposalState,
     getProposal,
     updateProposal,
     addTransaction,
@@ -70,9 +75,6 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
     getProposalChecklist,
     registerChecklistEvent,
   } = props;
-
-  const [proposalState, setProposalState] =
-    useState<ProposalDraftWithTransactions>(proposal);
 
   function getCurrentStage(
     proposal_status_id: number
