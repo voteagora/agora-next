@@ -1312,7 +1312,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@opentelemetry/api-logs@0.46.0":
+"@opentelemetry/api-logs@0.46.0", "@opentelemetry/api-logs@^0.46.0":
   version "0.46.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/api-logs/-/api-logs-0.46.0.tgz#25b407de1c2b238a103789d750f6469a43a4f08c"
   integrity sha512-+9BcqfiEDGPXEIo+o3tso/aqGM5dGbGwAkGVp3FPpZ8GlkK1YlaKRd9gMVyPaeRATwvO5wYGGnCsAc/sMMM9Qw==
