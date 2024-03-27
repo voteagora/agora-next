@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Image from "next/image";
-import successfulDelegation from "public/images/successfulDelegation.svg";
+import successfulDelegation from "../../../../../public/images/successfulDelegation.svg";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useEffect } from "react";
 
