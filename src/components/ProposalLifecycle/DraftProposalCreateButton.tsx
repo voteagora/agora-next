@@ -56,6 +56,8 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   const { address } = useAccount();
 
   const [updateENSDocsStatus, setUpdateENSDocsStatus] = useState(true);
+  const [ENSDocsURL, setENSDocsURL] = useState("");
+  const [ENSDocsLoading, setENSDocsLoading] = useState(false);
 
   const handleContinue = async () => {
     if (!address) return;
@@ -89,14 +91,20 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     }
 
     if (updateENSDocsStatus) {
-      const prLink = await createGithubProposal(proposalState);
-      alert("Proposal created! " + prLink);
+      setENSDocsLoading(true);
+      await createGithubProposal(proposalState)
+        .then((res) => {
+          setENSDocsURL(res);
 
-      registerChecklistEvent(
-        proposalState.id.toString(),
-        "update_docs",
-        address
-      );
+          registerChecklistEvent(
+            proposalState.id.toString(),
+            "update_docs",
+            address
+          );
+        })
+        .finally(() => {
+          setENSDocsLoading(false);
+        });
     }
   };
 
@@ -127,9 +135,18 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                 <div className="flex flex-row justify-between mb-8">
                   <p className="text-stone-700">Update ENS docs</p>
                   {updateENSDocsStatus ? (
-                    <div className="text-green-600">
-                      <p>Completed</p>
-                    </div>
+                    ENSDocsLoading ? (
+                      <div className="text-gray-600">
+                        <p>Loading...</p>
+                      </div>
+                    ) : (
+                      <div className="text-green-600">
+                        <p>Completed</p>
+                        <a target="_blank" href={ENSDocsURL}>
+                          Link
+                        </a>
+                      </div>
+                    )
                   ) : (
                     <div className="text-gray-600">
                       <p>Skipped</p>
