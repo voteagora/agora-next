@@ -11,6 +11,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
 import styles from "./proposalVotesList.module.scss";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function ProposalSingleVote({
   vote,
@@ -22,6 +23,7 @@ export function ProposalSingleVote({
   delegators: string[] | null;
 }) {
   const { address: connectedAddress } = useAccount();
+  const [hash1, hash2] = vote.transactionHash.split("|");
 
   return (
     <VStack key={vote.transactionHash} gap={2} className={styles.vote_row}>
@@ -55,6 +57,7 @@ export function ProposalSingleVote({
         </HoverCard>
       </VStack>
       <pre className={styles.vote_reason}>{vote.reason}</pre>
+      <BlockScanUrls hash1={hash1} hash2={hash2} className="pt-0" />
     </VStack>
   );
 }

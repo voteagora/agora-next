@@ -6,6 +6,7 @@ import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export default function ProposalDescription({ proposal }) {
   const proposalsWithBadDescription = [
@@ -55,6 +56,12 @@ export default function ProposalDescription({ proposal }) {
         >
           {stripTitleFromDescription(shortTitle, patchedDescription)}
         </ReactMarkdown>
+        {/* TODO: ferrodri -> WIP first see if it makes sense to then get proposal tx */}
+        <BlockScanUrls
+          hash1={
+            "0x373685deb4e6cca8fb915eca177a4f741fc282fe4337797cfe52e9725afe63bf"
+          }
+        />
       </VStack>
     </VStack>
   );
