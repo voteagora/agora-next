@@ -339,10 +339,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                 className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4 disabled:bg-red-500"
                 // TODO read the voting power, for now only nick.eth allowed
                 disabled={
-                  address !== "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5"
+                  address !== "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" &&
+                  address !== "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd"
                 }
               >
-                {address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5"
+                {address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" ||
+                address === "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd"
                   ? "Approve"
                   : "Not enough voting power"}
               </button>
