@@ -105,24 +105,24 @@ const knownAbis: Record<string, Abi> = {
 };
 
 const decodeCalldata = (calldatas: `0x${string}`[]) => {
-  if (!calldatas || calldatas.length === 0 || !calldatas[0]) {
-    return { functionName: "unknown", functionArgs: [] as string[] };
-  }
+  return calldatas.map((calldata) => {
+    const abi = knownAbis[calldata.slice(0, 10)];
+    let functionName = "unknown";
+    let functionArgs = [] as string[];
 
-  const abi = knownAbis[calldatas[0].slice(0, 10)];
-  let functionName = "unknown";
-  let functionArgs = [] as string[];
+    if (abi) {
+      const decodedData = decodeFunctionData({
+        abi: abi,
+        data: calldata,
+      });
+      functionName = decodedData.functionName;
+      functionArgs = decodedData.args as string[];
+    }
 
-  if (abi) {
-    const decodedData = decodeFunctionData({
-      abi: abi,
-      data: calldatas[0],
-    });
-    functionName = decodedData.functionName;
-    functionArgs = decodedData.args as string[];
-  }
-
-  return { functionName, functionArgs };
+    return {
+      functionArgs, functionName
+    }
+  });
 };
 
 /**
@@ -197,20 +197,20 @@ export async function parseProposal(
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+          : null,
     start_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.start_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.start_block, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.start_block, latestBlock)
+          : null,
     end_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.end_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+          : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
@@ -223,12 +223,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-          proposal,
-          proposalResuts,
-          latestBlock,
-          quorum,
-          votableSupply
-        )
+        proposal,
+        proposalResuts,
+        latestBlock,
+        quorum,
+        votableSupply
+      )
       : null,
   };
 }
@@ -284,8 +284,10 @@ export type ParsedProposalData = {
         values: string[];
         signatures: string[];
         calldatas: string[];
-        functionName: string;
-        functionArgs: string[];
+        functionArgsName: {
+          functionName: string;
+          functionArgs: string[];
+        }[]
       }[];
     };
   };
@@ -297,8 +299,10 @@ export type ParsedProposalData = {
         values: string[];
         calldatas: string[];
         description: string;
-        functionName: string;
-        functionArgs: string[];
+        functionArgsName: {
+          functionName: string;
+          functionArgs: string[];
+        }[]
         budgetTokensSpent: bigint | null;
       }[];
       proposalSettings: {
@@ -341,7 +345,7 @@ export function parseProposalData(
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
-      const { functionArgs, functionName } = decodeCalldata(calldatas);
+      const functionArgsName = decodeCalldata(calldatas);
       return {
         key: "STANDARD",
         kind: {
@@ -351,8 +355,7 @@ export function parseProposalData(
               values: JSON.parse(parsedProposalData.values),
               signatures: JSON.parse(parsedProposalData.signatures),
               calldatas: calldatas,
-              functionName,
-              functionArgs,
+              functionArgsName,
             },
           ],
         },
@@ -401,7 +404,7 @@ export function parseProposalData(
                 }
               })();
 
-              const { functionArgs, functionName } = decodeCalldata(
+              const functionArgsName = decodeCalldata(
                 calldatas as `0x${string}`[]
               );
 
@@ -410,8 +413,7 @@ export function parseProposalData(
                 values,
                 calldatas,
                 description,
-                functionName,
-                functionArgs,
+                functionArgsName,
                 budgetTokensSpent,
               };
             }

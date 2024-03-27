@@ -22,6 +22,7 @@ export default function ApprovedTransactions({ proposalData }) {
       className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
     >
       <p className="px-4 mb-2 font-mono text-xs font-medium leading-4 text-gray-af">
+        {/* TODO: frh -> no proposed transactions */}
         Proposed Transactions (signal only – transactions are manually executed
         by the Foundation)
       </p>
@@ -29,29 +30,32 @@ export default function ApprovedTransactions({ proposalData }) {
         {proposalData.options
           .slice(0, displayedOptions)
           .map((option, index) => {
-            // TODO: Right now this only handles the case with only 1 transaction. Each option can have multiple transactions
-            const valueETH =
-              option.values[0] > 0
-                ? `{ value: ${formatEther(option.values[0])} ETH }`
-                : undefined;
-
             return option.values.length > 0 ? (
-              <div key={index}>
-                <p className="font-mono text-xs font-medium leading-4 text-gray-af">
-                  <OptionDescription
-                    description={option.description}
-                    value={option.budgetTokensSpent || BigInt(0)}
-                    target={option.targets[0]}
-                  />
-                </p>
-                <CodeChange
-                  target={option.targets[0]}
-                  calldata={option.calldatas[0]}
-                  valueETH={valueETH}
-                  functionName={option.functionName}
-                  functionArgs={option.functionArgs}
-                />
-              </div>
+              option.targets.map((t, i) => {
+                const valueETH =
+                  option.values[i] > 0
+                    ? `{ value: ${formatEther(option.values[i])} ETH }`
+                    : undefined;
+                return (
+                  <div key={index}>
+                    <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+                      <OptionDescription
+                        key={i}
+                        description={option.description}
+                        // TODO: frh -> this budgetTokensSpent
+                        value={option.budgetTokensSpent || BigInt(0)}
+                        target={option.targets[i]}
+                      />
+                    </p>
+                    <CodeChange
+                      target={option.targets[i]}
+                      valueETH={valueETH}
+                      functionName={option.functionArgsName[i].functionName}
+                      functionArgs={option.functionArgsName[i].functionArgs}
+                    />
+                  </div>
+                );
+              })
             ) : (
               <p className="font-mono text-xs font-medium leading-4 text-gray-af">
                 {"//"} {option.description}
