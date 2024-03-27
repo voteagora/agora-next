@@ -55,6 +55,8 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
 
   const { address } = useAccount();
 
+  const [updateENSDocsStatus, setUpdateENSDocsStatus] = useState(true);
+
   const handleContinue = async () => {
     if (!address) return;
     const updatedProposal = await updateProposal(proposalState, {
@@ -86,13 +88,16 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
       return;
     }
 
-    // TODO save / run validation etc
-    // todo bring back, something on GH side broke
-    // const prLink = await createGithubProposal(proposalState);
+    if (updateENSDocsStatus) {
+      const prLink = await createGithubProposal(proposalState);
+      alert("Proposal created! " + prLink);
 
-    registerChecklistEvent(proposalState.id.toString(), "update_docs", address);
-
-    // alert("Proposal created! " + prLink);
+      registerChecklistEvent(
+        proposalState.id.toString(),
+        "update_docs",
+        address
+      );
+    }
   };
 
   return (
@@ -121,9 +126,15 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                 </p>
                 <div className="flex flex-row justify-between mb-8">
                   <p className="text-stone-700">Update ENS docs</p>
-                  <div className="text-green-600">
-                    <p>Completed</p>
-                  </div>
+                  {updateENSDocsStatus ? (
+                    <div className="text-green-600">
+                      <p>Completed</p>
+                    </div>
+                  ) : (
+                    <div className="text-gray-600">
+                      <p>Skipped</p>
+                    </div>
+                  )}
                 </div>
                 <button
                   className={`w-full py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
@@ -142,7 +153,10 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
         <div className="flex flex-row w-full items-center">
           <p className="text-gray-4f pr-5">Update ENS docs</p>
           <div className="border-b border-dashed flex-grow border-gray-eo mr-5"></div>
-          <Checkbox checked={true} />
+          <Checkbox
+            checked={updateENSDocsStatus}
+            onCheckedChange={() => setUpdateENSDocsStatus(!updateENSDocsStatus)}
+          />
         </div>
       </div>
     </div>
