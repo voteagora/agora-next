@@ -37,7 +37,7 @@ const DraftProposalSponsor: React.FC<DraftProposalSponsorProps> = ({
         updateProposal={updateProposal}
         getProposalChecklist={getProposalChecklist}
       />
-      <DraftProposalSponsorNote />
+      <DraftProposalSponsorNote proposal={proposal} />
     </div>
   );
 };
