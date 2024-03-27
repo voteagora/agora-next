@@ -55,6 +55,7 @@ const DraftProposalAbstract: React.FC<DraftProposalAbstractProps> = (props) => {
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   }
 

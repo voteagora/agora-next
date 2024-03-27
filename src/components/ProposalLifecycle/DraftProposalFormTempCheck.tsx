@@ -73,6 +73,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   };
 
@@ -84,6 +85,7 @@ const DraftProposalFormTempCheck: React.FC<DraftProposalFormTempCheckProps> = (
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   };
 

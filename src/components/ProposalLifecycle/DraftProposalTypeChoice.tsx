@@ -38,6 +38,7 @@ const DraftProposalTypeChoice: React.FC<DraftProposalTypeChoiceProps> = (
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   }
 

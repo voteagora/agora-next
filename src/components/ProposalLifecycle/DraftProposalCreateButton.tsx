@@ -70,6 +70,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   };
 

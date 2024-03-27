@@ -37,6 +37,7 @@ const DraftProposalSocialVotingStrategyType: React.FC<
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   }
 
