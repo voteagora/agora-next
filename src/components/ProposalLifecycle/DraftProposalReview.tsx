@@ -103,6 +103,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     setProposalState({
       ...updatedProposal,
       transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
     });
   };
 
@@ -154,6 +155,39 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               }}
             />
           </div>
+          {proposalState.proposal_type === "social" && (
+            <div className="flex flex-col gap-y-1 text-base">
+              <label className="font-medium">Voting strategy</label>
+              <p className="text-gray-4f">
+                {proposalState.voting_strategy_social}
+              </p>
+            </div>
+          )}
+          {proposalState.proposal_type === "social" && (
+            <div className="flex flex-col gap-y-1 text-base">
+              <label className="font-medium">Voting start</label>
+              <p className="text-gray-4f">
+                {`${proposalState.start_date_social?.toLocaleDateString()} ${proposalState.start_date_social?.toLocaleTimeString()}`}
+              </p>
+            </div>
+          )}
+          {proposalState.proposal_type === "social" && (
+            <div className="flex flex-col gap-y-1 text-base">
+              <label className="font-medium">Voting end</label>
+              <p className="text-gray-4f">
+                {`${proposalState.end_date_social?.toLocaleDateString()} ${proposalState.end_date_social?.toLocaleTimeString()}`}
+              </p>
+            </div>
+          )}
+          {proposalState.proposal_type === "social" &&
+            proposalState.voting_strategy_social === "approval" && (
+              <div className="flex flex-col gap-y-1 text-base">
+                <label className="font-medium">Voting options</label>
+                {proposalState.ProposalDraftOption.map((option, index) => (
+                  <p className="text-gray-4f">{option.text}</p>
+                ))}
+              </div>
+            )}
         </div>
       </div>
       <div className="flex flex-col gap-y-3 px-6 pt-6 pb-9">

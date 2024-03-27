@@ -23,6 +23,7 @@ async function getProposal(
     },
     include: {
       transactions: true,
+      ProposalDraftOption: true,
     },
   });
 

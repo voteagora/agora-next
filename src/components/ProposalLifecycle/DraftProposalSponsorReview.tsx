@@ -249,25 +249,27 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
         <div className="pt-6 pb-9 bg-white border border-gray-eb rounded-2xl z-20">
           <div className="flex flex-col gap-y-6 px-6 border-b border-gray-eb pb-8">
             <h3 className="text-2xl font-black">{proposal.title}</h3>
-            <div className="bg-[#F7F7F7] rounded-lg border border-gray-eo w-[620px] break-all">
-              <p className="stone-500 text-xs pt-3 px-6">
-                Proposed transactions
-              </p>
-              {proposal.transactions.map((transaction, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
-                  >
-                    <p>{`// ${transaction.description}`}</p>
-                    <p>{transaction.target}</p>
-                    <p>{transaction.function_details}</p>
-                    <p>{transaction.value}</p>
-                    <p>{transaction.calldata}</p>
-                  </div>
-                );
-              })}
-            </div>
+            {proposal.proposal_type === "executable" && (
+              <div className="bg-[#F7F7F7] rounded-lg border border-gray-eo w-[620px] break-all">
+                <p className="stone-500 text-xs pt-3 px-6">
+                  Proposed transactions
+                </p>
+                {proposal.transactions.map((transaction, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
+                    >
+                      <p>{`// ${transaction.description}`}</p>
+                      <p>{transaction.target}</p>
+                      <p>{transaction.function_details}</p>
+                      <p>{transaction.value}</p>
+                      <p>{transaction.calldata}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <div className="flex flex-col gap-y-1 text-base">
               <label className="font-medium">Description</label>
               <p className="text-gray-4f">{proposal.description}</p>
@@ -287,6 +289,39 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                 }}
               />
             </div>
+            {proposal.proposal_type === "social" && (
+              <div className="flex flex-col gap-y-1 text-base">
+                <label className="font-medium">Voting strategy</label>
+                <p className="text-gray-4f">
+                  {proposal.voting_strategy_social}
+                </p>
+              </div>
+            )}
+            {proposal.proposal_type === "social" && (
+              <div className="flex flex-col gap-y-1 text-base">
+                <label className="font-medium">Voting start</label>
+                <p className="text-gray-4f">
+                  {`${proposal.start_date_social?.toLocaleDateString()} ${proposal.start_date_social?.toLocaleTimeString()}`}
+                </p>
+              </div>
+            )}
+            {proposal.proposal_type === "social" && (
+              <div className="flex flex-col gap-y-1 text-base">
+                <label className="font-medium">Voting end</label>
+                <p className="text-gray-4f">
+                  {`${proposal.end_date_social?.toLocaleDateString()} ${proposal.end_date_social?.toLocaleTimeString()}`}
+                </p>
+              </div>
+            )}
+            {proposal.proposal_type === "social" &&
+              proposal.voting_strategy_social === "approval" && (
+                <div className="flex flex-col gap-y-1 text-base">
+                  <label className="font-medium">Voting options</label>
+                  {proposal.ProposalDraftOption.map((option, index) => (
+                    <p className="text-gray-4f">{option.text}</p>
+                  ))}
+                </div>
+              )}
           </div>
           <div className="flex flex-col gap-y-5 text-base px-6 pt-6">
             <DraftProposalFormSubmitChecklist
