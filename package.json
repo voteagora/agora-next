@@ -58,7 +58,7 @@
     "lodash": "^4.17.0",
     "lokijs": "^1.5.12",
     "lucide-react": "^0.258.0",
-    "next": "^14.0.1",
+    "next": "14.1.4",
     "pino-pretty": "^10.0.1",
     "postcss": "8.4.23",
     "postgres": "^3.3.5",
