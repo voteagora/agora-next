@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   AccordionContent,
@@ -10,6 +10,10 @@ import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { LinkIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ProposalDraftWithTransactions } from "./types";
+import {
+  processAddressOrEnsName,
+  resolveENSProfileImage,
+} from "@/app/lib/ENSUtils";
 
 const staticText = {
   description:
@@ -38,12 +42,32 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
     getProposalChecklist,
   } = props;
 
+  const [sponsorName, setSponsorName] = useState<string>("");
+  const [sponsorAvatar, setSponsorAvatar] = useState<string>("");
+
   const handleCopySponsorsipLink = () => {
     navigator.clipboard.writeText(
       `${window.location.origin}/proposals/sponsor/${proposalState.id}`
     );
     toast("Proposal link copied to clipboard!");
   };
+
+  const fetchSponsorName = async (sponsorAddress: string) => {
+    const name = await processAddressOrEnsName(sponsorAddress);
+    setSponsorName(name || "");
+  };
+
+  const fetchSponsorAvatar = async (sponsorAddress: string) => {
+    // todo not sure it works on sepolia?
+    const avatar = await resolveENSProfileImage(sponsorAddress);
+    setSponsorAvatar(avatar || "");
+  };
+
+  useEffect(() => {
+    if (!proposalState.sponsor_address) return;
+    fetchSponsorName(proposalState.sponsor_address);
+    fetchSponsorAvatar(proposalState.sponsor_address);
+  }, [proposalState]);
 
   return (
     <div className="bg-gray-fa rounded-2xl ring-1 ring-inset ring-gray-eo">
@@ -69,13 +93,15 @@ const DraftProposalFormSubmit: React.FC<DraftProposalFormSubmitProps> = (
       {proposalState.proposal_status_id == 4 && (
         <div className="flex flex-col gap-y-2 p-6">
           <p className="text-stone-700">
-            {`Your proposal is awaiting ${proposalState.sponsor_address}’s sponsorship. Once your sponsor approves, your proposal will be automatically submitted, without needing your input. In the meantime, you can contact your sponsor by copying the link below.`}
+            {`Your proposal is awaiting ${sponsorName}’s sponsorship. Once your sponsor approves, your proposal will be automatically submitted, without needing your input. In the meantime, you can contact your sponsor by copying the link below.`}
           </p>
           <div className="flex flex-row w-full ring-1 ring-inset ring-stone-200 rounded-xl items-center">
             <div className="flex flex-row flex-grow pl-4 gap-x-12 items-center">
               <div className="flex flex-row gap-x-2">
-                <div className="w-6 h-6 bg-black rounded-full"></div>
-                <p className="text-stone-900">sponsor</p>
+                {sponsorAvatar && (
+                  <img src={sponsorAvatar} className="w-12 h-12 rounded-full" />
+                )}
+                <p className="text-stone-900">{sponsorName}</p>
               </div>
               <p className="font-medium text-sm text-stone-700">
                 awaiting sponsorship
