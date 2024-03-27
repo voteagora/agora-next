@@ -22,8 +22,8 @@ export default function RetroPGFCategoryFilter() {
   const handleSelect = (value: string) => {
     router.push(
       value !== "ALL"
-        ? addSearchParam("category", value)
-        : deleteSearchParam("category"),
+        ? addSearchParam({ name: "category", value })
+        : deleteSearchParam({ name: "category" }),
       {
         scroll: false,
       }
