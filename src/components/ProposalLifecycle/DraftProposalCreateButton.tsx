@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
 import { useAccount } from "wagmi";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -140,10 +141,10 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                         <p>Loading...</p>
                       </div>
                     ) : (
-                      <div className="text-green-600">
-                        <p>Completed</p>
+                      <div className="flex flex-row items-center gap-x-2">
+                        <p className="text-green-600">Completed</p>
                         <a target="_blank" href={ENSDocsURL}>
-                          Link
+                          <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                         </a>
                       </div>
                     )
