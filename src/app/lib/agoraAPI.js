@@ -20,7 +20,7 @@ class AgoraAPI {
     const res = await fetch(`${this.baseURL}${endpoint}`, {
       method: "GET",
       headers: {
-        "agora-api-key": this.apiKey,
+        "authorization": this.apiKey,
       },
     });
 
@@ -39,7 +39,7 @@ class AgoraAPI {
     const res = await fetch(`${this.baseURL}${endpoint}`, {
       method: "POST",
       headers: {
-        "agora-api-key": this.apiKey,
+        "authorization": this.apiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
