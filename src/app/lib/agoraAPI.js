@@ -19,7 +19,6 @@ class AgoraAPI {
   async get(endpoint, instanceToken = this.instanceToken) {
     const res = await fetch(`${this.baseURL}${endpoint}`, {
       method: "GET",
-      credentials: "same-origin",
       headers: {
         "authorization": this.apiKey,
       },
