@@ -1,5 +1,34 @@
 import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDelegateStatement";
+import Tenant from "@/lib/tenant/tenant";
 
+export async function generateMetadata({}) {
+  const tenant = Tenant.current();
+  const page = tenant.ui.page("delegates");
+  const { title, description } = page.meta;
+
+  const preview = `/api/images/og/delegates?title=${encodeURIComponent(
+    title
+  )}&description=${encodeURIComponent(description)}`;
+
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+    other: {
+      ["twitter:card"]: "summary_large_image",
+      ["twitter:title"]: title,
+      ["twitter:description"]: description,
+    },
+  };
+}
 export default async function Page() {
   return <CurrentDelegateStatement />;
 }

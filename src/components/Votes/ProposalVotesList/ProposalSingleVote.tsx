@@ -37,11 +37,7 @@ export function ProposalSingleVote({
                 <VoteText support={vote.support} />
               </HStack>
               <HStack alignItems="items-center" className={styles.vote_weight}>
-                <TokenAmountDisplay
-                  amount={vote.weight}
-                  decimals={18}
-                  currency="OP"
-                />
+                <TokenAmountDisplay amount={vote.weight} />
               </HStack>
             </HStack>
           </HoverCardTrigger>

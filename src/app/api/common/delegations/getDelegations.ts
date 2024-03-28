@@ -1,4 +1,4 @@
-import { type AdvancedDelegationPayload, type Delegation } from "./delegation";
+import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
@@ -21,7 +21,7 @@ async function getCurrentDelegateesForAddress({
 }): Promise<Delegation[]> {
   const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegatees = await (prisma as any)[
+  const advancedDelegatees = await prisma[
     `${namespace}AdvancedDelegatees`
   ].findMany({
     where: {
@@ -101,21 +101,19 @@ async function getCurrentDelegateesForAddress({
     //       },
     //     ]
     //   : []),
-    ...advancedDelegatees.map(
-      (advancedDelegatee: AdvancedDelegationPayload) => ({
-        from: advancedDelegatee.from,
-        to: advancedDelegatee.to,
-        allowance: advancedDelegatee.delegated_amount.toFixed(0),
-        timestamp: latestBlock
-          ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
-          : null,
-        type: "ADVANCED",
-        amount:
-          Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
-            ? "FULL"
-            : "PARTIAL",
-      })
-    ),
+    ...advancedDelegatees.map((advancedDelegatee) => ({
+      from: advancedDelegatee.from,
+      to: advancedDelegatee.to,
+      allowance: advancedDelegatee.delegated_amount.toFixed(0),
+      timestamp: latestBlock
+        ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
+        : null,
+      type: "ADVANCED",
+      amount:
+        Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
+          ? "FULL"
+          : "PARTIAL",
+    })),
   ] as Delegation[];
 }
 
@@ -133,9 +131,7 @@ async function getCurrentDelegatorsForAddress({
 }) {
   const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegators = (prisma as any)[
-    `${namespace}AdvancedDelegatees`
-  ].findMany({
+  const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
@@ -201,21 +197,19 @@ async function getCurrentDelegatorsForAddress({
     //   amount: "FULL",
     // })),
 
-    ...(await advancedDelegators).map(
-      (advancedDelegator: AdvancedDelegationPayload) => ({
-        from: advancedDelegator.from,
-        to: advancedDelegator.to,
-        allowance: advancedDelegator.delegated_amount.toFixed(0),
-        timestamp: latestBlock
-          ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
-          : null,
-        type: "ADVANCED",
-        amount:
-          Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-            ? "FULL"
-            : "PARTIAL",
-      })
-    ),
+    ...(await advancedDelegators).map((advancedDelegator) => ({
+      from: advancedDelegator.from,
+      to: advancedDelegator.to,
+      allowance: advancedDelegator.delegated_amount.toFixed(0),
+      timestamp: latestBlock
+        ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+        : null,
+      type: "ADVANCED",
+      amount:
+        Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+          ? "FULL"
+          : "PARTIAL",
+    })),
   ] as Delegation[];
 }
 
@@ -234,7 +228,7 @@ const getDirectDelegateeForAddress = async ({
   const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    (prisma as any)[`${namespace}Delegatees`].findFirst({
+    prisma[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);
@@ -275,4 +269,4 @@ async function getAllDelegatorsInChainsForAddress({
 export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
 export const fetchCurrentDelegators = cache(getCurrentDelegators);
 export const fetchDirectDelegatee = cache(getDirectDelegatee);
-export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains); 
+export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains);

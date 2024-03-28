@@ -3,6 +3,12 @@ type UIToggle = {
   enabled: boolean;
 };
 
+type UILink = {
+  name: string;
+  title: string;
+  url: string;
+};
+
 type UIPage = {
   description: string;
   route: string;
@@ -18,6 +24,7 @@ type TenantUIParams = {
   hero?: string;
   logo: string;
   title: string;
+  links?: UILink[];
   pages?: UIPage[];
   toggles?: UIToggle[];
 };
@@ -27,14 +34,28 @@ export class TenantUI {
   private _hero?: string;
   private _logo: string;
   private _title: string;
+  private _links?: UILink[];
   private _pages?: UIPage[];
   private _toggles?: UIToggle[];
 
-  constructor({ color, hero, logo, title, pages, toggles }: TenantUIParams) {
+  private _linksCache: { [key: string]: UILink | undefined } = {};
+  private _pagesCache: { [key: string]: UIPage | undefined } = {};
+  private _togglesCache: { [key: string]: UIToggle | undefined } = {};
+
+  constructor({
+    color,
+    hero,
+    logo,
+    title,
+    links,
+    pages,
+    toggles,
+  }: TenantUIParams) {
     this._color = color;
     this._hero = hero;
     this._logo = logo;
     this._title = title;
+    this._links = links;
     this._toggles = toggles;
     this._pages = pages;
   }
@@ -55,11 +76,33 @@ export class TenantUI {
     return this._logo;
   }
 
+  public link(name: string): UILink | undefined {
+    if (this._linksCache[name] !== undefined) {
+      return this._linksCache[name];
+    }
+
+    const result = this._links?.find((t) => t.name === name);
+    this._linksCache[name] = result;
+    return result;
+  }
+
   public toggle(name: string): UIToggle | undefined {
-    return this._toggles?.find((t) => t.name === name);
+    if (this._togglesCache[name] !== undefined) {
+      return this._togglesCache[name];
+    }
+
+    const result = this._toggles?.find((t) => t.name === name);
+    this._togglesCache[name] = result;
+    return result;
   }
 
   public page(route: string): UIPage | undefined {
-    return this._pages?.find((t) => t.route === route);
+    if (this._pagesCache[route] !== undefined) {
+      return this._pagesCache[route];
+    }
+
+    const result = this._pages?.find((t) => t.route === route);
+    this._pagesCache[route] = result;
+    return result;
   }
 }
