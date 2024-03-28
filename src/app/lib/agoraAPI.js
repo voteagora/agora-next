@@ -17,7 +17,7 @@ class AgoraAPI {
    * Performs a GET request to the Agora API.
    */
   async get(endpoint, instanceToken = this.instanceToken) {
-    const res = await fetch(`${this.baseURL}${endpoint}`, {
+    const res = await fetch(`https://agora-next-eki93imta-voteagora.vercel.app/api/v1${endpoint}`, {
       method: "GET",
       headers: {
         "authorization": this.apiKey,
