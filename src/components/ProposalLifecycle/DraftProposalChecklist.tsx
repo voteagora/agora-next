@@ -97,13 +97,15 @@ const DraftProposalChecklistRow: React.FC<DraftProposalChecklistRowProps> = (
         <div className="w-full flex flex-row justify-between items-center">
           <h3 className="font-medium">{title}</h3>
           {proposal.proposal_status_id > index + 1 && (
-            <CheckmarkIcon className="w-4 h-4 text-green-500" />
+            <div className="flex flex-row justify-center items-center w-4 h-4 border border-gray-eo rounded-full">
+              <div className="w-2 h-2 bg-black rounded-full"></div>
+            </div>
           )}
           {proposal.proposal_status_id == index + 1 && (
-            <div className="w-5 h-5 border-2 border-gray-eo rounded-full bg-gray-eo"></div>
+            <div className="w-4 h-4 border border-gray-eo rounded-full bg-gray-eo"></div>
           )}
           {proposal.proposal_status_id < index + 1 && (
-            <div className="w-5 h-5 border-2 border-gray-eo rounded-full"></div>
+            <div className="w-4 h-4 border border-gray-eo rounded-full"></div>
           )}
         </div>
       </AccordionTrigger>
