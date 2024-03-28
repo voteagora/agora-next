@@ -11,6 +11,8 @@ import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
+import CreateProposalButton from "@/components/ProposalLifecycle/CreateProposalButton";
+import { useAccount } from "wagmi";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -18,11 +20,13 @@ export default function ProposalsList({
   fetchProposals,
   votableSupply,
   governanceCalendar,
+  createDraftProposal,
 }) {
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
   const [meta, setMeta] = useState(initRelevantProposals.meta);
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
     if (filter === "relevant") {
@@ -52,6 +56,12 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <ProposalsFilter />
+          {!!address && (
+            <CreateProposalButton
+              createProposal={createDraftProposal}
+              address={address}
+            />
+          )}
         </div>
       </div>
 

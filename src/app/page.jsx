@@ -10,6 +10,9 @@ import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposal
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
+import prisma from "@/app/lib/prisma";
+import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsList";
+import SponsorshipRequestList from "@/components/ProposalLifecycle/SponsorshipRequestList";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -22,6 +25,30 @@ async function fetchProposals(filter, page = 1) {
 async function fetchNeedsMyVoteProposals(address) {
   "use server";
   return apiFetchNeedsMyVoteProposals(address);
+}
+
+async function fetchDraftProposals(address) {
+  "use server";
+
+  const draftProposals = await prisma.proposalDraft.findMany({
+    where: {
+      author_address: address,
+    },
+  });
+
+  return draftProposals;
+}
+
+async function fetchSponsorshipRequests(address) {
+  "use server";
+
+  const draftProposals = await prisma.proposalDraft.findMany({
+    where: {
+      sponsor_address: address,
+    },
+  });
+
+  return draftProposals;
 }
 
 async function fetchDaoMetrics() {
@@ -37,6 +64,35 @@ async function fetchVotableSupply() {
 async function fetchGovernanceCalendar() {
   "use server";
   return apiFetchGovernanceCalendar();
+}
+
+async function createDraftProposal(address) {
+  "use server";
+
+  const proposal = await prisma.proposalDraft.create({
+    data: {
+      temp_check_link: "",
+      proposal_type: "executable",
+      title: "",
+      description: "",
+      abstract: "",
+      audit_url: "",
+      dao: {
+        connect: {
+          id: 1,
+        },
+      },
+      voting_strategy_social: "basic",
+      proposal_status: {
+        connect: {
+          id: 1,
+        },
+      },
+      author_address: address,
+    },
+  });
+
+  return proposal;
 }
 
 export async function generateMetadata({}, parent) {
@@ -148,6 +204,10 @@ export default async function Home() {
     <VStack>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
+      <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
+      <SponsorshipRequestList
+        fetchSponsorshipRequests={fetchSponsorshipRequests}
+      />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
@@ -161,6 +221,7 @@ export default async function Home() {
         }}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
+        createDraftProposal={createDraftProposal}
       />
     </VStack>
   );
