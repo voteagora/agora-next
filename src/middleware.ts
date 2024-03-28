@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { hasApiKey } from "@/app/lib/middleware/auth";
 
-const baseUrl = process.env.NEXT_PUBLIC_AGORA_BASE_URL;
-const allowedOrigins = [baseUrl?.split("/api")[0]];
 
+const allowedOrigins = ["https://vote.optimism.io/"];
 const corsOptions = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-}
+};
 
 /*
   Middleware function to run on matching routes for config.matcher.
@@ -19,45 +18,51 @@ const corsOptions = {
   client postgres support on edge runtime.
 */
 export function middleware(request: NextRequest) {
-  // Check the origin from the request
-  const origin = request.headers.get('origin') ?? ''
-  const isAllowedOrigin = allowedOrigins.includes(origin);
+  const origin = request.headers.get('origin') ?? '';
 
-  // Handle preflighted requests
+  let isAllowedOrigin = false;
+  if (process.env.NEXT_PUBLIC_AGORA_ENV === "prod") {
+    isAllowedOrigin = allowedOrigins.includes(origin);
+  } else {
+    // Allow all origins if not in production
+    isAllowedOrigin = true;
+  }
+
   const isPreflight = request.method === 'OPTIONS';
-
   if (isPreflight) {
     const preflightHeaders = {
-      ...(isAllowedOrigin && { 'Access-Control-Allow-Origin': origin }),
+      ...(isAllowedOrigin ? { 'Access-Control-Allow-Origin': origin } : {}),
       ...corsOptions,
+    };
+
+    // If not in prod, allow all origins for preflight requests
+    if (process.env.NEXT_PUBLIC_AGORA_ENV !== "prod") {
+      preflightHeaders['Access-Control-Allow-Origin'] = '*';
     }
+
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  // Handle simple requests
-  const response = NextResponse.next()
+  const response = NextResponse.next();
 
   if (isAllowedOrigin) {
-    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Origin', process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? origin : '*');
   }
 
   Object.entries(corsOptions).forEach(([key, value]) => {
-    response.headers.set(key, value)
+    response.headers.set(key, value);
   });
+
   if (request.nextUrl.pathname.startsWith('/api')) {
     const authResponse = hasApiKey(request);
-    // TODO prisma client -> postgres db is currently not supported on edge
-    // runtime for vercel specifically; migrate API key check when it is
-    // TODO consider session/cookie 
     if (!authResponse.authenticated) {
-      return new Response(
-        authResponse.reason,
-        { status: 401 }
-      );
+      return new Response(authResponse.reason, { status: 401 });
     }
   }
+
+  return response;
 }
 
 export const config = {
   matcher: '/api/v1/:path*',
-}
+};
