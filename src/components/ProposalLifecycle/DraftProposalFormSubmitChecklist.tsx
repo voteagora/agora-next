@@ -45,19 +45,10 @@ const DraftProposalFormSubmitChecklist: React.FC<
 
   return (
     <ul className="border border-gray-eo rounded-lg w-full divide-y divide-gray-eo">
-      {tempCheckData !== undefined ? (
-        <DraftProposalFormSubmitChecklistRow
-          title="Discourse Temp Check"
-          data={tempCheckData}
-        />
-      ) : (
-        <li className="w-full flex flex-row items-center justify-between p-4 font-medium">
-          <p>{`Discourse Temp Check`}</p>
-          <div className="flex flex-row items-center">
-            <p className="text-xs text-gray-af font-medium">skipped</p>
-          </div>
-        </li>
-      )}
+      <DraftProposalFormSubmitChecklistRow
+        title="Discourse Temp Check"
+        data={tempCheckData}
+      />
       {proposalState.proposal_type === "executable" && (
         <DraftProposalFormSubmitChecklistRow
           title="Transaction simulation"
@@ -99,14 +90,18 @@ const DraftProposalFormSubmitChecklistRow: React.FC<
   return (
     <li className="w-full flex flex-row items-center justify-between p-4 font-medium">
       <p>{title}</p>
-      <div className="flex flex-row items-center">
-        {data !== undefined && (
+      {data !== undefined ? (
+        <div className="flex flex-row items-center">
           <p className="text-xs mr-3 text-gray-af font-medium">
             on {data.completed_at.toLocaleDateString()} (by {data.completed_by})
           </p>
-        )}
-        <Checkbox checked={data !== undefined ? true : false} />
-      </div>
+          <Checkbox checked={data !== undefined ? true : false} />
+        </div>
+      ) : (
+        <div className="flex flex-row items-center">
+          <p className="text-xs text-gray-af font-medium">skipped</p>
+        </div>
+      )}
     </li>
   );
 };
