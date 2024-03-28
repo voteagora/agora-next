@@ -32,6 +32,18 @@ const DraftProposalContactVoters: React.FC<DraftProposalContactVotersProps> = (
 ) => {
   const { proposalState, setProposalState, updateProposal } = props;
 
+  const handleContactedVoters = async () => {
+    const updatedProposal = await updateProposal(proposalState, {
+      proposal_status_id: 6,
+    });
+
+    setProposalState({
+      ...updatedProposal,
+      transactions: proposalState.transactions,
+      ProposalDraftOption: proposalState.ProposalDraftOption,
+    });
+  };
+
   return (
     <div className="bg-gray-fa rounded-2xl ring-1 ring-inset ring-gray-eo">
       <AccordionItem
@@ -43,10 +55,16 @@ const DraftProposalContactVoters: React.FC<DraftProposalContactVotersProps> = (
         </AccordionTrigger>
       </AccordionItem>
       {proposalState.proposal_status_id == 5 && (
-        <div className="flex flex-col gap-y-2 p-6">
+        <div className="flex flex-row gap-x-6 p-6">
           <p className="text-stone-700">
             {`Please follow the steps from the handbook to ensure that delegates have been notified on telegram and discourse.`}
           </p>
+          <button
+            className={`w-[300px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg`}
+            onClick={handleContactedVoters}
+          >
+            <span className="text-center">I contacted the voters</span>
+          </button>
         </div>
       )}
     </div>

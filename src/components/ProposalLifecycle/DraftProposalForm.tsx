@@ -14,13 +14,15 @@ import {
 } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import DraftProposalContactVoters from "./DraftProposalFormContactVoters";
+import DraftProposalVoteLive from "./DraftProposalFormVoteLive";
 
 type ProposalLifecycleDraftStage =
   | "draft-temp-check"
   | "draft-create"
   | "draft-submit"
   | "awaiting-sponsor"
-  | "contact-voters";
+  | "contact-voters"
+  | "proposal-live";
 
 interface DraftProposalFormProps {
   proposal: ProposalDraftWithTransactions;
@@ -131,6 +133,12 @@ const DraftProposalForm: React.FC<DraftProposalFormProps> = (props) => {
         />
         <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
         <DraftProposalContactVoters
+          proposalState={proposalState}
+          setProposalState={setProposalState}
+          updateProposal={updateProposal}
+        />
+        <div className="border-l border-dashed border-gray-eo w-0 h-8 ml-6"></div>
+        <DraftProposalVoteLive
           proposalState={proposalState}
           setProposalState={setProposalState}
           updateProposal={updateProposal}
