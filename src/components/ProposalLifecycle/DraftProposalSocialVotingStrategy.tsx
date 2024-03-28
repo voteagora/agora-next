@@ -123,7 +123,7 @@ const DraftProposalSocialVotingStrategy: React.FC<
           key={`${option.index} ${proposalState.voting_strategy_social}`}
           optionIndex={option.index}
           votingStrategy={proposalState.voting_strategy_social}
-          label={`Option ${option.index + 1}`}
+          label={`Option ${option.index}`}
           value={option.value}
           placeholder="Option value (max 32 characters)"
           proposalState={proposalState}
