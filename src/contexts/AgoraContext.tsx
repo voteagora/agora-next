@@ -1,12 +1,23 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type Dispatch,
+  SetStateAction,
+} from "react";
 import { useAccount } from "wagmi";
 
 type AgoraContextType = {
   isConnected: boolean;
+  isDelegatesFiltering: boolean;
+  setIsDelegatesFiltering: Dispatch<SetStateAction<boolean>>;
 };
 
 const AgoraContext = createContext<AgoraContextType>({
   isConnected: false,
+  isDelegatesFiltering: false,
+  setIsDelegatesFiltering: (refetchDelegate) => {},
 });
 
 export function useAgoraContext() {
@@ -16,6 +27,7 @@ export function useAgoraContext() {
 const AgoraProvider = ({ children }: { children: React.ReactNode }) => {
   const { address: account } = useAccount();
   const [isConnected, setIsConnected] = useState(false);
+  const [isDelegatesFiltering, setIsDelegatesFiltering] = useState(false);
 
   useEffect(() => {
     setIsConnected(!!account);
@@ -25,6 +37,8 @@ const AgoraProvider = ({ children }: { children: React.ReactNode }) => {
     <AgoraContext.Provider
       value={{
         isConnected,
+        isDelegatesFiltering,
+        setIsDelegatesFiltering,
       }}
     >
       {children}
