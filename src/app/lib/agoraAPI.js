@@ -9,15 +9,13 @@ class AgoraAPI {
    */
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
-    this.instanceToken = process.env.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN;
-    this.baseURL = process.env.NEXT_PUBLIC_AGORA_BASE_URL;
   }
 
   /**
    * Performs a GET request to the Agora API.
    */
-  async get(endpoint, instanceToken = this.instanceToken) {
-    const res = await fetch(`https://agora-next-eki93imta-voteagora.vercel.app/api/v1${endpoint}`, {
+  async get(endpoint, version = 'v1') {
+    const res = await fetch(`/api/${version}${endpoint}`, {
       method: "GET",
       headers: {
         "authorization": this.apiKey,
@@ -35,8 +33,8 @@ class AgoraAPI {
   /**
    * POST request to the Agora API.
    */
-  async post(endpoint, data) {
-    const res = await fetch(`${this.baseURL}${endpoint}`, {
+  async post(endpoint, version = 'v1', data) {
+    const res = await fetch(`/api/${version}${endpoint}`, {
       method: "POST",
       headers: {
         "authorization": this.apiKey,
