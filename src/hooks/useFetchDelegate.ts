@@ -9,7 +9,7 @@ const useFetchDelegate = (address: string) => {
     enabled: !!address,
     queryKey: ['useFetchDelegate', address],
     queryFn: async () => {
-      return await api.get(`/delegate/${address}`);
+      return await api.get(`/delegates/${address}`);
     }
   });
 };
