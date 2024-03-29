@@ -17,7 +17,7 @@ export type AuthResponse = {
 
 export function hasApiKey(request: NextRequest): AuthResponse {
   const token = request.headers.get("authorization");
-  let authResponse: AuthResponse = {authenticated: true, reason: ""};
+  let authResponse: AuthResponse = { authenticated: true, reason: "" };
 
   if (!token) {
     authResponse = {
