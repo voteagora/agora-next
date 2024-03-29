@@ -16,11 +16,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/api/v1/delegates/:addressOrENSName',
-        destination: '/404',
-        permanent: true,
-      },
-      {
         source: '/api/v1/proposals/:proposalId',
         destination: '/404',
         permanent: true,
@@ -80,7 +75,7 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages:["@opentelemetry/sdk-node"]
+    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"]
   },
 };
 
