@@ -2,11 +2,10 @@
  * Show page for a single delegate
  * Takes in the delegate address as a parameter
  */
-
+import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
 import { VStack } from "@/components/Layout/Stack";
-import { VotesSortOrder } from "@/app/api/common/votes/vote";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
@@ -16,37 +15,41 @@ import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
   fetchDelegate,
-  fetchDelegateStatement,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
+  resolveENSName,
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
-  parent: any
-) {
-  const [delegate, delegateStatement, address] = await Promise.all([
-    fetchDelegate(params.addressOrENSName),
-    fetchDelegateStatement(params.addressOrENSName),
-    processAddressOrEnsName(params.addressOrENSName),
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // cache ENS address upfront for all subsequent queries
+  // TODO: change subqueries to use react cache
+  const address = await resolveENSName(params.addressOrENSName);
+  const ensOrTruncatedAddress = await processAddressOrEnsName(
+    params.addressOrENSName
+  );
+  const [delegate, avatar] = await Promise.all([
+    fetchDelegate(address || params.addressOrENSName),
+    resolveENSProfileImage(address || params.addressOrENSName),
   ]);
 
-  const avatar = await resolveENSProfileImage(
-    address || params.addressOrENSName
-  );
+  const { token } = Tenant.current();
 
   const statement = (
-    delegateStatement?.payload as { delegateStatement: string }
+    delegate.statement?.payload as { delegateStatement: string }
   )?.delegateStatement;
 
   const imgParams = [
     delegate.votingPower &&
       `votes=${encodeURIComponent(
-        `${formatNumber(delegate.votingPower || "0")} OP`
+        `${formatNumber(delegate.votingPower || "0")} ${token.symbol}`
       )}`,
     avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
@@ -54,21 +57,26 @@ export async function generateMetadata(
 
   const preview = `/api/images/og/delegate?${imgParams.join(
     "&"
-  )}&address=${address}`;
-  const title = `${address} on Agora`;
-  const description = `See what ${address} believes and how they vote on Optimism governance.`;
+  )}&address=${ensOrTruncatedAddress}`;
+  const title = `${ensOrTruncatedAddress} on Agora`;
+  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on ${token.name} governance.`;
 
   return {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
     other: {
       ["twitter:card"]: "summary_large_image",
       ["twitter:title"]: title,
       ["twitter:description"]: description,
-      ["twitter:image"]: preview,
     },
   };
 }
@@ -78,14 +86,15 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const [delegate, delegateVotes, statement, delegates, delegators] =
-    await Promise.all([
-      fetchDelegate(addressOrENSName),
-      fetchVotesForDelegate(addressOrENSName),
-      fetchDelegateStatement(addressOrENSName),
-      fetchCurrentDelegatees(addressOrENSName),
-      fetchCurrentDelegators(addressOrENSName),
-    ]);
+  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+  const [delegate, delegateVotes, delegates, delegators] = await Promise.all([
+    fetchDelegate(address),
+    fetchVotesForDelegate(address),
+    fetchCurrentDelegatees(address),
+    fetchCurrentDelegators(address),
+  ]);
+
+  const statement = delegate.statement;
 
   if (!delegate) {
     return (
@@ -113,7 +122,7 @@ export default async function Page({
             <div className="flex flex-col gap-4">
               <div className="flex flex-col justify-between gap-2 sm:flex-row">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
-                {/* <div className="flex flex-col justify-between gap-2 md:flex-row">
+                {/* <div className="flex flex-col justify-between gap-2 sm:flex-row">
                   <DelegatesVotesSort
                     fetchDelegateVotes={async (page, sortOrder) => {
                       "use server";
@@ -129,17 +138,10 @@ export default async function Page({
                 </div> */}
               </div>
               <DelegateVotes
-                fetchDelegateVotes={async (
-                  page: number,
-                  sortOrder: VotesSortOrder
-                ) => {
+                fetchDelegateVotes={async (page: number) => {
                   "use server";
 
-                  return fetchVotesForDelegate(
-                    addressOrENSName,
-                    page,
-                    sortOrder
-                  );
+                  return fetchVotesForDelegate(addressOrENSName, page);
                 }}
               />
             </div>

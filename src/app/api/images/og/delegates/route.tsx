@@ -7,10 +7,8 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const title = searchParams.get("title") || "Optimism Agora";
-  const description =
-    searchParams.get("description") ||
-    "Home of Token House Governance and RPGF";
+  const title = searchParams.get("title") || "";
+  const description = searchParams.get("description") || "";
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url)

@@ -1,18 +1,18 @@
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { contracts } from "@/lib/contracts/contracts";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
-export async function getAuthorityChainsForNamespace({
+async function getAuthorityChains({
   address,
   blockNumber,
-  namespace,
 }: {
   address: string;
   blockNumber: number;
-  namespace: "optimism";
 }): Promise<Array<string[]>> {
+  const { namespace, contracts } = Tenant.current();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
@@ -25,7 +25,7 @@ export async function getAuthorityChainsForNamespace({
     FROM ${namespace + ".authority_chains_snaps"} ac
     CROSS JOIN LATERAL (
       SELECT
-        MAX(balance_block_number) AS max_block_number
+        MAX(balance_ordinal) AS max_ordinal
       FROM ${namespace + ".authority_chains_snaps"}
       WHERE chain = ac.chain
         AND delegate = $1
@@ -34,12 +34,12 @@ export async function getAuthorityChainsForNamespace({
     ) AS max_blocks
     WHERE ac.delegate = $1
       AND ac.contract = $2
-      AND ac.balance_block_number = max_blocks.max_block_number
+      AND ac.balance_ordinal = max_blocks.max_ordinal
       AND ac.balance > 0
       AND ac.allowance > 0;
     `,
     address.toLowerCase(),
-    contracts(namespace).alligator.address.toLowerCase(),
+    contracts.alligator!.address,
     blockNumber
   );
 
@@ -67,3 +67,5 @@ export async function getAuthorityChainsForNamespace({
 
   return reversedChains;
 }
+
+export const fetchAuthorityChains = cache(getAuthorityChains);

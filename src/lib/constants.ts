@@ -1,3 +1,8 @@
+export const TENANT_NAMESPACES = {
+  OPTIMISM: "optimism",
+  ETHERFI: "etherfi",
+  ENS: "ens",
+} as const;
 export const proposalsFilterOptions = {
   relevant: {
     value: "Relevant",

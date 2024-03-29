@@ -1,14 +1,13 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./approvalProposalVotesList.module.scss";
-import { VStack, HStack } from "@/components/Layout/Stack";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import Image from "next/image";
 import { useAccount } from "wagmi";
 import { Vote } from "@/app/api/common/votes/vote";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 type Props = {
   initialProposalVotes: {
@@ -40,10 +39,10 @@ export default function ApprovalProposalVotesList({
   fetchUserVotes,
   proposal_id,
 }: Props) {
-  const fetching = React.useRef(false);
-  const [pages, setPages] = React.useState([initialProposalVotes] || []);
-  const [meta, setMeta] = React.useState(initialProposalVotes.meta);
-  const [userVotes, setUserVotes] = React.useState<Vote[]>([]);
+  const fetching = useRef(false);
+  const [pages, setPages] = useState([initialProposalVotes] || []);
+  const [meta, setMeta] = useState(initialProposalVotes.meta);
+  const [userVotes, setUserVotes] = useState<Vote[]>([]);
   const { address: connectedAddress } = useAccount();
 
   const proposalVotes = pages.reduce(
@@ -75,13 +74,13 @@ export default function ApprovalProposalVotesList({
     setUserVotes(fetchedUserVotes);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (connectedAddress) {
       fetchUserVoteAndSet(proposal_id, connectedAddress);
     } else {
       setUserVotes([]);
     }
-  }, [connectedAddress]);
+  }, [connectedAddress, proposal_id]);
 
   return (
     <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
@@ -124,7 +123,15 @@ export default function ApprovalProposalVotesList({
 
 function SingleVote({ vote }: { vote: Vote }) {
   const { address } = useAccount();
-  const { address: voterAddress, params, support, reason, weight } = vote;
+  const {
+    address: voterAddress,
+    params,
+    support,
+    reason,
+    weight,
+    transactionHash,
+  } = vote;
+  const [hash1, hash2] = transactionHash.split("|");
 
   return (
     <VStack className={""}>
@@ -139,7 +146,7 @@ function SingleVote({ vote }: { vote: Vote }) {
           {" voted for"}
         </div>
         <div className={"font-semibold text-gray-700"}>
-          <TokenAmountDisplay amount={weight} decimals={18} currency="OP" />
+          <TokenAmountDisplay amount={weight} />
         </div>
       </HStack>
       <VStack className={"text-xs leading-4 mb-2"}>
@@ -147,7 +154,7 @@ function SingleVote({ vote }: { vote: Vote }) {
           <p
             key={index}
             className={
-              "whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
+              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
             }
           >
             {++index}. {option}
@@ -166,6 +173,7 @@ function SingleVote({ vote }: { vote: Vote }) {
           </p>
         </div>
       )}
+      <BlockScanUrls hash1={hash1} hash2={hash2} />
     </VStack>
   );
 }

@@ -1,21 +1,17 @@
 import { parseProposal } from "@/lib/proposalUtils";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
-import { contracts } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
-import { getVotableSupplyForNamespace } from "../votableSupply/getVotableSupply";
-import { getQuorumForProposalForNamespace } from "../quorum/getQuorum";
+import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
+import { fetchQuorumForProposal } from "../quorum/getQuorum";
 
-export async function getNeedsMyVoteProposalsForNamespace({
-  address,
-  namespace,
-}: {
-  address: string;
-  namespace: "optimism";
-}) {
+async function getNeedsMyVoteProposals(address: string) {
+  const { namespace, contracts } = Tenant.current();
   const [latestBlock, votableSupply] = await Promise.all([
     provider.getBlockNumber(),
-    getVotableSupplyForNamespace({ namespace }),
+    fetchVotableSupply(),
   ]);
 
   if (!latestBlock) {
@@ -44,25 +40,24 @@ export async function getNeedsMyVoteProposalsForNamespace({
       `,
     latestBlock,
     address.toLowerCase(),
-    contracts(namespace).governor.address.toLowerCase()
+    contracts.governor.address,
   );
 
   const resolvedProposals = Promise.all(
     proposals.map(async (proposal) => {
-      const quorum = await getQuorumForProposalForNamespace({
-        proposal,
-        namespace,
-      });
+      const quorum = await fetchQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,
-        quorum,
-        BigInt(votableSupply)
+        quorum ?? null,
+        BigInt(votableSupply),
       );
-    })
+    }),
   );
 
   return {
     proposals: await resolvedProposals,
   };
 }
+
+export const fetchNeedsMyVoteProposals = cache(getNeedsMyVoteProposals);

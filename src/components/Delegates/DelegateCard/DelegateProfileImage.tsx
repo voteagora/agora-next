@@ -4,11 +4,15 @@ import ENSAvatar from "../../shared/ENSAvatar";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "../../shared/HumanAddress";
 import { useEnsName } from "wagmi";
-import { TOKEN, formatNumber } from "@/lib/tokenUtils";
+import { formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
 import styles from "./delegateCard.module.scss";
 import Image from "next/image";
 import badge from "@/icons/badge.svg";
+import { useEffect } from "react";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { formatEther } from "viem";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateProfileImage({
   address,
@@ -19,6 +23,8 @@ export function DelegateProfileImage({
   votingPower: string;
   citizen?: boolean;
 }) {
+  const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
+  const { token } = Tenant.current();
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
@@ -28,9 +34,37 @@ export function DelegateProfileImage({
     address: address as `0x${string}`,
   });
 
+  useEffect(() => {
+    /**
+     * When formatted voting power is different from refetch it means it has been updated
+     */
+    if (
+      refetchDelegate?.address === address &&
+      refetchDelegate?.prevVotingPowerDelegatee
+    ) {
+      const _votingPowerFormatted = Number(
+        formatEther(BigInt(refetchDelegate?.prevVotingPowerDelegatee))
+      ).toFixed(2);
+      const _formattedNumber = Number(formattedNumber).toFixed(2);
+      if (_votingPowerFormatted !== _formattedNumber) {
+        setRefetchDelegate(null);
+      }
+    }
+
+    return () => {
+      // If this component unmounts for a given address there is no point to refetch it when it is not on the UI anymore
+      if (
+        refetchDelegate?.address === address &&
+        refetchDelegate?.prevVotingPowerDelegatee
+      ) {
+        setRefetchDelegate(null);
+      }
+    };
+  }, [address, formattedNumber, refetchDelegate, setRefetchDelegate]);
+
   return (
     <HStack className="gap-4">
-      <div className={styles.profile_image}>
+      <div className="relative aspect-square">
         {citizen && (
           <Image
             className="absolute bottom-[-5px] right-[-7px] z-10"
@@ -46,7 +80,7 @@ export function DelegateProfileImage({
           <HumanAddress address={address} />
         </div>
         <div className={styles.token}>
-          {formattedNumber} {TOKEN.symbol}
+          {formattedNumber} {token.symbol}
         </div>
       </VStack>
     </HStack>

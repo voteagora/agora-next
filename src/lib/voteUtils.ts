@@ -1,17 +1,15 @@
 import * as theme from "@/styles/theme";
-import { Prisma, ProposalType } from "@prisma/client";
+import { ProposalType } from "@prisma/client";
 import {
-  ParsedProposalData,
   getProposalTotalValue,
   getTitleFromProposalDescription,
-  parseProposalData,
+  ParsedProposalData,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
-import { Block } from "ethers";
 import { Vote, VotePayload } from "@/app/api/common/votes/vote";
-import { isOldApprovalModule } from "./contracts/contracts";
-import { DEPLOYMENT_NAME } from "./config";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
  * Vote primitives
@@ -31,10 +29,13 @@ export function parseSupport(
    *      note that block number is indicative but works
    */
 
+  const { namespace, contracts } = Tenant.current();
+
   if (
-    DEPLOYMENT_NAME === "optimism" &&
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
     start_block &&
-    isOldApprovalModule(start_block)
+    contracts.governor.v6UpgradeBlock &&
+    Number(start_block) < contracts.governor.v6UpgradeBlock
   ) {
     return parseSupportOldModule(support, proposalType);
   }
@@ -94,6 +95,10 @@ type ParsedParams = {
   };
   OPTIMISTIC: {
     key: "OPTIMISTIC";
+    kind: null;
+  };
+  SNAPSHOT: {
+    key: "SNAPSHOT";
     kind: null;
   };
 };
@@ -162,8 +167,20 @@ export function checkMissingVoteForDelegate(
     (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
   );
 
+  // Direct vote is always going to match the vp of the vote
+
   // Case where delegate voted with both advanced and direct voting power.
   if (hasMultipleVotes) {
+    if (
+      delegateVotes.some(
+        (vote) => BigInt(vote.weight) === BigInt(votingPower.directVP)
+      )
+    ) {
+      return "NONE";
+    }
+    if (hasDirectVP) {
+      return "DIRECT";
+    }
     return "NONE";
   }
 

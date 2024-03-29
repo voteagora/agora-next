@@ -1,8 +1,9 @@
 import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
-import { Block } from "ethers";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
+import Tenant from "./tenant/tenant";
+import { TENANT_NAMESPACES } from "./constants";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -181,7 +182,8 @@ export async function parseProposal(
   );
   const proposalResuts = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
-    proposalData
+    proposalData,
+    proposal.start_block
   );
 
   const proposalTypeData =
@@ -191,16 +193,27 @@ export async function parseProposal(
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    created_time: latestBlock
-      ? getHumanBlockTime(proposal.created_block, latestBlock)
-      : null,
-    start_time: latestBlock
-      ? getHumanBlockTime(proposal.start_block, latestBlock)
-      : null,
-    end_time: latestBlock
-      ? getHumanBlockTime(proposal.end_block, latestBlock)
-      : null,
-    markdowntitle: getTitleFromProposalDescription(proposal.description || ""),
+    created_time:
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.created_ts * 1000)
+        : latestBlock
+        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+        : null,
+    start_time:
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.start_ts * 1000)
+        : latestBlock
+        ? getHumanBlockTime(proposal.start_block, latestBlock)
+        : null,
+    end_time:
+      proposalData.key === "SNAPSHOT"
+        ? new Date(proposalData.kind.end_ts * 1000)
+        : latestBlock
+        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+        : null,
+    markdowntitle:
+      (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
+      getTitleFromProposalDescription(proposal.description || ""),
     description: proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
@@ -249,6 +262,20 @@ export function getProposalTotalValue(
 }
 
 export type ParsedProposalData = {
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: {
+      title: string;
+      start_ts: number;
+      end_ts: number;
+      created_ts: number;
+      link: string;
+      scores: string[];
+      type: string;
+      votes: string;
+      state: "pending" | "active" | "closed";
+    };
+  };
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -294,6 +321,23 @@ export function parseProposalData(
   proposalType: ProposalType
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
+    case "SNAPSHOT": {
+      const parsedProposalData = JSON.parse(proposalData);
+      return {
+        key: "SNAPSHOT",
+        kind: {
+          title: parsedProposalData.title ?? "",
+          start_ts: parsedProposalData.start_ts ?? 0,
+          end_ts: parsedProposalData.end_ts ?? 0,
+          created_ts: parsedProposalData.created_ts ?? 0,
+          link: parsedProposalData.link ?? "",
+          scores: parsedProposalData.scores ?? [],
+          type: parsedProposalData.type ?? "",
+          votes: parsedProposalData.votes ?? "",
+          state: parsedProposalData.state ?? "",
+        },
+      };
+    }
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
@@ -404,6 +448,13 @@ function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
  */
 
 export type ParsedProposalResults = {
+  SNAPSHOT: {
+    key: "SNAPSHOT";
+    kind: {
+      scores: string[];
+      status: "pending" | "active" | "closed";
+    };
+  };
   STANDARD: {
     key: "STANDARD";
     kind: {
@@ -425,6 +476,7 @@ export type ParsedProposalResults = {
     kind: {
       for: bigint;
       abstain: bigint;
+      against: bigint;
       options: {
         option: string;
         votes: bigint;
@@ -445,9 +497,19 @@ type ProposalResults = {
 
 export function parseProposalResults(
   proposalResults: string,
-  proposalData: ParsedProposalData[ProposalType]
+  proposalData: ParsedProposalData[ProposalType],
+  startBlock: string
 ): ParsedProposalResults[ProposalType] {
   switch (proposalData.key) {
+    case "SNAPSHOT": {
+      return {
+        key: "SNAPSHOT",
+        kind: {
+          scores: JSON.parse(proposalResults).scores ?? [],
+          status: proposalData.kind.state ?? "",
+        },
+      };
+    }
     case "STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 
@@ -477,11 +539,34 @@ export function parseProposalResults(
         proposalResults
       ) as ProposalResults;
 
+      const { namespace, contracts } = Tenant.current();
+
+      const standardResults = (() => {
+        if (
+          namespace === TENANT_NAMESPACES.OPTIMISM &&
+          contracts.governor.v6UpgradeBlock &&
+          Number(startBlock) < contracts.governor.v6UpgradeBlock
+        ) {
+          return {
+            for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
+            against: 0n,
+            abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          };
+        }
+
+        return {
+          for: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          against: BigInt(parsedProposalResults.standard?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults.standard?.[2] ?? 0),
+        };
+      })();
+
       return {
         key: "APPROVAL",
         kind: {
-          for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
-          abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          for: standardResults.for,
+          abstain: standardResults.abstain,
+          against: standardResults.against,
           options: proposalData.kind.options.map((option, idx) => {
             return {
               option: option.description,
@@ -511,7 +596,8 @@ export type ProposalStatus =
   | "ACTIVE"
   | "PENDING"
   | "QUEUED"
-  | "EXECUTED";
+  | "EXECUTED"
+  | "CLOSED";
 
 export async function getProposalStatus(
   proposal: ProposalPayload,
@@ -520,6 +606,9 @@ export async function getProposalStatus(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
+  if (proposalResults.key === "SNAPSHOT") {
+    return proposalResults.kind.status.toUpperCase() as ProposalStatus;
+  }
   if (proposal.cancelled_block) {
     return "CANCELLED";
   }

@@ -1,14 +1,25 @@
 import AdminForm from "@/components/Admin/AdminForm";
-import { getVotableSupply } from "../api/votableSupply/getVotableSupply";
+import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import { fetchProposalTypes } from "@/app/admin/actions";
+import Tenant from "@/lib/tenant/tenant";
 
 async function fetchVotableSupply() {
   "use server";
-
-  return getVotableSupply();
+  return apiFetchVotableSupply();
 }
 
 export default async function Page() {
-  const votableSupply = await fetchVotableSupply();
 
-  return <AdminForm votableSupply={votableSupply} />;
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("admin")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
+  const votableSupply = await fetchVotableSupply();
+  const proposalTypes = await fetchProposalTypes();
+
+  return (
+    <AdminForm votableSupply={votableSupply} proposalTypes={proposalTypes} />
+  );
 }

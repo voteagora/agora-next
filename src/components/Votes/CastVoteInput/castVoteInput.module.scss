@@ -2,6 +2,7 @@
 @import "@/styles/mixins";
 
 .cast_vote_container {
+  background: white;
   border: 1px solid #e0e0e0;
   border-radius: $border-radius-lg;
   flex-shrink: 0;

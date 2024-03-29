@@ -1,93 +1,109 @@
-import React from "react";
-import Hero from "@/components/Hero/Hero";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
-import { PageDivider } from "@/components/Layout/PageDivider";
-import { getMetrics } from "../api/metrics/getMetrics";
-import { getDelegates } from "../api/delegates/getDelegates";
-import { getCitizens } from "../api/citizens/getCitizens";
+import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
+import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
+import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
+import { fetchMetrics as apiFetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
-import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
-import { getCurrentDelegators } from "../api/delegations/getDelegations";
+import Hero from "@/components/Hero/Hero";
+import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { TabsContent } from "@/components/ui/tabs";
+import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+import React from "react";
 
-async function fetchCitizens(sort, page = 1, seed) {
+async function fetchCitizens(sort, seed, page = 1) {
   "use server";
 
-  return getCitizens({ page, seed, sort });
+  return apiFetchCitizens({ page, seed, sort });
 }
 
-async function fetchDelegates(sort, page = 1, seed) {
+async function fetchDelegates(sort, seed, page = 1) {
   "use server";
 
-  return getDelegates({ page, seed, sort });
+  return apiFetchDelegates({ page, seed, sort });
 }
 
 async function fetchDaoMetrics() {
   "use server";
 
-  return getMetrics();
+  return apiFetchMetrics();
 }
 
 async function fetchDelegators(address) {
   "use server";
 
-  return getCurrentDelegators(address);
+  return apiFetchCurrentDelegators(address);
 }
 
 export async function generateMetadata({}, parent) {
-  const preview = `/api/images/og/delegates`;
-  const title = "Voter on Agora";
-  const description = "Delegate your voting power to a trusted representative";
+  const tenant = Tenant.current();
+  const page = tenant.ui.page("delegates");
+  const { title, description } = page.meta;
+
+  const preview = `/api/images/og/delegates?title=${encodeURIComponent(
+    title
+  )}&description=${encodeURIComponent(description)}`;
 
   return {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
     other: {
       ["twitter:card"]: "summary_large_image",
       ["twitter:title"]: title,
       ["twitter:description"]: description,
-      ["twitter:image"]: preview,
     },
   };
 }
 
 export default async function Page({ searchParams }) {
-  const sort = delegatesFilterOptions[searchParams.orderBy]?.sort || delegatesFilterOptions.weightedRandom.sort;
+  const sort =
+    delegatesFilterOptions[searchParams.orderBy]?.sort ||
+    delegatesFilterOptions.weightedRandom.sort;
   const citizensSort =
-    citizensFilterOptions[searchParams.citizensOrderBy]?.value || citizensFilterOptions.shuffle.sort;
+    citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
+    citizensFilterOptions.shuffle.sort;
+  const tab = searchParams.tab;
   const seed = Math.random();
-  const delegates = await fetchDelegates(sort);
-  const citizens = await fetchCitizens(citizensSort);
+  const delegates =
+    tab === "citizens"
+      ? await fetchCitizens(citizensSort, seed)
+      : await fetchDelegates(sort, seed);
   const metrics = await fetchDaoMetrics();
 
   return (
     <section>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
-      <PageDivider />
       <DelegateTabs>
         <TabsContent value="delegates">
           <DelegateCardList
+            isDelegatesCitizensFetching={tab === "citizens"}
             initialDelegates={delegates}
-            fetchDelegates={async (page) => {
+            fetchDelegates={async (page, seed) => {
               "use server";
 
-              return getDelegates({ page, seed, sort });
+              return apiFetchDelegates({ page, seed, sort });
             }}
             fetchDelegators={fetchDelegators}
           />
         </TabsContent>
         <TabsContent value="citizens">
           <DelegateCardList
-            initialDelegates={citizens}
-            fetchDelegates={async (page) => {
+            isDelegatesCitizensFetching={tab !== "citizens"}
+            initialDelegates={delegates}
+            fetchDelegates={async (page, seed) => {
               "use server";
 
-              return getCitizens({ page, seed, sort: citizensSort });
+              return apiFetchCitizens({ page, seed, sort: citizensSort });
             }}
             fetchDelegators={fetchDelegators}
           />{" "}

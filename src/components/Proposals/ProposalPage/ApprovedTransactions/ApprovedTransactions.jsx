@@ -2,7 +2,7 @@ import { VStack } from "@/components/Layout/Stack";
 import OptionDescription from "./OptionDescription";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 
 export default function ApprovedTransactions({ proposalData }) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
@@ -35,26 +35,28 @@ export default function ApprovedTransactions({ proposalData }) {
                 ? `{ value: ${formatEther(option.values[0])} ETH }`
                 : undefined;
 
-            if (option.values.length > 0) {
-              return (
-                <div key={index}>
-                  <p className="font-mono text-xs font-medium leading-4 text-gray-af">
-                    <OptionDescription
-                      description={option.description}
-                      value={option.values[0]}
-                      target={option.targets[0]}
-                    />
-                  </p>
-                  <CodeChange
+            return option.values.length > 0 ? (
+              <div key={index}>
+                <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+                  <OptionDescription
+                    description={option.description}
+                    value={option.budgetTokensSpent || BigInt(0)}
                     target={option.targets[0]}
-                    calldata={option.calldatas[0]}
-                    valueETH={valueETH}
-                    functionName={option.functionName}
-                    functionArgs={option.functionArgs}
                   />
-                </div>
-              );
-            }
+                </p>
+                <CodeChange
+                  target={option.targets[0]}
+                  calldata={option.calldatas[0]}
+                  valueETH={valueETH}
+                  functionName={option.functionName}
+                  functionArgs={option.functionArgs}
+                />
+              </div>
+            ) : (
+              <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+                {"//"} {option.description}
+              </p>
+            );
           })}
       </VStack>
       {proposalData.options.length > 1 && (

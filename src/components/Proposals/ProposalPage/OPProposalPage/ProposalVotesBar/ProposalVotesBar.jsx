@@ -11,7 +11,7 @@ import { TokenAmountDisplay, generateBarsForVote } from "@/lib/utils";
 export default function ProposalVotesBar({ proposal }) {
   return (
     <div>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={10}>
         <Tooltip>
           <TooltipTrigger asChild>
             <HStack
@@ -31,12 +31,9 @@ export default function ProposalVotesBar({ proposal }) {
           </TooltipTrigger>
           <TooltipContent>
             <p>
-              {TokenAmountDisplay(
-                proposal.proposalResults.abstain,
-                18,
-                "OP",
-                2
-              )}{" "}
+              {TokenAmountDisplay({
+                amount: proposal.proposalResults.abstain,
+              })}{" "}
               abstained
             </p>
           </TooltipContent>

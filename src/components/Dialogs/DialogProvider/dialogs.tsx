@@ -1,5 +1,6 @@
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
+import { SwitchNetwork } from "../SwitchNetworkDialog/SwitchNetworkDialog";
 import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
 import {
   CastVoteDialog,
@@ -23,7 +24,8 @@ export type DialogType =
   | CastVoteDialogType
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
-  | RetroPGFShareCardDialog;
+  | RetroPGFShareCardDialog
+  | SwithcNetworkDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -67,6 +69,13 @@ export type RetroPGFShareCardDialog = {
     displayName: string;
     id: string;
     profileImageUrl: string | null;
+  };
+};
+
+export type SwithcNetworkDialogType = {
+  type: "SWITCH_NETWORK";
+  params: {
+    chainId: number;
   };
 };
 
@@ -114,7 +123,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
       <DelegateDialog
         delegate={delegate}
         fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
-        completeDelegation={closeDialog}
         fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );
@@ -206,6 +214,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
+  SWITCH_NETWORK: ({ chainId }: { chainId: number }, closeDialog) => (
+    <SwitchNetwork chainId={chainId} closeDialog={closeDialog} />
+  ),
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

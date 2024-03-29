@@ -1,48 +1,45 @@
 import prisma from "@/app/lib/prisma";
+import { cache } from "react";
 import {
   getProxyAddress,
   getTotalVotableAllowance,
 } from "@/lib/alligatorUtils";
-import { contracts } from "@/lib/contracts/contracts";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData } from "./votingPower";
 import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
+import Tenant from "@/lib/tenant/tenant";
 
 /**
- * Voting Power at a given block number
- * @param address
+ * Voting Power for a given block
+ * @param addressOrENSName
  * @param blockNumber
- * @param namespace
- * @returns VotingPowerData
+ * @param proposalId
  */
-export const getVotingPowerForProposalForNamespace = ({
+const getVotingPowerForProposal = ({
   addressOrENSName,
   blockNumber,
   proposalId,
-  namespace,
 }: {
   addressOrENSName: string;
   blockNumber: number;
   proposalId: string;
-  namespace: "optimism";
 }) =>
   addressOrEnsNameWrap(getVotingPowerForProposalByAddress, addressOrENSName, {
     blockNumber,
     proposalId,
-    namespace,
   });
 
 async function getVotingPowerForProposalByAddress({
   address,
   blockNumber,
   proposalId,
-  namespace,
 }: {
   address: string;
   blockNumber: number;
   proposalId: string;
-  namespace: "optimism";
 }): Promise<VotingPowerData> {
+  const { namespace, contracts } = Tenant.current();
+
   const votingPowerQuery = prisma[`${namespace}VotingPowerSnaps`].findFirst({
     where: {
       delegate: address,
@@ -100,14 +97,14 @@ async function getVotingPowerForProposalByAddress({
         WHERE chain_str=s.chain_str 
           AND contract = $2
           AND block_number <= $3
-        ORDER BY block_number DESC
+        ORDER BY ordinal DESC
         LIMIT 1
       ) AS a ON TRUE
     ) t
     WHERE allowance > 0;
     `,
     address,
-    contracts(namespace).alligator.address.toLowerCase(),
+    contracts.alligator!.address,
     blockNumber
   );
 
@@ -130,28 +127,17 @@ async function getVotingPowerForProposalByAddress({
 
 /**
  * Voting Power
- * @param address
- * @param namespace
- * @returns VotingPowerData
+ * @param addressOrENSName
  */
-export const getCurrentVotingPowerForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(getCurrentVotingPowerForAddress, addressOrENSName, {
-    namespace,
-  });
+const getCurrentVotingPowerForNamespace = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getCurrentVotingPowerForAddress, addressOrENSName);
 
 async function getCurrentVotingPowerForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<VotingPowerData> {
+  const { namespace, contracts } = Tenant.current();
   const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
     where: {
       delegate: address,
@@ -164,7 +150,7 @@ async function getCurrentVotingPowerForAddress({
   ].findFirst({
     where: {
       delegate: address,
-      contract: contracts(namespace).alligator.address.toLowerCase(),
+      contract: contracts.alligator!.address,
     },
   });
 
@@ -179,45 +165,34 @@ async function getCurrentVotingPowerForAddress({
 }
 
 /**
- * Voting Power available for subdelegation
- * Includes subdelegated balances & undelegated balance
- * @param address
- * @param namespace
- * @returns {votingPower}
+ *  Voting Power available for subdelegation
+ * @param addressOrENSName
  */
-export const getVotingPowerAvailableForSubdelegationForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
+const getVotingPowerAvailableForSubdelegation = (addressOrENSName: string) =>
   addressOrEnsNameWrap(
     getVotingPowerAvailableForSubdelegationForAddress,
-    addressOrENSName,
-    { namespace }
+    addressOrENSName
   );
 
 async function getVotingPowerAvailableForSubdelegationForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<string> {
+  const { namespace, contracts } = Tenant.current();
   const advancedVotingPower = await prisma[
     `${namespace}AdvancedVotingPower`
   ].findFirst({
     where: {
       delegate: address,
-      contract: contracts(namespace).alligator.address.toLowerCase(),
+      contract: contracts.alligator!.address,
     },
   });
 
   const undelegatedVotingPower = (async () => {
     const [isBalanceAccountedFor, balance] = await Promise.all([
-      isAddressDelegatingToProxy({ address, namespace }),
-      contracts(namespace).token.contract.balanceOf(address),
+      isAddressDelegatingToProxy({ address }),
+      contracts.token.contract.balanceOf(address),
     ]);
     return isBalanceAccountedFor ? 0n : balance;
   })();
@@ -231,59 +206,38 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
 /**
  * Voting Power available for direct delegation:
  * Represents the balance of the user's account
- * @param address
- * @param namespace
- * @returns {votingPower}
+ * @param addressOrENSName
  */
-export const getVotingPowerAvailableForDirectDelegationForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
+const getVotingPowerAvailableForDirectDelegation = (addressOrENSName: string) =>
   addressOrEnsNameWrap(
     getVotingPowerAvailableForDirectDelegationForAddress,
-    addressOrENSName,
-    { namespace }
+    addressOrENSName
   );
 
 async function getVotingPowerAvailableForDirectDelegationForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<bigint> {
-  return contracts(namespace).token.contract.balanceOf(address); // TODO: update based on namespace
+  const { contracts } = Tenant.current();
+  return contracts.token.contract.balanceOf(address);
 }
 
 /**
  * Checks if a user has delegated to its proxy
- * @param address
- * @param namespace
- * @returns {boolean}
+ * @param addressOrENSName
  */
-export const isDelegatingToProxyForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(isAddressDelegatingToProxy, addressOrENSName, {
-    namespace,
-  });
+const isDelegatingToProxy = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(isAddressDelegatingToProxy, addressOrENSName);
 
 async function isAddressDelegatingToProxy({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<boolean> {
+  const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address, namespace),
+    getProxyAddress(address),
     prisma[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
@@ -302,27 +256,28 @@ async function isAddressDelegatingToProxy({
 
 /**
  * Gets the proxy address for a given address
- * @param address
- * @param namespace
- * @returns {string}
+ * @param addressOrENSName
  */
-export const getProxyForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(getProxyAddressForAddress, addressOrENSName, {
-    namespace,
-  });
+const getProxy = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getProxyAddressForAddress, addressOrENSName);
 
 async function getProxyAddressForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<string> {
-  return getProxyAddress(address, namespace);
+  return getProxyAddress(address);
 }
+
+export const fetchVotingPowerForProposal = cache(getVotingPowerForProposal);
+export const fetchCurrentVotingPowerForNamespace = cache(
+  getCurrentVotingPowerForNamespace
+);
+export const fetchVotingPowerAvailableForSubdelegation = cache(
+  getVotingPowerAvailableForSubdelegation
+);
+export const fetchVotingPowerAvailableForDirectDelegation = cache(
+  getVotingPowerAvailableForDirectDelegation
+);
+export const fetchIsDelegatingToProxy = cache(isDelegatingToProxy);
+export const fetchProxy = cache(getProxy);

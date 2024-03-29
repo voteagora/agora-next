@@ -90,16 +90,6 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
-  console.log(
-    "data",
-    data,
-    isLoading,
-    isSuccess,
-    isError,
-    missingVote,
-    localMissingVote
-  );
-
   useEffect(() => {
     if (
       missingVote == "BOTH" &&
@@ -108,7 +98,7 @@ export function ApprovalCastVoteDialog({
     ) {
       setLocalMissingVote("ADVANCED");
     }
-  }, [data]);
+  }, [data, missingVote]);
   if (
     missingVote === "BOTH" &&
     !data.advancedVoteData &&
@@ -263,13 +253,7 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"} with{"\u00A0"}
-            {
-              <TokenAmountDisplay
-                amount={votingPower}
-                decimals={18}
-                currency="OP"
-              />
-            }
+            {<TokenAmountDisplay amount={votingPower} />}
           </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
@@ -280,11 +264,7 @@ function CastVoteWithReason({
             {!copy ? (
               <>
                 Vote for no options with{"\u00A0"}
-                <TokenAmountDisplay
-                  amount={votingPower}
-                  decimals={18}
-                  currency="OP"
-                />
+                <TokenAmountDisplay amount={votingPower} />
               </>
             ) : (
               copy

@@ -1,47 +1,35 @@
-import { paginatePrismaResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
-import { VotePayload, VotesSort, VotesSortOrder } from "./vote";
+import { cache } from "react";
+import { VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import Tenant from "@/lib/tenant/tenant";
 
-export const getVotesForDelegateForNamespace = ({
+const getVotesForDelegate = ({
   addressOrENSName,
   page,
-  sort,
-  sortOrder,
-  namespace,
 }: {
   addressOrENSName: string;
   page: number;
-  sort: VotesSort | undefined;
-  sortOrder: VotesSortOrder | undefined;
-  namespace: "optimism";
 }) =>
   addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
     page,
-    sort,
-    sortOrder,
-    namespace,
   });
 
 async function getVotesForDelegateForAddress({
   address,
   page = 1,
-  sort = "block_number",
-  sortOrder = "desc",
-  namespace,
 }: {
   address: string;
   page: number;
-  sort: VotesSort | undefined;
-  sortOrder: VotesSortOrder | undefined;
-  namespace: "optimism";
 }) {
+  const { namespace } = Tenant.current();
   const pageSize = 10;
 
-  const { meta, data: votes } = await paginatePrismaResult(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -71,14 +59,14 @@ async function getVotesForDelegateForAddress({
           ) av
           LEFT JOIN LATERAL (
             SELECT
-              proposals_mat.start_block,
-              proposals_mat.description,
-              proposals_mat.proposal_data,
-              proposals_mat.proposal_type::config.proposal_type AS proposal_type
+              proposals.start_block,
+              proposals.description,
+              proposals.proposal_data,
+              proposals.proposal_type::config.proposal_type AS proposal_type
             FROM
-              ${namespace + ".proposals_mat"} proposals_mat
+              ${namespace + ".proposals"} proposals
             WHERE
-              proposals_mat.proposal_id = av.proposal_id) p ON TRUE
+              proposals.proposal_id = av.proposal_id) p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET $2
@@ -113,22 +101,19 @@ async function getVotesForDelegateForAddress({
   };
 }
 
-export async function getVotesForProposalForNamespace({
+async function getVotesForProposal({
   proposal_id,
   page = 1,
   sort = "weight",
-  sortOrder = "desc",
-  namespace,
 }: {
   proposal_id: string;
   page?: number;
   sort?: VotesSort;
-  sortOrder?: VotesSortOrder;
-  namespace: "optimism";
 }) {
+  const { namespace } = Tenant.current();
   const pageSize = 50;
 
-  const { meta, data: votes } = await paginatePrismaResult(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -158,12 +143,12 @@ export async function getVotesForProposalForNamespace({
           ) av
           LEFT JOIN LATERAL (
             SELECT
-              proposals_mat.start_block,
-              proposals_mat.description,
-              proposals_mat.proposal_data,
-              proposals_mat.proposal_type::config.proposal_type AS proposal_type
-            FROM ${namespace + ".proposals_mat"} proposals_mat
-            WHERE proposals_mat.proposal_id = $1) p ON TRUE
+              proposals.start_block,
+              proposals.description,
+              proposals.proposal_data,
+              proposals.proposal_type::config.proposal_type AS proposal_type
+            FROM ${namespace + ".proposals"} proposals
+            WHERE proposals.proposal_id = $1) p ON TRUE
         ) q
         ORDER BY ${sort} DESC
         OFFSET $2
@@ -196,15 +181,14 @@ export async function getVotesForProposalForNamespace({
   };
 }
 
-export async function getUserVotesForProposalForNamespace({
+async function getUserVotesForProposal({
   proposal_id,
   address,
-  namespace,
 }: {
   proposal_id: string;
   address: string;
-  namespace: "optimism";
 }) {
+  const { namespace } = Tenant.current();
   const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
     `
     SELECT 
@@ -240,22 +224,21 @@ export async function getUserVotesForProposalForNamespace({
   );
 }
 
-export async function getVotesForProposalAndDelegateForNamespace({
+async function getVotesForProposalAndDelegate({
   proposal_id,
   address,
-  namespace,
 }: {
   proposal_id: string;
   address: string;
-  namespace: "optimism";
 }) {
+  const { namespace } = Tenant.current();
   const votes = await prisma[`${namespace}Votes`].findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
   const latestBlock = await provider.getBlockNumber();
 
-  return votes.map((vote) =>
+  return votes.map((vote: VotePayload) =>
     parseVote(
       vote,
       parseProposalData(
@@ -266,3 +249,10 @@ export async function getVotesForProposalAndDelegateForNamespace({
     )
   );
 }
+
+export const fetchVotesForDelegate = cache(getVotesForDelegate);
+export const fetchVotesForProposal = cache(getVotesForProposal);
+export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
+export const fetchVotesForProposalAndDelegate = cache(
+  getVotesForProposalAndDelegate
+);

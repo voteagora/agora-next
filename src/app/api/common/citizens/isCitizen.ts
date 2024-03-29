@@ -1,12 +1,10 @@
 import { Prisma } from "@prisma/client";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
-import { deploymentToDaoSlug } from "@/lib/config";
+import Tenant from "@/lib/tenant/tenant";
 
-export async function isCitizenForNamespace(
-  address: string,
-  namespace: "optimism"
-) {
-  const daoSlug = deploymentToDaoSlug(namespace);
+async function isCitizen(address: string) {
+  const { slug } = Tenant.current();
 
   return prisma.$queryRaw<
     {
@@ -17,8 +15,10 @@ export async function isCitizenForNamespace(
     SELECT address
     FROM agora.address_metadata
     WHERE kind = 'citizen' 
-    AND dao_slug = ${daoSlug}::config.dao_slug
+    AND dao_slug = ${slug}::config.dao_slug
     AND LOWER(address) = LOWER(${address});
     `
   );
 }
+
+export const fetchIsCitizen = cache(isCitizen); 

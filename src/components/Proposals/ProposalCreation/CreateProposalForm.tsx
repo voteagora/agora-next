@@ -34,7 +34,7 @@ export type Transaction = {
   target: string;
   value: number;
   calldata: string;
-  transferAmount: number;
+  transferAmount: bigint;
   transferTo: string;
 };
 

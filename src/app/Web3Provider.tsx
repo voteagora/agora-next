@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
+
 import { WagmiConfig, createConfig, sepolia } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet, optimism } from "wagmi/chains";
@@ -8,9 +9,15 @@ import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
+import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+const queryClient = new QueryClient();
 
 const chains = [optimism, mainnet, sepolia];
 const metadata = {
@@ -22,17 +29,13 @@ const metadata = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 
-// const wagmiConfig = defaultWagmiConfig({
-//   chains,
-//   projectId,
-//   metadata,
-// });
+const { namespace } = Tenant.current();
 
 const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: chains,
+    chains: [optimism, mainnet],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
@@ -41,18 +44,23 @@ const config = createConfig(
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
-    <ConnectKitProvider>
-      <body className={inter.variable}>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <BetaBanner />
-        <PageContainer>
-          <Toaster />
-          <AgoraProvider>{children}</AgoraProvider>
-        </PageContainer>
-        <Footer />
-        <SpeedInsights />
-      </body>
-    </ConnectKitProvider>
+    <QueryClientProvider client={queryClient}>
+      <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+        <body className={inter.variable}>
+          <noscript>You need to enable JavaScript to run this app.</noscript>
+          {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />}
+          {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+          <ConnectButtonProvider>
+            <PageContainer>
+              <Toaster />
+              <AgoraProvider>{children}</AgoraProvider>
+            </PageContainer>
+          </ConnectButtonProvider>
+          <Footer />
+          <SpeedInsights />
+        </body>
+      </ConnectKitProvider>
+    </QueryClientProvider>
   </WagmiConfig>
 );
 

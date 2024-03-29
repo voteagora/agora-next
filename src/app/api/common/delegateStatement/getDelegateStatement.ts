@@ -1,45 +1,39 @@
 import "server-only";
 
 import prisma from "@/app/lib/prisma";
+import { cache } from "react";
 import { makeDynamoClient } from "@/app/lib/dynamodb";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { deploymentToDaoSlug } from "@/lib/config";
+import Tenant from "@/lib/tenant/tenant";
+import { DaoSlug } from "@prisma/client";
 
-export const getDelegateStatementForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(
-    getDelegateStatementForAddressForNamespace,
-    addressOrENSName,
-    { namespace }
-  );
+export const getDelegateStatement = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
 
-async function getDelegateStatementForAddressForNamespace({
+/*
+  Gets delegate statement from Postgres, or DynamoDB if not found
+*/
+async function getDelegateStatementForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }) {
-  const daoSlug = deploymentToDaoSlug(namespace);
+  const { slug } = Tenant.current();
 
   const postgreqsqlData = await prisma.delegateStatements
-    .findFirst({ where: { address: address.toLowerCase(), dao_slug: daoSlug } })
+    .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
-    : await getDelegateStatementForAddressDynamo({ address });
+    : slug === DaoSlug.OP // Only fetch from Dynamo for optimism
+    ? await getDelegateStatementForAddressDynamo(address)
+    : null;
 }
 
-async function getDelegateStatementForAddressDynamo({
-  address,
-}: {
-  address: string;
-}) {
+/*
+  Gets delegate statement from DynamoDB
+*/
+async function getDelegateStatementForAddressDynamo(address: string) {
   const dynamoDBClient = makeDynamoClient();
 
   try {
@@ -82,3 +76,5 @@ async function getDelegateStatementForAddressDynamo({
     return null;
   }
 }
+
+export const fetchDelegateStatement = cache(getDelegateStatement);

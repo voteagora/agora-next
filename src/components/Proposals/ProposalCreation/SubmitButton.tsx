@@ -2,28 +2,30 @@
 
 import { cx } from "@emotion/css";
 import { Form } from "./CreateProposalForm";
-import { ethers, AbiCoder } from "ethers";
+import { AbiCoder, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  OptimismContracts,
   approvalModuleAddress,
   optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   useAccount,
+  useContractRead,
   useContractWrite,
   usePrepareContractWrite,
-  useContractRead,
 } from "wagmi";
 import { useModal } from "connectkit";
 import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+
+const { contracts } = Tenant.current();
 
 const abiCoder = new AbiCoder();
-const governorContract = OptimismContracts.governor;
-const governanceTokenContract = OptimismContracts.token;
+const governorContract = contracts.governor;
+const governanceTokenContract = contracts.token;
 
 export default function SubmitButton({
   formTarget,
@@ -46,14 +48,14 @@ export default function SubmitButton({
     isError: onPrepareError,
     error,
   } = usePrepareContractWrite({
-    address: governorContract.address,
+    address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: governorFunction,
     args: inputData as any,
   });
 
   const { data: manager } = useContractRead({
-    address: governorContract.address,
+    address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: "manager",
   });
@@ -97,7 +99,7 @@ export default function SubmitButton({
 
   return (
     <>
-      {manager && manager !== address ? (
+      {manager && String(manager) !== address ? (
         <p className="text-gray-700 text-sm max-w-[420px] break-words">
           Only the Optimism Foundation manager address can create proposals for
           the time being.
@@ -202,7 +204,7 @@ function getInputData(form: Form): {
 
         option.transactions.forEach((t) => {
           if (t.type === "Transfer") {
-            formattedOption[0] += BigInt(t.transferAmount);
+            formattedOption[0] += t.transferAmount;
             formattedOption[1].push(governanceTokenContract.address);
             formattedOption[2].push(BigInt(0));
             formattedOption[3].push(
@@ -265,14 +267,11 @@ function getInputData(form: Form): {
   return { governorFunction, inputData, error };
 }
 
-function encodeTransfer(to: string, amount: number): string {
+function encodeTransfer(to: string, amount: bigint): string {
   return (
     "0xa9059cbb" +
     abiCoder
-      .encode(
-        ["address", "uint256"],
-        [ethers.getAddress(to), ethers.parseEther(amount.toString() || "0")]
-      )
+      .encode(["address", "uint256"], [ethers.getAddress(to), amount])
       .slice(2)
   );
 }

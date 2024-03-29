@@ -6,13 +6,14 @@ import { VStack } from "../../Layout/Stack";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
-import { useRouter } from "next/navigation";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { cn } from "@/lib/utils";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -20,59 +21,48 @@ export type DelegateChunk = Pick<
 >;
 
 interface DelegatePaginated {
+  seed: number;
   meta: any;
   delegates: DelegateChunk[];
 }
 
 interface Props {
+  isDelegatesCitizensFetching: boolean;
   initialDelegates: DelegatePaginated;
-  fetchDelegates: (page: number) => Promise<DelegatePaginated>;
+  fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
+  isDelegatesCitizensFetching,
 }: Props) {
-  const router = useRouter();
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialDelegates] || []);
   const [meta, setMeta] = useState(initialDelegates.meta);
+  const [delegates, setDelegates] = useState(initialDelegates.delegates);
   const { advancedDelegators } = useConnectedDelegate();
+  const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
-    setPages([initialDelegates]);
+    setIsDelegatesFiltering(false);
+    setDelegates(initialDelegates.delegates);
     setMeta(initialDelegates.meta);
-  }, [initialDelegates]);
+  }, [initialDelegates, setIsDelegatesFiltering]);
 
-  const handleClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    href: string
-  ) => {
-    e.preventDefault();
-    router.push(href);
-  };
-
-  const loadMore = async (page: any) => {
+  const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
-      const data = await fetchDelegates(page);
-      const existingIds = new Set(
-        pages.flatMap((page) => page.delegates.map((d) => d.address))
+      const data = await fetchDelegates(
+        meta.currentPage + 1,
+        initialDelegates.seed
       );
-      const uniqueDelegates = data.delegates.filter(
-        (d) => !existingIds.has(d.address)
-      );
-      setPages((prev) => [...prev, { ...data, delegates: uniqueDelegates }]);
-      setMeta(data.meta) ;
+      setDelegates(delegates.concat(data.delegates));
+      setMeta(data.meta);
       fetching.current = false;
     }
   };
 
-  const delegates = pages.reduce(
-    (all: DelegateChunk[], page) => all.concat(page.delegates),
-    []
-  );
   const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
@@ -81,7 +71,7 @@ export default function DelegateCardList({
       <InfiniteScroll
         className={styles.infinite_scroll}
         hasMore={meta.hasNextPage}
-        pageStart={0}
+        pageStart={1}
         loadMore={loadMore}
         loader={
           <div
@@ -93,7 +83,7 @@ export default function DelegateCardList({
         }
         element="div"
       >
-        {delegates.map((delegate, i) => {
+        {delegates.map((delegate) => {
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {
@@ -104,7 +94,15 @@ export default function DelegateCardList({
           }
 
           return (
-            <div key={delegate.address} className={styles.link}>
+            <div
+              key={delegate.address}
+              className={cn(
+                styles.link,
+                isDelegatesCitizensFetching || isDelegatesFiltering
+                  ? "animate-pulse"
+                  : ""
+              )}
+            >
               <Link href={`/delegates/${delegate.address}`}>
                 <VStack gap={4} className={styles.link_container}>
                   <VStack gap={4} justifyContent="justify-center">

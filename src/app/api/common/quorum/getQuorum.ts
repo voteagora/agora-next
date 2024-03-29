@@ -1,18 +1,21 @@
+import { cache } from "react";
 import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
-import { contracts } from "@/lib/contracts/contracts";
 import { ProposalPayload } from "../proposals/proposal";
+import Tenant from "@/lib/tenant/tenant";
 
-export async function getQuorumForProposalForNamespace({
-  proposal,
-  namespace,
-}: {
-  proposal: ProposalPayload;
-  namespace: "optimism";
-}) {
+/*
+  Retrieve quorum from the governor contract for the supplied proposal,
+  calculating it if not specified
+
+  @dev: only supports optimisim
+*/
+async function getQuorumForProposal(proposal: ProposalPayload) {
+  const { namespace, contracts } = Tenant.current();
+
   switch (namespace) {
     case "optimism": {
-      const contractQuorum = contracts(namespace).governor.contract.quorum(
+      const contractQuorum = contracts.governor.contract.quorum(
         proposal.proposal_id
       );
 
@@ -29,7 +32,12 @@ export async function getQuorumForProposalForNamespace({
   }
 }
 
-export async function getCurrentQuorumForNamespace(namespace: "optimism") {
+/*
+  Retrieve the current quorum based on block number
+*/
+async function getCurrentQuorum() {
+  const { namespace, contracts } = Tenant.current();
+
   switch (namespace) {
     case "optimism": {
       const latestBlock = await provider.getBlockNumber();
@@ -37,7 +45,17 @@ export async function getCurrentQuorumForNamespace(namespace: "optimism") {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return contracts(namespace).governor.contract.quorum(latestBlock - 1);
+      return contracts.governor.contract.quorum(latestBlock - 1);
     }
   }
 }
+
+/*
+  Gets and caches the quorum for the supplied proposal
+*/
+export const fetchQuorumForProposal = cache(getQuorumForProposal);
+
+/*
+  Gets and caches quorum based on current block number
+*/
+export const fetchCurrentQuorum = cache(getCurrentQuorum);

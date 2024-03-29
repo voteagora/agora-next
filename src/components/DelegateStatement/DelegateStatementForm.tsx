@@ -113,9 +113,9 @@ export default function DelegateStatementForm({
     !!agreeCodeConduct;
 
   return (
-    <div className="flex flex-col xl:flex-row-reverse items-center xl:items-start gap-16 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
-        <VStack className="static xl:sticky top-16 shrink-0 w-full xl:max-w-xs">
+        <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
           <DelegateCard delegate={delegate} />
         </VStack>
       )}
@@ -127,7 +127,7 @@ export default function DelegateStatementForm({
               <TopIssuesFormSection form={form} />
               <OtherInfoFormSection form={form} />
 
-              <div className="flex flex-col lg:flex-row justify-end lg:justify-between items-stretch lg:items-center gap-4 py-8 px-6 flex-wrap">
+              <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
                 <span className="text-sm text-gray-800">
                   Tip: you can always come back and edit your profile at any
                   time.

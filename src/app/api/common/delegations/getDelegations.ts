@@ -1,42 +1,33 @@
-import { Delegation } from "./delegation";
+import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
+import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
-import { contracts } from "@/lib/contracts/contracts";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import Tenant from "@/lib/tenant/tenant";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
  * @param addressOrENSName
- * @param namespace - "optimism"
- * @returns {delegations}
  */
-export const getCurrentDelegateesForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName, {
-    namespace,
-  });
+const getCurrentDelegatees = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName);
 
 async function getCurrentDelegateesForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }): Promise<Delegation[]> {
+  const { namespace, contracts } = Tenant.current();
+
   const advancedDelegatees = await prisma[
     `${namespace}AdvancedDelegatees`
   ].findMany({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts(namespace).alligator.address.toLowerCase(),
+      contract: contracts.alligator?.address,
     },
   });
 
@@ -129,32 +120,22 @@ async function getCurrentDelegateesForAddress({
 /**
  * Delegators for a given address (addresses delegating to the given address)
  * @param addressOrENSName
- * @param namespace - "optimism"
- * @returns {Delegation[]}
  */
-export const getCurrentDelegatorsForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName, {
-    namespace,
-  });
+const getCurrentDelegators = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName);
 
 async function getCurrentDelegatorsForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }) {
+  const { namespace, contracts } = Tenant.current();
+
   const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
     where: {
       to: address.toLowerCase(),
       delegated_amount: { gt: 0 },
-      contract: contracts(namespace).alligator.address.toLowerCase(),
+      contract: contracts.alligator?.address,
     },
   });
 
@@ -235,29 +216,18 @@ async function getCurrentDelegatorsForAddress({
 /**
  * Get the direct delegatee for a given address
  * @param addressOrENSName
- * @param namespace - "optimism"
- * @returns {delegatee}
  */
-export const getDirectDelegateeForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(getDirectDelegateeForAddress, addressOrENSName, {
-    namespace,
-  });
+const getDirectDelegatee = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getDirectDelegateeForAddress, addressOrENSName);
 
 const getDirectDelegateeForAddress = async ({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }) => {
+  const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address, namespace),
+    getProxyAddress(address),
     prisma[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
@@ -273,28 +243,16 @@ const getDirectDelegateeForAddress = async ({
 /**
  * Get all addresses that are in the delegation chain for a given address
  * @param addressOrENSName
- * @param namespace - "optimism"
- * @returns {addresses}
  */
-
-export const getAllDelegatorsInChainsForAddressForNamespace = ({
-  addressOrENSName,
-  namespace,
-}: {
-  addressOrENSName: string;
-  namespace: "optimism";
-}) =>
-  addressOrEnsNameWrap(getAllDelegatorsInChainsForAddress, addressOrENSName, {
-    namespace,
-  });
+const getAllDelegatorsInChains = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getAllDelegatorsInChainsForAddress, addressOrENSName);
 
 async function getAllDelegatorsInChainsForAddress({
   address,
-  namespace,
 }: {
   address: string;
-  namespace: "optimism";
 }) {
+  const { namespace, contracts } = Tenant.current();
   const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
     `
     SELECT array_agg(DISTINCT u.element) AS addresses
@@ -302,8 +260,13 @@ async function getAllDelegatorsInChainsForAddress({
     WHERE delegate=$1 AND contract=$2 AND allowance > 0;
     `,
     address,
-    contracts(namespace).alligator.address.toLowerCase()
+    contracts.alligator?.address
   );
 
   return allAddresess[0].addresses;
 }
+
+export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
+export const fetchCurrentDelegators = cache(getCurrentDelegators);
+export const fetchDirectDelegatee = cache(getDirectDelegatee);
+export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains);

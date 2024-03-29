@@ -1,12 +1,13 @@
 "use client";
 
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { OptimismContracts } from "@/lib/contracts/contracts";
 import { useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useContractRead } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
 
 const useIsAdvancedUser = () => {
+  const { contracts, isProd } = Tenant.current();
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
   const [isAdvancedUser, setIsAdvancedUser] = useState(false);
@@ -53,11 +54,21 @@ const useIsAdvancedUser = () => {
     "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd", // Woj Test 1
     "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Agora manager throwaway
     "0xC776cBDDeA014889E8BaB4323C894C5c34DB214D", // Fernando
+    "0x1d671d1B191323A38490972D58354971E5c1cd2A", // Andrei
+    "0xE61E4B3e1ADf8a2735976c83a3f44C28E952bc8D", // QA 3
+    "0x4713a905d98E2C793e25F7bF2fEEa76e18f12DC6", // QA 5
+    "0xD208ae597785CfccF46f78A65fDB2BE000E8074a", // QA 6
+    "0x74dc8Df481dd6daC9C8431947f505562badcfC20", // QA 7
+    "0x5a02851627752d2aEb3d0084002387dA51A13402", // QA 8
+    "0xa919348b2e20a7AAa33a41e04E7286E4eeD8889e", // QA 9
+    "0x30b6e0b4f29FA72E8C7D014B6309668024ceB881", // QA 10
+    "0x9b3d738C07Cd0E45eE98a792bA48ba67Bb5dAbca", // QA 11
+    "0x416a0343470ac6694D39e2fCd6C494eeEF39BeEB", // SAFE QA 3
   ] as `0x${string}`[];
 
   useContractRead({
-    address: OptimismContracts.token.address as `0x${string}`,
-    abi: OptimismContracts.token.abi,
+    address: contracts.token.address as `0x${string}`,
+    abi: contracts.token.abi,
     functionName: "balanceOf",
     enabled: isConnected && !!address,
     args: [address!],
@@ -66,10 +77,10 @@ const useIsAdvancedUser = () => {
      * PROD: only allowlist
      * TEST: more than 1 token or allowlist
      */
-    onSuccess: (balance) => {
+    onSuccess: (balance: bigint) => {
       const allowedBalance = parseUnits("100000", 18);
       setIsAdvancedUser(
-        process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+        isProd
           ? allowList.includes(address!)
           : balance >= allowedBalance || allowList.includes(address!)
       );

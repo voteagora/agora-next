@@ -34,8 +34,8 @@ export function DelegateSocialLinks({ discord, twitter }) {
           }}
         >
           <Image
-            height={discordIcon.height}
-            width={discordIcon.width}
+            height={twitterIcon.height}
+            width={twitterIcon.width}
             src={discordIcon.src}
             alt="discord"
           />

@@ -23,36 +23,36 @@
   width: 55%;
   align-items: flex-start;
   justify-content: center;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     width: 100%;
   }
 }
 .cell_status {
-  width: 15%;
+  width: 20%;
   align-items: flex-start;
   justify-content: center;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     display: none;
   }
 }
 .cell_result {
-  width: 30%;
+  width: 25%;
   align-items: flex-end;
   justify-content: center;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     display: none;
   }
 }
 
 .mobile_status {
   display: none;
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     display: block;
   }
 }
 
 .invisible_on_mobile {
-  @media (max-width: $max-width-lg) {
+  @media (max-width: $screen-sm) {
     display: none;
   }
 }

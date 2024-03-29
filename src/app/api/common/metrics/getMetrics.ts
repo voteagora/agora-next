@@ -1,18 +1,16 @@
 import prisma from "@/app/lib/prisma";
-import { getTokenSupply } from "@/lib/tokenUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
-export async function getMetricsForNamespace({
-  namespace,
-}: {
-  namespace: "optimism";
-}) {
-  const totalSupply = await getTokenSupply(namespace);
+async function getMetrics() {
+  const { namespace, contracts } = Tenant.current();
+  const totalSupply = await contracts.token.contract.totalSupply();
   const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
-  const quorum = (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
 
   return {
     votableSupply: votableSupply?.votable_supply || "0",
     totalSupply: totalSupply.toString(),
-    quorum,
   };
 }
+
+export const fetchMetrics = cache(getMetrics);

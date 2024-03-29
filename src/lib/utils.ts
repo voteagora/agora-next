@@ -2,8 +2,9 @@ import { type ClassValue, clsx } from "clsx";
 import { BigNumberish, formatUnits } from "ethers";
 import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
-
-const secondsPerBlock = 12;
+import Tenant from "./tenant/tenant";
+import { TENANT_NAMESPACES } from "./constants";
+const { token } = Tenant.current();
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,16 +22,19 @@ export function bpsToString(bps: number) {
 }
 
 export const getProposalTypeText = (proposalType: string) => {
-  switch (proposalType) {
-    case "OPTIMISTIC":
-      return "Optimistic Proposal";
-    case "STANDARD":
-      return "Standard Proposal";
-    case "APPROVAL":
-      return "Approval Vote Proposal";
-    default:
-      return "Proposal";
+  if (Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM) {
+    switch (proposalType) {
+      case "OPTIMISTIC":
+        return "Optimistic Proposal";
+      case "STANDARD":
+        return "Standard Proposal";
+      case "APPROVAL":
+        return "Approval Vote Proposal";
+      default:
+        return "Proposal";
+    }
   }
+  return "Proposal";
 };
 
 const format = new Intl.NumberFormat("en", {
@@ -74,12 +78,17 @@ export function formatNumber(
   return numberFormat.format(standardUnitAmount);
 }
 
-export function TokenAmountDisplay(
-  amount: string | BigNumberish,
-  decimals: number,
-  currency: string,
+export function TokenAmountDisplay({
+  amount,
+  decimals = token.decimals,
+  currency = token.symbol,
   maximumSignificantDigits = 2
-) {
+}: {
+  amount: string | BigNumberish,
+  decimals?: number,
+  currency?: string,
+  maximumSignificantDigits?: number
+}) {
   const formattedNumber = useMemo(() => {
     return formatNumber(amount, decimals, maximumSignificantDigits);
   }, [amount, decimals, maximumSignificantDigits]);
@@ -184,6 +193,7 @@ export async function fetchAndSetAll<
   values.forEach((value, index) => setters[index](value));
 }
 
+// TODO: Move this into tenant.ts
 export function getBlockScanUrl(hash: string | `0x${string}`) {
   switch (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME) {
     case "optimism":

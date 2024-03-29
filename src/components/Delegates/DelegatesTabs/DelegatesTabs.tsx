@@ -5,47 +5,50 @@ import { useSearchParams } from "next/navigation";
 import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
 import CitizensFilter from "@/components/Delegates/DelegatesFilter/CitizensFilter";
 import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import Tenant from "@/lib/tenant/tenant";
+import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
+import { useRouter } from "next/navigation";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const addSearchParam = useAddSearchParam();
+  const deleteSearchParam = useDeleteSearchParam();
   const tabParam = searchParams?.get("tab");
-  const [selectedTab, setSelectedTab] = useState(tabParam || "delegates");
+  const { ui } = Tenant.current();
 
-  // NOTE: Using window.history.pushState instead of router.push since router.push is waiting for API calls to resolve
-  // in order to push the url
+  const hasCitizens = ui.toggle("citizens")?.enabled;
+
   const handleTabChange = (value: string) => {
-    if (value === "citizens") {
-      setSelectedTab("citizens");
-      window.history.pushState({ tab: value }, "", `/delegates?tab=${value}`);
-    } else {
-      setSelectedTab("delegates");
-      window.history.pushState({ tab: value }, "", "/delegates");
-    }
+    router.push(
+      value === "citizens"
+        ? addSearchParam({ name: "tab", value, clean: true })
+        : deleteSearchParam({ name: "tab", clean: true }),
+      { scroll: false }
+    );
   };
 
   return (
     <Tabs
-      className="max-w-full mt-16"
+      className="max-w-full"
       defaultValue={tabParam || "delegates"}
       onValueChange={(value) => handleTabChange(value)}
     >
-      <div className="flex flex-col md:flex-row justify-between items-baseline gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
         <TabsList>
           <TabsTrigger className="text-2xl" value="delegates">
             Delegates
           </TabsTrigger>
-          <TabsTrigger className="text-2xl" value="citizens">
-            Citizens
-          </TabsTrigger>
-        </TabsList>
-        <div className="flex flex-col md:flex-row justify-between gap-4 w-full md:w-fit">
-          <DelegatesSearch />
-          {selectedTab === "citizens" ? (
-            <CitizensFilter />
-          ) : (
-            <DelegatesFilter />
+          {hasCitizens && (
+            <TabsTrigger className="text-2xl" value="citizens">
+              Citizens
+            </TabsTrigger>
           )}
+        </TabsList>
+        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
+          <DelegatesSearch />
+          {tabParam === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
         </div>
       </div>
       {children}

@@ -1,30 +1,33 @@
-import { getDefaultProvider, Provider } from "ethers";
-import { MulticallWrapper, MulticallProvider } from "ethers-multicall-provider";
+import { getDefaultProvider } from "ethers";
+import { MulticallProvider, MulticallWrapper } from "ethers-multicall-provider";
 
 declare global {
   var provider: MulticallProvider;
   var ethProvider: MulticallProvider;
 }
 
+const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
+
 let provider: MulticallProvider;
 let ethProvider: MulticallProvider;
 
-if (process.env.NODE_ENV === "production") {
+if (isProd) {
   provider = MulticallWrapper.wrap(
     getDefaultProvider("optimism", {
-      alchemy: process.env.NEXT_PUBLIC_ALCHEMY_ID,
+      alchemy: alchemyId,
     })
   );
   ethProvider = MulticallWrapper.wrap(
     getDefaultProvider("mainnet", {
-      alchemy: process.env.NEXT_PUBLIC_ALCHEMY_ID,
+      alchemy: alchemyId,
     })
   );
 } else {
   if (!global.provider) {
     global.provider = MulticallWrapper.wrap(
       getDefaultProvider("optimism", {
-        alchemy: process.env.NEXT_PUBLIC_ALCHEMY_ID,
+        alchemy: alchemyId,
       })
     );
   }
@@ -33,11 +36,10 @@ if (process.env.NODE_ENV === "production") {
   if (!global.ethProvider) {
     global.ethProvider = MulticallWrapper.wrap(
       getDefaultProvider("mainnet", {
-        alchemy: process.env.NEXT_PUBLIC_ALCHEMY_ID,
+        alchemy: alchemyId,
       })
     );
   }
-
   ethProvider = global.ethProvider;
 }
 

@@ -1,16 +1,25 @@
+import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { HStack } from "@/components/Layout/Stack";
-import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
-import styles from "./styles.module.scss";
 import CreateProposalForm from "@/components/Proposals/ProposalCreation/CreateProposalForm";
-import { getProposalTypes } from "@/app/api/proposals/getProposals";
+import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
+import Tenant from "@/lib/tenant/tenant";
+import styles from "./styles.module.scss";
+
 
 async function getProposalSettingsList() {
   "use server";
-
-  return await getProposalTypes();
+  return await fetchProposalTypes();
 }
 
 export default async function CreateProposalPage() {
+
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("proposals/create")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
+
   const proposalSettingsList = await getProposalSettingsList();
 
   return (
