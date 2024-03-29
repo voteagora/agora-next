@@ -153,10 +153,6 @@ interface DraftProposalSocialVotingStrategyOptionInputProps {
   placeholder: string;
   proposalState: ProposalDraftWithTransactions;
   removeOption: (index: number) => void;
-  // updateProposal: (
-  //   proposal: ProposalDraft,
-  //   updateData: Partial<ProposalDraft>
-  // ) => Promise<ProposalDraft>;
 }
 
 const DraftProposalSocialVotingStrategyOptionInput: React.FC<
@@ -247,8 +243,9 @@ const DraftProposalSocialVotingStrategyDateInput: React.FC<
       <label className="font-medium text-sm mb-1">{label}</label>
       {/* @ts-ignore */}
       <DatePicker
-        selected={
-          proposalState[field] ? (proposalState[field] as Date) : new Date()
+        selected={proposalState[field] ? (proposalState[field] as Date) : null}
+        placeholderText={
+          field === "start_date_social" ? "Start date" : "End date"
         }
         onChange={(date) => handleUpdateDate(date)}
         showTimeSelect

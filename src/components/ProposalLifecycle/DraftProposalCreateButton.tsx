@@ -82,14 +82,13 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
   const saveAndUpdateDocs = async () => {
     if (!address) return;
     if (proposalState.proposal_type === "social") {
-      await saveSocialProposalOptions(
+      const result = await saveSocialProposalOptions(
         proposalState,
         options.map((option) => option.value)
       );
-
-      handleContinue();
-      return;
     }
+
+    console.log(proposalState);
 
     if (updateENSDocsStatus) {
       setENSDocsLoading(true);
