@@ -12,6 +12,7 @@ import {
 } from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
 import { useAccount } from "wagmi";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { set } from "cypress/types/lodash";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -88,11 +89,24 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
       );
     }
 
-    console.log(proposalState);
-
     if (updateENSDocsStatus) {
       setENSDocsLoading(true);
-      await createGithubProposal(proposalState)
+
+      const proposalStateWithOptions = {
+        ...proposalState,
+        ProposalDraftOption: options.map((option) => {
+          return {
+            index: option.index,
+            text: option.value,
+          };
+        }),
+      };
+
+      // @ts-ignore
+      setProposalState(proposalStateWithOptions);
+
+      // @ts-ignore
+      await createGithubProposal(proposalStateWithOptions)
         .then((res) => {
           setENSDocsURL(res);
 
@@ -135,16 +149,16 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                 <div className="flex flex-row justify-between mb-8">
                   <p className="text-stone-700">Update ENS docs</p>
                   {updateENSDocsStatus ? (
-                    ENSDocsLoading ? (
-                      <div className="text-gray-600">
-                        <p>Loading...</p>
-                      </div>
-                    ) : (
+                    !!ENSDocsURL ? (
                       <div className="flex flex-row items-center gap-x-2">
                         <p className="text-green-600">Completed</p>
                         <a target="_blank" href={ENSDocsURL}>
                           <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                         </a>
+                      </div>
+                    ) : (
+                      <div className="text-gray-600">
+                        <p>Loading...</p>
                       </div>
                     )
                   ) : (

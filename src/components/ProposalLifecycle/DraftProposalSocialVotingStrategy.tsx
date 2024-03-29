@@ -127,6 +127,8 @@ const DraftProposalSocialVotingStrategy: React.FC<
           value={option.value}
           placeholder="Option value (max 32 characters)"
           proposalState={proposalState}
+          options={options}
+          setOptions={setOptions}
           removeOption={handleRemoveOption}
         />
       ))}
@@ -152,6 +154,10 @@ interface DraftProposalSocialVotingStrategyOptionInputProps {
   label: string;
   placeholder: string;
   proposalState: ProposalDraftWithTransactions;
+  options: { index: number; value: string }[];
+  setOptions: React.Dispatch<
+    React.SetStateAction<{ index: number; value: string }[]>
+  >;
   removeOption: (index: number) => void;
 }
 
@@ -164,7 +170,8 @@ const DraftProposalSocialVotingStrategyOptionInput: React.FC<
     votingStrategy,
     label,
     placeholder,
-    proposalState,
+    options,
+    setOptions,
     removeOption,
   } = props;
 
@@ -173,6 +180,18 @@ const DraftProposalSocialVotingStrategyOptionInput: React.FC<
   useEffect(() => {
     setOptionValue(value);
   }, [value]);
+
+  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newOptions = options.map((option) => {
+      if (option.index === optionIndex) {
+        return { index: optionIndex, value: e.target.value };
+      } else {
+        return option;
+      }
+    });
+
+    setOptions(newOptions);
+  };
 
   return (
     <div className="flex flex-col mb-5">
@@ -195,7 +214,7 @@ const DraftProposalSocialVotingStrategyOptionInput: React.FC<
         placeholder={placeholder}
         disabled={votingStrategy === "basic"}
         value={optionValue}
-        onChange={(e) => setOptionValue(e.target.value)}
+        onChange={(e) => handleOptionChange(e)}
       />
     </div>
   );
