@@ -10,14 +10,6 @@ import {
 export const SERVICE_NAME = 'agora-app';
 
 export async function register() {
-  registerOTel({
-    serviceName: SERVICE_NAME,
-    spanProcessors: [
-      new SimpleSpanProcessor(
-        new OTLPHttpJsonTraceExporter()
-      )
-    ],
-    traceExporter: new OTLPHttpJsonTraceExporter()
-  });
+  registerOTel(SERVICE_NAME);
 }
 
