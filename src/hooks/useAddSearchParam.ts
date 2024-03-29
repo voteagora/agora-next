@@ -8,8 +8,8 @@ export const useAddSearchParam = () => {
     const pathname = usePathname();
 
     return useCallback(
-        (name: string, value: string) => {
-            const params = new URLSearchParams(searchParams?.toString());
+        ({ name, value, clean }: { name: string, value: string, clean?: boolean }) => {
+            const params = new URLSearchParams(clean ? undefined : searchParams?.toString());
             params.set(name, value);
             return pathname + "?" + params.toString();
         },

@@ -12,6 +12,8 @@ import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { cn } from "@/lib/utils";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -25,6 +27,7 @@ interface DelegatePaginated {
 }
 
 interface Props {
+  isDelegatesCitizensFetching: boolean;
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
@@ -33,16 +36,19 @@ interface Props {
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
+  isDelegatesCitizensFetching,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
   const { advancedDelegators } = useConnectedDelegate();
+  const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
+    setIsDelegatesFiltering(false);
     setDelegates(initialDelegates.delegates);
     setMeta(initialDelegates.meta);
-  }, [initialDelegates]);
+  }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
@@ -88,7 +94,15 @@ export default function DelegateCardList({
           }
 
           return (
-            <div key={delegate.address} className={styles.link}>
+            <div
+              key={delegate.address}
+              className={cn(
+                styles.link,
+                isDelegatesCitizensFetching || isDelegatesFiltering
+                  ? "animate-pulse"
+                  : ""
+              )}
+            >
               <Link href={`/delegates/${delegate.address}`}>
                 <VStack gap={4} className={styles.link_container}>
                   <VStack gap={4} justifyContent="justify-center">
