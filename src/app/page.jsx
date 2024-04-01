@@ -9,19 +9,12 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 
-import { proposalsFilterOptions } from "@/lib/constants";
-import styles from "@/styles/homepage.module.scss";
-import { getVotableSupply } from "src/app/api/votableSupply/getVotableSupply";
-import { getMetrics } from "./api/metrics/getMetrics";
-import { getNeedsMyVoteProposals } from "./api/proposals/getNeedsMyVoteProposals";
-import { getProposals } from "./api/proposals/getProposals";
+import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import prisma from "@/app/lib/prisma";
 import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsList";
 import SponsorshipRequestList from "@/components/ProposalLifecycle/SponsorshipRequestList";
-
-import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
+// import { PageDivider } from "@/components/Layout/PageDivider";
 import Tenant from "@/lib/tenant/tenant";
-
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -213,7 +206,7 @@ export default async function Home() {
     <VStack>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
-      <PageDivider />
+      {/* <PageDivider /> */}
       <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
       <SponsorshipRequestList
         fetchSponsorshipRequests={fetchSponsorshipRequests}
