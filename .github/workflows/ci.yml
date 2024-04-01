@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Validate OpenAPI definition
-        uses: char0n/swagger-editor-validate@v1
+        uses: char0n/apidom-validate@v1
         with:
-          swagger-editor-url: https://editor-next.swagger.io/
+          fails-on: 2
           definition-file: spec/oas_v1.yaml
