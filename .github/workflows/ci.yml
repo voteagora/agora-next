@@ -1,0 +1,22 @@
+name: CI
+run-name: ${{ github.actor }} - ${{ github.event_name }} - ${{ github.repository }}
+on:
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  swagger_lint:
+    runs-on: ubuntu-latest
+    name: Swagger Editor Validator Remote
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate OpenAPI definition
+        uses: char0n/swagger-editor-validate@v1
+        with:
+          swagger-editor-url: https://editor-next.swagger.io/
+          definition-file: spec/oas_v1.yaml
