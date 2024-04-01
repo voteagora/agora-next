@@ -210,7 +210,7 @@ export default async function Home() {
     <VStack>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
-      <PageDivider />
+
       <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
       <SponsorshipRequestList
         fetchSponsorshipRequests={fetchSponsorshipRequests}
