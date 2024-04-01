@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Image from "next/image";
-import successfulDelegation from "public/images/successfulDelegation.svg";
+import successSvg from "@/assets/tenant/optimism-success.svg";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useEffect } from "react";
 
@@ -29,7 +29,7 @@ export function SuccessView({
       <div className="w-full">
         <Image
           className="w-full"
-          src={successfulDelegation}
+          src={successSvg}
           alt="Delegation successful image"
         />
       </div>

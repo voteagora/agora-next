@@ -20,6 +20,12 @@ import {
   domain,
   proposalTypes,
 } from "./snapshot";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 
 interface DraftProposalReviewProps {
   proposal: ProposalDraftWithTransactions;
@@ -37,6 +43,8 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
 }) => {
   const { address } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
+
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
 
   type BasicInputData = [string[], number[], string[], string];
 
@@ -234,7 +242,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
 
   useEffect(() => {
     if (isSuccess) {
-      alert("Proposal submitted");
+      setOpenSuccessDialog(true);
       handleProposalSubmitted();
     }
   }, [isSuccess, handleProposalSubmitted]);
@@ -344,12 +352,46 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                 }
               >
                 {address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" ||
-                address === "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd"
-                  ? "Approve"
-                  : "Not enough voting power"}
+                address === "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd" ? (
+                  isLoading ? (
+                    <div className="flex flex-row justify-center items-center">
+                      <div className="w-4 h-4 border border-gray-eo rounded-full animate-spin"></div>
+                      <p className="ml-2">Approving</p>
+                    </div>
+                  ) : (
+                    "Approve"
+                  )
+                ) : (
+                  "Not enough voting power"
+                )}
               </button>
             </div>
           </div>
+          <Dialog open={openSuccessDialog}>
+            <DialogContent>
+              <div className="px-6 py-8">
+                <p className="font-medium mb-4 text-stone-900">
+                  Draft successfully submitted!
+                </p>
+                {/* link to the draft using the hash */}
+                <div className="flex flex-row justify-between mb-8">
+                  <p className="text-stone-700">View on Etherscan</p>
+                  <a
+                    target="_blank"
+                    href={`https://sepolia.etherscan.io/tx/0xab5a8e617433a4a6eb68b3f4669603f2a35addf108f2fc4b161f93d0bb0873a3/${data?.hash}`}
+                  >
+                    <ArrowTopRightOnSquareIcon className="w-5 h-5" />
+                  </a>
+                </div>
+                <Link
+                  href="/"
+                  className="w-full py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed"
+                >
+                  Continue
+                </Link>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

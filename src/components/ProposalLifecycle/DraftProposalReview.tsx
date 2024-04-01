@@ -122,18 +122,32 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
                 Proposed transactions
               </p>
               {proposalState.transactions.map((transaction, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
-                  >
-                    <p>{`// ${transaction.description}`}</p>
-                    <p>{transaction.target}</p>
-                    <p>{transaction.function_details}</p>
-                    <p>{transaction.value}</p>
-                    <p>{transaction.calldata}</p>
-                  </div>
-                );
+                if (!!transaction.function_details) {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
+                    >
+                      <p>{`// ${transaction.description}`}</p>
+                      <p>{transaction.target}</p>
+                      <p>{transaction.function_details}</p>
+                      <p>{transaction.value}</p>
+                      <p>{transaction.calldata}</p>
+                    </div>
+                  );
+                }
+                if (!transaction.function_details) {
+                  // ETH transfer
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
+                    >
+                      <p>{`// ${transaction.description}`}</p>
+                      <p>{`${transaction.target}.transfer(${transaction.value})`}</p>
+                    </div>
+                  );
+                }
               })}
             </div>
           )}

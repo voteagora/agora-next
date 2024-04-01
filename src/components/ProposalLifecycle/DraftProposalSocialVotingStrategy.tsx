@@ -123,10 +123,12 @@ const DraftProposalSocialVotingStrategy: React.FC<
           key={`${option.index} ${proposalState.voting_strategy_social}`}
           optionIndex={option.index}
           votingStrategy={proposalState.voting_strategy_social}
-          label={`Option ${option.index + 1}`}
+          label={`Option ${option.index}`}
           value={option.value}
           placeholder="Option value (max 32 characters)"
           proposalState={proposalState}
+          options={options}
+          setOptions={setOptions}
           removeOption={handleRemoveOption}
         />
       ))}
@@ -152,11 +154,11 @@ interface DraftProposalSocialVotingStrategyOptionInputProps {
   label: string;
   placeholder: string;
   proposalState: ProposalDraftWithTransactions;
+  options: { index: number; value: string }[];
+  setOptions: React.Dispatch<
+    React.SetStateAction<{ index: number; value: string }[]>
+  >;
   removeOption: (index: number) => void;
-  // updateProposal: (
-  //   proposal: ProposalDraft,
-  //   updateData: Partial<ProposalDraft>
-  // ) => Promise<ProposalDraft>;
 }
 
 const DraftProposalSocialVotingStrategyOptionInput: React.FC<
@@ -168,7 +170,8 @@ const DraftProposalSocialVotingStrategyOptionInput: React.FC<
     votingStrategy,
     label,
     placeholder,
-    proposalState,
+    options,
+    setOptions,
     removeOption,
   } = props;
 
@@ -177,6 +180,18 @@ const DraftProposalSocialVotingStrategyOptionInput: React.FC<
   useEffect(() => {
     setOptionValue(value);
   }, [value]);
+
+  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newOptions = options.map((option) => {
+      if (option.index === optionIndex) {
+        return { index: optionIndex, value: e.target.value };
+      } else {
+        return option;
+      }
+    });
+
+    setOptions(newOptions);
+  };
 
   return (
     <div className="flex flex-col mb-5">
@@ -199,7 +214,7 @@ const DraftProposalSocialVotingStrategyOptionInput: React.FC<
         placeholder={placeholder}
         disabled={votingStrategy === "basic"}
         value={optionValue}
-        onChange={(e) => setOptionValue(e.target.value)}
+        onChange={(e) => handleOptionChange(e)}
       />
     </div>
   );
@@ -247,8 +262,9 @@ const DraftProposalSocialVotingStrategyDateInput: React.FC<
       <label className="font-medium text-sm mb-1">{label}</label>
       {/* @ts-ignore */}
       <DatePicker
-        selected={
-          proposalState[field] ? (proposalState[field] as Date) : new Date()
+        selected={proposalState[field] ? (proposalState[field] as Date) : null}
+        placeholderText={
+          field === "start_date_social" ? "Start date" : "End date"
         }
         onChange={(date) => handleUpdateDate(date)}
         showTimeSelect

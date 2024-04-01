@@ -114,6 +114,30 @@ export default function formatGithubProposal(
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
       : "";
 
+  const votingStrategy =
+    proposal.proposal_type === "social"
+      ? `# Voting Strategy \n ${proposal.voting_strategy_social}`
+      : ``;
+
+  const votingStrategyDates =
+    proposal.proposal_type === "social"
+      ? `# Voting Dates \n ${proposal.start_date_social} - ${proposal.end_date_social}`
+      : ``;
+
+  const socialOptionsBasic =
+    proposal.proposal_type === "social" &&
+    proposal.voting_strategy_social === "basic"
+      ? `# Voting options \n For, Against, Abstain`
+      : ``;
+
+  const socialOptionsApproval =
+    proposal.proposal_type === "social" &&
+    proposal.voting_strategy_social === "approval"
+      ? `# Voting options \n ${proposal.ProposalDraftOption.map(
+          (option) => option.text
+        ).join(", ")}`
+      : ``;
+
   const content =
     descriptionTable +
     "\n\n" +
@@ -122,10 +146,16 @@ export default function formatGithubProposal(
     statusTable +
     "\n\n" +
     abstract +
-    // "\n\n" +
-    // specification +
     "\n\n" +
-    transactions;
+    transactions +
+    "\n\n" +
+    votingStrategy +
+    "\n\n" +
+    votingStrategyDates +
+    "\n\n" +
+    socialOptionsBasic +
+    "\n\n" +
+    socialOptionsApproval;
 
   return content;
 }

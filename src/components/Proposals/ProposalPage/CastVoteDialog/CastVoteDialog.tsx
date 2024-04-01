@@ -10,9 +10,9 @@ import styles from "./castVoteDialog.module.scss";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
-import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
-import pendingImage from "public/images/action-pending.svg";
-import congrats from "public/images/congrats.svg";
+import { getVpToDisplay, MissingVote } from "@/lib/voteUtils";
+import loadingSvg from "@/assets/tenant/optimism-loading.svg";
+import successSvg from "@/assets/tenant/optimism-success.svg";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export type SupportTextProps = {
@@ -193,7 +193,7 @@ export function SuccessMessage({
       <Image
         width="457"
         height="155"
-        src={congrats}
+        src={successSvg}
         className="w-full mb-3"
         alt="agora loading"
       />
@@ -267,7 +267,7 @@ export function DisabledVoteDialog({
       <Image
         width="457"
         height="155"
-        src={pendingImage}
+        src={loadingSvg}
         className="w-full mb-3"
         alt="agora loading"
       />

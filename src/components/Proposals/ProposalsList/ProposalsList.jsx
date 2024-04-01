@@ -9,21 +9,25 @@ import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
-import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
-import { useSearchParams } from "next/navigation";
+
 import CreateProposalButton from "@/components/ProposalLifecycle/CreateProposalButton";
 import { useAccount } from "wagmi";
+
+import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
+import { useSearchParams } from "next/navigation";
+
 
 export default function ProposalsList({
   initRelevantProposals,
   initAllProposals,
   fetchProposals,
   votableSupply,
-  governanceCalendar,
   createDraftProposal,
+  governanceCalendar,
 }) {
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
+
   const [pages, setPages] = useState([initRelevantProposals] || []);
   const [meta, setMeta] = useState(initRelevantProposals.meta);
   const { address, isConnected } = useAccount();
