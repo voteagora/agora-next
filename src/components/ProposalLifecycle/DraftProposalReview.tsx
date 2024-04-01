@@ -198,7 +198,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               <div className="flex flex-col gap-y-1 text-base">
                 <label className="font-medium">Voting options</label>
                 {proposalState.ProposalDraftOption.map((option, index) => (
-                  <p className="text-gray-4f">{option.text}</p>
+                  <p className="text-gray-4f" key={`draft-${index}`}>{option.text}</p>
                 ))}
               </div>
             )}
