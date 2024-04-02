@@ -11,7 +11,9 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
 import styles from "./proposalVotesList.module.scss";
-import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
+import { useState } from "react";
 
 export function ProposalSingleVote({
   vote,
@@ -23,12 +25,16 @@ export function ProposalSingleVote({
   delegators: string[] | null;
 }) {
   const { address: connectedAddress } = useAccount();
-  const [hash1, hash2] = vote.transactionHash.split("|");
+  const [hovered, setHovered] = useState(false);
 
   return (
     <VStack key={vote.transactionHash} gap={2} className={styles.vote_row}>
       <VStack>
-        <HoverCard openDelay={100} closeDelay={100}>
+        <HoverCard
+          openDelay={100}
+          closeDelay={100}
+          onOpenChange={(open) => setHovered(open)}
+        >
           <HoverCardTrigger>
             <HStack justifyContent="justify-between" className={styles.voter}>
               <HStack gap={1} alignItems="items-center">
@@ -37,6 +43,16 @@ export function ProposalSingleVote({
                   <p>(you)</p>
                 )}
                 <VoteText support={vote.support} />
+                {/* TODO: frh -> this hash url */}
+                {hovered && (
+                  <a
+                    href={getBlockScanUrl("hash2")}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                  </a>
+                )}
               </HStack>
               <HStack alignItems="items-center" className={styles.vote_weight}>
                 <TokenAmountDisplay amount={vote.weight} />
@@ -57,7 +73,6 @@ export function ProposalSingleVote({
         </HoverCard>
       </VStack>
       <pre className={styles.vote_reason}>{vote.reason}</pre>
-      <BlockScanUrls hash1={hash1} hash2={hash2} className="pt-0" />
     </VStack>
   );
 }

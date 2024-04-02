@@ -3,6 +3,8 @@ import OptionDescription from "./OptionDescription";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
 
 export default function ApprovedTransactions({ proposalData }) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
@@ -21,10 +23,20 @@ export default function ApprovedTransactions({ proposalData }) {
       gap="1"
       className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
     >
-      <p className="px-4 mb-2 font-mono text-xs font-medium leading-4 text-gray-af">
-        Proposed Transactions (signal only – transactions are manually executed
-        by the Foundation)
-      </p>
+      <div className="flex items-center justify-between px-4 mb-2">
+        <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+          Proposed Transactions (signal only – transactions are manually
+          executed by the Foundation)
+        </p>
+        {/* TODO: frh -> this hash url */}
+        <a
+          href={getBlockScanUrl("hash2")}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+        </a>
+      </div>
       <VStack className="px-4">
         {proposalData.options
           .slice(0, displayedOptions)

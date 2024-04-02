@@ -24,6 +24,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
         <ProposalStatusDetail
           proposalStatus={proposal.status}
           proposalEndTime={proposal.end_time}
+          proposalStartTime={proposal.start_time}
         />
       </div>
       <div className="pt-2 text-xs font-semibold text-gray-700">

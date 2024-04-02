@@ -2,13 +2,13 @@
 "use client";
 
 import { HStack } from "@/components/Layout/Stack";
-import { formatDistanceToNowStrict } from "date-fns";
 
 export default function ProposalTimeStatus({
   proposalStatus,
   proposalEndTime,
+  proposalStartTime,
 }) {
-  const options = {
+  const activeOptions = {
     month: "long",
     day: "numeric",
     hour: "numeric",
@@ -18,24 +18,43 @@ export default function ProposalTimeStatus({
 
   const activeProposalEndTime = new Intl.DateTimeFormat(
     "en-US",
-    options
+    activeOptions
+  ).format(proposalEndTime);
+
+  const pendingOptions = {
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "short",
+  };
+
+  const pendingProposalStartTime = new Intl.DateTimeFormat(
+    "en-US",
+    pendingOptions
+  ).format(proposalStartTime);
+
+  const finishOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  };
+
+  const finishProposalEndTime = new Intl.DateTimeFormat(
+    "en-US",
+    finishOptions
   ).format(proposalEndTime);
 
   switch (proposalStatus) {
     case "PENDING":
-      return <HStack gap={1}>Voting</HStack>;
+      return <HStack gap={1}>Starts {pendingProposalStartTime}</HStack>;
 
     case "ACTIVE":
       return <HStack gap={1}>Ends {activeProposalEndTime}</HStack>;
 
-    case "CANCELLED":
-      return <HStack gap={1}></HStack>;
-
     default:
-      return (
-        <HStack gap={1}>
-          Ended {formatDistanceToNowStrict(proposalEndTime)} ago
-        </HStack>
-      );
+      return <HStack gap={1}>Ended {finishProposalEndTime}</HStack>;
   }
 }

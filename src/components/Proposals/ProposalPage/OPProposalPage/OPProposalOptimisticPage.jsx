@@ -125,6 +125,7 @@ export default async function OPProposalPage({ proposal }) {
                 <HStack className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md justify-end font-medium">
                   <ProposalTimeStatus
                     proposalStatus={proposal.status}
+                    proposalStartTime={proposal.start_time}
                     proposalEndTime={proposal.end_time}
                   />
                 </HStack>
