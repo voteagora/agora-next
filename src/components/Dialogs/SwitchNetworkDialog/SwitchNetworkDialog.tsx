@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import loadingSvg from "@/assets/tenant/optimism-loading.svg";
 import Tenant from "@/lib/tenant/tenant";
+import Image from "next/image";
 
 export function SwitchNetwork({
   chainId,
@@ -23,10 +24,12 @@ export function SwitchNetwork({
 
   return (
     <div className="flex flex-col gap-4">
-      <img
+      <Image
+        width="457"
+        height="155"
         src={loadingSvg}
         className="w-full"
-        alt="Switch netwrok"
+        alt="Switch network"
       />
       <h1 className="text-2xl font-extrabold">Switch Networks</h1>
       <p>
