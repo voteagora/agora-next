@@ -56,6 +56,262 @@ export default function Page() {
             <div>
               <div className={styles.changelogItem}>
                 <p id="changelogfeb2024" className={styles.changelogDate}>
+                  {formatFullDate(new Date(2024, 2, 27))}
+                </p>
+                <h3 className={styles.changelogTitle}>
+                  Governance Client Changelog #3
+                </h3>
+                <p>Morning OP collective,</p>
+                <p>
+                  The past few weeks were all about dates and UX polish. Most of
+                  what we shipped was centered around making it easier for you
+                  know which voting cylce we are in, and what is coming up. We
+                  also worked on a few lingering bugs and UX improvements.
+                </p>
+                <p>
+                  On the API side, we are happy announce that we are bringing
+                  the OP API back in June of 2024 and have assemlbed a working
+                  group of teams and individuals that used the API during
+                  RetroPGF Round 3. Stay tuned for more details here, in Discord
+                  and on X.
+                </p>
+                <p>
+                  On the contract side, we have a few audits underway for some
+                  contract upgrades that we will be bringing to governance soon
+                  for a vote. Excited to share more then.
+                </p>
+                <p>
+                  Keep letting us know if you have any other feedback or run
+                  into any issues. We are here to serve.
+                </p>
+                <p>All the best,</p>
+                <p>
+                  <a href="https://twitter.com/kentf">Kent</a>, Co-founder at{" "}
+                  <a href="https://voteagora.com">Agora</a>
+                </p>
+                <br />
+                <br />
+                <h4>Major updates</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/bc4ea97b4ac1dd11cdb9cde99dcae1536402e0c9"
+                        target="_blank"
+                      >
+                        Name Abstraction
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/b74ef1d5127b748eed19fb0c2df1217bd5411572"
+                        target="_blank"
+                      >
+                        Display Exact Date in Proposal
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/cb8196a97a44775a0582f34325484f0d13c17a97"
+                        target="_blank"
+                      >
+                        Added Current Governance Stage to Proposal Page
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/5d05acd03ecd7705ccd84465146439e45b4a33bd"
+                        target="_blank"
+                      >
+                        Integrate OpenTelemetry in Agora App
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/e8629ef5654f7f48ef2cd0deb12de2f969413677"
+                        target="_blank"
+                      >
+                        Allowed Concurrent Execution of Delegate Query
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/7cedfcfc142e846cc7a5631cfec1b8033992832e"
+                        target="_blank"
+                      >
+                        Sort Citizens with Most Voting Power
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/0c556c59f5c886044383006fec1b2e0191428bf6"
+                        target="_blank"
+                      >
+                        Allow 2+ Votes if Voter hasnt voted with direct VP
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+
+                <br />
+                <h4>Minor updates</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/1836bff2ccaf593c71c2bc9cc217dd61aa15a54e"
+                        target="_blank"
+                      >
+                        Prop Type Forms
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/a8ef0a289cf586b0024d3e419a1b896904aa3b6a"
+                        target="_blank"
+                      >
+                        Tenant Abstraction Contracts
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/a86eb751971e2b572742ed4a62faf346c80d9b57"
+                        target="_blank"
+                      >
+                        UI Improvements
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/7ff67e8e2f61993e6eb72c7d2d5bbba2f2a7b2cb"
+                        target="_blank"
+                      >
+                        Delegate Performance Optimization
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/8d630b784d3ee0ce202164df33c34ce69b368469"
+                        target="_blank"
+                      >
+                        Re-use Caching on Components and API
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+
+                <br />
+                <h4>Bug fixes</h4>
+                <ul>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/1c076587e2c32b4e31fd9d09edb2f36a45d0bdda"
+                        target="_blank"
+                      >
+                        Fixed Allowance Calculation Logic for Votes
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/a1e974d53c7db6cc36ff64ba5629943ad99d44e9"
+                        target="_blank"
+                      >
+                        Refactoring
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/b74f7ab5fbc88cf92536cc907e849692baff5867"
+                        target="_blank"
+                      >
+                        Voting Cast Not Executing
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/6342ae2cbeab72d5f27daa5b0c7720df2261416d"
+                        target="_blank"
+                      >
+                        Delegates Undefined Bug Fix
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/pull/178"
+                        target="_blank"
+                      >
+                        Conditional Check for Delegate Statement creation for
+                        wallet
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/4cc8909ba5d56bcb891e8567dd2621243730dc09"
+                        target="_blank"
+                      >
+                        Fix Optimistic Proposal Ids
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/8772c435ff4c4dec21a817aede6767953a80ce23"
+                        target="_blank"
+                      >
+                        Fix Requests being cancelled when trying to vote
+                      </a>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <a
+                        href="https://github.com/voteagora/agora-next/commit/f5203c218dad08e28e84dc3b62c6188ae204f22c"
+                        target="_blank"
+                      >
+                        Fix Non Clickable Div of Past Votes in Delegates/Address
+                        Page
+                      </a>
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="my-8 border-t border-gray-300"></div>
+            <div>
+              <div className={styles.changelogItem}>
+                <p id="changelogfeb2024" className={styles.changelogDate}>
                   {formatFullDate(new Date(2024, 2, 7))}
                 </p>
                 <h3 className={styles.changelogTitle}>

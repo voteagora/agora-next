@@ -32,9 +32,9 @@ export async function paginateResult<T extends Array<any>>(
   pageSize: number
 ): Promise<PaginatedResult<T>> {
   const skip = (page - 1) * pageSize;
-  const take = pageSize + 1;
+  const take = pageSize;
 
-  const ex = await paginateResultEx<T>(query, {limit: take, offset: skip});
+  const ex = await paginateResultEx<T>(query, { limit: take, offset: skip });
 
   return {
     meta: {
@@ -56,9 +56,9 @@ export async function paginateResultEx<T extends Array<any>>(
 
   if (!data || data.length === 0) {
     return {
-      meta: { 
+      meta: {
         has_next: false,
-        total_returned: 0, 
+        total_returned: 0,
         next_offset: 0
       },
       data: [] as any as T,

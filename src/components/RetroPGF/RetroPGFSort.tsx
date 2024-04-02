@@ -21,8 +21,8 @@ export default function RetroPGFSort() {
   const handleSelect = (value: string) => {
     router.push(
       value !== "byMostRPGFReceived"
-        ? addSearchParam("orderBy", value)
-        : deleteSearchParam("orderBy"),
+        ? addSearchParam({ name: "orderBy", value })
+        : deleteSearchParam({ name: "orderBy" }),
       {
         scroll: false,
       }
