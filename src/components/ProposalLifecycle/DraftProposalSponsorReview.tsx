@@ -6,12 +6,27 @@ import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist
 import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
-import { useAccount, useContractWrite, usePrepareContractWrite, useSignTypedData, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+  useSignTypedData,
+  useWaitForTransaction,
+} from "wagmi";
 import ENSGovernorABI from "@/lib/contracts/abis/ENSGovernor.json";
-import { createProposal, domain, proposalTypes, SnapshotProposalMessage } from "./snapshot";
-import { Dialog, DialogContent } from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
+import {
+  createProposal,
+  domain,
+  proposalTypes,
+  SnapshotProposalMessage,
+} from "./snapshot";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
+import Tenant from "@/lib/tenant/tenant";
 
 interface DraftProposalReviewProps {
   proposal: ProposalDraftWithTransactions;
@@ -29,6 +44,9 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
 }) => {
   const { address } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
+
+  const { contracts } = Tenant.current();
+  const [hasVotingPower, setVotingPower] = useState(false);
 
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
 
@@ -187,11 +205,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
     isError: onPrepareError,
     error,
   } = usePrepareContractWrite({
-    address: "0x630A6A268191c654ce084aAd2D7910fF651e0797",
+    address: "0xb65c031ac61128ae791d42ae43780f012e2f7f89",
     abi: ENSGovernorABI,
     functionName: "propose",
     args: inputData,
     chainId: 11155111,
+    enabled: hasVotingPower,
   });
 
   const { data, write } = useContractWrite(config);
@@ -201,8 +220,15 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
   });
 
   useEffect(() => {
-    console.log("data", data);
-  }, [data]);
+    if (address) {
+      (async () => {
+        const votingPower = address
+          ? await contracts.token.contract.balanceOf(address)
+          : BigInt(0);
+        setVotingPower(Boolean(votingPower > 100000000000000000000000));
+      })();
+    }
+  }, [address]);
 
   const handleApprove = async () => {
     if (proposal.proposal_type === "executable") {
@@ -312,7 +338,9 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                 <div className="flex flex-col gap-y-1 text-base">
                   <label className="font-medium">Voting options</label>
                   {proposal.ProposalDraftOption.map((option, index) => (
-                    <p className="text-gray-4f" key={`draft-${index}`}>{option.text}</p>
+                    <p className="text-gray-4f" key={`draft-${index}`}>
+                      {option.text}
+                    </p>
                   ))}
                 </div>
               )}
@@ -331,14 +359,9 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
               <button
                 onClick={() => handleApprove()}
                 className="flex flex-row justify-center shadow-sm py-3 px-6 bg-black text-white rounded-lg mt-4 disabled:bg-red-500"
-                // TODO read the voting power, for now only nick.eth allowed
-                disabled={
-                  address !== "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" &&
-                  address !== "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd"
-                }
+                disabled={!hasVotingPower}
               >
-                {address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" ||
-                address === "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd" ? (
+                {hasVotingPower ? (
                   isLoading ? (
                     <div className="flex flex-row justify-center items-center">
                       <div className="w-4 h-4 border border-gray-eo rounded-full animate-spin"></div>
