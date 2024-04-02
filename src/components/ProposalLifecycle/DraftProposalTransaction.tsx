@@ -72,6 +72,12 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
       transactionType
     );
     setTransactions([...transactions, newTransaction]);
+    setProposalState((prevState) => {
+      return {
+        ...prevState,
+        transactions: [...prevState.transactions, newTransaction],
+      };
+    });
   }
 
   async function handleDeleteTransaction(transactionId: number) {
