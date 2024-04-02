@@ -20,6 +20,8 @@ import SimulateTransaction, {
   encodeTransfer,
 } from "../shared/SimulateTransaction";
 import { ethers } from "ethers";
+import { VStack } from "../Layout/Stack";
+import Tenant from "@/lib/tenant/tenant";
 
 interface DraftProposalTransactionProps {
   label: string;
@@ -76,8 +78,6 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
     const updatedTransactions = await deleteTransaction(transactionId);
     setTransactions(updatedTransactions);
   }
-
-  console.log("transactions", transactions);
 
   return (
     <div className="flex flex-col px-6 py-4 border-y border-gray-eb">
@@ -240,6 +240,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
               {transaction.type === "transfer" ? (
                 transaction.token_address === ethers.ZeroAddress ? (
                   <SimulateTransaction
+                    className="flex flex-row space gap-x-6 text:py-3 px-4 button:py-3 px-4"
                     target={transaction.transfer_to || ethers.ZeroAddress}
                     value={ethers.parseEther(
                       transaction.transfer_amount?.toString() || "0"
@@ -248,6 +249,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   />
                 ) : (
                   <SimulateTransaction
+                    className="flex flex-row gap-x-6 text:py-3 px-4 button:py-3 px-4"
                     target={transaction.token_address || ethers.ZeroAddress}
                     value={0n}
                     calldata={encodeTransfer(
@@ -263,6 +265,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 )
               ) : (
                 <SimulateTransaction
+                  className="flex flex-row gap-x-6 text:py-3 px-4"
                   target={transaction.target}
                   value={ethers.parseEther(transaction.value.toString() || "0")}
                   calldata={transaction.calldata}
@@ -435,12 +438,42 @@ const DraftProposalTransactionValidity: React.FC<
     setIsLoading(true);
 
     const transactionsBundle = proposalState.transactions.map((transaction) => {
+      if (transaction.type === "transfer") {
+        if (transaction.token_address === ethers.ZeroAddress) {
+          return {
+            target: transaction.transfer_to || ethers.ZeroAddress,
+            value: ethers
+              .parseEther(transaction.transfer_amount?.toString() || "0")
+              .toString(),
+            calldata: "0x",
+            networkId: Tenant.current().isProd ? "1" : "11155111", // TODO: move to tenant
+            from: Tenant.current().contracts.governor.address,
+          };
+        }
+
+        return {
+          target: transaction.token_address || ethers.ZeroAddress,
+          value: "0",
+          calldata: encodeTransfer(
+            ethers.isAddress(transaction.transfer_to)
+              ? transaction.transfer_to
+              : ethers.ZeroAddress,
+            Number(transaction.transfer_amount?.toString()) || 0,
+            tokens.find((token) => token.address === transaction.token_address)
+              ?.decimals || 18
+          ),
+          networkId: Tenant.current().isProd ? "1" : "11155111",
+          from: Tenant.current().contracts.governor.address,
+        };
+      }
       return {
-        target: transaction.target,
-        value: transaction.value,
+        target: transaction.target || ethers.ZeroAddress,
+        value: ethers
+          .parseEther(transaction.value.toString() || "0")
+          .toString(),
         calldata: transaction.calldata,
-        networkId: "1",
-        from: "0xF417ACe7b13c0ef4fcb5548390a450A4B75D3eB3", // todo
+        networkId: Tenant.current().isProd ? "1" : "11155111",
+        from: Tenant.current().contracts.governor.address,
       };
     });
 
@@ -450,7 +483,7 @@ const DraftProposalTransactionValidity: React.FC<
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(transactionsBundle),
+        body: JSON.stringify({ transactionsBundle }),
       });
 
       // 0x4F2083f5fBede34C2714aFfb3105539775f7FE64
@@ -462,10 +495,16 @@ const DraftProposalTransactionValidity: React.FC<
 
       let allValid = true;
 
-      for (const simulation of res.response.simulation_results) {
-        if (!simulation.transaction.status) {
-          allValid = false;
+      if (!res.response.simulation_results) {
+        for (const simulation of res.response.simulation_results) {
+          if (!simulation.transaction.status) {
+            allValid = false;
+            setStatus(simulation.transaction?.error_message ?? "Invalid");
+            return;
+          }
         }
+      } else {
+        allValid = false;
       }
 
       if (allValid) {

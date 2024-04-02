@@ -8,27 +8,32 @@ type TransactionData = {
 
 export async function POST(request: Request) {
   const body = await request.json();
+
+  console.log("simulate-bundle", body.transactionsBundle);
+
   const user = process.env.TENDERLY_USER;
   const project = process.env.TENDERLY_PROJECT;
 
-  const tenderlyData = body.map((transaction: TransactionData) => {
-    return {
-      /* Simulation Configuration */
-      save: true, // if true simulation is saved and shows up in the dashboard
-      save_if_fails: true, // if true, reverting simulations show up in the dashboard
-      simulation_type: "full", // full or quick (full is default)
+  const tenderlyData = body.transactionsBundle.map(
+    (transaction: TransactionData) => {
+      return {
+        /* Simulation Configuration */
+        save: true, // if true simulation is saved and shows up in the dashboard
+        save_if_fails: true, // if true, reverting simulations show up in the dashboard
+        simulation_type: "full", // full or quick (full is default)
 
-      network_id: transaction.networkId || "1", // network to simulate on
+        network_id: transaction.networkId || "1", // network to simulate on
 
-      /* Standard EVM Transaction object */
-      from: transaction.from || "", // governor address
-      to: transaction.target || "",
-      input: transaction.calldata || "0x",
-      gas: 8000000,
-      gas_price: 0,
-      value: transaction.value || 0,
-    };
-  });
+        /* Standard EVM Transaction object */
+        from: transaction.from || "", // governor address
+        to: transaction.target || "",
+        input: transaction.calldata || "0x",
+        gas: 8000000,
+        gas_price: 0,
+        value: transaction.value || 0,
+      };
+    }
+  );
 
   try {
     const response = await fetch(

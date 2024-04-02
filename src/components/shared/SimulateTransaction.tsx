@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
 import { opAdminAddress } from "@/lib/contracts/contracts";
 import styles from "./styles.module.scss";
+import { cx } from "class-variance-authority";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";
 
@@ -15,10 +16,12 @@ export default function SimulateTransaction({
   target,
   value,
   calldata,
+  className,
 }: {
   target: string;
   value: BigInt;
   calldata: string;
+  className?: string;
 }) {
   const [status, setStatus] = useState<Status>("Unconfirmed");
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +68,10 @@ export default function SimulateTransaction({
   }
 
   return (
-    <HStack alignItems="items-center" className={styles.simulate}>
+    <HStack
+      alignItems="items-center"
+      className={cx(className, styles.simulate)}
+    >
       <p
         className={
           status === "Valid"
