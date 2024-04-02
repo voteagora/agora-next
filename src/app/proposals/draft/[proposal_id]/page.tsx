@@ -11,6 +11,7 @@ import {
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import { createGithubProposal as handleCreateGithubProposal } from "@/components/ProposalLifecycle/github";
 import DraftProposal from "@/components/ProposalLifecycle/DraftProposal";
+import { ethers } from "ethers";
 
 async function getProposal(
   proposal_id: string
@@ -22,7 +23,11 @@ async function getProposal(
       id: Number(proposal_id),
     },
     include: {
-      transactions: true,
+      transactions: {
+        orderBy: {
+          order: "asc",
+        },
+      },
       ProposalDraftOption: true,
     },
   });
@@ -71,7 +76,7 @@ async function addTransaction(
       proposal_id: proposalId,
       type: transactionType,
       order: newOrder,
-      target: "",
+      target: transactionType === "transfer" ? ethers.ZeroAddress : "",
       value: "",
       calldata: "",
       function_details: "",
