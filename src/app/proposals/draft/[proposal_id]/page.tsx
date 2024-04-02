@@ -1,19 +1,17 @@
-import DraftProposalChecklist from "@/components/ProposalLifecycle/DraftProposalChecklist";
-import DraftProposalForm from "@/components/ProposalLifecycle/DraftProposalForm";
 import React from "react";
 import prisma from "@/app/lib/prisma";
 import {
   ProposalChecklist,
   ProposalDraft,
-  ProposalDraftOption,
   ProposalDraftTransaction,
 } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import { createGithubProposal as handleCreateGithubProposal } from "@/components/ProposalLifecycle/github";
 import DraftProposal from "@/components/ProposalLifecycle/DraftProposal";
+import BannerStrong from "@/components/Banners/BannerStrong";
 
 async function getProposal(
-  proposal_id: string
+  proposal_id: string,
 ): Promise<ProposalDraftWithTransactions | null> {
   "use server";
 
@@ -32,7 +30,7 @@ async function getProposal(
 
 async function updateProposal(
   proposal: ProposalDraft,
-  updateData: Partial<ProposalDraft>
+  updateData: Partial<ProposalDraft>,
 ): Promise<ProposalDraft> {
   "use server";
 
@@ -50,7 +48,7 @@ async function updateProposal(
 
 async function addTransaction(
   proposalId: number,
-  transactionType: "transfer" | "custom"
+  transactionType: "transfer" | "custom",
 ): Promise<ProposalDraftTransaction> {
   "use server";
 
@@ -86,7 +84,7 @@ async function addTransaction(
 
 async function updateTransaction(
   transactionId: number,
-  data: Partial<ProposalDraftTransaction>
+  data: Partial<ProposalDraftTransaction>,
 ): Promise<ProposalDraftTransaction> {
   "use server";
 
@@ -103,7 +101,7 @@ async function updateTransaction(
 }
 
 async function deleteTransaction(
-  transactionId: number
+  transactionId: number,
 ): Promise<ProposalDraftTransaction[]> {
   "use server";
 
@@ -124,7 +122,7 @@ async function deleteTransaction(
 
 async function saveSocialProposalOptions(
   proposal: ProposalDraft,
-  options: string[]
+  options: string[],
 ): Promise<void> {
   "use server";
 
@@ -143,14 +141,14 @@ async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
   "use server";
 
   const result = await handleCreateGithubProposal(
-    proposal as ProposalDraftWithTransactions
+    proposal as ProposalDraftWithTransactions,
   );
 
   return result;
 }
 
 async function getProposalChecklist(
-  proposal_id: string
+  proposal_id: string,
 ): Promise<ProposalChecklist[]> {
   "use server";
 
@@ -166,7 +164,7 @@ async function getProposalChecklist(
 async function registerChecklistEvent(
   proposal_id: string,
   stage: string,
-  completed_by: string
+  completed_by: string,
 ): Promise<void> {
   "use server";
 
@@ -181,8 +179,8 @@ async function registerChecklistEvent(
 }
 
 export default async function DraftProposalPage({
-  params: { proposal_id },
-}: {
+                                                  params: { proposal_id },
+                                                }: {
   params: { proposal_id: string };
 }) {
   const proposalDraft = await getProposal(proposal_id);
@@ -194,17 +192,20 @@ export default async function DraftProposalPage({
   }
 
   return (
-    <DraftProposal
-      proposal={proposalDraft}
-      getProposal={getProposal}
-      updateProposal={updateProposal}
-      addTransaction={addTransaction}
-      updateTransaction={updateTransaction}
-      deleteTransaction={deleteTransaction}
-      createGithubProposal={createGithubProposal}
-      saveSocialProposalOptions={saveSocialProposalOptions}
-      getProposalChecklist={getProposalChecklist}
-      registerChecklistEvent={registerChecklistEvent}
-    />
+    <div>
+      <BannerStrong />
+      <DraftProposal
+        proposal={proposalDraft}
+        getProposal={getProposal}
+        updateProposal={updateProposal}
+        addTransaction={addTransaction}
+        updateTransaction={updateTransaction}
+        deleteTransaction={deleteTransaction}
+        createGithubProposal={createGithubProposal}
+        saveSocialProposalOptions={saveSocialProposalOptions}
+        getProposalChecklist={getProposalChecklist}
+        registerChecklistEvent={registerChecklistEvent}
+      />
+    </div>
   );
 }

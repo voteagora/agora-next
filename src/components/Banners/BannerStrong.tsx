@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui/button";
+
 const BannerStrong = () => {
   return (
-    <div className="bg-[#0B69F7] p-5 rounded-xl text-white mt-12 mb-12 flex">
-      <div className="w-[80px] border-2 border-[#053CFF] rounded-md flex justify-center items-center">
+    <div className="bg-[#0B69F7] p-5 rounded-xl text-white mt-12 mb-8 flex">
+      <div className="w-[45px] border-2 border-[#053CFF] rounded-md flex justify-center items-center">
         <svg
           width="22"
           height="21"
@@ -19,11 +21,9 @@ const BannerStrong = () => {
         </svg>
       </div>
       <div className="ml-5">
-        <div className="text-lg">ENS Proposal lifecycle</div>
-        <p className="text-gray-100 font-light">
-          We encourage you to go to Discourse to post a temp check that helps
-          gauge the community’s interest. It’s not mandatory, but helps create
-          alignment with the voter base.
+        <div className="font-semibold">ENS is open to all!</div>
+        <p className="text-gray-200">
+          Anyone can participate in the discussions for ENS. Learn how you can participate in the decisions.
         </p>
       </div>
     </div>
