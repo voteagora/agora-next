@@ -4,6 +4,7 @@ import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import prisma from "@/app/lib/prisma";
+import BannerStrong from "@/components/Banners/BannerStrong";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
@@ -203,7 +204,15 @@ export default async function Home() {
 
   return (
     <VStack>
-      <Hero />
+      {namespace === TENANT_NAMESPACES.ENS ? (
+        <BannerStrong
+          title="ENS is open to all!"
+          description="Anyone can participate in the discussions for ENS. Learn how you can participate in the decisions"
+        />
+      ) : (
+        <Hero />
+      )}
+
       <DAOMetricsHeader metrics={metrics} />
       <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
       <SponsorshipRequestList

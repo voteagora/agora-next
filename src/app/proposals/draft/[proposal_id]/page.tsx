@@ -1,17 +1,14 @@
-import DraftProposalChecklist from "@/components/ProposalLifecycle/DraftProposalChecklist";
-import DraftProposalForm from "@/components/ProposalLifecycle/DraftProposalForm";
 import React from "react";
 import prisma from "@/app/lib/prisma";
 import {
   ProposalChecklist,
   ProposalDraft,
-  ProposalDraftOption,
   ProposalDraftTransaction,
 } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 import { createGithubProposal as handleCreateGithubProposal } from "@/components/ProposalLifecycle/github";
 import DraftProposal from "@/components/ProposalLifecycle/DraftProposal";
-import { ethers } from "ethers";
+import BannerStrong from "@/components/Banners/BannerStrong";
 
 async function getProposal(
   proposal_id: string
@@ -199,17 +196,23 @@ export default async function DraftProposalPage({
   }
 
   return (
-    <DraftProposal
-      proposal={proposalDraft}
-      getProposal={getProposal}
-      updateProposal={updateProposal}
-      addTransaction={addTransaction}
-      updateTransaction={updateTransaction}
-      deleteTransaction={deleteTransaction}
-      createGithubProposal={createGithubProposal}
-      saveSocialProposalOptions={saveSocialProposalOptions}
-      getProposalChecklist={getProposalChecklist}
-      registerChecklistEvent={registerChecklistEvent}
-    />
+    <div>
+      <BannerStrong
+        title="ENS Proposal lifecycle"
+        description="Anyone can propose a new idea to ENS. It asll starts on the forum as a Temp Check Proposal. If the idea is received well, it can beocme a draft, where it gets ready to be submitted to a vote. Try your idea here!"
+      />
+      <DraftProposal
+        proposal={proposalDraft}
+        getProposal={getProposal}
+        updateProposal={updateProposal}
+        addTransaction={addTransaction}
+        updateTransaction={updateTransaction}
+        deleteTransaction={deleteTransaction}
+        createGithubProposal={createGithubProposal}
+        saveSocialProposalOptions={saveSocialProposalOptions}
+        getProposalChecklist={getProposalChecklist}
+        registerChecklistEvent={registerChecklistEvent}
+      />
+    </div>
   );
 }
