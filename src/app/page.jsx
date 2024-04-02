@@ -204,7 +204,14 @@ export default async function Home() {
 
   return (
     <VStack>
-      {namespace === TENANT_NAMESPACES.ENS ? <BannerStrong /> : <Hero />}
+      {namespace === TENANT_NAMESPACES.ENS ? (
+        <BannerStrong
+          title="ENS is open to all!"
+          description="Anyone can participate in the discussions for ENS. Learn how you can participate in the decisions"
+        />
+      ) : (
+        <Hero />
+      )}
 
       <DAOMetricsHeader metrics={metrics} />
 

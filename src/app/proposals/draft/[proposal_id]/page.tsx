@@ -11,7 +11,7 @@ import DraftProposal from "@/components/ProposalLifecycle/DraftProposal";
 import BannerStrong from "@/components/Banners/BannerStrong";
 
 async function getProposal(
-  proposal_id: string,
+  proposal_id: string
 ): Promise<ProposalDraftWithTransactions | null> {
   "use server";
 
@@ -30,7 +30,7 @@ async function getProposal(
 
 async function updateProposal(
   proposal: ProposalDraft,
-  updateData: Partial<ProposalDraft>,
+  updateData: Partial<ProposalDraft>
 ): Promise<ProposalDraft> {
   "use server";
 
@@ -48,7 +48,7 @@ async function updateProposal(
 
 async function addTransaction(
   proposalId: number,
-  transactionType: "transfer" | "custom",
+  transactionType: "transfer" | "custom"
 ): Promise<ProposalDraftTransaction> {
   "use server";
 
@@ -84,7 +84,7 @@ async function addTransaction(
 
 async function updateTransaction(
   transactionId: number,
-  data: Partial<ProposalDraftTransaction>,
+  data: Partial<ProposalDraftTransaction>
 ): Promise<ProposalDraftTransaction> {
   "use server";
 
@@ -101,7 +101,7 @@ async function updateTransaction(
 }
 
 async function deleteTransaction(
-  transactionId: number,
+  transactionId: number
 ): Promise<ProposalDraftTransaction[]> {
   "use server";
 
@@ -122,7 +122,7 @@ async function deleteTransaction(
 
 async function saveSocialProposalOptions(
   proposal: ProposalDraft,
-  options: string[],
+  options: string[]
 ): Promise<void> {
   "use server";
 
@@ -141,14 +141,14 @@ async function createGithubProposal(proposal: ProposalDraft): Promise<string> {
   "use server";
 
   const result = await handleCreateGithubProposal(
-    proposal as ProposalDraftWithTransactions,
+    proposal as ProposalDraftWithTransactions
   );
 
   return result;
 }
 
 async function getProposalChecklist(
-  proposal_id: string,
+  proposal_id: string
 ): Promise<ProposalChecklist[]> {
   "use server";
 
@@ -164,7 +164,7 @@ async function getProposalChecklist(
 async function registerChecklistEvent(
   proposal_id: string,
   stage: string,
-  completed_by: string,
+  completed_by: string
 ): Promise<void> {
   "use server";
 
@@ -179,8 +179,8 @@ async function registerChecklistEvent(
 }
 
 export default async function DraftProposalPage({
-                                                  params: { proposal_id },
-                                                }: {
+  params: { proposal_id },
+}: {
   params: { proposal_id: string };
 }) {
   const proposalDraft = await getProposal(proposal_id);
@@ -193,7 +193,10 @@ export default async function DraftProposalPage({
 
   return (
     <div>
-      <BannerStrong />
+      <BannerStrong
+        title="ENS Proposal lifecycle"
+        description="Anyone can propose a new idea to ENS. It asll starts on the forum as a Temp Check Proposal. If the idea is received well, it can beocme a draft, where it gets ready to be submitted to a vote. Try your idea here!"
+      />
       <DraftProposal
         proposal={proposalDraft}
         getProposal={getProposal}

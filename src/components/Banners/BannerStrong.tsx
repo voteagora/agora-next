@@ -1,6 +1,9 @@
-import { Button } from "@/components/ui/button";
+interface BannerStrongProps {
+  title: string;
+  description: string;
+}
 
-const BannerStrong = () => {
+const BannerStrong: React.FC<BannerStrongProps> = ({ title, description }) => {
   return (
     <div className="bg-[#0B69F7] p-5 rounded-xl text-white mt-12 mb-8 flex">
       <div className="w-[45px] border-2 border-[#053CFF] rounded-md flex justify-center items-center">
@@ -21,12 +24,11 @@ const BannerStrong = () => {
         </svg>
       </div>
       <div className="ml-5">
-        <div className="font-semibold">ENS is open to all!</div>
-        <p className="text-gray-200">
-          Anyone can participate in the discussions for ENS. Learn how you can participate in the decisions.
-        </p>
+        <div className="font-semibold">{title}</div>
+        <p className="text-gray-200">{description}</p>
       </div>
     </div>
   );
 };
+
 export default BannerStrong;
