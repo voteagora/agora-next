@@ -237,7 +237,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   field="description"
                 />
               )}
-              {transaction.type === "transfer" ? (
+              {/* {transaction.type === "transfer" ? (
                 transaction.token_address === ethers.ZeroAddress ? (
                   <SimulateTransaction
                     className="flex flex-row space gap-x-6 text:py-3 px-4 button:py-3 px-4"
@@ -270,7 +270,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   value={ethers.parseEther(transaction.value.toString() || "0")}
                   calldata={transaction.calldata}
                 />
-              )}
+              )} */}
             </div>
           ))}
           <DraftProposalAddAnotherTransaction
