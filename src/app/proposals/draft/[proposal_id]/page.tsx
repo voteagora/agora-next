@@ -76,7 +76,7 @@ async function addTransaction(
       proposal_id: proposalId,
       type: transactionType,
       order: newOrder,
-      target: transactionType === "transfer" ? ethers.ZeroAddress : "",
+      target: "",
       value: "",
       calldata: "",
       function_details: "",

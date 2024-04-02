@@ -145,7 +145,11 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   <DraftProposalTransactionInputTransferToken
                     id={transaction.id}
                     label="Token"
-                    placeholder="Token"
+                    placeholder={
+                      tokens.find(
+                        (token) => token.address === transaction.token_address
+                      )?.name || "ETH"
+                    }
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
                     value={transaction.token_address || ethers.ZeroAddress}
@@ -156,23 +160,12 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   id={transaction.id}
                   label={transaction.type === "custom" ? "Value" : "Amount"}
                   placeholder={
-                    transaction.type === "custom" ||
-                    transaction.token_address === ethers.ZeroAddress
-                      ? "ETH amount"
-                      : "amount"
+                    transaction.type === "custom" ? "ETH amount" : "amount"
                   }
                   updateTransaction={updateTransaction}
                   setProposalState={setProposalState}
-                  value={
-                    transaction.token_address === ethers.ZeroAddress
-                      ? transaction.value
-                      : transaction.transfer_amount?.toString() || "0"
-                  }
-                  field={
-                    transaction.token_address === ethers.ZeroAddress
-                      ? "value"
-                      : "transfer_amount"
-                  }
+                  value={transaction.transfer_amount?.toString() || ""}
+                  field={"transfer_amount"}
                 />
               </div>
               <div className="flex flex-row gap-x-10">
@@ -193,16 +186,8 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                     placeholder="address"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={
-                      transaction.token_address === ethers.ZeroAddress
-                        ? transaction.target
-                        : transaction.transfer_to || ethers.ZeroAddress
-                    }
-                    field={
-                      transaction.token_address === ethers.ZeroAddress
-                        ? "target"
-                        : "transfer_to"
-                    }
+                    value={transaction.transfer_to ?? ""}
+                    field={"transfer_to"}
                   />
                 )}
                 {transaction.type === "custom" ? (
