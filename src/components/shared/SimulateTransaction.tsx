@@ -98,3 +98,22 @@ export default function SimulateTransaction({
     </HStack>
   );
 }
+
+export function encodeTransfer(
+  to: string,
+  amount: number,
+  decimals: number
+): string {
+  return (
+    "0xa9059cbb" +
+    ethers.AbiCoder.defaultAbiCoder()
+      .encode(
+        ["address", "uint256"],
+        [
+          ethers.getAddress(to),
+          ethers.parseUnits(amount.toString() || "0", decimals || "18"),
+        ]
+      )
+      .slice(2)
+  );
+}

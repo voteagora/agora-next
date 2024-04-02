@@ -16,6 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAccount } from "wagmi";
+import SimulateTransaction, {
+  encodeTransfer,
+} from "../shared/SimulateTransaction";
+import { ethers } from "ethers";
 
 interface DraftProposalTransactionProps {
   label: string;
@@ -73,6 +77,8 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
     setTransactions(updatedTransactions);
   }
 
+  console.log("transactions", transactions);
+
   return (
     <div className="flex flex-col px-6 py-4 border-y border-gray-eb">
       <label className="font-medium mb-2">{label}</label>
@@ -113,103 +119,153 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                 </button>
               </div>
               <div className="flex flex-row gap-x-10">
-                {transactions[index].type === "custom" ? (
+                {transaction.type === "custom" ? (
                   <DraftProposalTransactionInput
-                    id={transactions[index].id}
+                    id={transaction.id}
                     label="Target"
                     placeholder="address"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={transactions[index].target}
+                    value={transaction.target}
                     field="target"
                   />
                 ) : (
                   <DraftProposalTransactionInputTransferToken
-                    id={transactions[index].id}
+                    id={transaction.id}
                     label="Token"
                     placeholder="Token"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={transactions[index].target}
-                    field="target"
+                    value={transaction.token_address || ethers.ZeroAddress}
+                    field="token_address"
                   />
                 )}
                 <DraftProposalTransactionInput
-                  id={transactions[index].id}
-                  label={
-                    transactions[index].type === "custom" ? "Value" : "Amount"
+                  id={transaction.id}
+                  label={transaction.type === "custom" ? "Value" : "Amount"}
+                  placeholder={
+                    transaction.type === "custom" ||
+                    transaction.token_address === ethers.ZeroAddress
+                      ? "ETH amount"
+                      : "amount"
                   }
-                  placeholder="ETH amount"
                   updateTransaction={updateTransaction}
                   setProposalState={setProposalState}
-                  value={transactions[index].value}
-                  field="value"
+                  value={
+                    transaction.token_address === ethers.ZeroAddress
+                      ? transaction.value
+                      : transaction.transfer_amount?.toString() || "0"
+                  }
+                  field={
+                    transaction.token_address === ethers.ZeroAddress
+                      ? "value"
+                      : "transfer_amount"
+                  }
                 />
               </div>
               <div className="flex flex-row gap-x-10">
-                {transactions[index].type === "custom" ? (
+                {transaction.type === "custom" ? (
                   <DraftProposalTransactionInput
-                    id={transactions[index].id}
+                    id={transaction.id}
                     label="Calldata"
                     placeholder="bytes"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={transactions[index].calldata}
+                    value={transaction.calldata}
                     field="calldata"
                   />
                 ) : (
                   <DraftProposalTransactionInput
-                    id={transactions[index].id}
+                    id={transaction.id}
                     label="Recipient"
                     placeholder="address"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={transactions[index].function_details}
-                    field="function_details"
+                    value={
+                      transaction.token_address === ethers.ZeroAddress
+                        ? transaction.target
+                        : transaction.transfer_to || ethers.ZeroAddress
+                    }
+                    field={
+                      transaction.token_address === ethers.ZeroAddress
+                        ? "target"
+                        : "transfer_to"
+                    }
                   />
                 )}
-                {transactions[index].type === "custom" ? (
+                {transaction.type === "custom" ? (
                   <DraftProposalTransactionInput
-                    id={transactions[index].id}
+                    id={transaction.id}
                     label="Function details"
                     placeholder="transfer(to, amount)"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={transactions[index].function_details}
+                    value={transaction.function_details}
                     field="function_details"
                   />
                 ) : (
                   <DraftProposalTransactionInput
-                    id={transactions[index].id}
+                    id={transaction.id}
                     label="Transaction description"
                     placeholder="Transfer tokens to the vendor"
                     updateTransaction={updateTransaction}
                     setProposalState={setProposalState}
-                    value={transactions[index].description}
+                    value={transaction.description}
                     field="description"
                   />
                 )}
               </div>
-              {transactions[index].type === "custom" && (
+              {transaction.type === "custom" && (
                 <DraftProposalTransactionInput
-                  id={transactions[index].id}
+                  id={transaction.id}
                   label="Contract ABI"
                   placeholder="ABI"
                   updateTransaction={updateTransaction}
                   setProposalState={setProposalState}
-                  value={transactions[index].contract_abi}
+                  value={transaction.contract_abi}
                   field="contract_abi"
                 />
               )}
-              {transactions[index].type === "custom" && (
+              {transaction.type === "custom" && (
                 <DraftProposalTransactionInput
-                  id={transactions[index].id}
+                  id={transaction.id}
                   label="Transaction description"
                   placeholder="Permits depositing ETH on Compound v3"
                   updateTransaction={updateTransaction}
                   setProposalState={setProposalState}
-                  value={transactions[index].description}
+                  value={transaction.description}
                   field="description"
+                />
+              )}
+              {transaction.type === "transfer" ? (
+                transaction.token_address === ethers.ZeroAddress ? (
+                  <SimulateTransaction
+                    target={transaction.transfer_to || ethers.ZeroAddress}
+                    value={ethers.parseEther(
+                      transaction.transfer_amount?.toString() || "0"
+                    )}
+                    calldata={"0x"}
+                  />
+                ) : (
+                  <SimulateTransaction
+                    target={transaction.token_address || ethers.ZeroAddress}
+                    value={0n}
+                    calldata={encodeTransfer(
+                      ethers.isAddress(transaction.transfer_to)
+                        ? transaction.transfer_to
+                        : ethers.ZeroAddress,
+                      Number(transaction.transfer_amount?.toString()) || 0,
+                      tokens.find(
+                        (token) => token.address === transaction.token_address
+                      )?.decimals || 18
+                    )}
+                  />
+                )
+              ) : (
+                <SimulateTransaction
+                  target={transaction.target}
+                  value={ethers.parseEther(transaction.value.toString() || "0")}
+                  calldata={transaction.calldata}
                 />
               )}
             </div>
@@ -295,54 +351,6 @@ const DraftProposalTransactionInput: React.FC<
   );
 };
 
-const DraftProposalTransactionInputTransferRecipient: React.FC<
-  DraftProposalTransactionInputProps
-> = (props) => {
-  const {
-    id,
-    label,
-    placeholder,
-    updateTransaction,
-    setProposalState,
-    value,
-    field,
-  } = props;
-
-  async function handleUpdateTransaction(newValue: string) {
-    const updatedTransaction = await updateTransaction(id, {
-      [field]: newValue,
-    });
-
-    setProposalState((prevState) => {
-      const newTransactions = prevState.transactions.map((transaction) => {
-        if (transaction.id === id) {
-          return updatedTransaction;
-        }
-        return transaction;
-      });
-
-      return {
-        ...prevState,
-        transactions: newTransactions,
-      };
-    });
-  }
-
-  return (
-    <div className="flex flex-col w-full">
-      <label className="font-medium text-sm mb-1">{label}</label>
-      {/* @ts-expect-error Server Component */}
-      <DebounceInput
-        debounceTimeout={1000}
-        className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => handleUpdateTransaction(e.target.value)}
-      />
-    </div>
-  );
-};
-
 const DraftProposalTransactionInputTransferToken: React.FC<
   DraftProposalTransactionInputProps
 > = (props) => {
@@ -377,7 +385,7 @@ const DraftProposalTransactionInputTransferToken: React.FC<
   }
 
   const CONTRACT_ADDRESSES = {
-    ETH: "0x",
+    ETH: ethers.ZeroAddress,
     USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     ENS: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
   };
@@ -554,3 +562,17 @@ const DraftProposalTransactionAuditPayload = () => {
     </div>
   );
 };
+
+const tokens = [
+  { name: "ETH", address: ethers.ZeroAddress, decimals: 18 },
+  {
+    name: "USDC",
+    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    decimals: 6,
+  },
+  {
+    name: "ENS",
+    address: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
+    decimals: 18,
+  },
+];
