@@ -218,8 +218,8 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
             handleAddTransaction={handleAddTransaction}
           />
           <DraftProposalTransactionValidity
-            label="Transaction validity"
-            placeholder="Permits depositing ETH on Compound v3"
+            label="Tenderly transaction simulation status"
+            placeholder="Unconfirmed"
             proposalState={proposalState}
             registerChecklistEvent={registerChecklistEvent}
           />
