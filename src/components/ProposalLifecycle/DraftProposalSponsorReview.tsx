@@ -1,29 +1,15 @@
 "use client";
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import DraftProposalFormSubmitChecklist from "./DraftProposalFormSubmitChecklist";
 import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
-import {
-  useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
-  useSignTypedData,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useContractWrite, usePrepareContractWrite, useSignTypedData, useWaitForTransaction } from "wagmi";
 import ENSGovernorABI from "@/lib/contracts/abis/ENSGovernor.json";
-import {
-  SnapshotProposalMessage,
-  createProposal,
-  domain,
-  proposalTypes,
-} from "./snapshot";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
+import { createProposal, domain, proposalTypes, SnapshotProposalMessage } from "./snapshot";
+import { Dialog, DialogContent } from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 
@@ -326,7 +312,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                 <div className="flex flex-col gap-y-1 text-base">
                   <label className="font-medium">Voting options</label>
                   {proposal.ProposalDraftOption.map((option, index) => (
-                    <p className="text-gray-4f">{option.text}</p>
+                    <p className="text-gray-4f" key={`draft-${index}`}>{option.text}</p>
                   ))}
                 </div>
               )}

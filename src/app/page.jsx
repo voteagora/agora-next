@@ -1,19 +1,18 @@
+import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
+import prisma from "@/app/lib/prisma";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
+import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsList";
+import SponsorshipRequestList from "@/components/ProposalLifecycle/SponsorshipRequestList";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
-import prisma from "@/app/lib/prisma";
-import DraftProposalsList from "@/components/ProposalLifecycle/DraftProposalsList";
-import SponsorshipRequestList from "@/components/ProposalLifecycle/SponsorshipRequestList";
-// import { PageDivider } from "@/components/Layout/PageDivider";
 import Tenant from "@/lib/tenant/tenant";
 
 // Revalidate cache every 60 seconds
@@ -206,7 +205,6 @@ export default async function Home() {
     <VStack>
       <Hero />
       <DAOMetricsHeader metrics={metrics} />
-      {/* <PageDivider /> */}
       <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
       <SponsorshipRequestList
         fetchSponsorshipRequests={fetchSponsorshipRequests}

@@ -1,6 +1,7 @@
-import { useNetwork, useSwitchNetwork, useChainId } from "wagmi";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import loadingSvg from "@/assets/tenant/optimism-loading.svg";
 import Tenant from "@/lib/tenant/tenant";
 
 export function SwitchNetwork({
@@ -23,7 +24,7 @@ export function SwitchNetwork({
   return (
     <div className="flex flex-col gap-4">
       <img
-        src="/images/action-pending.svg"
+        src={loadingSvg}
         className="w-full"
         alt="Switch netwrok"
       />

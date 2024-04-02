@@ -33,10 +33,9 @@ const staticText = {
     "Here’s what my proposal aims to achieve (p.s. I like markdown formatting)...",
   proposedTransactionDescription:
     "Proposed transactions will execute after a proposal passes and then gets executed. If you skip this step, a transfer of 0 ETH to you (the proposer) will be added.",
-  createButtonExplanation:
-    "This will post your draft to both the ENS forums and request an update to the ENS DAO docs.",
+  createButtonExplanation: "",
   checkmarkInfo:
-    "Both of these are required. Please uncheck only if you’ve already completed these manually.",
+    "Please uncheck only if you’ve already completed these manually.",
 };
 
 interface DraftProposalFormCreateProps {
