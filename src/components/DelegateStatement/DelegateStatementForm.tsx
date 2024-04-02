@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const cleanTopIssues = (
   issues: {
@@ -50,6 +51,7 @@ export default function DelegateStatementForm({
       const _delegate = await fetchDelegate(address as string);
       setDelegate(_delegate);
     }
+
     if (address) {
       _getDelegate();
     }
@@ -153,6 +155,12 @@ export default function DelegateStatementForm({
                 )}
               </div>
             </form>
+            <div className="bg-stone-100 rounded-b-xl shadow-newDefault px-5 py-5 flex justify-between items-center relative">
+              <span className="pr-2 relative z-10">
+                Receive email notifications when there are new votes
+              </span>
+              <Checkbox defaultChecked={true} className="relative z-10" />
+            </div>
           </Form>
         </VStack>
       </VStack>
