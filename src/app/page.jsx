@@ -214,7 +214,6 @@ export default async function Home() {
       )}
 
       <DAOMetricsHeader metrics={metrics} />
-
       <DraftProposalsList fetchDraftProposals={fetchDraftProposals} />
       <SponsorshipRequestList
         fetchSponsorshipRequests={fetchSponsorshipRequests}
