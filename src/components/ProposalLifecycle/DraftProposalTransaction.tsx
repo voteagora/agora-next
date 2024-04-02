@@ -77,6 +77,12 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
   async function handleDeleteTransaction(transactionId: number) {
     const updatedTransactions = await deleteTransaction(transactionId);
     setTransactions(updatedTransactions);
+    setProposalState((prevState) => {
+      return {
+        ...prevState,
+        transactions: updatedTransactions,
+      };
+    });
   }
 
   return (
