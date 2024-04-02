@@ -9,6 +9,7 @@ import { HStack } from "../Layout/Stack";
 import { opAdminAddress } from "@/lib/contracts/contracts";
 import styles from "./styles.module.scss";
 import { cx } from "class-variance-authority";
+import Tenant from "@/lib/tenant/tenant";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";
 
@@ -45,7 +46,7 @@ export default function SimulateTransaction({
             target,
             value: value.toString(),
             calldata,
-            networkId: "10",
+            networkId: Tenant.current().contracts.governor.chainId.toString(),
             from: opAdminAddress,
           }),
         });
