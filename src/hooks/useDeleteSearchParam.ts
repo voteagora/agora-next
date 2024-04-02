@@ -8,8 +8,8 @@ export const useDeleteSearchParam = () => {
     const pathname = usePathname();
 
     return useCallback(
-        (name: string) => {
-            const params = new URLSearchParams(searchParams?.toString());
+        ({ name, clean }: { name: string, clean?: boolean }) => {
+            const params = new URLSearchParams(clean ? undefined : searchParams?.toString());
             params.delete(name);
             return pathname + "?" + params.toString();
         },
