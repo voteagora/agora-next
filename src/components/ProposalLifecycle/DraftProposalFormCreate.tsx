@@ -36,7 +36,7 @@ const staticText = {
   createButtonExplanation:
     "This will post your draft to both the ENS forums and request an update to the ENS DAO docs.",
   checkmarkInfo:
-    "Both of these are required. Please uncheck only if you’ve already completed these manually.",
+    "Please uncheck only if you’ve already completed these manually.",
 };
 
 interface DraftProposalFormCreateProps {

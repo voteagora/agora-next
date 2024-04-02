@@ -30,32 +30,32 @@ const checklistItems = [
   {
     title: "Create draft",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.",
+      "Build and save your progress as you craft the right proposal for the ENS community.",
   },
   {
     title: "Submit a proposal",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.",
+      "Submit your proposal to the ENS DAO for consideration by the community.",
   },
   {
     title: "Wait for sponsor",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.",
+      "Wait for a sponsor to pick up your proposal and queue it for a vote.",
   },
   {
     title: "Contact voters",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.",
+      "Once the proposal is live, reach out to voters to make sure they vote on it.",
   },
   {
     title: "Queue proposal",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.",
+      "Once on an onchain proposal passes, it can be queued here for execution.",
   },
   {
     title: "Execute proposal",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.",
+      "The final step in the process is to execute the proposal onchain.",
   },
 ];
 

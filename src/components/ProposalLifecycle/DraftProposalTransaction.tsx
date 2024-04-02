@@ -223,7 +223,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
             proposalState={proposalState}
             registerChecklistEvent={registerChecklistEvent}
           />
-          <DraftProposalTransactionAuditPayload />
+          {/* <DraftProposalTransactionAuditPayload /> */}
         </div>
       )}
     </div>
