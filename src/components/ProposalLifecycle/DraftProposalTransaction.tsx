@@ -399,23 +399,19 @@ const DraftProposalTransactionInputTransferToken: React.FC<
     });
   }
 
-  const CONTRACT_ADDRESSES = {
-    ETH: ethers.ZeroAddress,
-    USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    ENS: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
-  };
-
   return (
     <div className="flex flex-col w-full">
       <label className="font-medium text-sm mb-1">{label}</label>
       <Select onValueChange={(value) => handleUpdateTransaction(value)}>
         <SelectTrigger className="py-3 px-4 w-full border border-gray-eo placeholder-gray-af bg-gray-fa rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-af focus:border-transparent">
-          <SelectValue placeholder="Token" />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={CONTRACT_ADDRESSES["ETH"]}>ETH</SelectItem>
-          <SelectItem value={CONTRACT_ADDRESSES["USDC"]}>USDC</SelectItem>
-          <SelectItem value={CONTRACT_ADDRESSES["ENS"]}>ENS</SelectItem>
+          {tokens.map((token) => (
+            <SelectItem key={token.name} value={token.address}>
+              {token.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
