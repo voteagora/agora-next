@@ -1,18 +1,14 @@
 import { Checkbox } from "../ui/checkbox";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { ProposalDraftWithTransactions } from "./types";
 import { ProposalDraft } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ProposalLifecycle/DraftProposalCreateDialog";
 import { useAccount } from "wagmi";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { set } from "cypress/types/lodash";
 
 interface DraftProposalCreateButtonProps {
   description: string;
@@ -130,7 +126,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
           <Dialog onOpenChange={(open) => open && saveAndUpdateDocs()}>
             <DialogTrigger>
               <button
-                className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed`}
+                className={`w-[200px] py-3 px-6 border font-medium border-black bg-black text-white rounded-lg disabled:opacity-75 disabled:cursor-not-allowed text-center`}
                 disabled={
                   !proposalState.title ||
                   !proposalState.description ||
@@ -138,7 +134,7 @@ const DraftProposalCreateButton: React.FC<DraftProposalCreateButtonProps> = (
                   !address
                 }
               >
-                <span className="text-center">Create draft</span>
+                Create draft
               </button>
             </DialogTrigger>
             <DialogContent>
