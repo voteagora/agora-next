@@ -446,7 +446,7 @@ const DraftProposalTransactionValidity: React.FC<
               .parseEther(transaction.transfer_amount?.toString() || "0")
               .toString(),
             calldata: "0x",
-            networkId: Tenant.current().isProd ? "1" : "11155111", // TODO: move to tenant
+            networkId: Tenant.current().contracts.governor.chainId.toString(),
             from: Tenant.current().contracts.governor.address,
           };
         }
@@ -462,7 +462,7 @@ const DraftProposalTransactionValidity: React.FC<
             tokens.find((token) => token.address === transaction.token_address)
               ?.decimals || 18
           ),
-          networkId: Tenant.current().isProd ? "1" : "11155111",
+          networkId: Tenant.current().contracts.governor.chainId.toString(),
           from: Tenant.current().contracts.governor.address,
         };
       }
@@ -472,7 +472,7 @@ const DraftProposalTransactionValidity: React.FC<
           .parseEther(transaction.value.toString() || "0")
           .toString(),
         calldata: transaction.calldata,
-        networkId: Tenant.current().isProd ? "1" : "11155111",
+        networkId: Tenant.current().contracts.governor.chainId.toString(),
         from: Tenant.current().contracts.governor.address,
       };
     });
@@ -495,16 +495,20 @@ const DraftProposalTransactionValidity: React.FC<
 
       let allValid = true;
 
+      console.log(res);
+
       if (!res.response.simulation_results) {
-        for (const simulation of res.response.simulation_results) {
-          if (!simulation.transaction.status) {
-            allValid = false;
-            setStatus(simulation.transaction?.error_message ?? "Invalid");
-            return;
-          }
-        }
-      } else {
         allValid = false;
+        setStatus(res.response.error?.message ?? "Invalid");
+        return;
+      }
+
+      for (const simulation of res.response.simulation_results) {
+        if (!simulation.transaction.status) {
+          allValid = false;
+          setStatus(simulation.transaction?.error_message ?? "Invalid");
+          return;
+        }
       }
 
       if (allValid) {
