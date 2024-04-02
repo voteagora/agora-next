@@ -215,7 +215,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   />
                 )}
               </div>
-              {transaction.type === "custom" && (
+              {/* {transaction.type === "custom" && (
                 <DraftProposalTransactionInput
                   id={transaction.id}
                   label="Contract ABI"
@@ -225,7 +225,7 @@ const DraftProposalTransaction: React.FC<DraftProposalTransactionProps> = (
                   value={transaction.contract_abi}
                   field="contract_abi"
                 />
-              )}
+              )} */}
               {transaction.type === "custom" && (
                 <DraftProposalTransactionInput
                   id={transaction.id}
