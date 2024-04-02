@@ -426,9 +426,7 @@ const DraftProposalTransactionValidity: React.FC<
 > = (props) => {
   const { label, placeholder, proposalState, registerChecklistEvent } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState<"Unconfirmed" | "Valid" | "Invalid">(
-    "Unconfirmed"
-  );
+  const [status, setStatus] = useState<string>("Unconfirmed");
 
   const { address } = useAccount();
 
@@ -503,10 +501,15 @@ const DraftProposalTransactionValidity: React.FC<
         return;
       }
 
-      for (const simulation of res.response.simulation_results) {
-        if (!simulation.transaction.status) {
+      for (const idx in res.response.simulation_results) {
+        if (!res.response.simulation_results[idx].transaction.status) {
           allValid = false;
-          setStatus(simulation.transaction?.error_message ?? "Invalid");
+          setStatus(
+            `Transaction #${idx + 1} failed: ${
+              res.response.simulation_results[idx]?.transaction
+                ?.error_message ?? "Unknown error"
+            }`
+          );
           return;
         }
       }
