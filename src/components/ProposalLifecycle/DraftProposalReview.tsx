@@ -9,6 +9,7 @@ import { DebounceInput } from "react-debounce-input";
 import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import Tenant from "@/lib/tenant/tenant";
 
 interface DraftProposalReviewProps {
   proposalState: ProposalDraftWithTransactions;
@@ -35,6 +36,8 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     getProposalChecklist,
   } = props;
 
+  const { contracts } = Tenant.current();
+
   const [sponsorInput, setSponsorInput] = useState<string>("");
 
   const {
@@ -59,16 +62,6 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
   const [sponsorAddress, setSponsorAddress] = useState<string>("");
   const [canSponsor, setCanSponsor] = useState<boolean>(false);
 
-  const hasVotingPower = (address: string) => {
-    // TODO implement voting power check
-    // State for today: Andrei is working on the infra
-    // right now only nick.eth can sponsor
-    return (
-      address === "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" ||
-      address === "0x000372c2ad29A4C1D89d6d8be7eb1349b103BABd"
-    );
-  };
-
   useEffect(() => {
     if (!!ensResolvedAddress) {
       setSponsorAddress(ensResolvedAddress);
@@ -89,7 +82,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
 
   useEffect(() => {
     if (!!sponsorAddress) {
-      setCanSponsor(hasVotingPower(sponsorAddress));
+      (async () => {
+        const votingPower = await contracts.token.contract.balanceOf(
+          sponsorAddress
+        );
+        setCanSponsor(votingPower > 100000000000000000000000);
+      })();
     }
   }, [sponsorAddress]);
 
@@ -198,7 +196,9 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               <div className="flex flex-col gap-y-1 text-base">
                 <label className="font-medium">Voting options</label>
                 {proposalState.ProposalDraftOption.map((option, index) => (
-                  <p className="text-gray-4f" key={`draft-${index}`}>{option.text}</p>
+                  <p className="text-gray-4f" key={`draft-${index}`}>
+                    {option.text}
+                  </p>
                 ))}
               </div>
             )}
