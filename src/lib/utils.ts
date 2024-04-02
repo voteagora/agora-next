@@ -203,3 +203,7 @@ export function getBlockScanUrl(hash: string | `0x${string}`) {
       return `https://etherscan.io/tx/${hash}`;
   }
 }
+
+export function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

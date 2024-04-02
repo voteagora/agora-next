@@ -12,7 +12,7 @@ import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
 import styles from "./proposalVotesList.module.scss";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl } from "@/lib/utils";
+import { getBlockScanUrl, timeout } from "@/lib/utils";
 import { useState } from "react";
 
 export function ProposalSingleVote({
@@ -26,6 +26,16 @@ export function ProposalSingleVote({
 }) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
+  const [hash1, hash2] = vote.transactionHash.split("|");
+
+  const _onOpenChange = async (open: boolean) => {
+    if (open) {
+      setHovered(open);
+    } else {
+      await timeout(100);
+      setHovered(open);
+    }
+  };
 
   return (
     <VStack key={vote.transactionHash} gap={2} className={styles.vote_row}>
@@ -33,7 +43,7 @@ export function ProposalSingleVote({
         <HoverCard
           openDelay={100}
           closeDelay={100}
-          onOpenChange={(open) => setHovered(open)}
+          onOpenChange={(open) => _onOpenChange(open)}
         >
           <HoverCardTrigger>
             <HStack justifyContent="justify-between" className={styles.voter}>
@@ -43,15 +53,25 @@ export function ProposalSingleVote({
                   <p>(you)</p>
                 )}
                 <VoteText support={vote.support} />
-                {/* TODO: frh -> this hash url */}
                 {hovered && (
-                  <a
-                    href={getBlockScanUrl("hash2")}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-                  </a>
+                  <>
+                    <a
+                      href={getBlockScanUrl(hash1)}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                    </a>
+                    {hash2 && (
+                      <a
+                        href={getBlockScanUrl(hash2)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                      </a>
+                    )}
+                  </>
                 )}
               </HStack>
               <HStack alignItems="items-center" className={styles.vote_weight}>

@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { useQuery } from "@tanstack/react-query";
-
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { timeout } from "@/lib/utils";
 
 // TODO: think about strategy to fetchConnectedDelegate, since balance and voting power can change on every block, 
 // also to prevent additional unnecessary fetches being done right now
