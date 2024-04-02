@@ -20,7 +20,11 @@ async function getProposal(
       id: Number(proposal_id),
     },
     include: {
-      transactions: true,
+      transactions: {
+        orderBy: {
+          order: "asc",
+        },
+      },
       ProposalDraftOption: true,
     },
   });
