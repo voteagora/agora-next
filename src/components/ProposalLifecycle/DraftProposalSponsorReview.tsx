@@ -27,6 +27,8 @@ import {
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
+import { ethers } from "ethers";
+import { encodeTransfer } from "../shared/SimulateTransaction";
 
 interface DraftProposalReviewProps {
   proposal: ProposalDraftWithTransactions;
@@ -50,9 +52,9 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
 
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
 
-  type BasicInputData = [string[], number[], string[], string];
+  type BasicInputData = [string[], bigint[], string[], string];
 
-  function getInputData(proposal: ProposalDraft): {
+  function getInputData(proposal: ProposalDraftWithTransactions): {
     inputData: BasicInputData;
   } {
     const description =
@@ -76,51 +78,51 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
 
     // provide default values for basic proposal
     let targets: string[] = [];
-    let values: number[] = [];
+    let values: bigint[] = [];
     let calldatas: string[] = [];
     let inputData: BasicInputData = [targets, values, calldatas, description];
 
-    // TODO add transactions
+    // TODO: validate transastion data
+    try {
+      if (proposal.transactions.length === 0) {
+        targets.push(ethers.ZeroAddress);
+        values.push(0n);
+        calldatas.push("0x");
+      } else {
+        proposal.transactions.forEach((t) => {
+          console.log("t", t);
 
-    targets.push("0x0000000000000000000000000000000000000000");
-    values.push(0);
-    calldatas.push("0x");
-
-    // try {
-    //   if (form.state.transactions.length === 0) {
-    //     targets.push(ethers.constants.AddressZero);
-    //     values.push(BigNumber.from(0));
-    //     calldatas.push("0x");
-    //   } else {
-    //     form.state.transactions.forEach((t) => {
-    //       if (t.type === "Transfer") {
-    //         if (t.token.address === ethers.constants.AddressZero) {
-    //           targets.push(t.transferTo);
-    //           values.push(
-    //             ethers.utils.parseUnits(
-    //               t.transferAmount.toString() || "0",
-    //               t.token.decimals
-    //             )
-    //           );
-    //           calldatas.push("0x");
-    //         } else {
-    //           targets.push(t.token.address);
-    //           values.push(BigNumber.from(0));
-    //           calldatas.push(
-    //             encodeTransfer(t.transferTo, t.transferAmount, t.token.decimals)
-    //           );
-    //         }
-    //       } else {
-    //         targets.push(ethers.utils.getAddress(t.target));
-    //         values.push(ethers.utils.parseEther(t.value.toString() || "0"));
-    //         calldatas.push(t.calldata);
-    //       }
-    //     });
-    //   }
-    // } catch (e) {
-    //   Sentry.captureException(e);
-    //   console.error(e);
-    // }
+          if (t.type === "transfer") {
+            if (t.token_address === ethers.ZeroAddress) {
+              targets.push(t.transfer_to || ethers.ZeroAddress);
+              values.push(
+                ethers.parseUnits(
+                  t.transfer_amount?.toString() || "0",
+                  18 // TODO: set dynamically based on token contract
+                )
+              );
+              calldatas.push("0x");
+            } else {
+              targets.push(t.token_address || ethers.ZeroAddress);
+              values.push(0n);
+              calldatas.push(
+                encodeTransfer(
+                  t.transfer_to || ethers.ZeroAddress,
+                  Number(t.transfer_amount?.toString() || 0),
+                  18
+                )
+              );
+            }
+          } else {
+            targets.push(ethers.getAddress(t.target));
+            values.push(ethers.parseEther(t.value.toString() || "0"));
+            calldatas.push(t.calldata);
+          }
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
 
     return { inputData };
   }
@@ -387,7 +389,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                   <p className="text-stone-700">View on Etherscan</p>
                   <a
                     target="_blank"
-                    href={`https://sepolia.etherscan.io/tx/0xab5a8e617433a4a6eb68b3f4669603f2a35addf108f2fc4b161f93d0bb0873a3/${data?.hash}`}
+                    // TODO: set dynamically based on network / tenant
+                    href={
+                      Tenant.current().isProd
+                        ? `https://etherscan.io/tx/${data?.hash}`
+                        : `https://sepolia.etherscan.io/tx/${data?.hash}`
+                    }
                   >
                     <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                   </a>
