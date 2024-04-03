@@ -29,6 +29,8 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { ethers } from "ethers";
 import { encodeTransfer } from "../shared/SimulateTransaction";
+import CodeChange from "../Proposals/ProposalPage/ApprovedTransactions/CodeChange";
+import { decodeCalldata } from "@/lib/abiUtils";
 
 interface DraftProposalReviewProps {
   proposal: ProposalDraftWithTransactions;
@@ -261,6 +263,22 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
     }
   }, [isSuccess, handleProposalSubmitted]);
 
+  const transactionData = proposal.transactions.map((transaction) => {
+    const { functionName, functionArgs } = decodeCalldata(
+      transaction.calldata as `0x${string}`,
+      transaction.function_details
+    );
+
+    return {
+      description: transaction.description,
+      target: transaction.target,
+      calldata: transaction.calldata,
+      valueETH: transaction.value,
+      functionName,
+      functionArgs,
+    };
+  });
+
   return (
     <div className="flex-grow">
       <div className="bg-[#FAFAF2] rounded-2xl ring-inset ring-1 ring-[#ECE3CA] z-10 mx-6">
@@ -276,17 +294,20 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                 <p className="stone-500 text-xs pt-3 px-6">
                   Proposed transactions
                 </p>
-                {proposal.transactions.map((transaction, index) => {
+                {transactionData.map((transaction, index) => {
                   return (
                     <div
                       key={index}
                       className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
                     >
                       <p>{`// ${transaction.description}`}</p>
-                      <p>{transaction.target}</p>
-                      <p>{transaction.function_details}</p>
-                      <p>{transaction.value}</p>
-                      <p>{transaction.calldata}</p>
+                      <CodeChange
+                        target={transaction.target}
+                        calldata={transaction.calldata}
+                        valueETH={transaction.valueETH}
+                        functionName={transaction.functionName}
+                        functionArgs={transaction.functionArgs}
+                      />
                     </div>
                   );
                 })}
