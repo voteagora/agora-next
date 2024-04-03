@@ -10,6 +10,29 @@ import { DaoSlug } from "@prisma/client";
 export const getDelegateStatement = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
 
+// TODO: typegen these from OAS
+
+type DelegateStatement = {
+  address: string;
+  email: string | null;
+  payload: DelegateStatementPayload;
+  twitter: string | null;
+  discord: string | null;
+};
+
+type DelegateStatementPayload = {
+  leastValuableProposals: string[];
+  mostValuableProposals: string[];
+  openToSponsoringProposals: boolean;
+  delegateStatement: string;
+  topIssues: Issue[];
+}
+
+type Issue = {
+  type: string;
+  value: string;
+}
+
 /*
   Gets delegate statement from Postgres, or DynamoDB if not found
 */
@@ -17,11 +40,21 @@ async function getDelegateStatementForAddress({
   address,
 }: {
   address: string;
-}) {
+}) : Promise<DelegateStatement | null>{
   const { slug } = Tenant.current();
 
   const postgreqsqlData = await prisma.delegateStatements
     .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
+    .then((data) => {
+      // convert data.payload from Prisma.JSONValue to DelegateStatementPayload
+      return {
+        address: data?.address as string,
+        email: data?.email as string,
+        twitter: data?.twitter as string,
+        discord: data?.discord as string,
+        payload: JSON.parse(data?.payload as string) as DelegateStatementPayload,
+      }
+    })
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
