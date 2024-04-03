@@ -389,7 +389,12 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                   <p className="text-stone-700">View on Etherscan</p>
                   <a
                     target="_blank"
-                    href={`https://sepolia.etherscan.io/tx/${data?.hash}`}
+                    // TODO: set dynamically based on network / tenant
+                    href={
+                      Tenant.current().isProd
+                        ? `https://etherscan.io/tx/${data?.hash}`
+                        : `https://sepolia.etherscan.io/tx/${data?.hash}`
+                    }
                   >
                     <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                   </a>
