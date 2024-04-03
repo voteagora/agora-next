@@ -389,7 +389,7 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                   <p className="text-stone-700">View on Etherscan</p>
                   <a
                     target="_blank"
-                    href={`https://sepolia.etherscan.io/tx/0xab5a8e617433a4a6eb68b3f4669603f2a35addf108f2fc4b161f93d0bb0873a3/${data?.hash}`}
+                    href={`https://sepolia.etherscan.io/tx/${data?.hash}`}
                   >
                     <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                   </a>
