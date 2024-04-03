@@ -143,9 +143,6 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
     }
 
     const description =
-      "# " +
-      proposal.title +
-      "\n\n" +
       proposal.description +
       "\n" +
       // `${
@@ -240,10 +237,9 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
     } else {
       const proposalId = await createSnapshot();
 
-      const snapshotLink =
-        process.env.REACT_APP_DEPLOY_ENV === "prod"
-          ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
-          : `https://demo.snapshot.org/#/stepandel.eth/proposal/${proposalId}`;
+      const snapshotLink = Tenant.current().isProd
+        ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
+        : `https://testnet.snapshot.org/#/stepandel.eth/proposal/${proposalId}`;
 
       alert("Snapshot created! " + snapshotLink);
     }
