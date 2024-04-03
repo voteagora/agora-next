@@ -18,7 +18,6 @@ function linkIfAddress(content) {
 
 export default function CodeChange({
   target,
-  calldata,
   valueETH,
   functionName,
   functionArgs,
@@ -29,27 +28,12 @@ export default function CodeChange({
       {valueETH}(
       <br />
       <span className="ml-2">
-        {functionArgs.length !== 0 ? (
-          functionArgs.map((arg, index) => (
-            <span key={arg}>
-              {arg}
-              {index !== functionArgs.length - 1 && ", "}
-            </span>
-          ))
-        ) : (
-          <>
-            {calldata !== "0x" && "0x"}
-            {calldata
-              .substring(2)
-              .match(/.{1,64}/g)
-              ?.map((data) => (
-                <span key={data}>
-                  {data}
-                  <br />
-                </span>
-              ))}
-          </>
-        )}
+        {functionArgs.map((arg, index) => (
+          <span key={arg}>
+            {arg}
+            {index !== functionArgs.length - 1 && ", "}
+          </span>
+        ))}
       </span>
       )
     </div>
