@@ -10,6 +10,8 @@ import { ProposalChecklist, ProposalDraft } from "@prisma/client";
 import { ProposalDraftWithTransactions } from "./types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import Tenant from "@/lib/tenant/tenant";
+import { decodeCalldata } from "@/lib/abiUtils";
+import CodeChange from "../Proposals/ProposalPage/ApprovedTransactions/CodeChange";
 
 interface DraftProposalReviewProps {
   proposalState: ProposalDraftWithTransactions;
@@ -105,6 +107,22 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
     });
   };
 
+  const transactionData = proposalState.transactions.map((transaction) => {
+    const { functionName, functionArgs } = decodeCalldata(
+      transaction.calldata as `0x${string}`,
+      transaction.function_details
+    );
+
+    return {
+      description: transaction.description,
+      target: transaction.target,
+      calldata: transaction.calldata,
+      valueETH: transaction.value,
+      functionName,
+      functionArgs,
+    };
+  });
+
   return (
     <div>
       <div className="bg-[#FAFAF2] rounded-2xl ring-inset ring-1 ring-[#ECE3CA] z-10 mx-6">
@@ -119,33 +137,22 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = (props) => {
               <p className="stone-500 text-xs pt-3 px-6">
                 Proposed transactions
               </p>
-              {proposalState.transactions.map((transaction, index) => {
-                if (!!transaction.function_details) {
-                  return (
-                    <div
-                      key={index}
-                      className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
-                    >
-                      <p>{`// ${transaction.description}`}</p>
-                      <p>{transaction.target}</p>
-                      <p>{transaction.function_details}</p>
-                      <p>{transaction.value}</p>
-                      <p>{transaction.calldata}</p>
-                    </div>
-                  );
-                }
-                if (!transaction.function_details) {
-                  // ETH transfer
-                  return (
-                    <div
-                      key={index}
-                      className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
-                    >
-                      <p>{`// ${transaction.description}`}</p>
-                      <p>{`${transaction.target}.transfer(${transaction.value})`}</p>
-                    </div>
-                  );
-                }
+              {transactionData.map((transaction, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col justify-between px-6 py-4 text-stone-700 text-xs"
+                  >
+                    <p>{`// ${transaction.description}`}</p>
+                    <CodeChange
+                      target={transaction.target}
+                      calldata={transaction.calldata}
+                      valueETH={transaction.valueETH}
+                      functionName={transaction.functionName}
+                      functionArgs={transaction.functionArgs}
+                    />
+                  </div>
+                );
               })}
             </div>
           )}
