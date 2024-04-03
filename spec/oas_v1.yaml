@@ -18,6 +18,17 @@ components:
       in: header
       name: Authorization
   schemas:
+    PageMetadata:
+      type: object
+      properties:
+        hasNext:
+          type: boolean
+        totalReturned:
+          type: integer
+          format: int32
+        nextOffset: 
+          type: integer
+          format: int32
     Delegate:
       type: object
       properties:
@@ -139,9 +150,14 @@ paths:
           content:
             application/json:
               schema: 
-                type: array
-                items:
-                  $ref: '#/components/schemas/Delegate'
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delegate'
         '400':
           description: Bad Request
         '401': 
