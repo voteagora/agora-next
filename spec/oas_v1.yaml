@@ -52,7 +52,7 @@ components:
           type: string
           examples:
             - summary: Twitter handle
-              value: ""
+              value: "@flip_liquide"
         discord:
           type: string
           examples:
@@ -64,10 +64,12 @@ components:
             - summary: Delegate statement
               value: "hello! I am a great delegate for reasons xyz"
         leastValuableProposals:
+          description: An array of proposal IDs
           type: array
           items:
             type: string
         mostValuableProposals:
+          description: An array of proposal IDs
           type: array
           items: 
             type: string
@@ -76,7 +78,18 @@ components:
         topIssues:
           type: array
           items: 
-            type: string
+              $ref: '#/components/schemas/Issue'
+    Issue:
+      type: object
+      properties:
+        type: 
+          type: string
+          examples: 
+            - "Funding"
+        value:
+          type: string
+          examples: 
+            - "Grant funding should be directed to projects with a great track record"
   parameters:
    limitParam:
       name: limit
