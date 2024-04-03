@@ -203,11 +203,15 @@ const optimismUI = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/create",
+      name: "proposals/co",
       enabled: true,
     },
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "delegates/code-of-conduct",
       enabled: true,
     },
     {
