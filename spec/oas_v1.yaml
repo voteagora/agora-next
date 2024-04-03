@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Agora API
+  description: Public API for interacting with the Agora platform
+  version: 0.1.0-beta
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: vote.optimisim.io/api/v1
+    description: Base URL for optimism production
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  schemas:
+    Delegate:
+      type: object
+      properties:
+        address:
+          type: string
+          examples: 
+            - summary: Address of the delegate.
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        votingPower:
+          type: object
+          properties:
+            advanced:
+              type: string
+              examples:
+                - summary: Advanced voting power
+                  value: "10000"
+            direct:
+              type: string
+              examples:
+                - summary: Direct voting power
+                  value: "20000"
+            total:
+              type: string
+              examples:
+                - summary: Total voting power
+                  value: "30000"
+        isCitizen:
+          type: boolean
+        email:
+          type: string
+        twitter:
+          type: string
+          examples:
+            - summary: Twitter handle
+              value: ""
+        discord:
+          type: string
+          examples:
+            - summary: Discord handle
+              value: "delegate#1234"
+        statement:
+          type: string
+          examples:
+            - summary: Delegate statement
+              value: "hello! I am a great delegate for reasons xyz"
+        leastValuableProposals:
+          type: array
+          items:
+            type: string
+        mostValuableProposals:
+          type: array
+          items: 
+            type: string
+        openToSponsoringProposals:
+          type: boolean
+        topIssues:
+          type: array
+          items: 
+            type: string
+  parameters:
+   limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 10
+   offsetParam:
+      name: offset
+      in: query
+      description: Offset from which start returned results
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+paths:
+  /delegates:
+    get:
+      summary: Gets a list of delegates.
+      description: >
+        Retrieves a list of voting delegates on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getDelegates
+      tags:
+        - delegates
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned delegates will be sorted.
+            Supported values are: 'most_delegators', 'weighted_random'
+          required: false
+          schema: 
+            type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Delegate'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /delegates/{addressOrEnsName}:
+    get:
+      summary: Gets a specific delegate.
+      description: >
+        Retrieves a specific delegate on Agora by address or ENS name.
+      operationId: getDelegate
+      tags: 
+        - delegates
+      parameters:
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the delegate to retrieve
+          required: true
+          schema:
+            type: string
+          examples: 
+            address: 
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+              summary: Address of the delegate. 
+            ensName:
+              value: "flipliquid.eth"
+              summary: ENS name of the delegate.
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Delegate'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
