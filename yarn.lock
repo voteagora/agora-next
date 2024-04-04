@@ -3530,6 +3530,13 @@
   dependencies:
     "@tanstack/query-core" "5.27.5"
 
+"@tenkeylabs/dappwright@^2.8.2":
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@tenkeylabs/dappwright/-/dappwright-2.8.2.tgz#fb0b35b58fbe190929f0882d59b087a6f0225105"
+  integrity sha512-FV9j7282CCdvz38PBzug3TLhZMlufPRHR5ZLQJI5nGfMDUNEeDh3SNvU/9kx3238GMmdm7kz3SPlfAdNfhyiIA==
+  dependencies:
+    node-stream-zip "^1.13.0"
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.10.tgz#b7ebd3adfa7750628d100594f6726b054d2c33b2"
@@ -8130,6 +8137,11 @@ node-releases@^2.0.14:
   version "2.0.14"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.14.tgz#2ffb053bceb8b2be8495ece1ab6ce600c4461b0b"
   integrity sha512-y10wOWt8yZpqXmOgRo77WaHEmhYQYGNA6y421PKsKYWEK8aW+cqAphborZDhqfyKrbZEN92CN1X2KbafY2s7Yw==
+
+node-stream-zip@^1.13.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/node-stream-zip/-/node-stream-zip-1.15.0.tgz#158adb88ed8004c6c49a396b50a6a5de3bca33ea"
+  integrity sha512-LN4fydt9TqhZhThkZIVQnF9cwjU3qmUH9h78Mx/K7d3VvfRqqwthLwJEUOEL0QPZ0XQmNN7be5Ggit5+4dq3Bw==
 
 normalize-path@^3.0.0, normalize-path@~3.0.0:
   version "3.0.0"

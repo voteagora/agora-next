@@ -2,6 +2,7 @@ import { test } from "@playwright/test";
 
 test.describe('homepage desktop', () => {
     test('connect wallet button', async ({ page }) => {
+        // TODO: frh -> should i add here to be visible?
         await page.goto('/');
         await page.getByText('Connect Wallet').first().click();
         await page.getByRole('button', { name: 'MetaMask' }).click();
