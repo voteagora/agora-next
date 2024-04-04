@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 // TODO: frh -> move all this into a fixture
-const BASE_URL =
-    process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
+// TODO: frh -> typescript
+// TODO: frh -> tests are failing on other browsers and connect wallet
 const validTenants = ["optimism", "ens", "etherfi", "lyra"];
 const tenant: string = process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME || "";
 
@@ -16,7 +16,7 @@ if (!validTenants.includes(tenant)) {
 
 
 test('homepage metadata', async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto('/');
 
     // TODO: frh -> WIP this should be automatically get from multitenancy and check better what each tag is for
     const title = await page.title();
