@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test('homepage metadata', async ({ page }) => {
+test('homepage metadata', async ({ page, baseURL }) => {
     await page.goto('/');
 
     // TODO: frh -> WIP this should be automatically get from multitenancy and check better what each tag is for
@@ -21,7 +21,7 @@ test('homepage metadata', async ({ page }) => {
     await expect(twitterDescription).toBe('Home of token house governance and RPGF');
 
     const twitterImage = await page.locator('meta[name="twitter\\:image"]').first().getAttribute('content');
-    await expect(twitterImage).toBe('http://localhost:3000/api/images/og/proposals?title=Optimism%20Agora&description=Home%20of%20token%20house%20governance%20and%20RPGF');
+    await expect(twitterImage).toBe(`${baseURL}/api/images/og/proposals?title=Optimism%20Agora&description=Home%20of%20token%20house%20governance%20and%20RPGF`);
 
     const twitterImageWidth = await page.locator('meta[name="twitter\\:image\\:width"]').first().getAttribute('content');
     await expect(twitterImageWidth).toBe('1200');
@@ -37,7 +37,7 @@ test('homepage metadata', async ({ page }) => {
     await expect(ogDescription).toBe('Home of token house governance and RPGF');
 
     const ogImage = await page.locator('meta[property="og\\:image"]').getAttribute('content');
-    await expect(ogImage).toBe('http://localhost:3000/api/images/og/proposals?title=Optimism%20Agora&description=Home%20of%20token%20house%20governance%20and%20RPGF');
+    await expect(ogImage).toBe(`${baseURL}/api/images/og/proposals?title=Optimism%20Agora&description=Home%20of%20token%20house%20governance%20and%20RPGF`);
 
     const ogImageWidth = await page.locator('meta[property="og\\:image\\:width"]').getAttribute('content');
     await expect(ogImageWidth).toBe('1200');
