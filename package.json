@@ -47,6 +47,7 @@
     "connectkit": "^1.5.3",
     "csstype": "^3.0.10",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.4.5",
     "encoding": "^0.1.13",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
