@@ -1,9 +1,9 @@
 import { Address } from "viem";
+import { ChainConstants } from "viem/types/chain";
 
 type TenantContractParams<ContractType> = {
   abi: any;
-  chainId: number;
-  chainName: string;
+  chain: ChainConstants;
   contract: ContractType;
   address: Address;
   v6UpgradeBlock?: number;
@@ -12,8 +12,7 @@ type TenantContractParams<ContractType> = {
 
 export class TenantContract<ContractType> {
   public abi: any;
-  public chainId: number;
-  public chainName: string;
+  public chain: ChainConstants;
   public contract: ContractType;
   private _address: Address;
   public v6UpgradeBlock?: number;
@@ -21,16 +20,14 @@ export class TenantContract<ContractType> {
 
   constructor({
     abi,
-    chainId,
-    chainName,
+    chain,
     contract,
     address,
     v6UpgradeBlock,
     optionBudgetChangeDate,
   }: TenantContractParams<ContractType>) {
     this.abi = abi;
-    this.chainId = chainId;
-    this.chainName = chainName;
+    this.chain = chain;
     this.contract = contract;
     this._address = address;
     this.v6UpgradeBlock = v6UpgradeBlock;
