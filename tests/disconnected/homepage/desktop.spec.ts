@@ -30,4 +30,20 @@ test.describe('homepage desktop', () => {
     test('two', async ({ page }) => {
         // ...
     });
+
+    // TODO: count proposals and check something more
+
+    // TODO: think about this and how to handle navigation to another page
+    // const tenantExpectedTextMapping: { [key: string]: string } = {
+    //     optimism: "Optimism voters",
+    //     ens: "ENS voters",
+    //     etherfi: "EtherFi voters",
+    //     lyra: "Lyra voters",
+    //   };
+
+    //   const expectedText = tenantExpectedTextMapping[tenant];
+
+    //   await page.getByRole("link", { name: "Voters" }).click();
+    //   await page.waitForURL("**/delegates");
+    //   await expect(page.locator("h1")).toContainText(expectedText);
 });
