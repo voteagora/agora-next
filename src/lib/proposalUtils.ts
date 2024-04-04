@@ -120,8 +120,9 @@ const decodeCalldata = (calldatas: `0x${string}`[]) => {
     }
 
     return {
-      functionArgs, functionName
-    }
+      functionArgs,
+      functionName,
+    };
   });
 };
 
@@ -197,20 +198,20 @@ export async function parseProposal(
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
         : latestBlock
-          ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
-          : null,
+        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+        : null,
     start_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.start_ts * 1000)
         : latestBlock
-          ? getHumanBlockTime(proposal.start_block, latestBlock)
-          : null,
+        ? getHumanBlockTime(proposal.start_block, latestBlock)
+        : null,
     end_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.end_ts * 1000)
         : latestBlock
-          ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
-          : null,
+        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+        : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
@@ -223,12 +224,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-        proposal,
-        proposalResuts,
-        latestBlock,
-        quorum,
-        votableSupply
-      )
+          proposal,
+          proposalResuts,
+          latestBlock,
+          quorum,
+          votableSupply
+        )
       : null,
   };
 }
@@ -287,7 +288,7 @@ export type ParsedProposalData = {
         functionArgsName: {
           functionName: string;
           functionArgs: string[];
-        }[]
+        }[];
       }[];
     };
   };
@@ -302,7 +303,7 @@ export type ParsedProposalData = {
         functionArgsName: {
           functionName: string;
           functionArgs: string[];
-        }[]
+        }[];
         budgetTokensSpent: bigint | null;
       }[];
       proposalSettings: {
