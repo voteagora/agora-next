@@ -211,6 +211,10 @@ const optimismUI = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegates/code-of-conduct",
+      enabled: true,
+    },
+    {
       name: "retropgf",
       enabled: true,
     },
