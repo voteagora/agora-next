@@ -9,7 +9,6 @@ async function fetchVotableSupply() {
 }
 
 export default async function Page() {
-
   const { ui } = Tenant.current();
 
   if (!ui.toggle("admin")) {

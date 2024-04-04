@@ -122,6 +122,8 @@ export const fetchConnectedDelegate = async (address: string) => {
   ]);
 };
 
-export const revalidateDelegateAddressPage = async (delegateAddress: string) => {
+export const revalidateDelegateAddressPage = async (
+  delegateAddress: string
+) => {
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
