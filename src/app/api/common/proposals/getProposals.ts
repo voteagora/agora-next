@@ -25,7 +25,7 @@ async function getProposals({
   const { meta, data: proposals } = await paginateResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
-        return (prisma as any)[`${namespace}Proposals`].findMany({
+        return prisma[`${namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -37,7 +37,7 @@ async function getProposals({
           },
         });
       } else {
-        return (prisma as any)[`${namespace}Proposals`].findMany({
+        return prisma[`${namespace}Proposals`].findMany({
           take,
           skip,
           orderBy: {
@@ -76,7 +76,7 @@ async function getProposals({
 
 async function getProposal(proposal_id: string) {
   const { namespace } = Tenant.current();
-  const proposal = await (prisma as any)[`${namespace}Proposals`].findFirst({
+  const proposal = await prisma[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });
 
@@ -99,7 +99,7 @@ async function getProposal(proposal_id: string) {
 async function getProposalTypes() {
   const { namespace, contracts } = Tenant.current();
 
-  return (prisma as any)[`${namespace}ProposalTypes`].findMany({
+  return prisma[`${namespace}ProposalTypes`].findMany({
     where: {
       contract: contracts.proposalTypesConfigurator!.address,
     },

@@ -9,7 +9,7 @@ import React from "react";
 async function fetchProposal(proposal_id) {
   "use server";
   return {
-    proposal: await apiFetchProposal(proposal_id)
+    proposal: await apiFetchProposal(proposal_id),
   };
 }
 
@@ -26,13 +26,18 @@ export async function generateMetadata({ params }, parent) {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
     other: {
       ["twitter:card"]: "summary_large_image",
       ["twitter:title"]: title,
       ["twitter:description"]: description,
-      ["twitter:image"]: preview,
     },
   };
 }

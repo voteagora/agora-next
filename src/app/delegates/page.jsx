@@ -48,13 +48,18 @@ export async function generateMetadata({}, parent) {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
     other: {
       ["twitter:card"]: "summary_large_image",
       ["twitter:title"]: title,
       ["twitter:description"]: description,
-      ["twitter:image"]: preview,
     },
   };
 }
@@ -66,9 +71,12 @@ export default async function Page({ searchParams }) {
   const citizensSort =
     citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
     citizensFilterOptions.shuffle.sort;
+  const tab = searchParams.tab;
   const seed = Math.random();
-  const delegates = await fetchDelegates(sort, seed);
-  const citizens = await fetchCitizens(citizensSort, seed);
+  const delegates =
+    tab === "citizens"
+      ? await fetchCitizens(citizensSort, seed)
+      : await fetchDelegates(sort, seed);
   const metrics = await fetchDaoMetrics();
 
   return (
@@ -78,6 +86,7 @@ export default async function Page({ searchParams }) {
       <DelegateTabs>
         <TabsContent value="delegates">
           <DelegateCardList
+            isDelegatesCitizensFetching={tab === "citizens"}
             initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
               "use server";
@@ -89,7 +98,8 @@ export default async function Page({ searchParams }) {
         </TabsContent>
         <TabsContent value="citizens">
           <DelegateCardList
-            initialDelegates={citizens}
+            isDelegatesCitizensFetching={tab !== "citizens"}
+            initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
               "use server";
 

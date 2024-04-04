@@ -35,7 +35,7 @@ export default function RetroPGFShareCardDialog({
   closeDialog: () => void;
 }) {
   return (
-    <VStack className="items-center justify-center p-8 h-full relative w-[100vw]">
+    <VStack className="items-center justify-center p-8 h-full relative">
       <Link
         onClick={closeDialog}
         href={`/retropgf/3/application/${parseProjectId(id)}`}

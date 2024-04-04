@@ -4,8 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-
-const secondsPerBlock = 12;
+const { token } = Tenant.current();
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -79,12 +78,17 @@ export function formatNumber(
   return numberFormat.format(standardUnitAmount);
 }
 
-export function TokenAmountDisplay(
-  amount: string | BigNumberish,
-  decimals: number,
-  currency: string,
+export function TokenAmountDisplay({
+  amount,
+  decimals = token.decimals,
+  currency = token.symbol,
   maximumSignificantDigits = 2
-) {
+}: {
+  amount: string | BigNumberish,
+  decimals?: number,
+  currency?: string,
+  maximumSignificantDigits?: number
+}) {
   const formattedNumber = useMemo(() => {
     return formatNumber(amount, decimals, maximumSignificantDigits);
   }, [amount, decimals, maximumSignificantDigits]);

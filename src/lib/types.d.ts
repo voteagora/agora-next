@@ -3,11 +3,10 @@ import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { BaseContract } from "ethers";
+import { TENANT_NAMESPACES } from "./constants";
 
 export type TenantNamespace =
-  | TENANT_NAMESPACES.ENS
-  | TENANT_NAMESPACES.ETHERFI
-  | TENANT_NAMESPACES.OPTIMISM;
+  (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;

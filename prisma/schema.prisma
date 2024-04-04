@@ -74,6 +74,34 @@ model SnapshotProposal {
   @@schema("snapshot")
 }
 
+model api_user {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  api_key     String?   @unique @default(dbgenerated("gen_random_uuid()"))
+  email       String?
+  address     String
+  chain_id    String
+  description String?
+  enabled     Boolean?  @default(true)
+  created_at  DateTime? @default(now()) @db.Date
+  updated_at  DateTime? @default(now()) @db.Date
+  chain       chain     @relation(fields: [chain_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([address, chain_id])
+  @@index([address], map: "idx_api_user_address")
+  @@index([api_key], map: "idx_api_user_api_key")
+  @@schema("agora")
+}
+
+model chain {
+  id         String     @id
+  name       String
+  created_at DateTime?  @default(now()) @db.Date
+  updated_at DateTime?  @default(now()) @db.Date
+  api_user   api_user[]
+
+  @@schema("agora")
+}
+
 view OptimismVotes {
   transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
@@ -120,13 +148,13 @@ view OptimismDelegates {
 
 view OptimismProposals {
   proposal_id        String       @unique
-  contract           String?      @db.VarChar(42)
+  contract           String       @db.VarChar(42)
   proposer           String
   description        String?
-  ordinal            Decimal?     @db.Decimal
-  created_block      BigInt
+  ordinal            Decimal      @db.Decimal
+  created_block      BigInt?
   start_block        String
-  end_block          String
+  end_block          String?
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
@@ -240,11 +268,11 @@ view ensDelegatees {
 }
 
 view ensDelegates {
-  delegate          String  @unique
-  num_of_delegators Decimal @db.Decimal
-  direct_vp         Decimal @db.Decimal
-  advanced_vp       String
-  voting_power      Decimal @db.Decimal
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
 
   @@map("delegates")
   @@schema("ens")
@@ -252,7 +280,7 @@ view ensDelegates {
 
 view ensProposals {
   proposal_id        String       @unique
-  contract           String       @db.VarChar(42)
+  contract           String       @db.VarChar
   proposer           String
   description        String?
   ordinal            Decimal      @db.Decimal
@@ -264,7 +292,7 @@ view ensProposals {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType
-  proposal_type_data String?
+  proposal_type_data Json?
   proposal_results   Json?
 
   @@map("proposals")
@@ -293,18 +321,18 @@ view ensVoterStats {
 }
 
 view ensVotes {
-  transaction_hash String        @unique @db.VarChar(66)
+  transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
   voter            String
   support          String
-  weight           Decimal       @db.Decimal
+  weight           Decimal      @db.Decimal
   reason           String?
   block_number     BigInt
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json?
-  proposal_type    ProposalType?
+  proposal_data    Json
+  proposal_type    ProposalType
 
   @@map("votes")
   @@schema("ens")
@@ -371,6 +399,20 @@ view ensAuthorityChainsSnaps {
   @@schema("ens")
 }
 
+view ensProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("ens")
+}
+
 view etherfiDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -382,11 +424,11 @@ view etherfiDelegatees {
 }
 
 view etherfiDelegates {
-  delegate          String  @unique
-  num_of_delegators Decimal @db.Decimal
-  direct_vp         Decimal @db.Decimal
-  advanced_vp       String
-  voting_power      Decimal @db.Decimal
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
 
   @@map("delegates")
   @@schema("etherfi")
@@ -420,19 +462,19 @@ view etherfiVotingPowerSnaps {
 
 view etherfiProposals {
   proposal_id        String       @unique
-  contract           String?      @db.VarChar
+  contract           String       @db.VarChar
   proposer           String
   description        String?
-  ordinal            Decimal?     @db.Decimal
-  created_block      BigInt
+  ordinal            Decimal      @db.Decimal
+  created_block      BigInt?
   start_block        String
-  end_block          String
+  end_block          String?
   cancelled_block    BigInt?
   executed_block     BigInt?
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType
-  proposal_type_data String?
+  proposal_type_data Json?
   proposal_results   Json?
 
   @@map("proposals")
@@ -510,6 +552,20 @@ view etherfiAuthorityChainsSnaps {
   balance_ordinal      Decimal? @db.Decimal
 
   @@map("authority_chains_snaps")
+  @@schema("etherfi")
+}
+
+view etherfiProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
   @@schema("etherfi")
 }
 
@@ -722,7 +778,7 @@ view ens_delegates_wrapper {
   delegate          String?
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
-  advanced_vp       String?
+  advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates_wrapper")
@@ -734,7 +790,7 @@ view ens_delegates_wrapper {
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view ens_proposals_wrapper {
   proposal_id        String?
-  contract           String?       @db.VarChar(42)
+  contract           String?       @db.VarChar
   proposer           String?
   description        String?
   ordinal            Decimal?      @db.Decimal
@@ -746,7 +802,7 @@ view ens_proposals_wrapper {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType?
-  proposal_type_data String?
+  proposal_type_data Json?
   proposal_results   Json?
 
   @@map("proposals_wrapper")
@@ -760,7 +816,7 @@ view etherfi_delegates_wrapper {
   delegate          String?
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
-  advanced_vp       String?
+  advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
 
   @@map("delegates_wrapper")

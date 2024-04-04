@@ -29,7 +29,9 @@ export default function OptionsResultsPanel({
   const options = proposalResults.options;
 
   const totalVotingPower =
-    BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
+    BigInt(proposalResults.for) +
+    BigInt(proposalResults.abstain) +
+    BigInt(proposalResults.against);
 
   const thresholdPosition = (() => {
     if (proposalSettings.criteria === "THRESHOLD") {
@@ -152,7 +154,7 @@ function SingleOption({
       >
         <div className={styles.descriptionText}>{description}</div>
         <div className={styles.votesText}>
-          <TokenAmountDisplay amount={votes} decimals={18} currency="OP" />
+          <TokenAmountDisplay amount={votes} />
           <span className={styles.votesMargin}>
             {percentage === 0n
               ? "(0%)"

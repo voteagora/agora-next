@@ -2,6 +2,8 @@ import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
+import Tenant from "./tenant/tenant";
+import { TENANT_NAMESPACES } from "./constants";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -103,24 +105,24 @@ const knownAbis: Record<string, Abi> = {
 };
 
 const decodeCalldata = (calldatas: `0x${string}`[]) => {
-  if (!calldatas || calldatas.length === 0 || !calldatas[0]) {
-    return { functionName: "unknown", functionArgs: [] as string[] };
-  }
+  return calldatas.map((calldata) => {
+    const abi = knownAbis[calldata.slice(0, 10)];
+    let functionName = "unknown";
+    let functionArgs = [] as string[];
 
-  const abi = knownAbis[calldatas[0].slice(0, 10)];
-  let functionName = "unknown";
-  let functionArgs = [] as string[];
+    if (abi) {
+      const decodedData = decodeFunctionData({
+        abi: abi,
+        data: calldata,
+      });
+      functionName = decodedData.functionName;
+      functionArgs = decodedData.args as string[];
+    }
 
-  if (abi) {
-    const decodedData = decodeFunctionData({
-      abi: abi,
-      data: calldatas[0],
-    });
-    functionName = decodedData.functionName;
-    functionArgs = decodedData.args as string[];
-  }
-
-  return { functionName, functionArgs };
+    return {
+      functionArgs, functionName
+    }
+  });
 };
 
 /**
@@ -180,7 +182,8 @@ export async function parseProposal(
   );
   const proposalResuts = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
-    proposalData
+    proposalData,
+    proposal.start_block
   );
 
   const proposalTypeData =
@@ -194,20 +197,20 @@ export async function parseProposal(
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+          : null,
     start_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.start_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.start_block, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.start_block, latestBlock)
+          : null,
     end_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.end_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+          : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
@@ -220,12 +223,12 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-          proposal,
-          proposalResuts,
-          latestBlock,
-          quorum,
-          votableSupply
-        )
+        proposal,
+        proposalResuts,
+        latestBlock,
+        quorum,
+        votableSupply
+      )
       : null,
   };
 }
@@ -281,8 +284,10 @@ export type ParsedProposalData = {
         values: string[];
         signatures: string[];
         calldatas: string[];
-        functionName: string;
-        functionArgs: string[];
+        functionArgsName: {
+          functionName: string;
+          functionArgs: string[];
+        }[]
       }[];
     };
   };
@@ -294,8 +299,10 @@ export type ParsedProposalData = {
         values: string[];
         calldatas: string[];
         description: string;
-        functionName: string;
-        functionArgs: string[];
+        functionArgsName: {
+          functionName: string;
+          functionArgs: string[];
+        }[]
         budgetTokensSpent: bigint | null;
       }[];
       proposalSettings: {
@@ -338,7 +345,7 @@ export function parseProposalData(
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
-      const { functionArgs, functionName } = decodeCalldata(calldatas);
+      const functionArgsName = decodeCalldata(calldatas);
       return {
         key: "STANDARD",
         kind: {
@@ -348,8 +355,7 @@ export function parseProposalData(
               values: JSON.parse(parsedProposalData.values),
               signatures: JSON.parse(parsedProposalData.signatures),
               calldatas: calldatas,
-              functionName,
-              functionArgs,
+              functionArgsName,
             },
           ],
         },
@@ -398,7 +404,7 @@ export function parseProposalData(
                 }
               })();
 
-              const { functionArgs, functionName } = decodeCalldata(
+              const functionArgsName = decodeCalldata(
                 calldatas as `0x${string}`[]
               );
 
@@ -407,8 +413,7 @@ export function parseProposalData(
                 values,
                 calldatas,
                 description,
-                functionName,
-                functionArgs,
+                functionArgsName,
                 budgetTokensSpent,
               };
             }
@@ -473,6 +478,7 @@ export type ParsedProposalResults = {
     kind: {
       for: bigint;
       abstain: bigint;
+      against: bigint;
       options: {
         option: string;
         votes: bigint;
@@ -493,7 +499,8 @@ type ProposalResults = {
 
 export function parseProposalResults(
   proposalResults: string,
-  proposalData: ParsedProposalData[ProposalType]
+  proposalData: ParsedProposalData[ProposalType],
+  startBlock: string
 ): ParsedProposalResults[ProposalType] {
   switch (proposalData.key) {
     case "SNAPSHOT": {
@@ -534,11 +541,34 @@ export function parseProposalResults(
         proposalResults
       ) as ProposalResults;
 
+      const { namespace, contracts } = Tenant.current();
+
+      const standardResults = (() => {
+        if (
+          namespace === TENANT_NAMESPACES.OPTIMISM &&
+          contracts.governor.v6UpgradeBlock &&
+          Number(startBlock) < contracts.governor.v6UpgradeBlock
+        ) {
+          return {
+            for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
+            against: 0n,
+            abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          };
+        }
+
+        return {
+          for: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          against: BigInt(parsedProposalResults.standard?.[0] ?? 0),
+          abstain: BigInt(parsedProposalResults.standard?.[2] ?? 0),
+        };
+      })();
+
       return {
         key: "APPROVAL",
         kind: {
-          for: BigInt(parsedProposalResults.standard?.[0] ?? 0),
-          abstain: BigInt(parsedProposalResults.standard?.[1] ?? 0),
+          for: standardResults.for,
+          abstain: standardResults.abstain,
+          against: standardResults.against,
           options: proposalData.kind.options.map((option, idx) => {
             return {
               option: option.description,
