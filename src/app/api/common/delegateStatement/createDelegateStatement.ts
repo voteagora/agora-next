@@ -24,7 +24,6 @@ export async function createDelegateStatement({
     address,
     message,
     signature,
-    daoSlug: slug,
   });
 
   if (!valid) {
