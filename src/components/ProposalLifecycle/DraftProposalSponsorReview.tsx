@@ -299,7 +299,6 @@ const DraftProposalReview: React.FC<DraftProposalReviewProps> = ({
                       <p>{`// ${transaction.description}`}</p>
                       <CodeChange
                         target={transaction.target}
-                        calldata={transaction.calldata}
                         valueETH={transaction.valueETH}
                         functionName={transaction.functionName}
                         functionArgs={transaction.functionArgs}
