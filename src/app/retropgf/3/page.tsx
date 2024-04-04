@@ -14,13 +14,11 @@ export default async function Page({
     orderBy?: keyof typeof retroPGFSort;
   };
 }) {
-
   const { ui } = Tenant.current();
 
   if (!ui.toggle("retropgf")) {
     return <div>Route not supported for namespace</div>;
   }
-
 
   const projects = await getRetroPGFResults({
     search: searchParams.search || "",

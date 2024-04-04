@@ -33,7 +33,7 @@ async function getDelegatesApi(
 ): Promise<PaginatedResultEx<any>> {
   const { namespace, slug } = Tenant.current();
   const apiDelegatesQuery = (sort: string) =>
-  `
+    `
     SELECT 
       delegates.delegate,
       num_of_delegators,
@@ -45,9 +45,7 @@ async function getDelegatesApi(
     FROM 
       ${namespace + ".delegates"}
     LEFT JOIN
-      ${
-        namespace + ".advanced_voting_power"
-      } avp
+      ${namespace + ".advanced_voting_power"} avp
     ON 
       avp.delegate = delegates.delegate
     LEFT JOIN 
@@ -112,7 +110,7 @@ async function getDelegatesApi(
       citizen: delegate.citizen,
       statement: _delegates[index].statement,
     })),
-  };    
+  };
 }
 
 /*

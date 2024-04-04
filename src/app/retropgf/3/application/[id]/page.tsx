@@ -5,11 +5,10 @@ import RetroPGFApplicationContent from "@/components/RetroPGF/RetroPGFApplicatio
 import Tenant from "@/lib/tenant/tenant";
 
 export default async function Page({
-                                     params: { id },
-                                   }: {
+  params: { id },
+}: {
   params: { id: string };
 }) {
-
   const { ui } = Tenant.current();
 
   if (!ui.toggle("retropgf")) {
