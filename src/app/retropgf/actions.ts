@@ -3,10 +3,17 @@
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 import { type RetroPGFProject } from "@/lib/types";
 
-export async function getRetroPGFResults(
-  { endCursor = "", search = "", category = null, orderBy = "mostAwarded" }:
-    { endCursor?: string, search: string, category: keyof typeof retroPGFCategories | null, orderBy: keyof typeof retroPGFSort }
-) {
+export async function getRetroPGFResults({
+  endCursor = "",
+  search = "",
+  category = null,
+  orderBy = "mostAwarded",
+}: {
+  endCursor?: string;
+  search: string;
+  category: keyof typeof retroPGFCategories | null;
+  orderBy: keyof typeof retroPGFSort;
+}) {
   const pageSize = 20;
   const seed = Date.now().toString();
   const query = `
@@ -60,7 +67,9 @@ export async function getRetroPGFResults(
   return data.data.retroPGF.projects;
 }
 
-export async function getResultsProjectId(id: string): Promise<RetroPGFProject> {
+export async function getResultsProjectId(
+  id: string
+): Promise<RetroPGFProject> {
   const query = `
       {
         retroPGF {
