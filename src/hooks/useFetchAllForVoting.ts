@@ -10,7 +10,7 @@ const useFetchAllForVoting = ({ proposal }: { proposal: Proposal }) => {
 
   const { data, isSuccess } = useQuery({
     enabled: !!address && !!proposal.snapshotBlockNumber,
-    queryKey: ['useFetchAllForVoting', address, proposal],
+    queryKey: ["useFetchAllForVoting", address, proposal],
     queryFn: async () => {
       const {
         votingPower,
@@ -27,9 +27,9 @@ const useFetchAllForVoting = ({ proposal }: { proposal: Proposal }) => {
         chains: authorityChains,
         delegate,
         votes: votesForProposalAndDelegate,
-        votingPower
-      }
-    }
+        votingPower,
+      };
+    },
   });
 
   return { ...data, isSuccess };

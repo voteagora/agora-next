@@ -14,11 +14,11 @@ class AgoraAPI {
   /**
    * Performs a GET request to the Agora API.
    */
-  async get(endpoint, version = 'v1') {
+  async get(endpoint, version = "v1") {
     const res = await fetch(`/api/${version}${endpoint}`, {
       method: "GET",
       headers: {
-        "authorization": this.apiKey,
+        authorization: this.apiKey,
       },
     });
 
@@ -33,11 +33,11 @@ class AgoraAPI {
   /**
    * POST request to the Agora API.
    */
-  async post(endpoint, version = 'v1', data) {
+  async post(endpoint, version = "v1", data) {
     const res = await fetch(`/api/${version}${endpoint}`, {
       method: "POST",
       headers: {
-        "authorization": this.apiKey,
+        authorization: this.apiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
