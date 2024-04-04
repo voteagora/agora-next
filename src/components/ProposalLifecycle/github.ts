@@ -76,7 +76,7 @@ function getFormattedTransactionTable(proposal: ProposalDraftWithTransactions) {
 }
 
 export default function formatGithubProposal(
-  proposal: ProposalDraftWithTransactions,
+  proposal: ProposalDraftWithTransactions
 ) {
   const descriptionTable = markdownTable([
     ["description"],
@@ -102,8 +102,8 @@ export default function formatGithubProposal(
     proposal.proposal_type === "executable"
       ? "[Agora](https://agora.ensdao.org/proposals/" + proposal.id + ")"
       : "[Snapshot](https://snapshot.org/#/ens.eth/proposal/" +
-      proposal.id +
-      ")"
+        proposal.id +
+        ")"
   }                                                                                                                                     |
   `;
 
@@ -134,8 +134,8 @@ export default function formatGithubProposal(
     proposal.proposal_type === "social" &&
     proposal.voting_strategy_social === "approval"
       ? `# Voting options \n ${proposal.ProposalDraftOption.map(
-        (option) => option.text,
-      ).join(", ")}`
+          (option) => option.text
+        ).join(", ")}`
       : ``;
 
   const content =
@@ -161,14 +161,14 @@ export default function formatGithubProposal(
 }
 
 export async function createGithubProposal(
-  proposal: ProposalDraftWithTransactions,
+  proposal: ProposalDraftWithTransactions
 ): Promise<string> {
   const octokit = new Octokit({
     auth: process.env.PR_BOT_TOKEN || "",
   });
 
   const content = Buffer.from(formatGithubProposal(proposal)).toString(
-    "base64",
+    "base64"
   );
 
   try {
@@ -178,7 +178,7 @@ export async function createGithubProposal(
       AGORA_PROXY_ACCOUNT,
       AGORA_ENS_FORK,
       ENS_REPO_OWNER,
-      ENS_REPO_NAME,
+      ENS_REPO_NAME
     );
 
     // Get the latest commit SHA of the base branch
@@ -190,16 +190,14 @@ export async function createGithubProposal(
 
     const baseBranchSHA = baseBranchRef.data.object.sha;
 
-
     // Get file name
     const { path, fileName } = await getFolderContents(
       octokit,
       AGORA_PROXY_ACCOUNT,
       AGORA_ENS_FORK,
       BASE_PATH,
-      proposal.title,
+      proposal.title
     );
-
 
     const formattedFileName = fileName.replace(".md", "");
 
@@ -252,7 +250,6 @@ export async function createGithubProposal(
         sha: summaryFile.data.sha,
       });
     } else {
-
       throw new Error("Expected a file but got a directory or none.");
     }
 
@@ -270,7 +267,6 @@ export async function createGithubProposal(
 
     return pullRequest.data.html_url;
   } catch (error) {
-
     console.error("------------------------------------------");
     console.error("Error creating PR:", error);
     throw new Error("Error creating PR");
@@ -282,7 +278,7 @@ async function getFolderContents(
   owner: string,
   repo: string,
   basePath: string,
-  title: string,
+  title: string
 ) {
   try {
     const foldersResponse = await octokit.repos.getContent({
@@ -316,7 +312,7 @@ async function getFolderContents(
     const fileName = `${
       title
         .replace(/\s+/g, "-") // Replace spaces with dashes
-        .replace(/[\[{(<\]})>\s]/g, function(match) {
+        .replace(/[\[{(<\]})>\s]/g, function (match) {
           switch (match) {
             case "{":
             case "(":
@@ -354,7 +350,7 @@ async function syncForkedBranch(
   owner: string,
   repo: string,
   upstreamOwner: string,
-  upstreamRepo: string,
+  upstreamRepo: string
 ) {
   try {
     const baseBranch = BASE_BRANCH; // Base branch in the upstream repository

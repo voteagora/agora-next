@@ -16,7 +16,6 @@ import { useAccount } from "wagmi";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
 
-
 export default function ProposalsList({
   initRelevantProposals,
   initAllProposals,

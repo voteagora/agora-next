@@ -3,7 +3,11 @@
 import DraftProposalChecklist from "@/components/ProposalLifecycle/DraftProposalChecklist";
 import DraftProposalForm from "@/components/ProposalLifecycle/DraftProposalForm";
 import React, { useState } from "react";
-import { ProposalChecklist, ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import {
+  ProposalChecklist,
+  ProposalDraft,
+  ProposalDraftTransaction,
+} from "@prisma/client";
 import { ProposalDraftWithTransactions } from "@/components/ProposalLifecycle/types";
 
 interface DraftProposalProps {
