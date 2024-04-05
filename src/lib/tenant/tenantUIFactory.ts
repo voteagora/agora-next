@@ -1,10 +1,10 @@
 import { TenantNamespace } from "@/lib/types";
 
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { uniswapTenantUIConfig } from "@/lib/tenant/configs/uniswap";
-import { etherfiTenantUIConfig } from "@/lib/tenant/configs/etherfi";
-import { ensTenantUIConfig } from "@/lib/tenant/configs/ens";
-import { optimismTenantUIConfig } from "@/lib/tenant/configs/optimism";
+import { uniswapTenantUIConfig } from "@/lib/tenant/configs/ui/uniswap";
+import { etherfiTenantUIConfig } from "@/lib/tenant/configs/ui/etherfi";
+import { ensTenantUIConfig } from "@/lib/tenant/configs/ui/ens";
+import { optimismTenantUIConfig } from "@/lib/tenant/configs/ui/optimism";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
