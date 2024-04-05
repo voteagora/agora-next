@@ -1,14 +1,16 @@
-import { ethProvider } from "@/app/lib/provider";
 import { EtherfiToken__factory } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
+import { ethProvider } from "@/app/lib/provider";
 import { mainnet } from "viem/chains";
 
-export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
-  const TOKEN = "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72";
+export const etherfiTenantContractConfig = (
+  isProd: boolean
+): TenantContracts => {
+  const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
+
   return {
-    // TOKEN
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
