@@ -3,7 +3,7 @@ import "server-only";
 import prisma from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { Prisma } from "@prisma/client";
-import verifyMessage from "@/lib/serverVerifyMessage";
+import { verifyMessage } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function createDelegateStatement({
@@ -20,13 +20,9 @@ export async function createDelegateStatement({
   const { twitter, discord, email } = delegateStatement;
   const { slug } = Tenant.current();
 
-  const valid = await verifyMessage({
-    address,
-    message,
-    signature,
-  });
+  const valid = await verifyMessage(message, signature);
 
-  if (!valid) {
+  if (address.toLowerCase() !== valid.toLowerCase()) {
     throw new Error("Invalid signature");
   }
 
