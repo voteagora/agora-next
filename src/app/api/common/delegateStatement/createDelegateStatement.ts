@@ -20,9 +20,9 @@ export async function createDelegateStatement({
   const { twitter, discord, email } = delegateStatement;
   const { slug } = Tenant.current();
 
-  const valid = await verifyMessage(message, signature);
+  const result = await verifyMessage(message, signature);
 
-  if (address.toLowerCase() !== valid.toLowerCase()) {
+  if (address.toLowerCase() !== result.toLowerCase()) {
     throw new Error("Invalid signature");
   }
 
