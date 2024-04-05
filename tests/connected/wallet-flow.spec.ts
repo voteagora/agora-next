@@ -11,7 +11,7 @@ export const test = baseTest.extend<{
             wallet: "metamask",
             version: MetaMaskWallet.recommendedVersion,
             seed: "test test test test test test test test test test test junk", // Hardhat's default https://hardhat.org/hardhat-network/docs/reference#accounts
-            headless: true,
+            headless: false,
         });
 
         await wallet.addNetwork({
@@ -32,7 +32,7 @@ export const test = baseTest.extend<{
 });
 
 test("should be able to connect", async ({ wallet, page }) => {
-    await page.goto('/');
+    await page.goto('https://vote.optimism.io/');
     await page.getByText('Connect Wallet').first().click();
     await page.getByRole('button', { name: 'MetaMask' }).click();
     await wallet.approve();
