@@ -32,7 +32,7 @@ export const test = baseTest.extend<{
 });
 
 test("should be able to connect", async ({ wallet, page }) => {
-    await page.goto('https://vote.optimism.io/');
+    await page.goto('/');
     await page.getByText('Connect Wallet').first().click();
     await page.getByRole('button', { name: 'MetaMask' }).click();
     await wallet.approve();
