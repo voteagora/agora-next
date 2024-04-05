@@ -1,17 +1,12 @@
-import { TenantContracts } from "@/lib/types";
-import { TenantContract } from "@/lib/tenant/tenantContract";
-import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
-import {
-  AlligatorOPV5__factory,
-  OptimismGovernor__factory,
-  OptimismToken__factory,
-  ProposalTypesConfigurator__factory,
-} from "@/lib/contracts/generated";
-import { optimism } from "viem/chains";
 import provider from "@/app/lib/provider";
-import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
+import {  ProposalTypesConfigurator__factory,  OptimismToken__factory,  OptimismGovernor__factory,  AlligatorOPV5__factory,} from "@/lib/contracts/generated";
 import { BaseContract } from "ethers";
+import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
+import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
+import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
+import { TenantContract } from "@/lib/tenant/tenantContract";
+import { TenantContracts } from "@/lib/types";
+import { optimism } from "viem/chains";
 
 export const optimismTenantContractConfig = (
   isProd: boolean

@@ -1,8 +1,8 @@
-import { ethProvider } from "@/app/lib/provider";
 import { EtherfiToken__factory } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
+import { ethProvider } from "@/app/lib/provider";
 import { mainnet } from "viem/chains";
 
 export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
