@@ -21,4 +21,4 @@ async function isCitizen(address: string) {
   );
 }
 
-export const fetchIsCitizen = cache(isCitizen); 
+export const fetchIsCitizen = cache(isCitizen);

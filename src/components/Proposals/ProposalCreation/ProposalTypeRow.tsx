@@ -24,7 +24,7 @@ function ProposalTypeRow({
   const { proposalType, proposalSettings } = form.state;
   const optimisticProposalSettingsIndex = proposalSettingsList.find(
     (item) => item.name === "Optimistic"
-  ).proposal_type_id;
+  )?.proposal_type_id;
   const infoText = () => {
     switch (proposalType) {
       case "Basic":
@@ -42,7 +42,7 @@ function ProposalTypeRow({
         optimisticProposalSettingsIndex.toString()
       );
     } else if (
-      proposalSettings === optimisticProposalSettingsIndex.toString()
+      proposalSettings === optimisticProposalSettingsIndex?.toString()
     ) {
       form.onChange.proposalSettings("0");
     }

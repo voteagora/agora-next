@@ -2,14 +2,14 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
-import { fetchAllForVoting as apiFetchAllForVoting} from "@/app/api/votes/getVotes";
+import { fetchAllForVoting as apiFetchAllForVoting } from "@/app/api/votes/getVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { fetchDelegate as apiFetchDelegate} from "@/app/api/common/delegates/getDelegates";
+import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
