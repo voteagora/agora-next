@@ -19,78 +19,120 @@ components:
       name: Authorization
   schemas:
     PageMetadata:
+      summary: Pagination metadata
+      description: Metadata associated with paginated requests.
       type: object
       properties:
         hasNext:
+          summary: Flag indicating if there's more data for retieval
+          description: A boolean flag indicating if there is additional data past the returned page to retrieve.
           type: boolean
         totalReturned:
+          summary: Total records returned
+          description: A number indicating the total amount of records returned for the request.
           type: integer
           format: int32
         nextOffset: 
+          summary: Offset to supply to the next request
+          description: A number indicating the offset at which a subsequent request may retrieve the next set of records.
           type: integer
           format: int32
-    Delegate:
+    Delegation:
+      summary: A delegation of voting power
+      description: A delegation of voting power from one address to another.
+      type: object
+      properties:
+        address: 
+          summary: Delegate address
+          description: Address of the delegator or delegatee.
+          type: string 
+          examples:
+          - summary: Address of the delegator or delegatee.
+            value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        totalAllowance:
+          summary: Voting allowance for delegate
+          description: Total amount of voting power delegated to or from address. 
+          type: string
+          examples:
+          - summary: Amount of voting power delegated to or from address.
+            value: "100000"
+        delegatedOn:
+          summary: When delegation occured
+          description: The datetime on which the delegation of voting power occurred. 
+          type: string
+          format: date-time
+          examples:
+          - summary: The datetime on which the delegation of voting power occurred.
+        type:
+          $ref: "#/components/schemas/DelegationType"
+    DelegationType:
+      summary: Type of delegation
+      description: The type of delegation; can be advanced or standard.
+      type: string
+      enum:
+        - advanced
+        - standard
+    BaseDelegate:
+      summary: A voting delegate
+      description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded. 
       type: object
       properties:
         address:
+          summary: Delegate address
+          description: Address of the delegate.
           type: string
           examples: 
             - summary: Address of the delegate.
               value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
         votingPower:
+          summary: Delegate's available voting power
+          description: An object providing a breakdown of a delegate's overall voting power between direct, advanced, and total.
           type: object
           properties:
             advanced:
+              description: Advanced voting power.
               type: string
               examples:
-                - summary: Advanced voting power
+                - summary: Advanced voting power.
                   value: "10000"
             direct:
+              description: Direct voting power.
               type: string
               examples:
                 - summary: Direct voting power
                   value: "20000"
             total:
+              description: Total voting power.
               type: string
               examples:
                 - summary: Total voting power
                   value: "30000"
         isCitizen:
+          description: A boolean flag indicating whether or not this delegate is an Agora citizen.
           type: boolean
-        email:
-          type: string
         twitter:
+          description: Optional twitter handle for a particular delegate.
           type: string
           examples:
             - summary: Twitter handle
               value: "@flip_liquide"
-        discord:
-          type: string
-          examples:
-            - summary: Discord handle
-              value: "delegate#1234"
         statement:
+          description: A statement from the delegate describing their voting positions.
           type: string
           examples:
             - summary: Delegate statement
               value: "hello! I am a great delegate for reasons xyz"
-        leastValuableProposals:
-          description: An array of proposal IDs
-          type: array
-          items:
-            type: string
-        mostValuableProposals:
-          description: An array of proposal IDs
-          type: array
-          items: 
-            type: string
         openToSponsoringProposals:
+          description: A boolean flag indicating if this delegate is willing to act as a sponsor for new proposals.
           type: boolean
         topIssues:
+          description: The most important issues for a given delegate.
           type: array
           items: 
               $ref: '#/components/schemas/Issue'
     Issue:
+      summary: Description of a governance issue
+      description: An object describing a particular view on a particular governance issue.
       type: object
       properties:
         type: 
@@ -157,7 +199,7 @@ paths:
                   delegates:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Delegate'
+                      $ref: '#/components/schemas/BaseDelegate'
         '400':
           description: Bad Request
         '401': 
@@ -192,7 +234,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Delegate'
+                $ref: '#/components/schemas/BaseDelegate'
         '400':
           description: Bad Request
         '401': 
