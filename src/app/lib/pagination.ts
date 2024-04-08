@@ -9,9 +9,9 @@ export type PaginatedResult<T> = {
 
 export type PaginatedResultEx<T> = {
   meta: {
-    hasNext: boolean;
-    totalReturned: number;
-    nextOffset: number;
+    has_next: boolean;
+    total_returned: number;
+    next_offset: number;
   };
   data: T;
 };
@@ -40,7 +40,7 @@ export async function paginateResult<T extends Array<any>>(
     meta: {
       currentPage: page,
       pageSize: pageSize,
-      hasNextPage: ex.meta.hasNext,
+      hasNextPage: ex.meta.has_next,
     },
     data: ex.data,
   };
@@ -57,9 +57,9 @@ export async function paginateResultEx<T extends Array<any>>(
   if (!data || data.length === 0) {
     return {
       meta: {
-        hasNext: false,
-        totalReturned: 0,
-        nextOffset: 0
+        has_next: false,
+        total_returned: 0,
+        next_offset: 0,
       },
       data: [] as any as T,
     };
@@ -70,9 +70,9 @@ export async function paginateResultEx<T extends Array<any>>(
 
   return {
     meta: {
-      hasNext: has_next,
-      totalReturned: data.length - 1,
-      nextOffset: has_next ? params.offset + params.limit : 0,
+      has_next: has_next,
+      total_returned: data.length - 1,
+      next_offset: has_next ? params.offset + params.limit : 0,
     },
     data: theData,
   };
