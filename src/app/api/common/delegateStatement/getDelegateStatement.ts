@@ -26,12 +26,12 @@ type DelegateStatementPayload = {
   openToSponsoringProposals: boolean;
   delegateStatement: string;
   topIssues: Issue[];
-}
+};
 
 type Issue = {
   type: string;
   value: string;
-}
+};
 
 /*
   Gets delegate statement from Postgres, or DynamoDB if not found
@@ -40,7 +40,7 @@ async function getDelegateStatementForAddress({
   address,
 }: {
   address: string;
-}) : Promise<DelegateStatement | null>{
+}): Promise<DelegateStatement | null> {
   const { slug } = Tenant.current();
 
   const postgreqsqlData = await prisma.delegateStatements
@@ -52,15 +52,15 @@ async function getDelegateStatementForAddress({
         email: data?.email as string,
         twitter: data?.twitter as string,
         discord: data?.discord as string,
-        payload: JSON.parse(data?.payload as string) as DelegateStatementPayload,
-      }
+        payload: data?.payload as DelegateStatementPayload,
+      };
     })
     .catch((error) => console.error(error));
   return postgreqsqlData
     ? postgreqsqlData
     : slug === DaoSlug.OP // Only fetch from Dynamo for optimism
-    ? await getDelegateStatementForAddressDynamo(address)
-    : null;
+      ? await getDelegateStatementForAddressDynamo(address)
+      : null;
 }
 
 /*
