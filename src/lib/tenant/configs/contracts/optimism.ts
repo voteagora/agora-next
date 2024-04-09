@@ -1,5 +1,10 @@
 import provider from "@/app/lib/provider";
-import {  ProposalTypesConfigurator__factory,  OptimismToken__factory,  OptimismGovernor__factory,  AlligatorOPV5__factory,} from "@/lib/contracts/generated";
+import {
+  ProposalTypesConfigurator__factory,
+  OptimismToken__factory,
+  OptimismGovernor__factory,
+  AlligatorOPV5__factory,
+} from "@/lib/contracts/generated";
 import { BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";

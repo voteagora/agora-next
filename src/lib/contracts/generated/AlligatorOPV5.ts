@@ -944,9 +944,7 @@ export interface AlligatorOPV5 extends BaseContract {
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "subdelegations"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "subdelegations"): TypedContractMethod<
     [from: AddressLike, to: AddressLike],
     [
       [bigint, bigint, bigint, bigint, string, bigint, bigint] & {
