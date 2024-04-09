@@ -19,7 +19,7 @@ async function getProposals({
 
   const { namespace, contracts, isProd } = Tenant.current();
   const prodDataOnly = isProd && {
-    contract: contracts?.governor?.address,
+    contract: contracts.governor.address,
   };
 
   const { meta, data: proposals } = await paginateResult(

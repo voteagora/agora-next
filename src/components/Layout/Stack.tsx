@@ -7,7 +7,7 @@ import * as theme from "@/styles/theme";
 
 type Props = {
   className?: string;
-  gap?: keyof typeof theme["spacing"];
+  gap?: keyof (typeof theme)["spacing"];
   justifyContent?:
     | "justify-around"
     | "justify-between"

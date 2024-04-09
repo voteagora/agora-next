@@ -6,11 +6,11 @@ import { BaseContract } from "ethers";
 import { TENANT_NAMESPACES } from "./constants";
 
 export type TenantNamespace =
-  typeof TENANT_NAMESPACES[keyof typeof TENANT_NAMESPACES];
+  (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;
-  governor?: TenantContract<IGovernorContract>;
+  governor: TenantContract<IGovernorContract>;
   alligator?: TenantContract<IAlligatorContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
 };

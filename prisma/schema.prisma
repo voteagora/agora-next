@@ -1185,7 +1185,7 @@ view uniswapVotes {
   proposal_data    Json
   proposal_type    ProposalType
 
-  @@ignore
+  @@map("votes")
   @@schema("uniswap")
 }
 
