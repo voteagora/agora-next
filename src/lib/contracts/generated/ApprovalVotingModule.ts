@@ -298,7 +298,9 @@ export interface ApprovalVotingModule extends BaseContract {
     [void],
     "nonpayable"
   >;
-  getFunction(nameOrSignature: "_formatExecuteParams"): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "_formatExecuteParams"
+  ): TypedContractMethod<
     [proposalId: BigNumberish, proposalData: BytesLike],
     [
       [string[], bigint[], string[]] & {
@@ -326,7 +328,9 @@ export interface ApprovalVotingModule extends BaseContract {
     [bigint[]],
     "view"
   >;
-  getFunction(nameOrSignature: "proposals"): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "proposals"
+  ): TypedContractMethod<
     [proposalId: BigNumberish],
     [
       [string, bigint, ProposalSettingsStructOutput] & {

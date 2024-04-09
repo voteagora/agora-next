@@ -27,6 +27,12 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
+      {tenant.ui.toggle("staking") && tenant.ui.toggle("staking").enabled && (
+        <HeaderLink href="/staking" isActive={pathname.includes("staking")}>
+          Staking
+        </HeaderLink>
+      )}
+
       {tenant.ui.toggle("retropgf") && tenant.ui.toggle("retropgf").enabled && (
         <HeaderLink
           href="/retropgf/3/summary"
