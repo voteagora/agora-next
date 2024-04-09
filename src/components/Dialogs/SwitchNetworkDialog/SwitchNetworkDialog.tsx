@@ -1,24 +1,23 @@
-import { useNetwork, useSwitchNetwork, useChainId } from "wagmi";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import Tenant from "@/lib/tenant/tenant";
+import { ChainConstants } from "viem/types/chain";
 
 export function SwitchNetwork({
-  chainId,
+  chain,
   closeDialog,
 }: {
-  chainId: number;
+  chain: ChainConstants;
   closeDialog: () => void;
 }) {
-  const { chain } = useNetwork();
+  const { chain: connectedChain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
-  const { contracts } = Tenant.current();
 
   useEffect(() => {
-    if (chain?.id === chainId) {
+    if (connectedChain?.id === chain.id) {
       closeDialog();
     }
-  }, [chain?.id, chainId, closeDialog]);
+  }, [connectedChain?.id, chain.id, closeDialog]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,19 +27,16 @@ export function SwitchNetwork({
         alt="Switch netwrok"
       />
       <h1 className="text-2xl font-extrabold">Switch Networks</h1>
-      <p>
-        Wrong network detected, switch to {contracts.token.chainName} to
-        continue.
-      </p>
+      <p>Wrong network detected, switch to {chain.name} to continue.</p>
       <Button
         variant="outline"
         className="font-bold"
         onClick={() => {
-          switchNetwork?.(chainId);
+          switchNetwork?.(chain.id);
           closeDialog();
         }}
       >
-        Switch to {contracts.token.chainName}
+        Switch to {chain.name}
       </Button>
     </div>
   );

@@ -7,10 +7,10 @@ const useFetchDelegate = (address: string) => {
   const api = new AgoraAPI();
   return useQuery({
     enabled: !!address,
-    queryKey: ['useFetchDelegate', address],
+    queryKey: ["useFetchDelegate", address],
     queryFn: async () => {
       return await api.get(`/delegates/${address}`);
-    }
+    },
   });
 };
 

@@ -5,20 +5,17 @@ import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
 import Tenant from "@/lib/tenant/tenant";
 import styles from "./styles.module.scss";
 
-
 async function getProposalSettingsList() {
   "use server";
   return await fetchProposalTypes();
 }
 
 export default async function CreateProposalPage() {
-
   const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals/create")) {
     return <div>Route not supported for namespace</div>;
   }
-
 
   const proposalSettingsList = await getProposalSettingsList();
 

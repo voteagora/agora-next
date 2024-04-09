@@ -40,7 +40,7 @@ async function getNeedsMyVoteProposals(address: string) {
       `,
     latestBlock,
     address.toLowerCase(),
-    contracts.governor.address,
+    contracts.governor.address
   );
 
   const resolvedProposals = Promise.all(
@@ -50,9 +50,9 @@ async function getNeedsMyVoteProposals(address: string) {
         proposal,
         latestBlock,
         quorum ?? null,
-        BigInt(votableSupply),
+        BigInt(votableSupply)
       );
-    }),
+    })
   );
 
   return {

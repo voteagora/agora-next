@@ -58,9 +58,14 @@ export default function CurrentDelegateStatement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
+
+  const { ui } = Tenant.current();
+  const requireCodeOfConduct = !!ui.toggle("delegates/code-of-conduct")
+    ?.enabled;
+
   const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
     return {
-      agreeCodeConduct: false,
+      agreeCodeConduct: !requireCodeOfConduct,
       daoSlug,
       discord: delegateStatement?.discord || "",
       delegateStatement:

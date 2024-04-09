@@ -1,4 +1,7 @@
-import { fetchConnectedDelegate, revalidateDelegateAddressPage } from "@/app/delegates/actions";
+import {
+  fetchConnectedDelegate,
+  revalidateDelegateAddressPage,
+} from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
@@ -9,7 +12,7 @@ function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// TODO: think about strategy to fetchConnectedDelegate, since balance and voting power can change on every block, 
+// TODO: think about strategy to fetchConnectedDelegate, since balance and voting power can change on every block,
 // also to prevent additional unnecessary fetches being done right now
 const useConnectedDelegate = () => {
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -19,9 +22,10 @@ const useConnectedDelegate = () => {
 
   const data = useQuery({
     enabled: !!address,
-    queryKey: ['useConnectedDelegate', address, refetchDelegate, retries],
+    queryKey: ["useConnectedDelegate", address, refetchDelegate, retries],
     queryFn: async () => {
-      const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address!);
+      const [delegate, advancedDelegators, balance] =
+        await fetchConnectedDelegate(address!);
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate.address);
       }
@@ -34,7 +38,9 @@ const useConnectedDelegate = () => {
          * Materialized view that brings the new voting power takes one minute to sync
          * Refetch delegate will be set to null by the delegateProfileImage
          */
-        if (delegatee.votingPower === refetchDelegate.prevVotingPowerDelegatee) {
+        if (
+          delegatee.votingPower === refetchDelegate.prevVotingPowerDelegatee
+        ) {
           await timeout(2000);
           const _retries = retries + 1;
           setRetries(_retries);
@@ -54,18 +60,20 @@ const useConnectedDelegate = () => {
       } else {
         return { delegate, advancedDelegators, balance };
       }
-    }
+    },
   });
 
-  return data.data ? {
-    ...data.data,
-    isLoading: data.isLoading
-  } : {
-    balance: null,
-    delegate: null,
-    advancedDelegators: null,
-    isLoading: data.isLoading
-  };
+  return data.data
+    ? {
+        ...data.data,
+        isLoading: data.isLoading,
+      }
+    : {
+        balance: null,
+        delegate: null,
+        advancedDelegators: null,
+        isLoading: data.isLoading,
+      };
 };
 
 export default useConnectedDelegate;

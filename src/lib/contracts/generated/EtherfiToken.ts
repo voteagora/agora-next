@@ -548,9 +548,7 @@ export interface EtherfiToken extends BaseContract {
   getFunction(
     nameOrSignature: "delegates"
   ): TypedContractMethod<[account: AddressLike], [string], "view">;
-  getFunction(
-    nameOrSignature: "eip712Domain"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "eip712Domain"): TypedContractMethod<
     [],
     [
       [string, string, string, bigint, string, string, bigint[]] & {

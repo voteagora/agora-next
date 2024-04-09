@@ -17,6 +17,7 @@ import {
   DelegateePayload,
   Delegation,
 } from "@/app/api/common/delegations/delegation";
+import { ChainConstants } from "viem/types/chain";
 
 export type DialogType =
   | DelegateDialogType
@@ -75,7 +76,7 @@ export type RetroPGFShareCardDialog = {
 export type SwithcNetworkDialogType = {
   type: "SWITCH_NETWORK";
   params: {
-    chainId: number;
+    chain: ChainConstants;
   };
 };
 
@@ -214,8 +215,8 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  SWITCH_NETWORK: ({ chainId }: { chainId: number }, closeDialog) => (
-    <SwitchNetwork chainId={chainId} closeDialog={closeDialog} />
+  SWITCH_NETWORK: ({ chain }: { chain: ChainConstants }, closeDialog) => (
+    <SwitchNetwork chain={chain} closeDialog={closeDialog} />
   ),
   // FAQ: () => {
   //   return <FaqDialog />;

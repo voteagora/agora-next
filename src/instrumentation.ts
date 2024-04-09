@@ -1,15 +1,11 @@
-import { registerOTel, OTLPHttpJsonTraceExporter } from "@vercel/otel";
-import {
-  SimpleSpanProcessor,
-} from "@opentelemetry/sdk-trace-node";
-import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
-import {
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
+import { registerOTel } from "@vercel/otel";
 
-export const SERVICE_NAME = 'agora-app';
+export const SERVICE_NAME = "agora-app";
 
 export async function register() {
-  registerOTel(SERVICE_NAME);
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation.node");
+  } else {
+    registerOTel({ serviceName: SERVICE_NAME });
+  }
 }
-

@@ -9,27 +9,25 @@ let prisma: PrismaClient;
 
 // Logging middleware
 const makePrismaClient = () => {
-  const execRaw = async (query: (args: any) => Promise<any>, args:any, operation: string) => {
-    return await time_this(
-      async () => await query(args),
-      {
-        operation,
-        args,
-      }
-    );
+  const execRaw = async (
+    query: (args: any) => Promise<any>,
+    args: any,
+    operation: string
+  ) => {
+    return await time_this(async () => await query(args), {
+      operation,
+      args,
+    });
   };
   return new PrismaClient().$extends({
     query: {
       $allModels: {
         async $allOperations({ operation, model, args, query }) {
-          return await time_this(
-            async () => await query(args),
-            {
-              model,
-              operation,
-              args,
-            }
-          )
+          return await time_this(async () => await query(args), {
+            model,
+            operation,
+            args,
+          });
         },
       },
       async $queryRaw({ args, query, operation }) {

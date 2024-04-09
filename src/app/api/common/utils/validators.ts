@@ -14,8 +14,13 @@ export const createOptionalStringValidator = <T extends string>(
     ...z.ZodLiteral<T>[]
   ];
   return z
-    .union([z.literal(null), z.literal(""), z.literal(defaultValue), ...literals])
-    .transform((x) => (x !== null && x !== "") ? x : defaultValue);
+    .union([
+      z.literal(null),
+      z.literal(""),
+      z.literal(defaultValue),
+      ...literals,
+    ])
+    .transform((x) => (x !== null && x !== "" ? x : defaultValue));
 };
 
 /*
@@ -23,14 +28,19 @@ export const createOptionalStringValidator = <T extends string>(
   If input is null, returns the supplied default value.
 */
 export const createOptionalNumberValidator = (
-  min: number, 
+  min: number,
   max: number,
   defaultValue: number
 ) => {
   return z
     .union([
-      z.literal(null), 
-      z.string().transform(x => parseInt(x)).refine(x => x >= min).refine(x => x <= max),
-      z.number().min(min).max(max).default(defaultValue)])
-    .transform((x) => (x !== null) ? x : defaultValue);
+      z.literal(null),
+      z
+        .string()
+        .transform((x) => parseInt(x))
+        .refine((x) => x >= min)
+        .refine((x) => x <= max),
+      z.number().min(min).max(max).default(defaultValue),
+    ])
+    .transform((x) => (x !== null ? x : defaultValue));
 };

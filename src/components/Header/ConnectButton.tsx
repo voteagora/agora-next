@@ -9,20 +9,19 @@ import Tenant from "@/lib/tenant/tenant";
 
 export function ConnectButton() {
   const { contracts } = Tenant.current();
-  const { chainId } = contracts.token;
   const { chain } = useNetwork();
   const openDialog = useOpenDialog();
 
   useEffect(() => {
-    if (chain?.id && chain.id !== chainId) {
+    if (chain?.id && chain.id !== contracts.token.chain.id) {
       openDialog({
         type: "SWITCH_NETWORK",
         params: {
-          chainId,
+          chain: contracts.token.chain,
         },
       });
     }
-  }, [chain?.id, chainId, openDialog]);
+  }, [chain?.id, contracts.token.chain.id, openDialog]);
 
   return (
     <div>

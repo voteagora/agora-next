@@ -23,7 +23,7 @@ export default function GovernorSettings() {
   const govContract = {
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
-    chainId: contracts.governor.chainId,
+    chainId: contracts.governor.chain.id,
   };
 
   const { data, isLoading: isInitializing } = useContractReads({

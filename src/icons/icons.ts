@@ -57,5 +57,5 @@ export const icons = {
   shareCard,
   newdao,
   github,
-  world
+  world,
 };

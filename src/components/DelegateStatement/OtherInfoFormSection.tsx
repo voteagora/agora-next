@@ -2,12 +2,16 @@ import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
 import DelegateStatementBoolSelector from "./DelegateStatementBoolSelector";
 import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function OtherInfoFormSection({
   form,
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
+  const { ui } = Tenant.current();
+  const requireCodeOfConduct = ui.toggle("delegates/code-of-conduct")?.enabled;
+
   return (
     <div className="py-8 px-6 border-b border-gray-300">
       <h3 className="font-bold">Other info</h3>
@@ -31,7 +35,7 @@ export default function OtherInfoFormSection({
           name="email"
           form={form}
         />
-        <DelegateStatementBoolSelector form={form} />
+        {requireCodeOfConduct && <DelegateStatementBoolSelector form={form} />}
       </div>
     </div>
   );

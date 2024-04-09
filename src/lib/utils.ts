@@ -82,12 +82,12 @@ export function TokenAmountDisplay({
   amount,
   decimals = token.decimals,
   currency = token.symbol,
-  maximumSignificantDigits = 2
+  maximumSignificantDigits = 2,
 }: {
-  amount: string | BigNumberish,
-  decimals?: number,
-  currency?: string,
-  maximumSignificantDigits?: number
+  amount: string | BigNumberish;
+  decimals?: number;
+  currency?: string;
+  maximumSignificantDigits?: number;
 }) {
   const formattedNumber = useMemo(() => {
     return formatNumber(amount, decimals, maximumSignificantDigits);
