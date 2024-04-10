@@ -49,15 +49,15 @@ const useAdvancedVoting = ({
           ? "castVoteWithReasonAndParams"
           : "castVoteWithReason"
         : params
-        ? "castVoteWithReasonAndParams"
-        : "castVote",
+          ? "castVoteWithReasonAndParams"
+          : "castVote",
       args: reason
         ? params
           ? [BigInt(proposalId), support, reason, params]
           : [BigInt(proposalId), support, reason]
         : params
-        ? [BigInt(proposalId), support, reason, params]
-        : ([BigInt(proposalId), support] as any),
+          ? [BigInt(proposalId), support, reason, params]
+          : ([BigInt(proposalId), support] as any),
       chainId: optimism.id,
     });
   const [standardVoteError, setStandardVoteError] =
@@ -163,8 +163,8 @@ const useAdvancedVoting = ({
       missingVote === "DIRECT"
         ? standardVoteLoading
         : missingVote === "ADVANCED"
-        ? advancedVoteLoading
-        : standardVoteLoading && advancedVoteLoading,
+          ? advancedVoteLoading
+          : standardVoteLoading && advancedVoteLoading,
     /**
      * TODO: frh -> what to do with the errors in SAFE:
      * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
@@ -178,14 +178,14 @@ const useAdvancedVoting = ({
       missingVote === "DIRECT"
         ? standardVoteError
         : missingVote === "ADVANCED"
-        ? advancedVoteError
-        : standardVoteError && advancedVoteError,
+          ? advancedVoteError
+          : standardVoteError && advancedVoteError,
     isSuccess:
       missingVote === "DIRECT"
         ? standardVoteSuccess
         : missingVote === "ADVANCED"
-        ? advancedVoteSuccess
-        : standardVoteSuccess && advancedVoteSuccess,
+          ? advancedVoteSuccess
+          : standardVoteSuccess && advancedVoteSuccess,
     write,
     data: { advancedTxHash, standardTxHash },
   };
