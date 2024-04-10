@@ -2718,7 +2718,9 @@ export interface NounsGovernor extends BaseContract {
   getFunction(
     nameOrSignature: "forkThresholdBPS"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(nameOrSignature: "getActions"): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "getActions"
+  ): TypedContractMethod<
     [proposalId: BigNumberish],
     [
       [string[], bigint[], string[], string[]] & {
