@@ -9,7 +9,7 @@ export default function BetaBanner() {
           feedback{" "}
           <a
             rel="noopener"
-            href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
+            href="https://agora.deform.cc/bugreport/"
             target="_blank"
             className="underline"
           >
