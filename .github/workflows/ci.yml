@@ -1,0 +1,19 @@
+name: CI
+run-name: ${{ github.actor }} - ${{ github.event_name }} - ${{ github.repository }}
+on:
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+    lint-prettier:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install dependencies
+              run: yarn install
+            - name: Lint with Prettier
+              run: yarn check-prettier
