@@ -40,7 +40,7 @@ export type SubdelegationRulesStructOutput = [
   notValidAfter: bigint,
   customRule: string,
   allowanceType: bigint,
-  allowance: bigint
+  allowance: bigint,
 ] & {
   maxRedelegations: bigint;
   blocksBeforeVoteCloses: bigint;
@@ -135,7 +135,7 @@ export interface AlligatorOPV5Interface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(
@@ -160,7 +160,7 @@ export interface AlligatorOPV5Interface extends Interface {
       BytesLike,
       BigNumberish,
       BytesLike,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(
@@ -175,7 +175,7 @@ export interface AlligatorOPV5Interface extends Interface {
       BigNumberish,
       BigNumberish,
       string,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(
@@ -189,7 +189,7 @@ export interface AlligatorOPV5Interface extends Interface {
       BytesLike,
       BigNumberish,
       BytesLike,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -399,12 +399,12 @@ export namespace SubDelegationEvent {
   export type InputTuple = [
     from: AddressLike,
     to: AddressLike,
-    subdelegationRules: SubdelegationRulesStruct
+    subdelegationRules: SubdelegationRulesStruct,
   ];
   export type OutputTuple = [
     from: string,
     to: string,
-    subdelegationRules: SubdelegationRulesStructOutput
+    subdelegationRules: SubdelegationRulesStructOutput,
   ];
   export interface OutputObject {
     from: string;
@@ -421,12 +421,12 @@ export namespace SubDelegations_address_address_array_tuple_Event {
   export type InputTuple = [
     from: AddressLike,
     to: AddressLike[],
-    subdelegationRules: SubdelegationRulesStruct
+    subdelegationRules: SubdelegationRulesStruct,
   ];
   export type OutputTuple = [
     from: string,
     to: string[],
-    subdelegationRules: SubdelegationRulesStructOutput
+    subdelegationRules: SubdelegationRulesStructOutput,
   ];
   export interface OutputObject {
     from: string;
@@ -443,12 +443,12 @@ export namespace SubDelegations_address_address_array_tuple_array_Event {
   export type InputTuple = [
     from: AddressLike,
     to: AddressLike[],
-    subdelegationRules: SubdelegationRulesStruct[]
+    subdelegationRules: SubdelegationRulesStruct[],
   ];
   export type OutputTuple = [
     from: string,
     to: string[],
-    subdelegationRules: SubdelegationRulesStructOutput[]
+    subdelegationRules: SubdelegationRulesStructOutput[],
   ];
   export interface OutputObject {
     from: string;
@@ -491,14 +491,14 @@ export namespace VoteCastEvent {
     voter: AddressLike,
     authority: AddressLike[],
     proposalId: BigNumberish,
-    support: BigNumberish
+    support: BigNumberish,
   ];
   export type OutputTuple = [
     proxy: string,
     voter: string,
     authority: string[],
     proposalId: bigint,
-    support: bigint
+    support: bigint,
   ];
   export interface OutputObject {
     proxy: string;
@@ -519,14 +519,14 @@ export namespace VotesCastEvent {
     voter: AddressLike,
     authorities: AddressLike[][],
     proposalId: BigNumberish,
-    support: BigNumberish
+    support: BigNumberish,
   ];
   export type OutputTuple = [
     proxies: string[],
     voter: string,
     authorities: string[][],
     proposalId: bigint,
-    support: bigint
+    support: bigint,
   ];
   export interface OutputObject {
     proxies: string[];
@@ -611,7 +611,7 @@ export interface AlligatorOPV5 extends BaseContract {
       support: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -622,7 +622,7 @@ export interface AlligatorOPV5 extends BaseContract {
       authority: AddressLike[],
       proposalId: BigNumberish,
       support: BigNumberish,
-      reason: string
+      reason: string,
     ],
     [void],
     "nonpayable"
@@ -634,7 +634,7 @@ export interface AlligatorOPV5 extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -646,7 +646,7 @@ export interface AlligatorOPV5 extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -661,7 +661,7 @@ export interface AlligatorOPV5 extends BaseContract {
       params: BytesLike,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -680,7 +680,7 @@ export interface AlligatorOPV5 extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -696,7 +696,7 @@ export interface AlligatorOPV5 extends BaseContract {
       params: BytesLike,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -745,7 +745,7 @@ export interface AlligatorOPV5 extends BaseContract {
         customRule: string;
         allowanceType: bigint;
         allowance: bigint;
-      }
+      },
     ],
     "view"
   >;
@@ -815,7 +815,7 @@ export interface AlligatorOPV5 extends BaseContract {
       support: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -827,7 +827,7 @@ export interface AlligatorOPV5 extends BaseContract {
       authority: AddressLike[],
       proposalId: BigNumberish,
       support: BigNumberish,
-      reason: string
+      reason: string,
     ],
     [void],
     "nonpayable"
@@ -840,7 +840,7 @@ export interface AlligatorOPV5 extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -853,7 +853,7 @@ export interface AlligatorOPV5 extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -869,7 +869,7 @@ export interface AlligatorOPV5 extends BaseContract {
       params: BytesLike,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -886,7 +886,7 @@ export interface AlligatorOPV5 extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -903,7 +903,7 @@ export interface AlligatorOPV5 extends BaseContract {
       params: BytesLike,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -955,7 +955,7 @@ export interface AlligatorOPV5 extends BaseContract {
         customRule: string;
         allowanceType: bigint;
         allowance: bigint;
-      }
+      },
     ],
     "view"
   >;

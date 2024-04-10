@@ -11,7 +11,7 @@ export const createOptionalStringValidator = <T extends string>(
   const literals = inputs.map((x) => z.literal(x)) as unknown as readonly [
     z.ZodLiteral<T>,
     z.ZodLiteral<T>,
-    ...z.ZodLiteral<T>[]
+    ...z.ZodLiteral<T>[],
   ];
   return z
     .union([

@@ -133,12 +133,12 @@ export namespace VotableSupplyCheckpointUpdatedEvent {
   export type InputTuple = [
     checkpointBlockNumber: BigNumberish,
     prevVotableSupply: BigNumberish,
-    newVotableSupply: BigNumberish
+    newVotableSupply: BigNumberish,
   ];
   export type OutputTuple = [
     checkpointBlockNumber: bigint,
     prevVotableSupply: bigint,
-    newVotableSupply: bigint
+    newVotableSupply: bigint,
   ];
   export interface OutputObject {
     checkpointBlockNumber: bigint;
@@ -154,11 +154,11 @@ export namespace VotableSupplyCheckpointUpdatedEvent {
 export namespace VotableSupplyUpdatedEvent {
   export type InputTuple = [
     prevVotableSupply: BigNumberish,
-    newVotableSupply: BigNumberish
+    newVotableSupply: BigNumberish,
   ];
   export type OutputTuple = [
     prevVotableSupply: bigint,
-    newVotableSupply: bigint
+    newVotableSupply: bigint,
   ];
   export interface OutputObject {
     prevVotableSupply: bigint;

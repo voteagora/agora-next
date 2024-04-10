@@ -68,8 +68,8 @@ export default function OpManagerDeleteProposal({
         {isLoading
           ? "Loading..."
           : isSuccess
-          ? "Proposal deleted"
-          : "Delete proposal"}
+            ? "Proposal deleted"
+            : "Delete proposal"}
       </Button>
     </div>
   );
