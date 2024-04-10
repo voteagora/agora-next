@@ -71,8 +71,8 @@ export default function SimulateTransaction({
           status === "Valid"
             ? styles.valid
             : status === "Invalid"
-            ? styles.invalid
-            : styles.else_color
+              ? styles.invalid
+              : styles.else_color
         }
       >
         {status}
