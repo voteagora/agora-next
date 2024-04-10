@@ -1,6 +1,5 @@
 import {
-  EtherfiToken__factory,
-  OptimismGovernor__factory,
+  OptimismGovernor__factory, UniStaker__factory, UniToken__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -8,6 +7,7 @@ import { TenantContracts } from "@/lib/types";
 import { ethProvider, sepoliaProvider } from "@/app/lib/provider";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
+import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 
 export const uniswapTenantContractConfig = (
   isProd: boolean,
@@ -22,12 +22,19 @@ export const uniswapTenantContractConfig = (
 
   return {
     token: new TenantContract<ITokenContract>({
-      abi: EtherfiToken__factory.abi,
+      abi: UniToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: EtherfiToken__factory.connect(TOKEN, provider),
+      contract: UniToken__factory.connect(TOKEN, provider),
     }),
-    
+
+    staker: new TenantContract<IStaker>({
+      abi: UniStaker__factory.connect(STAKING, provider),
+      address: STAKING,
+      chain,
+      contract: UniStaker__factory.connect(STAKING, provider),
+    }),
+
 
     // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
