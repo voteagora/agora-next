@@ -42,7 +42,6 @@ export async function GET(request: NextRequest) {
     return new Response(authResponse.reason, { status: 401 });
   }
 
-
   return await withUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
