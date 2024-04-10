@@ -34,8 +34,8 @@ async function getDelegateStatementForAddress({
   return postgreqsqlData
     ? postgreqsqlData
     : slug === DaoSlug.OP // Only fetch from Dynamo for optimism
-    ? await getDelegateStatementForAddressDynamo(address)
-    : null;
+      ? await getDelegateStatementForAddressDynamo(address)
+      : null;
 }
 
 /*

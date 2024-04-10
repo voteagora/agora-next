@@ -167,8 +167,8 @@ export default function ProposalType({
                           Number(e.target.value) > 100
                             ? 100
                             : Number(e.target.value) < 0
-                            ? 0
-                            : Number(e.target.value)
+                              ? 0
+                              : Number(e.target.value)
                         );
                       }}
                     />
@@ -213,8 +213,8 @@ export default function ProposalType({
                           Number(e.target.value) > 100
                             ? 100
                             : Number(e.target.value) < 0
-                            ? 0
-                            : Number(e.target.value)
+                              ? 0
+                              : Number(e.target.value)
                         );
                       }}
                     />

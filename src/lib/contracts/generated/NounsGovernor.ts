@@ -33,7 +33,7 @@ export declare namespace NounsDAOStorageV3 {
   export type DynamicQuorumParamsStructOutput = [
     minQuorumVotesBPS: bigint,
     maxQuorumVotesBPS: bigint,
-    quorumCoefficient: bigint
+    quorumCoefficient: bigint,
   ] & {
     minQuorumVotesBPS: bigint;
     maxQuorumVotesBPS: bigint;
@@ -49,7 +49,7 @@ export declare namespace NounsDAOStorageV3 {
   export type ReceiptStructOutput = [
     hasVoted: boolean,
     support: bigint,
-    votes: bigint
+    votes: bigint,
   ] & { hasVoted: boolean; support: bigint; votes: bigint };
 
   export type NounsDAOParamsStruct = {
@@ -67,7 +67,7 @@ export declare namespace NounsDAOStorageV3 {
     proposalThresholdBPS: bigint,
     lastMinuteWindowInBlocks: bigint,
     objectionPeriodDurationInBlocks: bigint,
-    proposalUpdatablePeriodInBlocks: bigint
+    proposalUpdatablePeriodInBlocks: bigint,
   ] & {
     votingPeriod: bigint;
     votingDelay: bigint;
@@ -118,7 +118,7 @@ export declare namespace NounsDAOStorageV3 {
     signers: string[],
     updatePeriodEndBlock: bigint,
     objectionPeriodEndBlock: bigint,
-    executeOnTimelockV1: boolean
+    executeOnTimelockV1: boolean,
   ] & {
     id: bigint;
     proposer: string;
@@ -150,7 +150,7 @@ export declare namespace NounsDAOStorageV3 {
   export type ProposerSignatureStructOutput = [
     sig: string,
     signer: string,
-    expirationTimestamp: bigint
+    expirationTimestamp: bigint,
   ] & { sig: string; signer: string; expirationTimestamp: bigint };
 
   export type DynamicQuorumParamsCheckpointStruct = {
@@ -160,7 +160,7 @@ export declare namespace NounsDAOStorageV3 {
 
   export type DynamicQuorumParamsCheckpointStructOutput = [
     fromBlock: bigint,
-    params: NounsDAOStorageV3.DynamicQuorumParamsStructOutput
+    params: NounsDAOStorageV3.DynamicQuorumParamsStructOutput,
   ] & {
     fromBlock: bigint;
     params: NounsDAOStorageV3.DynamicQuorumParamsStructOutput;
@@ -201,7 +201,7 @@ export declare namespace NounsDAOStorageV2 {
     vetoed: boolean,
     executed: boolean,
     totalSupply: bigint,
-    creationBlock: bigint
+    creationBlock: bigint,
   ] & {
     id: bigint;
     proposer: string;
@@ -423,7 +423,7 @@ export interface NounsGovernorInterface extends Interface {
       AddressLike,
       AddressLike[],
       BigNumberish,
-      BigNumberish
+      BigNumberish,
     ]
   ): string;
   encodeFunctionData(
@@ -524,7 +524,7 @@ export interface NounsGovernorInterface extends Interface {
     values: [
       BigNumberish,
       BigNumberish,
-      NounsDAOStorageV3.DynamicQuorumParamsStruct
+      NounsDAOStorageV3.DynamicQuorumParamsStruct,
     ]
   ): string;
   encodeFunctionData(
@@ -592,7 +592,7 @@ export interface NounsGovernorInterface extends Interface {
       AddressLike,
       AddressLike,
       NounsDAOStorageV3.NounsDAOParamsStruct,
-      NounsDAOStorageV3.DynamicQuorumParamsStruct
+      NounsDAOStorageV3.DynamicQuorumParamsStruct,
     ]
   ): string;
   encodeFunctionData(
@@ -668,7 +668,7 @@ export interface NounsGovernorInterface extends Interface {
       BigNumberish[],
       string[],
       BytesLike[],
-      string
+      string,
     ]
   ): string;
   encodeFunctionData(
@@ -707,7 +707,7 @@ export interface NounsGovernorInterface extends Interface {
       string[],
       BytesLike[],
       string,
-      string
+      string,
     ]
   ): string;
   encodeFunctionData(
@@ -720,7 +720,7 @@ export interface NounsGovernorInterface extends Interface {
       string[],
       BytesLike[],
       string,
-      string
+      string,
     ]
   ): string;
   encodeFunctionData(
@@ -735,7 +735,7 @@ export interface NounsGovernorInterface extends Interface {
       BigNumberish[],
       string[],
       BytesLike[],
-      string
+      string,
     ]
   ): string;
   encodeFunctionData(functionFragment: "veto", values: [BigNumberish]): string;
@@ -1087,11 +1087,11 @@ export namespace DAOWithdrawNounsFromEscrowEvent {
 export namespace ERC20TokensToIncludeInForkSetEvent {
   export type InputTuple = [
     oldErc20Tokens: AddressLike[],
-    newErc20tokens: AddressLike[]
+    newErc20tokens: AddressLike[],
   ];
   export type OutputTuple = [
     oldErc20Tokens: string[],
-    newErc20tokens: string[]
+    newErc20tokens: string[],
   ];
   export interface OutputObject {
     oldErc20Tokens: string[];
@@ -1109,14 +1109,14 @@ export namespace EscrowedToForkEvent {
     owner: AddressLike,
     tokenIds: BigNumberish[],
     proposalIds: BigNumberish[],
-    reason: string
+    reason: string,
   ];
   export type OutputTuple = [
     forkId: bigint,
     owner: string,
     tokenIds: bigint[],
     proposalIds: bigint[],
-    reason: string
+    reason: string,
   ];
   export interface OutputObject {
     forkId: bigint;
@@ -1137,14 +1137,14 @@ export namespace ExecuteForkEvent {
     forkTreasury: AddressLike,
     forkToken: AddressLike,
     forkEndTimestamp: BigNumberish,
-    tokensInEscrow: BigNumberish
+    tokensInEscrow: BigNumberish,
   ];
   export type OutputTuple = [
     forkId: bigint,
     forkTreasury: string,
     forkToken: string,
     forkEndTimestamp: bigint,
-    tokensInEscrow: bigint
+    tokensInEscrow: bigint,
   ];
   export interface OutputObject {
     forkId: bigint;
@@ -1162,11 +1162,11 @@ export namespace ExecuteForkEvent {
 export namespace ForkDAODeployerSetEvent {
   export type InputTuple = [
     oldForkDAODeployer: AddressLike,
-    newForkDAODeployer: AddressLike
+    newForkDAODeployer: AddressLike,
   ];
   export type OutputTuple = [
     oldForkDAODeployer: string,
-    newForkDAODeployer: string
+    newForkDAODeployer: string,
   ];
   export interface OutputObject {
     oldForkDAODeployer: string;
@@ -1181,7 +1181,7 @@ export namespace ForkDAODeployerSetEvent {
 export namespace ForkPeriodSetEvent {
   export type InputTuple = [
     oldForkPeriod: BigNumberish,
-    newForkPeriod: BigNumberish
+    newForkPeriod: BigNumberish,
   ];
   export type OutputTuple = [oldForkPeriod: bigint, newForkPeriod: bigint];
   export interface OutputObject {
@@ -1197,11 +1197,11 @@ export namespace ForkPeriodSetEvent {
 export namespace ForkThresholdSetEvent {
   export type InputTuple = [
     oldForkThreshold: BigNumberish,
-    newForkThreshold: BigNumberish
+    newForkThreshold: BigNumberish,
   ];
   export type OutputTuple = [
     oldForkThreshold: bigint,
-    newForkThreshold: bigint
+    newForkThreshold: bigint,
   ];
   export interface OutputObject {
     oldForkThreshold: bigint;
@@ -1219,14 +1219,14 @@ export namespace JoinForkEvent {
     owner: AddressLike,
     tokenIds: BigNumberish[],
     proposalIds: BigNumberish[],
-    reason: string
+    reason: string,
   ];
   export type OutputTuple = [
     forkId: bigint,
     owner: string,
     tokenIds: bigint[],
     proposalIds: bigint[],
-    reason: string
+    reason: string,
   ];
   export interface OutputObject {
     forkId: bigint;
@@ -1244,11 +1244,11 @@ export namespace JoinForkEvent {
 export namespace LastMinuteWindowSetEvent {
   export type InputTuple = [
     oldLastMinuteWindowInBlocks: BigNumberish,
-    newLastMinuteWindowInBlocks: BigNumberish
+    newLastMinuteWindowInBlocks: BigNumberish,
   ];
   export type OutputTuple = [
     oldLastMinuteWindowInBlocks: bigint,
-    newLastMinuteWindowInBlocks: bigint
+    newLastMinuteWindowInBlocks: bigint,
   ];
   export interface OutputObject {
     oldLastMinuteWindowInBlocks: bigint;
@@ -1263,11 +1263,11 @@ export namespace LastMinuteWindowSetEvent {
 export namespace MaxQuorumVotesBPSSetEvent {
   export type InputTuple = [
     oldMaxQuorumVotesBPS: BigNumberish,
-    newMaxQuorumVotesBPS: BigNumberish
+    newMaxQuorumVotesBPS: BigNumberish,
   ];
   export type OutputTuple = [
     oldMaxQuorumVotesBPS: bigint,
-    newMaxQuorumVotesBPS: bigint
+    newMaxQuorumVotesBPS: bigint,
   ];
   export interface OutputObject {
     oldMaxQuorumVotesBPS: bigint;
@@ -1282,11 +1282,11 @@ export namespace MaxQuorumVotesBPSSetEvent {
 export namespace MinQuorumVotesBPSSetEvent {
   export type InputTuple = [
     oldMinQuorumVotesBPS: BigNumberish,
-    newMinQuorumVotesBPS: BigNumberish
+    newMinQuorumVotesBPS: BigNumberish,
   ];
   export type OutputTuple = [
     oldMinQuorumVotesBPS: bigint,
-    newMinQuorumVotesBPS: bigint
+    newMinQuorumVotesBPS: bigint,
   ];
   export interface OutputObject {
     oldMinQuorumVotesBPS: bigint;
@@ -1314,11 +1314,11 @@ export namespace NewAdminEvent {
 export namespace NewImplementationEvent {
   export type InputTuple = [
     oldImplementation: AddressLike,
-    newImplementation: AddressLike
+    newImplementation: AddressLike,
   ];
   export type OutputTuple = [
     oldImplementation: string,
-    newImplementation: string
+    newImplementation: string,
   ];
   export interface OutputObject {
     oldImplementation: string;
@@ -1333,7 +1333,7 @@ export namespace NewImplementationEvent {
 export namespace NewPendingAdminEvent {
   export type InputTuple = [
     oldPendingAdmin: AddressLike,
-    newPendingAdmin: AddressLike
+    newPendingAdmin: AddressLike,
   ];
   export type OutputTuple = [oldPendingAdmin: string, newPendingAdmin: string];
   export interface OutputObject {
@@ -1349,11 +1349,11 @@ export namespace NewPendingAdminEvent {
 export namespace NewPendingVetoerEvent {
   export type InputTuple = [
     oldPendingVetoer: AddressLike,
-    newPendingVetoer: AddressLike
+    newPendingVetoer: AddressLike,
   ];
   export type OutputTuple = [
     oldPendingVetoer: string,
-    newPendingVetoer: string
+    newPendingVetoer: string,
   ];
   export interface OutputObject {
     oldPendingVetoer: string;
@@ -1381,11 +1381,11 @@ export namespace NewVetoerEvent {
 export namespace ObjectionPeriodDurationSetEvent {
   export type InputTuple = [
     oldObjectionPeriodDurationInBlocks: BigNumberish,
-    newObjectionPeriodDurationInBlocks: BigNumberish
+    newObjectionPeriodDurationInBlocks: BigNumberish,
   ];
   export type OutputTuple = [
     oldObjectionPeriodDurationInBlocks: bigint,
-    newObjectionPeriodDurationInBlocks: bigint
+    newObjectionPeriodDurationInBlocks: bigint,
   ];
   export interface OutputObject {
     oldObjectionPeriodDurationInBlocks: bigint;
@@ -1419,7 +1419,7 @@ export namespace ProposalCreatedEvent {
     calldatas: BytesLike[],
     startBlock: BigNumberish,
     endBlock: BigNumberish,
-    description: string
+    description: string,
   ];
   export type OutputTuple = [
     id: bigint,
@@ -1430,7 +1430,7 @@ export namespace ProposalCreatedEvent {
     calldatas: string[],
     startBlock: bigint,
     endBlock: bigint,
-    description: string
+    description: string,
   ];
   export interface OutputObject {
     id: bigint;
@@ -1475,7 +1475,7 @@ export namespace ProposalCreatedWithRequirements_uint256_address_address_array_a
     updatePeriodEndBlock: BigNumberish,
     proposalThreshold: BigNumberish,
     quorumVotes: BigNumberish,
-    description: string
+    description: string,
   ];
   export type OutputTuple = [
     id: bigint,
@@ -1490,7 +1490,7 @@ export namespace ProposalCreatedWithRequirements_uint256_address_address_array_a
     updatePeriodEndBlock: bigint,
     proposalThreshold: bigint,
     quorumVotes: bigint,
-    description: string
+    description: string,
   ];
   export interface OutputObject {
     id: bigint;
@@ -1525,7 +1525,7 @@ export namespace ProposalCreatedWithRequirements_uint256_address_address_array_u
     endBlock: BigNumberish,
     proposalThreshold: BigNumberish,
     quorumVotes: BigNumberish,
-    description: string
+    description: string,
   ];
   export type OutputTuple = [
     id: bigint,
@@ -1538,7 +1538,7 @@ export namespace ProposalCreatedWithRequirements_uint256_address_address_array_u
     endBlock: bigint,
     proposalThreshold: bigint,
     quorumVotes: bigint,
-    description: string
+    description: string,
   ];
   export interface OutputObject {
     id: bigint;
@@ -1564,13 +1564,13 @@ export namespace ProposalDescriptionUpdatedEvent {
     id: BigNumberish,
     proposer: AddressLike,
     description: string,
-    updateMessage: string
+    updateMessage: string,
   ];
   export type OutputTuple = [
     id: bigint,
     proposer: string,
     description: string,
-    updateMessage: string
+    updateMessage: string,
   ];
   export interface OutputObject {
     id: bigint;
@@ -1599,7 +1599,7 @@ export namespace ProposalExecutedEvent {
 export namespace ProposalObjectionPeriodSetEvent {
   export type InputTuple = [
     id: BigNumberish,
-    objectionPeriodEndBlock: BigNumberish
+    objectionPeriodEndBlock: BigNumberish,
   ];
   export type OutputTuple = [id: bigint, objectionPeriodEndBlock: bigint];
   export interface OutputObject {
@@ -1628,11 +1628,11 @@ export namespace ProposalQueuedEvent {
 export namespace ProposalThresholdBPSSetEvent {
   export type InputTuple = [
     oldProposalThresholdBPS: BigNumberish,
-    newProposalThresholdBPS: BigNumberish
+    newProposalThresholdBPS: BigNumberish,
   ];
   export type OutputTuple = [
     oldProposalThresholdBPS: bigint,
-    newProposalThresholdBPS: bigint
+    newProposalThresholdBPS: bigint,
   ];
   export interface OutputObject {
     oldProposalThresholdBPS: bigint;
@@ -1652,7 +1652,7 @@ export namespace ProposalTransactionsUpdatedEvent {
     values: BigNumberish[],
     signatures: string[],
     calldatas: BytesLike[],
-    updateMessage: string
+    updateMessage: string,
   ];
   export type OutputTuple = [
     id: bigint,
@@ -1661,7 +1661,7 @@ export namespace ProposalTransactionsUpdatedEvent {
     values: bigint[],
     signatures: string[],
     calldatas: string[],
-    updateMessage: string
+    updateMessage: string,
   ];
   export interface OutputObject {
     id: bigint;
@@ -1681,11 +1681,11 @@ export namespace ProposalTransactionsUpdatedEvent {
 export namespace ProposalUpdatablePeriodSetEvent {
   export type InputTuple = [
     oldProposalUpdatablePeriodInBlocks: BigNumberish,
-    newProposalUpdatablePeriodInBlocks: BigNumberish
+    newProposalUpdatablePeriodInBlocks: BigNumberish,
   ];
   export type OutputTuple = [
     oldProposalUpdatablePeriodInBlocks: bigint,
-    newProposalUpdatablePeriodInBlocks: bigint
+    newProposalUpdatablePeriodInBlocks: bigint,
   ];
   export interface OutputObject {
     oldProposalUpdatablePeriodInBlocks: bigint;
@@ -1706,7 +1706,7 @@ export namespace ProposalUpdatedEvent {
     signatures: string[],
     calldatas: BytesLike[],
     description: string,
-    updateMessage: string
+    updateMessage: string,
   ];
   export type OutputTuple = [
     id: bigint,
@@ -1716,7 +1716,7 @@ export namespace ProposalUpdatedEvent {
     signatures: string[],
     calldatas: string[],
     description: string,
-    updateMessage: string
+    updateMessage: string,
   ];
   export interface OutputObject {
     id: bigint;
@@ -1749,11 +1749,11 @@ export namespace ProposalVetoedEvent {
 export namespace QuorumCoefficientSetEvent {
   export type InputTuple = [
     oldQuorumCoefficient: BigNumberish,
-    newQuorumCoefficient: BigNumberish
+    newQuorumCoefficient: BigNumberish,
   ];
   export type OutputTuple = [
     oldQuorumCoefficient: bigint,
-    newQuorumCoefficient: bigint
+    newQuorumCoefficient: bigint,
   ];
   export interface OutputObject {
     oldQuorumCoefficient: bigint;
@@ -1768,11 +1768,11 @@ export namespace QuorumCoefficientSetEvent {
 export namespace QuorumVotesBPSSetEvent {
   export type InputTuple = [
     oldQuorumVotesBPS: BigNumberish,
-    newQuorumVotesBPS: BigNumberish
+    newQuorumVotesBPS: BigNumberish,
   ];
   export type OutputTuple = [
     oldQuorumVotesBPS: bigint,
-    newQuorumVotesBPS: bigint
+    newQuorumVotesBPS: bigint,
   ];
   export interface OutputObject {
     oldQuorumVotesBPS: bigint;
@@ -1788,12 +1788,12 @@ export namespace RefundableVoteEvent {
   export type InputTuple = [
     voter: AddressLike,
     refundAmount: BigNumberish,
-    refundSent: boolean
+    refundSent: boolean,
   ];
   export type OutputTuple = [
     voter: string,
     refundAmount: bigint,
-    refundSent: boolean
+    refundSent: boolean,
   ];
   export interface OutputObject {
     voter: string;
@@ -1823,12 +1823,12 @@ export namespace TimelocksAndAdminSetEvent {
   export type InputTuple = [
     timelock: AddressLike,
     timelockV1: AddressLike,
-    admin: AddressLike
+    admin: AddressLike,
   ];
   export type OutputTuple = [
     timelock: string,
     timelockV1: string,
-    admin: string
+    admin: string,
   ];
   export interface OutputObject {
     timelock: string;
@@ -1847,14 +1847,14 @@ export namespace VoteCastEvent {
     proposalId: BigNumberish,
     support: BigNumberish,
     votes: BigNumberish,
-    reason: string
+    reason: string,
   ];
   export type OutputTuple = [
     voter: string,
     proposalId: bigint,
     support: bigint,
     votes: bigint,
-    reason: string
+    reason: string,
   ];
   export interface OutputObject {
     voter: string;
@@ -1872,11 +1872,11 @@ export namespace VoteCastEvent {
 export namespace VoteSnapshotBlockSwitchProposalIdSetEvent {
   export type InputTuple = [
     oldVoteSnapshotBlockSwitchProposalId: BigNumberish,
-    newVoteSnapshotBlockSwitchProposalId: BigNumberish
+    newVoteSnapshotBlockSwitchProposalId: BigNumberish,
   ];
   export type OutputTuple = [
     oldVoteSnapshotBlockSwitchProposalId: bigint,
-    newVoteSnapshotBlockSwitchProposalId: bigint
+    newVoteSnapshotBlockSwitchProposalId: bigint,
   ];
   export interface OutputObject {
     oldVoteSnapshotBlockSwitchProposalId: bigint;
@@ -1891,7 +1891,7 @@ export namespace VoteSnapshotBlockSwitchProposalIdSetEvent {
 export namespace VotingDelaySetEvent {
   export type InputTuple = [
     oldVotingDelay: BigNumberish,
-    newVotingDelay: BigNumberish
+    newVotingDelay: BigNumberish,
   ];
   export type OutputTuple = [oldVotingDelay: bigint, newVotingDelay: bigint];
   export interface OutputObject {
@@ -1907,7 +1907,7 @@ export namespace VotingDelaySetEvent {
 export namespace VotingPeriodSetEvent {
   export type InputTuple = [
     oldVotingPeriod: BigNumberish,
-    newVotingPeriod: BigNumberish
+    newVotingPeriod: BigNumberish,
   ];
   export type OutputTuple = [oldVotingPeriod: bigint, newVotingPeriod: bigint];
   export interface OutputObject {
@@ -1937,7 +1937,7 @@ export namespace WithdrawFromForkEscrowEvent {
   export type InputTuple = [
     forkId: BigNumberish,
     owner: AddressLike,
-    tokenIds: BigNumberish[]
+    tokenIds: BigNumberish[],
   ];
   export type OutputTuple = [forkId: bigint, owner: string, tokenIds: bigint[]];
   export interface OutputObject {
@@ -2016,7 +2016,7 @@ export interface NounsGovernor extends BaseContract {
     [
       newMinQuorumVotesBPS: BigNumberish,
       newMaxQuorumVotesBPS: BigNumberish,
-      newQuorumCoefficient: BigNumberish
+      newQuorumCoefficient: BigNumberish,
     ],
     [void],
     "nonpayable"
@@ -2046,7 +2046,7 @@ export interface NounsGovernor extends BaseContract {
       forkDAODeployer_: AddressLike,
       erc20TokensToIncludeInFork_: AddressLike[],
       forkPeriod_: BigNumberish,
-      forkThresholdBPS_: BigNumberish
+      forkThresholdBPS_: BigNumberish,
     ],
     [void],
     "nonpayable"
@@ -2122,7 +2122,7 @@ export interface NounsGovernor extends BaseContract {
     [
       newTimelock: AddressLike,
       newTimelockV1: AddressLike,
-      newAdmin: AddressLike
+      newAdmin: AddressLike,
     ],
     [void],
     "nonpayable"
@@ -2178,7 +2178,7 @@ export interface NounsGovernor extends BaseContract {
       support: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -2194,7 +2194,7 @@ export interface NounsGovernor extends BaseContract {
     [
       againstVotes: BigNumberish,
       totalSupply: BigNumberish,
-      params: NounsDAOStorageV3.DynamicQuorumParamsStruct
+      params: NounsDAOStorageV3.DynamicQuorumParamsStruct,
     ],
     [bigint],
     "view"
@@ -2246,7 +2246,7 @@ export interface NounsGovernor extends BaseContract {
         values: bigint[];
         signatures: string[];
         calldatas: string[];
-      }
+      },
     ],
     "view"
   >;
@@ -2271,7 +2271,7 @@ export interface NounsGovernor extends BaseContract {
       forkDAODeployer_: AddressLike,
       vetoer_: AddressLike,
       daoParams_: NounsDAOStorageV3.NounsDAOParamsStruct,
-      dynamicQuorumParams_: NounsDAOStorageV3.DynamicQuorumParamsStruct
+      dynamicQuorumParams_: NounsDAOStorageV3.DynamicQuorumParamsStruct,
     ],
     [void],
     "nonpayable"
@@ -2331,7 +2331,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      description: string
+      description: string,
     ],
     [bigint],
     "nonpayable"
@@ -2344,7 +2344,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      description: string
+      description: string,
     ],
     [bigint],
     "nonpayable"
@@ -2356,7 +2356,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      description: string
+      description: string,
     ],
     [bigint],
     "nonpayable"
@@ -2398,7 +2398,7 @@ export interface NounsGovernor extends BaseContract {
       signatures: string[],
       calldatas: BytesLike[],
       description: string,
-      updateMessage: string
+      updateMessage: string,
     ],
     [void],
     "nonpayable"
@@ -2413,7 +2413,7 @@ export interface NounsGovernor extends BaseContract {
       signatures: string[],
       calldatas: BytesLike[],
       description: string,
-      updateMessage: string
+      updateMessage: string,
     ],
     [void],
     "nonpayable"
@@ -2432,7 +2432,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      updateMessage: string
+      updateMessage: string,
     ],
     [void],
     "nonpayable"
@@ -2497,7 +2497,7 @@ export interface NounsGovernor extends BaseContract {
     [
       newMinQuorumVotesBPS: BigNumberish,
       newMaxQuorumVotesBPS: BigNumberish,
-      newQuorumCoefficient: BigNumberish
+      newQuorumCoefficient: BigNumberish,
     ],
     [void],
     "nonpayable"
@@ -2523,7 +2523,7 @@ export interface NounsGovernor extends BaseContract {
       forkDAODeployer_: AddressLike,
       erc20TokensToIncludeInFork_: AddressLike[],
       forkPeriod_: BigNumberish,
-      forkThresholdBPS_: BigNumberish
+      forkThresholdBPS_: BigNumberish,
     ],
     [void],
     "nonpayable"
@@ -2599,7 +2599,7 @@ export interface NounsGovernor extends BaseContract {
     [
       newTimelock: AddressLike,
       newTimelockV1: AddressLike,
-      newAdmin: AddressLike
+      newAdmin: AddressLike,
     ],
     [void],
     "nonpayable"
@@ -2654,7 +2654,7 @@ export interface NounsGovernor extends BaseContract {
       support: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike
+      s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -2672,7 +2672,7 @@ export interface NounsGovernor extends BaseContract {
     [
       againstVotes: BigNumberish,
       totalSupply: BigNumberish,
-      params: NounsDAOStorageV3.DynamicQuorumParamsStruct
+      params: NounsDAOStorageV3.DynamicQuorumParamsStruct,
     ],
     [bigint],
     "view"
@@ -2726,7 +2726,7 @@ export interface NounsGovernor extends BaseContract {
         values: bigint[];
         signatures: string[];
         calldatas: string[];
-      }
+      },
     ],
     "view"
   >;
@@ -2754,7 +2754,7 @@ export interface NounsGovernor extends BaseContract {
       forkDAODeployer_: AddressLike,
       vetoer_: AddressLike,
       daoParams_: NounsDAOStorageV3.NounsDAOParamsStruct,
-      dynamicQuorumParams_: NounsDAOStorageV3.DynamicQuorumParamsStruct
+      dynamicQuorumParams_: NounsDAOStorageV3.DynamicQuorumParamsStruct,
     ],
     [void],
     "nonpayable"
@@ -2827,7 +2827,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      description: string
+      description: string,
     ],
     [bigint],
     "nonpayable"
@@ -2841,7 +2841,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      description: string
+      description: string,
     ],
     [bigint],
     "nonpayable"
@@ -2854,7 +2854,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      description: string
+      description: string,
     ],
     [bigint],
     "nonpayable"
@@ -2901,7 +2901,7 @@ export interface NounsGovernor extends BaseContract {
       signatures: string[],
       calldatas: BytesLike[],
       description: string,
-      updateMessage: string
+      updateMessage: string,
     ],
     [void],
     "nonpayable"
@@ -2917,7 +2917,7 @@ export interface NounsGovernor extends BaseContract {
       signatures: string[],
       calldatas: BytesLike[],
       description: string,
-      updateMessage: string
+      updateMessage: string,
     ],
     [void],
     "nonpayable"
@@ -2938,7 +2938,7 @@ export interface NounsGovernor extends BaseContract {
       values: BigNumberish[],
       signatures: string[],
       calldatas: BytesLike[],
-      updateMessage: string
+      updateMessage: string,
     ],
     [void],
     "nonpayable"
