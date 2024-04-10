@@ -170,6 +170,8 @@ const useAdvancedVoting = ({
      * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
      * - The user could also not execute the first tx and leave it for later. How are we informing this in the UI?
      * - The user could also not execute the second tx and leave it for later. How are we informing this in the UI?
+     * - Sometimes the tx does not execute instantly because the user has some other SAFE txs in the queue and these
+     *   have to be executed first.
      *
      * Remember that if waitForTransaction fails it means the txHash does not exist and therefore the SAFE transaction
      * failed, probably due to a nonce error
