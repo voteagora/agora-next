@@ -13,7 +13,7 @@ import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
 } from "@/app/api/common/utils/validators";
-import { setCurrentSpanAttributes } from "@/app/lib/logging";
+import { addBaggage, addSpanAttributes } from "@/app/lib/logging";
 
 const DEFAULT_SORT = "most_delegators";
 const DEFAULT_MAX_LIMIT = 100;
@@ -37,11 +37,13 @@ const offsetValidator = createOptionalNumberValidator(
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
-  setCurrentSpanAttributes({ user_id: authResponse.userId });
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.reason, { status: 401 });
   }
+  
+  addSpanAttributes({ user_id: authResponse.userId });
+  addBaggage({ user_id: authResponse.userId as string });
 
   const params = request.nextUrl.searchParams;
   try {
