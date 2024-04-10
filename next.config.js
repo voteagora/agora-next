@@ -11,21 +11,21 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/delegate/:addressOrENSName',
-        destination: '/delegates/:addressOrENSName',
+        source: "/delegate/:addressOrENSName",
+        destination: "/delegates/:addressOrENSName",
         permanent: true,
       },
       {
-        source: '/api/v1/proposals/:proposalId',
-        destination: '/404',
+        source: "/api/v1/proposals/:proposalId",
+        destination: "/404",
         permanent: true,
       },
       {
-        source: '/api/v1/proposals',
-        destination: '/404',
+        source: "/api/v1/proposals",
+        destination: "/404",
         permanent: true,
       },
-    ]
+    ];
   },
   async headers() {
     return [
@@ -75,7 +75,7 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"]
+    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
   },
 };
 
