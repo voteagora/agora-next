@@ -34,7 +34,10 @@ export const time_this = async <T>(
   }
 };
 
-export const time_this_sync = <T>(fn: () => T, log_fields: Record<string, any>) => {
+export const time_this_sync = <T>(
+  fn: () => T,
+  log_fields: Record<string, any>
+) => {
   const start = performance.now();
   try {
     return fn();
@@ -55,29 +58,36 @@ export const time_this_sync = <T>(fn: () => T, log_fields: Record<string, any>) 
   Adds baggage to active context.
   OTel contexts are immutable; as such, we create a new context with the added baggage.
 */
-export const addBaggage = (baggage: Record<string, string> | undefined): otel.Context | null => {
+export const addBaggage = (
+  baggage: Record<string, string> | undefined
+): otel.Context | null => {
   let ctxt: otel.Context | null = null;
   if (baggage) {
-    let baggage = otel.propagation.getBaggage(otel.context.active()) || otel.propagation.createBaggage();
+    let baggage =
+      otel.propagation.getBaggage(otel.context.active()) ||
+      otel.propagation.createBaggage();
     Object.entries(baggage).forEach(([key, value]) => {
-      baggage = baggage.setEntry(key, {value: value});
+      baggage = baggage.setEntry(key, { value: value });
     });
     ctxt = otel.propagation.setBaggage(otel.context.active(), baggage);
   }
   return ctxt;
-}
+};
 
 /*
   Adds span attributes to the supplied span, or the active span if none is supplied.
   No-op if there is no span supplied or if there is not an active span.
 */
-export const addSpanAttributes = (span_attrs: Record<string, any>, span: otel.Span | null = null) => {
+export const addSpanAttributes = (
+  span_attrs: Record<string, any>,
+  span: otel.Span | null = null
+) => {
   const chosenSpan = span || otel.trace.getActiveSpan();
   if (chosenSpan) {
     chosenSpan.setAttributes(span_attrs);
     otel.trace.setSpan(otel.context.active(), chosenSpan);
   }
-}
+};
 
 /*
   Runs supplied function within a span specified by the metadata.
@@ -101,40 +111,41 @@ export const doInSpan = <T>(
   }
 
   const newCtxt = addBaggage(metadata.additionalBaggage);
-  
-  const startAndRunInSpan = () => selectedTracer.startActiveSpan(name, (span) => {
-    const handleSuccess = (response: T) => {
-      span.setStatus({ code: otel.SpanStatusCode.OK });
-      span.end();
-      return response;
-    };
 
-    const catchError = (error: otel.Exception) => {
-      span.recordException(error);
-      span.setStatus({ code: otel.SpanStatusCode.ERROR });
-      span.setAttribute(SEMATTRS_EXCEPTION_ESCAPED, true);
-      span.end();
-      throw error;
-    };
+  const startAndRunInSpan = () =>
+    selectedTracer.startActiveSpan(name, (span) => {
+      const handleSuccess = (response: T) => {
+        span.setStatus({ code: otel.SpanStatusCode.OK });
+        span.end();
+        return response;
+      };
 
-    // unpack baggage and add to span attributes 
-    const baggage = otel.propagation.getBaggage(otel.context.active());
-    if (baggage) {
-      baggage.getAllEntries().forEach(([key, bag]) => {
-        span.setAttribute(key, bag.value);
-      });
-    }
+      const catchError = (error: otel.Exception) => {
+        span.recordException(error);
+        span.setStatus({ code: otel.SpanStatusCode.ERROR });
+        span.setAttribute(SEMATTRS_EXCEPTION_ESCAPED, true);
+        span.end();
+        throw error;
+      };
 
-    try {
-      const response = fn();
-      if (response instanceof Promise) {
-        return response.then(handleSuccess, catchError);
+      // unpack baggage and add to span attributes
+      const baggage = otel.propagation.getBaggage(otel.context.active());
+      if (baggage) {
+        baggage.getAllEntries().forEach(([key, bag]) => {
+          span.setAttribute(key, bag.value);
+        });
       }
-      return handleSuccess(response);
-    } catch (error) {
-      catchError(error as otel.Exception);
-    }
-  });
+
+      try {
+        const response = fn();
+        if (response instanceof Promise) {
+          return response.then(handleSuccess, catchError);
+        }
+        return handleSuccess(response);
+      } catch (error) {
+        catchError(error as otel.Exception);
+      }
+    });
 
   if (newCtxt) {
     return otel.context.with(newCtxt, startAndRunInSpan);

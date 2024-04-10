@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
   if (!authResponse.authenticated) {
     return new Response(authResponse.reason, { status: 401 });
   }
-  
+
   addSpanAttributes({ user_id: authResponse.userId });
   addBaggage({ user_id: authResponse.userId as string });
 

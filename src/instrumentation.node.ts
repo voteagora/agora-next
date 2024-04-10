@@ -1,12 +1,8 @@
 import { NodeSDK } from "@opentelemetry/sdk-node";
-import {
-  SimpleSpanProcessor,
-} from "@opentelemetry/sdk-trace-node";
+import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
-import {
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { Resource } from "@opentelemetry/resources";
 import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 
@@ -21,10 +17,6 @@ const sdk = new NodeSDK({
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),
   }),
-  spanProcessors: [
-    new SimpleSpanProcessor(
-      new OTLPTraceExporter()
-    )
-  ],
+  spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
 });
 sdk.start();

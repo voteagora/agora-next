@@ -16,7 +16,7 @@ export const getDelegateStatement = (addressOrENSName: string) => {
     },
     () => getDelegateStatementForAddress({ address: addressOrENSName })
   );
-}
+};
 
 /*
   Gets delegate statement from Postgres, or DynamoDB if not found
