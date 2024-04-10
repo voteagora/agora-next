@@ -15,6 +15,7 @@ export default function DAOMetricsHeader({ metrics }) {
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  const governanceForumLink = ui.link("governanceForum");
   const bugsLink = ui.link("bugs");
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
@@ -45,7 +46,7 @@ export default function DAOMetricsHeader({ metrics }) {
               )}
             >
               <div
-                className="w-full sm:w-2/3 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10"
+                className="w-full sm:w-3/5 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10"
                 onClick={() => setVisible(!visible)}
               >
                 <div className="flex gap-6 sm:gap-8">
@@ -65,24 +66,38 @@ export default function DAOMetricsHeader({ metrics }) {
                 />
               </div>
               <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+              <div className="w-full sm:w-2/5 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+                {governanceForumLink && (
+                  <a
+                    href={governanceForumLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                    className="text-center"
+                  >
+                    {governanceForumLink.title}
+                  </a>
+                )}
                 {bugsLink && (
                   <a
                     href={bugsLink.url}
                     rel="noreferrer nonopener"
                     target="_blank"
+                    className="text-center"
                   >
                     {bugsLink.title}
                   </a>
                 )}
                 {changeLogLink && (
-                  <Link href={changeLogLink.url}>{changeLogLink.title}</Link>
+                  <Link href={changeLogLink.url} className="text-center">
+                    {changeLogLink.title}
+                  </Link>
                 )}
                 {faqLink && (
                   <a
                     href={faqLink.url}
                     rel="noreferrer nonopener"
                     target="_blank"
+                    className="text-center"
                   >
                     {faqLink.title}
                   </a>

@@ -32,7 +32,7 @@ export declare namespace IProposalTypesConfigurator {
   export type ProposalTypeStructOutput = [
     quorum: bigint,
     approvalThreshold: bigint,
-    name: string
+    name: string,
   ] & { quorum: bigint; approvalThreshold: bigint; name: string };
 }
 
@@ -81,13 +81,13 @@ export namespace ProposalTypeSetEvent {
     proposalTypeId: BigNumberish,
     quorum: BigNumberish,
     approvalThreshold: BigNumberish,
-    name: string
+    name: string,
   ];
   export type OutputTuple = [
     proposalTypeId: bigint,
     quorum: bigint,
     approvalThreshold: bigint,
-    name: string
+    name: string,
   ];
   export interface OutputObject {
     proposalTypeId: bigint;
@@ -159,7 +159,7 @@ export interface ProposalTypesConfigurator extends BaseContract {
       proposalTypeId: BigNumberish,
       quorum: BigNumberish,
       approvalThreshold: BigNumberish,
-      name: string
+      name: string,
     ],
     [void],
     "nonpayable"
@@ -189,7 +189,7 @@ export interface ProposalTypesConfigurator extends BaseContract {
       proposalTypeId: BigNumberish,
       quorum: BigNumberish,
       approvalThreshold: BigNumberish,
-      name: string
+      name: string,
     ],
     [void],
     "nonpayable"
