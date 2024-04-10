@@ -187,7 +187,7 @@ export async function fetchAndSetAll<
   Fetchers extends [() => Promise<any>, ...Array<() => Promise<any>>],
   Setters extends {
     [K in keyof Fetchers]: (value: Awaited<ReturnType<Fetchers[K]>>) => void;
-  }
+  },
 >(fetchers: Fetchers, setters: Setters) {
   const values = await Promise.all(fetchers.map((fetcher) => fetcher()));
   values.forEach((value, index) => setters[index](value));
