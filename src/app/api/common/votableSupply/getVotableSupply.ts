@@ -7,7 +7,8 @@ async function getVotableSupply() {
   const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
 
   if (!votableSupply) {
-    return "0";
+    // TODO: Remove this once the data is in the DB
+    return "100000";
     // throw new Error("No votable supply found");
   }
   return votableSupply.votable_supply;

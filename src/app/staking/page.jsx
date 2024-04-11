@@ -1,12 +1,26 @@
-import { HStack } from "@/components/Layout/Stack";
+import { StakeButton } from "@/app/staking/components/StakeButton";
+import { StakedBalance } from "@/app/staking/components/StakedBalance";
+import { UnstakedBalance } from "@/app/staking/components/UnstakedBalance";
+import Hero from "@/components/Hero/Hero";
 import React from "react";
 
-// TODO: OG PReviews
-
 export default async function Page() {
+
   return (
-    <HStack justifyContent="justify-between" className="mt-12">
-      <div>Staking</div>
-    </HStack>
+    <section>
+      <Hero />
+
+      {/*<div>*/}
+      {/*  <UnstakedBalance />*/}
+      {/*</div>*/}
+
+      {/*<div>*/}
+      {/*  <StakedBalance />*/}
+      {/*</div>*/}
+      <div>
+        <StakeButton />
+      </div>
+
+    </section>
   );
 }

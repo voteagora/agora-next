@@ -1,5 +1,5 @@
 import {
-  OptimismGovernor__factory, UniStaker__factory, UniToken__factory,
+  OptimismGovernor__factory, UniswapStaker__factory, UniswapToken__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -22,17 +22,17 @@ export const uniswapTenantContractConfig = (
 
   return {
     token: new TenantContract<ITokenContract>({
-      abi: UniToken__factory.abi,
+      abi: UniswapToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: UniToken__factory.connect(TOKEN, provider),
+      contract: UniswapToken__factory.connect(TOKEN, provider),
     }),
 
     staker: new TenantContract<IStaker>({
-      abi: UniStaker__factory.connect(STAKING, provider),
+      abi: UniswapStaker__factory.connect(STAKING, provider),
       address: STAKING,
       chain,
-      contract: UniStaker__factory.connect(STAKING, provider),
+      contract: UniswapStaker__factory.connect(STAKING, provider),
     }),
 
 
