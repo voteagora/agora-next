@@ -24,12 +24,11 @@ const useConnectedDelegate = () => {
     enabled: !!address,
     queryKey: ["useConnectedDelegate", address, refetchDelegate, retries],
     queryFn: async () => {
-      const [delegate, advancedDelegators, balance] =
-        await Promise.all([
-          api.get(`/delegates/${address}`),
-          api.get(`/delegates/${address}/delegation-chains`),
-          contracts.token.contract.balanceOf(address as `0x${string}`),
-        ]);
+      const [delegate, advancedDelegators, balance] = await Promise.all([
+        api.get(`/delegates/${address}`),
+        api.get(`/delegates/${address}/delegation-chains`),
+        contracts.token.contract.balanceOf(address as `0x${string}`),
+      ]);
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate.address);
       }
@@ -37,7 +36,9 @@ const useConnectedDelegate = () => {
 
       // If refetchDelegate?.votingPower we are looking for a revalidation on the page of the delegatee
       if (refetchDelegate?.prevVotingPowerDelegatee) {
-        const delegatee = await api.get(`/delegates/${address}`);
+        const delegatee = await api.get(
+          `/delegates/${refetchDelegate.address}`
+        );
         /**
          * Materialized view that brings the new voting power takes one minute to sync
          * Refetch delegate will be set to null by the delegateProfileImage
@@ -69,15 +70,15 @@ const useConnectedDelegate = () => {
 
   return data.data
     ? {
-      ...data.data,
-      isLoading: data.isLoading,
-    }
+        ...data.data,
+        isLoading: data.isLoading,
+      }
     : {
-      balance: null,
-      delegate: null,
-      advancedDelegators: null,
-      isLoading: data.isLoading,
-    };
+        balance: null,
+        delegate: null,
+        advancedDelegators: null,
+        isLoading: data.isLoading,
+      };
 };
 
 export default useConnectedDelegate;

@@ -1,11 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { fetchAllDelegatorsInChains, } from "@/app/api/common/delegations/getDelegations";
+import { fetchAllDelegatorsInChains } from "@/app/api/common/delegations/getDelegations";
 import { authenticateApiUser } from "@/app/lib/middleware/auth";
-import { setCurrentSpanAttributes } from "@/app/lib/logging";
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
-  setCurrentSpanAttributes({ user_id: authResponse.userId });
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.reason, { status: 401 });
