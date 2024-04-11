@@ -1,14 +1,14 @@
 import { MissingVote } from "@/lib/voteUtils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
 import { optimism } from "viem/chains";
 import Tenant from "@/lib/tenant/tenant";
+import { waitForTransaction } from "wagmi/actions";
 
 const useAdvancedVoting = ({
   proposalId,
   support,
-  standardVP,
   advancedVP,
   authorityChains,
   reason = "",
@@ -17,69 +17,103 @@ const useAdvancedVoting = ({
 }: {
   proposalId: string;
   support: number;
-  standardVP: bigint;
   advancedVP: bigint;
   authorityChains: string[][];
   reason?: string;
   params?: `0x${string}`;
   missingVote: MissingVote;
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const { contracts } = Tenant.current();
-  const {
-    write: advancedVote,
-    isLoading: advancedVoteIsLoading,
-    isError: advancedVoteIsError,
-    isSuccess: advancedVoteIsSuccess,
-    data: advancedVoteData,
-  } = useContractWrite({
-    address: contracts.alligator!.address as `0x${string}`,
-    abi: contracts.alligator!.abi,
-    functionName: "limitedCastVoteWithReasonAndParamsBatched",
-    args: [
-      advancedVP,
-      authorityChains as any,
-      BigInt(proposalId),
-      support,
-      reason,
-      params ?? "0x",
-    ],
-    chainId: optimism.id,
-  });
+  const { writeAsync: advancedVote, isError: _advancedVoteError } =
+    useContractWrite({
+      address: contracts.alligator!.address as `0x${string}`,
+      abi: contracts.alligator!.abi,
+      functionName: "limitedCastVoteWithReasonAndParamsBatched",
+      args: [
+        advancedVP,
+        authorityChains as any,
+        BigInt(proposalId),
+        support,
+        reason,
+        params ?? "0x",
+      ],
+      chainId: optimism.id,
+    });
 
-  const {
-    write: standardVote,
-    isLoading: standardVoteIsLoading,
-    isError: standardVoteIsError,
-    isSuccess: standardVoteIsSuccess,
-    data: standardVoteData,
-  } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: reason
-      ? params
-        ? "castVoteWithReasonAndParams"
-        : "castVoteWithReason"
-      : params
-        ? "castVoteWithReasonAndParams"
-        : "castVote",
-    args: reason
-      ? params
-        ? [BigInt(proposalId), support, reason, params]
-        : [BigInt(proposalId), support, reason]
-      : params
-        ? [BigInt(proposalId), support, reason, params]
-        : ([BigInt(proposalId), support] as any),
-    chainId: optimism.id,
-  });
+  const { writeAsync: standardVote, isError: _standardVoteError } =
+    useContractWrite({
+      address: contracts.governor.address as `0x${string}`,
+      abi: contracts.governor.abi,
+      functionName: reason
+        ? params
+          ? "castVoteWithReasonAndParams"
+          : "castVoteWithReason"
+        : params
+          ? "castVoteWithReasonAndParams"
+          : "castVote",
+      args: reason
+        ? params
+          ? [BigInt(proposalId), support, reason, params]
+          : [BigInt(proposalId), support, reason]
+        : params
+          ? [BigInt(proposalId), support, reason, params]
+          : ([BigInt(proposalId), support] as any),
+      chainId: optimism.id,
+    });
+  const [standardVoteError, setStandardVoteError] =
+    useState(_standardVoteError);
+  const [advancedVoteError, setAdvancedVoteError] =
+    useState(_advancedVoteError);
+  const [standardVoteLoading, setStandardVoteLoading] = useState(false);
+  const [advancedVoteLoading, setAdvancedVoteLoading] = useState(false);
+  const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
+  const [advancedVoteSuccess, setAdvancedVoteSuccess] = useState(false);
+  const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
+    undefined
+  );
+  const [advancedTxHash, setAdvancedTxHash] = useState<string | undefined>(
+    undefined
+  );
 
   const write = useCallback(() => {
-    const vote = async () => {
-      setIsError(false);
-      setIsSuccess(false);
+    const _standardVote = async () => {
+      setStandardVoteLoading(true);
+      const directTx = await standardVote();
+      try {
+        const { status } = await waitForTransaction({
+          hash: directTx.hash,
+        });
+        if (status === "success") {
+          setStandardTxHash(directTx.hash);
+          setStandardVoteSuccess(true);
+        }
+      } catch (error) {
+        console.error(error);
+        setStandardVoteError(true);
+      } finally {
+        setStandardVoteLoading(false);
+      }
+    };
 
+    const _advancedVote = async () => {
+      setAdvancedVoteLoading(true);
+      const advancedTx = await advancedVote();
+      try {
+        const { status } = await waitForTransaction({
+          hash: advancedTx.hash,
+        });
+        if (status === "success") {
+          setAdvancedTxHash(advancedTx.hash);
+          setAdvancedVoteSuccess(true);
+        }
+      } catch (error) {
+        console.error(error);
+        setAdvancedVoteError(true);
+      } finally {
+        setAdvancedVoteLoading(false);
+      }
+    };
+    const vote = async () => {
       const trackingData: any = {
         dao_slug: "OP",
         proposal_id: BigInt(proposalId),
@@ -97,64 +131,65 @@ const useAdvancedVoting = ({
       switch (missingVote) {
         case "DIRECT":
           track("Standard Vote", trackingData);
-          standardVote();
+          await _standardVote();
           break;
+
         case "ADVANCED":
           track("Advanced Vote", trackingData);
-          advancedVote();
+          await _advancedVote();
           break;
+
         case "BOTH":
           track("Standard + Advanced Vote", trackingData);
-          standardVote();
-          advancedVote();
+          await _standardVote();
+          await _advancedVote();
           break;
       }
     };
 
     vote();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [standardVote, advancedVote, missingVote]);
-
-  useEffect(() => {
-    if (advancedVoteIsLoading || standardVoteIsLoading) {
-      setIsLoading(true);
-    }
-    if (advancedVoteIsError || standardVoteIsError) {
-      setIsError(true);
-      setIsLoading(false);
-    }
-    switch (missingVote) {
-      case "BOTH":
-        if (advancedVoteIsSuccess && standardVoteIsSuccess) {
-          setIsSuccess(true);
-          setIsLoading(false);
-        }
-        break;
-      default:
-        if (advancedVoteIsSuccess || standardVoteIsSuccess) {
-          setIsSuccess(true);
-          setIsLoading(false);
-        }
-        break;
-    }
   }, [
-    advancedVoteIsLoading,
-    standardVoteIsLoading,
-    advancedVoteIsError,
-    standardVoteIsError,
-    advancedVoteIsSuccess,
-    standardVoteIsSuccess,
-    authorityChains,
-    standardVP,
+    standardVote,
+    advancedVote,
     missingVote,
+    params,
+    proposalId,
+    reason,
+    support,
   ]);
 
   return {
-    isLoading,
-    isError,
-    isSuccess,
+    isLoading:
+      missingVote === "DIRECT"
+        ? standardVoteLoading
+        : missingVote === "ADVANCED"
+          ? advancedVoteLoading
+          : standardVoteLoading && advancedVoteLoading,
+    /**
+     * TODO: frh -> what to do with the errors in SAFE:
+     * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
+     * - The user could also not execute the first tx and leave it for later. How are we informing this in the UI?
+     * - The user could also not execute the second tx and leave it for later. How are we informing this in the UI?
+     * - Sometimes the tx does not execute instantly because the user has some other SAFE txs in the queue and these
+     *   have to be executed first.
+     *
+     * Remember that if waitForTransaction fails it means the txHash does not exist and therefore the SAFE transaction
+     * failed, probably due to a nonce error
+     */
+    isError:
+      missingVote === "DIRECT"
+        ? standardVoteError
+        : missingVote === "ADVANCED"
+          ? advancedVoteError
+          : standardVoteError && advancedVoteError,
+    isSuccess:
+      missingVote === "DIRECT"
+        ? standardVoteSuccess
+        : missingVote === "ADVANCED"
+          ? advancedVoteSuccess
+          : standardVoteSuccess && advancedVoteSuccess,
     write,
-    data: { advancedVoteData, standardVoteData },
+    data: { advancedTxHash, standardTxHash },
   };
 };
 
