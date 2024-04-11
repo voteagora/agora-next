@@ -7,8 +7,16 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { DaoSlug } from "@prisma/client";
 
-export const getDelegateStatement = (addressOrENSName: string) =>
-  addressOrEnsNameWrap(getDelegateStatementForAddress, addressOrENSName);
+import { doInSpan } from "@/app/lib/logging";
+
+export const getDelegateStatement = (addressOrENSName: string) => {
+  return doInSpan(
+    {
+      name: "getDelegateStatement",
+    },
+    () => getDelegateStatementForAddress({ address: addressOrENSName })
+  );
+};
 
 /*
   Gets delegate statement from Postgres, or DynamoDB if not found
