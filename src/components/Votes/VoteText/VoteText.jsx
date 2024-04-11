@@ -6,8 +6,8 @@ export default function VoteText({ support }) {
     support === "FOR"
       ? "voted for"
       : support === "AGAINST"
-      ? "voted against"
-      : "abstained";
+        ? "voted against"
+        : "abstained";
 
   return <p className={className}>{supportText}</p>;
 }
