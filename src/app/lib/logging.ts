@@ -59,17 +59,19 @@ export const time_this_sync = <T>(
   OTel contexts are immutable; as such, we create a new context with the added baggage.
 */
 export const addBaggage = (
-  baggage: Record<string, string> | undefined
-): otel.Context | null => {
-  let ctxt: otel.Context | null = null;
-  if (baggage) {
+  baggageToAdd: Record<string, string> | undefined
+): otel.Context => {
+  let ctxt: otel.Context;
+  if (baggageToAdd) {
     let baggage =
       otel.propagation.getBaggage(otel.context.active()) ||
       otel.propagation.createBaggage();
-    Object.entries(baggage).forEach(([key, value]) => {
+    Object.entries(baggageToAdd).forEach(([key, value]) => {
       baggage = baggage.setEntry(key, { value: value });
     });
     ctxt = otel.propagation.setBaggage(otel.context.active(), baggage);
+  } else {
+    ctxt = otel.context.active();
   }
   return ctxt;
 };
