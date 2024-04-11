@@ -11,7 +11,8 @@
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json",
     "typecheck": "tsc --pretty --noEmit",
     "generate-apikey": "ts-node src/scripts/generateApiKey.ts",
-    "check-prettier": "prettier --check src/"
+    "check-prettier": "prettier --check src/",
+    "prettier-src": "prettier -w src/"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
