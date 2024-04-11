@@ -1,14 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
-export const StakeButton = async () => {
+
+interface StakeButtonProps {
+  address: string;
+  amount: number;
+}
+
+export const StakeButton = ({ address, amount }: StakeButtonProps) => {
 
   const { contracts, token } = Tenant.current();
 
-  const { address } = useAccount();
   const { config } = usePrepareContractWrite({
     address: contracts?.staker?.address as `0x${string}`,
     abi: [
@@ -35,10 +40,16 @@ export const StakeButton = async () => {
     ],
     chainId: contracts?.staker?.chain.id,
     functionName: "stake",
-    args: [BigInt(1), address as `0x${string}`],
+    args: [BigInt(amount), address as `0x${string}`],
   });
+
 
   const { write, status } = useContractWrite(config);
 
-  return <Button onClick={() => { if (write) write(); }}>Stake 10 UNI</Button>;
+  return <Button className="w-full" onClick={() => {
+    if (write) write();
+  }}>Continue</Button>;
 };
+
+
+

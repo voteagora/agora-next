@@ -1,6 +1,4 @@
-import { StakeButton } from "@/app/staking/components/StakeButton";
-import { StakedBalance } from "@/app/staking/components/StakedBalance";
-import { UnstakedBalance } from "@/app/staking/components/UnstakedBalance";
+import { StakeDialog } from "@/app/staking/components/StakeDialog";
 import Hero from "@/components/Hero/Hero";
 import React from "react";
 
@@ -10,16 +8,8 @@ export default async function Page() {
     <section>
       <Hero />
 
-      {/*<div>*/}
-      {/*  <UnstakedBalance />*/}
-      {/*</div>*/}
+      <StakeDialog />
 
-      {/*<div>*/}
-      {/*  <StakedBalance />*/}
-      {/*</div>*/}
-      <div>
-        <StakeButton />
-      </div>
 
     </section>
   );
