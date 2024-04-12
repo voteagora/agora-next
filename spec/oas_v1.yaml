@@ -1,0 +1,1044 @@
+openapi: 3.1.0
+info:
+  title: Agora API
+  description: Public API for interacting with the Agora platform
+  version: 0.1.0-beta
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: vote.optimisim.io/api/v1
+    description: Base URL for optimism production
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  schemas:
+    PageMetadata:
+      summary: Pagination metadata
+      description: Metadata associated with paginated requests.
+      type: object
+      properties:
+        hasNext:
+          summary: Flag indicating if there's more data for retieval
+          description: A boolean flag indicating if there is additional data past the returned page to retrieve.
+          type: boolean
+        totalReturned:
+          summary: Total records returned
+          description: A number indicating the total amount of records returned for the request.
+          type: integer
+          format: int32
+        nextOffset: 
+          summary: Offset to supply to the next request
+          description: A number indicating the offset at which a subsequent request may retrieve the next set of records.
+          type: integer
+          format: int32
+    Delegation:
+      summary: A delegation of voting power
+      description: A delegation of voting power from one address to another.
+      type: object
+      properties:
+        delegatorAddress: 
+          summary: Delegator address
+          description: Address of the delegator.
+          type: string 
+          examples:
+          - summary: Address of the delegator.
+            value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        delegateeAddress: 
+          summary: Delegatee address
+          description: Address of the delegatee.
+          type: string 
+          examples:
+          - summary: Address of the delegatee.
+            value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        totalAllowance:
+          summary: Voting allowance for delegate
+          description: Total amount of voting power delegated to or from address. 
+          type: string
+          examples:
+          - summary: Amount of voting power delegated to or from address.
+            value: "100000"
+        delegatedOn:
+          summary: When delegation occured
+          description: The datetime on which the delegation of voting power occurred. 
+          type: string
+          format: date-time
+          examples:
+          - summary: The datetime on which the delegation of voting power occurred.
+        type:
+          summary: Type of delegation
+          description: The type of delegation; can be advanced or standard.
+          type: string
+          enum:
+            - advanced
+            - standard
+        amount:
+          summary: Amount delegated
+          description: The amount of voting power delegated; can be full or partial.
+          type: string
+          enum:
+            - full
+            - partial
+    BaseDelegate:
+      summary: A voting delegate
+      description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded. 
+      type: object
+      properties:
+        address:
+          summary: Delegate address
+          description: Address of the delegate.
+          type: string
+          examples: 
+            - summary: Address of the delegate.
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        votingPower:
+          summary: Delegate's available voting power
+          description: An object providing a breakdown of a delegate's overall voting power between direct, advanced, and total.
+          type: object
+          properties:
+            advanced:
+              description: Advanced voting power.
+              type: string
+              examples:
+                - summary: Advanced voting power.
+                  value: "10000"
+            direct:
+              description: Direct voting power.
+              type: string
+              examples:
+                - summary: Direct voting power
+                  value: "20000"
+            total:
+              description: Total voting power.
+              type: string
+              examples:
+                - summary: Total voting power
+                  value: "30000"
+        isCitizen:
+          description: A boolean flag indicating whether or not this delegate is an Agora citizen.
+          type: boolean
+        twitter:
+          description: Optional twitter handle for a particular delegate.
+          type: string
+          examples:
+            - summary: Twitter handle
+              value: "@flip_liquide"
+        statement:
+          description: A statement from the delegate describing their voting positions.
+          type: string
+          examples:
+            - summary: Delegate statement
+              value: "hello! I am a great delegate for reasons xyz"
+        topIssues:
+          description: The most important issues for a given delegate.
+          type: array
+          items: 
+              $ref: '#/components/schemas/Issue'
+    Issue:
+      summary: Description of a governance issue
+      description: An object describing a particular view on a particular governance issue.
+      type: object
+      properties:
+        type: 
+          type: string
+          examples: 
+            - "Funding"
+        value:
+          type: string
+          examples: 
+            - "Grant funding should be directed to projects with a great track record"
+    SnapshotProposalData:
+      summary: Data associated with a snapshot proposal
+      description: >
+        Metadata and data associated with a snapshot proposal, including start/end/created times, scores, and votes. 
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        title:
+          summary: Title of the proposal
+          type: string
+        startTimestamp:
+          summary: Start time of the proposal
+          type: string
+          format: date-time
+        endTimestamp:
+          summary: End time of the proposal
+          type: string
+          format: date-time
+        createdTimestamp:
+          summary: Creation time of the proposal
+          type: string
+          format: date-time
+        link:
+          summary: Link to the proposal
+          type: string
+        scores: 
+          summary: Scores for the proposal
+          type: array
+          items:
+            type: string 
+        votes:
+          summary: Votes for the proposal
+          type: string
+        state: 
+          summary: State of the proposal
+          type: string
+          enum: 
+            - ACTIVE
+            - CLOSED
+            - PENDING
+    StandardProposalData: 
+      summary: Data associated with standard proposal 
+      description: >
+        Metadata and data associated with a standard proposal, including onchain execution data.
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        options:
+          type: array 
+          items:
+            type: object 
+            properties:
+              executionData:
+                $ref: "#/components/schemas/ExecutionData"
+    ApprovalProposalData:
+      summary: Data associated with an approval proposal
+      description: >
+        Metadata and data associated with an approval proposal, including onchain execution data.
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        options: 
+          type: array 
+          items:
+            type: object 
+            properties:
+              executionData:
+                $ref: "#/components/schemas/ExecutionData"
+              budgetTokensSpent:
+                summary: Budget tokens spent
+                type: string
+              description:
+                summary: Description of the proposal
+                type: string
+        proposalSettings:
+          type: object 
+          properties:
+            maxApprovals: 
+              summary: Maximum approvals for the proposal
+              type: string
+            criteria:
+              summary: Criteria for the proposal
+              type: string
+              enum:
+                - THRESHOLD
+                - TOP_CHOICES
+            budgetToken: 
+              summary: Budget token for the proposal
+              type: string
+            criteriaValue:
+              summary: Criteria value for the proposal
+              type: string
+            budgetAmount:
+              summary: Budget amount for the proposal
+              type: string
+    OptimisticProposalData:
+      summary: Data associated with an optimistic proposal
+      description: >
+        Metadata and data associated with an optimistic proposal, including onchain execution data.
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        executionData:
+          $ref: "#/components/schemas/ExecutionData"
+        description:
+          summary: Description of the proposal
+          type: string
+    ExecutionData:
+      summary: Structured exceution data for proposal
+      description: >
+        Provides the values, targets, calldata, and functions for proposal execution.
+      type: object 
+      properties:
+        values:
+          summary: Values for execution
+          type: array 
+          items:
+            type: string
+        targets:
+          summary: Targets for execution
+          type: array 
+          items:
+            type: string
+        calldata:
+          summary: Calldata for execution
+          type: array 
+          items:
+            type: string
+        functionData:
+          summary: Functions for execution
+          type: array 
+          items:
+            type: object 
+            properties:
+              functionName:
+                summary: Function name
+                type: string
+              data:
+                summary: Data for function
+                type: array 
+                items:
+                  type: string 
+    Proposal: 
+      summary: A specific governance proposal for voting
+      description: >
+        An object describing the specifics and metadata associated with a particular governance proposal,
+        including the specific measure, proposer, data, etc.
+      type: object
+      properites:
+        proposalId:
+          type: string
+        contractAddress:
+          summary: Governor contract address
+          description: Governor contract address to which this proposal was submitted.
+          type: string
+        proposerAddress:
+          summary: Proposer's address
+          description: The address which submitted the proposal for voting.
+          type: string
+        description:
+          summary: Description of the voting measure
+          description: Extended information and context around the proposal.
+          type: string
+        ordinal:
+          summary: Number of this proposal's order
+          description: > 
+            Numeric descriptor of this proposal's ordering among others; Calculated as the concatentation
+            of the proposal's block number left-padded by 10 0's, transaction index left-padded by 3 0's, 
+            and log index left-padded by 3 0's.
+          type: string
+        createBlock:
+          summary: Proposal creation block number
+          description: Block number on which this proposal was created.
+          type: string
+        startBlock:
+          summary: Starting block number
+          description: Block number at which this proposal is open for voting.
+          type: string
+        endBlock:
+          summary: Ending block number
+          description: Block number at which the proposal has closed for voting.
+          type: string
+        cancelledBlock: 
+          summary: Cancelled block number 
+          description: Block number at which this proposal has been canceled. Zero if not canceled.
+          type: string
+        executedBlock:
+          summary: Execution block number 
+          description: Block number at which this proposal has been executed. Zero if not executed.
+          type: string
+        proposalData:
+          oneOf: 
+            - $ref: "#/components/schemas/SnapshotProposalData"
+            - $ref: "#/components/schemas/StandardProposalData"
+            - $ref: "#/components/schemas/ApprovalProposalData"
+            - $ref: "#/components/schemas/OptimisticProposalData"
+          discriminator:
+            propertyName: votingStrategy
+        proposalTemplate:
+          $ref: "#/components/schemas/ProposalTemplate"
+    ProposalTemplate:  
+      summary: Metadata about the proposal
+      description: > 
+        An object describing the particular voting parameters of a proposal.
+      type: object 
+      properties:
+        name: 
+          summary: Name of proposal template 
+          description: Name of proposal template 
+          type: string
+        proposalTemplateId:
+          summary: Numeric id of the proposal template
+          description: Numeric id of the proposal template 
+          type: integer
+        votingStrategy:
+          $ref: "#/components/schemas/VotingStrategy" 
+        # Note: quorum and threshold are strings since I'm not sure about the unit/size here 
+        # (i.e. if they can be contained in an int32/int64 type)
+        quorum:
+          summary: Minimmum participation for passage
+          description: >
+            The minimum number of voting power needed to be involved in a given proposal as a prerequisite for passage
+          type: string 
+        approvalThreshold:
+          summary: Amount needed for measure to pass 
+          description: The amount of voting power needed to pass the given proposal.
+          type: string
+        contractAddress:
+          summary: Governor contract address
+          description: Governor contract address to which this proposal was submitted.
+          type: string
+        createBlock:
+          summary: Proposal creation block number
+          description: Block number on which this proposal template was created.
+          type: string
+    VotingStrategy: 
+      summary: The voting strategy for a proposal
+      description: Enum description of the proposal's voting strategy.
+      type: string
+      enum: 
+        - STANDARD
+        - ADVANCED
+        - OPTIMISTIC
+        - SNAPSHOT
+    VoteSupport:
+      summary: Disposition of the vote
+      description: Describes which way the vote was cast (i.e. for/against/abstention)
+      type: string
+      enum: 
+        - FOR 
+        - AGAINST
+        - ABSTAIN
+    Vote:
+      summary: Information about a given vote
+      description: Information and metadata about a specific vote on a governance proposal.
+      type: object
+      properties:
+        transactionId:
+          summary: Transaction ID of the vote
+          description: The transaction ID of the transaction in which the vote was cast.
+          type: string
+        proposalId: 
+          summary: Proposal ID for the vote
+          description: The unique ID of the proposal on which the vote was cast.
+          type: string
+        voterAddress:
+          summary: Address casting the vote
+          description: On-chain address of the EOA or contract which cast the vote.
+          type: string
+        support:
+          $ref: "#/components/schemas/VoteSupport"
+        weight:
+          summary: Voting power behind the vote
+          description: Numeric description of the weight and voting power behind the vote.
+          type: string
+        castBlock:
+          summary: Block in which the vote was cast
+          description: The block number in which the transaction for the cast is contained.
+          type: string 
+        description:
+          summary: Rationale for the vote
+          description: A voter-supplied reason for voting the particular way they did.
+          type: string
+        approvalParams:
+          summary: Array of items to submit for approval 
+          description: An array of items to submit for approval for multiple choice votes.
+          type: array
+          items:
+            type: string
+    Contract:
+      summary: Information about a deployed contract
+      description: Metadata about a specific smart contract deployed on chain.
+      type: object
+      properties:
+          address:
+            summary: Contract address
+            description: The address of the contract on chain.
+            type: string
+          deployer:
+            summary: Deployer address
+            description: The address of the entity which deployed the contract.
+            type: string
+          creationBlock:
+            summary: Block in which the contract was deployed
+            description: The block number in which the contract was deployed.
+            type: string
+          transactionId:
+            summary: Transaction ID of the deployment
+            description: The transaction ID of the transaction in which the contract was deployed.
+            type: string
+  parameters:
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 10
+    offsetParam:
+      name: offset
+      in: query
+      description: Offset from which start returned results.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    blockParam: 
+      # What is a reasonable default?
+      name: blockNumber
+      in: query
+      description: The block number in which requested resources are to be sought.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    supportParam:
+      name: support
+      in: query
+      schema: 
+        $ref: "#/components/schemas/VoteSupport"
+    proposalStatusParam:
+      name: status
+      in: query
+      schema:
+
+paths:
+  /spec:
+    get: 
+      summary: Gets this specification
+      description: Retrieves the full OAS/Swagger spec for the API in YAML.
+      operationId: getSpec
+      tags:
+        - spec
+      responses: 
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /delegates:
+    get:
+      summary: Gets a list of delegates.
+      description: >
+        Retrieves a list of voting delegates on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getDelegates
+      tags:
+        - delegates
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned delegates will be sorted.
+            Supported values are: 'most_delegators', 'weighted_random'
+          required: false
+          schema: 
+            type: string
+            enum: 
+              - most_delegators
+              - weighted_random
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BaseDelegate'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /delegates/{addressOrEnsName}:
+    get:
+      summary: Gets a specific delegate.
+      description: >
+        Retrieves a specific delegate on Agora by address or ENS name.
+      operationId: getDelegateByAddress
+      tags: 
+        - delegates
+      parameters:
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the delegate to retrieve
+          required: true
+          schema:
+            type: string
+          examples: 
+            address: 
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+              summary: Address of the delegate. 
+            ensName:
+              value: "flipliquid.eth"
+              summary: ENS name of the delegate.
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BaseDelegate'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /delegates/{addressOrEnsName}/votes:
+    get:
+      summary: Gets a paginated list of votes.
+      description: >
+        Retrieves a paginated list of votes for a specific proposal on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getDelegateVotes
+      tags:
+        - delegates 
+        - votes
+      parameters:
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the delegate to retrieve
+          required: true
+          schema:
+            type: string
+          examples: 
+            address: 
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+              summary: Address of the delegate. 
+            ensName:
+              value: "flipliquid.eth"
+              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned delegates will be sorted.
+            Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
+          required: false
+          schema: 
+            type: string
+            enum: 
+              - weight
+              - block
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vote'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /proposals:
+    get:
+      summary: Gets a list of proposals.
+      description: >
+        Retrieves a list of voting proposals on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProposals
+      tags:
+        - proposals
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned votes will be sorted.
+            Supported values are: 'status', 'term'
+          required: false
+          schema: 
+            type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  proposals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Proposal'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /proposals/{proposalId}:
+    get:
+      summary: Gets a specific proposal
+      description: >
+        Retrieves a specific voting proposal on Agora.
+      operationId: getProposalById
+      tags:
+        - proposals
+      parameters:
+        - name: proposalId
+          in: path
+          description: The proposal ID of the proposal to retrieve.
+          required: true
+          schema:
+            type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Proposal"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /proposals/{proposalId}/votes:
+    get:
+      summary: Gets a paginated list of votes.
+      description: >
+        Retrieves a paginated list of votes for a specific proposal on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProposalVotes
+      tags:
+        - proposals 
+        - votes
+      parameters:
+        - name: proposalId
+          in: path
+          description: The proposal ID of the proposal to retrieve.
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned delegates will be sorted.
+            Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
+          required: false
+          schema: 
+            type: string
+            enum: 
+              - weight
+              - block
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vote'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /delegatees/{addressOrEnsName}:
+    get:
+      summary: Gets delegatee (delegating from) information for an address
+      description: >
+        Retrieves a paginated list of the delegatees for a given address. That is, the delegates to which
+        the supplied address is delegating votes.
+      operationId: getDelegateesByAddress
+      tags: 
+        - delegates
+        - delegations
+      parameters:
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the delegate to retrieve
+          required: true
+          schema:
+            type: string
+          examples: 
+            address: 
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+              summary: Address of the delegate. 
+            ensName:
+              value: "flipliquid.eth"
+              summary: ENS name of the delegate.
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Delegation'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /delegators/{addressOrEnsName}:
+    get:
+      summary: Gets delegator (delegating to) information for an address
+      description: >
+        Retrieves a paginated list of the delegators for a given address. That is, the delegates from which
+        the supplied address is being delegated votes.
+      operationId: getDelegatorsByAddress
+      tags: 
+        - delegates
+        - delegations
+      parameters:
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the delegate to retrieve
+          required: true
+          schema:
+            type: string
+          examples: 
+            address: 
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+              summary: Address of the delegate. 
+            ensName:
+              value: "flipliquid.eth"
+              summary: ENS name of the delegate.
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Delegation'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /votes:
+    get:
+      summary: Gets a paginated list of votes.
+      description: >
+        Retrieves a paginated list of votes on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getVotes
+      tags:
+        - votes
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned delegates will be sorted.
+            Supported values are: 'most_delegators', 'weighted_random'
+          required: false
+          schema: 
+            type: string
+            enum: 
+              - most_delegators
+              - weighted_random
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vote'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /votes/{transactionId}:
+    get:
+      summary: Gets a specific vote.
+      description: >
+        Retrieves a specific vote on Agora.
+      operationId: getVoteByTransactionId
+      tags:
+        - votes
+      parameters:
+        - name: transactionId
+          in: path
+          description: >
+            The transactionId in which the vote was cast
+          required: true
+          schema: 
+            type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Vote'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /proposals/types:
+    get:
+      summary: Gets a paginated list of proposal types.
+      description: >
+        Retrieves a paginated list of proposal types on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProposalTypes
+      tags:
+        - proposals
+        - proposalTypes
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned delegates will be sorted.
+            Supported values are: 'most_delegators', 'weighted_random'
+          required: false
+          schema: 
+            type: string
+            enum: 
+              - most_delegators
+              - weighted_random
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProposalTemplate'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /contracts/governor:
+    get:
+      summary: Gets the governor contract address
+      description: >
+        Retrieves the address of the governor contract on chain.
+      operationId: getGovernorContract
+      tags:
+        - contracts
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Contract'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /contracts/alligator:
+    get:
+      summary: Gets the alligator contract address
+      description: >
+        Retrieves the address of the alligator contract on chain.
+      operationId: getAlligatorContract
+      tags:
+        - contracts
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Contract'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /contracts/votingToken:
+    get:
+      summary: Gets the voting token contract address
+      description: >
+        Retrieves the address of the voting token contract on chain.
+      operationId: getVotingTokenContract
+      tags:
+        - contracts
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Contract'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
