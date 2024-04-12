@@ -127,9 +127,6 @@ components:
           examples:
             - summary: Delegate statement
               value: "hello! I am a great delegate for reasons xyz"
-        openToSponsoringProposals:
-          description: A boolean flag indicating if this delegate is willing to act as a sponsor for new proposals.
-          type: boolean
         topIssues:
           description: The most important issues for a given delegate.
           type: array
@@ -457,7 +454,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  proposals:
                     type: array
                     items:
                       $ref: '#/components/schemas/Proposal'
