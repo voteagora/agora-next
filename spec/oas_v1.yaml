@@ -208,11 +208,6 @@ components:
             properties:
               executionData:
                 $ref: "#/components/schemas/ExecutionData"
-              signatures:
-                summary: Signatures for the proposal
-                type: array
-                items:
-                  type: string
     ApprovalProposalData:
       summary: Data associated with an approval proposal
       description: >
@@ -412,7 +407,7 @@ components:
       enum: 
         - FOR 
         - AGAINST
-        - ABSTENTION
+        - ABSTAIN
     Vote:
       summary: Information about a given vote
       description: Information and metadata about a specific vote on a governance proposal.
