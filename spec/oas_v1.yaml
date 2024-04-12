@@ -139,7 +139,6 @@ components:
           type: array
           items: 
               $ref: '#/components/schemas/Issue'
-    
     Issue:
       summary: Description of a governance issue
       description: An object describing a particular view on a particular governance issue.
@@ -153,24 +152,157 @@ components:
           type: string
           examples: 
             - "Grant funding should be directed to projects with a great track record"
+    SnapshotProposalData:
+      summary: Data associated with a snapshot proposal
+      description: >
+        Metadata and data associated with a snapshot proposal, including start/end/created times, scores, and votes. 
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        title:
+          summary: Title of the proposal
+          type: string
+        startTimestamp:
+          summary: Start time of the proposal
+          type: string
+          format: date-time
+        endTimestamp:
+          summary: End time of the proposal
+          type: string
+          format: date-time
+        createdTimestamp:
+          summary: Creation time of the proposal
+          type: string
+          format: date-time
+        link:
+          summary: Link to the proposal
+          type: string
+        scores: 
+          summary: Scores for the proposal
+          type: array
+          items:
+            type: string 
+        votes:
+          summary: Votes for the proposal
+          type: string
+        state: 
+          summary: State of the proposal
+          type: string
+          enum: 
+            - ACTIVE
+            - CLOSED
+            - PENDING
+    StandardProposalData: 
+      summary: Data associated with standard proposal 
+      description: >
+        Metadata and data associated with a standard proposal, including onchain execution data.
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        options:
+          type: array 
+          items:
+            type: object 
+            properties:
+              executionData:
+                $ref: "#/components/schemas/ExecutionData"
+              signatures:
+                summary: Signatures for the proposal
+                type: array
+                items:
+                  type: string
+    ApprovalProposalData:
+      summary: Data associated with an approval proposal
+      description: >
+        Metadata and data associated with an approval proposal, including onchain execution data.
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        options: 
+          type: array 
+          items:
+            type: object 
+            properties:
+              executionData:
+                $ref: "#/components/schemas/ExecutionData"
+              budgetTokensSpent:
+                summary: Budget tokens spent
+                type: string
+              description:
+                summary: Description of the proposal
+                type: string
+        proposalSettings:
+          type: object 
+          properties:
+            maxApprovals: 
+              summary: Maximum approvals for the proposal
+              type: string
+            criteria:
+              summary: Criteria for the proposal
+              type: string
+              enum:
+                - THRESHOLD
+                - TOP_CHOICES
+            budgetToken: 
+              summary: Budget token for the proposal
+              type: string
+            criteriaValue:
+              summary: Criteria value for the proposal
+              type: string
+            budgetAmount:
+              summary: Budget amount for the proposal
+              type: string
+    OptimisticProposalData:
+      summary: Data associated with an optimistic proposal
+      description: >
+        Metadata and data associated with an optimistic proposal, including onchain execution data.
+      type: object
+      properties:
+        votingStrategy: 
+          $ref: "#/components/schemas/VotingStrategy"
+        executionData:
+          $ref: "#/components/schemas/ExecutionData"
+        description:
+          summary: Description of the proposal
+          type: string
     ExecutionData:
       summary: Structured exceution data for proposal
       description: >
-        Provides the values, targets, calldata, and signatures provided for proposal execution.
-      type: object
+        Provides the values, targets, calldata, and functions for proposal execution.
+      type: object 
       properties:
         values:
           summary: Values for execution
-          type: string
+          type: array 
+          items:
+            type: string
         targets:
           summary: Targets for execution
-          type: string
+          type: array 
+          items:
+            type: string
         calldata:
           summary: Calldata for execution
-          type: string
-        signatures:
-          summary: Signatures for execution
-          type: string
+          type: array 
+          items:
+            type: string
+        functionData:
+          summary: Functions for execution
+          type: array 
+          items:
+            type: object 
+            properties:
+              functionName:
+                summary: Function name
+                type: string
+              data:
+                summary: Data for function
+                type: array 
+                items:
+                  type: string 
     Proposal: 
       summary: A specific governance proposal for voting
       description: >
@@ -220,25 +352,31 @@ components:
           description: Block number at which this proposal has been executed. Zero if not executed.
           type: string
         proposalData:
-          $ref: "#/components/schemas/ExecutionData"
-        proposalType:
-          $ref: "#/components/schemas/BaseProposalType"
-    BaseProposalType:  
-      # ADD standard, advanced, optimistic, snapshot enum
+          oneOf: 
+            - $ref: "#/components/schemas/SnapshotProposalData"
+            - $ref: "#/components/schemas/StandardProposalData"
+            - $ref: "#/components/schemas/ApprovalProposalData"
+            - $ref: "#/components/schemas/OptimisticProposalData"
+          discriminator:
+            propertyName: votingStrategy
+        proposalTemplate:
+          $ref: "#/components/schemas/ProposalTemplate"
+    ProposalTemplate:  
       summary: Metadata about the proposal
-      description: An object describing the particular voting parameters of a proposal.
+      description: > 
+        An object describing the particular voting parameters of a proposal.
       type: object 
       properties:
-        # How are optimistic and approval types modeled? is there separate logic other than the 
-        # config of the following parameters?
         name: 
-          summary: Name of proposal type
-          description: Name of proposal type
+          summary: Name of proposal template 
+          description: Name of proposal template 
           type: string
-        proposalTypeId:
-          summary: Numeric id of the proposal type
-          description: Numeric id of the proposal type
+        proposalTemplateId:
+          summary: Numeric id of the proposal template
+          description: Numeric id of the proposal template 
           type: integer
+        votingStrategy:
+          $ref: "#/components/schemas/VotingStrategy" 
         # Note: quorum and threshold are strings since I'm not sure about the unit/size here 
         # (i.e. if they can be contained in an int32/int64 type)
         quorum:
@@ -250,21 +388,23 @@ components:
           summary: Amount needed for measure to pass 
           description: The amount of voting power needed to pass the given proposal.
           type: string
-    ExtendedProposalType:
-      allOf:
-        - $ref: "#/components/schemas/BaseProposalType"
-        - summary: Metadata about the proposal
-          description: An object describing the particular voting parameters of a proposal.
-          type: object
-          properties:
-            contractAddress:
-              summary: Governor contract address
-              description: Governor contract address to which this proposal was submitted.
-              type: string
-            createBlock:
-              summary: Proposal creation block number
-              description: Block number on which this proposal type was created.
-              type: string
+        contractAddress:
+          summary: Governor contract address
+          description: Governor contract address to which this proposal was submitted.
+          type: string
+        createBlock:
+          summary: Proposal creation block number
+          description: Block number on which this proposal template was created.
+          type: string
+    VotingStrategy: 
+      summary: The voting strategy for a proposal
+      description: Enum description of the proposal's voting strategy.
+      type: string
+      enum: 
+        - STANDARD
+        - ADVANCED
+        - OPTIMISTIC
+        - SNAPSHOT
     VoteSupport:
       summary: Disposition of the vote
       description: Describes which way the vote was cast (i.e. for/against/abstention)
