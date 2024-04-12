@@ -444,9 +444,12 @@ components:
           summary: Rationale for the vote
           description: A voter-supplied reason for voting the particular way they did.
           type: string
-        # Clarify intent
         approvalParams:
-          $ref: "#/components/schemas/ExecutionData"
+          summary: Array of items to submit for approval 
+          description: An array of items to submit for approval for multiple choice votes.
+          type: array
+          items:
+            type: string
   parameters:
     limitParam:
       name: limit
