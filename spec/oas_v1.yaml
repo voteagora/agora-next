@@ -42,12 +42,19 @@ components:
       description: A delegation of voting power from one address to another.
       type: object
       properties:
-        address: 
-          summary: Delegate address
-          description: Address of the delegator or delegatee.
+        delegatorAddress: 
+          summary: Delegator address
+          description: Address of the delegator.
           type: string 
           examples:
-          - summary: Address of the delegator or delegatee.
+          - summary: Address of the delegator.
+            value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        delegateeAddress: 
+          summary: Delegatee address
+          description: Address of the delegatee.
+          type: string 
+          examples:
+          - summary: Address of the delegatee.
             value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
         totalAllowance:
           summary: Voting allowance for delegate
