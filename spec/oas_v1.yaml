@@ -741,7 +741,7 @@ paths:
           description: Internal Server Error
   /delegates:
     get:
-      summary: Gets a list of delegates.
+      summary: Gets a list of delegates
       description: >
         Retrieves a list of voting delegates on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -784,7 +784,7 @@ paths:
           description: Internal Server Error
   /delegates/{addressOrEnsName}:
     get:
-      summary: Gets a specific delegate.
+      summary: Gets a specific delegate
       description: >
         Retrieves a specific delegate on Agora by address or ENS name.
       operationId: getDelegateByAddress
@@ -821,7 +821,7 @@ paths:
           description: Internal Server Error
   /delegates/{addressOrEnsName}/votes:
     get:
-      summary: Gets a paginated list of votes.
+      summary: Gets a paginated list of votes for a delegate
       description: >
         Retrieves a paginated list of votes for a specific proposal on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -878,7 +878,7 @@ paths:
           description: Internal Server Error
   /proposals:
     get:
-      summary: Gets a list of proposals.
+      summary: Gets a list of proposals
       description: >
         Retrieves a list of voting proposals on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -946,7 +946,7 @@ paths:
           description: Internal Server Error
   /proposals/{proposalId}/votes:
     get:
-      summary: Gets a paginated list of votes.
+      summary: Gets a paginated list of votes for a proposal
       description: >
         Retrieves a paginated list of votes for a specific proposal on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -1074,7 +1074,7 @@ paths:
           description: Internal Server Error
   /votes:
     get:
-      summary: Gets a paginated list of votes.
+      summary: Gets a paginated list of votes
       description: >
         Retrieves a paginated list of votes on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -1117,7 +1117,7 @@ paths:
           description: Internal Server Error
   /votes/{transactionId}:
     get:
-      summary: Gets a specific vote.
+      summary: Gets a specific vote
       description: >
         Retrieves a specific vote on Agora.
       operationId: getVoteByTransactionId
@@ -1146,7 +1146,7 @@ paths:
           description: Internal Server Error
   /proposals/types:
     get:
-      summary: Gets a paginated list of proposal types.
+      summary: Gets a paginated list of proposal types
       description: >
         Retrieves a paginated list of proposal types on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
