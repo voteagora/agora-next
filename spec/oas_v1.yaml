@@ -1,7 +1,9 @@
 openapi: 3.1.0
 info:
   title: Agora API
-  description: Public API for interacting with the Agora platform
+  description: >
+    ## Public API for interacting with the Agora platform
+    ## Note: This API is in beta and subject to change
   version: 0.1.0-beta
   license:
     name: MIT
