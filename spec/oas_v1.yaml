@@ -1447,6 +1447,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
+      requestBody:
+        $ref: "#/components/schemas/RPGFBallotSubmission"
       responses: 
         '200':
           description: OK
