@@ -703,7 +703,7 @@ components:
       required: true
       schema:
         type: integer
-    addressOrEnsParam:
+    ballotIdParam:
       name: addressOrEnsName
       in: path
       description: The address or ENS name of the ballot to retrieve
@@ -1365,7 +1365,7 @@ paths:
         - RPGFBallots
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/addressOrEnsParam"
+        - $ref: "#/components/parameters/ballotIdParam"
       responses: 
         '200':
           description: OK
@@ -1390,7 +1390,7 @@ paths:
           - RPGFBallots
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/addressOrEnsParam"
+        - $ref: "#/components/parameters/ballotIdParam"
       responses: 
         '200':
           description: OK
@@ -1452,7 +1452,7 @@ paths:
         - projects
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/addressOrEnsParam"
+        - $ref: "#/components/parameters/ballotIdParam"
       responses: 
         '200':
           description: OK
@@ -1478,7 +1478,7 @@ paths:
         - projects
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/addressOrEnsParam"
+        - $ref: "#/components/parameters/ballotIdParam"
       requestBody:
         content:
           application/json:
@@ -1513,7 +1513,7 @@ paths:
         - projects
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/addressOrEnsParam"
+        - $ref: "#/components/parameters/ballotIdParam"
         - $ref: "#/components/parameters/projectIdParam"
       responses: 
         '200':
