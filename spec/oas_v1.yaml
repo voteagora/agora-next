@@ -1188,6 +1188,40 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
+  /projects:
+  # Should this be paginated? How many ballots per round are expected?
+    get:
+      summary: Gets a list of projects
+      description: >
+        Retrieves a list of projects on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProjects
+      tags:
+        - RPGF
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RPGFProject'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
   /contracts/governor:
     get:
       summary: Gets the governor contract address
