@@ -15,7 +15,7 @@ export const StakeButton = ({ address, amount }: StakeButtonProps) => {
   const { contracts, token } = Tenant.current();
 
   const { config } = usePrepareContractWrite({
-    address: contracts?.staker?.address as `0x${string}`,
+    address: contracts.staker!.address as `0x${string}`,
     abi: [
       {
         name: "stake",
