@@ -523,7 +523,7 @@ components:
           description: The timestamp at which the RPGF event occurred.
           type: string
           format: date-time
-    RGPFRound:
+    RPGFRound:
       summary: An RPGF round
       description: >
         A Retroactive Public Goods Funding round on Agora, including 
