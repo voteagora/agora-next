@@ -638,6 +638,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RPGFBallotVote"
+    RPGFBallotSubmission:
+      summary: Fields required for ballot submission
+      description: An object containing the information required to submit a ballot.
+      type: object
+      properties:
+        ballotId:
+          summary: Address or ENS of the ballot
+          type: string
+        ballotContent: 
+          summary: Signed content of the ballot
+          type: string
+        signature:
+          summary: Badgeholder signature
+          description: Signature of the badgeholder submitting the ballot.
+          type: string
   parameters:
     limitParam:
       name: limit
