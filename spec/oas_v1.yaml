@@ -456,6 +456,10 @@ components:
             summary: Contract address
             description: The address of the contract on chain.
             type: string
+          chainId:
+            summary: Chain ID of the contract
+            description: The chain ID on which the contract is deployed.
+            type: string
           deployer:
             summary: Deployer address
             description: The address of the entity which deployed the contract.
@@ -468,6 +472,117 @@ components:
             summary: Transaction ID of the deployment
             description: The transaction ID of the transaction in which the contract was deployed.
             type: string
+    RPGFRoundStatus:
+      summary: Status of an RPGF round
+      description: Enum description of the status of an RPGF round.
+      type: string
+      enum:
+        - PLANNED
+        - SCHEDULED
+        - APPLICATIONS_STARTED
+        - APPLICATIONS_REVIEW
+        - APPLICATIONS_LOCKED
+        - VOTING 
+        - BALLOT_COUNTING 
+        - RESULTS_ANNOUNCED
+        - FUNDS_DISTRIBUTION
+        - DONE 
+        - CANCELLED
+    RPGFRoundEvent:
+      summary: An event within an RPGF round
+      description: > 
+        An event within an RPGF round, including status and timestamp.
+        For example, a round may have events for the start of voting, application review, etc.
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/RPGFRoundStatus"
+        timestamp:
+          summary: Timestamp of the event
+          description: The timestamp at which the RPGF event occurred.
+          type: string
+          format: date-time
+    RGPFRound:
+      summary: An RPGF round
+      description: >
+        A Retroactive Public Goods Funding round on Agora, including 
+        information about the round, and all events within the round.
+      type: object
+      properties:
+        roundId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        externalLink:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/RPGFRoundEvent"
+    RPGFSubmitter:
+      summary: A submitter for an RPGF project
+      description: >
+        A submitter for an RPGF project, including information about the submitter.
+      type: object
+      properties:
+        address:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        externalLink:
+          type: string
+        avatarUrls:
+          type: array
+          items:
+            type: string
+    RPGFCategory:
+      summary: A category for an RPGF project
+      description: >
+        A category for an RPGF project, including information about the category.
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    RPGFProject:
+      summary: A project submitted for RPGF 
+      description: >
+        Information about a project submitted for Retroactive Public Goods Funding on Agora.
+      type: object 
+      properties: 
+        attestationUid:
+          type: string
+        approvalAttestationUid:
+          type: string
+        name: 
+          type: string
+        description:
+          type: string
+        externalLink:
+          type: string
+        avatarUrls:
+          type: array
+          items:
+            type: string
+        team: 
+          type: array
+          items:
+            $ref: "#/components/schemas/RPGFSubmitter"
+        repositories:
+          type: array
+          items:
+            type: string
+        deployedContracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contract"
+        categories: 
+          $ref: "#/components/schemas/RPGFCategory"
   parameters:
     limitParam:
       name: limit
