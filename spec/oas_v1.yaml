@@ -1403,7 +1403,7 @@ paths:
         '500':
           description: Internal Server Error    
   /rpgf/rounds/{roundId}/projects:
-  # Should this be paginated? How many ballots per round are expected?
+  # Should this be paginated? How many projects per round are expected?
     get:
       summary: Gets a list of projects for an RPGF round
       description: >
