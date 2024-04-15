@@ -583,6 +583,40 @@ components:
             $ref: "#/components/schemas/Contract"
         categories: 
           $ref: "#/components/schemas/RPGFCategory"
+    RPGFBallotVote:
+      summary: A vote for an RPGF ballot
+      description: >
+        A vote for an RPGF ballot, including information about the vote.
+      type: object
+      properties:
+        projectId:
+          type: integer
+        categoryId:
+          type: integer
+        allocation:
+          type: integer
+    RPGFBallot: 
+      summary: A ballot for an RPGF round
+      description: >
+        A ballot for an RPGF round, including information about the ballot.
+      type: object
+      properties:
+        ballotId:
+          type: integer
+        roundId:
+          type: integer
+        submitterAddress:
+          type: string
+        status:
+          type: string
+          enum:
+            - PENDING
+            - APPROVED
+            - REJECTED
+        votes: 
+          type: array
+          items:
+            $ref: "#/components/schemas/RPGFBallotVote"
   parameters:
     limitParam:
       name: limit
