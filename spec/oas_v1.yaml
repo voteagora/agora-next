@@ -447,6 +447,27 @@ components:
           type: array
           items:
             type: string
+    VotingToken:
+      allOf:
+      - $ref: '#/components/schemas/Contract'
+      - type: object
+        properties:
+          tokenName:
+            summary: Name of the voting token
+            description: The name of the voting token.
+            type: string
+          tokenSymbol:
+            summary: Symbol of the voting token
+            description: The symbol of the voting token.
+            type: string
+          totalSupply:
+            summary: Total supply of the voting token
+            description: The total supply of the voting token.
+            type: string
+          votableSupply:
+            summary: Votable supply of the voting token
+            description: The votable supply of the voting token.
+            type: string
     Contract:
       summary: Information about a deployed contract
       description: Metadata about a specific smart contract deployed on chain.
@@ -1186,7 +1207,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Contract'
+                $ref: '#/components/schemas/VotingToken'
         '400':
           description: Bad Request
         '401': 
