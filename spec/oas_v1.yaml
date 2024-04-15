@@ -1465,9 +1465,9 @@ paths:
         '500':
           description: Internal Server Error
     put: 
-      summary: Adds a project on a specific ballot
+      summary: Links a project to a specific ballot
       description: >
-        Adds a link from an existing project to a particular ballot.
+        Creates a link from an existing project to a particular ballot.
       tags:
         - RPGF
         - RPGFBallots
