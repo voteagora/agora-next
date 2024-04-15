@@ -695,6 +695,28 @@ components:
       name: status
       in: query
       schema:
+        type: string
+    roundIdParam:
+      name: roundId
+      in: path
+      description: The round ID of the RPGF round to retrieve.
+      required: true
+      schema:
+        type: integer
+    addressOrEnsParam:
+      name: addressOrEnsName
+      in: path
+      description: The address or ENS name of the ballot to retrieve
+      required: true
+      schema:
+        type: string
+    projectIdParam:
+      name: projectId 
+      in: path
+      description: The id of the project on the ballot
+      required: true
+      schema:
+        type: string
 
 paths:
   /spec:
