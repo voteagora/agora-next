@@ -653,6 +653,17 @@ components:
           summary: Badgeholder signature
           description: Signature of the badgeholder submitting the ballot.
           type: string
+    SIWEVerificationBody:
+      summary: Body of SIWE /verify request
+      description: >
+        Body SIWE verification requests containing message and signature per 
+        (EIP-4361)[https://eips.ethereum.org/EIPS/eip-4361]
+      type: object
+      properties:
+        message:
+          type: string
+        signature:
+          type: string
   parameters:
     limitParam:
       name: limit
