@@ -8,4 +8,17 @@ export interface IStaker extends BaseContract {
     [bigint],
     "view"
   >;
+
+  deposits: TypedContractMethod<
+    [depositId: BigNumberish],
+    [
+        [bigint, string, string, string] & {
+        balance: bigint;
+        owner: string;
+        delegatee: string;
+        beneficiary: string;
+      }
+    ],
+    "view"
+  >;
 }
