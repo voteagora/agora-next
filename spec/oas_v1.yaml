@@ -1285,3 +1285,248 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
+  /rpgf/rounds/{roundId}:
+    get:
+      summary: Gets a specific RPGF round
+      description: >
+        Retrieves a specific RPGF round on Agora.
+      operationId: getRPGFRoundById
+      tags:
+        - RPGF
+        - RPGFRounds
+      parameters:
+        - name: roundId
+          in: path
+          description: The round ID of the RPGF round to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RPGFRound"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /rpgf/rounds/{roundId}/ballots:
+  # Should this be paginated? How many ballots per round are expected?
+    get: 
+      summary: Gets a list of ballots for an RPGF round
+      description: >
+        Retrieves a list of ballots for a specific RPGF round on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getRPGFRoundBallots
+      tags:
+        - RPGF
+        - RPGFBallots
+      parameters:
+        - name: roundId
+          in: path
+          description: The round ID of the RPGF round to retrieve.
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RPGFBallot'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}:
+    get:
+      summary: Gets a specific ballot for an RPGF round
+      description: >
+        Retrieves a specific ballot for an RPGF round on Agora.
+      operationId: getRPGFRoundBallotById
+      tags:
+        - RPGF
+        - RPGFBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RPGFBallot"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}/submit:
+    post:
+      summary: Submits a particular ballot
+      description: Submits the content of a ballot to be counted as final for the round.
+      tags:
+          - RPGF
+          - RPGFBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RPGFBallotSubmission"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error    
+  /rpgf/rounds/{roundId}/projects:
+  # Should this be paginated? How many ballots per round are expected?
+    get:
+      summary: Gets a list of projects for an RPGF round
+      description: >
+        Retrieves a list of projects for a specific RPGF round on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getRPGFRoundProjects
+      tags:
+        - RPGF
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RPGFProject'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}/projects:
+    get:
+      summary: Gets projects for a specific RPGF ballot
+      description: >
+        Retrieves a list of projects under a specific ballot for an RPGF round on Agora.
+      operationId: getProjectsInRPGFBallot
+      tags:
+        - RPGF
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RPGFBallot"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put: 
+      summary: Adds a project on a specific ballot
+      description: >
+        Adds a link from an existing project to a particular ballot.
+      tags:
+        - RPGF
+        - RPGFBallots
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId:
+                  type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RPGFBallot"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}/projects/{projectId}:
+    delete: 
+      summary: Removes a project from ballot
+      description: >
+        Deletes a link from a project to a particular ballot
+      tags:
+        - RPGF
+        - RPGFBallots
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsParam"
+        - $ref: "#/components/parameters/projectIdParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RPGFBallot"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
