@@ -570,7 +570,7 @@ components:
           type: string
         description:
           type: string
-    RPGFProject:
+    Project:
       summary: A project submitted for RPGF 
       description: >
         Information about a project submitted for Retroactive Public Goods Funding on Agora.
@@ -590,20 +590,83 @@ components:
           type: array
           items:
             type: string
+        socialLinks:
+          $ref: "#/components/schemas/SocialLinks"
         team: 
           type: array
           items:
             $ref: "#/components/schemas/RPGFSubmitter"
         repositories:
+          summary: Repository URLs for the project
+          description: >
+            URLs for the project's repositories, such as GitHub, GitLab, NPM and other platforms.
           type: array
           items:
             type: string
         deployedContracts:
+          summary: Deployed contracts for the project
+          description: >
+            Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
           type: array
           items:
             $ref: "#/components/schemas/Contract"
         categories: 
           $ref: "#/components/schemas/RPGFCategory"
+        funding: 
+          type: object
+          properties:
+            ventureCapital:
+              $ref: "#/components/schemas/FundingInfo"
+            grants:
+              $ref: "#/components/schemas/FundingInfo"
+            optimismGrants:
+              allOf:
+                - $ref: "#/components/schemas/FundingInfo"
+                - type: object
+                  properties:
+                    link:
+                      type: string
+                    type: 
+                      "#/components/schemas/OptimismGrantType"
+    SocialLinks:
+      summary: Social media links for a project
+      description: >
+        Social media links for a project, including links to Twitter, Discord, and other platforms.
+      type: object
+      properties:
+        twitter:
+          type: string
+        farcaster:
+          type: string
+        mirror:
+          type: string
+        website:
+          type: string
+    OptimisimGrantType:
+      summary: Type of Optimism grant
+      description: Enum description of the type of Optimism grant.
+      type: string
+      enum:
+        - DEVELOPMENT
+        - RESEARCH
+        - COMMUNITY
+        - ECOSYSTEM
+        - OTHER
+    FundingInfo:
+      summary: Information about funding for a project
+      description: >
+        Information about funding for a project, including the amount and source.
+      type: object
+      properties:
+        amount:
+          type: string
+        source:
+          type: string
+        date: 
+          type: string
+          format: date-time
+        details:
+          type: string
     RPGFBallotVote:
       summary: A vote for an RPGF ballot
       description: >
@@ -1271,7 +1334,7 @@ paths:
                   delegates:
                     type: array
                     items:
-                      $ref: '#/components/schemas/RPGFProject'
+                      $ref: '#/components/schemas/Project'
         '400':
           description: Bad Request
         '401': 
@@ -1488,7 +1551,7 @@ paths:
                   delegates:
                     type: array
                     items:
-                      $ref: '#/components/schemas/RPGFProject'
+                      $ref: '#/components/schemas/Project'
         '400':
           description: Bad Request
         '401': 
