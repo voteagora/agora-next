@@ -542,18 +542,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RPGFRoundEvent"
-    RPGFSubmitter:
-      summary: A submitter for an RPGF project
+    ProjectMember:
+      summary: Member of a RGPF project
       description: >
-        A submitter for an RPGF project, including information about the submitter.
+        A team member on a RPGF project.
       type: object
       properties:
         address:
+          summary: EOA address of the team member
           type: string
         name:
           type: string
         description:
           type: string
+        socialLinks:
+          $ref: "#/components/schemas/SocialLinks"
         externalLink:
           type: string
         avatarUrls:
@@ -576,6 +579,10 @@ components:
         Information about a project submitted for Retroactive Public Goods Funding on Agora.
       type: object 
       properties: 
+        avatarUrl:
+          type: string
+        coverImageUrl:
+          type: string
         attestationUid:
           type: string
         approvalAttestationUid:
@@ -586,16 +593,12 @@ components:
           type: string
         externalLink:
           type: string
-        avatarUrls:
-          type: array
-          items:
-            type: string
         socialLinks:
           $ref: "#/components/schemas/SocialLinks"
         team: 
           type: array
           items:
-            $ref: "#/components/schemas/RPGFSubmitter"
+            $ref: "#/components/schemas/ProjectMember"
         repositories:
           summary: Repository URLs for the project
           description: >
@@ -609,7 +612,19 @@ components:
             Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
           type: array
           items:
-            $ref: "#/components/schemas/Contract"
+            allOf:
+            - $ref: "#/components/schemas/Contract"
+            - type: object
+              properties:
+                verificationProof:
+                  summary: Proof of contract verification
+                  description: Verification of ownership of contract on chain.
+                  type: string
+                openSourceObserverSlug:
+                  summary: Open source observer verification slug 
+                  description: > 
+                    Slug for the open source observer external verification.
+                  type: string
         categories: 
           $ref: "#/components/schemas/RPGFCategory"
         funding: 
