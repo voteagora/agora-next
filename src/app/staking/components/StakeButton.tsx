@@ -59,6 +59,7 @@ export const StakeButton = ({ address, amount }: StakeButtonProps) => {
     if (data?.hash && !isLoading) {
       queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
       queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
+
     }
   }, [isLoading, data?.hash]);
 

@@ -1,16 +1,13 @@
 "use client";
 
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import React, { useState } from "react";
+import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { useTotalStaked } from "@/hooks/useTotalStaked";
-import { formatNumber } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { UnstakeButton } from "@/app/staking/components/UnstakeButton";
-import { useStakedDeposit } from "@/hooks/useStakedDeposit";
-import { truncateAddress } from "@/app/lib/utils/text";
+import { StakedDeposit } from "@/app/staking/components/StakedDeposit";
 
 export const UnstakeDialog = () => {
 
@@ -21,10 +18,9 @@ export const UnstakeDialog = () => {
   const { data: totalStaked, isFetched: isLoadedTotalStaked } = useTotalStaked(address as `0x${string}`);
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
-  const depositId = 20;
-  const { data: deposit, isFetched: isDepositFetched } = useStakedDeposit(depositId);
-
-  const hasDeposit = isDepositFetched && deposit?.balance != undefined && deposit.balance > 0;
+  const start = 6;
+  const end = 35;
+  const depositIds = Array.from({length: end - start + 1}, (_, i) => start + i);
 
   if (!isConnected || !address) {
     return <Button disabled={true}>Connect Wallet to Stake ${token.symbol}</Button>;
@@ -37,22 +33,14 @@ export const UnstakeDialog = () => {
       }
     </div>
 
-    {!hasDeposit &&
+    {!hasTotalStaked &&
       <div className="text-xs text-slate-600 py-4">
-        No deposits found
+        No deposits found for this wallet
       </div>
     }
 
-    {hasDeposit && (
-      <div>
-        <div className="text-xs py-4 text">Unstake {formatNumber(deposit.balance, token.decimals, 6)} {token.symbol}
-        </div>
-
-        <div className="text-xs text-slate-600 py-1">Owner {truncateAddress(deposit.owner)}</div>
-        <div className="text-xs text-slate-600 py-1 mb-2">Delegatee {truncateAddress(deposit.delegatee)}</div>
-
-        <UnstakeButton id={BigInt(depositId)} amount={deposit.balance} />
-      </div>
-    )}
+    {depositIds.map((depositId) => {
+      return <StakedDeposit id={depositId} key={`deposit-${depositId}`} />
+    })}
   </div>;
 };
