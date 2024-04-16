@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
 
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { useTotalStaked } from "@/hooks/useTotalStaked";
+import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 
@@ -21,14 +21,14 @@ export const StakeDialog = () => {
   const [amountToStake, setAmountToStake] = useState<number>(0);
   const [addressToDelegate, setAddressToDelegate] = useState<string | undefined>(address);
 
-  const { data: totalStaked, isFetched: isLoadedTotalStaked } = useTotalStaked(address as `0x${string}`);
+  const { data: totalStaked, isFetched: isLoadedTotalStaked } = useDepositorTotalStaked(address as `0x${string}`);
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(address as `0x${string}`);
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
 
 
-  if (!isConnected || !address ) {
+  if (!isConnected || !address) {
     return <Button disabled={true}>Connect Wallet to Stake ${token.symbol}</Button>;
   }
 

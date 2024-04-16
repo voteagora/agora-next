@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 
-export const useTotalStaked = () => {
+export const useDepositorTotalStaked = (address: string) => {
   const { contracts } = Tenant.current();
   const { data, isFetching, isFetched } = useQuery({
-    enabled: true,
-    queryKey: ["totalStaked"],
+    enabled: !!address,
+    queryKey: ["depositorTotalStaked", address],
     queryFn: async () => {
-      return await contracts.staker!.contract.totalStaked();
+      return await contracts.staker!.contract.depositorTotalStaked(address as `0x${string}`);
     },
   });
 

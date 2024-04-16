@@ -5,7 +5,7 @@ import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
-import { useTotalStaked } from "@/hooks/useTotalStaked";
+import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { Button } from "@/components/ui/button";
 import { StakedDeposit } from "@/app/staking/components/StakedDeposit";
 
@@ -15,7 +15,7 @@ export const UnstakeDialog = () => {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
 
-  const { data: totalStaked, isFetched: isLoadedTotalStaked } = useTotalStaked(address as `0x${string}`);
+  const { data: totalStaked, isFetched: isLoadedTotalStaked } = useDepositorTotalStaked(address as `0x${string}`);
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const start = 6;

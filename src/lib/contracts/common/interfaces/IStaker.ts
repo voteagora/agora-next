@@ -21,4 +21,6 @@ export interface IStaker extends BaseContract {
     ],
     "view"
   >;
+
+  totalStaked: TypedContractMethod<[], [bigint], "view">;
 }
