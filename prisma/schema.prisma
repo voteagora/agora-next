@@ -956,7 +956,6 @@ view etherfi_vote_cast_with_params_events {
   @@schema("etherfi")
 }
 
-
 view uniswapAdvancedDelegatees {
   pair             String  @unique
   from             String
@@ -1032,7 +1031,6 @@ view uniswapAuthorityChainsSnaps {
   @@schema("uniswap")
 }
 
-
 view uniswapDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -1042,7 +1040,6 @@ view uniswapDelegatees {
   @@map("delegatees")
   @@schema("uniswap")
 }
-
 
 view uniswapDelegates {
   delegate          String   @unique
@@ -1114,7 +1111,7 @@ view uniswapProposals {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType
-  proposal_type_data Json?
+  proposal_type_data String?
   proposal_results   Json?
 
   @@map("proposals")
@@ -1129,7 +1126,7 @@ view uniswapVotableSupply {
 }
 
 view uniswap_vote_cast_events {
-  transaction_hash String?  @db.VarChar
+  transaction_hash String?
   proposal_id      String?
   voter            String?
   support          String?
@@ -1144,7 +1141,7 @@ view uniswap_vote_cast_events {
 }
 
 view uniswap_vote_cast_with_params_events {
-  transaction_hash String?  @db.VarChar
+  transaction_hash String?
   proposal_id      String?
   voter            String?
   support          String?

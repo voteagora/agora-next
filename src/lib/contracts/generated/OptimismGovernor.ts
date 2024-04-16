@@ -1536,7 +1536,9 @@ export interface OptimismGovernor extends BaseContract {
   getFunction(
     nameOrSignature: "proposalThreshold"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(nameOrSignature: "proposalVotes"): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "proposalVotes"
+  ): TypedContractMethod<
     [proposalId: BigNumberish],
     [
       [bigint, bigint, bigint] & {
