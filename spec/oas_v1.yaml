@@ -1788,39 +1788,6 @@ paths:
             description: Unauthorized
           '500':
             description: Internal Server Error
-      put: 
-        summary: Adds an impact metric to a specific RPGF round
-        description: >
-          Adds an impact metric to a specific RPGF round on Agora. ID field, if supplied,
-          is ignored; the resource ID will be returned in the response body.
-        operationId: putRPGFImpactMetric
-        tags:
-          - RPGF
-          - RPGFRounds
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-        requestBody:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metricId:
-                    type: string
-        responses: 
-          '200':
-            description: OK
-            content: 
-              application/json:
-                schema: 
-                  $ref: '#/components/schemas/RPGFImpactMetric'
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '500':
-            description: Internal Server Error
     /rpgf/rounds/{roundId}/impactMetrics/{impactMetricId}:
       get:
         summary: Gets a specific impact metric for an RPGF round
@@ -1846,34 +1813,6 @@ paths:
               application/json:
                 schema: 
                   $ref: '#/components/schemas/RPGFImpactMetric'
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '404':
-            description: Not Found
-          '500':
-            description: Internal Server Error
-      delete: 
-        summary: Removes an impact metric from a round
-        description: >
-          Removes an impact metric from a specific RPGF round on Agora.
-        operationId: removeImpactMetricFromRPGFRound
-        tags:
-          - RPGF
-          - RPGFRounds
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-          - name: impactMetricId
-            in: path
-            description: The id of the metric to remove
-            required: true
-            schema:
-              type: string
-        responses: 
-          '200':
-            description: OK
           '400':
             description: Bad Request
           '401': 
