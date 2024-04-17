@@ -12,13 +12,13 @@ servers:
   - url: vote.optimisim.io/api/v1
     description: Base URL for optimism production
 security:
-  - ApiKeyAuth: []
+  - bearerAuth: []
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: Authorization
+    bearerAuth:
+      type: http
+      scheme: bearer 
+      bearerFormat: JWT
   schemas:
     AuthToken:
       summary: JWT token for authentication and authorization 
