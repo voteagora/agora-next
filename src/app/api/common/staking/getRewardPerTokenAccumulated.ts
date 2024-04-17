@@ -6,4 +6,6 @@ async function rewardPerTokenAccumulated() {
   return await contracts.staker!.contract.rewardPerTokenAccumulated();
 }
 
-export const apiFetchRewardPerTokenAccumulated = cache(rewardPerTokenAccumulated);
+export const apiFetchRewardPerTokenAccumulated = cache(
+  rewardPerTokenAccumulated
+);

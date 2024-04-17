@@ -1030,9 +1030,7 @@ export interface UniswapStaker extends BaseContract {
   getFunction(
     nameOrSignature: "depositorTotalStaked"
   ): TypedContractMethod<[depositor: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "deposits"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "deposits"): TypedContractMethod<
     [depositId: BigNumberish],
     [
       [bigint, string, string, string] & {
@@ -1047,9 +1045,7 @@ export interface UniswapStaker extends BaseContract {
   getFunction(
     nameOrSignature: "earningPower"
   ): TypedContractMethod<[beneficiary: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "eip712Domain"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "eip712Domain"): TypedContractMethod<
     [],
     [
       [string, string, string, bigint, string, string, bigint[]] & {

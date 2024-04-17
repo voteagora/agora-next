@@ -1,12 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/utils";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-
 
 interface UnstakeButtonProps {
   id: BigInt;
@@ -14,7 +17,6 @@ interface UnstakeButtonProps {
 }
 
 export const UnstakeButton = ({ amount, id }: UnstakeButtonProps) => {
-
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();
 
@@ -45,7 +47,6 @@ export const UnstakeButton = ({ amount, id }: UnstakeButtonProps) => {
     args: [id, amount],
   });
 
-
   const { data, write, status } = useContractWrite(config);
 
   const { isLoading } = useWaitForTransaction({
@@ -60,11 +61,19 @@ export const UnstakeButton = ({ amount, id }: UnstakeButtonProps) => {
     }
   }, [isLoading, data?.hash]);
 
-
-  return <Button className="w-full"  disabled={isLoading} onClick={() => {
-    if (write) write();
-  }}>{isLoading ? "Unstaking..." : `Unstake ${formatNumber(amount.toString(), token.decimals, 6)} ${token.symbol}`}</Button>;
+  return (
+    <Button
+      className="w-full"
+      disabled={isLoading}
+      onClick={() => {
+        if (write) write();
+      }}
+    >
+      {isLoading
+        ? "Unstaking..."
+        : `Unstake ${formatNumber(amount.toString(), token.decimals, 6)} ${
+            token.symbol
+          }`}
+    </Button>
+  );
 };
-
-
-

@@ -7,7 +7,9 @@ export const useDepositorTotalStaked = (address: string) => {
     enabled: !!address,
     queryKey: ["depositorTotalStaked", address],
     queryFn: async () => {
-      return await contracts.staker!.contract.depositorTotalStaked(address as `0x${string}`);
+      return await contracts.staker!.contract.depositorTotalStaked(
+        address as `0x${string}`
+      );
     },
   });
 

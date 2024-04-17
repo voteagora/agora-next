@@ -9,7 +9,6 @@ import { apiFetchRewardPerTokenAccumulated } from "@/app/api/common/staking/getR
 import { apiFetchRewardEndTime } from "@/app/api/common/staking/getRewardEndTime";
 import Tenant from "@/lib/tenant/tenant";
 
-
 async function fetchTotalStaked() {
   "use server";
   return apiFetchTotalStaked();
@@ -28,12 +27,9 @@ async function fetchRewardPerToken() {
 async function fetchRewardEndTime() {
   "use server";
   return apiFetchRewardEndTime();
-
 }
 
-
 export default async function Page() {
-
   const { token } = Tenant.current();
 
   const totalStaked = await fetchTotalStaked();
@@ -45,7 +41,9 @@ export default async function Page() {
     <section>
       <Hero />
 
-      <div className="font-black text-2xl mb-4">{token.symbol} Staking Metrics</div>
+      <div className="font-black text-2xl mb-4">
+        {token.symbol} Staking Metrics
+      </div>
       <PoolStats
         rewardEndTime={rewardEndTime}
         rewardPerToken={rewardPerToken}
