@@ -696,7 +696,7 @@ components:
           format: date-time
         details:
           type: string
-    RetroFundingBallotVote:
+    RetroFundingBallotAllocation:
       summary: A vote for an RetroFunding ballot
       description: >
         A vote for an RetroFunding ballot, including information about the vote.
@@ -732,10 +732,10 @@ components:
             - PENDING
             - APPROVED
             - REJECTED
-        votes: 
+        allocations: 
           type: array
           items:
-            $ref: "#/components/schemas/RetroFundingBallotVote"
+            $ref: "#/components/schemas/RetroFundingBallotAllocation"
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
