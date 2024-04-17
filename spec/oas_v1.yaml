@@ -1623,9 +1623,10 @@ paths:
           '500':
             description: Internal Server Error
       post: 
-        summary: Adds an impact metric to a specific RetroFunding ballot
+        summary: Adds or updates an impact metric on a specific RetroFunding ballot
         description: >
-          Adds an impact metric to a specific ballot for an RetroFunding round on Agora.
+          Adds an impact metric or updates an existing impact metric's allocation amount 
+          on a specific ballot for an RetroFunding round on Agora.
         operationId: addImpactMetricToRetroFundingBallot
         tags:
           - RetroFunding
@@ -1642,9 +1643,11 @@ paths:
                 properties:
                   metricId:
                     type: string
+                  allocationAmount:
+                    type: string
         responses: 
-          '200':
-            description: OK
+          '201':
+            description: Created
           '400':
             description: Bad Request
           '401': 
