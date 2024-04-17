@@ -8,12 +8,12 @@ const CollectFeeActionCard = () => {
   return (
     <HStack
       gap={4}
-      className="p-4 rounded-lg border border-gray-300 shadow-newDefault mt-5 "
+      className="p-4 rounded-lg border border-gray-300 shadow-newDefault mt-5"
     >
       <div className="min-w-[48px] h-12 p-3 rounded-lg  border border-gray-300 shadow-newDefault ">
         <Image height={24} width={24} src={icons.currency} alt="" />
       </div>
-      <VStack className="">
+      <VStack>
         <p className="text-xs font-semibold text-gray-4f">
           Available to collect
         </p>

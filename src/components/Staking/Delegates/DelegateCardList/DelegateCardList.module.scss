@@ -18,6 +18,14 @@
     gap: $spacing-4;
   }
 
+  .self_vote_card {
+    grid-column-start: 1;
+    grid-column-end: -1;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    width: 100%;
+  }
+
   .link {
     display: flex;
     flex-direction: column;
@@ -30,6 +38,7 @@
       border-width: $spacing-px;
       border-color: $gray-300;
       box-shadow: $box-shadow-newDefault;
+      cursor: pointer;
 
       .summary {
         display: -webkit-box;

@@ -4,7 +4,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HStack, VStack } from "@/components/Layout/Stack";
 
-const SelectedDelegatesFeeCard = () => {
+interface IProps {
+  selectedDelegateAddress: string | null;
+  setShowReceipt: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const SelectedDelegatesFeeCard: React.FC<IProps> = ({
+  selectedDelegateAddress,
+  setShowReceipt,
+}) => {
+  const handleShowReceipt = () => {
+    setShowReceipt(true);
+  };
   return (
     <VStack className="p-4 rounded-lg border border-gray-300 shadow-newDefault ">
       <VStack className="w-full h-[123px] justify-center items-center rounded-lg border border-gray-300">
@@ -28,7 +39,15 @@ const SelectedDelegatesFeeCard = () => {
         represent you in Uniswap governance
       </p>
       <Link href="/staking/delegates">
-        <Button className="w-full">Continue</Button>
+        <Button
+          className="w-full"
+          disabled={selectedDelegateAddress === null}
+          onClick={handleShowReceipt}
+        >
+          {selectedDelegateAddress === null
+            ? "Select delegate to continue"
+            : "Continue"}
+        </Button>
       </Link>
     </VStack>
   );
