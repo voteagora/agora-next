@@ -23,4 +23,8 @@ export interface IStaker extends BaseContract {
   >;
 
   totalStaked: TypedContractMethod<[], [bigint], "view">;
+
+  rewardPerTokenAccumulated: TypedContractMethod<[], [bigint], "view">;
+
+  rewardEndTime: TypedContractMethod<[], [bigint], "view">;
 }
