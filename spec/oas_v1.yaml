@@ -518,6 +518,30 @@ components:
             summary: Transaction ID of the deployment
             description: The transaction ID of the transaction in which the contract was deployed.
             type: string
+    Comment: 
+      summary: A comment 
+      description: >
+        A discussion comment, including the author, timestamp, and content.
+      type: object
+      properties: 
+        createdAt:
+          summary: Timestamp of the comment
+          description: The timestamp at which the comment was created.
+          type: string
+          format: date-time
+        editedAt:
+          summary: Timestamp of the comment edit
+          description: The timestamp at which the comment was last edited.
+          type: string
+          format: date-time
+        content: 
+          summary: Content of the comment
+          description: The text content of the comment.
+          type: string
+        commenter:
+          summary: Author of the comment
+          description: The author of the comment.
+          type: string
     RetroFundingRoundStatus:
       summary: Status of an RetroFunding round
       description: Enum description of the status of an RetroFunding round.
