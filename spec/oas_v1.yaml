@@ -702,7 +702,7 @@ components:
         A vote for an RetroFunding ballot, including information about the vote.
       type: object
       properties:
-        projectId:
+        metricId:
           type: integer
         categoryId:
           type: integer
@@ -715,8 +715,12 @@ components:
       type: object
       properties:
         address: 
+          summary: Onchain address of the ballot
+          description: The onchain address of the ballot.
           type: string
         ballotId:
+          summary: Ballot ID
+          description: The unique ID / ordinal of the ballot.
           type: integer
         roundId:
           type: integer
