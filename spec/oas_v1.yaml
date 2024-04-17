@@ -1548,7 +1548,10 @@ paths:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
       requestBody:
-        $ref: "#/components/schemas/RetroFundingBallotSubmission"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetroFundingBallotSubmission"
       responses: 
         '200':
           description: OK
