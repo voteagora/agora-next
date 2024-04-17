@@ -829,7 +829,7 @@ components:
       schema:
         type: integer
     ballotIdParam:
-      name: addressOrEnsName
+      name: ballotAddressOrEns
       in: path
       description: The address or ENS name of the ballot to retrieve
       required: true
@@ -1523,7 +1523,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}:
     get:
       summary: Gets a specific ballot for an RetroFunding round
       description: >
@@ -1550,7 +1550,7 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/submit:
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/submit:
     post:
       summary: Submits a particular ballot
       description: Submits the content of a ballot to be counted as final for the round.
@@ -1611,7 +1611,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics:
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics:
     get:
       summary: Gets impact metrics for a specific RetroFunding ballot
       description: >
