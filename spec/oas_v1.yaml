@@ -306,7 +306,7 @@ components:
         An object describing the specifics and metadata associated with a particular governance proposal,
         including the specific measure, proposer, data, etc.
       type: object
-      properites:
+      properties:
         proposalId:
           type: string
         contractAddress:
@@ -640,7 +640,9 @@ components:
                     Slug for the open source observer external verification.
                   type: string
         categories: 
-          $ref: "#/components/schemas/RetroFundingCategory"
+          type: array 
+          items:
+            $ref: "#/components/schemas/RetroFundingCategory"
         funding: 
           type: object
           properties:
@@ -656,7 +658,7 @@ components:
                     link:
                       type: string
                     type: 
-                      "#/components/schemas/OptimismGrantType"
+                      $ref: "#/components/schemas/OptimismGrantType"
     SocialLinks:
       summary: Social media links for a project
       description: >
@@ -671,7 +673,7 @@ components:
           type: string
         website:
           type: string
-    OptimisimGrantType:
+    OptimismGrantType:
       summary: Type of Optimism grant
       description: Enum description of the type of Optimism grant.
       type: string
@@ -707,7 +709,7 @@ components:
         categoryId:
           type: integer
         allocation:
-          type: integer
+          type: string
     RetroFundingBallot: 
       summary: A ballot for an RetroFunding round
       description: >
@@ -1538,6 +1540,7 @@ paths:
     post:
       summary: Submits a particular ballot
       description: Submits the content of a ballot to be counted as final for the round.
+      operationId: submitRetroFundingBallot
       tags:
           - RetroFunding
           - RetroFundingBallots
@@ -1591,159 +1594,159 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-    /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics:
-      get:
-        summary: Gets impact metrics for a specific RetroFunding ballot
-        description: >
-          Retrieves a list of impact metrics for a specific ballot for an RetroFunding round on Agora.
-        operationId: getImpactMetricsOnRetroFundingBallot
-        tags:
-          - RetroFunding
-          - RetroFundingBallots
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-          - $ref: "#/components/parameters/ballotIdParam"
-        responses: 
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema: 
-                  type: object
-                  properties:
-                    impactMetrics:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/RetroFundingImpactMetric'
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '500':
-            description: Internal Server Error
-      post: 
-        summary: Adds or updates an impact metric on a specific RetroFunding ballot
-        description: >
-          Adds an impact metric or updates an existing impact metric's allocation amount 
-          on a specific ballot for an RetroFunding round on Agora.
-        operationId: addImpactMetricToRetroFundingBallot
-        tags:
-          - RetroFunding
-          - RetroFundingBallots
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-          - $ref: "#/components/parameters/ballotIdParam"
-        requestBody:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics:
+    get:
+      summary: Gets impact metrics for a specific RetroFunding ballot
+      description: >
+        Retrieves a list of impact metrics for a specific ballot for an RetroFunding round on Agora.
+      operationId: getImpactMetricsOnRetroFundingBallot
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      responses: 
+        '200':
+          description: OK
           content:
             application/json:
-              schema:
+              schema: 
                 type: object
                 properties:
-                  metricId:
-                    type: string
-                  allocationAmount:
-                    type: string
-        responses: 
-          '201':
-            description: Created
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '500':
-            description: Internal Server Error
-    /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics/{metricId}:
-      delete: 
-        summary: Removes an impact metric from a ballot
-        description: >
-          Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
-        operationId: removeImpactMetricFromRetroFundingBallot
-        tags:
-          - RetroFunding
-          - RetroFundingBallots
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-          - $ref: "#/components/parameters/ballotIdParam"
-          - name: metricId
-            in: path
-            description: The id of the metric to remove
-            required: true
+                  impactMetrics:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingImpactMetric'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+    post: 
+      summary: Adds or updates an impact metric on a specific RetroFunding ballot
+      description: >
+        Adds an impact metric or updates an existing impact metric's allocation amount 
+        on a specific ballot for an RetroFunding round on Agora.
+      operationId: addImpactMetricToRetroFundingBallot
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      requestBody:
+        content:
+          application/json:
             schema:
-              type: string
-        responses: 
-          '200':
-            description: OK
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '404':
-            description: Not Found
-          '500':
-            description: Internal Server Error
-    /retrofunding/rounds/{roundId}/impactMetrics:
-      get:
-        summary: Gets impact metrics for a specific RetroFunding round
-        description: >
-          Retrieves a list of impact metrics for a specific RetroFunding round on Agora.
-        operationId: getImpactMetricsOnRetroFundingRound
-        tags:
-          - RetroFunding
-          - RetroFundingRounds
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-        responses: 
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema: 
-                  type: object
-                  properties:
-                    impactMetrics:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/RetroFundingImpactMetric'
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '500':
-            description: Internal Server Error
-    /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}:
-      get:
-        summary: Gets a specific impact metric for an RetroFunding round
-        description: >
-          Retrieves a specific impact metric for a specific RetroFunding round on Agora.
-        operationId: getImpactMetricOnRetroFundingRound
-        tags:
-          - RetroFunding
-          - RetroFundingRounds
-          - impactMetrics
-        parameters:
-          - $ref: "#/components/parameters/roundIdParam"
-          - name: impactMetricId
-            in: path
-            description: The id of the metric to retrieve
-            required: true
-            schema:
-              type: string
-        responses: 
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema: 
-                  $ref: '#/components/schemas/RetroFundingImpactMetric'
-          '400':
-            description: Bad Request
-          '401': 
-            description: Unauthorized
-          '404':
-            description: Not Found
-          '500':
-            description: Internal Server Error
+              type: object
+              properties:
+                metricId:
+                  type: string
+                allocationAmount:
+                  type: string
+      responses: 
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics/{metricId}:
+    delete: 
+      summary: Removes an impact metric from a ballot
+      description: >
+        Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
+      operationId: removeImpactMetricFromRetroFundingBallot
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+        - name: metricId
+          in: path
+          description: The id of the metric to remove
+          required: true
+          schema:
+            type: string
+      responses: 
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics:
+    get:
+      summary: Gets impact metrics for a specific RetroFunding round
+      description: >
+        Retrieves a list of impact metrics for a specific RetroFunding round on Agora.
+      operationId: getImpactMetricsOnRetroFundingRound
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  impactMetrics:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingImpactMetric'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}:
+    get:
+      summary: Gets a specific impact metric for an RetroFunding round
+      description: >
+        Retrieves a specific impact metric for a specific RetroFunding round on Agora.
+      operationId: getImpactMetricOnRetroFundingRound
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - name: impactMetricId
+          in: path
+          description: The id of the metric to retrieve
+          required: true
+          schema:
+            type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RetroFundingImpactMetric'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
