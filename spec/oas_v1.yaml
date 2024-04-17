@@ -870,8 +870,21 @@ components:
       description: The id of the project on the ballot
       required: true
       schema:
+        type: string 
+    impactMetricParam:
+      name: impactMetricId
+      in: path
+      description: The id of the metric to retrieve
+      required: true
+      schema:
         type: string
-
+    commentIdParam:
+      name: commentId
+      in: path
+      description: The id of the comment to delete
+      required: true
+      schema:
+        type: string
 paths:
   /spec:
     get: 
@@ -1707,7 +1720,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics/{metricId}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics/{impactMetricId}:
     delete: 
       summary: Removes an impact metric from a ballot
       description: >
@@ -1720,12 +1733,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
-        - name: metricId
-          in: path
-          description: The id of the metric to remove
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/impactMetricParam"
       responses: 
         '200':
           description: OK
@@ -1779,12 +1787,7 @@ paths:
         - impactMetrics
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - name: impactMetricId
-          in: path
-          description: The id of the metric to retrieve
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/impactMetricParam"
       responses: 
         '200':
           description: OK
@@ -1814,12 +1817,7 @@ paths:
         - comments
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - name: impactMetricId
-          in: path
-          description: The id of the metric to retrieve
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/impactMetricParam"
       requestBody:
         content:
           application/json:
@@ -1853,18 +1851,8 @@ paths:
         - comments
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - name: impactMetricId
-          in: path
-          description: The id of the metric to retrieve
-          required: true
-          schema:
-            type: string
-        - name: commentId
-          in: path
-          description: The id of the comment to delete
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
       responses: 
         '200':
           description: OK
