@@ -493,9 +493,9 @@ components:
             summary: Transaction ID of the deployment
             description: The transaction ID of the transaction in which the contract was deployed.
             type: string
-    RPGFRoundStatus:
-      summary: Status of an RPGF round
-      description: Enum description of the status of an RPGF round.
+    RetroFundingRoundStatus:
+      summary: Status of an RetroFunding round
+      description: Enum description of the status of an RetroFunding round.
       type: string
       enum:
         - PLANNED
@@ -509,22 +509,22 @@ components:
         - FUNDS_DISTRIBUTION
         - DONE 
         - CANCELLED
-    RPGFRoundEvent:
-      summary: An event within an RPGF round
+    RetroFundingRoundEvent:
+      summary: An event within an RetroFunding round
       description: > 
-        An event within an RPGF round, including status and timestamp.
+        An event within an RetroFunding round, including status and timestamp.
         For example, a round may have events for the start of voting, application review, etc.
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/RPGFRoundStatus"
+          $ref: "#/components/schemas/RetroFundingRoundStatus"
         timestamp:
           summary: Timestamp of the event
-          description: The timestamp at which the RPGF event occurred.
+          description: The timestamp at which the RetroFunding event occurred.
           type: string
           format: date-time
-    RPGFRound:
-      summary: An RPGF round
+    RetroFundingRound:
+      summary: An RetroFunding round
       description: >
         A Retroactive Public Goods Funding round on Agora, including 
         information about the round, and all events within the round.
@@ -541,11 +541,11 @@ components:
         events:
           type: array
           items:
-            $ref: "#/components/schemas/RPGFRoundEvent"
-    RPGFImpactMetric:
-      summary: Impact metric for an RPGF project 
+            $ref: "#/components/schemas/RetroFundingRoundEvent"
+    RetroFundingImpactMetric:
+      summary: Impact metric for an RetroFunding project 
       description: >
-        An impact metric for an RPGF project with associated metadata.
+        An impact metric for an RetroFunding project with associated metadata.
       type: object
       properties:
         id: 
@@ -559,7 +559,7 @@ components:
     ProjectMember:
       summary: Member of a RGPF project
       description: >
-        A team member on a RPGF project.
+        A team member on a RetroFunding project.
       type: object
       properties:
         address:
@@ -577,10 +577,10 @@ components:
           type: array
           items:
             type: string
-    RPGFCategory:
-      summary: A category for an RPGF project
+    RetroFundingCategory:
+      summary: A category for an RetroFunding project
       description: >
-        A category for an RPGF project, including information about the category.
+        A category for an RetroFunding project, including information about the category.
       type: object
       properties:
         name:
@@ -588,7 +588,7 @@ components:
         description:
           type: string
     Project:
-      summary: A project submitted for RPGF 
+      summary: A project submitted for RetroFunding 
       description: >
         Information about a project submitted for Retroactive Public Goods Funding on Agora.
       type: object 
@@ -640,7 +640,7 @@ components:
                     Slug for the open source observer external verification.
                   type: string
         categories: 
-          $ref: "#/components/schemas/RPGFCategory"
+          $ref: "#/components/schemas/RetroFundingCategory"
         funding: 
           type: object
           properties:
@@ -696,10 +696,10 @@ components:
           format: date-time
         details:
           type: string
-    RPGFBallotVote:
-      summary: A vote for an RPGF ballot
+    RetroFundingBallotVote:
+      summary: A vote for an RetroFunding ballot
       description: >
-        A vote for an RPGF ballot, including information about the vote.
+        A vote for an RetroFunding ballot, including information about the vote.
       type: object
       properties:
         projectId:
@@ -708,10 +708,10 @@ components:
           type: integer
         allocation:
           type: integer
-    RPGFBallot: 
-      summary: A ballot for an RPGF round
+    RetroFundingBallot: 
+      summary: A ballot for an RetroFunding round
       description: >
-        A ballot for an RPGF round, including information about the ballot.
+        A ballot for an RetroFunding round, including information about the ballot.
       type: object
       properties:
         ballotId:
@@ -729,8 +729,8 @@ components:
         votes: 
           type: array
           items:
-            $ref: "#/components/schemas/RPGFBallotVote"
-    RPGFBallotSubmission:
+            $ref: "#/components/schemas/RetroFundingBallotVote"
+    RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
       type: object
@@ -802,7 +802,7 @@ components:
     roundIdParam:
       name: roundId
       in: path
-      description: The round ID of the RPGF round to retrieve.
+      description: The round ID of the RetroFunding round to retrieve.
       required: true
       schema:
         type: integer
@@ -1345,7 +1345,7 @@ paths:
         Limit, offset, and sort parameters can be used to customize the returned list.
       operationId: getProjects
       tags:
-        - RPGF
+        - RetroFunding
         - projects
       parameters:
         - $ref: "#/components/parameters/limitParam"
@@ -1433,19 +1433,19 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /rpgf/rounds/{roundId}:
+  /retrofunding/rounds/{roundId}:
     get:
-      summary: Gets a specific RPGF round
+      summary: Gets a specific RetroFunding round
       description: >
-        Retrieves a specific RPGF round on Agora.
-      operationId: getRPGFRoundById
+        Retrieves a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundById
       tags:
-        - RPGF
-        - RPGFRounds
+        - RetroFunding
+        - RetroFundingRounds
       parameters:
         - name: roundId
           in: path
-          description: The round ID of the RPGF round to retrieve.
+          description: The round ID of the RetroFunding round to retrieve.
           required: true
           schema:
             type: integer
@@ -1455,28 +1455,28 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/RPGFRound"
+                $ref: "#/components/schemas/RetroFundingRound"
         '400':
           description: Bad Request
         '401': 
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /rpgf/rounds/{roundId}/ballots:
+  /retrofunding/rounds/{roundId}/ballots:
   # Should this be paginated? How many ballots per round are expected?
     get: 
-      summary: Gets a list of ballots for an RPGF round
+      summary: Gets a list of ballots for an RetroFunding round
       description: >
-        Retrieves a list of ballots for a specific RPGF round on Agora as a JSON array.
+        Retrieves a list of ballots for a specific RetroFunding round on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
-      operationId: getRPGFRoundBallots
+      operationId: getRetroFundingRoundBallots
       tags:
-        - RPGF
-        - RPGFBallots
+        - RetroFunding
+        - RetroFundingBallots
       parameters:
         - name: roundId
           in: path
-          description: The round ID of the RPGF round to retrieve.
+          description: The round ID of the RetroFunding round to retrieve.
           required: true
           schema:
             type: integer
@@ -1495,22 +1495,22 @@ paths:
                   delegates:
                     type: array
                     items:
-                      $ref: '#/components/schemas/RPGFBallot'
+                      $ref: '#/components/schemas/RetroFundingBallot'
         '400':
           description: Bad Request
         '401': 
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}:
     get:
-      summary: Gets a specific ballot for an RPGF round
+      summary: Gets a specific ballot for an RetroFunding round
       description: >
-        Retrieves a specific ballot for an RPGF round on Agora.
-      operationId: getRPGFRoundBallotById
+        Retrieves a specific ballot for an RetroFunding round on Agora.
+      operationId: getRetroFundingRoundBallotById
       tags:
-        - RPGF
-        - RPGFBallots
+        - RetroFunding
+        - RetroFundingBallots
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1520,7 +1520,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/RPGFBallot"
+                $ref: "#/components/schemas/RetroFundingBallot"
         '400':
           description: Bad Request
         '401': 
@@ -1529,18 +1529,18 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}/submit:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/submit:
     post:
       summary: Submits a particular ballot
       description: Submits the content of a ballot to be counted as final for the round.
       tags:
-          - RPGF
-          - RPGFBallots
+          - RetroFunding
+          - RetroFundingBallots
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
       requestBody:
-        $ref: "#/components/schemas/RPGFBallotSubmission"
+        $ref: "#/components/schemas/RetroFundingBallotSubmission"
       responses: 
         '200':
           description: OK
@@ -1552,16 +1552,16 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error    
-  /rpgf/rounds/{roundId}/projects:
+  /retrofunding/rounds/{roundId}/projects:
   # Should this be paginated? How many projects per round are expected?
     get:
-      summary: Gets a list of projects for an RPGF round
+      summary: Gets a list of projects for an RetroFunding round
       description: >
-        Retrieves a list of projects for a specific RPGF round on Agora as a JSON array.
+        Retrieves a list of projects for a specific RetroFunding round on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
-      operationId: getRPGFRoundProjects
+      operationId: getRetroFundingRoundProjects
       tags:
-        - RPGF
+        - RetroFunding
         - projects
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
@@ -1587,15 +1587,15 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-    /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics:
+    /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics:
       get:
-        summary: Gets impact metrics for a specific RPGF ballot
+        summary: Gets impact metrics for a specific RetroFunding ballot
         description: >
-          Retrieves a list of impact metrics for a specific ballot for an RPGF round on Agora.
-        operationId: getImpactMetricsOnRPGFBallot
+          Retrieves a list of impact metrics for a specific ballot for an RetroFunding round on Agora.
+        operationId: getImpactMetricsOnRetroFundingBallot
         tags:
-          - RPGF
-          - RPGFBallots
+          - RetroFunding
+          - RetroFundingBallots
           - impactMetrics
         parameters:
           - $ref: "#/components/parameters/roundIdParam"
@@ -1611,7 +1611,7 @@ paths:
                     impactMetrics:
                       type: array
                       items:
-                        $ref: '#/components/schemas/RPGFImpactMetric'
+                        $ref: '#/components/schemas/RetroFundingImpactMetric'
           '400':
             description: Bad Request
           '401': 
@@ -1619,13 +1619,13 @@ paths:
           '500':
             description: Internal Server Error
       post: 
-        summary: Adds an impact metric to a specific RPGF ballot
+        summary: Adds an impact metric to a specific RetroFunding ballot
         description: >
-          Adds an impact metric to a specific ballot for an RPGF round on Agora.
-        operationId: addImpactMetricToRPGFBallot
+          Adds an impact metric to a specific ballot for an RetroFunding round on Agora.
+        operationId: addImpactMetricToRetroFundingBallot
         tags:
-          - RPGF
-          - RPGFBallots
+          - RetroFunding
+          - RetroFundingBallots
           - impactMetrics
         parameters:
           - $ref: "#/components/parameters/roundIdParam"
@@ -1647,15 +1647,15 @@ paths:
             description: Unauthorized
           '500':
             description: Internal Server Error
-    /rpgf/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics/{metricId}:
+    /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/impactMetrics/{metricId}:
       delete: 
         summary: Removes an impact metric from a ballot
         description: >
-          Removes an impact metric from a specific ballot for an RPGF round on Agora.
-        operationId: removeImpactMetricFromRPGFBallot
+          Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
+        operationId: removeImpactMetricFromRetroFundingBallot
         tags:
-          - RPGF
-          - RPGFBallots
+          - RetroFunding
+          - RetroFundingBallots
           - impactMetrics
         parameters:
           - $ref: "#/components/parameters/roundIdParam"
@@ -1677,15 +1677,15 @@ paths:
             description: Not Found
           '500':
             description: Internal Server Error
-    /rpgf/rounds/{roundId}/impactMetrics:
+    /retrofunding/rounds/{roundId}/impactMetrics:
       get:
-        summary: Gets impact metrics for a specific RPGF round
+        summary: Gets impact metrics for a specific RetroFunding round
         description: >
-          Retrieves a list of impact metrics for a specific RPGF round on Agora.
-        operationId: getImpactMetricsOnRPGFRound
+          Retrieves a list of impact metrics for a specific RetroFunding round on Agora.
+        operationId: getImpactMetricsOnRetroFundingRound
         tags:
-          - RPGF
-          - RPGFRounds
+          - RetroFunding
+          - RetroFundingRounds
           - impactMetrics
         parameters:
           - $ref: "#/components/parameters/roundIdParam"
@@ -1700,22 +1700,22 @@ paths:
                     impactMetrics:
                       type: array
                       items:
-                        $ref: '#/components/schemas/RPGFImpactMetric'
+                        $ref: '#/components/schemas/RetroFundingImpactMetric'
           '400':
             description: Bad Request
           '401': 
             description: Unauthorized
           '500':
             description: Internal Server Error
-    /rpgf/rounds/{roundId}/impactMetrics/{impactMetricId}:
+    /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}:
       get:
-        summary: Gets a specific impact metric for an RPGF round
+        summary: Gets a specific impact metric for an RetroFunding round
         description: >
-          Retrieves a specific impact metric for a specific RPGF round on Agora.
-        operationId: getImpactMetricOnRPGFRound
+          Retrieves a specific impact metric for a specific RetroFunding round on Agora.
+        operationId: getImpactMetricOnRetroFundingRound
         tags:
-          - RPGF
-          - RPGFRounds
+          - RetroFunding
+          - RetroFundingRounds
           - impactMetrics
         parameters:
           - $ref: "#/components/parameters/roundIdParam"
@@ -1731,7 +1731,7 @@ paths:
             content:
               application/json:
                 schema: 
-                  $ref: '#/components/schemas/RPGFImpactMetric'
+                  $ref: '#/components/schemas/RetroFundingImpactMetric'
           '400':
             description: Bad Request
           '401': 
