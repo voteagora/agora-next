@@ -14,14 +14,14 @@ interface StakedDepositProps {
 export const StakedDeposit = ({ id }: StakedDepositProps) => {
 
   const { token } = Tenant.current();
-  const { data: deposit, isFetched, isFetching,  } = useStakedDeposit(id);
+  const { data: deposit, isFetched, isFetching } = useStakedDeposit(id);
 
   if (!deposit && isFetching) {
     return <div className="text-xs text-slate-600">Loading...</div>;
   }
 
   if (!deposit?.balance || deposit?.balance === BigInt(0)) {
-    return;
+    return <></>;
   }
 
   return (<div>
