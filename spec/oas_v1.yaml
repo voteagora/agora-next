@@ -714,6 +714,8 @@ components:
         A ballot for an RetroFunding round, including information about the ballot.
       type: object
       properties:
+        address: 
+          type: string
         ballotId:
           type: integer
         roundId:
