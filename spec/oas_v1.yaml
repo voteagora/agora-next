@@ -568,6 +568,9 @@ components:
           items:
             $ref: "#/components/schemas/RetroFundingRoundEvent"
     RetroFundingImpactMetric:
+      # Note: these are externally defined on Open Source Observer, 
+      # So it's not completely clear what information needs to be represented here 
+      # The most important aspect are that IDs are present for linking metrics on ballots
       summary: Impact metric for an RetroFunding project 
       description: >
         An impact metric for an RetroFunding project with associated metadata.
