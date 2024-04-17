@@ -731,8 +731,6 @@ components:
       properties:
         metricId:
           type: integer
-        categoryId:
-          type: integer
         allocation:
           type: string
     RetroFundingBallot: 
