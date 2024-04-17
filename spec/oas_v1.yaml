@@ -1469,12 +1469,11 @@ paths:
         '500':
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots:
-  # Should this be paginated? How many ballots per round are expected?
     get: 
       summary: Gets a list of ballots for an RetroFunding round
       description: >
         Retrieves a list of ballots for a specific RetroFunding round on Agora as a JSON array.
-        Limit, offset, and sort parameters can be used to customize the returned list.
+        Limit, offset parameters can be used to customize the returned list sorted by ballot ordinal.
       operationId: getRetroFundingRoundBallots
       tags:
         - RetroFunding
@@ -1559,7 +1558,6 @@ paths:
         '500':
           description: Internal Server Error    
   /retrofunding/rounds/{roundId}/projects:
-  # Should this be paginated? How many projects per round are expected?
     get:
       summary: Gets a list of projects for an RetroFunding round
       description: >
