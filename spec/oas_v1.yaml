@@ -1,7 +1,9 @@
 openapi: 3.1.0
 info:
   title: Agora API
-  description: Public API for interacting with the Agora platform
+  description: >
+    ## Public API for interacting with the Agora platform.
+    Note: This API is in beta and subject to change.
   version: 0.1.0-beta
   license:
     name: MIT
@@ -10,14 +12,39 @@ servers:
   - url: vote.optimisim.io/api/v1
     description: Base URL for optimism production
 security:
-  - ApiKeyAuth: []
+  - bearerAuth: []
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: Authorization
+    bearerAuth:
+      type: http
+      scheme: bearer 
+      bearerFormat: JWT
   schemas:
+    AuthToken:
+      summary: JWT token for authentication and authorization 
+      description: >
+        A JWT token for authentication and authorization on the Agora platform.
+      type: object
+      properties: 
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          summary: Expiration time of the token
+          description: The time at which the token will expire.
+          type: integer
+    SIWEVerificationBody:
+      summary: Body of SIWE /verify request
+      description: >
+        Body SIWE verification requests containing message and signature per 
+        (EIP-4361)[https://eips.ethereum.org/EIPS/eip-4361]
+      type: object
+      properties:
+        message:
+          type: string
+        signature:
+          type: string
     PageMetadata:
       summary: Pagination metadata
       description: Metadata associated with paginated requests.
@@ -304,7 +331,7 @@ components:
         An object describing the specifics and metadata associated with a particular governance proposal,
         including the specific measure, proposer, data, etc.
       type: object
-      properites:
+      properties:
         proposalId:
           type: string
         contractAddress:
@@ -445,6 +472,27 @@ components:
           type: array
           items:
             type: string
+    VotingToken:
+      allOf:
+      - $ref: '#/components/schemas/Contract'
+      - type: object
+        properties:
+          tokenName:
+            summary: Name of the voting token
+            description: The name of the voting token.
+            type: string
+          tokenSymbol:
+            summary: Symbol of the voting token
+            description: The symbol of the voting token.
+            type: string
+          totalSupply:
+            summary: Total supply of the voting token
+            description: The total supply of the voting token.
+            type: string
+          votableSupply:
+            summary: Votable supply of the voting token
+            description: The votable supply of the voting token.
+            type: string
     Contract:
       summary: Information about a deployed contract
       description: Metadata about a specific smart contract deployed on chain.
@@ -453,6 +501,10 @@ components:
           address:
             summary: Contract address
             description: The address of the contract on chain.
+            type: string
+          chainId:
+            summary: Chain ID of the contract
+            description: The chain ID on which the contract is deployed.
             type: string
           deployer:
             summary: Deployer address
@@ -466,6 +518,299 @@ components:
             summary: Transaction ID of the deployment
             description: The transaction ID of the transaction in which the contract was deployed.
             type: string
+    Comment: 
+      summary: A comment 
+      description: >
+        A discussion comment, including the author, timestamp, and content.
+      type: object
+      properties: 
+        id:
+          summary: Comment ID
+          description: The unique ID of the comment.
+          type: string
+        createdAt:
+          summary: Timestamp of the comment
+          description: The timestamp at which the comment was created.
+          type: string
+          format: date-time
+        editedAt:
+          summary: Timestamp of the comment edit
+          description: The timestamp at which the comment was last edited.
+          type: string
+          format: date-time
+        content: 
+          summary: Content of the comment
+          description: The text content of the comment.
+          type: string
+        commenter:
+          summary: Author of the comment
+          description: The delegate address of the author of the comment.
+          type: string
+    RetroFundingRoundStatus:
+      summary: Status of an RetroFunding round
+      description: Enum description of the status of an RetroFunding round.
+      type: string
+      enum:
+        - PLANNED
+        - SCHEDULED
+        - APPLICATIONS_STARTED
+        - APPLICATIONS_REVIEW
+        - APPLICATIONS_LOCKED
+        - VOTING 
+        - BALLOT_COUNTING 
+        - RESULTS_ANNOUNCED
+        - FUNDS_DISTRIBUTION
+        - DONE 
+        - CANCELLED
+    RetroFundingRoundEvent:
+      summary: An event within an RetroFunding round
+      description: > 
+        An event within an RetroFunding round, including status and timestamp.
+        For example, a round may have events for the start of voting, application review, etc.
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/RetroFundingRoundStatus"
+        timestamp:
+          summary: Timestamp of the event
+          description: The timestamp at which the RetroFunding event occurred.
+          type: string
+          format: date-time
+    RetroFundingRound:
+      summary: An RetroFunding round
+      description: >
+        A Retroactive Public Goods Funding round on Agora, including 
+        information about the round, and all events within the round.
+      type: object
+      properties:
+        roundId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        externalLink:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingRoundEvent"
+    RetroFundingImpactMetric:
+      # Note: these are externally defined on Open Source Observer, 
+      # So it's not completely clear what information needs to be represented here 
+      # The most important aspect are that IDs are present for linking metrics on ballots
+      summary: Impact metric for an RetroFunding project 
+      description: >
+        An impact metric for an RetroFunding project with associated metadata.
+      type: object
+      properties:
+        id: 
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        externalLink:
+          type: string
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+    ProjectMember:
+      summary: Member of a RGPF project
+      description: >
+        A team member on a RetroFunding project.
+      type: object
+      properties:
+        address:
+          summary: EOA address of the team member
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        socialLinks:
+          $ref: "#/components/schemas/SocialLinks"
+        externalLink:
+          type: string
+        avatarUrls:
+          type: array
+          items:
+            type: string
+    RetroFundingCategory:
+      summary: A category for an RetroFunding project
+      description: >
+        A category for an RetroFunding project, including information about the category.
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    Project:
+      summary: A project submitted for RetroFunding 
+      description: >
+        Information about a project submitted for Retroactive Public Goods Funding on Agora.
+      type: object 
+      properties: 
+        avatarUrl:
+          type: string
+        coverImageUrl:
+          type: string
+        attestationUid:
+          type: string
+        approvalAttestationUid:
+          type: string
+        name: 
+          type: string
+        description:
+          type: string
+        externalLink:
+          type: string
+        socialLinks:
+          $ref: "#/components/schemas/SocialLinks"
+        team: 
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectMember"
+        repositories:
+          summary: Repository URLs for the project
+          description: >
+            URLs for the project's repositories, such as GitHub, GitLab, NPM and other platforms.
+          type: array
+          items:
+            type: string
+        deployedContracts:
+          summary: Deployed contracts for the project
+          description: >
+            Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
+          type: array
+          items:
+            allOf:
+            - $ref: "#/components/schemas/Contract"
+            - type: object
+              properties:
+                verificationProof:
+                  summary: Proof of contract verification
+                  description: Verification of ownership of contract on chain.
+                  type: string
+                openSourceObserverSlug:
+                  summary: Open source observer verification slug 
+                  description: > 
+                    Slug for the open source observer external verification.
+                  type: string
+        categories: 
+          type: array 
+          items:
+            $ref: "#/components/schemas/RetroFundingCategory"
+        funding: 
+          type: object
+          properties:
+            ventureCapital:
+              $ref: "#/components/schemas/FundingInfo"
+            grants:
+              $ref: "#/components/schemas/FundingInfo"
+            optimismGrants:
+              allOf:
+                - $ref: "#/components/schemas/FundingInfo"
+                - type: object
+                  properties:
+                    link:
+                      type: string
+                    type: 
+                      $ref: "#/components/schemas/OptimismGrantType"
+    SocialLinks:
+      summary: Social media links for a project
+      description: >
+        Social media links for a project, including links to Twitter, Discord, and other platforms.
+      type: object
+      properties:
+        twitter:
+          type: string
+        farcaster:
+          type: string
+        mirror:
+          type: string
+        website:
+          type: string
+    OptimismGrantType:
+      summary: Type of Optimism grant
+      description: Enum description of the type of Optimism grant.
+      type: string
+      enum:
+        - DEVELOPMENT
+        - RESEARCH
+        - COMMUNITY
+        - ECOSYSTEM
+        - OTHER
+    FundingInfo:
+      summary: Information about funding for a project
+      description: >
+        Information about funding for a project, including the amount and source.
+      type: object
+      properties:
+        amount:
+          type: string
+        source:
+          type: string
+        date: 
+          type: string
+          format: date-time
+        details:
+          type: string
+    RetroFundingBallotAllocation:
+      summary: A vote for an RetroFunding ballot
+      description: >
+        A vote for an RetroFunding ballot, including information about the vote.
+      type: object
+      properties:
+        metricId:
+          type: integer
+        allocation:
+          type: string
+    RetroFundingBallot: 
+      summary: A ballot for an RetroFunding round
+      description: >
+        A ballot for an RetroFunding round, including information about the ballot.
+      type: object
+      properties:
+        address: 
+          summary: Onchain address of the ballot
+          description: The onchain address of the ballot.
+          type: string
+        ballotId:
+          summary: Ballot ID
+          description: The unique ID / ordinal of the ballot.
+          type: integer
+        roundId:
+          type: integer
+        status:
+          type: string
+          enum:
+            - PENDING
+            - APPROVED
+            - REJECTED
+        allocations: 
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallotAllocation"
+        submitterAddress:
+          type: string
+    RetroFundingBallotSubmission:
+      summary: Fields required for ballot submission
+      description: An object containing the information required to submit a ballot.
+      type: object
+      properties:
+        ballotId:
+          summary: Address or ENS of the ballot
+          type: string
+        ballotContent: 
+          summary: Signed content of the ballot
+          type: string
+        signature:
+          summary: Badgeholder signature
+          description: Signature of the badgeholder submitting the ballot.
+          type: string
   parameters:
     limitParam:
       name: limit
@@ -508,7 +853,42 @@ components:
       name: status
       in: query
       schema:
-
+        type: string
+    roundIdParam:
+      name: roundId
+      in: path
+      description: The round ID of the RetroFunding round to retrieve.
+      required: true
+      schema:
+        type: integer
+    ballotIdParam:
+      name: ballotAddressOrEns
+      in: path
+      description: The address or ENS name of the ballot to retrieve
+      required: true
+      schema:
+        type: string
+    projectIdParam:
+      name: projectId 
+      in: path
+      description: The id of the project on the ballot
+      required: true
+      schema:
+        type: string 
+    impactMetricParam:
+      name: impactMetricId
+      in: path
+      description: The id of the metric to retrieve
+      required: true
+      schema:
+        type: string
+    commentIdParam:
+      name: commentId
+      in: path
+      description: The id of the comment to delete
+      required: true
+      schema:
+        type: string
 paths:
   /spec:
     get: 
@@ -530,9 +910,54 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
+  /auth/nonce:
+    get:
+      summary: Gets nonce for SIWE authentication
+      description: Gets nonce for SIWE authentication.
+      operationId: getNonce
+      tags: 
+        - auth
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema: 
+                type: string
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /auth/verify:
+    post:
+      summary: Posts SIWE verification payload
+      description: Posts SIWE message and signature.
+      operationId: postSiweVerificationMessage
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SIWEVerificationBody"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error  
   /delegates:
     get:
-      summary: Gets a list of delegates.
+      summary: Gets a list of delegates
       description: >
         Retrieves a list of voting delegates on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -575,7 +1000,7 @@ paths:
           description: Internal Server Error
   /delegates/{addressOrEnsName}:
     get:
-      summary: Gets a specific delegate.
+      summary: Gets a specific delegate
       description: >
         Retrieves a specific delegate on Agora by address or ENS name.
       operationId: getDelegateByAddress
@@ -612,7 +1037,7 @@ paths:
           description: Internal Server Error
   /delegates/{addressOrEnsName}/votes:
     get:
-      summary: Gets a paginated list of votes.
+      summary: Gets a paginated list of votes for a delegate
       description: >
         Retrieves a paginated list of votes for a specific proposal on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -669,7 +1094,7 @@ paths:
           description: Internal Server Error
   /proposals:
     get:
-      summary: Gets a list of proposals.
+      summary: Gets a list of proposals
       description: >
         Retrieves a list of voting proposals on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -737,7 +1162,7 @@ paths:
           description: Internal Server Error
   /proposals/{proposalId}/votes:
     get:
-      summary: Gets a paginated list of votes.
+      summary: Gets a paginated list of votes for a proposal
       description: >
         Retrieves a paginated list of votes for a specific proposal on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -865,7 +1290,7 @@ paths:
           description: Internal Server Error
   /votes:
     get:
-      summary: Gets a paginated list of votes.
+      summary: Gets a paginated list of votes
       description: >
         Retrieves a paginated list of votes on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -908,7 +1333,7 @@ paths:
           description: Internal Server Error
   /votes/{transactionId}:
     get:
-      summary: Gets a specific vote.
+      summary: Gets a specific vote
       description: >
         Retrieves a specific vote on Agora.
       operationId: getVoteByTransactionId
@@ -937,7 +1362,7 @@ paths:
           description: Internal Server Error
   /proposals/types:
     get:
-      summary: Gets a paginated list of proposal types.
+      summary: Gets a paginated list of proposal types
       description: >
         Retrieves a paginated list of proposal types on Agora as a JSON array.
         Limit, offset, and sort parameters can be used to customize the returned list.
@@ -973,6 +1398,40 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/ProposalTemplate'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /projects:
+  # Should this be paginated? How many ballots per round are expected?
+    get:
+      summary: Gets a list of projects
+      description: >
+        Retrieves a list of projects on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProjects
+      tags:
+        - RetroFunding
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
         '400':
           description: Bad Request
         '401': 
@@ -1035,10 +1494,377 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Contract'
+                $ref: '#/components/schemas/VotingToken'
         '400':
           description: Bad Request
         '401': 
           description: Unauthorized
         '500':
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}:
+    get:
+      summary: Gets a specific RetroFunding round
+      description: >
+        Retrieves a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundById
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+      parameters:
+        - name: roundId
+          in: path
+          description: The round ID of the RetroFunding round to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RetroFundingRound"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots:
+    get: 
+      summary: Gets a list of ballots for an RetroFunding round
+      description: >
+        Retrieves a list of ballots for a specific RetroFunding round on Agora as a JSON array.
+        Limit, offset parameters can be used to customize the returned list sorted by ballot ordinal.
+      operationId: getRetroFundingRoundBallots
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - name: roundId
+          in: path
+          description: The round ID of the RetroFunding round to retrieve.
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingBallot'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}:
+    get:
+      summary: Gets a specific ballot for an RetroFunding round
+      description: >
+        Retrieves a specific ballot for an RetroFunding round on Agora.
+      operationId: getRetroFundingRoundBallotById
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RetroFundingBallot"
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/submit:
+    post:
+      summary: Submits a particular ballot
+      description: Submits the content of a ballot to be counted as final for the round.
+      operationId: submitRetroFundingBallot
+      tags:
+          - RetroFunding
+          - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetroFundingBallotSubmission"
+      responses: 
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error    
+  /retrofunding/rounds/{roundId}/projects:
+    get:
+      summary: Gets a list of projects for an RetroFunding round
+      description: >
+        Retrieves a list of projects for a specific RetroFunding round on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getRetroFundingRoundProjects
+      tags:
+        - RetroFunding
+        - projects
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  delegates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics:
+    get:
+      summary: Gets impact metrics for a specific RetroFunding ballot
+      description: >
+        Retrieves a list of impact metrics for a specific ballot for an RetroFunding round on Agora.
+      operationId: getImpactMetricsOnRetroFundingBallot
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  impactMetrics:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingImpactMetric'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+    post: 
+      summary: Adds or updates an impact metric on a specific RetroFunding ballot
+      description: >
+        Adds an impact metric or updates an existing impact metric's allocation amount 
+        on a specific ballot for an RetroFunding round on Agora.
+      operationId: addImpactMetricToRetroFundingBallot
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                metricId:
+                  type: string
+                allocationAmount:
+                  type: string
+      responses: 
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics/{impactMetricId}:
+    delete: 
+      summary: Removes an impact metric from a ballot
+      description: >
+        Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
+      operationId: removeImpactMetricFromRetroFundingBallot
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+      responses: 
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics:
+    get:
+      summary: Gets impact metrics for a specific RetroFunding round
+      description: >
+        Retrieves a paginated list of impact metrics for a specific RetroFunding round on Agora.
+      operationId: getImpactMetricsOnRetroFundingRound
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  impactMetrics:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingImpactMetric'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}:
+    get:
+      summary: Gets a specific impact metric for an RetroFunding round
+      description: >
+        Retrieves a specific impact metric for a specific RetroFunding round on Agora.
+      operationId: getImpactMetricOnRetroFundingRound
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RetroFundingImpactMetric'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
+    put:
+      summary: Comments on an impact metric
+      description: >
+        Creates or edits a comment on a specific impact metric for a specific round.
+        If supplied, comment ID is ignored.
+      operationId: putImpactMetricComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments/{commentId}:
+    delete:
+      summary: Deletes a comment on an impact metric
+      description: >
+        Deletes a comment on a specific impact metric for a specific round.
+      operationId: deleteImpactMetricComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      responses: 
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error 
