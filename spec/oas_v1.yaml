@@ -20,6 +20,31 @@ components:
       in: header
       name: Authorization
   schemas:
+    AuthToken:
+      summary: JWT token for authentication and authorization 
+      description: >
+        A JWT token for authentication and authorization on the Agora platform.
+      type: object
+      properties: 
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          summary: Expiration time of the token
+          description: The time at which the token will expire.
+          type: integer
+    SIWEVerificationBody:
+      summary: Body of SIWE /verify request
+      description: >
+        Body SIWE verification requests containing message and signature per 
+        (EIP-4361)[https://eips.ethereum.org/EIPS/eip-4361]
+      type: object
+      properties:
+        message:
+          type: string
+        signature:
+          type: string
     PageMetadata:
       summary: Pagination metadata
       description: Metadata associated with paginated requests.
@@ -726,8 +751,6 @@ components:
           type: integer
         roundId:
           type: integer
-        submitterAddress:
-          type: string
         status:
           type: string
           enum:
@@ -738,6 +761,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotAllocation"
+        submitterAddress:
+          type: string
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -752,17 +777,6 @@ components:
         signature:
           summary: Badgeholder signature
           description: Signature of the badgeholder submitting the ballot.
-          type: string
-    SIWEVerificationBody:
-      summary: Body of SIWE /verify request
-      description: >
-        Body SIWE verification requests containing message and signature per 
-        (EIP-4361)[https://eips.ethereum.org/EIPS/eip-4361]
-      type: object
-      properties:
-        message:
-          type: string
-        signature:
           type: string
   parameters:
     limitParam:
@@ -885,10 +899,10 @@ paths:
       responses:
         '200':
           description: OK
-          headers:
-            Set-Cookie:
-              schema: 
-                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
         '400':
           description: Bad Request
         '401': 
