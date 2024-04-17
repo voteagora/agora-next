@@ -540,7 +540,7 @@ components:
           type: string
         commenter:
           summary: Author of the comment
-          description: The author of the comment.
+          description: The delegate address of the author of the comment.
           type: string
     RetroFundingRoundStatus:
       summary: Status of an RetroFunding round
@@ -608,6 +608,10 @@ components:
           type: string
         externalLink:
           type: string
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
     ProjectMember:
       summary: Member of a RGPF project
       description: >
