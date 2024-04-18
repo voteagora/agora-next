@@ -47,7 +47,7 @@ export const PoolStats = async ({
         <div className="font-medium">{`${formatNumber(
           rewardPerToken,
           token.decimals
-        )} ${token.symbol}`}</div>
+        )} WETH`}</div>
       </div>
 
       <div className="border-r border-gray-300"></div>

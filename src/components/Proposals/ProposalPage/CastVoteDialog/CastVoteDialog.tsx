@@ -11,8 +11,8 @@ import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
 import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
-import pendingImage from "public/images/action-pending.svg";
-import congrats from "public/images/congrats.svg";
+import pendingImage from "@/assets/pending.svg";
+import successImage from "@/assets/success.svg";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export type SupportTextProps = {
@@ -193,7 +193,7 @@ export function SuccessMessage({
       <Image
         width="457"
         height="155"
-        src={congrats}
+        src={successImage}
         className="w-full mb-3"
         alt="agora loading"
       />
