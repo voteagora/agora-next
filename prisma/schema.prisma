@@ -663,7 +663,7 @@ view uniswapProposals {
   proposal_data      Json?
   proposal_data_raw  String?
   proposal_type      ProposalType
-  proposal_type_data Json?
+  proposal_type_data String?
   proposal_results   Json?
 
   @@map("proposals")
