@@ -9,6 +9,7 @@ import { HStack } from "@/components/Layout/Stack";
 import SelectedDelegatesFeeCard from "@/components/Staking/Delegates/SelectedDelegatesFeeCard";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import TransactionReceipt from "../TransactionReceipt/TransactionReceipt";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   initialDelegates: DelegatePaginated;
@@ -21,13 +22,18 @@ export default async function Delegates({
   fetchDelegates,
   fetchDelegators,
 }: Props) {
+  const searchParams = useSearchParams();
+  const isRedeemStakeParam = searchParams?.get("isRedeemStake");
+
   const [selectedDelegateAddress, setSelectedDelegateAddress] = React.useState<
     string | null
   >(null);
-  const [showReceipt, setShowReceipt] = React.useState<boolean>(false);
+  const [showReceipt, setShowReceipt] = React.useState<boolean>(
+    !!isRedeemStakeParam ?? false
+  );
 
   return (
-    <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
+    <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10 mt-12">
       <div className="sm:col-span-4">
         {showReceipt ? (
           <TransactionReceipt />
@@ -46,6 +52,9 @@ export default async function Delegates({
       </div>
       <div className="sm:col-start-5">
         <SelectedDelegatesFeeCard
+          buttonText={
+            !!isRedeemStakeParam ? "Redeem stake and collect rewards" : ""
+          }
           setShowReceipt={setShowReceipt}
           selectedDelegateAddress={selectedDelegateAddress}
         />

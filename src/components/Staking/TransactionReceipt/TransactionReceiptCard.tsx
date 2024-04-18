@@ -20,8 +20,10 @@ const TransactionReceiptCard: React.FC<ConfirmStakingTransactionCardProps> = ({
 }) => {
   return (
     <VStack
-      className={`font-code max-w-[408px] w-full  px-[34px] py-8 bg-gray-fa rounded-lg border border-gray-300 shadow-newDefault mt-6 ${styles["transaction-box"]}`}
+      className={`font-code max-w-[408px] w-full px-[34px] py-8 bg-gray-fa rounded-lg border border-gray-300 shadow-2xl mt-6 ${styles["transaction-box"]}`}
     >
+      <div className={`rounded-lg ${styles["transaction-box-border"]}`}></div>
+
       <Image
         src="/images/horse_icon.png"
         alt="img"
@@ -41,7 +43,7 @@ const TransactionReceiptCard: React.FC<ConfirmStakingTransactionCardProps> = ({
         <TextRow title="Staking" value={`${totalStake} $ UNI`} />
         <TextRow title="Total stake after" value={stakedAmount} />
         <TextRow title="Staking" value={`${totalStake} $ UNI`} />
-        <TextRow title="Delegating to " value={stakedAmount} />
+        <TextRow title="Delegating to" value={stakedAmount} />
         <TextRow title="Staking" value={delegateTo} />
       </VStack>
       <div className="h-0.5 w-full border-t border-dashed border-gray-300 mt-[46px]"></div>

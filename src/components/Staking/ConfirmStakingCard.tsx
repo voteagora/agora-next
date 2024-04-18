@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -61,11 +63,11 @@ const ConfirmStakingCard = () => {
             Once your UNI is staked, you will start earning from pools where
             fees are turned on.
           </p>
-          <Link href="/staking/delegates">
+          <Link href="/staking/delegates?isRedeemStake=true">
             <Button className="w-full mb-7">Continue</Button>
           </Link>
         </TabsContent>
-        <TabsContent className="mx-4" value="stake">
+        <TabsContent className="mx-4 mt-5" value="stake">
           <div className="border rounded-lg">
             <VStack className="w-full h-[123px] justify-center text-center rounded-lg border-b border-b-gray-300 shadow-newDefault ">
               <p className="text-xs font-semibold text-gray-4f">

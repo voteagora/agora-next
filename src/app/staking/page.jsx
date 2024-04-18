@@ -1,5 +1,3 @@
-import { HStack } from "@/components/Layout/Stack";
-
 import Tenant from "@/lib/tenant/tenant";
 import StackingHeroSection from "@/components/Staking/StackingHeroSection";
 import StackingInfoBoxes from "@/components/Staking/StackingInfoBoxes";
@@ -15,7 +13,7 @@ export default function Page() {
   }
 
   return (
-    <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 w-full max-w-6xl pb-16 mt-12 font-inter">
+    <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10 w-full max-w-6xl pb-16 mt-12 font-inter">
       <div className="sm:col-span-4">
         <StackingHeroSection />
         <StackingInfoBoxes />
@@ -25,6 +23,6 @@ export default function Page() {
         <ConfirmStakingCard />
         <CollectFeeActionCard />
       </div>
-    </HStack>
+    </div>
   );
 }
