@@ -1,10 +1,12 @@
-import Head from 'next/head'
-import { Inter } from 'next/font/google'
-import 'swagger-ui-react/swagger-ui.css'
+import Head from "next/head";
+import { Inter } from "next/font/google";
+import "swagger-ui-react/swagger-ui.css";
 import dynamic from "next/dynamic";
 
-const inter = Inter({ subsets: ['latin'] })
-const DynamicSwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false })
+const inter = Inter({ subsets: ["latin"] });
+const DynamicSwaggerUI = dynamic(() => import("swagger-ui-react"), {
+  ssr: false,
+});
 
 export default function Page() {
   return (
@@ -19,5 +21,5 @@ export default function Page() {
         <DynamicSwaggerUI url="https://petstore3.swagger.io/api/v3/openapi.json" />
       </main>
     </>
-  )
+  );
 }
