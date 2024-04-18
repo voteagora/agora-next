@@ -1,6 +1,5 @@
 "use client";
 
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -18,7 +17,7 @@ export const UnstakeDialog = () => {
     useDepositorTotalStaked(address as `0x${string}`);
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
-  const start = 6;
+  const start = 16;
   const end = 35;
   const depositIds = Array.from(
     { length: end - start + 1 },
@@ -32,16 +31,7 @@ export const UnstakeDialog = () => {
   }
 
   return (
-    <div className="rounded-lg border border-slate-300 w-[400px] p-5">
-      <div className="text-center mb-2 text-xs text-slate-600">
-        {hasTotalStaked && (
-          <TokenAmountDisplay
-            maximumSignificantDigits={5}
-            amount={totalStaked}
-          />
-        )}
-      </div>
-
+    <div>
       {!hasTotalStaked && (
         <div className="text-xs text-slate-600 py-4">
           No deposits found for this wallet

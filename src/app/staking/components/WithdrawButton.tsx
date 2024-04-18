@@ -7,16 +7,15 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { formatNumber } from "@/lib/utils";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface UnstakeButtonProps {
+interface WithdrawButtonProps {
   id: BigInt;
   amount: BigInt;
 }
 
-export const UnstakeButton = ({ amount, id }: UnstakeButtonProps) => {
+export const WithdrawButton = ({ amount, id }: WithdrawButtonProps) => {
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();
 
@@ -63,17 +62,13 @@ export const UnstakeButton = ({ amount, id }: UnstakeButtonProps) => {
 
   return (
     <Button
-      className="w-full"
+      variant="outline"
       disabled={isLoading}
       onClick={() => {
         if (write) write();
       }}
     >
-      {isLoading
-        ? "Unstaking..."
-        : `Unstake ${formatNumber(amount.toString(), token.decimals, 6)} ${
-            token.symbol
-          }`}
+      {isLoading ? "Unstaking..." : "Withdraw "}
     </Button>
   );
 };

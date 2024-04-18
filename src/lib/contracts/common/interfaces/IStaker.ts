@@ -2,7 +2,6 @@ import type { TypedContractMethod } from "@/lib/contracts/generated/common";
 import type { AddressLike, BaseContract, BigNumberish } from "ethers";
 
 export interface IStaker extends BaseContract {
-
   depositorTotalStaked: TypedContractMethod<
     [depositor: AddressLike],
     [bigint],
@@ -12,12 +11,12 @@ export interface IStaker extends BaseContract {
   deposits: TypedContractMethod<
     [depositId: BigNumberish],
     [
-        [bigint, string, string, string] & {
+      [bigint, string, string, string] & {
         balance: bigint;
         owner: string;
         delegatee: string;
         beneficiary: string;
-      }
+      },
     ],
     "view"
   >;
@@ -33,5 +32,4 @@ export interface IStaker extends BaseContract {
     [bigint],
     "view"
   >;
-
 }

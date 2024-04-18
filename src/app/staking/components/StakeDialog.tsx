@@ -3,24 +3,26 @@
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import { StakeButton } from "@/app/staking/components/StakeButton";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
 
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
-import { useAgoraContext } from "@/contexts/AgoraContext";
 
-export const StakeDialog = () => {
+interface StakeDialogProps {
+  delegate?: string;
+  depositId?: number;
+}
+
+export const StakeDialog = ({ delegate }: StakeDialogProps) => {
   const { token } = Tenant.current();
-  const { isConnected } = useAgoraContext();
   const { address } = useAccount();
 
   const [amountToStake, setAmountToStake] = useState<number>(0);
   const [addressToDelegate, setAddressToDelegate] = useState<
     string | undefined
-  >(address);
+  >(delegate);
 
   const { data: totalStaked, isFetched: isLoadedTotalStaked } =
     useDepositorTotalStaked(address as `0x${string}`);
@@ -30,12 +32,6 @@ export const StakeDialog = () => {
     address as `0x${string}`
   );
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
-
-  if (!isConnected || !address) {
-    return (
-      <Button disabled={true}>Connect Wallet to Stake ${token.symbol}</Button>
-    );
-  }
 
   return (
     <div className="rounded-lg border border-slate-300 w-[400px] p-5">
@@ -53,18 +49,21 @@ export const StakeDialog = () => {
           />
         </div>
 
-        <div className="py-4">
-          <div>Delegate</div>
-          <Input
-            className="w-full mt-2 text-center"
-            defaultValue={address}
-            onChange={(e) => {
-              setAddressToDelegate(e.target.value);
-            }}
-            type="text"
-          />
-        </div>
+        {!delegate && (
+          <div className="py-4">
+            <div>Delegate</div>
+            <Input
+              className="w-full mt-2 text-center"
+              defaultValue={address}
+              onChange={(e) => {
+                setAddressToDelegate(e.target.value);
+              }}
+              type="text"
+            />
+          </div>
+        )}
       </div>
+
       <div className="gap-8 columns-2">
         <div className="text-left p-2">
           <div className="text-xs text-slate-600">Available to stake</div>

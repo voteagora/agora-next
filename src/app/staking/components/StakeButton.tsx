@@ -69,7 +69,7 @@ export const StakeButton = ({ address, amount }: StakeButtonProps) => {
 
   return (
     <Button className="w-full" disabled={isLoading} onClick={() => write?.()}>
-      {isLoading ? "Staking..." : "Stake"}
+      {isLoading ? "Staking..." : "Stake and Delegate"}
     </Button>
   );
 };

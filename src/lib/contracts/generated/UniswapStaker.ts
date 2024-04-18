@@ -209,7 +209,7 @@ export interface UniswapStakerInterface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(
@@ -220,7 +220,7 @@ export interface UniswapStakerInterface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(
@@ -275,7 +275,7 @@ export interface UniswapStakerInterface extends Interface {
       AddressLike,
       AddressLike,
       BigNumberish,
-      BytesLike
+      BytesLike,
     ]
   ): string;
   encodeFunctionData(
@@ -486,12 +486,12 @@ export namespace BeneficiaryAlteredEvent {
   export type InputTuple = [
     depositId: BigNumberish,
     oldBeneficiary: AddressLike,
-    newBeneficiary: AddressLike
+    newBeneficiary: AddressLike,
   ];
   export type OutputTuple = [
     depositId: bigint,
     oldBeneficiary: string,
-    newBeneficiary: string
+    newBeneficiary: string,
   ];
   export interface OutputObject {
     depositId: bigint;
@@ -508,12 +508,12 @@ export namespace DelegateeAlteredEvent {
   export type InputTuple = [
     depositId: BigNumberish,
     oldDelegatee: AddressLike,
-    newDelegatee: AddressLike
+    newDelegatee: AddressLike,
   ];
   export type OutputTuple = [
     depositId: bigint,
     oldDelegatee: string,
-    newDelegatee: string
+    newDelegatee: string,
   ];
   export interface OutputObject {
     depositId: bigint;
@@ -580,13 +580,13 @@ export namespace StakeDepositedEvent {
     owner: AddressLike,
     depositId: BigNumberish,
     amount: BigNumberish,
-    depositBalance: BigNumberish
+    depositBalance: BigNumberish,
   ];
   export type OutputTuple = [
     owner: string,
     depositId: bigint,
     amount: bigint,
-    depositBalance: bigint
+    depositBalance: bigint,
   ];
   export interface OutputObject {
     owner: string;
@@ -604,12 +604,12 @@ export namespace StakeWithdrawnEvent {
   export type InputTuple = [
     depositId: BigNumberish,
     amount: BigNumberish,
-    depositBalance: BigNumberish
+    depositBalance: BigNumberish,
   ];
   export type OutputTuple = [
     depositId: bigint,
     amount: bigint,
-    depositBalance: bigint
+    depositBalance: bigint,
   ];
   export interface OutputObject {
     depositId: bigint;
@@ -712,7 +712,7 @@ export interface UniswapStaker extends BaseContract {
       _newBeneficiary: AddressLike,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -730,7 +730,7 @@ export interface UniswapStaker extends BaseContract {
       _newDelegatee: AddressLike,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -764,7 +764,7 @@ export interface UniswapStaker extends BaseContract {
         owner: string;
         delegatee: string;
         beneficiary: string;
-      }
+      },
     ],
     "view"
   >;
@@ -786,7 +786,7 @@ export interface UniswapStaker extends BaseContract {
         verifyingContract: string;
         salt: string;
         extensions: bigint[];
-      }
+      },
     ],
     "view"
   >;
@@ -821,7 +821,7 @@ export interface UniswapStaker extends BaseContract {
       _deadline: BigNumberish,
       _v: BigNumberish,
       _r: BytesLike,
-      _s: BytesLike
+      _s: BytesLike,
     ],
     [bigint],
     "nonpayable"
@@ -834,7 +834,7 @@ export interface UniswapStaker extends BaseContract {
       _deadline: BigNumberish,
       _v: BigNumberish,
       _r: BytesLike,
-      _s: BytesLike
+      _s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -890,7 +890,7 @@ export interface UniswapStaker extends BaseContract {
       _amount: BigNumberish,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -903,7 +903,7 @@ export interface UniswapStaker extends BaseContract {
       _beneficiary: AddressLike,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [bigint],
     "nonpayable"
@@ -931,7 +931,7 @@ export interface UniswapStaker extends BaseContract {
       _amount: BigNumberish,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -989,7 +989,7 @@ export interface UniswapStaker extends BaseContract {
       _newBeneficiary: AddressLike,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -1009,7 +1009,7 @@ export interface UniswapStaker extends BaseContract {
       _newDelegatee: AddressLike,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -1030,9 +1030,7 @@ export interface UniswapStaker extends BaseContract {
   getFunction(
     nameOrSignature: "depositorTotalStaked"
   ): TypedContractMethod<[depositor: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "deposits"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "deposits"): TypedContractMethod<
     [depositId: BigNumberish],
     [
       [bigint, string, string, string] & {
@@ -1040,16 +1038,14 @@ export interface UniswapStaker extends BaseContract {
         owner: string;
         delegatee: string;
         beneficiary: string;
-      }
+      },
     ],
     "view"
   >;
   getFunction(
     nameOrSignature: "earningPower"
   ): TypedContractMethod<[beneficiary: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "eip712Domain"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "eip712Domain"): TypedContractMethod<
     [],
     [
       [string, string, string, bigint, string, string, bigint[]] & {
@@ -1060,7 +1056,7 @@ export interface UniswapStaker extends BaseContract {
         verifyingContract: string;
         salt: string;
         extensions: bigint[];
-      }
+      },
     ],
     "view"
   >;
@@ -1095,7 +1091,7 @@ export interface UniswapStaker extends BaseContract {
       _deadline: BigNumberish,
       _v: BigNumberish,
       _r: BytesLike,
-      _s: BytesLike
+      _s: BytesLike,
     ],
     [bigint],
     "nonpayable"
@@ -1109,7 +1105,7 @@ export interface UniswapStaker extends BaseContract {
       _deadline: BigNumberish,
       _v: BigNumberish,
       _r: BytesLike,
-      _s: BytesLike
+      _s: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -1168,7 +1164,7 @@ export interface UniswapStaker extends BaseContract {
       _amount: BigNumberish,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -1182,7 +1178,7 @@ export interface UniswapStaker extends BaseContract {
       _beneficiary: AddressLike,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [bigint],
     "nonpayable"
@@ -1211,7 +1207,7 @@ export interface UniswapStaker extends BaseContract {
       _amount: BigNumberish,
       _depositor: AddressLike,
       _deadline: BigNumberish,
-      _signature: BytesLike
+      _signature: BytesLike,
     ],
     [void],
     "nonpayable"

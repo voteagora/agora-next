@@ -7,7 +7,9 @@ export const useUnclaimedReward = (address: string | undefined) => {
     enabled: !!address,
     queryKey: ["unclaimedReward", address],
     queryFn: async () => {
-      return await contracts.staker!.contract.unclaimedReward(address as `0x${string}`);
+      return await contracts.staker!.contract.unclaimedReward(
+        address as `0x${string}`
+      );
     },
   });
 
