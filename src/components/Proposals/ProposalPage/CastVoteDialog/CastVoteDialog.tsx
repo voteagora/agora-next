@@ -11,8 +11,8 @@ import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
 import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
-import pendingImage from "public/images/action-pending.svg";
-import congrats from "public/images/congrats.svg";
+import pendingImage from "../../../../../public/images/action-pending.svg";
+import congrats from "../../../../../public/images/congrats.svg";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export type SupportTextProps = {
