@@ -15,7 +15,6 @@
     "prettier-src": "prettier -w src/"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.454.0",
     "@babel/core": "^7.0.0-0",
     "@emotion/css": "^11.11.2",
     "@headlessui/react": "^1.7.17",
@@ -86,6 +85,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.454.0",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "@typechain/ethers-v6": "^0.5.1",
