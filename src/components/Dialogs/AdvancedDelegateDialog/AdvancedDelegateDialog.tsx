@@ -217,7 +217,9 @@ export function AdvancedDelegateDialog({
                   </HStack>
                   <AdvancedDelegationDisplayAmount amount={availableBalance} />
                 </VStack>
-                <VStack className="max-h-[400px] overflow-y-scroll">
+                <VStack
+                  className={`overflow-y-scroll ${overflowDelegation ? "max-h-[240px] sm:max-h-[400px]" : "max-h-[400px]"}`}
+                >
                   {delegatees.map((delegatee, index) => (
                     <SubdelegationToRow
                       key={index}
