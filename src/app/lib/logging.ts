@@ -1,8 +1,9 @@
-import { trace, Span } from "@opentelemetry/api";
+import * as otel from "@opentelemetry/api";
 import { type NextRequest } from "next/server";
 import { performance } from "perf_hooks";
 import * as util from "util";
 
+import { SEMATTRS_EXCEPTION_ESCAPED } from "@opentelemetry/semantic-conventions";
 import { SERVICE_NAME } from "@/instrumentation";
 
 // 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
@@ -11,9 +12,9 @@ const log_emission =
   process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ||
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev";
 
-const tracer = trace.getTracer(SERVICE_NAME);
+export const OTEL_API_TRACER = otel.trace.getTracer(SERVICE_NAME);
 
-const time_this = async <T>(
+export const time_this = async <T>(
   fn: () => Promise<T>,
   log_fields: Record<string, any>
 ) => {
@@ -33,7 +34,10 @@ const time_this = async <T>(
   }
 };
 
-const time_this_sync = <T>(fn: () => T, log_fields: Record<string, any>) => {
+export const time_this_sync = <T>(
+  fn: () => T,
+  log_fields: Record<string, any>
+) => {
   const start = performance.now();
   try {
     return fn();
@@ -50,11 +54,104 @@ const time_this_sync = <T>(fn: () => T, log_fields: Record<string, any>) => {
   }
 };
 
-export const setCurrentSpanAttributes = <T>(
-  span_attrs: Record<string, any>
-) => {
-  const span = trace.getActiveSpan() as Span;
-  span.setAttributes(span_attrs);
+/* 
+  Adds baggage to active context.
+  OTel contexts are immutable; as such, we create a new context with the added baggage.
+*/
+export const addBaggage = (
+  baggageToAdd: Record<string, string> | undefined
+): otel.Context => {
+  let ctxt: otel.Context;
+  if (baggageToAdd) {
+    let baggage =
+      otel.propagation.getBaggage(otel.context.active()) ||
+      otel.propagation.createBaggage();
+    Object.entries(baggageToAdd).forEach(([key, value]) => {
+      baggage = baggage.setEntry(key, { value: value });
+    });
+    ctxt = otel.propagation.setBaggage(otel.context.active(), baggage);
+  } else {
+    ctxt = otel.context.active();
+  }
+  return ctxt;
 };
 
-export { time_this, time_this_sync };
+/*
+  Adds span attributes to the supplied span, or the active span if none is supplied.
+  No-op if there is no span supplied or if there is not an active span.
+*/
+export const addSpanAttributes = (
+  span_attrs: Record<string, any>,
+  span: otel.Span | null = null
+) => {
+  const chosenSpan = span || otel.trace.getActiveSpan();
+  if (chosenSpan) {
+    chosenSpan.setAttributes(span_attrs);
+    otel.trace.setSpan(otel.context.active(), chosenSpan);
+  }
+};
+
+/*
+  Runs supplied function within a span specified by the metadata.
+  If no tracer is supplied, uses the global tracer to create a span.
+  Adds all baggage in context as span attributes, including additional baggage.  
+*/
+export const doInSpan = <T>(
+  metadata: {
+    name: string;
+    tracer?: otel.Tracer;
+    additionalBaggage?: Record<string, string>;
+  },
+  fn: () => T
+): T | Promise<T> | undefined => {
+  const { tracer, name } = metadata;
+  let selectedTracer: otel.Tracer;
+  if (!tracer) {
+    selectedTracer = OTEL_API_TRACER;
+  } else {
+    selectedTracer = tracer;
+  }
+
+  const newCtxt = addBaggage(metadata.additionalBaggage);
+
+  const startAndRunInSpan = () =>
+    selectedTracer.startActiveSpan(name, (span) => {
+      const handleSuccess = (response: T) => {
+        span.setStatus({ code: otel.SpanStatusCode.OK });
+        span.end();
+        return response;
+      };
+
+      const catchError = (error: otel.Exception) => {
+        span.recordException(error);
+        span.setStatus({ code: otel.SpanStatusCode.ERROR });
+        span.setAttribute(SEMATTRS_EXCEPTION_ESCAPED, true);
+        span.end();
+        throw error;
+      };
+
+      // unpack baggage and add to span attributes
+      const baggage = otel.propagation.getBaggage(otel.context.active());
+      if (baggage) {
+        baggage.getAllEntries().forEach(([key, bag]) => {
+          span.setAttribute(key, bag.value);
+        });
+      }
+
+      try {
+        const response = fn();
+        if (response instanceof Promise) {
+          return response.then(handleSuccess, catchError);
+        }
+        return handleSuccess(response);
+      } catch (error) {
+        catchError(error as otel.Exception);
+      }
+    });
+
+  if (newCtxt) {
+    return otel.context.with(newCtxt, startAndRunInSpan);
+  } else {
+    return startAndRunInSpan();
+  }
+};

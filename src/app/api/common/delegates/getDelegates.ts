@@ -25,6 +25,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import { doInSpan } from "@/app/lib/logging";
 
 async function getDelegatesApi(
   sort: string,
@@ -84,10 +85,14 @@ async function getDelegatesApi(
     }
   };
 
-  const { meta, data: delegates } = await paginateResultEx(
-    paginatedQuery,
-    pagination
-  );
+  const result = (await doInSpan(
+    { name: "getDelegatesApi" },
+    async () => await paginateResultEx(paginatedQuery, pagination)
+  )) as PaginatedResultEx<DelegatesGetPayload[]>;
+
+  const delegates = result.data;
+  const meta = result.meta;
+
   const _delegates = await Promise.all(
     delegates.map(async (delegate: DelegatesGetPayload) => {
       return {
