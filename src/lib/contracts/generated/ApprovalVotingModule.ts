@@ -34,7 +34,7 @@ export type ProposalSettingsStructOutput = [
   criteria: bigint,
   budgetToken: string,
   criteriaValue: bigint,
-  budgetAmount: bigint
+  budgetAmount: bigint,
 ] & {
   maxApprovals: bigint;
   criteria: bigint;
@@ -205,7 +205,7 @@ export interface ApprovalVotingModule extends BaseContract {
       account: AddressLike,
       support: BigNumberish,
       weight: BigNumberish,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -218,7 +218,7 @@ export interface ApprovalVotingModule extends BaseContract {
         targets: string[];
         values: bigint[];
         calldatas: string[];
-      }
+      },
     ],
     "nonpayable"
   >;
@@ -248,7 +248,7 @@ export interface ApprovalVotingModule extends BaseContract {
         governor: string;
         initBalance: bigint;
         settings: ProposalSettingsStructOutput;
-      }
+      },
     ],
     "view"
   >;
@@ -257,7 +257,7 @@ export interface ApprovalVotingModule extends BaseContract {
     [
       proposalId: BigNumberish,
       proposalData: BytesLike,
-      descriptionHash: BytesLike
+      descriptionHash: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -293,7 +293,7 @@ export interface ApprovalVotingModule extends BaseContract {
       account: AddressLike,
       support: BigNumberish,
       weight: BigNumberish,
-      params: BytesLike
+      params: BytesLike,
     ],
     [void],
     "nonpayable"
@@ -307,7 +307,7 @@ export interface ApprovalVotingModule extends BaseContract {
         targets: string[];
         values: bigint[];
         calldatas: string[];
-      }
+      },
     ],
     "nonpayable"
   >;
@@ -337,7 +337,7 @@ export interface ApprovalVotingModule extends BaseContract {
         governor: string;
         initBalance: bigint;
         settings: ProposalSettingsStructOutput;
-      }
+      },
     ],
     "view"
   >;
@@ -347,7 +347,7 @@ export interface ApprovalVotingModule extends BaseContract {
     [
       proposalId: BigNumberish,
       proposalData: BytesLike,
-      descriptionHash: BytesLike
+      descriptionHash: BytesLike,
     ],
     [void],
     "nonpayable"

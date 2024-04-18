@@ -60,8 +60,8 @@ export default function OptionsResultsPanel({
       return BigInt(b.votes || 0) > BigInt(a.votes || 0)
         ? 1
         : BigInt(b.votes || 0) < BigInt(a.votes || 0)
-        ? -1
-        : 0;
+          ? -1
+          : 0;
     });
 
   return (
