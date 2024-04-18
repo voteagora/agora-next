@@ -1,3 +1,3 @@
-const { PolyFile } = require('next/dist/compiled/undici')
+const { PolyFile } = require("undici");
 
 globalThis.File  = globalThis.File ?? PolyFile
