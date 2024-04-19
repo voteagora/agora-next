@@ -1,10 +1,9 @@
-import Head from 'next/head'
-import { Inter } from 'next/font/google'
-import SwaggerUI from 'swagger-ui-react'
-import 'swagger-ui-react/swagger-ui.css'
+import Head from "next/head";
+import { Inter } from "next/font/google";
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
 
-
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function SpecUI() {
   return (
@@ -19,5 +18,5 @@ export default function SpecUI() {
         <SwaggerUI url="/api/v1/spec" />
       </main>
     </>
-  )
+  );
 }
