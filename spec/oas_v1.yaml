@@ -1877,12 +1877,8 @@ paths:
         - $ref: "#/components/parameters/impactMetricParam"
         - $ref: "#/components/parameters/commentIdParam"
       responses: 
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/Comment'
+      '200':
+        description: OK
       '400':
         description: Bad Request
       '401': 
