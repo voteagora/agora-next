@@ -1,3 +1,3 @@
-const { PolyFile } = require("undici");
+const { PolyFile } = require("node:buffer");
 
 globalThis.File  = globalThis.File ?? PolyFile
