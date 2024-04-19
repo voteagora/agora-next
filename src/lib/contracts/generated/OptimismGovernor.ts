@@ -161,7 +161,7 @@ export interface OptimismGovernorInterface extends Interface {
       BigNumberish,
       string,
       BigNumberish,
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -181,7 +181,7 @@ export interface OptimismGovernorInterface extends Interface {
       BytesLike,
       BigNumberish,
       BytesLike,
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -229,7 +229,7 @@ export interface OptimismGovernorInterface extends Interface {
       AddressLike,
       BigNumberish[],
       BigNumberish[],
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -580,7 +580,7 @@ export namespace ProposalCreated_uint256_address_address_array_uint256_array_str
     startBlock: BigNumberish,
     endBlock: BigNumberish,
     description: string,
-    proposalType: BigNumberish,
+    proposalType: BigNumberish
   ];
   export type OutputTuple = [
     proposalId: bigint,
@@ -592,7 +592,7 @@ export namespace ProposalCreated_uint256_address_address_array_uint256_array_str
     startBlock: bigint,
     endBlock: bigint,
     description: string,
-    proposalType: bigint,
+    proposalType: bigint
   ];
   export interface OutputObject {
     proposalId: bigint;
@@ -621,7 +621,7 @@ export namespace ProposalCreated_uint256_address_address_bytes_uint256_uint256_s
     startBlock: BigNumberish,
     endBlock: BigNumberish,
     description: string,
-    proposalType: BigNumberish,
+    proposalType: BigNumberish
   ];
   export type OutputTuple = [
     proposalId: bigint,
@@ -631,7 +631,7 @@ export namespace ProposalCreated_uint256_address_address_bytes_uint256_uint256_s
     startBlock: bigint,
     endBlock: bigint,
     description: string,
-    proposalType: bigint,
+    proposalType: bigint
   ];
   export interface OutputObject {
     proposalId: bigint;
@@ -657,7 +657,7 @@ export namespace ProposalCreated_uint256_address_address_bytes_uint256_uint256_s
     proposalData: BytesLike,
     startBlock: BigNumberish,
     endBlock: BigNumberish,
-    description: string,
+    description: string
   ];
   export type OutputTuple = [
     proposalId: bigint,
@@ -666,7 +666,7 @@ export namespace ProposalCreated_uint256_address_address_bytes_uint256_uint256_s
     proposalData: string,
     startBlock: bigint,
     endBlock: bigint,
-    description: string,
+    description: string
   ];
   export interface OutputObject {
     proposalId: bigint;
@@ -693,7 +693,7 @@ export namespace ProposalCreated_uint256_address_address_array_uint256_array_str
     calldatas: BytesLike[],
     startBlock: BigNumberish,
     endBlock: BigNumberish,
-    description: string,
+    description: string
   ];
   export type OutputTuple = [
     proposalId: bigint,
@@ -704,7 +704,7 @@ export namespace ProposalCreated_uint256_address_address_array_uint256_array_str
     calldatas: string[],
     startBlock: bigint,
     endBlock: bigint,
-    description: string,
+    description: string
   ];
   export interface OutputObject {
     proposalId: bigint;
@@ -751,11 +751,11 @@ export namespace ProposalExecutedEvent {
 export namespace ProposalThresholdSetEvent {
   export type InputTuple = [
     oldProposalThreshold: BigNumberish,
-    newProposalThreshold: BigNumberish,
+    newProposalThreshold: BigNumberish
   ];
   export type OutputTuple = [
     oldProposalThreshold: bigint,
-    newProposalThreshold: bigint,
+    newProposalThreshold: bigint
   ];
   export interface OutputObject {
     oldProposalThreshold: bigint;
@@ -770,7 +770,7 @@ export namespace ProposalThresholdSetEvent {
 export namespace ProposalTypeUpdatedEvent {
   export type InputTuple = [
     proposalId: BigNumberish,
-    proposalType: BigNumberish,
+    proposalType: BigNumberish
   ];
   export type OutputTuple = [proposalId: bigint, proposalType: bigint];
   export interface OutputObject {
@@ -786,11 +786,11 @@ export namespace ProposalTypeUpdatedEvent {
 export namespace QuorumNumeratorUpdatedEvent {
   export type InputTuple = [
     oldQuorumNumerator: BigNumberish,
-    newQuorumNumerator: BigNumberish,
+    newQuorumNumerator: BigNumberish
   ];
   export type OutputTuple = [
     oldQuorumNumerator: bigint,
-    newQuorumNumerator: bigint,
+    newQuorumNumerator: bigint
   ];
   export interface OutputObject {
     oldQuorumNumerator: bigint;
@@ -808,14 +808,14 @@ export namespace VoteCastEvent {
     proposalId: BigNumberish,
     support: BigNumberish,
     weight: BigNumberish,
-    reason: string,
+    reason: string
   ];
   export type OutputTuple = [
     voter: string,
     proposalId: bigint,
     support: bigint,
     weight: bigint,
-    reason: string,
+    reason: string
   ];
   export interface OutputObject {
     voter: string;
@@ -837,7 +837,7 @@ export namespace VoteCastWithParamsEvent {
     support: BigNumberish,
     weight: BigNumberish,
     reason: string,
-    params: BytesLike,
+    params: BytesLike
   ];
   export type OutputTuple = [
     voter: string,
@@ -845,7 +845,7 @@ export namespace VoteCastWithParamsEvent {
     support: bigint,
     weight: bigint,
     reason: string,
-    params: string,
+    params: string
   ];
   export interface OutputObject {
     voter: string;
@@ -864,7 +864,7 @@ export namespace VoteCastWithParamsEvent {
 export namespace VotingDelaySetEvent {
   export type InputTuple = [
     oldVotingDelay: BigNumberish,
-    newVotingDelay: BigNumberish,
+    newVotingDelay: BigNumberish
   ];
   export type OutputTuple = [oldVotingDelay: bigint, newVotingDelay: bigint];
   export interface OutputObject {
@@ -880,7 +880,7 @@ export namespace VotingDelaySetEvent {
 export namespace VotingPeriodSetEvent {
   export type InputTuple = [
     oldVotingPeriod: BigNumberish,
-    newVotingPeriod: BigNumberish,
+    newVotingPeriod: BigNumberish
   ];
   export type OutputTuple = [oldVotingPeriod: bigint, newVotingPeriod: bigint];
   export interface OutputObject {
@@ -963,7 +963,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      descriptionHash: BytesLike,
+      descriptionHash: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -987,7 +987,7 @@ export interface OptimismGovernor extends BaseContract {
       support: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1000,7 +1000,7 @@ export interface OptimismGovernor extends BaseContract {
       support: BigNumberish,
       reason: string,
       votes: BigNumberish,
-      params: BytesLike,
+      params: BytesLike
     ],
     [void],
     "nonpayable"
@@ -1017,7 +1017,7 @@ export interface OptimismGovernor extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike,
+      params: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1031,7 +1031,7 @@ export interface OptimismGovernor extends BaseContract {
       params: BytesLike,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1048,7 +1048,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      descriptionHash: BytesLike,
+      descriptionHash: BytesLike
     ],
     [bigint],
     "payable"
@@ -1083,7 +1083,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      descriptionHash: BytesLike,
+      descriptionHash: BytesLike
     ],
     [bigint],
     "view"
@@ -1100,7 +1100,7 @@ export interface OptimismGovernor extends BaseContract {
       proposalId: BigNumberish,
       account: AddressLike,
       votes: BigNumberish,
-      accountVotes: BigNumberish,
+      accountVotes: BigNumberish
     ],
     [void],
     "nonpayable"
@@ -1116,7 +1116,7 @@ export interface OptimismGovernor extends BaseContract {
       arg1: AddressLike,
       arg2: BigNumberish[],
       arg3: BigNumberish[],
-      arg4: BytesLike,
+      arg4: BytesLike
     ],
     [string],
     "nonpayable"
@@ -1128,7 +1128,7 @@ export interface OptimismGovernor extends BaseContract {
       arg1: AddressLike,
       arg2: BigNumberish,
       arg3: BigNumberish,
-      arg4: BytesLike,
+      arg4: BytesLike
     ],
     [string],
     "nonpayable"
@@ -1161,7 +1161,7 @@ export interface OptimismGovernor extends BaseContract {
         againstVotes: bigint;
         forVotes: bigint;
         abstainVotes: bigint;
-      },
+      }
     ],
     "view"
   >;
@@ -1171,7 +1171,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      description: string,
+      description: string
     ],
     [bigint],
     "nonpayable"
@@ -1183,7 +1183,7 @@ export interface OptimismGovernor extends BaseContract {
       values: BigNumberish[],
       calldatas: BytesLike[],
       description: string,
-      proposalType: BigNumberish,
+      proposalType: BigNumberish
     ],
     [bigint],
     "nonpayable"
@@ -1200,7 +1200,7 @@ export interface OptimismGovernor extends BaseContract {
       module: AddressLike,
       proposalData: BytesLike,
       description: string,
-      proposalType: BigNumberish,
+      proposalType: BigNumberish
     ],
     [bigint],
     "nonpayable"
@@ -1330,7 +1330,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      descriptionHash: BytesLike,
+      descriptionHash: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1357,7 +1357,7 @@ export interface OptimismGovernor extends BaseContract {
       support: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1371,7 +1371,7 @@ export interface OptimismGovernor extends BaseContract {
       support: BigNumberish,
       reason: string,
       votes: BigNumberish,
-      params: BytesLike,
+      params: BytesLike
     ],
     [void],
     "nonpayable"
@@ -1390,7 +1390,7 @@ export interface OptimismGovernor extends BaseContract {
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
-      params: BytesLike,
+      params: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1405,7 +1405,7 @@ export interface OptimismGovernor extends BaseContract {
       params: BytesLike,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [bigint],
     "nonpayable"
@@ -1424,7 +1424,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      descriptionHash: BytesLike,
+      descriptionHash: BytesLike
     ],
     [bigint],
     "payable"
@@ -1464,7 +1464,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      descriptionHash: BytesLike,
+      descriptionHash: BytesLike
     ],
     [bigint],
     "view"
@@ -1483,7 +1483,7 @@ export interface OptimismGovernor extends BaseContract {
       proposalId: BigNumberish,
       account: AddressLike,
       votes: BigNumberish,
-      accountVotes: BigNumberish,
+      accountVotes: BigNumberish
     ],
     [void],
     "nonpayable"
@@ -1502,7 +1502,7 @@ export interface OptimismGovernor extends BaseContract {
       arg1: AddressLike,
       arg2: BigNumberish[],
       arg3: BigNumberish[],
-      arg4: BytesLike,
+      arg4: BytesLike
     ],
     [string],
     "nonpayable"
@@ -1515,7 +1515,7 @@ export interface OptimismGovernor extends BaseContract {
       arg1: AddressLike,
       arg2: BigNumberish,
       arg3: BigNumberish,
-      arg4: BytesLike,
+      arg4: BytesLike
     ],
     [string],
     "nonpayable"
@@ -1536,14 +1536,16 @@ export interface OptimismGovernor extends BaseContract {
   getFunction(
     nameOrSignature: "proposalThreshold"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(nameOrSignature: "proposalVotes"): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "proposalVotes"
+  ): TypedContractMethod<
     [proposalId: BigNumberish],
     [
       [bigint, bigint, bigint] & {
         againstVotes: bigint;
         forVotes: bigint;
         abstainVotes: bigint;
-      },
+      }
     ],
     "view"
   >;
@@ -1554,7 +1556,7 @@ export interface OptimismGovernor extends BaseContract {
       targets: AddressLike[],
       values: BigNumberish[],
       calldatas: BytesLike[],
-      description: string,
+      description: string
     ],
     [bigint],
     "nonpayable"
@@ -1567,7 +1569,7 @@ export interface OptimismGovernor extends BaseContract {
       values: BigNumberish[],
       calldatas: BytesLike[],
       description: string,
-      proposalType: BigNumberish,
+      proposalType: BigNumberish
     ],
     [bigint],
     "nonpayable"
@@ -1586,7 +1588,7 @@ export interface OptimismGovernor extends BaseContract {
       module: AddressLike,
       proposalData: BytesLike,
       description: string,
-      proposalType: BigNumberish,
+      proposalType: BigNumberish
     ],
     [bigint],
     "nonpayable"
