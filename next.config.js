@@ -77,7 +77,6 @@ const nextConfig = {
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
     serverComponentsExternalPackages: ["@opentelemetry/sdk-node"]
   },
-  reactStrictMode: false,
 };
 
 module.exports = nextConfig;
