@@ -1082,7 +1082,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  votes:
                     type: array
                     items:
                       $ref: '#/components/schemas/Vote'
@@ -1200,7 +1200,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  votes:
                     type: array
                     items:
                       $ref: '#/components/schemas/Vote'
@@ -1240,7 +1240,14 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Delegation'
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  votes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delegation'
         '400':
           description: Bad Request
         '401': 
@@ -1279,7 +1286,14 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Delegation'
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  votes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delegation'
         '400':
           description: Bad Request
         '401': 
@@ -1321,7 +1335,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  votes:
                     type: array
                     items:
                       $ref: '#/components/schemas/Vote'
@@ -1394,7 +1408,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  proposalTypes:
                     type: array
                     items:
                       $ref: '#/components/schemas/ProposalTemplate'
@@ -1428,7 +1442,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  projects:
                     type: array
                     items:
                       $ref: '#/components/schemas/Project'
@@ -1559,7 +1573,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  ballots:
                     type: array
                     items:
                       $ref: '#/components/schemas/RetroFundingBallot'
@@ -1647,7 +1661,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  projects:
                     type: array
                     items:
                       $ref: '#/components/schemas/Project'
@@ -1833,7 +1847,12 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Comment'
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
         '400':
           description: Bad Request
         '401': 
