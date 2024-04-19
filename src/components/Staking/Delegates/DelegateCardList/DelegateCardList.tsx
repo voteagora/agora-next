@@ -92,7 +92,7 @@ export default function DelegateCardList({
         }
         element="div"
       >
-        {dummyDaligates.map((delegate, index) => {
+        {delegates.map((delegate, index) => {
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {

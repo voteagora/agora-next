@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
+import Link from "next/link";
 
 const CollectFeeActionCard = () => {
   return (
@@ -41,13 +42,15 @@ const CollectFeeActionCard = () => {
             9/10 recent proposals
           </p>
         </HStack>
-        <Button
-          variant="outline"
-          size="lg"
-          className=" text-base font-semibold text-black mt-[18px] mb-5"
-        >
-          Change delegate
-        </Button>
+        <Link href="/staking/delegates">
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full text-base font-semibold text-black mt-[18px] mb-5"
+          >
+            Change delegate
+          </Button>
+        </Link>
       </VStack>
     </div>
   );

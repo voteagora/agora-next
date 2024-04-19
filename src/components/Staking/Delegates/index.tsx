@@ -10,6 +10,7 @@ import SelectedDelegatesFeeCard from "@/components/Staking/Delegates/SelectedDel
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import TransactionReceipt from "../TransactionReceipt/TransactionReceipt";
 import { useSearchParams } from "next/navigation";
+// import RewardRedemptionCard from "../RewardRedemptionCard";
 
 interface Props {
   initialDelegates: DelegatePaginated;
@@ -52,12 +53,29 @@ export default async function Delegates({
       </div>
       <div className="sm:col-start-5">
         <SelectedDelegatesFeeCard
+          isShowCollectRewards={!!isRedeemStakeParam}
           buttonText={
-            !!isRedeemStakeParam ? "Redeem stake and collect rewards" : ""
+            !!isRedeemStakeParam
+              ? "Redeem stake and collect rewards"
+              : selectedDelegateAddress === null
+              ? "Select delegate to continue"
+              : showReceipt
+              ? "Stake & delegate my UNI"
+              : "Continue"
           }
           setShowReceipt={setShowReceipt}
-          selectedDelegateAddress={selectedDelegateAddress}
+          isButtonDisabled={selectedDelegateAddress === null}
         />
+        {/* // This component will be shown for claim rewards */}
+        {/*
+           <RewardRedemptionCard
+            buttonText={
+              !!isRedeemStakeParam ? "Redeem stake and collect rewards" : ""
+            }
+            setShowReceipt={setShowReceipt}
+            selectedDelegateAddress={selectedDelegateAddress}
+          />
+          */}
       </div>
     </HStack>
   );

@@ -26,6 +26,7 @@ import flag from "./flag.svg";
 import lightbulb from "./lightbulb.svg";
 import currency from "./currency.svg";
 import arrow_right from "./arrow_right.svg";
+import logout from "./logout.svg";
 
 export const icons = {
   contractVoter,
@@ -56,4 +57,5 @@ export const icons = {
   lightbulb,
   currency,
   arrow_right,
+  logout,
 };
