@@ -6,7 +6,7 @@ module.exports = {
     includePaths: [path.join(__dirname, "styles")],
   },
 };
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
     return [
@@ -77,7 +77,7 @@ const nextConfig = {
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
     serverComponentsExternalPackages: ["@opentelemetry/sdk-node"]
   },
-  reactStrictMode: false
+  reactStrictMode: false,
 };
 
 module.exports = nextConfig;
