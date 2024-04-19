@@ -10,19 +10,14 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 
-interface StakeDialogProps {
-  delegate?: string;
-  depositId?: number;
-}
-
-export const StakeDialog = ({ delegate }: StakeDialogProps) => {
+export const StakeDialog = () => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
   const [amountToStake, setAmountToStake] = useState<number>(0);
   const [addressToDelegate, setAddressToDelegate] = useState<
     string | undefined
-  >(delegate);
+  >(address);
 
   const { data: totalStaked, isFetched: isLoadedTotalStaked } =
     useDepositorTotalStaked(address as `0x${string}`);
@@ -49,19 +44,17 @@ export const StakeDialog = ({ delegate }: StakeDialogProps) => {
           />
         </div>
 
-        {!delegate && (
-          <div className="py-4">
-            <div>Delegate</div>
-            <Input
-              className="w-full mt-2 text-center"
-              defaultValue={address}
-              onChange={(e) => {
-                setAddressToDelegate(e.target.value);
-              }}
-              type="text"
-            />
-          </div>
-        )}
+        <div className="py-4">
+          <div>Delegate</div>
+          <Input
+            className="w-full mt-2 text-center"
+            defaultValue={address}
+            onChange={(e) => {
+              setAddressToDelegate(e.target.value);
+            }}
+            type="text"
+          />
+        </div>
       </div>
 
       <div className="gap-8 columns-2">

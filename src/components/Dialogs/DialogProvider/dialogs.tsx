@@ -85,7 +85,6 @@ export type SwithcNetworkDialogType = {
 export type StakeDepositModeDialogType = {
   type: "STAKE_DEPOSIT_MORE";
   params: {
-    delegate: string;
     depositId: number;
   };
 };
@@ -229,15 +228,8 @@ export const dialogs: DialogDefinitions<DialogType> = {
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
   ),
 
-  STAKE_DEPOSIT_MORE: (
-    { delegate, depositId }: { delegate: string; depositId: number },
-    closeDialog
-  ) => (
-    <DepositMoreDialog
-      closeDialog={closeDialog}
-      delegate={delegate}
-      depositId={depositId}
-    />
+  STAKE_DEPOSIT_MORE: ({ depositId }: { depositId: number }, closeDialog) => (
+    <DepositMoreDialog closeDialog={closeDialog} depositId={depositId} />
   ),
 
   // FAQ: () => {

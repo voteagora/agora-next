@@ -29,7 +29,6 @@ export default async function Page() {
 
       <div className="flex gap-5 columns-3">
         <StakeDialog />
-        <StakeDialog delegate={"0x1d671d1B191323A38490972D58354971E5c1cd2A"} />
         <UnstakeDialog />
       </div>
     </section>

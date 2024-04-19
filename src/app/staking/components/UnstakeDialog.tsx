@@ -18,7 +18,7 @@ export const UnstakeDialog = () => {
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const start = 16;
-  const end = 35;
+  const end = 40;
   const depositIds = Array.from(
     { length: end - start + 1 },
     (_, i) => start + i

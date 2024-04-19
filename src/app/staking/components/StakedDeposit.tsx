@@ -15,6 +15,7 @@ interface StakedDepositProps {
 
 export const StakedDeposit = async ({ id }: StakedDepositProps) => {
   const openDialog = useOpenDialog();
+
   const { token } = Tenant.current();
   const { data: deposit, isFetched, isFetching } = useStakedDeposit(id);
 
@@ -52,7 +53,7 @@ export const StakedDeposit = async ({ id }: StakedDepositProps) => {
 
       <div className="flex flex-col p-5">
         <Button
-          onClick={() => {
+          onClick={(event) => {
             openDialog({
               type: "STAKE_DEPOSIT_MORE",
               params: {
@@ -62,7 +63,7 @@ export const StakedDeposit = async ({ id }: StakedDepositProps) => {
             });
           }}
         >
-          Add More
+          Add
         </Button>
       </div>
     </div>

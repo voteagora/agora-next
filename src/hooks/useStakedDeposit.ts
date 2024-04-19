@@ -5,7 +5,7 @@ export const useStakedDeposit = (id: number) => {
   const { contracts } = Tenant.current();
   const { data, isFetching, isFetched } = useQuery({
     enabled: !!id,
-    queryKey: ["stakedDeposit", id],
+    queryKey: ["stakedDeposit", { id }],
     queryFn: async () => {
       return await contracts.staker!.contract.deposits(BigInt(id));
     },
