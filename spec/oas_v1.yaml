@@ -707,18 +707,24 @@ components:
           type: object
           properties:
             ventureCapital:
-              $ref: "#/components/schemas/FundingInfo"
+              type: array
+              items:
+                $ref: "#/components/schemas/FundingInfo"
             grants:
-              $ref: "#/components/schemas/FundingInfo"
+              type: array
+              items:
+                $ref: "#/components/schemas/FundingInfo"
             optimismGrants:
-              allOf:
-                - $ref: "#/components/schemas/FundingInfo"
-                - type: object
-                  properties:
-                    link:
-                      type: string
-                    type: 
-                      $ref: "#/components/schemas/OptimismGrantType"
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/FundingInfo"
+                  - type: object
+                    properties:
+                      link:
+                        type: string
+                      type: 
+                        $ref: "#/components/schemas/OptimismGrantType"
     SocialLinks:
       summary: Social media links for a project
       description: >
