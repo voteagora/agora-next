@@ -90,30 +90,3 @@ export async function GET(request: Request) {
     status: 200,
   });
 }
-
-/*
-{
-  "metadata": ,
-  "projects": [
-    {
-      "team": [
-        
-      ],
-      "deployedContracts": [
-        
-      ],
-      "categories": [
-        {
-          "name": "string",
-          "description": "string"
-        }
-      ],
-      "funding": {
-        "ventureCapital": ,
-        "grants": ,
-        "optimismGrants": 
-      }
-    }
-  ]
-}
-*/
