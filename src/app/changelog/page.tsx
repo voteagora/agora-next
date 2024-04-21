@@ -53,6 +53,194 @@ export default function Page() {
               </div>
             </div>
             <div className="my-8 border-t border-gray-300"></div>
+            <div className={styles.changelogItem}>
+              <p id="changelogfeb2024" className={styles.changlogDate}>
+                {formatFullDate(new Date(2024, 3, 15))}
+              </p>
+              <h3 className={styles.changelogTitle}>
+                Governance Client Changelog #4
+              </h3>
+              <p>Morning OP collective,</p>
+              <p>
+                The past few weeks have been all about making our API faster and
+                more secure. We added authentication, started work on rate
+                limiting, and did some performance optimizations under the hood.
+              </p>
+              <p>
+                On the client side, we did some clean up around Optimistic
+                proposal creation and more improvements to make the loading of
+                delegate cards faster.
+              </p>
+              <p>Keep the feedback coming and have a great week,</p>
+              <p>
+                <a href="https://twitter.com/kentf">Kent</a>, Co-founder at{" "}
+                <a href="https://voteagora.com">Agora</a>
+              </p>
+              <br />
+              <br />
+              <h4> Major Updates </h4>
+              <ul>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/199"
+                      target="_blank"
+                    >
+                      API User Authentication
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="ttps://github.com/voteagora/agora-next/pull/201"
+                      target="_blank"
+                    >
+                      Simplified and Optimized Token Amount Display
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/202"
+                      target="_blank"
+                    >
+                      Enhanced Proposal Handling
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/212"
+                      target="_blank"
+                    >
+                      Formal OAS for Agora API
+                    </a>
+                  </p>
+                </li>
+              </ul>
+              <br />
+              <h4> Minor Updates </h4>
+              <ul>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/205"
+                      target="_blank"
+                    >
+                      Emit User Id with API Calls
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/182"
+                      target="_blank"
+                    >
+                      Update Various Components and Hooks
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/183"
+                      target="_blank"
+                    >
+                      Resolved Requests being cancelled when trying to vote
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/187"
+                      target="_blank"
+                    >
+                      API Routes and Validators & Pagination Logic{" "}
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href=" https://github.com/voteagora/agora-next/pull/191"
+                      target="_blank"
+                    >
+                      UI Consistency with Links{" "}
+                    </a>
+                  </p>
+                </li>
+              </ul>
+              <br />
+              <h4> Bug Fixes </h4>
+              <ul>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/180"
+                      target="_blank"
+                    >
+                      Fix - Creating Optimistic Proposals{" "}
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href=" https://github.com/voteagora/agora-next/pull/190"
+                      target="_blank"
+                    >
+                      Fix - Hover for Abstained Votes
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/193"
+                      target="_blank"
+                    >
+                      Fix - Approval Proposal Results for V6 Governor{" "}
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/195"
+                      target="_blank"
+                    >
+                      Fix - Vote Casted on Approval
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href="https://github.com/voteagora/agora-next/pull/200"
+                      target="_blank"
+                    >
+                      Fix - voteHoverCard → fetchDelegate Server Action
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <a
+                      href=" https://github.com/voteagora/agora-next/pull/204"
+                      target="_blank"
+                    >
+                      Fix - Citizen/Delegate Double Loading
+                    </a>
+                  </p>
+                </li>
+              </ul>
+            </div>
+            <div className="my-8 border-t border-gray-300"></div>
             <div>
               <div className={styles.changelogItem}>
                 <p id="changelogfeb2024" className={styles.changelogDate}>
