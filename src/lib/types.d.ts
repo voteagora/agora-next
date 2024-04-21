@@ -13,6 +13,7 @@ export type TenantContracts = {
   governor: TenantContract<IGovernorContract>;
   alligator?: TenantContract<IAlligatorContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
+  changelog?: TenantContract<BaseContract>;
 };
 
 export type TenantToken = {
