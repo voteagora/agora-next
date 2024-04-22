@@ -1822,11 +1822,46 @@ paths:
         '500':
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
+    get:
+      summary: Gets comments on an impact metric
+      description: >
+        Gets a paginated list of comments on a particular impact metric. Ordered by creation date.
+      operationId: getImpactMetricComments
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     put:
-      summary: Comments on an impact metric
+      summary: Creates a comment on an impact metric
       description: >
         Creates or edits a comment on a specific impact metric for a specific round.
-        If supplied, comment ID is ignored.
+        If supplied, comment ID is ignored. Returns created comment.
       operationId: putImpactMetricComment
       tags:
         - RetroFunding
@@ -1836,6 +1871,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
       requestBody:
         content:
           application/json:
@@ -1847,12 +1884,7 @@ paths:
           content:
             application/json:
               schema: 
-                type: object
-                properties:
-                  comments:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Comment'
+                $ref: '#/components/schemas/Comment'
         '400':
           description: Bad Request
         '401': 
