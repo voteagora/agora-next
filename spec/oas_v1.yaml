@@ -1629,6 +1629,10 @@ paths:
       responses: 
         '200':
           description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RetroFundingBallot"
         '400':
           description: Bad Request
         '401': 
