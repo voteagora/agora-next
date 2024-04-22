@@ -39,7 +39,8 @@ async function getProjectsApi() {
       chainId: "10",
       deployer: "0x42004661285881D4B0F245B1eD3774d8166CF314",
       creationBlock: "71801427",
-      transactionId: "0x6ff5f386e46b2fb0099a78429ecd104f552fe545c65d51068098211d8b11560d",
+      transactionId:
+        "0x6ff5f386e46b2fb0099a78429ecd104f552fe545c65d51068098211d8b11560d",
       verificationProof: "trust me ;)",
       openSourceObserverSlug: "---",
     },
