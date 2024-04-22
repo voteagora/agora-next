@@ -10,18 +10,18 @@ async function getBallotsApi(roundId: string) {
   const defaultBallots = {
     ballots: [
       {
-        address: "0x", 
+        address: "0x",
         ballotId: 0,
         roundId: roundId,
         status: "PENDING",
         allocations: [
           {
-            "metricId": 0,
-            "allocation": "0"
-          }
+            metricId: 0,
+            allocation: "0",
+          },
         ],
         submitterAddress: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11",
-      }
+      },
     ],
   };
 
@@ -39,15 +39,14 @@ async function getBallotApi(roundId: string, ballotAddressOrEns: string) {
     status: "PENDING",
     allocations: [
       {
-        "metricId": 0,
-        "allocation": "0"
-      }
+        metricId: 0,
+        allocation: "0",
+      },
     ],
     submitterAddress: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11",
   };
 
   return defaultBallot;
-
 }
 
 export const fetchBallots = cache(getBallotsApi);
