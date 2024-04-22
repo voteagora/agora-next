@@ -31,9 +31,9 @@ async function getBallotsApi(roundId: string) {
   };
 }
 
-async function getBallotApi(roundId: string, ballotAddressOrEns: string) {
+async function getBallotApi(roundId: string, ballotCasterAddressOrEns: string) {
   const defaultBallot = {
-    address: ballotAddressOrEns,
+    address: ballotCasterAddressOrEns,
     ballotId: 0,
     roundId: roundId,
     status: "PENDING",

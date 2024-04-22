@@ -862,9 +862,9 @@ components:
       schema:
         type: integer
     ballotIdParam:
-      name: ballotAddressOrEns
+      name: ballotCasterAddressOrEns
       in: path
-      description: The address or ENS name of the ballot to retrieve
+      description: The address or ENS name of the caster of a given ballot to retrieve.
       required: true
       schema:
         type: string
@@ -1583,7 +1583,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}:
     get:
       summary: Gets a specific ballot for an RetroFunding round
       description: >
@@ -1610,7 +1610,7 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/submit:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/submit:
     post:
       summary: Submits a particular ballot
       description: Submits the content of a ballot to be counted as final for the round.
@@ -1675,7 +1675,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
     get:
       summary: Gets impact metrics for a specific RetroFunding ballot
       description: >
@@ -1742,7 +1742,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics/{impactMetricId}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics/{impactMetricId}:
     delete: 
       summary: Removes an impact metric from a ballot
       description: >
