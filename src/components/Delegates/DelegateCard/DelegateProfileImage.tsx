@@ -15,12 +15,11 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
 
-
 export function DelegateProfileImage({
   address,
   votingPower,
   citizen,
-  copyable = false
+  copyable = false,
 }: {
   address: string;
   votingPower: string;
