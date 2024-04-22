@@ -13,3 +13,17 @@ export async function GET(
     status: 200,
   });
 }
+
+export async function POST(
+  request: Request,
+  route: { params: { roundId: string; ballotAddressOrEns: string } }
+) {
+  const { roundId, ballotAddressOrEns } = route.params;
+  const impactMetrics = await fetchImpactMetricsApi(
+    roundId,
+    ballotAddressOrEns
+  );
+  return new Response(JSON.stringify(impactMetrics), {
+    status: 200,
+  });
+}
