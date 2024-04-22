@@ -1858,7 +1858,7 @@ paths:
         '500':
           description: Internal Server Error
     put:
-      summary: Creats a comment on an impact metric
+      summary: Creates a comment on an impact metric
       description: >
         Creates or edits a comment on a specific impact metric for a specific round.
         If supplied, comment ID is ignored. Returns created comment.
