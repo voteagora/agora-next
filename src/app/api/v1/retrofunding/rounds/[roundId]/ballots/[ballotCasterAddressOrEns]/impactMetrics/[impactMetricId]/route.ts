@@ -3,12 +3,12 @@ export async function DELETE(
   route: {
     params: {
       roundId: string;
-      ballotAddressOrEns: string;
+      ballotCasterAddressOrEns: string;
       impactMetricId: string;
     };
   }
 ) {
-  const { roundId, ballotAddressOrEns, impactMetricId } = route.params;
+  const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
   return new Response(null, {
     status: 200,
   });
