@@ -13,7 +13,7 @@ function CopyableHumanAddress({ address }: { address: string }) {
   const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
 
   useEffect(() => {
-    let id = null;
+    let id: NodeJS.Timeout | number | null = null;
     if (isInCopiedState) {
       id = setTimeout(() => {
         setIsInCopiedState(false);
