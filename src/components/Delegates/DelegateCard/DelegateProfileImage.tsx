@@ -2,7 +2,7 @@
 
 import ENSAvatar from "../../shared/ENSAvatar";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import HumanAddress from "../../shared/HumanAddress";
+import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
@@ -13,7 +13,6 @@ import { useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
-import toast from "react-hot-toast";
 
 
 export function DelegateProfileImage({
@@ -79,14 +78,7 @@ export function DelegateProfileImage({
 
       <VStack>
         <div className={styles.address}>
-          <button onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toast("copied address to clipboard");
-            navigator.clipboard.writeText(address);
-          }}>
-            <HumanAddress address={address} />
-          </button>
+            <CopyableHumanAddress address={address} />
         </div>
         <div className={styles.token}>
           {formattedNumber} {token.symbol}
