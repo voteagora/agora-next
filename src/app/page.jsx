@@ -60,11 +60,16 @@ export async function generateMetadata({}, parent) {
         },
       ],
     },
-    other: {
-      ["twitter:card"]: "summary_large_image",
-      ["twitter:title"]: title,
-      ["twitter:description"]: description,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
+    // other: {
+    //   ["twitter:card"]: "summary_large_image",
+    //   ["twitter:title"]: title,
+    //   ["twitter:description"]: description,
+    // },
   };
 }
 
