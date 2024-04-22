@@ -13,6 +13,8 @@ import { useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
+import toast from "react-hot-toast";
+
 
 export function DelegateProfileImage({
   address,
@@ -77,7 +79,14 @@ export function DelegateProfileImage({
 
       <VStack>
         <div className={styles.address}>
-          <HumanAddress address={address} />
+          <button onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toast("copied address to clipboard");
+            navigator.clipboard.writeText(address);
+          }}>
+            <HumanAddress address={address} />
+          </button>
         </div>
         <div className={styles.token}>
           {formattedNumber} {token.symbol}
