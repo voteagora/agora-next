@@ -26,7 +26,9 @@ function CopyableHumanAddress({ address }: {address: string}) {
 
 
     return (
-        <HStack alignItems="items-center" className="cursor-pointer group" gap={1} onClick={() => {
+        <HStack alignItems="items-center" className="cursor-pointer group" gap={1} onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             navigator.clipboard.writeText(address)
             setIsInCopiedState(true)
         }}>

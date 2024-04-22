@@ -21,7 +21,7 @@ type Props = {
     | "items-start"
     | "items-end"
     | "items-baseline";
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
   children: ReactNode;
 };
 

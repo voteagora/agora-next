@@ -14,6 +14,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
             address={delegate.address}
             citizen={delegate.citizen}
             votingPower={delegate.votingPower}
+            copyable={true}
           />
         </VStack>
 
