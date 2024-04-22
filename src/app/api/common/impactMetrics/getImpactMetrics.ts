@@ -34,11 +34,6 @@ async function getImpactMetricsApi(
 }
 
 async function getImpactMetricApi(impactMetricId: string) {
-  const defaultPageMetadata = {
-    hasNext: false,
-    totalReturned: 1,
-    nextOffset: 0,
-  };
   const defaultComments = [
     {
       id: "1",
@@ -48,17 +43,14 @@ async function getImpactMetricApi(impactMetricId: string) {
       editedAt: "2021-10-01T00:00:00Z",
     },
   ];
-  const defaultImpactMetrics = {
+  const defaultImpactMetric = {
     id: impactMetricId,
     name: `Impact Metric ${impactMetricId}`,
     description: `Description of Impact Metric ${impactMetricId}`,
     externalLink: "https://www.opensource.observer/",
     comments: defaultComments,
   };
-  return {
-    metadata: defaultPageMetadata,
-    impactMetrics: defaultImpactMetrics,
-  };
+  return defaultImpactMetric;
 }
 
 export const fetchImpactMetricsApi = cache(getImpactMetricsApi);
