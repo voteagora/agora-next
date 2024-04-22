@@ -794,7 +794,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotAllocation"
-        submitterAddress:
+        ballotCasterAddress:
+          summary: Address of the ballot caster
+          description: The resolved address of the entity which cast the ballot.
           type: string
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
