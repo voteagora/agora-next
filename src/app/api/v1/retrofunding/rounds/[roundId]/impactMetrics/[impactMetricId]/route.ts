@@ -5,12 +5,12 @@ export async function GET(
   route: {
     params: {
       roundId: string;
-      ballotAddressOrEns: string;
+      ballotCasterAddressOrEns: string;
       impactMetricId: string;
     };
   }
 ) {
-  const { roundId, ballotAddressOrEns, impactMetricId } = route.params;
+  const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
   const impactMetrics = await fetchImpactMetricApi(impactMetricId);
   return new Response(JSON.stringify(impactMetrics), {
     status: 200,

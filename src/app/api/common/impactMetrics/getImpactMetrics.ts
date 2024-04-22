@@ -2,7 +2,7 @@ import { cache } from "react";
 
 async function getImpactMetricsApi(
   roundId: string,
-  ballotAddressOrEns?: string
+  ballotCasterAddressOrEns?: string
 ) {
   const defaultPageMetadata = {
     hasNext: false,

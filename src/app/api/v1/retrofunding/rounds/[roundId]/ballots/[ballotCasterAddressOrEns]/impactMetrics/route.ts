@@ -2,12 +2,12 @@ import { fetchImpactMetricsApi } from "@/app/api/common/impactMetrics/getImpactM
 
 export async function GET(
   request: Request,
-  route: { params: { roundId: string; ballotAddressOrEns: string } }
+  route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const { roundId, ballotAddressOrEns } = route.params;
+  const { roundId, ballotCasterAddressOrEns } = route.params;
   const impactMetrics = await fetchImpactMetricsApi(
     roundId,
-    ballotAddressOrEns
+    ballotCasterAddressOrEns
   );
   return new Response(JSON.stringify(impactMetrics), {
     status: 200,
@@ -16,12 +16,12 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  route: { params: { roundId: string; ballotAddressOrEns: string } }
+  route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const { roundId, ballotAddressOrEns } = route.params;
+  const { roundId, ballotCasterAddressOrEns } = route.params;
   const impactMetrics = await fetchImpactMetricsApi(
     roundId,
-    ballotAddressOrEns
+    ballotCasterAddressOrEns
   );
   return new Response(JSON.stringify(impactMetrics), {
     status: 200,
