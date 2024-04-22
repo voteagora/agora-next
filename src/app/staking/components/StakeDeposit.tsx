@@ -10,7 +10,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 
-export const StakeDialog = () => {
+export const StakeDeposit = () => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 

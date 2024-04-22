@@ -1,4 +1,4 @@
-import { StakeDialog } from "@/app/staking/components/StakeDialog";
+import { StakeDeposit } from "@/app/staking/components/StakeDeposit";
 import { UnstakeDialog } from "@/app/staking/components/UnstakeDialog";
 import { PoolStats } from "@/app/staking/components/PoolStats";
 import Hero from "@/components/Hero/Hero";
@@ -28,7 +28,7 @@ export default async function Page() {
       <ClaimRewards />
 
       <div className="flex gap-5 columns-3">
-        <StakeDialog />
+        <StakeDeposit />
         <UnstakeDialog />
       </div>
     </section>
