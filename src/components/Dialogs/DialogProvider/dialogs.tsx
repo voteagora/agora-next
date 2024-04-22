@@ -18,7 +18,8 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { ChainConstants } from "viem/types/chain";
-import { DepositMoreDialog } from "@/components/Dialogs/Staking/DepositMoreDialog";
+import { DepositAddDialog } from "@/components/Dialogs/Staking/DepositAddDialog";
+import { DepositWithdrawDialog } from "@/components/Dialogs/Staking/DepositWithdrawDialog";
 
 export type DialogType =
   | DelegateDialogType
@@ -28,7 +29,8 @@ export type DialogType =
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
   | SwithcNetworkDialogType
-  | StakeDepositModeDialogType;
+  | StakeDepositModeDialogType
+  | StakeDepositWithdrawDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -84,6 +86,13 @@ export type SwithcNetworkDialogType = {
 
 export type StakeDepositModeDialogType = {
   type: "STAKE_DEPOSIT_MORE";
+  params: {
+    depositId: number;
+  };
+};
+
+export type StakeDepositWithdrawDialogType = {
+  type: "STAKE_DEPOSIT_WITHDRAW";
   params: {
     depositId: number;
   };
@@ -229,7 +238,14 @@ export const dialogs: DialogDefinitions<DialogType> = {
   ),
 
   STAKE_DEPOSIT_MORE: ({ depositId }: { depositId: number }, closeDialog) => (
-    <DepositMoreDialog closeDialog={closeDialog} depositId={depositId} />
+    <DepositAddDialog closeDialog={closeDialog} depositId={depositId} />
+  ),
+
+  STAKE_DEPOSIT_WITHDRAW: (
+    { depositId }: { depositId: number },
+    closeDialog
+  ) => (
+    <DepositWithdrawDialog closeDialog={closeDialog} depositId={depositId} />
   ),
 
   // FAQ: () => {

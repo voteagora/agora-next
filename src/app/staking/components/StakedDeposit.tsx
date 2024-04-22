@@ -48,7 +48,18 @@ export const StakedDeposit = ({ id }: StakedDepositProps) => {
         <div className="border-r border-gray-300"></div>
 
         <div className="flex flex-col p-5">
-          <WithdrawButton id={BigInt(id)} amount={deposit.balance} />
+          <Button
+            onClick={(event) => {
+              openDialog({
+                type: "STAKE_DEPOSIT_WITHDRAW",
+                params: {
+                  depositId: id,
+                },
+              });
+            }}
+          >
+            Withdraw
+          </Button>
         </div>
 
         <div className="border-r border-gray-300"></div>

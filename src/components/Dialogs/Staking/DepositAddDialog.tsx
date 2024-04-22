@@ -11,7 +11,7 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import { Button } from "@/components/ui/button";
 import { StakeMoreButton } from "@/app/staking/components/StakeMoreButton";
 
-export function DepositMoreDialog({
+export function DepositAddDialog({
   depositId,
   closeDialog,
 }: {
@@ -33,10 +33,13 @@ export function DepositMoreDialog({
     <div>
       <div className="mb-4">
         Delegate more {token.symbol} to{" "}
-        <HumanAddress address={deposit?.delegatee} />
+        <span className="font-medium">
+          <HumanAddress address={deposit?.delegatee} />
+        </span>
       </div>
       <div className="flex flex-col">
         <Input
+          placeholder={"0"}
           className="text-center"
           type="number"
           onChange={(e) => {

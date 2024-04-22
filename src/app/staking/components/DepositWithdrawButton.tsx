@@ -16,7 +16,7 @@ interface StakeMoreButtonProps {
   onSuccess: () => void;
 }
 
-export const StakeMoreButton = ({
+export const DepositWithdrawButton = ({
   amount,
   depositId,
   onSuccess,
