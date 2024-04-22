@@ -794,7 +794,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotAllocation"
-        submitterAddress:
+        ballotCasterAddress:
+          summary: Address of the ballot caster
+          description: The resolved address of the entity which cast the ballot.
           type: string
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
@@ -862,9 +864,9 @@ components:
       schema:
         type: integer
     ballotIdParam:
-      name: ballotAddressOrEns
+      name: ballotCasterAddressOrEns
       in: path
-      description: The address or ENS name of the ballot to retrieve
+      description: The address or ENS name of the caster of a given ballot to retrieve.
       required: true
       schema:
         type: string
@@ -1583,7 +1585,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}:
     get:
       summary: Gets a specific ballot for an RetroFunding round
       description: >
@@ -1610,7 +1612,7 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/submit:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/submit:
     post:
       summary: Submits a particular ballot
       description: Submits the content of a ballot to be counted as final for the round.
@@ -1629,6 +1631,10 @@ paths:
       responses: 
         '200':
           description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RetroFundingBallot"
         '400':
           description: Bad Request
         '401': 
@@ -1671,7 +1677,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
     get:
       summary: Gets impact metrics for a specific RetroFunding ballot
       description: >
@@ -1738,7 +1744,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics/{impactMetricId}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics/{impactMetricId}:
     delete: 
       summary: Removes an impact metric from a ballot
       description: >
@@ -1822,11 +1828,46 @@ paths:
         '500':
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
+    get:
+      summary: Gets comments on an impact metric
+      description: >
+        Gets a paginated list of comments on a particular impact metric. Ordered by creation date.
+      operationId: getImpactMetricComments
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     put:
-      summary: Comments on an impact metric
+      summary: Creates a comment on an impact metric
       description: >
         Creates or edits a comment on a specific impact metric for a specific round.
-        If supplied, comment ID is ignored.
+        If supplied, comment ID is ignored. Returns created comment.
       operationId: putImpactMetricComment
       tags:
         - RetroFunding
@@ -1836,6 +1877,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
       requestBody:
         content:
           application/json:
@@ -1847,12 +1890,7 @@ paths:
           content:
             application/json:
               schema: 
-                type: object
-                properties:
-                  comments:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Comment'
+                $ref: '#/components/schemas/Comment'
         '400':
           description: Bad Request
         '401': 
