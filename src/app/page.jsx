@@ -65,11 +65,6 @@ export async function generateMetadata({}, parent) {
       title,
       description,
     },
-    // other: {
-    //   ["twitter:card"]: "summary_large_image",
-    //   ["twitter:title"]: title,
-    //   ["twitter:description"]: description,
-    // },
   };
 }
 
