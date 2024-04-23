@@ -16,7 +16,7 @@ interface StakeMoreButtonProps {
   onSuccess: () => void;
 }
 
-export const StakeMoreButton = ({
+export const DepositAddButton = ({
   amount,
   depositId,
   onSuccess,
@@ -42,12 +42,10 @@ export const StakeMoreButton = ({
 
   useEffect(() => {
     if (data?.hash && !isLoading) {
+      // TODO: Figure out why invalidating multiple queries didn't work
       queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
       queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
-      queryClient.invalidateQueries({
-        queryKey: ["stakedDeposit", { id: depositId }],
-      });
-      // onSuccess();
+      onSuccess();
     }
   }, [isLoading, data?.hash, onSuccess, queryClient]);
 

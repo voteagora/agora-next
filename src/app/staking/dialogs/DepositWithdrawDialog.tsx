@@ -4,23 +4,20 @@ import Tenant from "@/lib/tenant/tenant";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { useStakedDeposit } from "@/hooks/useStakedDeposit";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { Button } from "@/components/ui/button";
 import { DepositWithdrawButton } from "@/app/staking/components/DepositWithdrawButton";
+import { StakedDeposit } from "@/lib/types";
 
 export function DepositWithdrawDialog({
-  depositId,
+  deposit,
   closeDialog,
 }: {
-  depositId: number;
+  deposit: StakedDeposit;
   closeDialog: () => void;
 }) {
   const { token } = Tenant.current();
   const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
-  const { data: deposit, isFetched, isFetching } = useStakedDeposit(depositId);
-
-  const hasTotalDepositedAmount = isFetched && deposit?.balance !== undefined;
 
   return (
     <div>
@@ -45,23 +42,21 @@ export function DepositWithdrawDialog({
           }}
         />
         <div className="flex justify-end">
-          {hasTotalDepositedAmount && (
-            <Button
-              className="text-xs font-light w-400 text-blue-700"
-              variant="link"
-              onClick={() => setWithdrawAmount(Number(deposit?.balance))}
-            >
-              Max&nbsp;
-              <TokenAmountDisplay
-                maximumSignificantDigits={5}
-                amount={deposit?.balance}
-              />
-            </Button>
-          )}
+          <Button
+            className="text-xs font-light w-400 text-blue-700"
+            variant="link"
+            onClick={() => setWithdrawAmount(Number(deposit?.amount))}
+          >
+            Max&nbsp;
+            <TokenAmountDisplay
+              maximumSignificantDigits={5}
+              amount={deposit?.amount}
+            />
+          </Button>
         </div>
       </div>
       <DepositWithdrawButton
-        id={BigInt(depositId)}
+        id={BigInt(deposit.id)}
         amount={BigInt(withdrawAmount)}
         onSuccess={closeDialog}
       />

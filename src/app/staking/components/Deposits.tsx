@@ -1,28 +1,37 @@
 "use client";
 
-import React, { Suspense } from "react";
-import { useAgoraContext } from "@/contexts/AgoraContext";
+import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { StakedDepositList } from "@/app/staking/components/StakedDepositList";
+import { StakedDeposit } from "@/lib/types";
 
-export const Deposits = () => {
-    const { isConnected } = useAgoraContext();
-    const { address } = useAccount();
+interface DepositsProps {
+  fetchStaked: (address: string) => Promise<StakedDeposit[] | null>;
+}
 
-    const { data: totalStaked, isFetched: isLoadedTotalStaked } = useDepositorTotalStaked(address as `0x${string}`);
-    const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined && totalStaked > 0;
+export const Deposits = ({ fetchStaked }: DepositsProps) => {
+  const { address } = useAccount();
 
-    if (!isConnected || !address) {
-      return <div>Connect wallet to conitnue</div>;
+  const [deposits, setDeposits] = useState<StakedDeposit[] | []>([]);
+
+  async function getDeposits(a: string) {
+    const data = await fetchStaked(a);
+    if (data && data.length >= 0) {
+      setDeposits(data);
     }
-
-    if (!hasTotalStaked) {
-      return <div className="text-xs text-slate-600 py-4">
-        No deposits found for this wallet
-      </div>;
-    }
-
-    return <StakedDepositList address={address} />
   }
-;
+
+  useEffect(() => {
+    if (address && deposits.length === 0) {
+      getDeposits(address.toLowerCase());
+    }
+  }, [address, deposits]);
+
+  if (deposits.length === 0) {
+    return (
+      <div className="text-xs text-slate-600 py-4">Loading deposits...</div>
+    );
+  }
+
+  return <StakedDepositList deposits={deposits} />;
+};

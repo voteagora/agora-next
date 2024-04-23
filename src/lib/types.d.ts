@@ -10,12 +10,11 @@ export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
 export type StakedDeposit = {
-  amount: string;
+  amount: BigNumberish;
   delegatee: string;
   depositor: string;
   id: number;
-}
-
+};
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;

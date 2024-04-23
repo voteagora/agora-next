@@ -41,12 +41,10 @@ export const DepositWithdrawButton = ({
 
   useEffect(() => {
     if (data?.hash && !isLoading) {
+      // TODO: Figure out why invalidating multiple queries didn't work
       queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
       queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
-      queryClient.invalidateQueries({
-        queryKey: ["stakedDeposit", { id: id }],
-      });
-      // onSuccess();
+      onSuccess();
     }
   }, [isLoading, data?.hash, onSuccess, queryClient]);
 

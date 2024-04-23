@@ -3,10 +3,11 @@ import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { StakedDeposit } from "@/lib/types";
 
-async function fetchStakedDepositsForAddress({ address }: {
+export async function fetchStakedDepositsForAddress({
+  address,
+}: {
   address: string;
 }): Promise<StakedDeposit[]> {
-
   const { namespace } = Tenant.current();
   const deposits = await prisma[`${namespace}StakedDeposits`].findMany({
     where: {
@@ -26,8 +27,8 @@ async function fetchStakedDepositsForAddress({ address }: {
     },
   });
 
-  return deposits.map(deposit => ({
-    amount: deposit.amount.toString(),
+  return deposits.map((deposit) => ({
+    amount: BigInt(parseFloat(deposit.amount)),
     delegatee: deposit.delegatee,
     depositor: deposit.depositor,
     id: Number(deposit.deposit_id),

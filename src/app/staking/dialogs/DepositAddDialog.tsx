@@ -1,33 +1,35 @@
 "use client";
 
 import Tenant from "@/lib/tenant/tenant";
-import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { Input } from "@/components/ui/input";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { useStakedDeposit } from "@/hooks/useStakedDeposit";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { Button } from "@/components/ui/button";
-import { StakeMoreButton } from "@/app/staking/components/StakeMoreButton";
+import { DepositAddButton } from "@/app/staking/components/DepositAddButton";
+import { StakedDeposit } from "@/lib/types";
 
 export function DepositAddDialog({
-  depositId,
+  deposit,
   closeDialog,
 }: {
-  depositId: number;
+  deposit: StakedDeposit;
   closeDialog: () => void;
 }) {
   const { token } = Tenant.current();
-  const { address } = useAccount();
   const [depositAmount, setDepositAmount] = useState<number>(0);
 
-  const { data: deposit } = useStakedDeposit(depositId);
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
-    address as `0x${string}`
+    deposit.depositor
   );
-
   const hasMoreTokens = isLoadedBalance && tokenBalance !== undefined;
+
+  if (!hasMoreTokens) {
+    return (
+      <div className="text-slate-600">Loading {token.symbol} balance...</div>
+    );
+  }
 
   return (
     <div>
@@ -67,8 +69,8 @@ export function DepositAddDialog({
           )}
         </div>
       </div>
-      <StakeMoreButton
-        depositId={depositId}
+      <DepositAddButton
+        depositId={deposit.id}
         amount={depositAmount}
         onSuccess={closeDialog}
       />
