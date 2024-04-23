@@ -9,46 +9,23 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { isAddress } from "viem";
 
 interface StakeButtonProps {
-  address: string;
+  address?: string;
   amount: number;
 }
 
 export const StakeButton = ({ address, amount }: StakeButtonProps) => {
   const { contracts, token } = Tenant.current();
-
   const queryClient = useQueryClient();
 
+  const isValidInput = Boolean(amount > 0 && address && isAddress(address));
+
   const { config } = usePrepareContractWrite({
-    enabled: !!address,
+    enabled: isValidInput,
     address: contracts.staker!.address as `0x${string}`,
-    abi: [
-      {
-        name: "stake",
-        type: "function",
-        stateMutability: "nonpayable",
-        inputs: [
-          {
-            internalType: "uint256",
-            name: "_amount",
-            type: "uint256",
-          },
-          {
-            internalType: "address",
-            name: "_delegatee",
-            type: "address",
-          },
-        ],
-        outputs: [
-          {
-            internalType: "UniStaker.DepositIdentifier",
-            name: "_depositId",
-            type: "uint256",
-          },
-        ],
-      },
-    ],
+    abi: contracts.staker!.abi.abi,
     chainId: contracts?.staker?.chain.id,
     functionName: "stake",
     args: [BigInt(amount), address as `0x${string}`],
@@ -68,7 +45,11 @@ export const StakeButton = ({ address, amount }: StakeButtonProps) => {
   }, [isLoading, data?.hash]);
 
   return (
-    <Button className="w-full" disabled={isLoading} onClick={() => write?.()}>
+    <Button
+      className="w-full"
+      disabled={!isValidInput || isLoading}
+      onClick={() => write?.()}
+    >
       {isLoading ? "Staking..." : "Stake and Delegate"}
     </Button>
   );

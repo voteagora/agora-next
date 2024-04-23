@@ -1,15 +1,17 @@
 "use client";
 
 import Tenant from "@/lib/tenant/tenant";
+import { useAccount } from "wagmi";
 import React, { useState } from "react";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { Input } from "@/components/ui/input";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useStakedDeposit } from "@/hooks/useStakedDeposit";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { Button } from "@/components/ui/button";
-import { DepositWithdrawButton } from "@/app/staking/components/DepositWithdrawButton";
+import { StakeMoreButton } from "@/app/staking/components/StakeMoreButton";
 
-export function DepositWithdrawDialog({
+export function DepositAddDialog({
   depositId,
   closeDialog,
 }: {
@@ -17,10 +19,15 @@ export function DepositWithdrawDialog({
   closeDialog: () => void;
 }) {
   const { token } = Tenant.current();
-  const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
-  const { data: deposit, isFetched, isFetching } = useStakedDeposit(depositId);
+  const { address } = useAccount();
+  const [depositAmount, setDepositAmount] = useState<number>(0);
 
-  const hasTotalDepositedAmount = isFetched && deposit?.balance !== undefined;
+  const { data: deposit } = useStakedDeposit(depositId);
+  const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
+    address as `0x${string}`
+  );
+
+  const hasMoreTokens = isLoadedBalance && tokenBalance !== undefined;
 
   return (
     <div>
@@ -33,32 +40,36 @@ export function DepositWithdrawDialog({
       <div className="flex flex-col">
         <Input
           placeholder={"0"}
-          value={withdrawAmount / 10 ** token.decimals}
+          value={
+            depositAmount > 10 ** token.decimals
+              ? depositAmount / 10 ** token.decimals
+              : depositAmount
+          }
           className="text-center"
           type="number"
           onChange={(e) => {
-            setWithdrawAmount(Number(e.target.value));
+            setDepositAmount(Math.floor(Number(e.target.value)));
           }}
         />
         <div className="flex justify-end">
-          {hasTotalDepositedAmount && (
+          {hasMoreTokens && (
             <Button
               className="text-xs font-light w-400 text-blue-700"
               variant="link"
-              onClick={() => setWithdrawAmount(Number(deposit?.balance))}
+              onClick={() => setDepositAmount(Number(tokenBalance))}
             >
               Max&nbsp;
               <TokenAmountDisplay
                 maximumSignificantDigits={5}
-                amount={deposit?.balance}
+                amount={tokenBalance}
               />
             </Button>
           )}
         </div>
       </div>
-      <DepositWithdrawButton
+      <StakeMoreButton
         depositId={depositId}
-        amount={withdrawAmount}
+        amount={depositAmount}
         onSuccess={closeDialog}
       />
     </div>

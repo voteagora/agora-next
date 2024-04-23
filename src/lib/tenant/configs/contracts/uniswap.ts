@@ -30,7 +30,7 @@ export const uniswapTenantContractConfig = (
     }),
 
     staker: new TenantContract<IStaker>({
-      abi: UniswapStaker__factory.connect(STAKING, provider),
+      abi: UniswapStaker__factory.abi,
       address: STAKING,
       chain,
       contract: UniswapStaker__factory.connect(STAKING, provider),

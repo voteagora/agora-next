@@ -9,8 +9,9 @@ import Tenant from "@/lib/tenant/tenant";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { Button } from "@/components/ui/button";
 
-export const StakeDeposit = () => {
+export const StakeAndDelegate = () => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
@@ -21,6 +22,7 @@ export const StakeDeposit = () => {
 
   const { data: totalStaked, isFetched: isLoadedTotalStaked } =
     useDepositorTotalStaked(address as `0x${string}`);
+
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
@@ -36,12 +38,32 @@ export const StakeDeposit = () => {
 
           <Input
             className="w-full mt-2 text-center"
-            defaultValue={0}
+            placeholder={"0"}
+            value={
+              amountToStake > 10 ** token.decimals
+                ? amountToStake / 10 ** token.decimals
+                : amountToStake
+            }
             onChange={(e) => {
-              setAmountToStake(Number(e.target.value));
+              setAmountToStake(Math.floor(Number(e.target.value)));
             }}
             type="number"
           />
+        </div>
+        <div className="flex justify-end">
+          {hasTokenBalance && (
+            <Button
+              className="text-xs font-light w-400 text-blue-700"
+              variant="link"
+              onClick={() => setAmountToStake(Number(tokenBalance))}
+            >
+              Max&nbsp;
+              <TokenAmountDisplay
+                maximumSignificantDigits={5}
+                amount={tokenBalance}
+              />
+            </Button>
+          )}
         </div>
 
         <div className="py-4">
@@ -86,10 +108,7 @@ export const StakeDeposit = () => {
         are turned on.
       </div>
 
-      {!addressToDelegate && "Must choose delegate"}
-      {addressToDelegate && (
-        <StakeButton address={addressToDelegate} amount={amountToStake} />
-      )}
+      <StakeButton address={addressToDelegate} amount={amountToStake} />
     </div>
   );
 };

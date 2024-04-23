@@ -8,7 +8,7 @@ import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { Button } from "@/components/ui/button";
 import { StakedDeposit } from "@/app/staking/components/StakedDeposit";
 
-export const UnstakeDialog = () => {
+export const Deposits = () => {
   const { token } = Tenant.current();
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
@@ -17,8 +17,9 @@ export const UnstakeDialog = () => {
     useDepositorTotalStaked(address as `0x${string}`);
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
-  const start = 16;
-  const end = 40;
+  const start = 28;
+  const end = 45;
+
   const depositIds = Array.from(
     { length: end - start + 1 },
     (_, i) => start + i

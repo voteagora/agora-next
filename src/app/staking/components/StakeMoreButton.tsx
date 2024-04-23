@@ -28,29 +28,10 @@ export const StakeMoreButton = ({
   const { config } = usePrepareContractWrite({
     enabled: isValidAmount,
     address: contracts.staker!.address as `0x${string}`,
-    abi: [
-      {
-        inputs: [
-          {
-            internalType: "uint256",
-            name: "_depositId",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "_amount",
-            type: "uint256",
-          },
-        ],
-        name: "stakeMore",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-      },
-    ],
+    abi: contracts.staker!.abi,
     chainId: contracts?.staker?.chain.id,
     functionName: "stakeMore",
-    args: [BigInt(depositId), BigInt(amount)],
+    args: [depositId, BigInt(amount)],
   });
 
   const { data, write, status } = useContractWrite(config);

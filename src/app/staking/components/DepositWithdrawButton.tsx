@@ -10,47 +10,27 @@ import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface StakeMoreButtonProps {
-  amount: number;
-  depositId: number;
+interface DepositWithdrawButtonProps {
+  id: bigint;
+  amount: bigint;
   onSuccess: () => void;
 }
 
 export const DepositWithdrawButton = ({
   amount,
-  depositId,
+  id,
   onSuccess,
-}: StakeMoreButtonProps) => {
+}: DepositWithdrawButtonProps) => {
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();
-  const isValidAmount = amount > 0;
+  const isValidAmount = amount > 0n;
 
   const { config } = usePrepareContractWrite({
-    enabled: isValidAmount,
     address: contracts.staker!.address as `0x${string}`,
-    abi: [
-      {
-        inputs: [
-          {
-            internalType: "uint256",
-            name: "_depositId",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "_amount",
-            type: "uint256",
-          },
-        ],
-        name: "stakeMore",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-      },
-    ],
-    chainId: contracts?.staker?.chain.id,
-    functionName: "stakeMore",
-    args: [BigInt(depositId), BigInt(amount)],
+    abi: contracts.staker!.abi,
+    chainId: contracts.staker!.chain.id,
+    functionName: "withdraw",
+    args: [id, amount],
   });
 
   const { data, write, status } = useContractWrite(config);
@@ -64,7 +44,7 @@ export const DepositWithdrawButton = ({
       queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
       queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
       queryClient.invalidateQueries({
-        queryKey: ["stakedDeposit", { id: depositId }],
+        queryKey: ["stakedDeposit", { id: id }],
       });
       // onSuccess();
     }
@@ -76,7 +56,7 @@ export const DepositWithdrawButton = ({
       disabled={isLoading || !isValidAmount}
       onClick={() => write?.()}
     >
-      {isLoading ? "Staking..." : "Stake More"}
+      {isLoading ? "Withdrawing..." : "Withdraw"}
     </Button>
   );
 };
