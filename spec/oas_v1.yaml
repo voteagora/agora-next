@@ -9,7 +9,7 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: vote.optimisim.io/api/v1
+  - url: https://vote.optimism.io/api/v1
     description: Base URL for optimism production
 security:
   - bearerAuth: []
