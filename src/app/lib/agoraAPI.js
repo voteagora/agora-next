@@ -8,7 +8,7 @@ class AgoraAPI {
    * Initializes a new instance of the AgoraAPI class.
    */
   constructor() {
-    this.apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
+    this.bearerToken = `Bearer ${process.env.NEXT_PUBLIC_AGORA_API_KEY}`;
   }
 
   /**
@@ -18,7 +18,7 @@ class AgoraAPI {
     const res = await fetch(`/api/${version}${endpoint}`, {
       method: "GET",
       headers: {
-        authorization: this.apiKey,
+        authorization: this.bearerToken,
       },
     });
 
@@ -37,7 +37,7 @@ class AgoraAPI {
     const res = await fetch(`/api/${version}${endpoint}`, {
       method: "POST",
       headers: {
-        authorization: this.apiKey,
+        authorization: this.bearerToken,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
