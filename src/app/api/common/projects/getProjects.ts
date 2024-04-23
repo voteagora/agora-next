@@ -78,7 +78,7 @@ async function getProjectsApi() {
     description: "string",
     externalLink: "string",
     socialLinks: defaultSocialLinks,
-    team: [],
+    team: defaultTeam,
     repositories: ["https://github.com/voteagora/agora-next"],
     deployedContracts: defaultDeployedContracts,
     categories: defaultCategories,
