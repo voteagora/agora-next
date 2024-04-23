@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import ENSName from "./ENSName"; // adjust the import path as per your project structure
 import { HStack } from "@/components/Layout/Stack";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
-import { ClipboardIcon } from "@heroicons/react/24/outline";
+import { icons } from "@/icons/icons";
 
 // This component will display the ENS name for a given address
 // It will also be copyable, meaning that when clicked, it will copy the address to the clipboard
@@ -40,7 +41,11 @@ function CopyableHumanAddress({ address }: { address: string }) {
       {isInCopiedState ? (
         <CheckCircleIcon className="text-green-600 w-4 h-4" />
       ) : (
-        <ClipboardIcon className="text-primary w-4 h-4 hidden group-hover:block" />
+        <Image
+          src={icons.clipboard}
+          alt={"clipboard icon"}
+          className="w-4 h-4 hidden group-hover:block group-hover:opacity-90"
+        />
       )}
     </HStack>
   );
