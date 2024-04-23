@@ -3,8 +3,8 @@ info:
   title: Agora API
   description: >
     ## Public API for interacting with the Agora platform.
-    Note: This API is in beta and subject to change.
-  version: 0.1.0-beta
+    Note: This API is in alpha and subject to change.
+  version: 0.0.0-alpha
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
