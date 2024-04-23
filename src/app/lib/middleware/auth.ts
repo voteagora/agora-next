@@ -16,10 +16,10 @@ export type AuthResponse = {
 };
 
 export function extractBearerToken(token: string) {
-  if (token && token.split(' ')[0] === 'Bearer') {
-      return token.split(' ')[1];
-  } 
-  return null;  
+  if (token && token.split(" ")[0] === "Bearer") {
+    return token.split(" ")[1];
+  }
+  return null;
 }
 
 export function hasApiKey(request: NextRequest): AuthResponse {
