@@ -109,15 +109,14 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                     </VStack>
                     <DelegateVoteIcon {...vote} />
                   </HStack>
-                  {vote.proposalType === "APPROVAL" ||
-                    (vote.reason && (
-                      <VStack className="space-y-1 mt-2">
-                        {vote.proposalType === "APPROVAL" && (
-                          <ApprovalVoteReason {...vote} />
-                        )}
-                        {vote.reason && <VoteReason reason={vote.reason} />}
-                      </VStack>
-                    ))}
+                  {(vote.proposalType === "APPROVAL" || vote.reason) && (
+                    <VStack className="space-y-1 mt-2">
+                      {vote.proposalType === "APPROVAL" && (
+                        <ApprovalVoteReason {...vote} />
+                      )}
+                      {vote.reason && <VoteReason reason={vote.reason} />}
+                    </VStack>
+                  )}
                 </VStack>
               </div>
             </VoteDetailsContainer>
