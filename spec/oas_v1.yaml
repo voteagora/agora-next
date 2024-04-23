@@ -622,21 +622,23 @@ components:
         A team member on a RetroFunding project.
       type: object
       properties:
-        address:
-          summary: EOA address of the team member
+        # address:
+        #   summary: EOA address of the team member
+        #   type: string
+        # name:
+        #   type: string
+        # description:
+        #   type: string
+        farcasterId:
+          summary: Farcaster ID for project team member
+          desription: Farcaster ID for project team member.
           type: string
-        name:
-          type: string
-        description:
-          type: string
-        socialLinks:
-          $ref: "#/components/schemas/SocialLinks"
-        externalLink:
-          type: string
-        avatarUrls:
-          type: array
-          items:
-            type: string
+        # externalLink:
+        #   type: string
+        # avatarUrls:
+        #   type: array
+        #   items:
+        #     type: string
     RetroFundingCategory:
       summary: A category for an RetroFunding project
       description: >
