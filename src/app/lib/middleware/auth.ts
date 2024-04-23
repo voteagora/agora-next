@@ -15,7 +15,7 @@ export type AuthResponse = {
   reason?: string;
 };
 
-export function extractBearerToken(token: string) {
+export function extractBearerToken(token?: string | null) {
   if (token && token.split(" ")[0] === "Bearer") {
     return token.split(" ")[1];
   }
@@ -23,7 +23,7 @@ export function extractBearerToken(token: string) {
 }
 
 export function hasApiKey(request: NextRequest): AuthResponse {
-  const token = request.headers.get("Authorization");
+  const token = extractBearerToken(request.headers.get("Authorization"));
   let authResponse: AuthResponse = { authenticated: true, reason: "" };
 
   if (!token) {
@@ -59,7 +59,7 @@ export async function authenticateApiUser(
 
   let authResponse: AuthResponse = hasApiKey(request);
 
-  const key = request.headers.get("Authorization");
+  const key = extractBearerToken(request.headers.get("Authorization"));
 
   if (!key) {
     return authResponse;
