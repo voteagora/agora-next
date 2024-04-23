@@ -15,12 +15,7 @@ async function getProjectsApi() {
 
   const defaultTeam = [
     {
-      address: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11",
-      name: "Flip Liquid",
-      description: "Snake. Call me snake.",
-      socialLinks: defaultSocialLinks,
-      externalLink: "flipliquid.xyz",
-      avatarUrls: ["string"],
+      farcasterId: defaultSocialLinks.farcaster,
     },
   ];
 
