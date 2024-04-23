@@ -57,5 +57,5 @@ export const icons = {
   shareCard,
   scroll,
   github,
-  world
+  world,
 };

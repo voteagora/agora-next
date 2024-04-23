@@ -114,14 +114,8 @@ export async function balanceOf(address: string) {
   return contracts.token.contract.balanceOf(address);
 }
 
-export const fetchConnectedDelegate = async (address: string) => {
-  return await Promise.all([
-    fetchDelegate(address),
-    fetchAllDelegatorsInChainsForAddress(address),
-    balanceOf(address),
-  ]);
-};
-
-export const revalidateDelegateAddressPage = async (delegateAddress: string) => {
+export const revalidateDelegateAddressPage = async (
+  delegateAddress: string
+) => {
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
