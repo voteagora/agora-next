@@ -27,6 +27,7 @@ import shareCard from "./shareCard.svg";
 import newdao from "./newdao.svg";
 import github from "./github.svg";
 import world from "./world.svg";
+import clipboard from "./clipboard.svg";
 
 export const icons = {
   badge,
@@ -58,4 +59,5 @@ export const icons = {
   newdao,
   github,
   world,
+  clipboard,
 };
