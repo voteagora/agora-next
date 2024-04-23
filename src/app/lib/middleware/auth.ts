@@ -5,7 +5,7 @@ import { validate as validateUuid } from "uuid";
 let prismaModule: any;
 
 const HASH_FN = "sha256";
-const REASON_NO_TOKEN = "No token provided in 'authorization' header";
+const REASON_NO_TOKEN = "No token provided in 'Authorization' header";
 const REASON_INVALID_API_KEY = "Invalid API Key";
 const REASON_DISABLED_USER = "User disabled";
 
