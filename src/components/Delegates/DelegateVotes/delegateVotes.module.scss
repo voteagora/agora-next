@@ -27,6 +27,12 @@
   display: grid;
   overflow-y: hidden;
   grid-template-columns: 1fr 1px 1fr;
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+
+  ::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 
   @media (max-width: $screen-sm) {
     grid-template-rows: 1fr;
@@ -70,14 +76,19 @@
 }
 
 .vote_reason_container {
-  overflow-y: scroll;
-  overflow-x: scroll;
+  overflow-x: hidden;
   padding: $spacing-4 $spacing-6;
   font-size: $font-size-xs;
   font-weight: $font-weight-medium;
   white-space: pre-wrap;
   color: #66676b;
-  width: fit-content;
+  word-wrap: break-word;
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+
+  ::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 
   @media (max-width: $screen-sm) {
     padding-top: 0;
