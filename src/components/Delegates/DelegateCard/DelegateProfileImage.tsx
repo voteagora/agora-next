@@ -2,7 +2,8 @@
 
 import ENSAvatar from "../../shared/ENSAvatar";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import HumanAddress from "../../shared/HumanAddress";
+import HumanAddress from "@/components/shared/HumanAddress";
+import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
@@ -18,10 +19,12 @@ export function DelegateProfileImage({
   address,
   votingPower,
   citizen,
+  copyable = false,
 }: {
   address: string;
   votingPower: string;
   citizen?: boolean;
+  copyable?: boolean;
 }) {
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const { token } = Tenant.current();
@@ -77,7 +80,11 @@ export function DelegateProfileImage({
 
       <VStack>
         <div className={styles.address}>
-          <HumanAddress address={address} />
+          {copyable ? (
+            <CopyableHumanAddress address={address} />
+          ) : (
+            <HumanAddress address={address} />
+          )}
         </div>
         <div className={styles.token}>
           {formattedNumber} {token.symbol}
