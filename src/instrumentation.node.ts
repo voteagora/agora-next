@@ -4,7 +4,10 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { Resource } from "@opentelemetry/resources";
-import { SEMRESATTRS_DEPLOYMENT_ENVIRONMENT, SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
+import {
+  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
+  SEMRESATTRS_SERVICE_NAME,
+} from "@opentelemetry/semantic-conventions";
 
 import { SERVICE_NAME } from "./instrumentation";
 
