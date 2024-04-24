@@ -12,7 +12,7 @@ export default function ProposalTitle({ title, proposalType }) {
         {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
         {proposalText} by The Optimism Foundation
         {/* <HumanAddress address={proposerAddress} /> */}
-        {/* TODO: frh -> this hash url */}
+        {/* TODO: this hash url */}
         <a
           href={getBlockScanUrl("hash2")}
           target="_blank"

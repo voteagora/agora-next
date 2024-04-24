@@ -175,6 +175,7 @@ view OptimismAdvancedDelegatees {
   delegated_share  Decimal @db.Decimal
   block_number     BigInt
   contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
 
   @@map("advanced_delegatees")
   @@schema("optimism")
@@ -376,6 +377,7 @@ view ensAdvancedDelegatees {
   delegated_share  Decimal @db.Decimal
   block_number     BigInt
   contract         String? @db.VarChar
+  transaction_hash String?
 
   @@map("advanced_delegatees")
   @@schema("ens")
@@ -483,21 +485,24 @@ view etherfiVotingPowerSnaps {
 }
 
 view etherfiProposals {
-  proposal_id        String       @unique
-  contract           String       @db.VarChar
-  proposer           String
-  description        String?
-  ordinal            Decimal      @db.Decimal
-  created_block      BigInt?
-  start_block        String
-  end_block          String?
-  cancelled_block    BigInt?
-  executed_block     BigInt?
-  proposal_data      Json?
-  proposal_data_raw  String?
-  proposal_type      ProposalType
-  proposal_type_data Json?
-  proposal_results   Json?
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?
+  cancelled_transaction_hash String?
+  executed_transaction_hash  String?
 
   @@map("proposals")
   @@schema("etherfi")
@@ -543,6 +548,7 @@ view etherfiAdvancedDelegatees {
   delegated_share  Decimal @db.Decimal
   block_number     BigInt
   contract         String? @db.VarChar
+  transaction_hash String?
 
   @@map("advanced_delegatees")
   @@schema("etherfi")
@@ -650,21 +656,24 @@ view uniswapVotingPowerSnaps {
 }
 
 view uniswapProposals {
-  proposal_id        String       @unique
-  contract           String       @db.VarChar
-  proposer           String
-  description        String?
-  ordinal            Decimal      @db.Decimal
-  created_block      BigInt?
-  start_block        String
-  end_block          String?
-  cancelled_block    BigInt?
-  executed_block     BigInt?
-  proposal_data      Json?
-  proposal_data_raw  String?
-  proposal_type      ProposalType
-  proposal_type_data Json?
-  proposal_results   Json?
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?
+  cancelled_transaction_hash String?
+  executed_transaction_hash  String?
 
   @@map("proposals")
   @@schema("uniswap")
@@ -710,6 +719,7 @@ view uniswapAdvancedDelegatees {
   delegated_share  Decimal @db.Decimal
   block_number     BigInt
   contract         String? @db.VarChar
+  transaction_hash String?
 
   @@map("advanced_delegatees")
   @@schema("uniswap")
@@ -938,21 +948,24 @@ view authority_chains_wrapper {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view proposals_wrapper {
-  proposal_id        String?
-  contract           String?       @db.VarChar(42)
-  proposer           String?
-  description        String?
-  ordinal            Decimal?      @db.Decimal
-  created_block      BigInt?
-  start_block        String?
-  end_block          String?
-  cancelled_block    BigInt?
-  executed_block     BigInt?
-  proposal_data      Json?
-  proposal_data_raw  String?
-  proposal_type      ProposalType?
-  proposal_type_data Json?
-  proposal_results   Json?
+  proposal_id                String?
+  contract                   String?       @db.VarChar(42)
+  proposer                   String?
+  description                String?
+  ordinal                    Decimal?      @db.Decimal
+  created_block              BigInt?
+  start_block                String?
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType?
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?       @db.VarChar(66)
+  cancelled_transaction_hash String?       @db.VarChar
+  executed_transaction_hash  String?       @db.VarChar
 
   @@ignore
   @@schema("optimism")
@@ -989,21 +1002,24 @@ view ens_delegates_wrapper {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view ens_proposals_wrapper {
-  proposal_id        String?
-  contract           String?       @db.VarChar
-  proposer           String?
-  description        String?
-  ordinal            Decimal?      @db.Decimal
-  created_block      BigInt?
-  start_block        String?
-  end_block          String?
-  cancelled_block    BigInt?
-  executed_block     BigInt?
-  proposal_data      Json?
-  proposal_data_raw  String?
-  proposal_type      ProposalType?
-  proposal_type_data Json?
-  proposal_results   Json?
+  proposal_id                String?
+  contract                   String?       @db.VarChar
+  proposer                   String?
+  description                String?
+  ordinal                    Decimal?      @db.Decimal
+  created_block              BigInt?
+  start_block                String?
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType?
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?       @db.VarChar
+  cancelled_transaction_hash String?       @db.VarChar
+  executed_transaction_hash  String?       @db.VarChar
 
   @@map("proposals_wrapper")
   @@ignore

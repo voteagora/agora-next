@@ -55,6 +55,7 @@ function DelegationsContainer({
                   <TableHead className="h-10">Type</TableHead>
                   <TableHead className="h-10">Amount</TableHead>
                   <TableHead className="h-10">From</TableHead>
+                  <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

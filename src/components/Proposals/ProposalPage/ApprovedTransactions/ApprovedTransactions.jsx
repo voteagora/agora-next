@@ -32,7 +32,7 @@ export default function ApprovedTransactions({ proposalData, proposalType }) {
           Proposed Transactions (signal only – transactions are manually
           executed by the Foundation)
         </p>
-        {/* TODO: frh -> this hash url */}
+        {/* TODO: this hash url */}
         <a
           href={getBlockScanUrl("hash2")}
           target="_blank"

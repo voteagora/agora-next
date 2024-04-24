@@ -38,7 +38,7 @@ export default function ProposalStatusDetail({
         {proposalStatus === "CANCELLED" && (
           <div className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold flex items-center">
             <span>CANCELLED</span>
-            {/* TODO: frh -> this hash url */}
+            {/* TODO: this hash url */}
             <a
               href={getBlockScanUrl("hash2")}
               target="_blank"
