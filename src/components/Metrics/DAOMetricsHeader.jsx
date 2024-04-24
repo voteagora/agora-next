@@ -9,6 +9,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function DAOMetricsHeader({ metrics }) {
   const { token, ui } = Tenant.current();
@@ -30,7 +35,9 @@ export default function DAOMetricsHeader({ metrics }) {
     totalSupply: formatNumber(metrics.totalSupply),
   };
 
-  if (isClient) {
+  if (!isClient) {
+    return null;
+  } else {
     return (
       <>
         {createPortal(
@@ -50,14 +57,36 @@ export default function DAOMetricsHeader({ metrics }) {
                 onClick={() => setVisible(!visible)}
               >
                 <div className="flex gap-6 sm:gap-8">
-                  <span>
-                    {formattedMetrics.totalSupply} {token.symbol} total
-                    <span className="hidden sm:inline">&nbsp;supply</span>
-                  </span>
-                  <span>
-                    {formattedMetrics.votableSupply} {token.symbol} votable
-                    <span className="hidden sm:inline">&nbsp;supply</span>
-                  </span>
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger>
+                      <span className="cursor-default">
+                        {formattedMetrics.totalSupply} {token.symbol} total
+                        <span className="hidden sm:inline">&nbsp;supply</span>
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-full shadow"
+                      side="bottom"
+                      sideOffset={3}
+                    >
+                      <span>Total amount of OP in existence</span>
+                    </HoverCardContent>
+                  </HoverCard>
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger>
+                      <span className="cursor-default">
+                        {formattedMetrics.votableSupply} {token.symbol} votable
+                        <span className="hidden sm:inline">&nbsp;supply</span>
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-full shadow"
+                      side="bottom"
+                      sideOffset={3}
+                    >
+                      <span>OP currently delegated to a voter</span>
+                    </HoverCardContent>
+                  </HoverCard>
                 </div>
                 <Image
                   src={infoTransparent}
