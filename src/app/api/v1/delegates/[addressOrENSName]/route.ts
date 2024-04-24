@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 import { authenticateApiUser } from "@/app/lib/middleware/auth";
-import { withUserId } from "../../apiUtils";
+import { traceWithUserId } from "../../apiUtils";
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     return new Response(authResponse.reason, { status: 401 });
   }
 
-  return await withUserId(authResponse.userId as string, async () => {
+  return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const addressOrENSName = request.nextUrl.pathname.split("/")[4];
       const delegate = await fetchDelegate(addressOrENSName);
