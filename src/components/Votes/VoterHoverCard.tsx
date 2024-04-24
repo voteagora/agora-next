@@ -66,6 +66,7 @@ export default function VoterHoverCard({
           <div className="flex-grow" />
           <HStack alignItems="items-stretch" className={"justify-between"}>
             <DelegateSocialLinks
+              warpcast={delegate?.statement.warpcast}
               discord={delegate?.statement.discord}
               twitter={delegate?.statement.twitter}
             />
