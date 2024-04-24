@@ -21,7 +21,7 @@ export async function GET(
     const { roundId, impactMetricId } = route.params;
     try {
       const comments = fetchImpactMetricComments(roundId, impactMetricId);
-      return new Response(JSON.stringify(comments), { status: 200 });
+      return NextResponse.json(comments);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
@@ -50,7 +50,7 @@ export async function PUT(
         impactMetricId,
         comment.id
       );
-      return new Response(JSON.stringify(retrievedComment), { status: 200 });
+      return NextResponse.json(retrievedComment);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

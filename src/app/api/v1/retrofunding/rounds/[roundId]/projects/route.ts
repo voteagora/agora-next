@@ -14,9 +14,7 @@ export async function GET(request: NextRequest) {
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const projects = await fetchProjectsApi();
-      return new Response(JSON.stringify(projects), {
-        status: 200,
-      });
+      return NextResponse.json(projects);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

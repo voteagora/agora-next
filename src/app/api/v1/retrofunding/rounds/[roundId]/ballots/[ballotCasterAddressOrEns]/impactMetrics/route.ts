@@ -20,9 +20,7 @@ export async function GET(
         roundId,
         ballotCasterAddressOrEns
       );
-      return new Response(JSON.stringify(impactMetrics), {
-        status: 200,
-      });
+      return NextResponse.json(impactMetrics);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
@@ -48,9 +46,7 @@ export async function POST(
         roundId,
         ballotCasterAddressOrEns
       );
-      return new Response(JSON.stringify(impactMetrics), {
-        status: 200,
-      });
+      return NextResponse.json(impactMetrics);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

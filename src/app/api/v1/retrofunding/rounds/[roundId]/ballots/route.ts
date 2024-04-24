@@ -16,9 +16,7 @@ export async function GET(
     try {
       const { roundId } = route.params;
       const ballots = await fetchBallots(roundId);
-      return new Response(JSON.stringify(ballots), {
-        status: 200,
-      });
+      return NextResponse.json(ballots);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

@@ -19,9 +19,7 @@ export async function GET(
 
     try {
       const round = await fetchRetroFundingRounds(roundId);
-      return new Response(JSON.stringify(round), {
-        status: 200,
-      });
+      return NextResponse.json(round);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

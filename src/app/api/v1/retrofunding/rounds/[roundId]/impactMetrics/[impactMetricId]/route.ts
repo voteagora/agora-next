@@ -25,9 +25,7 @@ export async function GET(
       const { roundId, ballotCasterAddressOrEns, impactMetricId } =
         route.params;
       const impactMetrics = await fetchImpactMetricApi(impactMetricId);
-      return new Response(JSON.stringify(impactMetrics), {
-        status: 200,
-      });
+      return NextResponse.json(impactMetrics);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

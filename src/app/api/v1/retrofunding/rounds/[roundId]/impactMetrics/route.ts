@@ -18,9 +18,7 @@ export async function GET(
     try {
       const { roundId } = route.params;
       const impactMetrics = await fetchImpactMetricsApi(roundId);
-      return new Response(JSON.stringify(impactMetrics), {
-        status: 200,
-      });
+      return NextResponse.json(impactMetrics);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

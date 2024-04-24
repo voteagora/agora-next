@@ -17,9 +17,7 @@ export async function POST(
     const { roundId, ballotCasterAddressOrEns } = route.params;
     try {
       const ballot = await fetchBallot(roundId, ballotCasterAddressOrEns);
-      return new Response(JSON.stringify(ballot), {
-        status: 200,
-      });
+      return NextResponse.json(ballot);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
