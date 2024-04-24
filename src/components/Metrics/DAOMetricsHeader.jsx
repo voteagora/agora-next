@@ -35,7 +35,9 @@ export default function DAOMetricsHeader({ metrics }) {
     totalSupply: formatNumber(metrics.totalSupply),
   };
 
-  if (isClient) {
+  if (!isClient) {
+    return null;
+  } else {
     return (
       <>
         {createPortal(
