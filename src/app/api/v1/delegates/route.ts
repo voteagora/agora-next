@@ -13,7 +13,7 @@ import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
 } from "@/app/api/common/utils/validators";
-import { withUserId } from "../apiUtils";
+import { traceWithUserId } from "../apiUtils";
 
 const DEFAULT_SORT = "most_delegators";
 const DEFAULT_MAX_LIMIT = 100;
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     return new Response(authResponse.reason, { status: 401 });
   }
 
-  return await withUserId(authResponse.userId as string, async () => {
+  return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
       const sort = sortValidator.parse(params.get("sort"));

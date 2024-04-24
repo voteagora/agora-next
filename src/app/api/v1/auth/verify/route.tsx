@@ -1,3 +1,5 @@
+import { NextResponse, type NextRequest } from "next/server";
+
 export async function POST(request: Request) {
   const responseBody = {
     access_token:
@@ -5,7 +7,5 @@ export async function POST(request: Request) {
     token_type: "JWT",
     expires_in: 9999999999,
   };
-  return new Response(JSON.stringify(responseBody), {
-    status: 200,
-  });
+  return NextResponse.json(responseBody);
 }

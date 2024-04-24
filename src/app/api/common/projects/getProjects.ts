@@ -1,5 +1,6 @@
 import { cache } from "react";
 
+// TODO: Implement span for projects retrieval
 async function getProjectsApi() {
   const pageMetadata = {
     hasNext: true,
