@@ -1,5 +1,6 @@
 import { getDefaultProvider } from "ethers";
 import { MulticallProvider, MulticallWrapper } from "ethers-multicall-provider";
+import { AlchemyProvider } from "ethers";
 
 declare global {
   var provider: MulticallProvider;
@@ -12,11 +13,13 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
 let provider: MulticallProvider;
 let ethProvider: MulticallProvider;
 
-const sepoliaProvider = MulticallWrapper.wrap(
-  getDefaultProvider("sepolia", {
-    alchemy: alchemyId,
-  })
-);
+// const sepoliaProvider = MulticallWrapper.wrap(
+//   getDefaultProvider("sepolia", {
+//     alchemy: alchemyId,
+//   })
+// );
+
+const sepoliaProvider = new AlchemyProvider("sepolia", alchemyId);
 
 if (isProd) {
   provider = MulticallWrapper.wrap(

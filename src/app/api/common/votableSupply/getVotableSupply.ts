@@ -9,7 +9,7 @@ async function getVotableSupply() {
   if (!votableSupply) {
     // TODO: Remove this once the data is in the DB
     return "100000";
-    // throw new Error("No votable supply found");
+    // throw create Error("No votable supply found");
   }
   return votableSupply.votable_supply;
 }

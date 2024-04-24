@@ -56,7 +56,7 @@ export const time_this_sync = <T>(
 
 /* 
   Adds baggage to active context.
-  OTel contexts are immutable; as such, we create a new context with the added baggage.
+  OTel contexts are immutable; as such, we create a create context with the added baggage.
 */
 export const addBaggage = (
   baggageToAdd: Record<string, string> | undefined
