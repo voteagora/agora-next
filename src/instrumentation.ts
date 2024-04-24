@@ -9,9 +9,9 @@ export async function register() {
     registerOTel({
       serviceName: SERVICE_NAME,
       attributes: {
-        "service.name": SERVICE_NAME,
-        "node.env": process.env.NODE_ENV,
+        "deployment.environment": process.env.VERCEL_ENV,
         "vercel.env": process.env.VERCEL_ENV,
+        "node.env": process.env.NODE_ENV,
         "vercel.region": process.env.VERCEL_REGION,
         "vercel.runtime": process.env.NEXT_RUNTIME,
         "vercel.sha": process.env.VERCEL_GIT_COMMIT_SHA,
