@@ -16,6 +16,7 @@ model DelegateStatements {
   payload   Json
   twitter   String?
   discord   String?
+  warpcast  String?
   email     String?
   createdAt DateTime? @default(now()) @map("created_at") @db.Date
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
