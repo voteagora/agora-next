@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useCallback, useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
 import Link from "next/link";
@@ -8,7 +9,8 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "../Delegates/DelegateCard/AdvancedDelegateButton";
 import { DelegateButton } from "../Delegates/DelegateCard/DelegateButton";
-import useFetchDelegate from "@/hooks/useFetchDelegate";
+import { Delegate } from "@/app/api/common/delegates/delegate";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 interface Props {
   address: string;
@@ -21,9 +23,20 @@ export default function VoterHoverCard({
   isAdvancedUser,
   delegators,
 }: Props) {
-  const { data: delegate } = useFetchDelegate(address);
+  // full delegate object is required for the delegate button, that can appear later
+  const [delegate, setDelegate] = useState<Delegate>();
+
   const { isConnected } = useAgoraContext();
   const { address: connectedAddress } = useAccount();
+
+  const fetchDelegateAndSet = useCallback(async (addressOrENSName: string) => {
+    const delegate = await fetchDelegate(addressOrENSName);
+    setDelegate(delegate);
+  }, []);
+
+  useEffect(() => {
+    fetchDelegateAndSet(address);
+  }, [fetchDelegateAndSet, address]);
 
   let truncatedStatement = "";
   if (delegate?.statement?.payload) {
