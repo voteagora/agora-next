@@ -6,8 +6,6 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata() {
-  const { ui } = Tenant.current();
-
   const title = "Agora - Optimism's RetroPGF Round 3 Summary";
   const description =
     "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.";
