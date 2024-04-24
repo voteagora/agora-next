@@ -59,7 +59,7 @@ export default function DAOMetricsHeader({ metrics }) {
                 <div className="flex gap-6 sm:gap-8">
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger>
-                      <span>
+                      <span className="cursor-default">
                         {formattedMetrics.totalSupply} {token.symbol} total
                         <span className="hidden sm:inline">&nbsp;supply</span>
                       </span>
@@ -69,12 +69,12 @@ export default function DAOMetricsHeader({ metrics }) {
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>Total tokens created</span>
+                      <span>Total amount of OP in existence</span>
                     </HoverCardContent>
                   </HoverCard>
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger>
-                      <span>
+                      <span className="cursor-default">
                         {formattedMetrics.votableSupply} {token.symbol} votable
                         <span className="hidden sm:inline">&nbsp;supply</span>
                       </span>
@@ -84,7 +84,7 @@ export default function DAOMetricsHeader({ metrics }) {
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>Total tokens available to vote</span>
+                      <span>OP currently delegated to a voter</span>
                     </HoverCardContent>
                   </HoverCard>
                 </div>
