@@ -85,15 +85,15 @@ const useConnectedDelegate = () => {
 
   return data.data
     ? {
-      ...data.data,
-      isLoading: data.isLoading,
-    }
+        ...data.data,
+        isLoading: data.isLoading,
+      }
     : {
-      balance: null,
-      delegate: null,
-      advancedDelegators: null,
-      isLoading: data.isLoading,
-    };
+        balance: null,
+        delegate: null,
+        advancedDelegators: null,
+        isLoading: data.isLoading,
+      };
 };
 
 export default useConnectedDelegate;
