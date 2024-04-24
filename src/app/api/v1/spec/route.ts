@@ -1,10 +1,13 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { authenticateApiUser } from "@/app/lib/middleware/auth";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
+
 import fs from "fs";
 import path from "path";
 
-export async function GET(request: Request) {
-  const fp = path.join(process.cwd(), "spec/oas_v1.yaml");
-
+export async function GET(request: NextRequest) {
   try {
+    const fp = path.join(process.cwd(), "spec/oas_v1.yaml");
     const data = fs.readFileSync(fp, "utf8");
     // set headers
     const headers = new Headers();
