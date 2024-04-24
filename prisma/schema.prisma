@@ -19,6 +19,7 @@ model DelegateStatements {
   email     String?
   createdAt DateTime? @default(now()) @map("created_at") @db.Date
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
+  warpcast  String?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -147,21 +148,24 @@ view OptimismDelegates {
 }
 
 view OptimismProposals {
-  proposal_id        String       @unique
-  contract           String       @db.VarChar(42)
-  proposer           String
-  description        String?
-  ordinal            Decimal      @db.Decimal
-  created_block      BigInt?
-  start_block        String
-  end_block          String?
-  cancelled_block    BigInt?
-  executed_block     BigInt?
-  proposal_data      Json?
-  proposal_data_raw  String?
-  proposal_type      ProposalType
-  proposal_type_data Json?
-  proposal_results   Json?
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar(42)
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
   @@schema("optimism")
@@ -291,21 +295,24 @@ view ensDelegates {
 }
 
 view ensProposals {
-  proposal_id        String       @unique
-  contract           String       @db.VarChar
-  proposer           String
-  description        String?
-  ordinal            Decimal      @db.Decimal
-  created_block      BigInt?
-  start_block        String
-  end_block          String?
-  cancelled_block    BigInt?
-  executed_block     BigInt?
-  proposal_data      Json?
-  proposal_data_raw  String?
-  proposal_type      ProposalType
-  proposal_type_data Json?
-  proposal_results   Json?
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?      @db.VarChar
+  cancelled_transaction_hash String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
   @@schema("ens")

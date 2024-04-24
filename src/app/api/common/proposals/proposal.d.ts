@@ -24,4 +24,7 @@ export type Proposal = {
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
   status: ProposalStatus | null;
+  created_transaction_hash: string | null;
+  cancelled_transaction_hash: string | null;
+  executed_transaction_hash: string | null;
 };
