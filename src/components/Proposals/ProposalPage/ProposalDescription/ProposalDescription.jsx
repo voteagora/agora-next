@@ -53,6 +53,7 @@ export default function ProposalDescription({ proposal }) {
         <ApprovedTransactions
           proposalData={proposal.proposalData}
           proposalType={proposal.proposalType}
+          executedTransactionHash={proposal.executed_transaction_hash}
         />
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}

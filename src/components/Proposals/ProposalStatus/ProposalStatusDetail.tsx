@@ -8,10 +8,12 @@ export default function ProposalStatusDetail({
   proposalStatus,
   proposalEndTime,
   proposalStartTime,
+  cancelledTransactionHash,
 }: {
   proposalStatus: ProposalStatus | null;
   proposalEndTime: Date | null;
   proposalStartTime: Date | null;
+  cancelledTransactionHash: string | null;
 }) {
   return (
     <HStack
@@ -36,16 +38,20 @@ export default function ProposalStatusDetail({
           </p>
         )}
         {proposalStatus === "CANCELLED" && (
-          <div className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold flex items-center">
-            <span>CANCELLED</span>
-            {/* TODO: this hash url */}
-            <a
-              href={getBlockScanUrl("hash2")}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-            </a>
+          <div className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
+            {cancelledTransactionHash ? (
+              <a
+                href={getBlockScanUrl(cancelledTransactionHash)}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="flex items-center"
+              >
+                <span>CANCELLED</span>
+                <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+              </a>
+            ) : (
+              <span>CANCELLED</span>
+            )}
           </div>
         )}
       </div>

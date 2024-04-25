@@ -5,7 +5,11 @@ import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
 
-export default function ApprovedTransactions({ proposalData, proposalType }) {
+export default function ApprovedTransactions({
+  proposalData,
+  proposalType,
+  executedTransactionHash,
+}) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
   const toggleElements = () => {
     displayedOptions === 1
@@ -32,14 +36,15 @@ export default function ApprovedTransactions({ proposalData, proposalType }) {
           Proposed Transactions (signal only – transactions are manually
           executed by the Foundation)
         </p>
-        {/* TODO: this hash url */}
-        <a
-          href={getBlockScanUrl("hash2")}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-        </a>
+        {executedTransactionHash && (
+          <a
+            href={getBlockScanUrl(executedTransactionHash)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+          </a>
+        )}
       </div>
       {!isNoProposedTransactions && (
         <VStack className="px-4">
