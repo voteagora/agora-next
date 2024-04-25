@@ -59,6 +59,7 @@
     "ethers-multicall-provider": "^5.0.0",
     "faker": "4.1.0",
     "framer-motion": "^10.16.5",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.0",
     "lokijs": "^1.5.12",
     "lucide-react": "^0.258.0",
