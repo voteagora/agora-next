@@ -113,7 +113,7 @@ async function getCurrentDelegateesForAddress({
         Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
           ? "FULL"
           : "PARTIAL",
-      transaction_hash: advancedDelegatee.transaction_hash
+      transaction_hash: advancedDelegatee.transaction_hash,
     })),
   ] as Delegation[];
 }
@@ -210,7 +210,7 @@ async function getCurrentDelegatorsForAddress({
         Number(advancedDelegator.delegated_share.toFixed(3)) === 1
           ? "FULL"
           : "PARTIAL",
-      transaction_hash: advancedDelegator.transaction_hash
+      transaction_hash: advancedDelegator.transaction_hash,
     })),
   ] as Delegation[];
 }

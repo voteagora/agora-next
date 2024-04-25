@@ -224,16 +224,16 @@ export async function parseProposal(
     proposalType: proposal.proposal_type as ProposalType,
     status: latestBlock
       ? await getProposalStatus(
-        proposal,
-        proposalResuts,
-        latestBlock,
-        quorum,
-        votableSupply
-      )
+          proposal,
+          proposalResuts,
+          latestBlock,
+          quorum,
+          votableSupply
+        )
       : null,
     created_transaction_hash: proposal.created_transaction_hash,
     cancelled_transaction_hash: proposal.cancelled_transaction_hash,
-    executed_transaction_hash: proposal.executed_transaction_hash
+    executed_transaction_hash: proposal.executed_transaction_hash,
   };
 }
 
