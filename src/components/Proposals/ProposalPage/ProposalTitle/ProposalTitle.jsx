@@ -3,7 +3,11 @@ import { getBlockScanUrl } from "@/lib/utils";
 import { VStack } from "@/components/Layout/Stack";
 import { getProposalTypeText } from "@/lib/utils";
 
-export default function ProposalTitle({ title, proposalType }) {
+export default function ProposalTitle({
+  title,
+  proposalType,
+  createdTransactionHash,
+}) {
   const proposalText = getProposalTypeText(proposalType);
   return (
     <VStack className="flex-col-reverse items-start">
@@ -12,9 +16,8 @@ export default function ProposalTitle({ title, proposalType }) {
         {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
         {proposalText} by The Optimism Foundation
         {/* <HumanAddress address={proposerAddress} /> */}
-        {/* TODO: this hash url */}
         <a
-          href={getBlockScanUrl("hash2")}
+          href={getBlockScanUrl(createdTransactionHash)}
           target="_blank"
           rel="noreferrer noopener"
         >

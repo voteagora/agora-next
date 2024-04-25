@@ -47,6 +47,7 @@ export default function ProposalDescription({ proposal }) {
         title={shortTitle}
         proposalType={proposal.proposalType}
         proposerAddress={proposal.proposer}
+        createdTransactionHash={proposal.created_transaction_hash}
       />
       <VStack gap={2}>
         <ApprovedTransactions
