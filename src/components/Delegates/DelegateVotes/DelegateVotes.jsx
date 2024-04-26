@@ -34,7 +34,11 @@ function propHeader(vote) {
     headerString = `Voted ${vote.support.toLowerCase()} this proposal `;
 
   if (vote.proposalType === "APPROVAL")
-    headerString = `Voted on ${vote.params.length} options in this proposal `;
+    if (!vote.params || vote.params?.length === 0) {
+      headerString = `Abstained from voting on this proposal `;
+    } else {
+      headerString = `Voted on ${vote.params?.length} options in this proposal `;
+    }
 
   if (vote.proposalValue != 0n)
     headerString += ` asking ${formatNumber(vote.proposalValue)} ETH `;
