@@ -6,6 +6,8 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
 
 export default function DelegationToRow({
   delegation,
@@ -30,6 +32,18 @@ export default function DelegationToRow({
         >
           <HumanAddress address={delegation.to} />
         </Link>
+      </TableCell>
+      <TableCell>
+        <a
+          href={getBlockScanUrl(
+            "0x373685deb4e6cca8fb915eca177a4f741fc282fe4337797cfe52e9725afe63bf"
+          )}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          View
+          <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2 inline align-text-bottom" />
+        </a>
       </TableCell>
     </TableRow>
   );
