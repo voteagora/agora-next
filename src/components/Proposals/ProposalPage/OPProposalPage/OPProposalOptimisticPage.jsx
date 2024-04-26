@@ -7,7 +7,6 @@ import {
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import { disapprovalThreshold } from "@/lib/constants";
@@ -16,6 +15,7 @@ import { formatUnits } from "ethers";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
 import styles from "./OPProposalPage.module.scss";
+import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
   "use server";
@@ -99,7 +99,7 @@ export default async function OPProposalPage({ proposal }) {
               <div className={styles.proposal_header}>Proposal votes</div>
               <div className={styles.proposal_votes_summary_container}>
                 {proposal.status === "CANCELLED" ? (
-                  <p className="text-red-negative">
+                  <p className="text-red-negative font-bold">
                     This proposal has been cancelled
                   </p>
                 ) : (
@@ -107,8 +107,8 @@ export default async function OPProposalPage({ proposal }) {
                     <p
                       className={
                         status === "approved"
-                          ? "text-green-positive"
-                          : "text-red-negative"
+                          ? "text-green-positive font-bold"
+                          : "text-red-negative font-bold"
                       }
                     >
                       This proposal is optimistically {status}
@@ -122,12 +122,13 @@ export default async function OPProposalPage({ proposal }) {
                     </p>
                   </div>
                 )}
-                <HStack className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md justify-end font-medium">
-                  <ProposalTimeStatus
-                    proposalStatus={proposal.status}
-                    proposalEndTime={proposal.end_time}
-                  />
-                </HStack>
+                <ProposalStatusDetail
+                  proposalStatus={proposal.status}
+                  proposalEndTime={proposal.end_time}
+                  proposalStartTime={proposal.start_time}
+                  proposalCancelledTime={proposal.cancelled_time}
+                  cancelledTransactionHash={proposal.cancelled_transaction_hash}
+                />
               </div>
             </div>
             {/* Show the scrolling list of votes for the proposal */}

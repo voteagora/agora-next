@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useQuery } from "@tanstack/react-query";
+import { timeout } from "@/lib/utils";
 import { fetchDelegate } from "@/app/delegates/actions";
 
 /**
@@ -13,10 +14,6 @@ import { fetchDelegate } from "@/app/delegates/actions";
  * takes around 120 seconds to update)
  */
 const MAX_RETRIES = 10;
-
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 // TODO: think about strategy to fetch, since balance and voting power can change on every block,
 // also to prevent additional unnecessary fetches being done right now
