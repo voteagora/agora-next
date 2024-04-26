@@ -11,6 +11,7 @@
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json",
     "typecheck": "tsc --pretty --noEmit",
     "generate-apikey": "ts-node src/scripts/generateApiKey.ts",
+    "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/"
   },
@@ -104,6 +105,7 @@
     "prettier": "^3.2.5",
     "sass": "^1.62.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.7.3",
     "typechain": "^8.3.2",
     "typescript": "5.0.4"
   }
