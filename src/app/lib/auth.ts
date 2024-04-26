@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+import {SignJWT, jwtVerify, type JWTPayload} from 'jose';
 
-const DEFAULT_JWT_TTL = "1d";
+const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
 const DEFAULT_USER_SCOPE = "";
 
 // Note: this is not included in lib/middleware/auth.ts since that file will be
@@ -8,17 +8,24 @@ const DEFAULT_USER_SCOPE = "";
 export async function generateJwt(
   userId: string,
   scope?: string | null,
-  ttl?: string | null
-) {
+  ttl?: number | null
+): Promise<string> {
   const resolvedScope = scope || (await getScopeForUser(userId));
-  const resolvedTtl = ttl || (await getExpiryForUser(userId));
-  return jwt.sign(
-    { sub: userId, scope: resolvedScope },
-    process.env.JWT_SECRET as string,
-    {
-      expiresIn: resolvedTtl,
-    }
-  );
+  const resolvedTtl = ttl || await getExpiryForUser(userId);
+  const iat = Math.floor(Date.now() / 1000);
+  const exp = iat + resolvedTtl; 
+
+  const payload: JWTPayload = {
+    sub: userId,
+    scope: resolvedScope,
+  };
+
+  return new SignJWT({...payload})
+      .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
+      .setExpirationTime(exp)
+      .setIssuedAt(iat)
+      .setNotBefore(iat)
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 }
 
 export async function getExpiryForUser(userId: string) {

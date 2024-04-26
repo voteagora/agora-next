@@ -8,7 +8,7 @@ import { generateJwt } from "../app/lib/auth";
 
 // accept user ID as argument, scope and ttl as optional arguments
 let scope = "";
-let ttl = "1d";
+let ttl = 60 * 60 * 24;
 if (process.argv.length < 3) {
   console.error("User ID is required");
   process.exit(1);
@@ -30,7 +30,7 @@ if (process.argv.length == 4) {
 }
 
 if (process.argv.length == 5) {
-  ttl = process.argv[4];
+  ttl = Number(process.argv[4]);
 }
 
 (async () => {
