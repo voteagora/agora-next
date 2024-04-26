@@ -29,12 +29,12 @@ export async function authenticateApiUser(
   if (!user) {
     authResponse = {
       authenticated: false,
-      reason: REASON_INVALID_BEARER_TOKEN,
+      failReason: REASON_INVALID_BEARER_TOKEN,
     };
   } else if (!user.enabled) {
     authResponse = {
       authenticated: false,
-      reason: REASON_DISABLED_USER,
+      failReason: REASON_DISABLED_USER,
     };
   } else {
     authResponse.userId = user.id;

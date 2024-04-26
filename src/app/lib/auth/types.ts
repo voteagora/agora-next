@@ -3,7 +3,7 @@ export type AuthInfo = {
   authenticated: boolean;
   userId?: string;
   scope?: string;
-  reason?: string;
+  failReason?: string;
   type?: "api_key" | "jwt",
   token?: string,
 };
