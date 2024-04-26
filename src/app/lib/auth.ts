@@ -5,10 +5,11 @@ const DEFAULT_USER_SCOPE = "";
 
 // Note: this is not included in lib/middleware/auth.ts since that file will be 
 // used in a non-node environment. This file is only intended to be used in/on node.
-export async function generateJwt(userId: string) {
-  const scope = await getScopeForUser(userId);
-  return jwt.sign({ sub: userId, scope: scope }, process.env.JWT_SECRET as string, {
-    expiresIn: await getExpiryForUser(userId),
+export async function generateJwt(userId: string, scope?: string | null , ttl?: string | null) {
+  const resolvedScope = scope || await getScopeForUser(userId);
+  const resolvedTtl = ttl || await getExpiryForUser(userId);
+  return jwt.sign({ sub: userId, scope: resolvedScope }, process.env.JWT_SECRET as string, {
+    expiresIn: resolvedTtl,
   });
 }
 
