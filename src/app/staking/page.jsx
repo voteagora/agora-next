@@ -1,28 +1,36 @@
+import { Deposits } from "@/app/staking/components/Deposits";
+import { PoolStats } from "@/app/staking/components/PoolStats";
+import React from "react";
 import Tenant from "@/lib/tenant/tenant";
-import StackingHeroSection from "@/components/Staking/StackingHeroSection";
-import StackingInfoBoxes from "@/components/Staking/StackingInfoBoxes";
-import FAQs from "@/components/Staking/FAQs";
-import CollectFeeActionCard from "@/components/Staking/CollectFeeActionCard";
-import ConfirmStakingCard from "@/components/Staking/ConfirmStakingCard";
+import { apiFetchStakedDeposits } from "@/app/api/staking/getStakedDeposits";
 
-export default function Page() {
-  const { ui } = Tenant.current();
+export default async function Page() {
+  const { token, contracts } = Tenant.current();
 
-  if (!ui.toggle("staking")) {
-    return <div>Route not supported for namespace</div>;
-  }
+  const [totalSupply, rewardPerToken, rewardDuration] = await Promise.all([
+    contracts.token.contract.totalSupply(),
+    contracts.staker.contract.rewardPerTokenAccumulated(),
+    contracts.staker.contract.REWARD_DURATION(),
+  ]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10 w-full max-w-6xl pb-16 mt-12 font-inter">
-      <div className="sm:col-span-4">
-        <StackingHeroSection />
-        <StackingInfoBoxes />
-        <FAQs />
+    <section>
+      <Deposits
+        fetchStaked={async (address) => {
+          "use server";
+          return apiFetchStakedDeposits({ address });
+        }}
+      />
+
+      <div className="font-black text-2xl mb-4">
+        {token.symbol} Staking Metrics
       </div>
-      <div className="sm:col-start-5">
-        <ConfirmStakingCard />
-        <CollectFeeActionCard />
-      </div>
-    </div>
+
+      <PoolStats
+        rewardDuration={rewardDuration}
+        rewardPerToken={rewardPerToken}
+        totalSupply={totalSupply}
+      />
+    </section>
   );
 }

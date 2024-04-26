@@ -25,7 +25,7 @@ export function parseSupport(
   /**
    * @dev If start_block number of vote is less than 114615036, then it's a proposal
    *      from old approval voting module where 0 = for, 1 = against
-   *      new approval voting module is 0 = against, 1 = abstain, 2 = for
+   *      create approval voting module is 0 = against, 1 = abstain, 2 = for
    *      note that block number is indicative but works
    */
 

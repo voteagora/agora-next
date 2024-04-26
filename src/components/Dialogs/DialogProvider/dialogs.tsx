@@ -18,6 +18,9 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { ChainConstants } from "viem/types/chain";
+import { DepositAddDialog } from "@/app/staking/dialogs/DepositAddDialog";
+import { DepositWithdrawDialog } from "@/app/staking/dialogs/DepositWithdrawDialog";
+import { StakedDeposit } from "@/lib/types";
 
 export type DialogType =
   | DelegateDialogType
@@ -26,7 +29,9 @@ export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
-  | SwithcNetworkDialogType;
+  | SwithcNetworkDialogType
+  | StaleDepositAddDialogType
+  | StakeDepositWithdrawDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -77,6 +82,20 @@ export type SwithcNetworkDialogType = {
   type: "SWITCH_NETWORK";
   params: {
     chain: ChainConstants;
+  };
+};
+
+export type StaleDepositAddDialogType = {
+  type: "STAKE_DEPOSIT_ADD";
+  params: {
+    deposit: StakedDeposit;
+  };
+};
+
+export type StakeDepositWithdrawDialogType = {
+  type: "STAKE_DEPOSIT_WITHDRAW";
+  params: {
+    deposit: StakedDeposit;
   };
 };
 
@@ -218,6 +237,16 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SWITCH_NETWORK: ({ chain }: { chain: ChainConstants }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
   ),
+
+  STAKE_DEPOSIT_ADD: ({ deposit }: { deposit: StakedDeposit }, closeDialog) => (
+    <DepositAddDialog closeDialog={closeDialog} deposit={deposit} />
+  ),
+
+  STAKE_DEPOSIT_WITHDRAW: (
+    { deposit }: { deposit: StakedDeposit },
+    closeDialog
+  ) => <DepositWithdrawDialog closeDialog={closeDialog} deposit={deposit} />,
+
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

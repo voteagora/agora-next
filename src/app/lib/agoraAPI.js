@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
  */
 class AgoraAPI {
   /**
-   * Initializes a new instance of the AgoraAPI class.
+   * Initializes a create instance of the AgoraAPI class.
    */
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;

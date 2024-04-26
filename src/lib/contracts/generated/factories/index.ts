@@ -8,4 +8,6 @@ export { NounsGovernor__factory } from "./NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./OptimismGovernor__factory";
 export { OptimismToken__factory } from "./OptimismToken__factory";
 export { ProposalTypesConfigurator__factory } from "./ProposalTypesConfigurator__factory";
+export { UniswapStaker__factory } from "./UniswapStaker__factory";
+export { UniswapToken__factory } from "./UniswapToken__factory";
 export { VotableSupplyOracle__factory } from "./VotableSupplyOracle__factory";

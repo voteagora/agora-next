@@ -23,7 +23,7 @@ export default function Page() {
               Stay up to date with the latest changes with Agora&apos;s
               development. Please report bugs and feedback{" "}
               <a
-                href="https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc/"
+                href="https://agora.deform.cc/bugreport/"
                 className="font-semibold text-indigo-600 hover:text-indigo-500"
               >
                 using this form

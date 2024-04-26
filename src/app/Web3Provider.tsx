@@ -3,18 +3,16 @@
 import { FC, PropsWithChildren } from "react";
 import { createConfig, WagmiConfig } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet, optimism } from "wagmi/chains";
+import { mainnet, optimism, sepolia } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
 import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
-import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +31,7 @@ const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: [optimism, mainnet],
+    chains: [optimism, mainnet, sepolia],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
