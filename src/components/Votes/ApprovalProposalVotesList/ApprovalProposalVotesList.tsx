@@ -2,12 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { HStack, VStack } from "@/components/Layout/Stack";
-import HumanAddress from "@/components/shared/HumanAddress";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useAccount } from "wagmi";
-import { Vote } from "@/app/api/common/votes/vote";
-import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { type Vote } from "@/app/api/common/votes/vote";
+import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 
 type Props = {
   initialProposalVotes: {
@@ -102,7 +99,7 @@ export default function ApprovalProposalVotesList({
         <ul className="flex flex-col divide-y">
           {userVotes.map((vote) => (
             <li key={vote.transactionHash} className={`p-4`}>
-              <SingleVote vote={vote} />
+              <ApprovalProposalSingleVote vote={vote} />
             </li>
           ))}
           {proposalVotes.map((vote) => (
@@ -112,68 +109,11 @@ export default function ApprovalProposalVotesList({
                 connectedAddress?.toLowerCase() === vote.address && "hidden"
               }`}
             >
-              <SingleVote vote={vote} />
+              <ApprovalProposalSingleVote vote={vote} />
             </li>
           ))}
         </ul>
       </InfiniteScroll>
     </div>
-  );
-}
-
-function SingleVote({ vote }: { vote: Vote }) {
-  const { address } = useAccount();
-  const {
-    address: voterAddress,
-    params,
-    support,
-    reason,
-    weight,
-    transactionHash,
-  } = vote;
-  const [hash1, hash2] = transactionHash.split("|");
-
-  return (
-    <VStack className={""}>
-      <HStack
-        alignItems="items-center"
-        justifyContent="justify-between"
-        className={"mb-2 text-xs leading-4"}
-      >
-        <div className="text-black font-semibold">
-          <HumanAddress address={voterAddress} />
-          {address?.toLowerCase() === voterAddress && " (you)"}
-          {" voted for"}
-        </div>
-        <div className={"font-semibold text-gray-700"}>
-          <TokenAmountDisplay amount={weight} />
-        </div>
-      </HStack>
-      <VStack className={"text-xs leading-4 mb-2"}>
-        {params?.map((option: string, index: number) => (
-          <p
-            key={index}
-            className={
-              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
-            }
-          >
-            {++index}. {option}
-          </p>
-        ))}
-        {support === "ABSTAIN" && (
-          <p className="pl-3 border-l border-gray-eo text-gray-4f font-medium">
-            {"Abstain"}
-          </p>
-        )}
-      </VStack>
-      {reason && (
-        <div>
-          <p className={"text-gray-4f font-medium text-xs leading-4"}>
-            {reason}
-          </p>
-        </div>
-      )}
-      <BlockScanUrls hash1={hash1} hash2={hash2} />
-    </VStack>
   );
 }

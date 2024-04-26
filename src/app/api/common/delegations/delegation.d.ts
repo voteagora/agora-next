@@ -9,4 +9,5 @@ export type Delegation = {
   timestamp: Date | null;
   type: "DIRECT" | "ADVANCED";
   amount: "FULL" | "PARTIAL";
+  transaction_hash: string;
 };

@@ -2,8 +2,14 @@ import { VStack } from "@/components/Layout/Stack";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
 
-export default function ApprovedTransactions({ proposalData, proposalType }) {
+export default function ApprovedTransactions({
+  proposalData,
+  proposalType,
+  executedTransactionHash,
+}) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
   const toggleElements = () => {
     displayedOptions === 1
@@ -24,11 +30,22 @@ export default function ApprovedTransactions({ proposalData, proposalType }) {
       gap="1"
       className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
     >
-      <p className="px-4 mb-2 font-mono text-xs font-medium leading-4 text-gray-af">
-        {isNoProposedTransactions ? "No " : ""}
-        Proposed Transactions (signal only – transactions are manually executed
-        by the Foundation)
-      </p>
+      <div className="flex items-center justify-between px-4 mb-2">
+        <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+          {isNoProposedTransactions ? "No " : ""}
+          Proposed Transactions (signal only – transactions are manually
+          executed by the Foundation)
+        </p>
+        {executedTransactionHash && (
+          <a
+            href={getBlockScanUrl(executedTransactionHash)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+          </a>
+        )}
+      </div>
       {!isNoProposedTransactions && (
         <VStack className="px-4">
           {proposalData.options.slice(0, displayedOptions).map((option) => {
