@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { extractBearerToken } from "@/app/lib/middleware/auth";
+import { extractBearerToken } from "@/app/lib/auth/auth";
 
 /*
   Middleware function to run on matching routes for config.matcher.

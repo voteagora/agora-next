@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { ZodError, z } from "zod";
 
-import { authenticateApiUser } from "@/app/lib/middleware/auth";
+import { authenticateApiUser } from "@/app/lib/auth/auth";
 import { fetchDelegatesApi } from "@/app/api/common/delegates/getDelegates";
 import {
   type Delegate,

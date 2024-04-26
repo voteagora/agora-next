@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
-import { authenticateApiUser } from "@/app/lib/middleware/auth";
+import { authenticateApiUser } from "@/app/lib/auth/auth";
 import { traceWithUserId } from "../../apiUtils";
 
 export async function GET(request: NextRequest) {

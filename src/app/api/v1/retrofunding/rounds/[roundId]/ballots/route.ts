@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/middleware/auth";
+import { authenticateApiUser } from "@/app/lib/auth/auth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { fetchBallots } from "@/app/api/common/ballots/getBallots";
 
