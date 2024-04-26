@@ -236,6 +236,7 @@ module.exports = {
           700: "#b83280",
           800: "#97266d",
           900: "#FF007A",
+          positive: "#FF007A1A",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

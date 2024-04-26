@@ -4,11 +4,12 @@ import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { useUnclaimedReward } from "@/hooks/useUnclaimedReward";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import { Button } from "@/components/ui/button";
+import { icons } from "@/assets/icons/icons";
 import { formatNumber } from "@/lib/utils";
 import React from "react";
 import Image from "next/image";
-import coins from "@/assets/icons/coins.svg";
 
 export const ClaimRewards = () => {
   const { token } = Tenant.current();
@@ -19,29 +20,34 @@ export const ClaimRewards = () => {
   const hasRewards = data && data > 0;
 
   return (
-    <div className="flex flex-col rounded-lg border border-gray-300 w-auto h-100 mb-4 p-5">
-      <div className="flex flex-row gap-4 mb-4">
-        <div className="border-gray-300 w-100 h-100 p-2 bg-gray-50 rounded-lg border">
-          <Image
-            src={coins}
-            alt="coins"
-            width="24"
-            height="24"
-            className="hidden sm:block"
-          />
+    <VStack className="mt-5 max-w-[354px] w-full py-5 px-[17px] rounded-lg  border border-gray-300 shadow-newDefault">
+      <Image
+        src="/images/rewards.svg"
+        alt="results 2"
+        height="164"
+        width="320"
+      />
+      <HStack gap={4} className="mt-4">
+        <div className="min-w-[48px] h-12 p-3 rounded-lg  border border-gray-300 shadow-newDefault ">
+          <Image height={24} width={24} src={icons.currency} alt="" />
         </div>
-        <div>
-          <div className="text-xs">Available to collect</div>
-          <div className="font-medium">{`${formatNumber(
-            hasRewards ? data : 0,
-            token.decimals
-          )} WETH`}</div>
-        </div>
-      </div>
-
-      <Button variant="outline" disabled={!hasRewards}>
-        Claim Rewards
+        <VStack>
+          <p className="text-xs font-semibold text-gray-4f justify-center text-center">
+            Available to collect
+          </p>
+          <h6 className="text-base font-medium text-black">
+            {`${formatNumber(hasRewards ? data : 0, token.decimals)} WETH`}{" "}
+          </h6>
+        </VStack>
+      </HStack>
+      <Button
+        variant="outline"
+        size="lg"
+        disabled={!hasRewards}
+        className="px-5 text-base font-semibold text-black mt-5"
+      >
+        Collect fees
       </Button>
-    </div>
+    </VStack>
   );
 };

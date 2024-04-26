@@ -15,8 +15,6 @@ import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 
-import dummyDaligates from "../dummyDaligates.json";
-
 export type DelegateChunk = Pick<
   Delegate,
   "address" | "votingPower" | "statement" | "citizen"
@@ -138,8 +136,7 @@ export default function DelegateCardList({
                     <div className="min-h-[24px]">
                       <DelegateActions
                         delegate={delegate}
-                        isAdvancedUser={isAdvancedUser}
-                        delegators={advancedDelegators}
+                        setSelectedDelegateAddress={setSelectedDelegateAddress}
                       />
                     </div>
                   </VStack>
@@ -178,8 +175,7 @@ export default function DelegateCardList({
                   <div className="min-h-[24px]">
                     <DelegateActions
                       delegate={delegate}
-                      isAdvancedUser={isAdvancedUser}
-                      delegators={advancedDelegators}
+                      setSelectedDelegateAddress={setSelectedDelegateAddress}
                     />
                   </div>
                 </VStack>

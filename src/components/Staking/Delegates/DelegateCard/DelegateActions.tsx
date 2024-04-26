@@ -1,31 +1,28 @@
 "use client";
 
 import { HStack } from "@/components/Layout/Stack";
-import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
-import { useAccount } from "wagmi";
-import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
-import { useAgoraContext } from "@/contexts/AgoraContext";
+
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Button } from "@/components/Button";
-import { ConnectKitButton } from "connectkit";
-import { type SyntheticEvent } from "react";
+import { Dispatch, SetStateAction, type SyntheticEvent } from "react";
 
 export function DelegateActions({
   delegate,
   className,
-  isAdvancedUser,
-  delegators,
+
+  setSelectedDelegateAddress,
 }: {
   delegate: DelegateChunk;
   className?: string;
-  isAdvancedUser: boolean;
-  delegators: string[] | null;
+  setSelectedDelegateAddress: Dispatch<SetStateAction<string | null>>;
 }) {
-  const { isConnected } = useAgoraContext();
-  const { address } = useAccount();
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
+
+  const handleSelectDelegate = (address: string) => {
+    setSelectedDelegateAddress(address);
+  };
 
   return (
     <HStack
@@ -34,31 +31,17 @@ export function DelegateActions({
     >
       <DelegateSocialLinks discord={discord} twitter={twitter} />
       <div>
-        {isConnected ? (
-          address &&
-          (isAdvancedUser ? (
-            <AdvancedDelegateButton
-              delegate={delegate}
-              delegators={delegators}
-            />
-          ) : (
-            <DelegateButton full={!twitter && !discord} delegate={delegate} />
-          ))
-        ) : (
-          <ConnectKitButton.Custom>
-            {({ show }) => (
-              <Button
-                onClick={(e: SyntheticEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  show?.();
-                }}
-              >
-                Delegate
-              </Button>
-            )}
-          </ConnectKitButton.Custom>
-        )}
+        <Button
+          onClick={(e: SyntheticEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleSelectDelegate(delegate.address);
+          }}
+          size="lg"
+          className="!px-5 text-base font-semibold !text-white !bg-black !min-w-[179px]"
+        >
+          Select as delegate
+        </Button>
       </div>
     </HStack>
   );

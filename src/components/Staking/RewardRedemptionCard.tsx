@@ -7,21 +7,16 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 
 interface IProps {
-  selectedDelegateAddress: string | null;
-  setShowReceipt: React.Dispatch<React.SetStateAction<boolean>>;
+  onButtonClick?: () => void;
   buttonText?: string;
   isButtonDisabled?: boolean;
 }
 
 const RewardRedemptionCard: React.FC<IProps> = ({
-  setShowReceipt,
+  onButtonClick,
   buttonText,
   isButtonDisabled,
 }) => {
-  const handleShowReceipt = () => {
-    setShowReceipt(true);
-  };
-
   return (
     <div className="border rounded-lg font-inter">
       <VStack className="p-4 rounded-lg border-b border-b-gray-300  shadow-newDefault ">
@@ -41,7 +36,7 @@ const RewardRedemptionCard: React.FC<IProps> = ({
         <Button
           disabled={isButtonDisabled}
           className="w-full mb-3"
-          onClick={handleShowReceipt}
+          onClick={onButtonClick}
         >
           {buttonText ? buttonText : "Collect rewards"}
         </Button>

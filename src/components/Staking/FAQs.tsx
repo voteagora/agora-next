@@ -17,7 +17,7 @@ const faqs = [
 ];
 export default function FAQs() {
   return (
-    <div className="mt-10 ">
+    <div className="mt-10 font-inter">
       <h1 className="font-black text-2xl text-black">FAQ</h1>
       <div className="mt-[18px]">
         {faqs.map((faq, index) => (
