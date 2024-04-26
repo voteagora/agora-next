@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { hasApiKey } from "@/app/lib/middleware/auth";
+import { extractBearerToken } from "@/app/lib/middleware/auth";
 
 /*
   Middleware function to run on matching routes for config.matcher.
@@ -13,7 +13,7 @@ import { hasApiKey } from "@/app/lib/middleware/auth";
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   if (path.startsWith("/api/v1") && !path.startsWith("/api/v1/spec")) {
-    const authResponse = hasApiKey(request);
+    const authResponse = extractBearerToken(request);
     // TODO prisma client -> postgres db is currently not supported on edge
     // runtime for vercel specifically; migrate API key check when it is
     // TODO consider session/cookie
