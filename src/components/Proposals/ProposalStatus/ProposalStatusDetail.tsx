@@ -8,11 +8,13 @@ export default function ProposalStatusDetail({
   proposalStatus,
   proposalEndTime,
   proposalStartTime,
+  proposalCancelledTime,
   cancelledTransactionHash,
 }: {
   proposalStatus: ProposalStatus | null;
   proposalEndTime: Date | null;
   proposalStartTime: Date | null;
+  proposalCancelledTime: Date | null;
   cancelledTransactionHash: string | null;
 }) {
   return (
@@ -60,6 +62,7 @@ export default function ProposalStatusDetail({
           proposalStatus={proposalStatus}
           proposalStartTime={proposalStartTime}
           proposalEndTime={proposalEndTime}
+          proposalCancelledTime={proposalCancelledTime}
         />
       </div>
     </HStack>

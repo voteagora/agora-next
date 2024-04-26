@@ -65,6 +65,7 @@ export default function Proposal({ proposal, votableSupply }) {
                 proposalStatus={proposal.status}
                 proposalStartTime={proposal.start_time}
                 proposalEndTime={proposal.end_time}
+                proposalCancelledTime={proposal.cancelled_time}
               />
             </div>
             <ProposalStatus proposal={proposal} />

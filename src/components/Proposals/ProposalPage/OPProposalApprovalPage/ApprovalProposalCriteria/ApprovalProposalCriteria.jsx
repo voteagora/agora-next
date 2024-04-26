@@ -25,6 +25,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
           proposalStatus={proposal.status}
           proposalEndTime={proposal.end_time}
           proposalStartTime={proposal.start_time}
+          proposalCancelledTime={proposal.cancelled_time}
           cancelledTransactionHash={proposal.cancelled_transaction_hash}
         />
       </div>
