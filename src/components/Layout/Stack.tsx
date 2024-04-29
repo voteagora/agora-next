@@ -22,6 +22,7 @@ type Props = {
     | "items-end"
     | "items-baseline";
   children: ReactNode;
+  onClick?: () => void;
 };
 
 function Stack({
@@ -45,7 +46,8 @@ function Stack({
 }
 
 export function VStack(props: Props) {
-  const { className, gap, alignItems, justifyContent, children } = props;
+  const { className, gap, alignItems, justifyContent, children, onClick } =
+    props;
 
   const classes = [
     "flex",
@@ -58,7 +60,11 @@ export function VStack(props: Props) {
     .filter(Boolean)
     .join(" ");
 
-  return <div className={classes}>{children}</div>;
+  return (
+    <div onClick={onClick} className={classes}>
+      {children}
+    </div>
+  );
 }
 
 export function HStack(props: Props) {

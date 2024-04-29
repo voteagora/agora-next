@@ -272,7 +272,7 @@ export const fontFamily = {
     '"Courier New"',
     "monospace",
   ]),
-  code: makeFontString(["IBM", "Plex", "Mono"]),
+  code: makeFontString(["IBM Plex Mono", "monospace"]),
 };
 
 function makeFontString(fonts) {
