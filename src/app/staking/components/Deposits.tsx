@@ -14,7 +14,7 @@ export const Deposits = ({ fetchStaked }: DepositsProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
-  const [isLoadingDeposits, setIsLoadingDeposits] = useState<boolean>(true);
+  const [isLoadingDeposits, setIsLoadingDeposits] = useState<boolean>(false);
   const [deposits, setDeposits] = useState<StakedDeposit[] | []>([]);
   const hasDeposits = !isLoadingDeposits || deposits.length > 0;
 
@@ -29,10 +29,10 @@ export const Deposits = ({ fetchStaked }: DepositsProps) => {
   }
 
   useEffect(() => {
-    if (address && deposits.length === 0) {
+    if (address && deposits.length === 0 && !isLoadingDeposits) {
       getDeposits(address.toLowerCase());
     }
-  }, [address, deposits]);
+  }, [address, deposits, getDeposits]);
 
   if (hasDeposits && address) {
     return (

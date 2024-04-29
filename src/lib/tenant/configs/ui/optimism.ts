@@ -84,7 +84,7 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/create",
+      name: "proposals/new",
       enabled: true,
     },
     {

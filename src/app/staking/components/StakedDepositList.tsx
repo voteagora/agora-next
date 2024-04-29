@@ -18,9 +18,9 @@ interface StakedDepositListProps {
 }
 
 export const StakedDepositList = ({
-  deposits,
-  address,
-}: StakedDepositListProps) => {
+                                    deposits,
+                                    address,
+                                  }: StakedDepositListProps) => {
   const openDialog = useOpenDialog();
 
   const { data, isFetched } = useTokenBalance(address);
@@ -55,42 +55,25 @@ export const StakedDepositList = ({
                     <HumanAddress address={deposit.delegatee} />
                   </div>
                 </div>
-                <div className="border-r border-gray-300"></div>
-
-                <div className="flex flex-col p-5">
-                  {/*<Link href={`/staking/deposits/${deposit.id}/withdraw`}>Add</Link>*/}
-                  <Button
-                    onClick={() => {
-                      openDialog({
-                        type: "STAKE_DEPOSIT_ADD",
-                        params: {
-                          deposit: deposit,
-                        },
-                      });
-                    }}
-                  >
-                    Add
-                  </Button>
-                </div>
 
                 <div className="border-r border-gray-300"></div>
 
                 <div className="flex flex-col p-5">
-                  {/*<Link href={`/staking/deposits/${deposit.id}/withdraw`}>Withdraw</Link>*/}
+                  <Link href={`/staking/deposits/${deposit.id}`}>Manage</Link>
 
-                  <Button
-                    variant={"outline"}
-                    onClick={() => {
-                      openDialog({
-                        type: "STAKE_DEPOSIT_WITHDRAW",
-                        params: {
-                          deposit: deposit,
-                        },
-                      });
-                    }}
-                  >
-                    Withdraw
-                  </Button>
+                  {/*<Button*/}
+                  {/*  variant={"outline"}*/}
+                  {/*  onClick={() => {*/}
+                  {/*    openDialog({*/}
+                  {/*      type: "STAKE_DEPOSIT_WITHDRAW",*/}
+                  {/*      params: {*/}
+                  {/*        deposit: deposit,*/}
+                  {/*      },*/}
+                  {/*    });*/}
+                  {/*  }}*/}
+                  {/*>*/}
+                  {/*  Withdraw*/}
+                  {/*</Button>*/}
                 </div>
               </div>
             );
@@ -101,7 +84,7 @@ export const StakedDepositList = ({
             <>
               <div className="font-medium">
                 {canDepositMode ? (
-                  <Link href="staking/deposits/create">
+                  <Link href="staking/new">
                     Deposit another stake
                   </Link>
                 ) : (

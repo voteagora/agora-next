@@ -105,7 +105,7 @@ export interface UniswapTokenInterface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -149,7 +149,7 @@ export interface UniswapTokenInterface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -239,7 +239,7 @@ export namespace ApprovalEvent {
   export type InputTuple = [
     owner: AddressLike,
     spender: AddressLike,
-    amount: BigNumberish,
+    amount: BigNumberish
   ];
   export type OutputTuple = [owner: string, spender: string, amount: bigint];
   export interface OutputObject {
@@ -257,12 +257,12 @@ export namespace DelegateChangedEvent {
   export type InputTuple = [
     delegator: AddressLike,
     fromDelegate: AddressLike,
-    toDelegate: AddressLike,
+    toDelegate: AddressLike
   ];
   export type OutputTuple = [
     delegator: string,
     fromDelegate: string,
-    toDelegate: string,
+    toDelegate: string
   ];
   export interface OutputObject {
     delegator: string;
@@ -279,12 +279,12 @@ export namespace DelegateVotesChangedEvent {
   export type InputTuple = [
     delegate: AddressLike,
     previousBalance: BigNumberish,
-    newBalance: BigNumberish,
+    newBalance: BigNumberish
   ];
   export type OutputTuple = [
     delegate: string,
     previousBalance: bigint,
-    newBalance: bigint,
+    newBalance: bigint
   ];
   export interface OutputObject {
     delegate: string;
@@ -314,7 +314,7 @@ export namespace TransferEvent {
   export type InputTuple = [
     from: AddressLike,
     to: AddressLike,
-    amount: BigNumberish,
+    amount: BigNumberish
   ];
   export type OutputTuple = [from: string, to: string, amount: bigint];
   export interface OutputObject {
@@ -408,7 +408,7 @@ export interface UniswapToken extends BaseContract {
       expiry: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
@@ -456,7 +456,7 @@ export interface UniswapToken extends BaseContract {
       deadline: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
@@ -532,7 +532,7 @@ export interface UniswapToken extends BaseContract {
       expiry: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
@@ -588,7 +588,7 @@ export interface UniswapToken extends BaseContract {
       deadline: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"

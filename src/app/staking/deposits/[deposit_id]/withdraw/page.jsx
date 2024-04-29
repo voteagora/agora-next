@@ -1,7 +1,7 @@
 "use server";
 
 import React from "react";
-import { apiFetchDeposit } from "@/app/api/snapshot/getDeposit";
+import { apiFetchDeposit } from "@/app/api/staking/getDeposit";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
 export default async function Page({ params: { deposit_id } }) {
