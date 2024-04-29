@@ -80,7 +80,7 @@ export function ProposalSingleVote({
             </HStack>
           </HoverCardTrigger>
           <HoverCardContent
-            className="w-full shadow"
+            className="w-full shadow hidden sm:block"
             side="left"
             sideOffset={3}
           >
