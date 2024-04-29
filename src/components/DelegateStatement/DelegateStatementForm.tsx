@@ -63,10 +63,17 @@ export default function DelegateStatementForm({
       throw new Error("signer not available");
     }
     values.topIssues = cleanTopIssues(values.topIssues);
-    const { daoSlug, discord, delegateStatement, email, twitter, topIssues } =
-      values;
+    const {
+      daoSlug,
+      discord,
+      delegateStatement,
+      email,
+      twitter,
+      warpcast,
+      topIssues,
+    } = values;
 
-    // User will only sign what he is seeing on the frontend
+    // User will only sign what they are seeing on the frontend
     const body = {
       agreeCodeConduct: values.agreeCodeConduct,
       daoSlug,
@@ -74,6 +81,7 @@ export default function DelegateStatementForm({
       delegateStatement,
       email,
       twitter,
+      warpcast,
       topIssues,
     };
 
