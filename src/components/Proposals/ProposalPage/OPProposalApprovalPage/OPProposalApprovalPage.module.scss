@@ -23,7 +23,6 @@
 .proposal_votes_container {
   position: sticky;
   top: $spacing-20;
-  max-height: calc(100vh - 162px);
   flex-shrink: 0;
   width: $max-width-sm;
   background-color: $white;
