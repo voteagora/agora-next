@@ -6,6 +6,7 @@ import { apiFetchStakedDeposits } from "@/app/api/staking/getStakedDeposits";
 import { HStack } from "@/components/Layout/Stack";
 import { ClaimRewards } from "./components/ClaimRewards";
 import FAQs from "@/components/Staking/FAQs";
+import StartUniStackCard from "@/components/Staking/StartUniStackCard";
 
 export default async function Page() {
   const { token, contracts, ui } = Tenant.current();
@@ -21,7 +22,7 @@ export default async function Page() {
   }
 
   return (
-    <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
+    <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 font-inter mt-12">
       <div className="sm:col-span-4">
         <Deposits
           fetchStaked={async (address) => {
@@ -42,8 +43,15 @@ export default async function Page() {
         <FAQs />
       </div>
       <div className="sm:col-start-5">
-        <h2 className="font-black text-2xl text-black">Your rewards</h2>
-        <ClaimRewards />
+        {/*these cards will be shown on the basis of first deposit and collect reward basis */}
+        {true ? (
+          <StartUniStackCard />
+        ) : (
+          <>
+            <h2 className="font-black text-2xl text-black">Your rewards</h2>
+            <ClaimRewards />
+          </>
+        )}
       </div>
     </HStack>
   );

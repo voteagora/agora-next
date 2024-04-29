@@ -46,7 +46,7 @@ export const Deposits = ({ fetchStaked }: DepositsProps) => {
   }
 
   return (
-    <div className="my-12">
+    <div className="mb-12">
       <div className="font-black text-2xl mb-4">
         Introducing staking, the next chapter of Uniswap Governance
       </div>

@@ -5,7 +5,7 @@
   grid-auto-flow: row;
   justify-content: space-between;
   padding-top: $spacing-4;
-  grid-template-columns: repeat(2, 25rem);
+  grid-template-columns: repeat(3, 25rem);
   gap: $spacing-6;
 
   @media (max-width: $screen-sm) {
@@ -18,13 +18,7 @@
     gap: $spacing-4;
   }
 
-  .self_vote_card {
-    grid-column-start: 1;
-    grid-column-end: -1;
-    grid-row-start: 2;
-    grid-row-end: 3;
-    width: 100%;
-  }
+
 
   .link {
     display: flex;

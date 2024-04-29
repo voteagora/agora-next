@@ -1,24 +1,29 @@
 import React from "react";
-import TransactionReceiptCard from "./TransactionReceiptCard";
+import TransactionReceiptCard, {
+  IReceiptEntries,
+} from "./TransactionReceiptCard";
+interface ConfirmStakingTransactionCardProps {
+  address: string;
+  ownedAmount: string;
+  receiptEntries: IReceiptEntries[];
+  receiptTitle?: string;
+}
 
-const TransactionReceipt = () => {
+const TransactionReceipt: React.FC<ConfirmStakingTransactionCardProps> = ({
+  address,
+  ownedAmount,
+  receiptEntries,
+  receiptTitle,
+}) => {
   return (
-    <div className="min-h-[723px] bg-[url('/images/receipt_bg.svg')] p-4 bg-cover bg-center flex justify-center items-center">
+    <div
+      className={`min-h-[723px] bg-[url('/images/receipt_bg.svg')] p-4 bg-center bg-cover flex justify-center items-center`}
+    >
       <TransactionReceiptCard
-        receiptTitle="Confirm your staked UNI withdrawal transaction"
-        address="tokenholder.eth"
-        ownedAmount="500,000 UNI"
-        receiptEntries={[
-          {
-            title: "Already staked",
-            value: "100,000 UNI",
-            showDivider: true,
-          },
-          {
-            title: "Collecting rewards",
-            value: "2.1 ETH",
-          },
-        ]}
+        receiptTitle={receiptTitle}
+        address={address}
+        ownedAmount={ownedAmount}
+        receiptEntries={receiptEntries}
       />
     </div>
   );

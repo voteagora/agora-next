@@ -100,12 +100,13 @@ export default function DelegateCardList({
             truncatedStatement = delegateStatement.slice(0, 120);
           }
 
-          if (index === 2) {
+          if (index === 0) {
             return (
               <>
-                <div className={styles.self_vote_card}>
-                  <SelfVotingDelegateCard key="self-voting-delegate-card" />
-                </div>
+                <SelfVotingDelegateCard
+                  address={delegate.address}
+                  key={delegate.address}
+                />
                 <div
                   key={delegate.address}
                   className={cn(
@@ -113,18 +114,7 @@ export default function DelegateCardList({
                     isDelegatesFiltering ? "animate-pulse" : ""
                   )}
                 >
-                  <VStack
-                    gap={4}
-                    className={` ${styles.link_container} ${
-                      selectedDelegateAddress === delegate.address
-                        ? "!border-2 !border-pink-900 relative"
-                        : selectedDelegateAddress !== null && "opacity-50"
-                    }`}
-                    onClick={() => handleSelectDelegate(delegate.address)}
-                  >
-                    {selectedDelegateAddress === delegate.address && (
-                      <DelegateChip />
-                    )}
+                  <VStack gap={4} className={styles.link_container}>
                     <VStack gap={4} justifyContent="justify-center">
                       <DelegateProfileImage
                         address={delegate.address}
@@ -154,16 +144,9 @@ export default function DelegateCardList({
               >
                 <VStack
                   gap={4}
-                  className={` ${styles.link_container} ${
-                    selectedDelegateAddress === delegate.address
-                      ? "!border-2 !border-pink-900 relative"
-                      : selectedDelegateAddress !== null && "opacity-50"
-                  }`}
+                  className={styles.link_container}
                   onClick={() => handleSelectDelegate(delegate.address)}
                 >
-                  {selectedDelegateAddress === delegate.address && (
-                    <DelegateChip />
-                  )}
                   <VStack gap={4} justifyContent="justify-center">
                     <DelegateProfileImage
                       address={delegate.address}
@@ -187,11 +170,3 @@ export default function DelegateCardList({
     </DialogProvider>
   );
 }
-
-const DelegateChip = () => {
-  return (
-    <div className="absolute top-0 right-6 px-4 leading-none rounded-br-2xl rounded-bl-2xl bg-pink-900 w-[117px] h-[24px]">
-      <span className="text-xs text-white font-medium"> Your delegate</span>
-    </div>
-  );
-};

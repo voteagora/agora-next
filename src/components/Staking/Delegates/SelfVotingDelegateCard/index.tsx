@@ -1,34 +1,34 @@
-import { HStack } from "@/components/Layout/Stack";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import React from "react";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import { Button } from "@/components/ui/button";
+import styles from "../DelegateCardList/DelegateCardList.module.scss";
+import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 
-const SelfVotingDelegateCard = () => {
+const SelfVotingDelegateCard = ({ address }: { address: string }) => {
   return (
-    <HStack
-      gap={5}
-      className="flex-wrap sm:flex-nowrap p-7 rounded-lg border border-gray-300 shadow-newDefault"
-    >
-      <Image
-        src="/images/horse_icon.png"
-        alt="img"
-        width={40}
-        height={40}
-        className="rounded w-auto h-auto"
-      />
-      <p>
-        Want to vote yourself? Delegate your votes to yourself to engage
-        directly in Uniswap governance{" "}
-      </p>
-
-      <Button
-        variant="outline"
-        size="lg"
-        className="!px-5 text-base font-semibold text-black !min-w-[156px]"
-      >
-        I’ll vote myself
-      </Button>
-    </HStack>
+    <div className={styles.link}>
+      <VStack gap={4} className={styles.link_container}>
+        <VStack gap={4} justifyContent="justify-center">
+          <DelegateProfileImage
+            address={address}
+            votingPower={"0"}
+            citizen={true}
+          />
+          <p className={styles.summary}>
+            Want to vote yourself? Delegate your votes to yourself to engage
+            directly in Uniswap governance{" "}
+          </p>
+        </VStack>
+        <HStack justifyContent="justify-end">
+          <Button
+            size="lg"
+            className="!px-5 text-base font-semibold !text-white !bg-black !min-w-[179px]"
+          >
+            I’ll vote myself
+          </Button>
+        </HStack>
+      </VStack>
+    </div>
   );
 };
 

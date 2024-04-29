@@ -46,7 +46,7 @@ const SelectedDelegatesFeeCard: React.FC<IProps> = ({
           Uniswap voters manage the fee switch. Choose your delegate carefully
           to represent you in Uniswap governance
         </p>
-        <Link href="/staking/delegates">
+        <Link href="/staking/deposits/delegates">
           <Button
             className="w-full mb-3"
             disabled={isButtonDisabled}

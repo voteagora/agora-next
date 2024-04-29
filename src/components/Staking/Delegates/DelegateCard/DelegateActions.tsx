@@ -1,11 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, type SyntheticEvent } from "react";
 import { HStack } from "@/components/Layout/Stack";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
 
 import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Button } from "@/components/Button";
-import { Dispatch, SetStateAction, type SyntheticEvent } from "react";
 
 export function DelegateActions({
   delegate,
@@ -17,11 +18,12 @@ export function DelegateActions({
   className?: string;
   setSelectedDelegateAddress: Dispatch<SetStateAction<string | null>>;
 }) {
+  const router = useRouter();
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
 
   const handleSelectDelegate = (address: string) => {
-    setSelectedDelegateAddress(address);
+    router.push(`/staking/deposits/create?delegate=${address}`);
   };
 
   return (

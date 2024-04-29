@@ -105,7 +105,7 @@ const ConfirmStakingCard = () => {
             Once your UNI is staked, you will start earning from pools where
             fees are turned on.
           </p>
-          <Link href="/staking/delegates">
+          <Link href="/staking/deposits/delegates">
             <Button className="w-full mb-7">Continue</Button>
           </Link>
         </TabsContent>

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./transactionReceipt.module.scss";
 
-interface IReceiptEntries {
+export interface IReceiptEntries {
   title: string;
   value: string;
   showDivider?: boolean;
@@ -60,9 +60,11 @@ const TransactionReceiptCard: React.FC<ConfirmStakingTransactionCardProps> = ({
 
 const TextRow = ({ title, value }: { title: string; value: string }) => {
   return (
-    <HStack className="w-full justify-between items-center text-black">
-      <p className="text-base leading-4">{title} </p>
-      <p className="text-base leading-4">{value}</p>
+    <HStack className="w-full justify-between items-start text-black gap-y-3">
+      <p className="text-base font-normal leading-4 ">{title} </p>
+      <p className="text-base leading-4 font-normal text-end min-w-[50px]">
+        {value}
+      </p>
     </HStack>
   );
 };

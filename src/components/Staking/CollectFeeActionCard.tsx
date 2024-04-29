@@ -42,7 +42,7 @@ const CollectFeeActionCard = () => {
             9/10 recent proposals
           </p>
         </HStack>
-        <Link href="/staking/delegates">
+        <Link href="/staking/deposits/delegates">
           <Button
             variant="outline"
             size="lg"

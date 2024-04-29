@@ -50,7 +50,7 @@ export const StakeButton = ({ address, amount }: StakeButtonProps) => {
       disabled={!isValidInput || isLoading}
       onClick={() => write?.()}
     >
-      {isLoading ? "Staking..." : "Stake and Delegate"}
+      {isLoading ? "Staking..." : "Stake & delegate my UNI"}
     </Button>
   );
 };
