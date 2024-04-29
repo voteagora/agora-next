@@ -1,0 +1,470 @@
+[
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x32d1A53f6709a03f4b6cf4cb0501204ba188d4f5"
+        },
+        "weight": "55",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-13T18:55:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xfF5F8228D003705D1668079a9DBF23DbA5209E8C"
+        },
+        "weight": "6",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-13T21:28:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xcC2688350d29623E2A0844Cc8885F9050F0f6Ed5"
+        },
+        "weight": "4",
+        "support": "ABSTAIN",
+        "block": {
+            "timestamp": "2024-04-16T01:15:11Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x2666f0C8FB58d182f2Dd79475DCA4A07B3724607"
+        },
+        "weight": "3",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T22:53:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "krel.eth",
+            "picture": null,
+            "address": "0xA86882277E69FbF0a51805cdc8b0a3a113079E63"
+        },
+        "weight": "3",
+        "support": "ABSTAIN",
+        "block": {
+            "timestamp": "2024-04-17T08:13:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x5CE2a14f80B3578D54346fdE637E2FFBb87BcBa3"
+        },
+        "weight": "3",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T07:49:11Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "kellywerder.eth",
+            "picture": null,
+            "address": "0xCEEd9585854F12F81A0103861b83b995A64AD915"
+        },
+        "weight": "3",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-14T16:07:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "necfas.eth",
+            "picture": null,
+            "address": "0x1db19B9903c5510AA5a866ea643Eb021CD12Bda0"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T01:05:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x0a049e014999A489b3D7174B8f70D4200b0Ce79B"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T23:27:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xDCb4117e3A00632efCaC3C169E0B23959f555E5e"
+        },
+        "weight": "2",
+        "support": "AGAINST",
+        "block": {
+            "timestamp": "2024-04-14T18:24:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x75Da258B48596C742750D389fAdEEF7c8d5fac4c"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T13:18:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "coralorca.eth",
+            "picture": null,
+            "address": "0x9c74aE08Fd4337E14786f086D911E964df35e623"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T02:07:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "supriyo.eth",
+            "picture": null,
+            "address": "0x7f64C6e6908DE72221A06A06b4a02A6546a4d6d2"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T02:48:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "carlosjmelgar.eth",
+            "picture": null,
+            "address": "0xCA72c93172BA6EfF168E59e7F17C3C7A8FeA9B62"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-14T20:27:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xd8EF18493b795970a986E6D00CC451f0D6A9B17A"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-14T12:51:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "indexcard.eth",
+            "picture": null,
+            "address": "0x10deC36B4AC9d3b60490dFE2799881287d4a74cc"
+        },
+        "weight": "2",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T13:33:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xf84a5Fd946A7714c6d48508FA8292c8c5037b5A8"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T16:15:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "samscolari.eth",
+            "picture": null,
+            "address": "0xE3ff24a97BFB65CAdEF30F6Ad19a6EA7E6F6149d"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T10:59:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x0DF2A3c87d7d1ff7ee80f01a1719DdB1BE419a85"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T10:21:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "matascup.eth",
+            "picture": null,
+            "address": "0xcB06bEDe7cB0a4b333581B6BdcD05f7cc737b9cC"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T08:47:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x5C3E2c131Cb10E4f4c9DF581725Bee57443D8523"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T01:12:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "0xcryptojoe.eth",
+            "picture": null,
+            "address": "0x1Ba2A537A771AA4EaC2f18427716557e4E744864"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-14T23:46:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x3Cbd57dA2F08b3268da07E5C9038C11861828637"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-14T23:44:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x9997209380F8259440242288c55B6C8b3d708eED"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-14T04:52:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "mikegood.eth",
+            "picture": null,
+            "address": "0xFC538FFD2923ddDaED09c8aD1a51686275C56183"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T03:24:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x8E37D5fD47016Fe5c671C7c1b980afbe6773595C"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T02:36:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "benbodhi.eth",
+            "picture": null,
+            "address": "0xa903C06BF35286f6d1cDAD25396748353979a44C"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T00:57:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "el4d.eth",
+            "picture": null,
+            "address": "0xffAF62026731607c5087a44BBa2CbCE1Fc908d99"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T23:18:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "drewcoffman.eth",
+            "picture": null,
+            "address": "0xc7A0D765C3aF6E2710bA05A56c5E2cA190C2E11e"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-17T00:29:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "joelcares.eth",
+            "picture": "https://static.tally.xyz/694cdf6f-0221-4fb2-b606-8ada3d55735b_400x400.jpg",
+            "address": "0x281eC184E704CE57570614C33B3477Ec7Ff07243"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T22:47:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "storiedhome.eth",
+            "picture": null,
+            "address": "0xE3f27DEFf96fe178e87559F36Cbf868B9E75967D"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T22:02:11Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x849151d7D0bF1F34b70d5caD5149D28CC2308bf1"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T19:48:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "mattdowney.eth",
+            "picture": null,
+            "address": "0xC802883c7633386a592031dCcD04b0d1994928bE"
+        },
+        "weight": "1",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T15:53:35Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "91poap.eth",
+            "picture": null,
+            "address": "0xD4c37daf283eF98C2db3E51339201d4DCd2025B9"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T03:55:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x0f2B0600D624e0A214098695964e5EEDD8a0F6e1"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T06:25:11Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xC012bB9cA2710fA395AE62Ea1C44994AA71816F5"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T07:09:23Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x0883AdAfE30b4fB20C8b01Bb4D10713413278d97"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T07:28:47Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x40eF89206c76b6183a7e32351Df1c88a34a8D040"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-16T08:28:11Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0xC5016c4F4d5e46235E33f87695eabB78A1e50665"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-15T00:50:47Z"
+        }
+    }
+]
