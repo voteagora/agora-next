@@ -8,8 +8,8 @@ import { ClaimRewards } from "./components/ClaimRewards";
 import FAQs from "@/components/Staking/FAQs";
 
 export default async function Page() {
-  const { token, contracts, ui } = Tenant.current();
 
+  const { token, contracts, ui } = Tenant.current();
   const [totalSupply, rewardPerToken, rewardDuration] = await Promise.all([
     contracts.token.contract.totalSupply(),
     contracts.staker.contract.rewardPerTokenAccumulated(),
@@ -30,15 +30,16 @@ export default async function Page() {
           }}
         />
 
-        <div className="font-black text-2xl mb-4">
-          {token.symbol} Staking Metrics
+        <div className="mt-10">
+          <div className="font-black text-2xl mb-5">
+            {token.symbol} Staking Metrics
+          </div>
+          <PoolStats
+            rewardDuration={rewardDuration}
+            rewardPerToken={rewardPerToken}
+            totalSupply={totalSupply}
+          />
         </div>
-
-        <PoolStats
-          rewardDuration={rewardDuration}
-          rewardPerToken={rewardPerToken}
-          totalSupply={totalSupply}
-        />
         <FAQs />
       </div>
       <div className="sm:col-start-5">

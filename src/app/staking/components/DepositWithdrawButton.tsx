@@ -1,11 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { Button } from "@/components/Button";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,10 +13,10 @@ interface DepositWithdrawButtonProps {
 }
 
 export const DepositWithdrawButton = ({
-  amount,
-  id,
-  onSuccess,
-}: DepositWithdrawButtonProps) => {
+                                        amount,
+                                        id,
+                                        onSuccess,
+                                      }: DepositWithdrawButtonProps) => {
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();
   const isValidAmount = amount > 0n;
@@ -41,10 +37,10 @@ export const DepositWithdrawButton = ({
 
   useEffect(() => {
     if (data?.hash && !isLoading) {
-      // TODO: Figure out why invalidating multiple queries didn't work
-      queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
-      queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
-      onSuccess();
+      console.log("Invalidated");
+      // queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
+      // queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
+      // onSuccess();
     }
   }, [isLoading, data?.hash, onSuccess, queryClient]);
 

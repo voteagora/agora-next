@@ -2,15 +2,14 @@
 
 import React from "react";
 import HumanAddress from "@/components/shared/HumanAddress";
-import {
-  DialogProvider,
-  useOpenDialog,
-} from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { StakedDeposit } from "@/lib/types";
-import { Button } from "@/components/Button";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import Link from "next/link";
+import { Button } from "@/components/Button";
+import { HStack } from "@/components/Layout/Stack";
+import { DepositWithdrawButton } from "@/app/staking/components/DepositWithdrawButton";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];
@@ -21,7 +20,6 @@ export const StakedDepositList = ({
                                     deposits,
                                     address,
                                   }: StakedDepositListProps) => {
-  const openDialog = useOpenDialog();
 
   const { data, isFetched } = useTokenBalance(address);
   const hasTokenBalance = data && isFetched;
@@ -29,17 +27,16 @@ export const StakedDepositList = ({
 
   return (
     <DialogProvider>
-      <div className="flex flex-col rounded-lg border border-gray-300 w-auto h-100 bg-gray-50">
-        <div className="border-b border-gray-300 rounded-lg bg-white">
-          {deposits.map((deposit) => {
+      <div className="flex flex-col rounded-xl border border-gray-300 w-auto h-100 bg-gray-50 shadow-newDefault">
+        <div className="border-b border-gray-300 rounded-xl bg-white shadow-newDefault">
+          {deposits.map((deposit, idx) => {
             return (
               <div
                 key={`deposit-${deposit.id}`}
-                className="flex justify-evenly rounded-lg w-auto h-100"
-              >
-                <div className="flex flex-col p-5 min-w-[110px]">
-                  <div className="text-xs">Staked</div>
-                  <div className="text-xs font-medium">
+                className={`flex w-auto h-100 ${idx < deposits.length - 1 ? "border-b border-b-gray-300" : ""}`}>
+                <div className="flex flex-col p-5 min-w-[140px]">
+                  <div className="text-xs font-medium text-gray-700">Staked</div>
+                  <div className="font-medium">
                     <TokenAmountDisplay
                       maximumSignificantDigits={4}
                       amount={deposit.amount}
@@ -49,31 +46,18 @@ export const StakedDepositList = ({
 
                 <div className="border-r border-gray-300"></div>
 
-                <div className="flex flex-col p-5 min-w-[200px]">
-                  <div className="text-xs">Vote delegated to</div>
-                  <div className="text-xs font-medium">
-                    <HumanAddress address={deposit.delegatee} />
-                  </div>
-                </div>
-
-                <div className="border-r border-gray-300"></div>
-
                 <div className="flex flex-col p-5">
-                  <Link href={`/staking/deposits/${deposit.id}`}>Manage</Link>
-
-                  {/*<Button*/}
-                  {/*  variant={"outline"}*/}
-                  {/*  onClick={() => {*/}
-                  {/*    openDialog({*/}
-                  {/*      type: "STAKE_DEPOSIT_WITHDRAW",*/}
-                  {/*      params: {*/}
-                  {/*        deposit: deposit,*/}
-                  {/*      },*/}
-                  {/*    });*/}
-                  {/*  }}*/}
-                  {/*>*/}
-                  {/*  Withdraw*/}
-                  {/*</Button>*/}
+                  <HStack>
+                    <div>
+                      <div className="text-xs font-medium text-gray-700">Vote delegated to</div>
+                      <div className="font-medium">
+                        <HumanAddress address={deposit.delegatee} />
+                      </div>
+                    </div>
+                    <Button href={`/staking/deposits/${deposit.id}`}>Manage deposit</Button>
+                    <DepositWithdrawButton id={BigInt(deposit.id)} amount={BigInt(deposit.amount)} onSuccess={() => {
+                    }} />
+                  </HStack>
                 </div>
               </div>
             );

@@ -1,22 +1,57 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
+import { StakedDeposit } from "@/lib/types";
+import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IProps {
-  onButtonClick?: () => void;
   buttonText?: string;
+  deposit: StakedDeposit;
   isButtonDisabled?: boolean;
+  onButtonClick?: () => void;
 }
 
 const RewardRedemptionCard: React.FC<IProps> = ({
-  onButtonClick,
-  buttonText,
-  isButtonDisabled,
-}) => {
+                                                  buttonText,
+                                                  deposit,
+                                                  isButtonDisabled,
+                                                  onButtonClick,
+                                                }) => {
+
+  const { contracts } = Tenant.current();
+  const queryClient = useQueryClient();
+
+  const { config } = usePrepareContractWrite({
+    address: contracts.staker!.address as `0x${string}`,
+    abi: contracts.staker!.abi,
+    chainId: contracts.staker!.chain.id,
+    functionName: "withdraw",
+    args: [deposit.id, deposit.amount],
+  });
+
+  const { data, write, status } = useContractWrite(config);
+
+  const { isLoading } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  useEffect(() => {
+    if (data?.hash && !isLoading) {
+      // TODO: Figure out why invalidating multiple queries didn't work
+      queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
+      queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
+      // onSuccess();
+    }
+  }, [isLoading, data?.hash, queryClient]);
+
   return (
     <div className="border rounded-lg font-inter">
       <VStack className="p-4 rounded-lg border-b border-b-gray-300  shadow-newDefault ">
@@ -25,7 +60,7 @@ const RewardRedemptionCard: React.FC<IProps> = ({
             Collecting your reward
           </p>
           <h6 className="text-[44px] text-center font-semibold text-black">
-            2.1 ETH
+            <TokenAmountDisplay maximumSignificantDigits={4} amount={deposit.amount} />
           </h6>
         </VStack>
 
@@ -34,11 +69,12 @@ const RewardRedemptionCard: React.FC<IProps> = ({
         </p>
 
         <Button
-          disabled={isButtonDisabled}
+          disabled={isLoading}
           className="w-full mb-3"
-          onClick={onButtonClick}
+
+          onClick={() => write?.()}
         >
-          {buttonText ? buttonText : "Collect rewards"}
+          {isLoading ? "Withdrawing..." : "Withdraw"}
         </Button>
       </VStack>
       <HStack

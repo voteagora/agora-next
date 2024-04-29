@@ -22,7 +22,7 @@ export const PoolStats = async ({
   const totalStaked = data ?? BigInt(0);
 
   return (
-    <div className="flex justify-evenly rounded-lg border border-gray-300 w-auto h-100 mb-4 bg-gray-50">
+    <div className="flex justify-evenly rounded-xl border border-gray-300 w-auto h-100 mb-4 bg-gray-50">
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Total Supply</div>
         <div className="font-medium">{`${formatNumber(

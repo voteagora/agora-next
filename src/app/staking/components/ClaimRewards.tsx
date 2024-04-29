@@ -1,7 +1,6 @@
 "use client";
 
 import Tenant from "@/lib/tenant/tenant";
-import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { useUnclaimedReward } from "@/hooks/useUnclaimedReward";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -12,15 +11,15 @@ import React from "react";
 import Image from "next/image";
 
 export const ClaimRewards = () => {
-  const { token } = Tenant.current();
-  const { isConnected } = useAgoraContext();
-  const { address } = useAccount();
 
+  const { token } = Tenant.current();
+  const { address } = useAccount();
+  const { isConnected } = useAccount();
   const { data, isFetched } = useUnclaimedReward(address);
   const hasRewards = data && data > 0;
 
   return (
-    <VStack className="mt-5 max-w-[354px] w-full py-5 px-[17px] rounded-lg  border border-gray-300 shadow-newDefault">
+    <VStack className="mt-5 max-w-[354px] w-full py-5 px-[17px] rounded-lg border border-gray-300 shadow-newDefault">
       <Image
         src="/images/rewards.svg"
         alt="results 2"
@@ -32,11 +31,11 @@ export const ClaimRewards = () => {
           <Image height={24} width={24} src={icons.currency} alt="" />
         </div>
         <VStack>
-          <p className="text-xs font-semibold text-gray-4f justify-center text-center">
+          <p className="text-xs font-semibold text-gray-4f">
             Available to collect
           </p>
           <h6 className="text-base font-medium text-black">
-            {`${formatNumber(hasRewards ? data : 0, token.decimals)} WETH`}{" "}
+            {isConnected ? `${formatNumber(hasRewards ? data : 0, token.decimals)} WETH ` : "Connect wallet for balance"}
           </h6>
         </VStack>
       </HStack>
@@ -46,7 +45,7 @@ export const ClaimRewards = () => {
         disabled={!hasRewards}
         className="px-5 text-base font-semibold text-black mt-5"
       >
-        Collect fees
+        Collect rewards
       </Button>
     </VStack>
   );

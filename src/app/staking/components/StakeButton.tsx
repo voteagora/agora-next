@@ -28,7 +28,7 @@ export const StakeButton = ({ address, amount }: StakeButtonProps) => {
     abi: contracts.staker!.abi.abi,
     chainId: contracts?.staker?.chain.id,
     functionName: "stake",
-    args: [BigInt(amount), address as `0x${string}`],
+    args: [amount, address as `0x${string}`],
   });
 
   const { data, write, status } = useContractWrite(config);

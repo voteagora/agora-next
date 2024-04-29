@@ -8,7 +8,7 @@ import SelectDelegatesHeader from "@/components/Staking/Delegates/SelectDelegate
 import { HStack } from "@/components/Layout/Stack";
 import SelectedDelegatesFeeCard from "@/components/Staking/Delegates/SelectedDelegatesFeeCard";
 import { Delegation } from "@/app/api/common/delegations/delegation";
-import TransactionReceipt from "../TransactionReceipt/TransactionReceipt";
+import DepositReceipt from "../../../app/staking/components/DepositReceipt";
 import { useSearchParams } from "next/navigation";
 // import RewardRedemptionCard from "../RewardRedemptionCard";
 
@@ -37,7 +37,7 @@ export default async function Delegates({
     <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10 mt-12">
       <div className="sm:col-span-4">
         {showReceipt ? (
-          <TransactionReceipt />
+          <DepositReceipt />
         ) : (
           <>
             <SelectDelegatesHeader />

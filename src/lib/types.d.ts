@@ -10,7 +10,7 @@ export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
 export type StakedDeposit = {
-  amount: BigNumberish;
+  amount: string;
   delegatee: string;
   depositor: string;
   id: number;

@@ -36,8 +36,8 @@ export const Deposits = ({ fetchStaked }: DepositsProps) => {
 
   if (hasDeposits && address) {
     return (
-      <div className="my-12">
-        <div className="font-black text-2xl mb-4">
+      <div>
+        <div className="font-black text-2xl mb-5">
           Your {token.symbol} Deposits
         </div>
         <StakedDepositList address={address} deposits={deposits} />
@@ -46,8 +46,8 @@ export const Deposits = ({ fetchStaked }: DepositsProps) => {
   }
 
   return (
-    <div className="my-12">
-      <div className="font-black text-2xl mb-4">
+    <div>
+      <div className="font-black text-2xl mb-5">
         Introducing staking, the next chapter of Uniswap Governance
       </div>
       <div className="text-gray-700">

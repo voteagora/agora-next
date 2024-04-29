@@ -3,11 +3,11 @@ import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { StakedDeposit } from "@/lib/types";
 
-export async function fetchDeposit({
-  id,
-}: {
+interface IFetchDepositProps {
   id: number;
-}): Promise<StakedDeposit> {
+}
+
+export async function fetchDeposit({ id }: IFetchDepositProps): Promise<StakedDeposit> {
   const { namespace, token } = Tenant.current();
 
   const deposit = await prisma[`${namespace}StakedDeposits`].findFirst({
@@ -21,7 +21,7 @@ export async function fetchDeposit({
   }
 
   return {
-    amount: BigInt(deposit.amount),
+    amount: deposit.amount.toString(),
     delegatee: deposit.delegatee,
     depositor: deposit.depositor,
     id: Number(deposit.deposit_id),
