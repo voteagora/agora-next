@@ -1,7 +1,11 @@
 "use client";
 
 import { Button } from "@/components/Button";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,10 +17,10 @@ interface DepositWithdrawButtonProps {
 }
 
 export const DepositWithdrawButton = ({
-                                        amount,
-                                        id,
-                                        onSuccess,
-                                      }: DepositWithdrawButtonProps) => {
+  amount,
+  id,
+  onSuccess,
+}: DepositWithdrawButtonProps) => {
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();
   const isValidAmount = amount > 0n;

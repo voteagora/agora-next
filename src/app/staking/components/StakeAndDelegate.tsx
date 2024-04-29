@@ -26,7 +26,7 @@ export const StakeAndDelegate = () => {
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
-    address as `0x${string}`,
+    address as `0x${string}`
   );
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
 
@@ -34,7 +34,6 @@ export const StakeAndDelegate = () => {
     <div className="rounded-xl border border-slate-300 w-[354px] p-4">
       <div className="text-center mb-2 text-xs text-slate-600 bg-gray-100 border rounded-xl">
         <div className="rounded-xl bg-white border border-slate-300 p-2">
-
           <div>Enter {token.symbol} to stake</div>
 
           <Input
@@ -93,7 +92,6 @@ export const StakeAndDelegate = () => {
           </div>
         </div>
       </div>
-
 
       <StakeButton address={addressToDelegate} amount={amountToStake} />
     </div>

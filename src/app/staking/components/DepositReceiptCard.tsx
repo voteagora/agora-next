@@ -21,12 +21,12 @@ interface ConfirmStakingTransactionCardProps {
 }
 
 const DepositReceiptCard: React.FC<ConfirmStakingTransactionCardProps> = ({
-                                                                            amount,
-                                                                            delegatee,
-                                                                            depositor,
-                                                                            receiptEntries,
-                                                                            receiptTitle,
-                                                                          }) => {
+  amount,
+  delegatee,
+  depositor,
+  receiptEntries,
+  receiptTitle,
+}) => {
   return (
     <VStack
       className={`font-code max-w-[408px] w-full px-[34px] py-8 bg-gray-fa rounded-lg border border-gray-300 shadow-2xl mt-6 ${styles["transaction-box"]}`}
@@ -44,20 +44,24 @@ const DepositReceiptCard: React.FC<ConfirmStakingTransactionCardProps> = ({
         {receiptTitle ?? "Confirm your staking transaction"}
       </h1>
       <VStack className="w-full gap-[15px] mt-7">
-
         <HStack className="w-full justify-between items-center text-black">
           <p className="text-base leading-4">Your address</p>
-          <p className="text-base leading-4"><ENSName address={depositor} /></p>
+          <p className="text-base leading-4">
+            <ENSName address={depositor} />
+          </p>
         </HStack>
 
         <HStack className="w-full justify-between items-center text-black">
           <p className="text-base leading-4">Delegated to</p>
-          <p className="text-base leading-4"><ENSName address={delegatee} /></p>
+          <p className="text-base leading-4">
+            <ENSName address={delegatee} />
+          </p>
         </HStack>
 
         <HStack className="w-full justify-between items-center text-black">
           <p className="text-base leading-4">You deposited</p>
-          <p className="text-base leading-4"><TokenAmountDisplay maximumSignificantDigits={4} amount={amount} />
+          <p className="text-base leading-4">
+            <TokenAmountDisplay maximumSignificantDigits={4} amount={amount} />
           </p>
         </HStack>
 

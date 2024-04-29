@@ -17,10 +17,9 @@ interface StakedDepositListProps {
 }
 
 export const StakedDepositList = ({
-                                    deposits,
-                                    address,
-                                  }: StakedDepositListProps) => {
-
+  deposits,
+  address,
+}: StakedDepositListProps) => {
   const { data, isFetched } = useTokenBalance(address);
   const hasTokenBalance = data && isFetched;
   const canDepositMode = hasTokenBalance && data > 0n;
@@ -33,9 +32,12 @@ export const StakedDepositList = ({
             return (
               <div
                 key={`deposit-${deposit.id}`}
-                className={`flex w-auto h-100 ${idx < deposits.length - 1 ? "border-b border-b-gray-300" : ""}`}>
+                className={`flex w-auto h-100 ${idx < deposits.length - 1 ? "border-b border-b-gray-300" : ""}`}
+              >
                 <div className="flex flex-col p-5 min-w-[140px]">
-                  <div className="text-xs font-medium text-gray-700">Staked</div>
+                  <div className="text-xs font-medium text-gray-700">
+                    Staked
+                  </div>
                   <div className="font-medium">
                     <TokenAmountDisplay
                       maximumSignificantDigits={4}
@@ -49,14 +51,21 @@ export const StakedDepositList = ({
                 <div className="flex flex-col p-5">
                   <HStack>
                     <div>
-                      <div className="text-xs font-medium text-gray-700">Vote delegated to</div>
+                      <div className="text-xs font-medium text-gray-700">
+                        Vote delegated to
+                      </div>
                       <div className="font-medium">
                         <HumanAddress address={deposit.delegatee} />
                       </div>
                     </div>
-                    <Button href={`/staking/deposits/${deposit.id}`}>Manage deposit</Button>
-                    <DepositWithdrawButton id={BigInt(deposit.id)} amount={BigInt(deposit.amount)} onSuccess={() => {
-                    }} />
+                    <Button href={`/staking/deposits/${deposit.id}`}>
+                      Manage deposit
+                    </Button>
+                    <DepositWithdrawButton
+                      id={BigInt(deposit.id)}
+                      amount={BigInt(deposit.amount)}
+                      onSuccess={() => {}}
+                    />
                   </HStack>
                 </div>
               </div>
@@ -68,9 +77,7 @@ export const StakedDepositList = ({
             <>
               <div className="font-medium">
                 {canDepositMode ? (
-                  <Link href="staking/new">
-                    Deposit another stake
-                  </Link>
+                  <Link href="staking/new">Deposit another stake</Link>
                 ) : (
                   <>No more stakes available</>
                 )}

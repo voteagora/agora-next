@@ -18,16 +18,12 @@ export default async function Page() {
 
       <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10 mt-12">
         <div className="sm:col-span-4">
-          <ReceiptContainer>
-            My receipt here...
-          </ReceiptContainer>
+          <ReceiptContainer>My receipt here...</ReceiptContainer>
         </div>
         <div className="sm:col-start-5">
           <StakeAndDelegate />
         </div>
       </HStack>
     </div>
-
-
   );
 }

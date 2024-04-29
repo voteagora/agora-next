@@ -58,10 +58,10 @@ export default async function Delegates({
             !!isRedeemStakeParam
               ? "Redeem stake and collect rewards"
               : selectedDelegateAddress === null
-              ? "Select delegate to continue"
-              : showReceipt
-              ? "Stake & delegate my UNI"
-              : "Continue"
+                ? "Select delegate to continue"
+                : showReceipt
+                  ? "Stake & delegate my UNI"
+                  : "Continue"
           }
           setShowReceipt={setShowReceipt}
           isButtonDisabled={selectedDelegateAddress === null}

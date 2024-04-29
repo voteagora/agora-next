@@ -11,7 +11,6 @@ import React from "react";
 import Image from "next/image";
 
 export const ClaimRewards = () => {
-
   const { token } = Tenant.current();
   const { address } = useAccount();
   const { isConnected } = useAccount();
@@ -35,7 +34,9 @@ export const ClaimRewards = () => {
             Available to collect
           </p>
           <h6 className="text-base font-medium text-black">
-            {isConnected ? `${formatNumber(hasRewards ? data : 0, token.decimals)} WETH ` : "Connect wallet for balance"}
+            {isConnected
+              ? `${formatNumber(hasRewards ? data : 0, token.decimals)} WETH `
+              : "Connect wallet for balance"}
           </h6>
         </VStack>
       </HStack>

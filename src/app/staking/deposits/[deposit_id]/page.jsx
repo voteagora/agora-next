@@ -25,6 +25,5 @@ export default async function Page({ params: { deposit_id } }) {
         </div>
       </HStack>
     </div>
-
   );
 }

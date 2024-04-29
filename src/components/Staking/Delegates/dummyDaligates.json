@@ -1,450 +1,450 @@
 [
-    {
-        "address": "0x3eee61b92c36e97be6319bf9096a1ac3c04a1466",
-        "votingPower": "10075713046655970335660274",
-        "citizen": false,
-        "statement": {
-            "address": "0x3eee61b92c36e97be6319bf9096a1ac3c04a1466",
-            "dao_slug": "OP",
-            "signature": "0x214109d73917e63a7f7072b32d67162fd0560cdcefe6ea991027bbd3465922d4412148febeaf526e8d9d0bd5a758103b0ae5083e44e78802236a8e128c358a881c",
-            "payload": {
-                "email": "anticapture@optimism.io",
-                "daoSlug": "OP",
-                "discord": "N/A",
-                "twitter": "N/A",
-                "topIssues": [],
-                "agreeCodeConduct": true,
-                "delegateStatement": "The Anticapture Commission (ACC) is mandated to represent the interests of individual delegates as a key tokenholder group and to prevent the capture of the Token House by any single tokenholder or group of tokenholders, including protocols, OP Chains, etc. This program, introduced as an experiment in Season 5, consists of high-impact delegates who meet the membership criteria and have opted in.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "N/A",
-            "discord": "N/A",
-            "email": "anticapture@optimism.io",
-            "createdAt": "2024-01-24T00:00:00.000Z",
-            "updatedAt": "2024-01-24T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0xf11b6a8c3cb8bb7dbc1518a613b10ceb0bbfc06b",
-        "votingPower": "5217655539216606258430599",
-        "citizen": false,
-        "statement": null
-    },
-    {
-        "address": "0xeff8d84e0fd304550da242040ccd45bd44ce71f1",
-        "votingPower": "5034264070092143000894564",
-        "citizen": false,
-        "statement": null
-    },
-    {
-        "address": "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-        "votingPower": "4933015591150100753931139",
-        "citizen": false,
-        "statement": {
-            "address": "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
-            "dao_slug": "OP",
-            "signature": "0xbef030bc332e0ec87585a086b486fac178ddee2312ffab71982fab8a67286c1349a4baf4fe60514ac8f6f7b1c5b491b6994fda87a6336294776a41b18f98c0961b",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "_krst",
-                "twitter": "@l2beat",
-                "topIssues": [],
-                "delegateStatement": "### Intro to L2Beat\n\nL2BEAT is an independent, public goods company who acts as an impartial watchdog for the Ethereum Layer2 ecosystem. Our mission is to provide comprehensive and unbiased analysis and comparative evaluations of Layer 2 solutions . We are committed to the verification and fact-checking of the claims made by each project, with a special focus on the security aspects. What sets L2BEAT apart is our unwavering commitment to delivering accurate and reliable information. \n\nIn addition, L2Beat has a governance team which actively participates in constructive discussions of specific protocol challenges and issues, fostering the discourse toward increasingly permissionless, open source, and trustless systems. Our participation in various DAOs and public debates reflects this commitment.\n\n### **Governance Team**\n\nThe governance team currently consists of kaereste (Krzysztof Urbanski) and Sinkas (Anastassis Oikonomopoulos). Both members have extensive knowledge and experience in the broader web3 ecosystem, on both technical and non-technical fronts. Any governance actions of the L2Beat delegation team will be the product of research, fact-checking and ideation of the 2 aforementioned members.\n\n### ****Our Mission, Values and Approach to Governance****\n\nFor us, governance isn't just about casting a vote. The real magic happens during healthy debates and coming to conclusions together. Voting should just be the cherry on top of a great community-driven process.\n\nWhen participating in governance, we hold the following principles in mind:\n\n- Transparency & Open Communication: We believe in being open about our decision-making process and keeping the community informed about any proposals or issues we discuss.\n- Community Focus: Our top priority is to always consider the community's needs and interests in every decision we make.\n- Inclusiveness: We're committed to fostering a diverse and inclusive environment, where everyone's voice is heard, regardless of their background or experience.\n- Accountability: We value accountability and are always open to feedback, which helps us continually improve and better serve our community.\n\nAt L2BEAT we believe that crypto is the new infrastructure for the future financial system. As such, we believe that in order for it to be successful, it needs to be:\n\n- Permissionless, no one should need a third party's permission to join the network,\n- Censorship resistant, everyone should be free from arbitrary censorship,\n- Trustless, it's all about cryptographic proofs and consensus, not trusting a central party\n- Decentralised, power and control should be spread across many participants\n- Transparent, everyone should be able to verify and account for transactions, even if they're private\n- Secure and safe, user safety and security come first, not relying on anyone acting honestly.\n- Open-source, we live by \"don't trust, verify,\" so if we can't see the code, we can't trust it.\n\n### Why we chose to be delegates\n\nWe recognize that proper governance is of paramount importance for any protocol that wants to be efficient while remaining decentralized. The precedents we establish today will significantly influence the organizational structures and systems of the future. Consequently, we view our engagement in governance as a professional responsibility, and our team is dedicated to addressing all governance and policy issues that arise within the protocols we’re engaged with.\n\nWe assert that governance involves much more than the act of voting; it revolves primarily around fostering constructive dialogue and facilitating the healthy exchange of opinions and viewpoints in order to reach consensus on specific issues.\n\nPublic Goods are essential for any thriving community (virtual or not). A systemic solution to the public goods funding problem will make Optimism the best rollup to use.\n\n## **Skills and areas of expertise:**\n\nWe consider ourselves experts on blockchain scaling solutions. We have a deep technical understanding of underlying protocols and a broad overview of available solutions. We’ve spent hours understanding the code, documentation and on-chain data of every project listed on our website.\n\nIn terms of DAO-relevant work, we served on several grant committees and helped organise the work of the DAOs we're involved with.\n\n## Languages we speak and write\n\nEnglish, Polish, Greek\n\n## **Disclosure of Conflicts of Interest:**\n\nIt’s not necessary COI but it’s worth mentioning that we are active delegates in other ecosystems, with more coming in the near future. We also have a working relationship with almost every major Ethereum L2 project and with most bridge projects.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "@l2beat",
-            "discord": "_krst",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee",
-        "votingPower": "4301773640245275125967266",
-        "citizen": true,
-        "statement": {
-            "address": "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "I want to further support the important work that Optimism is doing on scaling. I’m also passionate about public goods funding and governance experimentation.\n\n\n\nMy view on the Optimistic Vision: I align strongly with the vision. I’m excited about the new model focused on optimizing for positive impact and providing retroactive incentives for public goods.\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nAgree, I think the collective should be open to experimentation and be dynamic in the early days as we grow and learn\n\nAgree, I’m supportive of checks and balances\n\nAgree, I’m glad to see the Optimism Foundation be a steward of the collective early on\n\n\n\nMy skills and areas of expertise: product (previously product manager at Coinbase), governance (delegate for Gitcoin and Element DAO), writing / creating educational content, operations, strategy, DeFi (advisor of 0x and investor in many DeFi projects), investing (co-founder of crypto fund Scalar Capital)",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x429f9ada43e9f345cbb85ec88681bb70df808892",
-        "votingPower": "3659832427196893561129363",
-        "citizen": true,
-        "statement": {
-            "address": "0x429f9ada43e9f345cbb85ec88681bb70df808892",
-            "dao_slug": "OP",
-            "signature": "0x78e37ec1595d35601778d1088339a49b5e24a1bfa099beae7c49d1d0432f2e1d507050a2eb9c4b23fa559373201a58452a0e80b63083a9d850f8a3f232daeabe1b",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "Update: It's now been over a year, and I've enjoyed my time as an active delegate. I've voted on all eligible proposals, and look forward to continuing contributing in shaping Optimism Collective. My key interest remains in moving from pure plutocratic voting to more democratic methods, i.e. Citizen House. Of course, citizen onboarding remains a huge challenge. My original statement at genesis follows:\n\nI have been writing about rollups as a side hobby for a couple of years and curious to see what the governance for a major rollup feels like. Wish I could offer you some grand statement, but it’s just curiosity at this point.\n\n\n\n\nMy view on the Optimistic Vision: Well, it’s curiosity and also a novel vision. I despise the entirely plutocratic systems that pervade the crypto space (a large reason why I’m a crypto-skeptic), and any attempt at breaking beyond it is worth contributing to.\n\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n1. This is pretty obvious - you wouldn’t have governance if the constitution wasn’t a work-in-progress.\n\n2. Finding a balance will be challenging, I believe more specific goals and targets need to be fleshed out by citizens and holders and embedded into the constitution.\n\n3. Also a pragmatic way to begin, though I’d like to see Optimism Foundation’s influence gradually diminish over time.\n\n\n\n\nSkills: I’m skilled at studying, identifying, and investing in cultural and artistic movements.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x2b888954421b424c5d3d9ce9bb67c9bd47537d12",
-        "votingPower": "3018065371478044005797746",
-        "citizen": true,
-        "statement": {
-            "address": "0x2b888954421b424c5d3d9ce9bb67c9bd47537d12",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "I have considerable experience on DAO governance, being an active delegate in 2 of the biggest DAOs (gitcoin and ENS) and I want to use that to help the Collective towards its goals of proving that public goods can be be profitable and something more people should work on. Not everyone needs to work on a VC-funded for-profit soul-crashing startup that gives nothing back to the world.\n\n\n\n\nMy view on the Optimistic Vision: In short I dig it. The main thing that pushed me to get actively involved in Gitcoin DAO was the goal of funding public goods. Only for my specific case public goods is the much more specific and hard case of opensource software. The idea of finding ways to make opensource software sustainable by providing incentives to those who build them is something that excites me and fills me with purpose.\n\n\n\n\nMy view on the first three articles of the Working Constitution: I find them logical. (1) Makes sense. Things will evolve. (2) Intrigued to see how the bicameral governance of checks and balances will end up working out. (3) For the 3rd article and the foundation, I wonder if the DAO gets any say on the operations of the foundation, like who sits in the board etc.?\n\n\n\n\nMy skills and areas of expertise: Software development, opensource, software architecture, managements, governance and ehm … photography? :smiley:\n\n\n\n\nMy favorite Web3 projects: rotki, trueblocks, erigon",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-        "votingPower": "2770831751507803793771970",
-        "citizen": true,
-        "statement": {
-            "address": "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
-            "dao_slug": "OP",
-            "signature": "0x48d5205e709fc5e0ca4f77492ad311fb99cbcf41a4aaa387c9a82ee5ec4217f948d1f85ff38cbb06fb4a84f897404677550f5552f59d32dd89a2b7df6008338b01",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "olimpio#3300",
-                "twitter": "@OlimpioCrypto",
-                "topIssues": [],
-                "delegateStatement": "As a strong believer in the power of decentralization and the importance of public goods funding, I am excited to apply for the role of delegate for Optimism. My passion for cryptocurrencies and the financial freedom they enable has driven me to pursue a career in the DeFi space, and I am confident that my experience and values greatly align with the goals of the Optimism network.\n\nI understand the importance of decentralization in decision-making and believe that it is critical for the success of any blockchain project. That is why I am committed to representing the views of the wider community and ensuring that their voices are heard in the decision-making process. I will prioritize transparency, fairness, and inclusiveness in all my actions as a delegate, and will always act in the best interests of the Optimism network.\n\nI am also passionate about public goods funding and believe that it is a crucial component of any successful crypto ecosystem. I understand the importance of supporting projects and initiatives within an ecosystem and will work to ensure that Optimism's resources are directed towards initiatives that align with this goal.\n\nMy view on the Optimistic Vision: I like all scaling solutions, including Optimism. They all share a common vision, a vision which I stand for. The main north (impact=profit) is something that truly resonates with me.\n\nMy view on the first three articles of the Working Constitution:\n\nI agree with the articles. Especially with the flexibility that article 1 proposes, you cannot have a fixed constitution, rules, or laws, in an ecosystem that’s so rapidly changing.\n\nMy skills and areas of expertise: Crypto, in general\n\nMy favorite Web3 projects: Dune, Nansen. (I know, it’s web2 oriented to web3 services). Vfat, ENS, Lens",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "@OlimpioCrypto",
-            "discord": "olimpio#3300",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0xa6e8772af29b29b9202a073f8e36f447689beef6",
-        "votingPower": "2530907588847296975799713",
-        "citizen": false,
-        "statement": {
-            "address": "0xa6e8772af29b29b9202a073f8e36f447689beef6",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "We look forward to leveraging our learnings from other protocols and the deep relationships our team has fostered across DeFi, TradFi, governments, and academics.\n\n\n\n\nGFX has a record of rolling up our sleeves and getting work done. The GFX team has authored half of all successful proposals on Uniswap (including the first cross-chain governance proposal), listed multiple assets and developed the price oracle on Compound, and led efforts at MakerDAO to interface with regulators, lawmakers, and outside researchers. We actively work to find mutual benefits for protocols we cover to collaborate – such as the soon-to-be deployed DAI Direct Deposit Module for MakerDAO to plug directly into Compound.\n\n\n\n\nDelegation to GFX Labs is a delegation to a governance team that is one of the most experienced in DeFi, able to facilitate partnerships, and with a track record of consistent engagement and delivery of results.\n\n\n\n\nGFX Labs isn’t a fund. We don’t hold positions. We are a team of builders who love DeFi. Our participation in governance is rooted in a desire to see DeFi overtake legacy finance. We promise to be active participants. We’ll explain not only when we agree, but most importantly, when we disagree. As first-hand participants in governance, we know how frustrating it is to work on a proposal, receive limited comments, only to have the proposal shot down at launch. Our door will always be open to those who share the passion for DeFi that we have.\n\n\n\n\nMy view on the Optimistic Vision: GFX has a passion for building and optimizing protocols and the Web3 ecosystem generally. Our past record shows a commitment to the same ideals expressed in the Optimistic Vision – collaboration, coordination, and democratization of everything Web3.\n\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nArticle 1: Experimentation is appropriate, but past experience at major protocols suggests experimentation should be done with specific goals in mind. An ability to experiment early on is worthwhile, but needs to be tempered with an ability to commit once a winning formula has been found.\n\n\n\n\nArticle 2: A bicameral structure should in theory provide a more robust set of checks and balances, but only to the extent that OP Holder and OP Citizens are representative of differing constituencies. Shaping the criteria for the latter will be very important to get correct.\n\n\n\n\nArticle 3: The Foundation-that-decentralizes-over-time model worked quite well for governing the Maker protocol. It will be important to have robust governance processes developed prior to the end of that journey, however, to insure institutional knowledge is retained and best practices continue after full decentralization.\n\n\n\n\nMy skills and areas of expertise: GFX staff have experience in DeFi governance, proposal creation & execution, regulatory interface, academic outreach, economics, financial systems & markets, cross-protocol collaboration.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0xd6ce44f039250dddb3b1fb3aad1f68e838713b45",
-        "votingPower": "2413826995240760285348453",
-        "citizen": false,
-        "statement": null
-    },
-    {
-        "address": "0x1689b49f4fcb3acd3f84d88bf9f03f2aec15d374",
-        "votingPower": "2413092688239812427428199",
-        "citizen": false,
-        "statement": null
-    },
-    {
-        "address": "0x406b607644c5d7bfda95963201e45a4c6ab1c159",
-        "votingPower": "1869051724743890570595437",
-        "citizen": false,
-        "statement": {
-            "address": "0x406b607644c5d7bfda95963201e45a4c6ab1c159",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "As Synthetix ambassadors we feel that we are well equipped to contribute to the improvement and maintenance of Optimism via governance and represent the Synthetix ecosystem in the Optimism ecosystem as well.\n\nThe SNX Ambassadors play the role of governance participation on behalf of our community for many protocols and Optimism governance would be yet another key place for us to be active in.\n\n\n\nMy view on the Optimistic Vision :\n\n\n\nThe OP collective will be a new path for governance in Cyberspace, and the physical world.\nOwnership and rewards are the most reliable way to attract the best builders to address problems that affect the collective\nWeb3 needs groups that want to create incentives to build public goods; OP vision is a rallying point for builders to push against short termism. This will ensure value will compound for the long run.\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nThis is a “working” constitution:\nWe live in constant change, and this transitory document needs to reflect our human behavior/lifestyle to be fluid until we create our “bedrock” framework.\nInnovation is needed for blockchain governance\n\n\nOP Citizens and OP Holders will equally coexist within the Collective:\nShort-term incentives and long term visions must be aligned; we are excited about the experimentation between OP Governance and OP citizenship.\nVariants of the bicameral model worked for Sparta, and has alot of potential on what OP is proposing\n\n\nThe Optimism Foundation will be a steward of the Optimism Collective and its early governance model:\nWe believe in progressive decentralization and welcome the OP Foundation as early leaders in the OP Collectives governance model.\n\n\n\n\nMy skills and areas of expertise: The Synthetix Ambassador Council is comprised of three members who are signers on the OPsnxAmbassadors.eth multi-sig and we oversee governance for many ecosystem protocols. We are currently active Delegates for several DeFi projects and have experience in submitting and deploying governance proposals and staying up to date on broader governance matters. We also have access to resources with in the Synthetix DAO for purposes of protocol integrations.\n\n\n\nOur current signers, who’s twitter handles can be found on @snxambassadors profile bio, are made up of a combination of SNX Core Contributors and long time active Community members who are well versed in the operation of Synthetix and other DeFi/NFT projects.\nWe have a diverse set of skills that include Protocol/Governance analysis, user acquisition strategies, varying degrees of DeFi integrations, general marketing/communication skills and a wide range of other abilities in web3 and DeFi alike.\n\n\n\nMy favorite Web3 projects:\nEthereum, Optimism, Synthetix",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x4f41877773e44f2275da1942fee898556821bf66",
-        "votingPower": "1716737223156152422110314",
-        "citizen": false,
-        "statement": {
-            "address": "0x4f41877773e44f2275da1942fee898556821bf66",
-            "dao_slug": "OP",
-            "signature": "0x085542f152b6f98e36b688b3e157056e920281d3852dfc31225438357fca7cda0b53072b26aa2350b3ed298b818be83386eab5b5545472ffca18f9a99c5197611b",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "jack-anorak#6505",
-                "twitter": "@jack_anorak",
-                "topIssues": [
-                    {
-                        "type": "treasury",
-                        "value": "I believe in the catalytic power of treasuries. Although there's certainly cause to ensure a sound runway, treasuries are made to be spent on productive uses, not hoarded. In a high-growth setting, the productive deployment of capacity should bring about massive economic multipliers. Finding the winning projects and initiatives capable of generating these multipliers is priority #1."
-                    }
-                ],
-                "delegateStatement": "Delegates have a primary job: direct Optimism’s capacity to support the ecosystem’s growth and health.  As a founding core Velodrome team member and a long-term player in crypto, DeFi, and NFTs, I offer deep perspective in helping shape this direction. What’s good for Optimism is good for my protocol; what’s good for my protocol is good for Optimism. Velodrome can help to enact Optimism policy, and I intend to be one of hopefully many protocol liaisons to the Token House.\n\nI see in Optimism an opportunity to play out my core belief that broadening stakeholder participation in a way that advantages growth is going to supplant legacy organizational models. Impact = Profit isn’t just about aligning incentives so that an entire community benefits from policy and private activity. It’s about reconsidering how we relate to one another, dropping zero-sum habits and aiming for growing overall bounties. \n\nMore generally, I want a front row seat with a genuine attempt to explore new forms of governance that can be applied well beyond the scope of DeFi, etc.\n\nBecoming a delegate isn’t just about promoting core ideals, however: I’m also very competitive, and I want Optimism to win. Within Optimism we may aspire to be positive-sum, but in order to play this out completely, we need to demonstrate that we can also just work better than current alternatives in the market. So we need to win, and I want to help us get there.\n\nMy view on the Optimistic Vision\n\nReading through the other statements I’m struck by applicants’ enthusiasm about the possibilities of where correct digital democracy can take us: aligning stakeholders onchain and offchain; dodging the tragedy of the commons; provisioning and providing accessibility to underserved corners of societies; and so on.\n\nI share this enthusiasm, and it’s what initially drove me to study and pursue alternative organizational models away from traditional corporate structures.\n\nLess attended to, however, is, ironically, the defining phrase of the Collective:\n\na new model of digital democratic governance,\noptimized,\nto drive rapid and sustained growth of a decentralized ecosystem.\nIt’s not enough to be satisfied with calling ourselves a new model — to me this statement is one of obligation. We need deliberate but rapid iteration – the optimization — which requires serious debate and decisive, data-driven action to make sure that this decentralized ecosystem will grow quickly and sustainably. Delegates need to be putting in the work here; weekly up/down votes are simply not enough.\n\nTo do this work correctly, we need greater participation from protocols — which are extensions of our democratic model — to ensure our ideals are getting translated into action. This means that protocols should contribute to governance while being accountable.\n\nI’ve written elsewhere that many questions about DAO governance are fundamental organizational questions that have been grappled with over ages. We can build on previous knowledge in many cases, and I think that’s in part what I can offer here, having been an economist by training and profession.\n\nTo summarize, we’re all here because we agree we want the things outlined in the Vision. That’s the given, and it’s not enough for a delegate just to want this. Optimism’s core work – the thing that delegates need to be laser-focused on – is how to use administrative, social, and market levers to make Optimism as a going concern last long enough and thrive well enough to even have a shot at achieving these things.\n\nMy view on the first three articles of the Working Constitution\n\nVirtually all of the responses to this segment say something like “This is great and I like this.” I do think this is great, and I do like this. But in the spirit of working beyond the commonly understood, I’ll add some additional thoughts.\n\nThis is a “Working Constitution” - That the constitution ought to be reconsidered does **not mean that community members and delegates can arbitrarily present standards as given without inviting serious pushback. The Constitution is still a foundational framework, and deviation or elaboration on this framework needs, at minimum, a paper trail.\nOP Citizens and OP Holders will equally coexist within the Collective - We’ve seen in history that bicameral governance structures allow a specialized minority Guardian class (here, Citizens) to hold disproportionate sway over broader policy. I think this frees up more space for the OP Holder class to allow for some more vote concentration, and ironically current fears about excessive concentration at the hands of protocols risk Optimism’s early direction being managed by a minority of incumbent Delegates. We shouldn’t be afraid of getting more OP tokens delegated.\nThe Optimism Foundation will be a steward of the Optimism Collective and its early governance model - Until the Citizens take hold, it’s probably acceptable to lean more on the Foundation for their guidance (where they’re able to provide it), and as a Delegate I’d work to incorporate more of their expertise into my own thinking. I’m not sure to what extent Delegates have access to Foundation members, but they’ve been thinking about these topics for as long as anybody in this thread.\n\nMy skills and areas of expertise: economics, finance, organizational strategy, prediction markets\n\nMy favorite Web3 projects: Velodrome, Gitcoin, Maker DAO",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "@jack_anorak",
-            "discord": "jack-anorak#6505",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x48a63097e1ac123b1f5a8bbffafa4afa8192fab0",
-        "votingPower": "1595041048034596335249742",
-        "citizen": true,
-        "statement": {
-            "address": "0x48a63097e1ac123b1f5a8bbffafa4afa8192fab0",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "My reasons for wanting to be a delegate: Public goods are good.\n\n\n\nBut really, I’ve spent the last 5 years putting my heart and soul into funding public goods as a co-founder of Gitcoin. Over that time, we’ve seen projects like Dune Analytics, Ethers.js, Snapshot, Uniswap, WalletConnect, Yearn, and of course Plasma Group (now Optimism) reach sustainability in a variety of ways that are only possible thanks to Ethereum. While I’m proud of the impact we’ve been able to have, I believe that to scale our work further it is crucial that we do more to dispel the myth that public goods aren’t profitable. Having connected with @optimistprime and others on the Optimism team so much over the years, and worked closely with them via Gitcoin, I’m confident that they will be able to help achieve this goal, both thanks to the sheer talent on their team and their broader values alignment.\n\n\n\nMy view on the Optimistic Vision:\n\n\n\nPublic goods are often discussed as goods that are non-excludable and non-rivalrous. I submit that a better framing might be to consider public goods as goods that create positive externalities. In that framing, we can find plenty of examples of projects in Ethereum, including many DAOs, that are critical for the long term sustainability of web3. These projects should be financially rewarded such that they can not only survive, but thrive, and we now have new coordination and incentive mechanisms to ensure that happens in a way that benefits all market participants. In short, I believe in the optimistic vision for the same reason I believe in playing positive-sum games.\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\n1. \"This is a “Working” Constitution\"\n\n\n\nGood governance means working flexibly and adjusting direction not only based on the will of the community but based on learnings that naturally happen as a DAO scales. Huge fan of this approach and especially a fan of the four year limit. Consensus > immutability.\n\n\n\n2. \"OP Citizens and OP Holders will equally coexist within the Collective.\"\n\n\n\nLove the idea of checks and balances across different decision-making bodies, and strongly agree with Vitalik here. Although DAO governance is a powerful tool, we need to be careful, just in other democratic systems, to avoid implicit or explicit plutocracy.\n\n\n\n3. \"The Optimism Foundation will be a steward of the Optimism Collective and its early governance model.\"\n\n\n\nI strongly agree with the idea of progressive decentralization and believe it’s only natural for Optimism to focus in on the foundation to start and slowly expand its values and goals out to the community. A DAO without direction cannot achieve its goals, and there needs to be a core group that sets the initial conditions for future direction / growth.\n\n\n\n\nMy skills and areas of expertise: partnerships, governance design, economic modeling, community building\n\n\n\nMy favorite Web3 projects: Gitcoin, Optimism, ENS\n\n\n\nLet’s create a positive-sum world.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x6eda5acaff7f5964e1ecc3fd61c62570c186ca0c",
-        "votingPower": "1440216337074905259731107",
-        "citizen": true,
-        "statement": {
-            "address": "0x6eda5acaff7f5964e1ecc3fd61c62570c186ca0c",
-            "dao_slug": "OP",
-            "signature": "0x624fc60b3ca89c3e38a6d1e55bb6809de49f72663bc1f9ba0711acfa60100af92a3baac6c46d555cddc6d13ddcb482cc2087c318d4984490be2eafcfa18df5401c",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "theblockchainguy",
-                "twitter": "@elblockchainguy",
-                "topIssues": [],
-                "delegateStatement": "My primary goal in participating in governance is to see the OP Collective succeed, and to accelerate the positive feedback loop of RetroPGF & Ether’s Phoenix.\n\nAs an independent Optimism Delegate, not associated with any protocol, The Collective itself is my only stakeholder. I’ve been active in OP Governance since the token airdrop, and full-time in governance since the start of 2023. I have served 3 terms on the Optimism Grants Council, which is widely regarded as one of the most effective grants councils in crypto. I am also a volunteer host of the Token House Community Call, which means that I am always deeply informed on the most important issues within governance. I have voted on 100% of issues since my first vote in 2022.\n\nI am a firm believer in the Optimistic Vision, envisioning that the collaborative governance of The Optimism Collective, augmented by RPGF, has immense potential to transcend the digital world and address significant global challenges.\n\nIf you believe in this vision and choose me as your delegate, I would be honored. Together, let’s make this vision a reality. ",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "@elblockchainguy",
-            "discord": "theblockchainguy",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x070341aa5ed571f0fb2c4a5641409b1a46b4961b",
-        "votingPower": "1243733817081442871197671",
-        "citizen": false,
-        "statement": {
-            "address": "0x070341aa5ed571f0fb2c4a5641409b1a46b4961b",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "Hello everyone! We’re Penn Blockchain (@PennBlockchain on twitter), a leading, completely student run blockchain organization from The University of Pennsylvania for both our undergraduate and graduate schools. The club currently has over 50 members and we’re expecting many more in the semesters to come!\n\n\n\n\nPenn Blockchain has committees covering Governance, Research, Education, Business Development, and Development/Web3. On the governance side of things, our team has different members leading governance initiatives for different protocols we have delegations for. Current Penn Blockchain delegations include Aave, Compound, Uniswap, DyDx, IndexCoop, Maker, etc. Each week, governance leads will share updates with the club about new proposals and we will all debate about what to do before voting with our wallet.\n\n\n\n\nWe’d love to be your $OP delegate as many of us have been closely following Optimism for a while now. Our weekly discussions combine graduates with years of expertise in many jurisdictions with many bright minded undergrads eager to leave their impact and names in Web3.\n\n\n\n\nMy view on the Optimistic Vision:\n“Together, we will create the future of coordinated, collaborative cyberspace.” We couldn’t have put it better ourselves. The ushering in of a new digital democratic governance used to drive rapid and sustained growth is one that resonates well with us, and something we entirely support!\n\n\n\n\nMy view on the first three articles of the Working Constitution:\n\nThis is a working constitution: We like the introductory period before the constitution becomes the Bedrock Constitution. As with most novel things, we will have to change and amend multiple things; this allows us to do just that.\n\n\n\nOP Citizens and OP Holders will equally coexist within the Collective: We are in support of the bicameral governance system. As stated, short-term incentives and long term visions must be aligned.\n\n\n\nThe Optimism Foundation will be a steward of the Optimism Collective and its early governance model: We understand that the Optimism Foundation will at times have to step in. We expect, as well as are confident, that the Optimism Foundation will act in the best interest of the ecosystem.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0xed11e5ea95a5a3440fbaadc4cc404c56d0a5bb04",
-        "votingPower": "1222879113680281626012629",
-        "citizen": false,
-        "statement": {
-            "address": "0xed11e5ea95a5a3440fbaadc4cc404c56d0a5bb04",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "she256 started almost 4 years ago, with the mission to increase diversity in the crypto space. We fundamentally believe that blockchain technology will shape our future financial and governance structures, and as such it’s crucial that those building these systems are representative of the global, diverse population which they intend to serve.\n\n\n\nAs users (old and new) are priced out of Ethereum Layer 1, we urgently support Optimism’s mission to scale Ethereum sustainably and are firm supporters in the creation of a virtuous cycle of public goods funding to benefit users both financially and through user experience of the cyberspace.\n\n\n\nWe support the Collective’s axiom of impact=profit and the principle that positive externalities should be rewarded with profit to the individual. We intent to use our delegation to ensure the individuals rewarded make up the global, diverse population that exists today and welcome them to the cyberspace through the work achieved by the Optimism Collective.\n\n\n\nWe know, based on numerous studies, that diversity within organizations boosts innovation and acts as a driver for increased profitability. So, by encouraging more diverse participation in Optimism by delegating to she256, Optimism is structurally cementing an environment ripe to produce more innovative products and superior financial returns.\n\n\n\nWe believe we can be neutral governance participants who will represent the values and interests of our allies and underrepresented folks in crypto, as well as the Optimism Collective itself. By delegating to us, you’ll be an ally to our cause. Thank you!\n\n\n\nMy view on the Optimistic Vision:\nWe support the Collective’s axiom of impact=profit and the principle that positive externalities should be rewarded with profit to the individual. We want to align this to our vision by using our delegation to ensure the individuals rewarded make up the global, diverse population that exists today and welcome them to the cyberspace through the work achieved by the Optimism Collective.\n\n\n\nWe support the funding of public goods in the Ethereum ecosystem. Lack of public goods funding in the physical world often perpetuates inequalities, especially for underrepresented members of society. We align wholeheartedly with the statement that public goods can in fact be profitable, because democratizing access to resources has ripple effects in reducing inequality and as a result, generating profit. We aim to represent our communities of allies and underrepresented folks of crypto and believe we can assist the Collective in this goal. We would welcome the opportunity to contribute and play a directional role in building a virtuous cycle of impact driven expansion which benefits all users of the ecosystem (both existing and potential) both financially and via user experience which aligns closely she256’s core mission.\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nAs we fundamentally believe in blockchain technology shaping our future governance structures, we support the Working Constitution’s commitment to experimentation and flexibility and would welcome the opportunity to play an active role in building the playbook for fair, democratic decentralized governance. Impossible to master on the first try, governance requires commitment to rapid experimentation / adaptation ensures a healthy system where incentives remain aligned.\n\n\n\nWe support the Optimism’s model to move away from simple token-based governance systems which tend towards consolidated power amongst the wealthy “whales” of our ecosystem. This experiment to build a voting system representative of a large diverse community, regardless of token balance, aligns closely with she256’s core mission. As the Optimism Collective continues to experiment with governance structures, we welcome the opportunity to help hold the Collective accountable in avoiding excessive consolidation of power and aligning incentives for all members of our society as this is a key component of our voting philosophy.\n\n\n\nWe believe in progressive decentralization and welcome the Optimism Foundation as early leaders in the Optimism Collective’s governance model. We request the transparency in actions and decision-making of the Foundation and look forward to the guidance and unique insight that the Foundation can provide.\n\n\n\nZooming out, we believe the ability to clearly and concisely communicate information, as done in the Working Constitution itself, is a healthy indication of well-organized and sustainable governance.\n\n\n\nMy skills and areas of expertise:\n\n\n\nHave been in the space since early 2018, and were the first-ever 501c3 created to tackle the diversity issue in web3.\nWe have onboarded 1000s of women, and other underrepresented minorities to this space through a combination of educational content, mentorship initiatives, and community-building. Read more about our initiatives here: she256.org\nOur core team comprises individuals active in web3, contributing to projects and entities such Uniswap, NEAR, Celo, Opyn, Variant, Union, Metamask, Orca, Gitcoin, and many more.\n\n\n\nMy favorite Web3 projects: Optimism, ENS",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x46abfe1c972fca43766d6ad70e1c1df72f4bb4d1",
-        "votingPower": "1184956281975645911622384",
-        "citizen": false,
-        "statement": {
-            "address": "0x46abfe1c972fca43766d6ad70e1c1df72f4bb4d1",
-            "dao_slug": "OP",
-            "signature": "",
-            "payload": {
-                "for": "optimism-agora",
-                "discord": "",
-                "twitter": "",
-                "topIssues": [],
-                "delegateStatement": "This is the Synthetix Ambassador Eth Multi-Sig Wallet that currently does not have access to voting on Optimism, which is why we have two wallet addresses. \n\nAs Synthetix ambassadors we feel that we are well equipped to contribute to the improvement and maintenance of Optimism via governance and represent the Synthetix ecosystem in the Optimism ecosystem as well.\n\nThe SNX Ambassadors play the role of governance participation on behalf of our community for many protocols and Optimism governance would be yet another key place for us to be active in.\n\nMy skills and areas of expertise: The Synthetix Ambassador Council is comprised of three members who are signers on the OPsnxAmbassadors.eth multi-sig and we oversee governance for many ecosystem protocols. We are currently active Delegates for several DeFi projects and have experience in submitting and deploying governance proposals and staying up to date on broader governance matters. We also have access to resources with in the Synthetix DAO for purposes of protocol integrations.\n\nOur current signers, who’s twitter handles can be found on @snxambassadors profile bio, are made up of a combination of SNX Core Contributors and long time active Community members who are well versed in the operation of Synthetix and other DeFi/NFT projects.\nWe have a diverse set of skills that include Protocol/Governance analysis, user acquisition strategies, varying degrees of DeFi integrations, general marketing/communication skills and a wide range of other abilities in web3 and DeFi alike.\n\nMy favorite Web3 projects:\nEthereum, Optimism, Synthetix",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": null
-            },
-            "twitter": "",
-            "discord": "",
-            "email": null,
-            "createdAt": "2024-04-10T00:00:00.000Z",
-            "updatedAt": "2024-04-10T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x3d2d722b443a5cae8e41877bb7cd649f3650937c",
-        "votingPower": "1170207778375675796759768",
-        "citizen": false,
-        "statement": {
-            "address": "0x3d2d722b443a5cae8e41877bb7cd649f3650937c",
-            "dao_slug": "OP",
-            "signature": "0xb5c056ce47aaf77cfd06d32288d5683ffd41d77582df653de0ba5895675474ce3d47c83d45ed31ce6c0f8c68f6e3c48b1757153d15c10164d48b0e5550afde631be7e60cb2ac5899f71fa28e46caf442740f98f75b96f3ad6593092ddc424751f379d0685b8f4f005a1e33df1b35797fca1f9b0fc149f9636c820f0be6fb29cd221b",
-            "payload": {
-                "email": "",
-                "daoSlug": "OP",
-                "discord": "tjaaark",
-                "twitter": "@PoolTogether_",
-                "topIssues": [],
-                "agreeCodeConduct": true,
-                "delegateStatement": "We are the PoolCollective: a collective of [PoolTogether](https://pooltogether.com) community members. \n\nPoolTogether has been an active participant within the DeFi and DAO ecosystems since their inception. While being at the frontier of decentralized governance it is important to us continuously experiment and evolve. We are looking to bring in our experience and apply learnings from the process to both PoolTogether & Optimism governance. We are dedicated to the Optimism-, and therefore the Ethereum-, ecosystem and desire to help the Optimistic Vision succeed.\n\nIndividuals voting on behalf of the collective: [Tjark](https://twitter.com/tjaaark) (Discord: tjaaark), [cpoetter](twitter.com/carstenpoetter) (Discord: cpoetter), [Illpo](twitter.com/illpocrypto) (Discord: illpo)\n\n**Our view on the Optimistic Vision**: \nWith PoolTogether ultimately being designed as public good, our community is working toward this vision already. We thrive to create a more fair and empathetic world where basic human needs are accessible to all.\n\n**Our view on the first three articles of the Working Constitution**:\n1. This is a “Working” Constitution. \nAlways has been. In a system with many moving parts, it is important to adapt to changes and constantly improve on learnings from the process.\n\n2. OP Citizens and OP Holders will equally coexist within the Collective. \nWe agree. All life is about balance. As a community around a decentralized protocol that aims to serve as an important financial infrastructure owned by its users, we see this as an invitation to participate.\n\n3. The Optimism Foundation will be a steward of the Optimism Collective and its early governance model. \nWe see the Optimism Foundation as an important part of facilitating and stewarding the process while protecting the vision and constitution. We trust in its decisions and guidance.",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "@PoolTogether_",
-            "discord": "tjaaark",
-            "email": "",
-            "createdAt": "2024-02-06T00:00:00.000Z",
-            "updatedAt": "2024-02-06T00:00:00.000Z"
-        }
-    },
-    {
-        "address": "0x94db037207f6fb697dbd33524aadffd108819dc8",
-        "votingPower": "1158877841265743457678573",
-        "citizen": true,
-        "statement": {
-            "address": "0x94db037207f6fb697dbd33524aadffd108819dc8",
-            "dao_slug": "OP",
-            "signature": "0x4db34197df804276103ed4cada5971af78326d550554a00b130a75508925d83701ecd5b19344dab8925ab2bdaf285a741ce70a102b18039ec588d090c2ce86611b",
-            "payload": {
-                "email": "joxes@seedlatam.org",
-                "daoSlug": "OP",
-                "discord": "0xjoxes",
-                "twitter": "@0xJoxes",
-                "topIssues": [
-                    {
-                        "type": "treasury",
-                        "value": "We believe that the Treasury should allocate its resources towards initiatives that benefit Optimism and public goods around its ecosystem. Expenses must demonstrate productive results in accordance with the optimistic vision."
-                    },
-                    {
-                        "type": "funding",
-                        "value": "We champion transparency and prioritize quality over quantity. We support grants that foster the sustainable development of the Optimism ecosystem while endorsing initiatives with accountable funding. We are not interested in “wagmi” projects but those that can do a good job and set realistic goals."
-                    },
-                    {
-                        "type": "publicGoods",
-                        "value": "Making public goods often lacks proper incentives and can be challenging. As a fundamental part of permissionless and decentralized protocols, they should be funded in a way that not only continuity of the same but incentivizes more contributions. Our approach is to support public goods and transparent and reasonable forms of financing which preserve the open-source ethos."
-                    }
-                ],
-                "agreeCodeConduct": true,
-                "delegateStatement": "## Presentation\n\nWe’re the SEED Latam delegation led by Joxes, aiming to push for protocol decentralization & a better ecosystem for the Optimism Collective while we help Latam communities to benefit and get involved. \n\n## What is SEED Latam?\n\nSEED Latam is an ecosystem that aims to promote knowledge and critical thinking about Web3 in Spanish, as well as empower future Web3 leaders.\n\nOur work focuses on two fundamental pillars: governance and education. Through governance, we seek to raise the Latin American voice, promote participation, and empower those delegates who represent the region. While in the educational field, we continue generating content to encourage the active participation of more people in the Web3 ecosystem. Since 2020 we have brought valuable content to members and encourage collaborative and cooperative learning.\n\n## Our mission and values\n\nWe work to make Optimism governance and ecosystem better and offer a valuable point of view according to the following values:\n\n- **Transparency**: we are believers that communication and accounting are the fundamental pillars of any governance. We will encourage and motivate this behavior where it is reasonable to apply it.\n- **Neutrality**: any chain, application, and community member should be treated equally without preferences other than the interests of Optimism Collective.\n- **Decentralization**: should be palpable in every corner of Optimism. We will be in favor of any initiative that leads Optimism as a whole to go into \"autopilot\" mode, subtracting central entities over time, if it is appropriate to do so.\n- **Quality over quantity**: Expansion is meaningless without results, we are advocates that every action in which the Optimism Collective has an investment grade should be justified and with reasonable prospects of success.\n\n\n## Delegation team\n\nEach delegation in SEED Latam has its own work structure and dedicated contributors. For this delegation, we work under the following structure:\n\n- **Leader**: [me, Joxes!], I’m in charge of representing SEED Latam and carrying out the tasks as a delegate in Optimism governance. This includes voting, providing official feedback, submitting proposals, being the point of contact for delegators and the foundation, and other functions that are expected of this role.\n\n- **Dedicated contributors**: our passionate collaborators who love Optimism and dedicate time to its governance. They help this delegation fulfill its responsibilities and provide their expert insight on different topics such as DeFi, infrastructure, and DAO processes and contribute to creative action for the delegation. Also, they’re very active in the forum.\n  - Manugotsuka: he collaborates with supporting Optimism’s Anticapture Commission responsibilities by assisting the delegation with specific tasks.\n  - Pumbi.eth: He is collaborating in the day-to-day activities of the delegation, such as in the Mission Request tracking.\n  - Habacuc.eth: He contributes to supporting Joxes in tasks related to Missions and Grants Council.\n\n## Contributor's Hall of Fame\n\nWe want to honor the exceptional champions whose contributions have left an indelible mark on the history of our delegation (in chronological order).\n\n- Nicoproducto\n- Ahhsun\n- ErikSuazo\n- Gasm\n- Pacha\n- 0xBlonde\n- CryptoChica\n- Netrim\n- Jadmat\n\n## Point of contact\n\nTelegram: @0xJoxes\nDiscord: 0xjoxes\nForum: https://gov.optimism.io/u/joxes/\nhttps://seedlatam.org/links",
-                "mostValuableProposals": [],
-                "leastValuableProposals": [],
-                "openToSponsoringProposals": "yes"
-            },
-            "twitter": "@0xJoxes",
-            "discord": "0xjoxes",
-            "email": "joxes@seedlatam.org",
-            "createdAt": "2024-02-08T00:00:00.000Z",
-            "updatedAt": "2024-02-08T00:00:00.000Z"
-        }
+  {
+    "address": "0x3eee61b92c36e97be6319bf9096a1ac3c04a1466",
+    "votingPower": "10075713046655970335660274",
+    "citizen": false,
+    "statement": {
+      "address": "0x3eee61b92c36e97be6319bf9096a1ac3c04a1466",
+      "dao_slug": "OP",
+      "signature": "0x214109d73917e63a7f7072b32d67162fd0560cdcefe6ea991027bbd3465922d4412148febeaf526e8d9d0bd5a758103b0ae5083e44e78802236a8e128c358a881c",
+      "payload": {
+        "email": "anticapture@optimism.io",
+        "daoSlug": "OP",
+        "discord": "N/A",
+        "twitter": "N/A",
+        "topIssues": [],
+        "agreeCodeConduct": true,
+        "delegateStatement": "The Anticapture Commission (ACC) is mandated to represent the interests of individual delegates as a key tokenholder group and to prevent the capture of the Token House by any single tokenholder or group of tokenholders, including protocols, OP Chains, etc. This program, introduced as an experiment in Season 5, consists of high-impact delegates who meet the membership criteria and have opted in.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "N/A",
+      "discord": "N/A",
+      "email": "anticapture@optimism.io",
+      "createdAt": "2024-01-24T00:00:00.000Z",
+      "updatedAt": "2024-01-24T00:00:00.000Z"
     }
+  },
+  {
+    "address": "0xf11b6a8c3cb8bb7dbc1518a613b10ceb0bbfc06b",
+    "votingPower": "5217655539216606258430599",
+    "citizen": false,
+    "statement": null
+  },
+  {
+    "address": "0xeff8d84e0fd304550da242040ccd45bd44ce71f1",
+    "votingPower": "5034264070092143000894564",
+    "citizen": false,
+    "statement": null
+  },
+  {
+    "address": "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
+    "votingPower": "4933015591150100753931139",
+    "citizen": false,
+    "statement": {
+      "address": "0x1b686ee8e31c5959d9f5bbd8122a58682788eead",
+      "dao_slug": "OP",
+      "signature": "0xbef030bc332e0ec87585a086b486fac178ddee2312ffab71982fab8a67286c1349a4baf4fe60514ac8f6f7b1c5b491b6994fda87a6336294776a41b18f98c0961b",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "_krst",
+        "twitter": "@l2beat",
+        "topIssues": [],
+        "delegateStatement": "### Intro to L2Beat\n\nL2BEAT is an independent, public goods company who acts as an impartial watchdog for the Ethereum Layer2 ecosystem. Our mission is to provide comprehensive and unbiased analysis and comparative evaluations of Layer 2 solutions . We are committed to the verification and fact-checking of the claims made by each project, with a special focus on the security aspects. What sets L2BEAT apart is our unwavering commitment to delivering accurate and reliable information. \n\nIn addition, L2Beat has a governance team which actively participates in constructive discussions of specific protocol challenges and issues, fostering the discourse toward increasingly permissionless, open source, and trustless systems. Our participation in various DAOs and public debates reflects this commitment.\n\n### **Governance Team**\n\nThe governance team currently consists of kaereste (Krzysztof Urbanski) and Sinkas (Anastassis Oikonomopoulos). Both members have extensive knowledge and experience in the broader web3 ecosystem, on both technical and non-technical fronts. Any governance actions of the L2Beat delegation team will be the product of research, fact-checking and ideation of the 2 aforementioned members.\n\n### ****Our Mission, Values and Approach to Governance****\n\nFor us, governance isn't just about casting a vote. The real magic happens during healthy debates and coming to conclusions together. Voting should just be the cherry on top of a great community-driven process.\n\nWhen participating in governance, we hold the following principles in mind:\n\n- Transparency & Open Communication: We believe in being open about our decision-making process and keeping the community informed about any proposals or issues we discuss.\n- Community Focus: Our top priority is to always consider the community's needs and interests in every decision we make.\n- Inclusiveness: We're committed to fostering a diverse and inclusive environment, where everyone's voice is heard, regardless of their background or experience.\n- Accountability: We value accountability and are always open to feedback, which helps us continually improve and better serve our community.\n\nAt L2BEAT we believe that crypto is the new infrastructure for the future financial system. As such, we believe that in order for it to be successful, it needs to be:\n\n- Permissionless, no one should need a third party's permission to join the network,\n- Censorship resistant, everyone should be free from arbitrary censorship,\n- Trustless, it's all about cryptographic proofs and consensus, not trusting a central party\n- Decentralised, power and control should be spread across many participants\n- Transparent, everyone should be able to verify and account for transactions, even if they're private\n- Secure and safe, user safety and security come first, not relying on anyone acting honestly.\n- Open-source, we live by \"don't trust, verify,\" so if we can't see the code, we can't trust it.\n\n### Why we chose to be delegates\n\nWe recognize that proper governance is of paramount importance for any protocol that wants to be efficient while remaining decentralized. The precedents we establish today will significantly influence the organizational structures and systems of the future. Consequently, we view our engagement in governance as a professional responsibility, and our team is dedicated to addressing all governance and policy issues that arise within the protocols we’re engaged with.\n\nWe assert that governance involves much more than the act of voting; it revolves primarily around fostering constructive dialogue and facilitating the healthy exchange of opinions and viewpoints in order to reach consensus on specific issues.\n\nPublic Goods are essential for any thriving community (virtual or not). A systemic solution to the public goods funding problem will make Optimism the best rollup to use.\n\n## **Skills and areas of expertise:**\n\nWe consider ourselves experts on blockchain scaling solutions. We have a deep technical understanding of underlying protocols and a broad overview of available solutions. We’ve spent hours understanding the code, documentation and on-chain data of every project listed on our website.\n\nIn terms of DAO-relevant work, we served on several grant committees and helped organise the work of the DAOs we're involved with.\n\n## Languages we speak and write\n\nEnglish, Polish, Greek\n\n## **Disclosure of Conflicts of Interest:**\n\nIt’s not necessary COI but it’s worth mentioning that we are active delegates in other ecosystems, with more coming in the near future. We also have a working relationship with almost every major Ethereum L2 project and with most bridge projects.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "@l2beat",
+      "discord": "_krst",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee",
+    "votingPower": "4301773640245275125967266",
+    "citizen": true,
+    "statement": {
+      "address": "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "I want to further support the important work that Optimism is doing on scaling. I’m also passionate about public goods funding and governance experimentation.\n\n\n\nMy view on the Optimistic Vision: I align strongly with the vision. I’m excited about the new model focused on optimizing for positive impact and providing retroactive incentives for public goods.\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nAgree, I think the collective should be open to experimentation and be dynamic in the early days as we grow and learn\n\nAgree, I’m supportive of checks and balances\n\nAgree, I’m glad to see the Optimism Foundation be a steward of the collective early on\n\n\n\nMy skills and areas of expertise: product (previously product manager at Coinbase), governance (delegate for Gitcoin and Element DAO), writing / creating educational content, operations, strategy, DeFi (advisor of 0x and investor in many DeFi projects), investing (co-founder of crypto fund Scalar Capital)",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x429f9ada43e9f345cbb85ec88681bb70df808892",
+    "votingPower": "3659832427196893561129363",
+    "citizen": true,
+    "statement": {
+      "address": "0x429f9ada43e9f345cbb85ec88681bb70df808892",
+      "dao_slug": "OP",
+      "signature": "0x78e37ec1595d35601778d1088339a49b5e24a1bfa099beae7c49d1d0432f2e1d507050a2eb9c4b23fa559373201a58452a0e80b63083a9d850f8a3f232daeabe1b",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "Update: It's now been over a year, and I've enjoyed my time as an active delegate. I've voted on all eligible proposals, and look forward to continuing contributing in shaping Optimism Collective. My key interest remains in moving from pure plutocratic voting to more democratic methods, i.e. Citizen House. Of course, citizen onboarding remains a huge challenge. My original statement at genesis follows:\n\nI have been writing about rollups as a side hobby for a couple of years and curious to see what the governance for a major rollup feels like. Wish I could offer you some grand statement, but it’s just curiosity at this point.\n\n\n\n\nMy view on the Optimistic Vision: Well, it’s curiosity and also a novel vision. I despise the entirely plutocratic systems that pervade the crypto space (a large reason why I’m a crypto-skeptic), and any attempt at breaking beyond it is worth contributing to.\n\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n1. This is pretty obvious - you wouldn’t have governance if the constitution wasn’t a work-in-progress.\n\n2. Finding a balance will be challenging, I believe more specific goals and targets need to be fleshed out by citizens and holders and embedded into the constitution.\n\n3. Also a pragmatic way to begin, though I’d like to see Optimism Foundation’s influence gradually diminish over time.\n\n\n\n\nSkills: I’m skilled at studying, identifying, and investing in cultural and artistic movements.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x2b888954421b424c5d3d9ce9bb67c9bd47537d12",
+    "votingPower": "3018065371478044005797746",
+    "citizen": true,
+    "statement": {
+      "address": "0x2b888954421b424c5d3d9ce9bb67c9bd47537d12",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "I have considerable experience on DAO governance, being an active delegate in 2 of the biggest DAOs (gitcoin and ENS) and I want to use that to help the Collective towards its goals of proving that public goods can be be profitable and something more people should work on. Not everyone needs to work on a VC-funded for-profit soul-crashing startup that gives nothing back to the world.\n\n\n\n\nMy view on the Optimistic Vision: In short I dig it. The main thing that pushed me to get actively involved in Gitcoin DAO was the goal of funding public goods. Only for my specific case public goods is the much more specific and hard case of opensource software. The idea of finding ways to make opensource software sustainable by providing incentives to those who build them is something that excites me and fills me with purpose.\n\n\n\n\nMy view on the first three articles of the Working Constitution: I find them logical. (1) Makes sense. Things will evolve. (2) Intrigued to see how the bicameral governance of checks and balances will end up working out. (3) For the 3rd article and the foundation, I wonder if the DAO gets any say on the operations of the foundation, like who sits in the board etc.?\n\n\n\n\nMy skills and areas of expertise: Software development, opensource, software architecture, managements, governance and ehm … photography? :smiley:\n\n\n\n\nMy favorite Web3 projects: rotki, trueblocks, erigon",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
+    "votingPower": "2770831751507803793771970",
+    "citizen": true,
+    "statement": {
+      "address": "0xf4b0556b9b6f53e00a1fdd2b0478ce841991d8fa",
+      "dao_slug": "OP",
+      "signature": "0x48d5205e709fc5e0ca4f77492ad311fb99cbcf41a4aaa387c9a82ee5ec4217f948d1f85ff38cbb06fb4a84f897404677550f5552f59d32dd89a2b7df6008338b01",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "olimpio#3300",
+        "twitter": "@OlimpioCrypto",
+        "topIssues": [],
+        "delegateStatement": "As a strong believer in the power of decentralization and the importance of public goods funding, I am excited to apply for the role of delegate for Optimism. My passion for cryptocurrencies and the financial freedom they enable has driven me to pursue a career in the DeFi space, and I am confident that my experience and values greatly align with the goals of the Optimism network.\n\nI understand the importance of decentralization in decision-making and believe that it is critical for the success of any blockchain project. That is why I am committed to representing the views of the wider community and ensuring that their voices are heard in the decision-making process. I will prioritize transparency, fairness, and inclusiveness in all my actions as a delegate, and will always act in the best interests of the Optimism network.\n\nI am also passionate about public goods funding and believe that it is a crucial component of any successful crypto ecosystem. I understand the importance of supporting projects and initiatives within an ecosystem and will work to ensure that Optimism's resources are directed towards initiatives that align with this goal.\n\nMy view on the Optimistic Vision: I like all scaling solutions, including Optimism. They all share a common vision, a vision which I stand for. The main north (impact=profit) is something that truly resonates with me.\n\nMy view on the first three articles of the Working Constitution:\n\nI agree with the articles. Especially with the flexibility that article 1 proposes, you cannot have a fixed constitution, rules, or laws, in an ecosystem that’s so rapidly changing.\n\nMy skills and areas of expertise: Crypto, in general\n\nMy favorite Web3 projects: Dune, Nansen. (I know, it’s web2 oriented to web3 services). Vfat, ENS, Lens",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "@OlimpioCrypto",
+      "discord": "olimpio#3300",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0xa6e8772af29b29b9202a073f8e36f447689beef6",
+    "votingPower": "2530907588847296975799713",
+    "citizen": false,
+    "statement": {
+      "address": "0xa6e8772af29b29b9202a073f8e36f447689beef6",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "We look forward to leveraging our learnings from other protocols and the deep relationships our team has fostered across DeFi, TradFi, governments, and academics.\n\n\n\n\nGFX has a record of rolling up our sleeves and getting work done. The GFX team has authored half of all successful proposals on Uniswap (including the first cross-chain governance proposal), listed multiple assets and developed the price oracle on Compound, and led efforts at MakerDAO to interface with regulators, lawmakers, and outside researchers. We actively work to find mutual benefits for protocols we cover to collaborate – such as the soon-to-be deployed DAI Direct Deposit Module for MakerDAO to plug directly into Compound.\n\n\n\n\nDelegation to GFX Labs is a delegation to a governance team that is one of the most experienced in DeFi, able to facilitate partnerships, and with a track record of consistent engagement and delivery of results.\n\n\n\n\nGFX Labs isn’t a fund. We don’t hold positions. We are a team of builders who love DeFi. Our participation in governance is rooted in a desire to see DeFi overtake legacy finance. We promise to be active participants. We’ll explain not only when we agree, but most importantly, when we disagree. As first-hand participants in governance, we know how frustrating it is to work on a proposal, receive limited comments, only to have the proposal shot down at launch. Our door will always be open to those who share the passion for DeFi that we have.\n\n\n\n\nMy view on the Optimistic Vision: GFX has a passion for building and optimizing protocols and the Web3 ecosystem generally. Our past record shows a commitment to the same ideals expressed in the Optimistic Vision – collaboration, coordination, and democratization of everything Web3.\n\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nArticle 1: Experimentation is appropriate, but past experience at major protocols suggests experimentation should be done with specific goals in mind. An ability to experiment early on is worthwhile, but needs to be tempered with an ability to commit once a winning formula has been found.\n\n\n\n\nArticle 2: A bicameral structure should in theory provide a more robust set of checks and balances, but only to the extent that OP Holder and OP Citizens are representative of differing constituencies. Shaping the criteria for the latter will be very important to get correct.\n\n\n\n\nArticle 3: The Foundation-that-decentralizes-over-time model worked quite well for governing the Maker protocol. It will be important to have robust governance processes developed prior to the end of that journey, however, to insure institutional knowledge is retained and best practices continue after full decentralization.\n\n\n\n\nMy skills and areas of expertise: GFX staff have experience in DeFi governance, proposal creation & execution, regulatory interface, academic outreach, economics, financial systems & markets, cross-protocol collaboration.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0xd6ce44f039250dddb3b1fb3aad1f68e838713b45",
+    "votingPower": "2413826995240760285348453",
+    "citizen": false,
+    "statement": null
+  },
+  {
+    "address": "0x1689b49f4fcb3acd3f84d88bf9f03f2aec15d374",
+    "votingPower": "2413092688239812427428199",
+    "citizen": false,
+    "statement": null
+  },
+  {
+    "address": "0x406b607644c5d7bfda95963201e45a4c6ab1c159",
+    "votingPower": "1869051724743890570595437",
+    "citizen": false,
+    "statement": {
+      "address": "0x406b607644c5d7bfda95963201e45a4c6ab1c159",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "As Synthetix ambassadors we feel that we are well equipped to contribute to the improvement and maintenance of Optimism via governance and represent the Synthetix ecosystem in the Optimism ecosystem as well.\n\nThe SNX Ambassadors play the role of governance participation on behalf of our community for many protocols and Optimism governance would be yet another key place for us to be active in.\n\n\n\nMy view on the Optimistic Vision :\n\n\n\nThe OP collective will be a new path for governance in Cyberspace, and the physical world.\nOwnership and rewards are the most reliable way to attract the best builders to address problems that affect the collective\nWeb3 needs groups that want to create incentives to build public goods; OP vision is a rallying point for builders to push against short termism. This will ensure value will compound for the long run.\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nThis is a “working” constitution:\nWe live in constant change, and this transitory document needs to reflect our human behavior/lifestyle to be fluid until we create our “bedrock” framework.\nInnovation is needed for blockchain governance\n\n\nOP Citizens and OP Holders will equally coexist within the Collective:\nShort-term incentives and long term visions must be aligned; we are excited about the experimentation between OP Governance and OP citizenship.\nVariants of the bicameral model worked for Sparta, and has alot of potential on what OP is proposing\n\n\nThe Optimism Foundation will be a steward of the Optimism Collective and its early governance model:\nWe believe in progressive decentralization and welcome the OP Foundation as early leaders in the OP Collectives governance model.\n\n\n\n\nMy skills and areas of expertise: The Synthetix Ambassador Council is comprised of three members who are signers on the OPsnxAmbassadors.eth multi-sig and we oversee governance for many ecosystem protocols. We are currently active Delegates for several DeFi projects and have experience in submitting and deploying governance proposals and staying up to date on broader governance matters. We also have access to resources with in the Synthetix DAO for purposes of protocol integrations.\n\n\n\nOur current signers, who’s twitter handles can be found on @snxambassadors profile bio, are made up of a combination of SNX Core Contributors and long time active Community members who are well versed in the operation of Synthetix and other DeFi/NFT projects.\nWe have a diverse set of skills that include Protocol/Governance analysis, user acquisition strategies, varying degrees of DeFi integrations, general marketing/communication skills and a wide range of other abilities in web3 and DeFi alike.\n\n\n\nMy favorite Web3 projects:\nEthereum, Optimism, Synthetix",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x4f41877773e44f2275da1942fee898556821bf66",
+    "votingPower": "1716737223156152422110314",
+    "citizen": false,
+    "statement": {
+      "address": "0x4f41877773e44f2275da1942fee898556821bf66",
+      "dao_slug": "OP",
+      "signature": "0x085542f152b6f98e36b688b3e157056e920281d3852dfc31225438357fca7cda0b53072b26aa2350b3ed298b818be83386eab5b5545472ffca18f9a99c5197611b",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "jack-anorak#6505",
+        "twitter": "@jack_anorak",
+        "topIssues": [
+          {
+            "type": "treasury",
+            "value": "I believe in the catalytic power of treasuries. Although there's certainly cause to ensure a sound runway, treasuries are made to be spent on productive uses, not hoarded. In a high-growth setting, the productive deployment of capacity should bring about massive economic multipliers. Finding the winning projects and initiatives capable of generating these multipliers is priority #1."
+          }
+        ],
+        "delegateStatement": "Delegates have a primary job: direct Optimism’s capacity to support the ecosystem’s growth and health.  As a founding core Velodrome team member and a long-term player in crypto, DeFi, and NFTs, I offer deep perspective in helping shape this direction. What’s good for Optimism is good for my protocol; what’s good for my protocol is good for Optimism. Velodrome can help to enact Optimism policy, and I intend to be one of hopefully many protocol liaisons to the Token House.\n\nI see in Optimism an opportunity to play out my core belief that broadening stakeholder participation in a way that advantages growth is going to supplant legacy organizational models. Impact = Profit isn’t just about aligning incentives so that an entire community benefits from policy and private activity. It’s about reconsidering how we relate to one another, dropping zero-sum habits and aiming for growing overall bounties. \n\nMore generally, I want a front row seat with a genuine attempt to explore new forms of governance that can be applied well beyond the scope of DeFi, etc.\n\nBecoming a delegate isn’t just about promoting core ideals, however: I’m also very competitive, and I want Optimism to win. Within Optimism we may aspire to be positive-sum, but in order to play this out completely, we need to demonstrate that we can also just work better than current alternatives in the market. So we need to win, and I want to help us get there.\n\nMy view on the Optimistic Vision\n\nReading through the other statements I’m struck by applicants’ enthusiasm about the possibilities of where correct digital democracy can take us: aligning stakeholders onchain and offchain; dodging the tragedy of the commons; provisioning and providing accessibility to underserved corners of societies; and so on.\n\nI share this enthusiasm, and it’s what initially drove me to study and pursue alternative organizational models away from traditional corporate structures.\n\nLess attended to, however, is, ironically, the defining phrase of the Collective:\n\na new model of digital democratic governance,\noptimized,\nto drive rapid and sustained growth of a decentralized ecosystem.\nIt’s not enough to be satisfied with calling ourselves a new model — to me this statement is one of obligation. We need deliberate but rapid iteration – the optimization — which requires serious debate and decisive, data-driven action to make sure that this decentralized ecosystem will grow quickly and sustainably. Delegates need to be putting in the work here; weekly up/down votes are simply not enough.\n\nTo do this work correctly, we need greater participation from protocols — which are extensions of our democratic model — to ensure our ideals are getting translated into action. This means that protocols should contribute to governance while being accountable.\n\nI’ve written elsewhere that many questions about DAO governance are fundamental organizational questions that have been grappled with over ages. We can build on previous knowledge in many cases, and I think that’s in part what I can offer here, having been an economist by training and profession.\n\nTo summarize, we’re all here because we agree we want the things outlined in the Vision. That’s the given, and it’s not enough for a delegate just to want this. Optimism’s core work – the thing that delegates need to be laser-focused on – is how to use administrative, social, and market levers to make Optimism as a going concern last long enough and thrive well enough to even have a shot at achieving these things.\n\nMy view on the first three articles of the Working Constitution\n\nVirtually all of the responses to this segment say something like “This is great and I like this.” I do think this is great, and I do like this. But in the spirit of working beyond the commonly understood, I’ll add some additional thoughts.\n\nThis is a “Working Constitution” - That the constitution ought to be reconsidered does **not mean that community members and delegates can arbitrarily present standards as given without inviting serious pushback. The Constitution is still a foundational framework, and deviation or elaboration on this framework needs, at minimum, a paper trail.\nOP Citizens and OP Holders will equally coexist within the Collective - We’ve seen in history that bicameral governance structures allow a specialized minority Guardian class (here, Citizens) to hold disproportionate sway over broader policy. I think this frees up more space for the OP Holder class to allow for some more vote concentration, and ironically current fears about excessive concentration at the hands of protocols risk Optimism’s early direction being managed by a minority of incumbent Delegates. We shouldn’t be afraid of getting more OP tokens delegated.\nThe Optimism Foundation will be a steward of the Optimism Collective and its early governance model - Until the Citizens take hold, it’s probably acceptable to lean more on the Foundation for their guidance (where they’re able to provide it), and as a Delegate I’d work to incorporate more of their expertise into my own thinking. I’m not sure to what extent Delegates have access to Foundation members, but they’ve been thinking about these topics for as long as anybody in this thread.\n\nMy skills and areas of expertise: economics, finance, organizational strategy, prediction markets\n\nMy favorite Web3 projects: Velodrome, Gitcoin, Maker DAO",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "@jack_anorak",
+      "discord": "jack-anorak#6505",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x48a63097e1ac123b1f5a8bbffafa4afa8192fab0",
+    "votingPower": "1595041048034596335249742",
+    "citizen": true,
+    "statement": {
+      "address": "0x48a63097e1ac123b1f5a8bbffafa4afa8192fab0",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "My reasons for wanting to be a delegate: Public goods are good.\n\n\n\nBut really, I’ve spent the last 5 years putting my heart and soul into funding public goods as a co-founder of Gitcoin. Over that time, we’ve seen projects like Dune Analytics, Ethers.js, Snapshot, Uniswap, WalletConnect, Yearn, and of course Plasma Group (now Optimism) reach sustainability in a variety of ways that are only possible thanks to Ethereum. While I’m proud of the impact we’ve been able to have, I believe that to scale our work further it is crucial that we do more to dispel the myth that public goods aren’t profitable. Having connected with @optimistprime and others on the Optimism team so much over the years, and worked closely with them via Gitcoin, I’m confident that they will be able to help achieve this goal, both thanks to the sheer talent on their team and their broader values alignment.\n\n\n\nMy view on the Optimistic Vision:\n\n\n\nPublic goods are often discussed as goods that are non-excludable and non-rivalrous. I submit that a better framing might be to consider public goods as goods that create positive externalities. In that framing, we can find plenty of examples of projects in Ethereum, including many DAOs, that are critical for the long term sustainability of web3. These projects should be financially rewarded such that they can not only survive, but thrive, and we now have new coordination and incentive mechanisms to ensure that happens in a way that benefits all market participants. In short, I believe in the optimistic vision for the same reason I believe in playing positive-sum games.\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\n1. \"This is a “Working” Constitution\"\n\n\n\nGood governance means working flexibly and adjusting direction not only based on the will of the community but based on learnings that naturally happen as a DAO scales. Huge fan of this approach and especially a fan of the four year limit. Consensus > immutability.\n\n\n\n2. \"OP Citizens and OP Holders will equally coexist within the Collective.\"\n\n\n\nLove the idea of checks and balances across different decision-making bodies, and strongly agree with Vitalik here. Although DAO governance is a powerful tool, we need to be careful, just in other democratic systems, to avoid implicit or explicit plutocracy.\n\n\n\n3. \"The Optimism Foundation will be a steward of the Optimism Collective and its early governance model.\"\n\n\n\nI strongly agree with the idea of progressive decentralization and believe it’s only natural for Optimism to focus in on the foundation to start and slowly expand its values and goals out to the community. A DAO without direction cannot achieve its goals, and there needs to be a core group that sets the initial conditions for future direction / growth.\n\n\n\n\nMy skills and areas of expertise: partnerships, governance design, economic modeling, community building\n\n\n\nMy favorite Web3 projects: Gitcoin, Optimism, ENS\n\n\n\nLet’s create a positive-sum world.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x6eda5acaff7f5964e1ecc3fd61c62570c186ca0c",
+    "votingPower": "1440216337074905259731107",
+    "citizen": true,
+    "statement": {
+      "address": "0x6eda5acaff7f5964e1ecc3fd61c62570c186ca0c",
+      "dao_slug": "OP",
+      "signature": "0x624fc60b3ca89c3e38a6d1e55bb6809de49f72663bc1f9ba0711acfa60100af92a3baac6c46d555cddc6d13ddcb482cc2087c318d4984490be2eafcfa18df5401c",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "theblockchainguy",
+        "twitter": "@elblockchainguy",
+        "topIssues": [],
+        "delegateStatement": "My primary goal in participating in governance is to see the OP Collective succeed, and to accelerate the positive feedback loop of RetroPGF & Ether’s Phoenix.\n\nAs an independent Optimism Delegate, not associated with any protocol, The Collective itself is my only stakeholder. I’ve been active in OP Governance since the token airdrop, and full-time in governance since the start of 2023. I have served 3 terms on the Optimism Grants Council, which is widely regarded as one of the most effective grants councils in crypto. I am also a volunteer host of the Token House Community Call, which means that I am always deeply informed on the most important issues within governance. I have voted on 100% of issues since my first vote in 2022.\n\nI am a firm believer in the Optimistic Vision, envisioning that the collaborative governance of The Optimism Collective, augmented by RPGF, has immense potential to transcend the digital world and address significant global challenges.\n\nIf you believe in this vision and choose me as your delegate, I would be honored. Together, let’s make this vision a reality. ",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "@elblockchainguy",
+      "discord": "theblockchainguy",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x070341aa5ed571f0fb2c4a5641409b1a46b4961b",
+    "votingPower": "1243733817081442871197671",
+    "citizen": false,
+    "statement": {
+      "address": "0x070341aa5ed571f0fb2c4a5641409b1a46b4961b",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "Hello everyone! We’re Penn Blockchain (@PennBlockchain on twitter), a leading, completely student run blockchain organization from The University of Pennsylvania for both our undergraduate and graduate schools. The club currently has over 50 members and we’re expecting many more in the semesters to come!\n\n\n\n\nPenn Blockchain has committees covering Governance, Research, Education, Business Development, and Development/Web3. On the governance side of things, our team has different members leading governance initiatives for different protocols we have delegations for. Current Penn Blockchain delegations include Aave, Compound, Uniswap, DyDx, IndexCoop, Maker, etc. Each week, governance leads will share updates with the club about new proposals and we will all debate about what to do before voting with our wallet.\n\n\n\n\nWe’d love to be your $OP delegate as many of us have been closely following Optimism for a while now. Our weekly discussions combine graduates with years of expertise in many jurisdictions with many bright minded undergrads eager to leave their impact and names in Web3.\n\n\n\n\nMy view on the Optimistic Vision:\n“Together, we will create the future of coordinated, collaborative cyberspace.” We couldn’t have put it better ourselves. The ushering in of a new digital democratic governance used to drive rapid and sustained growth is one that resonates well with us, and something we entirely support!\n\n\n\n\nMy view on the first three articles of the Working Constitution:\n\nThis is a working constitution: We like the introductory period before the constitution becomes the Bedrock Constitution. As with most novel things, we will have to change and amend multiple things; this allows us to do just that.\n\n\n\nOP Citizens and OP Holders will equally coexist within the Collective: We are in support of the bicameral governance system. As stated, short-term incentives and long term visions must be aligned.\n\n\n\nThe Optimism Foundation will be a steward of the Optimism Collective and its early governance model: We understand that the Optimism Foundation will at times have to step in. We expect, as well as are confident, that the Optimism Foundation will act in the best interest of the ecosystem.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0xed11e5ea95a5a3440fbaadc4cc404c56d0a5bb04",
+    "votingPower": "1222879113680281626012629",
+    "citizen": false,
+    "statement": {
+      "address": "0xed11e5ea95a5a3440fbaadc4cc404c56d0a5bb04",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "she256 started almost 4 years ago, with the mission to increase diversity in the crypto space. We fundamentally believe that blockchain technology will shape our future financial and governance structures, and as such it’s crucial that those building these systems are representative of the global, diverse population which they intend to serve.\n\n\n\nAs users (old and new) are priced out of Ethereum Layer 1, we urgently support Optimism’s mission to scale Ethereum sustainably and are firm supporters in the creation of a virtuous cycle of public goods funding to benefit users both financially and through user experience of the cyberspace.\n\n\n\nWe support the Collective’s axiom of impact=profit and the principle that positive externalities should be rewarded with profit to the individual. We intent to use our delegation to ensure the individuals rewarded make up the global, diverse population that exists today and welcome them to the cyberspace through the work achieved by the Optimism Collective.\n\n\n\nWe know, based on numerous studies, that diversity within organizations boosts innovation and acts as a driver for increased profitability. So, by encouraging more diverse participation in Optimism by delegating to she256, Optimism is structurally cementing an environment ripe to produce more innovative products and superior financial returns.\n\n\n\nWe believe we can be neutral governance participants who will represent the values and interests of our allies and underrepresented folks in crypto, as well as the Optimism Collective itself. By delegating to us, you’ll be an ally to our cause. Thank you!\n\n\n\nMy view on the Optimistic Vision:\nWe support the Collective’s axiom of impact=profit and the principle that positive externalities should be rewarded with profit to the individual. We want to align this to our vision by using our delegation to ensure the individuals rewarded make up the global, diverse population that exists today and welcome them to the cyberspace through the work achieved by the Optimism Collective.\n\n\n\nWe support the funding of public goods in the Ethereum ecosystem. Lack of public goods funding in the physical world often perpetuates inequalities, especially for underrepresented members of society. We align wholeheartedly with the statement that public goods can in fact be profitable, because democratizing access to resources has ripple effects in reducing inequality and as a result, generating profit. We aim to represent our communities of allies and underrepresented folks of crypto and believe we can assist the Collective in this goal. We would welcome the opportunity to contribute and play a directional role in building a virtuous cycle of impact driven expansion which benefits all users of the ecosystem (both existing and potential) both financially and via user experience which aligns closely she256’s core mission.\n\n\n\nMy view on the first three articles of the Working Constitution:\n\n\n\nAs we fundamentally believe in blockchain technology shaping our future governance structures, we support the Working Constitution’s commitment to experimentation and flexibility and would welcome the opportunity to play an active role in building the playbook for fair, democratic decentralized governance. Impossible to master on the first try, governance requires commitment to rapid experimentation / adaptation ensures a healthy system where incentives remain aligned.\n\n\n\nWe support the Optimism’s model to move away from simple token-based governance systems which tend towards consolidated power amongst the wealthy “whales” of our ecosystem. This experiment to build a voting system representative of a large diverse community, regardless of token balance, aligns closely with she256’s core mission. As the Optimism Collective continues to experiment with governance structures, we welcome the opportunity to help hold the Collective accountable in avoiding excessive consolidation of power and aligning incentives for all members of our society as this is a key component of our voting philosophy.\n\n\n\nWe believe in progressive decentralization and welcome the Optimism Foundation as early leaders in the Optimism Collective’s governance model. We request the transparency in actions and decision-making of the Foundation and look forward to the guidance and unique insight that the Foundation can provide.\n\n\n\nZooming out, we believe the ability to clearly and concisely communicate information, as done in the Working Constitution itself, is a healthy indication of well-organized and sustainable governance.\n\n\n\nMy skills and areas of expertise:\n\n\n\nHave been in the space since early 2018, and were the first-ever 501c3 created to tackle the diversity issue in web3.\nWe have onboarded 1000s of women, and other underrepresented minorities to this space through a combination of educational content, mentorship initiatives, and community-building. Read more about our initiatives here: she256.org\nOur core team comprises individuals active in web3, contributing to projects and entities such Uniswap, NEAR, Celo, Opyn, Variant, Union, Metamask, Orca, Gitcoin, and many more.\n\n\n\nMy favorite Web3 projects: Optimism, ENS",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x46abfe1c972fca43766d6ad70e1c1df72f4bb4d1",
+    "votingPower": "1184956281975645911622384",
+    "citizen": false,
+    "statement": {
+      "address": "0x46abfe1c972fca43766d6ad70e1c1df72f4bb4d1",
+      "dao_slug": "OP",
+      "signature": "",
+      "payload": {
+        "for": "optimism-agora",
+        "discord": "",
+        "twitter": "",
+        "topIssues": [],
+        "delegateStatement": "This is the Synthetix Ambassador Eth Multi-Sig Wallet that currently does not have access to voting on Optimism, which is why we have two wallet addresses. \n\nAs Synthetix ambassadors we feel that we are well equipped to contribute to the improvement and maintenance of Optimism via governance and represent the Synthetix ecosystem in the Optimism ecosystem as well.\n\nThe SNX Ambassadors play the role of governance participation on behalf of our community for many protocols and Optimism governance would be yet another key place for us to be active in.\n\nMy skills and areas of expertise: The Synthetix Ambassador Council is comprised of three members who are signers on the OPsnxAmbassadors.eth multi-sig and we oversee governance for many ecosystem protocols. We are currently active Delegates for several DeFi projects and have experience in submitting and deploying governance proposals and staying up to date on broader governance matters. We also have access to resources with in the Synthetix DAO for purposes of protocol integrations.\n\nOur current signers, who’s twitter handles can be found on @snxambassadors profile bio, are made up of a combination of SNX Core Contributors and long time active Community members who are well versed in the operation of Synthetix and other DeFi/NFT projects.\nWe have a diverse set of skills that include Protocol/Governance analysis, user acquisition strategies, varying degrees of DeFi integrations, general marketing/communication skills and a wide range of other abilities in web3 and DeFi alike.\n\nMy favorite Web3 projects:\nEthereum, Optimism, Synthetix",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": null
+      },
+      "twitter": "",
+      "discord": "",
+      "email": null,
+      "createdAt": "2024-04-10T00:00:00.000Z",
+      "updatedAt": "2024-04-10T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x3d2d722b443a5cae8e41877bb7cd649f3650937c",
+    "votingPower": "1170207778375675796759768",
+    "citizen": false,
+    "statement": {
+      "address": "0x3d2d722b443a5cae8e41877bb7cd649f3650937c",
+      "dao_slug": "OP",
+      "signature": "0xb5c056ce47aaf77cfd06d32288d5683ffd41d77582df653de0ba5895675474ce3d47c83d45ed31ce6c0f8c68f6e3c48b1757153d15c10164d48b0e5550afde631be7e60cb2ac5899f71fa28e46caf442740f98f75b96f3ad6593092ddc424751f379d0685b8f4f005a1e33df1b35797fca1f9b0fc149f9636c820f0be6fb29cd221b",
+      "payload": {
+        "email": "",
+        "daoSlug": "OP",
+        "discord": "tjaaark",
+        "twitter": "@PoolTogether_",
+        "topIssues": [],
+        "agreeCodeConduct": true,
+        "delegateStatement": "We are the PoolCollective: a collective of [PoolTogether](https://pooltogether.com) community members. \n\nPoolTogether has been an active participant within the DeFi and DAO ecosystems since their inception. While being at the frontier of decentralized governance it is important to us continuously experiment and evolve. We are looking to bring in our experience and apply learnings from the process to both PoolTogether & Optimism governance. We are dedicated to the Optimism-, and therefore the Ethereum-, ecosystem and desire to help the Optimistic Vision succeed.\n\nIndividuals voting on behalf of the collective: [Tjark](https://twitter.com/tjaaark) (Discord: tjaaark), [cpoetter](twitter.com/carstenpoetter) (Discord: cpoetter), [Illpo](twitter.com/illpocrypto) (Discord: illpo)\n\n**Our view on the Optimistic Vision**: \nWith PoolTogether ultimately being designed as public good, our community is working toward this vision already. We thrive to create a more fair and empathetic world where basic human needs are accessible to all.\n\n**Our view on the first three articles of the Working Constitution**:\n1. This is a “Working” Constitution. \nAlways has been. In a system with many moving parts, it is important to adapt to changes and constantly improve on learnings from the process.\n\n2. OP Citizens and OP Holders will equally coexist within the Collective. \nWe agree. All life is about balance. As a community around a decentralized protocol that aims to serve as an important financial infrastructure owned by its users, we see this as an invitation to participate.\n\n3. The Optimism Foundation will be a steward of the Optimism Collective and its early governance model. \nWe see the Optimism Foundation as an important part of facilitating and stewarding the process while protecting the vision and constitution. We trust in its decisions and guidance.",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "@PoolTogether_",
+      "discord": "tjaaark",
+      "email": "",
+      "createdAt": "2024-02-06T00:00:00.000Z",
+      "updatedAt": "2024-02-06T00:00:00.000Z"
+    }
+  },
+  {
+    "address": "0x94db037207f6fb697dbd33524aadffd108819dc8",
+    "votingPower": "1158877841265743457678573",
+    "citizen": true,
+    "statement": {
+      "address": "0x94db037207f6fb697dbd33524aadffd108819dc8",
+      "dao_slug": "OP",
+      "signature": "0x4db34197df804276103ed4cada5971af78326d550554a00b130a75508925d83701ecd5b19344dab8925ab2bdaf285a741ce70a102b18039ec588d090c2ce86611b",
+      "payload": {
+        "email": "joxes@seedlatam.org",
+        "daoSlug": "OP",
+        "discord": "0xjoxes",
+        "twitter": "@0xJoxes",
+        "topIssues": [
+          {
+            "type": "treasury",
+            "value": "We believe that the Treasury should allocate its resources towards initiatives that benefit Optimism and public goods around its ecosystem. Expenses must demonstrate productive results in accordance with the optimistic vision."
+          },
+          {
+            "type": "funding",
+            "value": "We champion transparency and prioritize quality over quantity. We support grants that foster the sustainable development of the Optimism ecosystem while endorsing initiatives with accountable funding. We are not interested in “wagmi” projects but those that can do a good job and set realistic goals."
+          },
+          {
+            "type": "publicGoods",
+            "value": "Making public goods often lacks proper incentives and can be challenging. As a fundamental part of permissionless and decentralized protocols, they should be funded in a way that not only continuity of the same but incentivizes more contributions. Our approach is to support public goods and transparent and reasonable forms of financing which preserve the open-source ethos."
+          }
+        ],
+        "agreeCodeConduct": true,
+        "delegateStatement": "## Presentation\n\nWe’re the SEED Latam delegation led by Joxes, aiming to push for protocol decentralization & a better ecosystem for the Optimism Collective while we help Latam communities to benefit and get involved. \n\n## What is SEED Latam?\n\nSEED Latam is an ecosystem that aims to promote knowledge and critical thinking about Web3 in Spanish, as well as empower future Web3 leaders.\n\nOur work focuses on two fundamental pillars: governance and education. Through governance, we seek to raise the Latin American voice, promote participation, and empower those delegates who represent the region. While in the educational field, we continue generating content to encourage the active participation of more people in the Web3 ecosystem. Since 2020 we have brought valuable content to members and encourage collaborative and cooperative learning.\n\n## Our mission and values\n\nWe work to make Optimism governance and ecosystem better and offer a valuable point of view according to the following values:\n\n- **Transparency**: we are believers that communication and accounting are the fundamental pillars of any governance. We will encourage and motivate this behavior where it is reasonable to apply it.\n- **Neutrality**: any chain, application, and community member should be treated equally without preferences other than the interests of Optimism Collective.\n- **Decentralization**: should be palpable in every corner of Optimism. We will be in favor of any initiative that leads Optimism as a whole to go into \"autopilot\" mode, subtracting central entities over time, if it is appropriate to do so.\n- **Quality over quantity**: Expansion is meaningless without results, we are advocates that every action in which the Optimism Collective has an investment grade should be justified and with reasonable prospects of success.\n\n\n## Delegation team\n\nEach delegation in SEED Latam has its own work structure and dedicated contributors. For this delegation, we work under the following structure:\n\n- **Leader**: [me, Joxes!], I’m in charge of representing SEED Latam and carrying out the tasks as a delegate in Optimism governance. This includes voting, providing official feedback, submitting proposals, being the point of contact for delegators and the foundation, and other functions that are expected of this role.\n\n- **Dedicated contributors**: our passionate collaborators who love Optimism and dedicate time to its governance. They help this delegation fulfill its responsibilities and provide their expert insight on different topics such as DeFi, infrastructure, and DAO processes and contribute to creative action for the delegation. Also, they’re very active in the forum.\n  - Manugotsuka: he collaborates with supporting Optimism’s Anticapture Commission responsibilities by assisting the delegation with specific tasks.\n  - Pumbi.eth: He is collaborating in the day-to-day activities of the delegation, such as in the Mission Request tracking.\n  - Habacuc.eth: He contributes to supporting Joxes in tasks related to Missions and Grants Council.\n\n## Contributor's Hall of Fame\n\nWe want to honor the exceptional champions whose contributions have left an indelible mark on the history of our delegation (in chronological order).\n\n- Nicoproducto\n- Ahhsun\n- ErikSuazo\n- Gasm\n- Pacha\n- 0xBlonde\n- CryptoChica\n- Netrim\n- Jadmat\n\n## Point of contact\n\nTelegram: @0xJoxes\nDiscord: 0xjoxes\nForum: https://gov.optimism.io/u/joxes/\nhttps://seedlatam.org/links",
+        "mostValuableProposals": [],
+        "leastValuableProposals": [],
+        "openToSponsoringProposals": "yes"
+      },
+      "twitter": "@0xJoxes",
+      "discord": "0xjoxes",
+      "email": "joxes@seedlatam.org",
+      "createdAt": "2024-02-08T00:00:00.000Z",
+      "updatedAt": "2024-02-08T00:00:00.000Z"
+    }
+  }
 ]

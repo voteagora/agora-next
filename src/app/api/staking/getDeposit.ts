@@ -7,7 +7,9 @@ interface IFetchDepositProps {
   id: number;
 }
 
-export async function fetchDeposit({ id }: IFetchDepositProps): Promise<StakedDeposit> {
+export async function fetchDeposit({
+  id,
+}: IFetchDepositProps): Promise<StakedDeposit> {
   const { namespace, token } = Tenant.current();
 
   const deposit = await prisma[`${namespace}StakedDeposits`].findFirst({

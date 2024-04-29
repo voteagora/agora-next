@@ -8,7 +8,11 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import { StakedDeposit } from "@/lib/types";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -20,12 +24,11 @@ interface IProps {
 }
 
 const RewardRedemptionCard: React.FC<IProps> = ({
-                                                  buttonText,
-                                                  deposit,
-                                                  isButtonDisabled,
-                                                  onButtonClick,
-                                                }) => {
-
+  buttonText,
+  deposit,
+  isButtonDisabled,
+  onButtonClick,
+}) => {
   const { contracts } = Tenant.current();
   const queryClient = useQueryClient();
 
@@ -60,7 +63,10 @@ const RewardRedemptionCard: React.FC<IProps> = ({
             Collecting your reward
           </p>
           <h6 className="text-[44px] text-center font-semibold text-black">
-            <TokenAmountDisplay maximumSignificantDigits={4} amount={deposit.amount} />
+            <TokenAmountDisplay
+              maximumSignificantDigits={4}
+              amount={deposit.amount}
+            />
           </h6>
         </VStack>
 
@@ -71,7 +77,6 @@ const RewardRedemptionCard: React.FC<IProps> = ({
         <Button
           disabled={isLoading}
           className="w-full mb-3"
-
           onClick={() => write?.()}
         >
           {isLoading ? "Withdrawing..." : "Withdraw"}

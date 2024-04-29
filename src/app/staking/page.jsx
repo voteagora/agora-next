@@ -8,7 +8,6 @@ import { ClaimRewards } from "./components/ClaimRewards";
 import FAQs from "@/components/Staking/FAQs";
 
 export default async function Page() {
-
   const { token, contracts, ui } = Tenant.current();
   const [totalSupply, rewardPerToken, rewardDuration] = await Promise.all([
     contracts.token.contract.totalSupply(),
