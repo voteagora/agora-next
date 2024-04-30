@@ -6,7 +6,7 @@ import {
   REASON_DISABLED_USER,
   REASON_INVALID_BEARER_TOKEN,
 } from "@/app/lib/auth/constants";
-import { extractBearerToken } from "@/app/lib/auth/edgeAuth";
+import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
 
 const HASH_FN = "sha256";
@@ -18,7 +18,7 @@ const DEFAULT_USER_SCOPE = "";
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
-  let authResponse: AuthInfo = extractBearerToken(request);
+  let authResponse: AuthInfo = await validateBearerToken(request);
 
   // if the token is not a UUID, it's a JWT
 
