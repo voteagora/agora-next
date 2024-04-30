@@ -2,7 +2,10 @@ import { NextRequest } from "next/server";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import prisma from "@/app/lib/prisma";
 
-import { REASON_DISABLED_USER, REASON_INVALID_BEARER_TOKEN } from "@/app/lib/auth/constants";
+import {
+  REASON_DISABLED_USER,
+  REASON_INVALID_BEARER_TOKEN,
+} from "@/app/lib/auth/constants";
 import { extractBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
 

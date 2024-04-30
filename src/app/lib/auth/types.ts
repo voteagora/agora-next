@@ -4,7 +4,6 @@ export type AuthInfo = {
   userId?: string;
   scope?: string;
   failReason?: string;
-  type?: "api_key" | "jwt",
-  token?: string,
+  type?: "api_key" | "jwt";
+  token?: string;
 };
-
