@@ -57,7 +57,7 @@ const RewardRedemptionCard: React.FC<IProps> = ({
 
   return (
     <div className="border rounded-lg font-inter">
-      <VStack className="p-4 rounded-lg border-b border-b-gray-300  shadow-newDefault ">
+      <VStack className="p-4 rounded-lg border-b border-b-gray-300 shadow-newDefault ">
         <VStack className="w-full h-[123px] justify-center items-center rounded-lg border border-gray-300">
           <p className="text-xs font-semibold text-gray-4f">
             Collecting your reward

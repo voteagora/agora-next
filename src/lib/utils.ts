@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
+
 const { token } = Tenant.current();
 
 export function cn(...inputs: ClassValue[]) {
@@ -61,6 +62,10 @@ export function pluralize(word: string, count: number) {
     pluralWord = pluralWord.charAt(0).toUpperCase() + pluralWord.slice(1);
   }
   return `${count} ${pluralWord}`;
+}
+
+export function tokenToHumanNumber(amount: number, decimals: number) {
+  return Math.floor(amount / Math.pow(10, decimals));
 }
 
 export function formatNumber(

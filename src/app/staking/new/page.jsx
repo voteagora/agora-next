@@ -1,29 +1,31 @@
 "use server";
 
 import React from "react";
-import Link from "next/link";
-import { StakeAndDelegate } from "@/app/staking/components/StakeAndDelegate";
-import { HStack } from "@/components/Layout/Stack";
-import DepositReceipt from "@/app/staking/components/DepositReceipt";
-import ReceiptContainer from "@/app/staking/components/ReceiptContainer";
+import { NewStakeFlow } from "@/app/staking/components/NewStakeFlow";
+import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
+import { delegatesFilterOptions } from "@/lib/constants";
 
-export default async function Page() {
+async function fetchDelegates(sort, seed, page = 1) {
+  "use server";
+  return apiFetchDelegates({ page, seed, sort });
+}
+
+export default async function Page({ searchParams }) {
+  const sort =
+    delegatesFilterOptions[searchParams.orderBy]?.sort ||
+    delegatesFilterOptions.weightedRandom.sort;
+  const seed = Math.random();
+  const delegates = await fetchDelegates(sort, seed);
+
   return (
-    <div>
-      <div className="mb-4">
-        <Link href="/staking" title="Back to staking">
-          Back
-        </Link>
-      </div>
-
-      <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10 mt-12">
-        <div className="sm:col-span-4">
-          <ReceiptContainer>My receipt here...</ReceiptContainer>
-        </div>
-        <div className="sm:col-start-5">
-          <StakeAndDelegate />
-        </div>
-      </HStack>
+    <div className="mt-12">
+      <NewStakeFlow
+        initialDelegates={delegates}
+        fetchDelegates={async (page, seed) => {
+          "use server";
+          return apiFetchDelegates({ page, seed, sort });
+        }}
+      />
     </div>
   );
 }

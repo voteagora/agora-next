@@ -29,7 +29,7 @@ const DepositReceiptCard: React.FC<ConfirmStakingTransactionCardProps> = ({
 }) => {
   return (
     <VStack
-      className={`font-code max-w-[408px] w-full px-[34px] py-8 bg-gray-fa rounded-lg border border-gray-300 shadow-2xl mt-6 ${styles["transaction-box"]}`}
+      className={`font-code max-w-[408px] w-full px-[34px] py-8 bg-gray-fa rounded-lg border border-gray-300 mt-6 ${styles["transaction-box"]}`}
     >
       <div className={`rounded-lg ${styles["transaction-box-border"]}`}></div>
 
