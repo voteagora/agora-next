@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { validate as validateUuid } from "uuid";
-import { JWTVerifyResult, jwtVerify, type JWTPayload } from "jose";
+import { jwtVerify } from "jose";
 
 import {
   REASON_INVALID_TOKEN,

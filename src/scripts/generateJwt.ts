@@ -4,7 +4,7 @@
   The secret required to sign the JWT should be stored in the JWT_SECRET
   environment variable.
 */
-import { generateJwt } from "../app/lib/auth/serverAuth";
+import { generateJwt } from "@/app/lib/auth/serverAuth";
 
 // accept user ID as argument, scope and ttl as optional arguments
 let scope = "";
