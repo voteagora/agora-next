@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createHash } from "crypto";
-import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import prisma from "@/app/lib/prisma";
+import { SignJWT, type JWTPayload } from "jose";
+import { PrismaClient } from "@prisma/client";
 
 import {
   REASON_DISABLED_USER,
@@ -19,6 +19,7 @@ const DEFAULT_USER_SCOPE = "";
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
+  const prisma = require("@app/lib/prisma") as PrismaClient;
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {
