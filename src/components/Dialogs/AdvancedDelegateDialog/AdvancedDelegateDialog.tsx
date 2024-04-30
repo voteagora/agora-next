@@ -34,6 +34,8 @@ type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
 };
 
+type Delegatee = Omit<Delegation, "transaction_hash">;
+
 export function AdvancedDelegateDialog({
   target,
   fetchAllForAdvancedDelegation,
@@ -45,7 +47,7 @@ export function AdvancedDelegateDialog({
   const [availableBalance, setAvailableBalance] = useState<string>("");
   const [isDelegatingToProxy, setIsDelegatingToProxy] =
     useState<boolean>(false);
-  const [delegatees, setDelegatees] = useState<Delegation[]>([]);
+  const [delegatees, setDelegatees] = useState<Delegatee[]>([]);
   const [proxyAddress, setProxyAddress] = useState<string>("");
   const [isReady, setIsReady] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -97,7 +99,7 @@ export function AdvancedDelegateDialog({
       if (!isTargetDelegated) {
         // ADD 0 for the target
         initAllowance.push(0);
-        delegatees.push({
+        (delegatees as Delegatee[]).push({
           from: address,
           to: target,
           allowance: "0",
@@ -126,7 +128,7 @@ export function AdvancedDelegateDialog({
     isDelegatingToProxy,
     proxyAddress,
     // target can be a string or an array of strings
-    target: delegatees.map((delegation: Delegation) => delegation.to),
+    target: delegatees.map((delegation: Delegatee) => delegation.to),
     // alowance can be a number or an array of numbers
     allocation: allowance, // (value / 100000) 100% = 100000
   });

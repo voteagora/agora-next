@@ -47,11 +47,13 @@ export default function ProposalDescription({ proposal }) {
         title={shortTitle}
         proposalType={proposal.proposalType}
         proposerAddress={proposal.proposer}
+        createdTransactionHash={proposal.created_transaction_hash}
       />
       <VStack gap={2}>
         <ApprovedTransactions
           proposalData={proposal.proposalData}
           proposalType={proposal.proposalType}
+          executedTransactionHash={proposal.executed_transaction_hash}
         />
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}

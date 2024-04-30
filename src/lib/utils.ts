@@ -130,7 +130,7 @@ export function* generateBarsForVote(
     if (totalVotes === BigInt(0)) {
       yield sections[defaultSectionIndex].value;
     } else {
-      const value = (totalVotes * BigInt(index)) / BigInt(bars);
+      const value = (BigInt(totalVotes) * BigInt(index)) / BigInt(bars);
 
       let lastSectionValue = BigInt(0);
       for (const section of sections) {
@@ -202,4 +202,8 @@ export function getBlockScanUrl(hash: string | `0x${string}`) {
     default:
       return `https://etherscan.io/tx/${hash}`;
   }
+}
+
+export function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

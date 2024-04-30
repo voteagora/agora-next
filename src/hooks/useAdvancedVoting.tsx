@@ -166,7 +166,7 @@ const useAdvancedVoting = ({
           ? advancedVoteLoading
           : standardVoteLoading && advancedVoteLoading,
     /**
-     * TODO: frh -> what to do with the errors in SAFE:
+     * TODO: what to do with the errors in SAFE:
      * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
      * - The user could also not execute the first tx and leave it for later. How are we informing this in the UI?
      * - The user could also not execute the second tx and leave it for later. How are we informing this in the UI?
