@@ -31,7 +31,7 @@ export default async function Page() {
           }}
         />
 
-        <div className="font-black text-2xl mb-4">
+        <div className="font-black text-2xl mb-4 mt-8">
           {token.symbol} Staking Metrics
         </div>
 

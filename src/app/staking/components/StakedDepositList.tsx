@@ -1,16 +1,26 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import {
   DialogProvider,
   useOpenDialog,
 } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import { icons } from "@/icons/icons";
+
 import { StakedDeposit } from "@/lib/types";
 import { Button } from "@/components/Button";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
-import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];
@@ -29,37 +39,50 @@ export const StakedDepositList = ({
 
   return (
     <DialogProvider>
-      <div className="flex flex-col rounded-lg border border-gray-300 w-auto h-100 bg-gray-50">
-        <div className="border-b border-gray-300 rounded-lg bg-white">
-          {deposits.map((deposit) => {
-            return (
-              <div
-                key={`deposit-${deposit.id}`}
-                className="flex justify-evenly rounded-lg w-auto h-100"
-              >
-                <div className="flex flex-col p-5 min-w-[110px]">
-                  <div className="text-xs">Staked</div>
-                  <div className="text-xs font-medium">
-                    <TokenAmountDisplay
-                      maximumSignificantDigits={4}
-                      amount={deposit.amount}
-                    />
-                  </div>
-                </div>
-
-                <div className="border-r border-gray-300"></div>
-
-                <div className="flex flex-col p-5 min-w-[200px]">
-                  <div className="text-xs">Vote delegated to</div>
-                  <div className="text-xs font-medium">
-                    <HumanAddress address={deposit.delegatee} />
-                  </div>
-                </div>
-                <div className="border-r border-gray-300"></div>
-
-                <div className="flex flex-col p-5">
-                  {/*<Link href={`/staking/deposits/${deposit.id}/withdraw`}>Add</Link>*/}
+      <div className="mt-4 rounded-lg border border-gray-300 shadow-newDefault">
+        {deposits.map((deposit, index) => (
+          <HStack
+            key={index}
+            className="h-auto w-full sm:w-auto text-start flex flex-col sm:flex-row items-center rounded-lg border-b border-gray-300 shadow-newDefault"
+          >
+            <VStack className="w-full p-4">
+              <p className="text-xs font-semibold text-gray-4f">Staked</p>
+              <h6 className="text-base font-semibold text-black">
+                <TokenAmountDisplay
+                  maximumSignificantDigits={4}
+                  amount={deposit.amount}
+                />
+              </h6>
+            </VStack>
+            <div className="w-2 h-8 bg-gray-300 mr-4"></div>
+            <VStack className="w-full p-4">
+              <p className="text-xs font-semibold text-gray-4f">
+                Voted delegated to
+              </p>
+              <h6 className="text-base font-medium text-black">
+                <HumanAddress address={deposit.delegatee} />
+              </h6>
+            </VStack>
+            <VStack className="w-full p-4">
+              <p className="text-xs font-semibold text-gray-4f">
+                Voting activity
+              </p>
+              <h6 className="text-base font-medium text-black ">
+                9/10 last props
+              </h6>
+            </VStack>
+            <VStack className="w-full  bg-white">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="outline-none ">
                   <Button
+                    variant="outline"
+                    className="text-base font-semibold text-black"
+                  >
+                    Manage deposit
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
                     onClick={() => {
                       openDialog({
                         type: "STAKE_DEPOSIT_ADD",
@@ -68,18 +91,12 @@ export const StakedDepositList = ({
                         },
                       });
                     }}
+                    className="text-base font-semibold text-black"
                   >
-                    Add
-                  </Button>
-                </div>
-
-                <div className="border-r border-gray-300"></div>
-
-                <div className="flex flex-col p-5">
-                  {/*<Link href={`/staking/deposits/${deposit.id}/withdraw`}>Withdraw</Link>*/}
-
-                  <Button
-                    variant={"outline"}
+                    Edit amount or delegate
+                  </DropdownMenuItem>
+                  <hr />
+                  <DropdownMenuItem
                     onClick={() => {
                       openDialog({
                         type: "STAKE_DEPOSIT_WITHDRAW",
@@ -88,39 +105,43 @@ export const StakedDepositList = ({
                         },
                       });
                     }}
+                    className="text-base font-semibold text-black"
                   >
-                    Withdraw
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="p-5 flex justify-between">
-          {hasTokenBalance ? (
-            <>
-              <div className="font-medium">
-                {canDepositMode ? (
-                  <Link href="staking/deposits/create">
-                    Deposit another stake
-                  </Link>
-                ) : (
-                  <>No more stakes available</>
-                )}
-              </div>
+                    Withdraw stake
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </VStack>
+          </HStack>
+        ))}
 
-              <div className="font-light text-gray-600">
+        <HStack className="w-full py-4 px-6 flex justify-between items-center bg-gray-fa rounded-lg">
+          {canDepositMode ? (
+            <HStack className="w-full py-4 px-6 justify-between items-center ">
+              <div className="flex flex-row gap-2 justify-center text-center items-center">
+                <Link
+                  className="w-10 h-10  flex justify-center items-center  rounded-full border border-gray-300 shadow-newDefault"
+                  href="/staking/deposits/create"
+                >
+                  <Image height={14} width={14} src={icons.plus} alt="plus" />
+                </Link>
+
+                <h3 className="text-base font-semibold text-black leading-6">
+                  Deposit another stake{" "}
+                </h3>
+              </div>
+              <p className="text-base font-medium text-gray-4f">
                 <TokenAmountDisplay
                   maximumSignificantDigits={4}
                   amount={data}
                 />{" "}
                 available
-              </div>
-            </>
+              </p>
+            </HStack>
           ) : (
-            "Loading token balance..."
+            <>No more stakes available</>
           )}
-        </div>
+        </HStack>
       </div>
     </DialogProvider>
   );

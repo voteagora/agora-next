@@ -27,6 +27,7 @@ import shareCard from "./shareCard.svg";
 import scroll from "./scroll.svg";
 import github from "./github.svg";
 import world from "./world.svg";
+import plus from "./plus.svg";
 import notification from "./notification.svg";
 
 export const icons = {
@@ -59,5 +60,6 @@ export const icons = {
   scroll,
   github,
   world,
+  plus,
   notification,
 };
