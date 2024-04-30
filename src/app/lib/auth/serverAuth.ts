@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { createHash } from "crypto";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import prisma from "@/app/lib/prisma";
 
