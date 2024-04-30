@@ -20,7 +20,11 @@ export async function authenticateApiUser(
 ): Promise<AuthInfo> {
   let authResponse: AuthInfo = await validateBearerToken(request);
 
-  // if the token is not a UUID, it's a JWT
+  if (!authResponse.authenticated) {
+    return authResponse;
+  }
+
+  const key = authResponse.token as string;
 
   // TODO: caching logic, rate limiting
   const user = await prisma.api_user.findFirst({
