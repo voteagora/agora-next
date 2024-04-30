@@ -96,7 +96,7 @@ export function TokenAmountDisplay({
   return `${formattedNumber} ${currency}`;
 }
 
-export function* generateBarsForVote(
+export function generateBarsForVote(
   forVotes: bigint,
   abstainVotes: bigint,
   againstVotes: bigint
@@ -104,46 +104,57 @@ export function* generateBarsForVote(
   const sections = [
     {
       amount: forVotes,
-      value: "for" as const,
+      value: "for",
+      threshold: BigInt(0),
     },
     {
       amount: abstainVotes,
-      value: "abstain" as const,
+      value: "abstain",
+      threshold: BigInt(0),
     },
     {
       amount: againstVotes,
-      value: "against" as const,
+      value: "against",
+      threshold: BigInt(0),
     },
   ];
 
-  const defaultSectionIndex = 1;
-
   const bars = 57;
+  const result = new Array(bars).fill(""); // Initialize the result array with empty strings
 
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
-    (acc, section) => acc + section.amount,
+    (acc, section) => acc + BigInt(section.amount),
     BigInt(0)
   );
 
-  for (let index = 0; index < bars; index++) {
-    if (totalVotes === BigInt(0)) {
-      yield sections[defaultSectionIndex].value;
-    } else {
-      const value = (BigInt(totalVotes) * BigInt(index)) / BigInt(bars);
-
-      let lastSectionValue = BigInt(0);
-      for (const section of sections) {
-        const sectionAmount = section.amount;
-        if (value < lastSectionValue + sectionAmount) {
-          yield section.value;
-          break;
-        }
-
-        lastSectionValue += sectionAmount;
-      }
-    }
+  if (totalVotes === BigInt(0)) {
+    // If no votes, optionally fill the array with 'abstain' or keep empty
+    return result.fill("abstain"); // Default to 'abstain' if no votes are cast
   }
+
+  let accumulatedVotes = BigInt(0);
+
+  // Accumulate votes and calculate the threshold for each section
+  sections.forEach((section) => {
+    accumulatedVotes += BigInt(section.amount);
+    section.threshold = (accumulatedVotes * BigInt(bars)) / totalVotes;
+  });
+
+  let currentSection = 0;
+
+  for (let index = 0; index < bars; index++) {
+    // Update current section based on index threshold
+    while (
+      currentSection < sections.length - 1 &&
+      BigInt(index) >= sections[currentSection].threshold
+    ) {
+      currentSection++;
+    }
+    result[index] = sections[currentSection].value;
+  }
+
+  return result;
 }
 
 export function formatFullDate(date: Date): string {
