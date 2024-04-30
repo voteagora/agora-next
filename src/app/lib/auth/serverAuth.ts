@@ -19,7 +19,7 @@ const DEFAULT_USER_SCOPE = "";
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
-  const prisma = require("@app/lib/prisma") as PrismaClient;
+  const prisma = require("@/app/lib/prisma") as PrismaClient;
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {
