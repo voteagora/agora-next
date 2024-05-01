@@ -30,23 +30,28 @@ const PAGE_TITLE = [
 ];
 
 export const NewStakeFlow = ({
-  initialDelegates,
-  fetchDelegates,
-}: NewStakeFlowProps) => {
+                               initialDelegates,
+                               fetchDelegates,
+                             }: NewStakeFlowProps) => {
+
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(0);
   const [delegate, setDelegate] = useState<string | undefined>();
-  const TOTAL_STEPS = 3;
+
+  if (!address) {
+    return <div>Connect your wallet to stake</div>;
+  }
 
   return (
     <div>
       <BreadcrumbsNav
         step={step}
-        setStep={setStep}
+        onClick={setStep}
         title={PAGE_TITLE[step - 1]}
-        totalSteps={TOTAL_STEPS}
+        totalSteps={3}
       />
+
 
       {step === 1 && (
         <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
@@ -73,14 +78,22 @@ export const NewStakeFlow = ({
       )}
 
       {step === 2 && (
-        <StakingDelegateCardList
-          onSelect={(address) => {
-            setDelegate(address);
-            setStep(3);
-          }}
-          initialDelegates={initialDelegates}
-          fetchDelegates={fetchDelegates}
-        />
+        <>
+          <div className="border rounded-xl w-full shadow-newDefault p-4 text-sm font-medium">
+            Uniswap voters manage staking rewards. Choose your delegate carefully to represent you in Uniswap
+            governance.
+          </div>
+          <StakingDelegateCardList
+            address={address}
+            amount={amount}
+            onSelect={(address) => {
+              setDelegate(address);
+              setStep(3);
+            }}
+            initialDelegates={initialDelegates}
+            fetchDelegates={fetchDelegates}
+          />
+        </>
       )}
 
       {step === 3 && (

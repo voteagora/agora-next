@@ -4,12 +4,10 @@ import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useQueryClient } from "@tanstack/react-query";
 import { isAddress } from "viem";
-import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { formatNumber, numberToToken } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface SetStakeDialogProps {
   amount: number;
@@ -17,23 +15,22 @@ interface SetStakeDialogProps {
 }
 
 export const StakeConfirmDialog = ({
-  amount,
-  address,
-}: SetStakeDialogProps) => {
+                                     amount,
+                                     address,
+                                   }: SetStakeDialogProps) => {
+  const router = useRouter();
   const { token, contracts } = Tenant.current();
   const queryClient = useQueryClient();
   const isValidInput = Boolean(amount > 0 && address && isAddress(address));
-
-  console.log(isValidInput);
 
   const { config } = usePrepareContractWrite({
     enabled: isValidInput,
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi.abi,
-    chainId: contracts?.staker?.chain.id,
+    chainId: contracts.staker!.chain.id,
     functionName: "stake",
     args: [
-      BigInt(amount * Math.pow(10, token.decimals)),
+      numberToToken(amount),
       address as `0x${string}`,
     ],
   });
@@ -44,12 +41,13 @@ export const StakeConfirmDialog = ({
     hash: data?.hash,
   });
 
-  // useEffect(() => {
-  //   if (data?.hash && !isLoading) {
-  //     queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
-  //     queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
-  //   }
-  // }, [isLoading, data?.hash]);
+  useEffect(() => {
+    if (data?.hash && !isLoading) {
+      queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
+      queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
+      router.replace("/staking", { scroll: false });
+    }
+  }, [isLoading, data?.hash]);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -59,7 +57,7 @@ export const StakeConfirmDialog = ({
         </div>
 
         <div className="w-full text-center bg-white font-bold text-3xl text-black">
-          {amount} {token.symbol}
+          {formatNumber(numberToToken(amount).toString(), token.decimals)} {token.symbol}
         </div>
       </div>
       <div className="text-sm py-4">
@@ -70,9 +68,6 @@ export const StakeConfirmDialog = ({
         className="w-full"
         disabled={!isValidInput || isLoading}
         onClick={() => {
-          console.log("write", write);
-          console.log("config", config);
-          console.log("value", BigInt(amount * Math.pow(10, token.decimals)));
           write?.();
         }}
       >

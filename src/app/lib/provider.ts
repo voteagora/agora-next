@@ -1,6 +1,5 @@
-import { getDefaultProvider } from "ethers";
+import { getDefaultProvider, AlchemyProvider } from "ethers";
 import { MulticallProvider, MulticallWrapper } from "ethers-multicall-provider";
-import { AlchemyProvider } from "ethers";
 
 declare global {
   var provider: MulticallProvider;
@@ -16,7 +15,7 @@ let ethProvider: MulticallProvider;
 // const sepoliaProvider = MulticallWrapper.wrap(
 //   getDefaultProvider("sepolia", {
 //     alchemy: alchemyId,
-//   })
+//   }),
 // );
 
 const sepoliaProvider = new AlchemyProvider("sepolia", alchemyId);
@@ -25,19 +24,19 @@ if (isProd) {
   provider = MulticallWrapper.wrap(
     getDefaultProvider("optimism", {
       alchemy: alchemyId,
-    })
+    }),
   );
   ethProvider = MulticallWrapper.wrap(
     getDefaultProvider("mainnet", {
       alchemy: alchemyId,
-    })
+    }),
   );
 } else {
   if (!global.provider) {
     global.provider = MulticallWrapper.wrap(
       getDefaultProvider("optimism", {
         alchemy: alchemyId,
-      })
+      }),
     );
   }
   provider = global.provider;
@@ -46,7 +45,7 @@ if (isProd) {
     global.ethProvider = MulticallWrapper.wrap(
       getDefaultProvider("mainnet", {
         alchemy: alchemyId,
-      })
+      }),
     );
   }
   ethProvider = global.ethProvider;

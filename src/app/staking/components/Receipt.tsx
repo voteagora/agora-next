@@ -4,6 +4,7 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "../../../components/Staking/TransactionReceipt/transactionReceipt.module.scss";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
+import { formatNumber, numberToToken } from "@/lib/utils";
 
 interface ReceiptProps {
   amount: number;
@@ -13,12 +14,14 @@ interface ReceiptProps {
 }
 
 export const Receipt = ({
-  amount,
-  delegatee,
-  depositor,
-  title,
-}: ReceiptProps) => {
+                          amount,
+                          delegatee,
+                          depositor,
+                          title,
+                        }: ReceiptProps) => {
+
   const { token } = Tenant.current();
+
   return (
     <VStack
       className={`font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 ${styles["transaction-box"]}`}
@@ -53,7 +56,7 @@ export const Receipt = ({
         <HStack className="w-full justify-between items-center text-black">
           <p className="text-base leading-4">Deposit</p>
           <p className="text-base leading-4">
-            {amount} {token.symbol}
+            {formatNumber(numberToToken(amount).toString(), token.decimals)} {token.symbol}
           </p>
         </HStack>
       </VStack>

@@ -8,11 +8,10 @@ import { DelegateProfileImage } from "@/components/Delegates/DelegateCard/Delega
 import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { useAgoraContext } from "@/contexts/AgoraContext";
+import { capitalizeFirstLetter, cn, numberToToken } from "@/lib/utils";
 import { DelegateSocialLinks } from "@/components/Delegates/DelegateCard/DelegateSocialLinks";
 import { Button } from "@/components/ui/button";
+import Tenant from "@/lib/tenant/tenant";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -26,33 +25,38 @@ interface DelegatePaginated {
 }
 
 interface Props {
+  address: string;
+  amount: number;
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   onSelect: (address: string) => void;
 }
 
 export default function StakingDelegateCardList({
-  initialDelegates,
-  fetchDelegates,
-  onSelect,
-}: Props) {
+                                                  address,
+                                                  amount,
+                                                  initialDelegates,
+                                                  fetchDelegates,
+                                                  onSelect,
+                                                }: Props) {
+
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
-  const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
+  const { namespace } = Tenant.current();
+
 
   useEffect(() => {
-    setIsDelegatesFiltering(false);
     setDelegates(initialDelegates.delegates);
     setMeta(initialDelegates.meta);
-  }, [initialDelegates, setIsDelegatesFiltering]);
+  }, [initialDelegates]);
 
   const loadMore = async () => {
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchDelegates(
         meta.currentPage + 1,
-        initialDelegates.seed
+        initialDelegates.seed,
       );
       setDelegates(delegates.concat(data.delegates));
       setMeta(data.meta);
@@ -78,6 +82,14 @@ export default function StakingDelegateCardList({
         }
         element="div"
       >
+        <DelegateCard
+          key={address}
+          address={address}
+          onSelect={onSelect}
+          statement={`Delegate your votes to yourself to engage directly in ${capitalizeFirstLetter(namespace)} governance.`}
+          action={"I’ll vote myself"}
+          votingPower={numberToToken(amount).toString()}
+        />
         {delegates.map((delegate) => {
           let truncatedStatement = "";
 
@@ -93,49 +105,74 @@ export default function StakingDelegateCardList({
           }
 
           return (
-            <div
+            <DelegateCard
               key={delegate.address}
-              className={cn(
-                styles.link,
-                isDelegatesFiltering ? "animate-pulse" : ""
-              )}
-            >
-              <Link href={`/delegates/${delegate.address}`}>
-                <VStack gap={4} className={styles.link_container}>
-                  <VStack gap={4} justifyContent="justify-center">
-                    <DelegateProfileImage
-                      address={delegate.address}
-                      votingPower={delegate.votingPower}
-                      citizen={delegate.citizen}
-                    />
-                    <p className={styles.summary}>{truncatedStatement}</p>
-                  </VStack>
-                  <div className="min-h-[24px]">
-                    <HStack
-                      alignItems="items-stretch"
-                      className="justify-between"
-                    >
-                      <DelegateSocialLinks
-                        discord={discord}
-                        twitter={twitter}
-                      />
-                      <Button
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          onSelect(delegate.address);
-                        }}
-                      >
-                        Select as delegate
-                      </Button>
-                    </HStack>
-                  </div>
-                </VStack>
-              </Link>
-            </div>
+              action={"Select as delegate"}
+              address={delegate.address}
+              discord={discord}
+              onSelect={onSelect}
+              statement={truncatedStatement}
+              twitter={twitter}
+              votingPower={delegate.votingPower}
+            />
           );
         })}
       </InfiniteScroll>
     </DialogProvider>
   );
 }
+
+interface DelegateCardProps {
+  address: string;
+  action: string;
+  discord?: string;
+  twitter?: string;
+  onSelect: (address: string) => void;
+  statement: string;
+  votingPower: string;
+}
+
+const DelegateCard = ({
+                        address,
+                        action,
+                        discord,
+                        onSelect,
+                        statement,
+                        twitter,
+                        votingPower,
+                      }: DelegateCardProps) => {
+  return <div
+    className={cn(styles.link)}>
+    <VStack gap={4} className={styles.link_container}>
+      <VStack gap={4} justifyContent="justify-center">
+        <DelegateProfileImage
+          address={address}
+          votingPower={votingPower}
+        />
+        <p className={styles.summary}>{statement}</p>
+      </VStack>
+      <div className="min-h-[24px]">
+        <HStack
+          alignItems="items-stretch"
+          className="justify-between"
+        >
+          <DelegateSocialLinks
+            discord={discord}
+            twitter={twitter}
+          />
+          <Button
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onSelect(address);
+            }}
+          >
+            {action}
+          </Button>
+        </HStack>
+      </div>
+    </VStack>
+  </div>;
+};
+
+

@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
+import exp from "node:constants";
 
 const { token } = Tenant.current();
 
@@ -64,14 +65,24 @@ export function pluralize(word: string, count: number) {
   return `${count} ${pluralWord}`;
 }
 
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLocaleLowerCase();
+}
+
+
 export function tokenToHumanNumber(amount: number, decimals: number) {
   return Math.floor(amount / Math.pow(10, decimals));
+}
+
+export function numberToToken(number: number) {
+  const { token } = Tenant.current();
+  return BigInt(number * Math.pow(10, token.decimals));
 }
 
 export function formatNumber(
   amount: string | BigNumberish,
   decimals: number,
-  maximumSignificantDigits = 4
+  maximumSignificantDigits = 4,
 ) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
 
@@ -84,11 +95,11 @@ export function formatNumber(
 }
 
 export function TokenAmountDisplay({
-  amount,
-  decimals = token.decimals,
-  currency = token.symbol,
-  maximumSignificantDigits = 2,
-}: {
+                                     amount,
+                                     decimals = token.decimals,
+                                     currency = token.symbol,
+                                     maximumSignificantDigits = 2,
+                                   }: {
   amount: string | BigNumberish;
   decimals?: number;
   currency?: string;
@@ -104,7 +115,7 @@ export function TokenAmountDisplay({
 export function* generateBarsForVote(
   forVotes: bigint,
   abstainVotes: bigint,
-  againstVotes: bigint
+  againstVotes: bigint,
 ) {
   const sections = [
     {
@@ -128,7 +139,7 @@ export function* generateBarsForVote(
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
     (acc, section) => acc + section.amount,
-    BigInt(0)
+    BigInt(0),
   );
 
   for (let index = 0; index < bars; index++) {
@@ -182,7 +193,7 @@ export function formatFullDate(date: Date): string {
 
 export async function fetchAndSet<T>(
   fetcher: () => Promise<T>,
-  setter: (value: T) => void
+  setter: (value: T) => void,
 ) {
   const value = await fetcher();
   setter(value);
