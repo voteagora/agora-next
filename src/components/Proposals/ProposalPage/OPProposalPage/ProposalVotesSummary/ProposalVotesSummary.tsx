@@ -44,8 +44,11 @@ export default function ProposalVotesSummary({
           </>
         </HStack>
         <ProposalStatusDetail
+          proposalStartTime={proposal.start_time}
           proposalEndTime={proposal.end_time}
           proposalStatus={proposal.status}
+          proposalCancelledTime={proposal.cancelled_time}
+          cancelledTransactionHash={proposal.cancelled_transaction_hash}
         />
       </VStack>
     </VStack>

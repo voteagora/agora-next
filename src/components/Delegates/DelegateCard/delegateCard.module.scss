@@ -49,6 +49,10 @@
 .address {
   font-size: $font-size-base;
   font-weight: $font-weight-semibold;
+
+  :hover {
+    opacity: 0.9;
+  }
 }
 
 .token {
