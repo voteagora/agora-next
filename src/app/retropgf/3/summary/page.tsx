@@ -6,8 +6,6 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata() {
-  const { ui } = Tenant.current();
-
   const title = "Agora - Optimism's RetroPGF Round 3 Summary";
   const description =
     "See which of your favourite projects were allocated in Optimism's RetroPGF Round 3.";
@@ -30,10 +28,10 @@ export async function generateMetadata() {
         },
       ],
     },
-    other: {
-      ["twitter:card"]: "summary_large_image",
-      ["twitter:title"]: title,
-      ["twitter:description"]: description,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
