@@ -1,11 +1,9 @@
-import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
@@ -22,11 +20,6 @@ async function fetchProposals(filter, page = 1) {
 async function fetchNeedsMyVoteProposals(address) {
   "use server";
   return apiFetchNeedsMyVoteProposals(address);
-}
-
-async function fetchDaoMetrics() {
-  "use server";
-  return fetchMetrics();
 }
 
 async function fetchVotableSupply() {
@@ -60,10 +53,10 @@ export async function generateMetadata({}, parent) {
         },
       ],
     },
-    other: {
-      ["twitter:card"]: "summary_large_image",
-      ["twitter:title"]: title,
-      ["twitter:description"]: description,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
@@ -141,13 +134,11 @@ export default async function Home() {
     proposalsFilterOptions.everything.filter
   );
 
-  const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
   return (
     <VStack>
       <Hero />
-      <DAOMetricsHeader metrics={metrics} />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
