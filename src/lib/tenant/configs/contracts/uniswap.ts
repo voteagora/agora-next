@@ -18,8 +18,8 @@ export const uniswapTenantContractConfig = (
   const GOVERNOR = "0x0";
   const STAKING = "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
 
-  const provider = isProd ? ethProvider : sepoliaProvider;
-  const chain = isProd ? mainnet : sepolia;
+  const provider = sepoliaProvider;
+  const chain = sepolia;
 
   return {
     token: new TenantContract<ITokenContract>({

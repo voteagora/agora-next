@@ -1,0 +1,84 @@
+"use client";
+
+import { HStack } from "@/components/Layout/Stack";
+import { PoolStats } from "@/app/staking/components/PoolStats";
+import FAQs from "@/components/Staking/FAQs";
+import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
+import React, { useEffect, useRef, useState } from "react";
+import Tenant from "@/lib/tenant/tenant";
+import { BigNumberish } from "ethers";
+import { useAccount } from "wagmi";
+import { StakedDeposit } from "@/lib/types";
+import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
+
+interface StakeHomeProps {
+  rewardDuration: string;
+  rewardPerToken: BigNumberish;
+  totalSupply: BigNumberish;
+  fetchDeposits: (address: string) => Promise<StakedDeposit[] | null>;
+}
+
+export const StakeHome = ({ rewardDuration, rewardPerToken, totalSupply, fetchDeposits }: StakeHomeProps) => {
+
+  const { token } = Tenant.current();
+  const { address } = useAccount();
+  const [deposits, setDeposits] = useState<StakedDeposit[] | null>(null);
+
+  const isFetched = useRef(false);
+  const isFetching = useRef(false);
+  const hasDeposits = isFetched.current && deposits && deposits.length > 0;
+
+  const fetchData = async (address: string) => {
+    isFetching.current = true;
+    const data = await fetchDeposits(address);
+    if (data) {
+      setDeposits(data);
+    }
+    isFetched.current = true;
+  };
+
+  useEffect(() => {
+    if (address && !isFetched.current && !isFetching.current) {
+      fetchData(address.toLowerCase());
+    }
+
+  }, [address]);
+
+  return <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
+    <div className="sm:col-span-4">
+      <div>
+        <div className="font-black text-2xl mb-5">
+          Introducing staking, the next chapter of Uniswap Governance
+        </div>
+        <div className="text-gray-700">
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+          accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
+          illo inventore veritatis et quasi architecto beatae vitae dicta sunt
+          explicabo.
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <div className="font-black text-2xl mb-5">
+          {token.symbol} Staking Metrics
+        </div>
+        <PoolStats
+          rewardDuration={rewardDuration}
+          rewardPerToken={rewardPerToken}
+          totalSupply={totalSupply}
+        />
+      </div>
+      <FAQs />
+    </div>
+    <div className="sm:col-start-5">
+      {hasDeposits ? (
+        <div>
+          <h2 className="font-black text-2xl text-black">Your rewards</h2>
+          <PanelClaimRewards address={address} />
+        </div>
+      ) : (
+        <PanelNewDeposit address={address} />
+      )}
+    </div>
+  </HStack>;
+};

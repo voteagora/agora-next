@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { StakedDepositList } from "@/app/staking/components/StakedDepositList";
 import { StakedDeposit } from "@/lib/types";
@@ -14,25 +14,28 @@ export const Deposits = ({ fetchStaked }: DepositsProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
-  const [isLoadingDeposits, setIsLoadingDeposits] = useState<boolean>(false);
-  const [deposits, setDeposits] = useState<StakedDeposit[] | []>([]);
-  const hasDeposits = !isLoadingDeposits || deposits.length > 0;
+  const fetching = useRef(false);
+  const loaded = useRef(false);
+  const [deposits, setDeposits] = useState<StakedDeposit[] | null>([]);
+
+  const hasDeposits =  loaded.current && deposits && deposits.length > 0;
 
   async function getDeposits(a: string) {
-    setIsLoadingDeposits(true);
+    fetching.current = true;
 
     const data = await fetchStaked(a);
-    if (data && data.length >= 0) {
-      setIsLoadingDeposits(false);
+    if (data) {
       setDeposits(data);
     }
+    fetching.current = false;
+    loaded.current = true;
   }
 
   useEffect(() => {
-    if (address && deposits.length === 0 && !isLoadingDeposits) {
+    if (address && !fetching.current && !loaded.current) {
       getDeposits(address.toLowerCase());
     }
-  }, [address, deposits, getDeposits]);
+  }, [address, fetching.current, loaded.current]);
 
   if (hasDeposits && address) {
     return (
