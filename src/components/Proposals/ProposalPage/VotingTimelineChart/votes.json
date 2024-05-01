@@ -5,10 +5,22 @@
             "picture": null,
             "address": "0x32d1A53f6709a03f4b6cf4cb0501204ba188d4f5"
         },
-        "weight": "55",
+        "weight": "23",
         "support": "FOR",
         "block": {
             "timestamp": "2024-04-13T18:55:59Z"
+        }
+    },
+    {
+        "voter": {
+            "name": "",
+            "picture": null,
+            "address": "0x32d1A53f6709a03f4b6cf4cb0501204ba188d4f5"
+        },
+        "weight": "0",
+        "support": "FOR",
+        "block": {
+            "timestamp": "2024-04-12T18:55:59Z"
         }
     },
     {
@@ -56,7 +68,7 @@
         "weight": "3",
         "support": "ABSTAIN",
         "block": {
-            "timestamp": "2024-04-17T08:13:59Z"
+            "timestamp": "2024-04-17T12:13:59Z"
         }
     },
     {

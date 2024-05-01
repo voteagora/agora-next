@@ -6,6 +6,7 @@ import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
+import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
 
 export default function ProposalDescription({ proposal }) {
   const proposalsWithBadDescription = [
@@ -48,6 +49,8 @@ export default function ProposalDescription({ proposal }) {
         proposalType={proposal.proposalType}
         proposerAddress={proposal.proposer}
       />
+      <VotingTimelineChart proposal={proposal} />
+
       <VStack gap={2}>
         <ApprovedTransactions
           proposalData={proposal.proposalData}

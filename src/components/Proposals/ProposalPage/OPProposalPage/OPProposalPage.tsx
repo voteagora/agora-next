@@ -6,7 +6,6 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
-import VotingTimelineChart from "../VotingTimelineChart";
 import { fetchProposalVotes } from "@/app/proposals/actions";
 
 export default async function OPProposalPage({
@@ -24,12 +23,7 @@ export default async function OPProposalPage({
       alignItems="items-start"
       className={styles.proposal_container}
     >
-      <div>
-        <ProposalDescription proposal={proposal} />
-        <div className="mt-4">
-          <VotingTimelineChart />
-        </div>
-      </div>
+      <ProposalDescription proposal={proposal} />
       <div>
         <OpManagerDeleteProposal proposal={proposal} />
 

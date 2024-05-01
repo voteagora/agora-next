@@ -8,211 +8,159 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   ReferenceLine,
-  Tooltip,
 } from "recharts";
 
-import avatar0 from "@/components/shared/avatars/avatar0.svg";
-import avatar1 from "@/components/shared/avatars/avatar1.svg";
-import avatar2 from "@/components/shared/avatars/avatar2.svg";
-import avatar3 from "@/components/shared/avatars/avatar3.svg";
-import avatar4 from "@/components/shared/avatars/avatar4.svg";
-import avatar5 from "@/components/shared/avatars/avatar5.svg";
-import avatar6 from "@/components/shared/avatars/avatar6.svg";
-// import avatar7 from "@/components/shared/avatars/avatar7.png";
-import avatar7 from "../../../shared/avatars/avatar7.svg";
-import Link from "next/link";
-import chartData1 from "./votes.json";
-import { ta } from "date-fns/locale";
+import { icons } from "@/icons/icons";
 
-const avatars = [
-  avatar0,
-  avatar1,
-  avatar2,
-  avatar3,
-  avatar4,
-  avatar5,
-  avatar6,
-  avatar7,
-];
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import proposalVotes from "./votes.json";
 
-// const data = Array.from({ length: 10 }, (_, index) => ({
-//   name: `Page ${index + 1}`,
-//   uv: Math.floor(Math.random() * 120),
-//   pv: Math.floor(Math.random() * 120),
-//   amt: Math.floor(Math.random() * 120),
-// })).sort((a, b) => a.uv - b.uv);
-
-const chartData = chartData1.sort(
+const sortedChartData = proposalVotes.sort(
   (a, b) =>
     new Date(a.block.timestamp).getTime() -
     new Date(b.block.timestamp).getTime()
 );
 
-const processData = () => {
-  // Organize data into separate arrays based on support type
-  const forData = chartData.filter((item) => item.support === "FOR");
-  const againstData = chartData.filter((item) => item.support === "AGAINST");
-  const abstainData = chartData.filter((item) => item.support === "ABSTAIN");
+const chartData = () => {
+  let forCount = 0;
+  let abstain = 0;
+  let against = 0;
 
-  // Function to calculate cumulative sum for each array
-  const calculateCumulativeSum = (dataArray: any) => {
-    let sum = 0;
-    return dataArray.map((item: any) => {
-      sum += parseInt(item.weight);
-      return { ...item, cumulativeWeight: sum };
-    });
-  };
+  return sortedChartData.map((voter) => {
+    forCount =
+      voter.support === "FOR"
+        ? forCount + parseInt(voter.weight)
+        : forCount + 0;
+    abstain =
+      voter.support === "ABSTAIN"
+        ? abstain + parseInt(voter.weight)
+        : abstain + 0;
+    against =
+      voter.support === "AGAINST"
+        ? against + parseInt(voter.weight)
+        : against + 0;
 
-  // Calculate cumulative sum for each support type
-  const processedForData = calculateCumulativeSum([
-    { ...chartData[0], weight: 0 },
-    ...forData,
-  ]);
-  const processedAgainstData = calculateCumulativeSum([
-    { ...chartData[0], weight: 0 },
-    ...againstData,
-  ]);
-  const processedAbstainData = calculateCumulativeSum([
-    { ...chartData[0], weight: 0 },
-    ...againstData,
-  ]);
-
-  return {
-    processedForData,
-    processedAgainstData,
-    processedAbstainData,
-  };
+    return {
+      ...voter,
+      for: forCount,
+      abstain,
+      against,
+    };
+  });
 };
 
-const CutomizedChartDots = (props: any) => {
-  const { cx, cy, stroke, payload, value } = props;
+const tickFormatter = (timeStr: string, index: number) => {
+  const date = new Date(timeStr);
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
 
-  const randomIndex = Math.floor(Math.random() * avatars.length);
-  const SelectedAvatar = avatars[randomIndex];
+  // Get hours and minutes
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
 
-  console.log(payload, "payload");
+  // Convert hours to 12-hour format
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Handle midnight (0 hours)
 
-  const voterpicture = payload.voter.picture;
+  minutes = minutes < 10 ? parseInt("0" + minutes) : minutes;
+  const formattedDate = month + "/" + day + " " + hours + ":" + minutes + ampm;
 
-  if (payload.cumulativeWeight !== 0) {
-    return (
-      <svg height="16" width="16" x={cx - 12} y={cy - 12}>
-        <Link href="#">
-          <foreignObject height="16px" width="16px">
-            <Image
-              width={16}
-              height={16}
-              className="rounded-full"
-              alt="User profile image"
-              src={voterpicture ?? SelectedAvatar}
-            />
-          </foreignObject>
-        </Link>
-      </svg>
-    );
-  }
+  const metaText = index === 0 ? "(vote begins)" : "(vote end)";
 
-  return null;
+  return `${formattedDate} ${metaText}`;
 };
 
-const CustomLabel = ({
-  x,
-  y,
-  ...res
-}: {
-  x?: string | number;
-  y?: string | number;
-}) => (
-  <text
-    x={715}
-    y={55}
-    fontSize={12}
-    fill="#718096"
-    className="text-sm"
-    textAnchor="end"
-    {...res}
-  >
-    {/* Custom label styling */}
-    <tspan dy="0.71em">Quorum needed</tspan>
-  </text>
-);
+const customizedTick = (props: any) => {
+  const { index, x, y, fill, payload, tickFormatter, className } = props;
 
-export default function VotingTimelineChart() {
-  const { processedForData, processedAgainstData, processedAbstainData } =
-    processData();
   return (
-    <>
-      <LineChart
-        height={500}
-        width={750}
-        data={chartData}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
-      >
-        <CartesianGrid color="red" vertical={false} />
-        <XAxis
-          dataKey="block.timestamp"
-          axisLine={false}
-          tickLine={false}
-          domain={["auto", "auto"]}
-          fontSize={10}
-          fill="#718096"
-          tickFormatter={(timeStr) => {
-            const date = new Date(timeStr);
-            const options: Intl.DateTimeFormatOptions = {
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-            };
-            return date.toLocaleDateString("en-US", options);
-          }}
-        />
+    <g transform={`translate(${index === 0 ? x : x + 20},${y})`}>
+      <text x={0} y={0} dy={10} fill="#AFAFAF" className={className}>
+        <tspan textAnchor={index === 0 ? "middle" : "middle"} x="0">
+          {tickFormatter(payload.value, index)}
+        </tspan>
+      </text>
+    </g>
+  );
+};
 
-        <YAxis
-          tickLine={false}
-          fontSize="12px"
-          fill="#718096"
-          axisLine={false}
-        />
-        <ReferenceLine
-          fill="#718096"
-          y={109}
-          strokeWidth={1}
-          strokeDasharray="3 3"
-          stroke="#718096"
-          label={<CustomLabel />}
-        />
-        <Tooltip />
-        <Line
-          data={processedAgainstData}
-          dataKey="cumulativeWeight"
-          type="linear"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={<CutomizedChartDots />}
-        />
-        <Line
-          data={processedForData}
-          type="linear"
-          dataKey="cumulativeWeight"
-          stroke="#82ca9d"
-          strokeWidth={2}
-          dot={<CutomizedChartDots />}
-        />
-        <Line
-          type="linear"
-          stroke="#880808"
-          strokeWidth={2}
-          dataKey="cumulativeWeight"
-          data={processedAbstainData}
-          dot={<CutomizedChartDots />}
-        />
-      </LineChart>
-    </>
+export default function VotingTimelineChart({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
+  return (
+    <div className="border border-gray-300 rounded-lg p-4 pb-0 w-full font-inter ">
+      <p className=" flex items-center gap-x-1.5 text-xs font-semibold ml-1 mb-2">
+        Proposal Voting timeline{" "}
+        <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
+      </p>
+      <ResponsiveContainer width="100%" height={230}>
+        <LineChart data={chartData()}>
+          <CartesianGrid vertical={false} strokeDasharray={"3 3"} />
+          <XAxis
+            dataKey="block.timestamp"
+            axisLine={false}
+            tickLine={false}
+            interval="preserveStartEnd"
+            ticks={[
+              chartData()[0].block.timestamp,
+              chartData()[chartData().length - 1].block.timestamp,
+            ]}
+            tickFormatter={tickFormatter}
+            tick={customizedTick}
+            className="text-xs font-inter font-semibold text-gray-af"
+            fill={"#AFAFAF"}
+          />
+
+          <YAxis
+            className="text-xs font-inter font-semibold fill:text-gray-af fill"
+            tick={{
+              fill: "#AFAFAF",
+            }}
+            tickLine={false}
+            axisLine={false}
+            tickCount={7}
+            interval={0}
+            width={20}
+            tickMargin={0}
+          />
+          <ReferenceLine
+            y={80}
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            stroke="#4F4F4F"
+            label={{
+              position: "insideBottomRight",
+              value: "QUORUM",
+              className: "text-xs font-inter font-semibold",
+              fill: "#4F4F4F",
+            }}
+          />
+          <Line
+            dataKey="against"
+            type="step"
+            stroke="#C52F00"
+            strokeWidth={2}
+            dot={false}
+          />
+          <Line
+            type="step"
+            dataKey="for"
+            stroke="#00992B"
+            strokeWidth={2}
+            dot={false}
+          />
+          <Line
+            type="step"
+            stroke="#8C8C8C"
+            strokeWidth={2}
+            dataKey="abstain"
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
