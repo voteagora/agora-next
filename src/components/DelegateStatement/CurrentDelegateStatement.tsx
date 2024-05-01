@@ -24,6 +24,7 @@ const formSchema = z.object({
   delegateStatement: z.string(),
   email: z.string(),
   twitter: z.string(),
+  warpcast: z.string(),
   topIssues: z.array(
     z
       .object({
@@ -73,6 +74,7 @@ export default function CurrentDelegateStatement() {
           ?.delegateStatement || "",
       email: delegateStatement?.email || "",
       twitter: delegateStatement?.twitter || "",
+      warpcast: delegateStatement?.warpcast || "",
       topIssues:
         (
           delegateStatement?.payload as {

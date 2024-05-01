@@ -1,10 +1,13 @@
-import { revalidateDelegateAddressPage } from "@/app/delegates/actions";
+import {
+  fetchConnectedDelegate,
+  revalidateDelegateAddressPage,
+} from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useQuery } from "@tanstack/react-query";
-import AgoraAPI from "@/app/lib/agoraAPI";
-import Tenant from "@/lib/tenant/tenant";
+import { timeout } from "@/lib/utils";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 /**
  * Define maximum number of retries, max retries 10 means 180 seconds waiting in total (advanced delegation voting power
@@ -12,15 +15,9 @@ import Tenant from "@/lib/tenant/tenant";
  */
 const MAX_RETRIES = 10;
 
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 // TODO: think about strategy to fetch, since balance and voting power can change on every block,
 // also to prevent additional unnecessary fetches being done right now
 const useConnectedDelegate = () => {
-  const { contracts } = Tenant.current();
-  const api = new AgoraAPI();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const { address } = useAccount();
   const [retries, setRetries] = useState<number>(0);
@@ -30,11 +27,8 @@ const useConnectedDelegate = () => {
     enabled: !!address,
     queryKey: ["useConnectedDelegate", address, refetchDelegate, retries],
     queryFn: async () => {
-      const [delegate, advancedDelegators, balance] = await Promise.all([
-        api.get(`/delegates/${address}`),
-        api.get(`/delegates/${address}/delegation-chains`),
-        contracts.token.contract.balanceOf(address as `0x${string}`),
-      ]);
+      const [delegate, advancedDelegators, balance] =
+        await fetchConnectedDelegate(address!);
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate.address);
       }
@@ -42,9 +36,7 @@ const useConnectedDelegate = () => {
 
       // If refetchDelegate?.votingPower we are looking for a revalidation on the page of the delegatee
       if (refetchDelegate?.prevVotingPowerDelegatee) {
-        const delegatee = await api.get(
-          `/delegates/${refetchDelegate.address}`
-        );
+        const delegatee = await fetchDelegate(refetchDelegate.address);
         /**
          * Materialized view that brings the new voting power takes one minute to sync
          * Refetch delegate will be set to null by the delegateProfileImage

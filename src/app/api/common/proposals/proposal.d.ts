@@ -15,6 +15,7 @@ export type Proposal = {
   created_time: Date | null;
   start_time: Date | null;
   end_time: Date | null;
+  cancelled_time: Date | null;
   markdowntitle: string;
   description: string | null;
   quorum: BigNumberish | null;
@@ -24,4 +25,7 @@ export type Proposal = {
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
   status: ProposalStatus | null;
+  created_transaction_hash: string | null;
+  cancelled_transaction_hash: string | null;
+  executed_transaction_hash: string | null;
 };

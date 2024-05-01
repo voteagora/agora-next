@@ -17,7 +17,7 @@ export async function createDelegateStatement({
   signature: `0x${string}`;
   message: string;
 }) {
-  const { twitter, discord, email } = delegateStatement;
+  const { twitter, warpcast, discord, email } = delegateStatement;
   const { slug } = Tenant.current();
 
   const valid = await verifyMessage({
@@ -36,6 +36,7 @@ export async function createDelegateStatement({
     signature,
     payload: delegateStatement as Prisma.InputJsonValue,
     twitter,
+    warpcast,
     discord,
     email,
   };
