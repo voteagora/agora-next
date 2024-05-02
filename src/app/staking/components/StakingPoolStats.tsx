@@ -1,54 +1,44 @@
-"use client";
-
-import { formatNumber } from "@/lib/utils";
 import React from "react";
-import Tenant from "@/lib/tenant/tenant";
 import { BigNumberish } from "ethers";
-import { useTotalStaked } from "@/hooks/useTotalStaked";
+import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
-interface PoolStatsProps {
+interface StakingPoolStatsProps {
   rewardDuration: string;
   rewardPerToken: BigNumberish;
+  totalStaked: BigNumberish;
   totalSupply: BigNumberish;
 }
 
-export const PoolStats = async ({
-  rewardPerToken,
-  totalSupply,
-  rewardDuration,
-}: PoolStatsProps) => {
-  const { token, contracts } = Tenant.current();
-  const { data } = useTotalStaked();
-  const totalStaked = data ?? BigInt(0);
+export const StakingPoolStats = ({
+                            rewardDuration,
+                            rewardPerToken,
+                            totalStaked,
+                            totalSupply,
+                          }: StakingPoolStatsProps) => {
 
   return (
     <div className="flex justify-evenly rounded-xl border border-gray-300 w-auto h-100 mb-4 bg-gray-50">
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Total Supply</div>
-        <div className="font-medium">{`${formatNumber(
-          totalSupply,
-          token.decimals
-        )} ${token.symbol}`}</div>
+        <div className="font-medium">
+          <TokenAmountDisplay amount={totalSupply} />
+        </div>
       </div>
 
       <div className="border-r border-gray-300"></div>
 
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Total Staked</div>
-        <div className="font-medium">{`${formatNumber(
-          totalStaked,
-          token.decimals
-        )} ${token.symbol}`}</div>
+        <div className="font-medium"><TokenAmountDisplay amount={totalStaked} /></div>
       </div>
 
       <div className="border-r border-gray-300"></div>
 
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Rewards per token</div>
-        <div className="font-medium">{`${formatNumber(
-          rewardPerToken,
-          token.decimals
-        )} WETH`}</div>
+        <div className="font-medium">
+          <TokenAmountDisplay amount={rewardPerToken} currency={"WETH"} />
+        </div>
       </div>
 
       <div className="border-r border-gray-300"></div>

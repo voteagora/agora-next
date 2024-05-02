@@ -1,7 +1,7 @@
 "use client";
 
 import { HStack } from "@/components/Layout/Stack";
-import { PoolStats } from "@/app/staking/components/PoolStats";
+import { StakingPoolStats } from "@/app/staking/components/StakingPoolStats";
 import FAQs from "@/components/Staking/FAQs";
 import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
 import React, { useEffect, useRef, useState } from "react";
@@ -12,13 +12,20 @@ import { StakedDeposit } from "@/lib/types";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
 
 interface StakeHomeProps {
+  fetchDeposits: (address: string) => Promise<StakedDeposit[] | null>;
   rewardDuration: string;
   rewardPerToken: BigNumberish;
+  totalStaked: BigNumberish;
   totalSupply: BigNumberish;
-  fetchDeposits: (address: string) => Promise<StakedDeposit[] | null>;
 }
 
-export const StakeHome = ({ rewardDuration, rewardPerToken, totalSupply, fetchDeposits }: StakeHomeProps) => {
+export const StakeHome = ({
+                            fetchDeposits,
+                            rewardDuration,
+                            rewardPerToken,
+                            totalStaked,
+                            totalSupply,
+}: StakeHomeProps) => {
 
   const { token } = Tenant.current();
   const { address } = useAccount();
@@ -62,9 +69,10 @@ export const StakeHome = ({ rewardDuration, rewardPerToken, totalSupply, fetchDe
         <div className="font-black text-2xl mb-5">
           {token.symbol} Staking Metrics
         </div>
-        <PoolStats
+        <StakingPoolStats
           rewardDuration={rewardDuration}
           rewardPerToken={rewardPerToken}
+          totalStaked={totalStaked}
           totalSupply={totalSupply}
         />
       </div>

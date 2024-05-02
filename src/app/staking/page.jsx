@@ -12,8 +12,9 @@ export default async function Page() {
 
   const { ui, contracts } = Tenant.current();
 
-  const [totalSupply, rewardPerToken, rewardDuration] = await Promise.all([
+  const [totalSupply, totalStaked, rewardPerToken, rewardDuration] = await Promise.all([
     contracts.token.contract.totalSupply(),
+    contracts.staker.contract.totalStaked(),
     contracts.staker.contract.rewardPerTokenAccumulated(),
     contracts.staker.contract.REWARD_DURATION(),
   ]);
@@ -25,6 +26,7 @@ export default async function Page() {
   return <StakeHome
     fetchDeposits={fetchDeposits}
     totalSupply={totalSupply}
+    totalStaked={totalStaked}
     rewardPerToken={rewardPerToken}
     rewardDuration={rewardDuration} />;
 }
