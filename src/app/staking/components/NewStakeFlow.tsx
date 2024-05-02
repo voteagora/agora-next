@@ -7,9 +7,9 @@ import ReceiptContainer from "@/app/staking/components/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/Receipt";
 import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
 import { useAccount } from "wagmi";
-import StakingDelegateCardList, {
+import DelegateCardList, {
   DelegateChunk,
-} from "@/app/staking/components/StakingDelegateCardList";
+} from "@/app/staking/components/delegates/DelegateCardList";
 import { StakeConfirmDialog } from "@/app/staking/components/StakeConfirmDialog";
 
 interface DelegatePaginated {
@@ -83,7 +83,7 @@ export const NewStakeFlow = ({
             Uniswap voters manage staking rewards. Choose your delegate carefully to represent you in Uniswap
             governance.
           </div>
-          <StakingDelegateCardList
+          <DelegateCardList
             address={address}
             amount={amount}
             onSelect={(address) => {

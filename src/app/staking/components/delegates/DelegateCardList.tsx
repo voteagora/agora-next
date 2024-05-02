@@ -2,16 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { HStack, VStack } from "@/components/Layout/Stack";
 
-import { DelegateProfileImage } from "@/components/Delegates/DelegateCard/DelegateProfileImage";
 import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { capitalizeFirstLetter, cn, numberToToken } from "@/lib/utils";
-import { DelegateSocialLinks } from "@/components/Delegates/DelegateCard/DelegateSocialLinks";
-import { Button } from "@/components/ui/button";
+import { capitalizeFirstLetter, numberToToken } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
+import { DelegateCard } from "@/app/staking/components/delegates/DelegateCard";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -32,7 +29,7 @@ interface Props {
   onSelect: (address: string) => void;
 }
 
-export default function StakingDelegateCardList({
+export default function DelegateCardList({
                                                   address,
                                                   amount,
                                                   initialDelegates,
@@ -121,58 +118,3 @@ export default function StakingDelegateCardList({
     </DialogProvider>
   );
 }
-
-interface DelegateCardProps {
-  address: string;
-  action: string;
-  discord?: string;
-  twitter?: string;
-  onSelect: (address: string) => void;
-  statement: string;
-  votingPower: string;
-}
-
-const DelegateCard = ({
-                        address,
-                        action,
-                        discord,
-                        onSelect,
-                        statement,
-                        twitter,
-                        votingPower,
-                      }: DelegateCardProps) => {
-  return <div
-    className={cn(styles.link)}>
-    <VStack gap={4} className={styles.link_container}>
-      <VStack gap={4} justifyContent="justify-center">
-        <DelegateProfileImage
-          address={address}
-          votingPower={votingPower}
-        />
-        <p className={styles.summary}>{statement}</p>
-      </VStack>
-      <div className="min-h-[24px]">
-        <HStack
-          alignItems="items-stretch"
-          className="justify-between"
-        >
-          <DelegateSocialLinks
-            discord={discord}
-            twitter={twitter}
-          />
-          <Button
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onSelect(address);
-            }}
-          >
-            {action}
-          </Button>
-        </HStack>
-      </div>
-    </VStack>
-  </div>;
-};
-
-
