@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-
 import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/common/delegates/delegate";

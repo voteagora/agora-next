@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { useQueryClient } from "@tanstack/react-query";
 import { isAddress } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -18,34 +17,32 @@ export const StakeConfirmDialog = ({
                                      amount,
                                      address,
                                    }: SetStakeDialogProps) => {
+
   const router = useRouter();
   const { token, contracts } = Tenant.current();
-  const queryClient = useQueryClient();
   const isValidInput = Boolean(amount > 0 && address && isAddress(address));
 
   const { config } = usePrepareContractWrite({
     enabled: isValidInput,
     address: contracts.staker!.address as `0x${string}`,
-    abi: contracts.staker!.abi.abi,
+    abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
     functionName: "stake",
-    args: [
-      numberToToken(amount),
-      address as `0x${string}`,
-    ],
+    args: [numberToToken(amount), address as `0x${string}`],
   });
 
   const { data, write, status } = useContractWrite(config);
-
   const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
 
+  const isStakeConfirmed = Boolean(data?.hash && !isLoading);
+
   useEffect(() => {
     if (data?.hash && !isLoading) {
-      queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
-      queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
-      router.replace("/staking", { scroll: false });
+      setTimeout(() => {
+        router.replace("/staking");
+      }, 6000);
     }
   }, [isLoading, data?.hash]);
 
@@ -64,15 +61,22 @@ export const StakeConfirmDialog = ({
         Please verify your transaction details before confirming.
       </div>
 
-      <Button
-        className="w-full"
-        disabled={!isValidInput || isLoading}
-        onClick={() => {
-          write?.();
-        }}
-      >
-        {isLoading ? "Staking..." : `Stake & delegate my ${token.symbol}`}
-      </Button>
+      {isStakeConfirmed ? (
+        <Button className="w-full" disabled={true}>
+          Confirming onchain transaction...
+        </Button>
+
+      ) : (
+        <Button
+          className="w-full"
+          disabled={!isValidInput || isLoading}
+          onClick={() => {
+            write?.();
+          }}
+        >
+          {isLoading ? "Staking..." : `Stake & delegate my ${token.symbol}`}
+        </Button>
+      )}
     </div>
   );
 };

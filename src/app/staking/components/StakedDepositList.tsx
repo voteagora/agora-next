@@ -10,16 +10,17 @@ import Link from "next/link";
 import { Button } from "@/components/Button";
 import { HStack } from "@/components/Layout/Stack";
 import { DepositWithdrawButton } from "@/app/staking/components/DepositWithdrawButton";
+import { useAccount } from "wagmi";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];
-  address: string;
 }
 
 export const StakedDepositList = ({
-  deposits,
-  address,
-}: StakedDepositListProps) => {
+                                    deposits,
+                                  }: StakedDepositListProps) => {
+
+  const { address } = useAccount();
   const { data, isFetched } = useTokenBalance(address);
   const hasTokenBalance = data && isFetched;
   const canDepositMode = hasTokenBalance && data > 0n;
@@ -58,13 +59,14 @@ export const StakedDepositList = ({
                         <HumanAddress address={deposit.delegatee} />
                       </div>
                     </div>
-                    <Button href={`/staking/deposits/${deposit.id}`}>
+                    <Link href={`/staking/deposits/${deposit.id}`}>
                       Manage deposit
-                    </Button>
+                    </Link>
                     <DepositWithdrawButton
                       id={BigInt(deposit.id)}
                       amount={BigInt(deposit.amount)}
-                      onSuccess={() => {}}
+                      onSuccess={() => {
+                      }}
                     />
                   </HStack>
                 </div>

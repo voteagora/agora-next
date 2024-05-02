@@ -9,6 +9,8 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 interface DepositWithdrawButtonProps {
   id: bigint;
@@ -17,10 +19,11 @@ interface DepositWithdrawButtonProps {
 }
 
 export const DepositWithdrawButton = ({
-  amount,
-  id,
-  onSuccess,
-}: DepositWithdrawButtonProps) => {
+                                        amount,
+                                        id,
+                                        onSuccess,
+                                      }: DepositWithdrawButtonProps) => {
+  const router = useRouter();
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();
   const isValidAmount = amount > 0n;
@@ -41,10 +44,9 @@ export const DepositWithdrawButton = ({
 
   useEffect(() => {
     if (data?.hash && !isLoading) {
-      console.log("Invalidated");
-      // queryClient.invalidateQueries({ queryKey: ["tokenBalance"] });
-      // queryClient.invalidateQueries({ queryKey: ["totalStaked"] });
-      // onSuccess();
+      setTimeout(() => {
+        revalidatePath("/staking");
+      }, 6000);
     }
   }, [isLoading, data?.hash, onSuccess, queryClient]);
 

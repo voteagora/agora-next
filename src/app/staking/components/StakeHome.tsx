@@ -10,6 +10,7 @@ import { BigNumberish } from "ethers";
 import { useAccount } from "wagmi";
 import { StakedDeposit } from "@/lib/types";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
+import { StakedDepositList } from "@/app/staking/components/StakedDepositList";
 
 interface StakeHomeProps {
   fetchDeposits: (address: string) => Promise<StakedDeposit[] | null>;
@@ -25,7 +26,7 @@ export const StakeHome = ({
                             rewardPerToken,
                             totalStaked,
                             totalSupply,
-}: StakeHomeProps) => {
+                          }: StakeHomeProps) => {
 
   const { token } = Tenant.current();
   const { address } = useAccount();
@@ -48,22 +49,30 @@ export const StakeHome = ({
     if (address && !isFetched.current && !isFetching.current) {
       fetchData(address.toLowerCase());
     }
-
   }, [address]);
 
   return <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
     <div className="sm:col-span-4">
-      <div>
-        <div className="font-black text-2xl mb-5">
-          Introducing staking, the next chapter of Uniswap Governance
+      {hasDeposits ? (
+        <div>
+          <div className="font-black text-2xl mb-5">
+            Your {token.symbol} Stake
+          </div>
+          <StakedDepositList deposits={deposits} />
         </div>
-        <div className="text-gray-700">
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-          accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-          illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-          explicabo.
+      ) : (
+        <div>
+          <div className="font-black text-2xl mb-5">
+            Introducing staking, the next chapter of Uniswap Governance
+          </div>
+          <div className="text-gray-700">
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+            accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
+            illo inventore veritatis et quasi architecto beatae vitae dicta sunt
+            explicabo.
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="mt-10">
         <div className="font-black text-2xl mb-5">
@@ -81,7 +90,7 @@ export const StakeHome = ({
     <div className="sm:col-start-5">
       {hasDeposits ? (
         <div>
-          <h2 className="font-black text-2xl text-black">Your rewards</h2>
+          <h2 className="font-black text-2xl text-black mb-5">Your rewards</h2>
           <PanelClaimRewards address={address} />
         </div>
       ) : (
@@ -90,3 +99,4 @@ export const StakeHome = ({
     </div>
   </HStack>;
 };
+;

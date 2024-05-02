@@ -21,24 +21,26 @@ export const BreadcrumbsNav = ({
 
   const router = useRouter();
 
-  return (
+  // Prefetch the staking page when the user is on the first step
+  if (step === 1) {
+    router.prefetch("/staking");
+  }
 
+  const onBackButton = () => {
+    if (step > 1) {
+      onClick(step - 1);
+    } else {
+      router.push("/staking");
+    }
+  };
+
+  return (
 
     <div className="flex flex-row gap-3 mb-5 items-center">
       <Button
         className="w-8 h-8 border bg-white rounded-full items-center justify-center mr-2 shadow-newDefault"
         variant="secondary"
-        onClick={() => {
-          if (step > 1) {
-            onClick(step - 1);
-          } else {
-            router.push("/staking");
-          }
-
-        }}
-      >
-        ←
-      </Button>
+        onClick={onBackButton}> ← </Button>
 
       <div className="text-xl font-bold">{title}</div>
       <div className="text-sm">
