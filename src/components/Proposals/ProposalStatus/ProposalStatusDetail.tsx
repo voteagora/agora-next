@@ -1,13 +1,21 @@
 import { HStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import { type ProposalStatus } from "@/lib/proposalUtils";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { getBlockScanUrl } from "@/lib/utils";
 
 export default function ProposalStatusDetail({
   proposalStatus,
   proposalEndTime,
+  proposalStartTime,
+  proposalCancelledTime,
+  cancelledTransactionHash,
 }: {
   proposalStatus: ProposalStatus | null;
   proposalEndTime: Date | null;
+  proposalStartTime: Date | null;
+  proposalCancelledTime: Date | null;
+  cancelledTransactionHash: string | null;
 }) {
   return (
     <HStack
@@ -31,11 +39,30 @@ export default function ProposalStatusDetail({
             DEFEATED
           </p>
         )}
+        {proposalStatus === "CANCELLED" && (
+          <div className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
+            {cancelledTransactionHash ? (
+              <a
+                href={getBlockScanUrl(cancelledTransactionHash)}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="flex items-center"
+              >
+                <span>CANCELLED</span>
+                <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+              </a>
+            ) : (
+              <span>CANCELLED</span>
+            )}
+          </div>
+        )}
       </div>
       <div>
         <ProposalTimeStatus
           proposalStatus={proposalStatus}
+          proposalStartTime={proposalStartTime}
           proposalEndTime={proposalEndTime}
+          proposalCancelledTime={proposalCancelledTime}
         />
       </div>
     </HStack>

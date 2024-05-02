@@ -5,7 +5,7 @@ import { validate as validateUuid } from "uuid";
 let prismaModule: any;
 
 const HASH_FN = "sha256";
-const REASON_NO_TOKEN = "No token provided in 'authorization' header";
+const REASON_NO_TOKEN = "No token provided in 'Authorization' header";
 const REASON_INVALID_API_KEY = "Invalid API Key";
 const REASON_DISABLED_USER = "User disabled";
 
@@ -15,8 +15,15 @@ export type AuthResponse = {
   reason?: string;
 };
 
+export function extractBearerToken(token?: string | null) {
+  if (token && token.split(" ")[0] === "Bearer") {
+    return token.split(" ")[1];
+  }
+  return null;
+}
+
 export function hasApiKey(request: NextRequest): AuthResponse {
-  const token = request.headers.get("authorization");
+  const token = extractBearerToken(request.headers.get("Authorization"));
   let authResponse: AuthResponse = { authenticated: true, reason: "" };
 
   if (!token) {
@@ -52,7 +59,7 @@ export async function authenticateApiUser(
 
   let authResponse: AuthResponse = hasApiKey(request);
 
-  const key = request.headers.get("authorization");
+  const key = extractBearerToken(request.headers.get("Authorization"));
 
   if (!key) {
     return authResponse;

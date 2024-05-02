@@ -118,10 +118,10 @@ export async function generateMetadata({}, parent) {
         },
       ],
     },
-    other: {
-      ["twitter:card"]: "summary_large_image",
-      ["twitter:title"]: title,
-      ["twitter:description"]: description,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
@@ -199,7 +199,6 @@ export default async function Home() {
     proposalsFilterOptions.everything.filter
   );
 
-  const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
   return (

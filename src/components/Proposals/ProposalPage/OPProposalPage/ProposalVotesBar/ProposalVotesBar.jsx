@@ -18,15 +18,13 @@ export default function ProposalVotesBar({ proposal }) {
               justifyContent="justify-around"
               className={styles.vote_bar_ticks}
             >
-              {Array.from(
-                generateBarsForVote(
-                  proposal.proposalResults.for,
-                  proposal.proposalResults.abstain,
-                  proposal.proposalResults.against
-                )
-              ).map((value, idx) => (
-                <div key={`${idx}`} className={styles[value]} />
-              ))}
+              {generateBarsForVote(
+                proposal.proposalResults.for,
+                proposal.proposalResults.abstain,
+                proposal.proposalResults.against
+              ).map((value, idx) => {
+                return <div key={`${idx}`} className={styles[value]} />;
+              })}
             </HStack>
           </TooltipTrigger>
           <TooltipContent>

@@ -4,11 +4,7 @@ import styles from "./delegateVotes.module.scss";
 
 function VoteReason({ reason }) {
   return (
-    <>
-      <div className={styles.vote_reason} />
-
-      <VStack className={styles.vote_reason_container}>{reason}</VStack>
-    </>
+    <VStack className={styles.vote_reason_container}>Reason: {reason}</VStack>
   );
 }
 

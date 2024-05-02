@@ -198,20 +198,26 @@ export async function parseProposal(
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+          : null,
     start_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.start_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.start_block, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.start_block, latestBlock)
+          : null,
     end_time:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.end_ts * 1000)
         : latestBlock
-        ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
-        : null,
+          ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+          : null,
+    cancelled_time:
+      proposalData.key === "SNAPSHOT"
+        ? null
+        : latestBlock
+          ? getHumanBlockTime(proposal.cancelled_block ?? 0, latestBlock)
+          : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
@@ -231,6 +237,9 @@ export async function parseProposal(
           votableSupply
         )
       : null,
+    created_transaction_hash: proposal.created_transaction_hash,
+    cancelled_transaction_hash: proposal.cancelled_transaction_hash,
+    executed_transaction_hash: proposal.executed_transaction_hash,
   };
 }
 

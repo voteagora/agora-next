@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { getVpToDisplay, MissingVote } from "@/lib/voteUtils";
 import loadingSvg from "@/assets/tenant/optimism-loading.svg";
 import successSvg from "@/assets/tenant/optimism-success.svg";
+import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
+import pendingImage from "../../../../../public/images/action-pending.svg";
+import congrats from "../../../../../public/images/congrats.svg";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export type SupportTextProps = {
@@ -40,7 +43,6 @@ function CastVoteDialogContents({
   const { write, isLoading, isSuccess, data } = useAdvancedVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-    standardVP: BigInt(votingPower.directVP),
     advancedVP: BigInt(votingPower.advancedVP),
     authorityChains,
     reason,
@@ -52,8 +54,8 @@ function CastVoteDialogContents({
   useEffect(() => {
     if (
       missingVote == "BOTH" &&
-      data?.standardVoteData &&
-      !data?.advancedVoteData
+      data?.standardTxHash &&
+      !data?.advancedTxHash
     ) {
       setLocalMissingVote("ADVANCED");
     }
@@ -64,11 +66,11 @@ function CastVoteDialogContents({
     return null;
   }
 
-  if (
-    missingVote === "BOTH" &&
-    !data.advancedVoteData &&
-    data.standardVoteData
-  ) {
+  if (isLoading) {
+    return <LoadingVote />;
+  }
+
+  if (missingVote === "BOTH" && !data.advancedTxHash && data.standardTxHash) {
     return (
       <VStack gap={4} className={styles.dialog_container}>
         <HStack justifyContent="justify-between">
@@ -105,7 +107,7 @@ function CastVoteDialogContents({
 
   return (
     <>
-      {!isLoading && !isSuccess && (
+      {!isSuccess && (
         <VStack gap={4} className={styles.dialog_container}>
           <HStack justifyContent="justify-between">
             <VStack>
@@ -146,10 +148,7 @@ function CastVoteDialogContents({
           {missingVote === "BOTH" && <AdvancedVoteAlert />}
         </VStack>
       )}
-      {isLoading && <LoadingVote />}
-      {isSuccess && data && (
-        <SuccessMessage closeDialog={closeDialog} data={data} />
-      )}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
     </>
   );
 }
@@ -184,8 +183,8 @@ export function SuccessMessage({
 }: {
   closeDialog: () => void;
   data: {
-    advancedVoteData: { hash: string } | undefined;
-    standardVoteData: { hash: string } | undefined;
+    standardTxHash: string | undefined;
+    advancedTxHash: string | undefined;
   };
 }) {
   return (
@@ -210,8 +209,8 @@ export function SuccessMessage({
         </div>
       </div>
       <BlockScanUrls
-        hash1={data.standardVoteData?.hash}
-        hash2={data.advancedVoteData?.hash}
+        hash1={data?.standardTxHash}
+        hash2={data?.advancedTxHash}
       />
     </VStack>
   );

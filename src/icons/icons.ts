@@ -30,6 +30,7 @@ import world from "./world.svg";
 import createTransaction from "./createTransaction.svg";
 import uploadTransaction from "./uploadTransaction.svg";
 import usersEdit from "./usersEdit.svg";
+import clipboard from "./clipboard.svg";
 
 export const icons = {
   anonNoun,
@@ -64,4 +65,5 @@ export const icons = {
   wallet,
   walletConnected,
   world,
+  clipboard,
 };

@@ -9,12 +9,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function DAOMetricsHeader({ metrics }) {
   const { token, ui } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  const governanceForumLink = ui.link("governanceForum");
   const bugsLink = ui.link("bugs");
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
@@ -29,7 +35,9 @@ export default function DAOMetricsHeader({ metrics }) {
     totalSupply: formatNumber(metrics.totalSupply),
   };
 
-  if (isClient) {
+  if (!isClient) {
+    return null;
+  } else {
     return (
       <>
         {createPortal(
@@ -45,18 +53,40 @@ export default function DAOMetricsHeader({ metrics }) {
               )}
             >
               <div
-                className="w-full sm:w-2/3 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10"
+                className="w-full sm:w-3/5 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10"
                 onClick={() => setVisible(!visible)}
               >
                 <div className="flex gap-6 sm:gap-8">
-                  <span>
-                    {formattedMetrics.totalSupply} {token.symbol} total
-                    <span className="hidden sm:inline">&nbsp;supply</span>
-                  </span>
-                  <span>
-                    {formattedMetrics.votableSupply} {token.symbol} votable
-                    <span className="hidden sm:inline">&nbsp;supply</span>
-                  </span>
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger>
+                      <span className="cursor-default">
+                        {formattedMetrics.totalSupply} {token.symbol} total
+                        <span className="hidden sm:inline">&nbsp;supply</span>
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-full shadow"
+                      side="bottom"
+                      sideOffset={3}
+                    >
+                      <span>Total amount of OP in existence</span>
+                    </HoverCardContent>
+                  </HoverCard>
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger>
+                      <span className="cursor-default">
+                        {formattedMetrics.votableSupply} {token.symbol} votable
+                        <span className="hidden sm:inline">&nbsp;supply</span>
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-full shadow"
+                      side="bottom"
+                      sideOffset={3}
+                    >
+                      <span>OP currently delegated to a voter</span>
+                    </HoverCardContent>
+                  </HoverCard>
                 </div>
                 <Image
                   src={infoTransparent}
@@ -65,24 +95,38 @@ export default function DAOMetricsHeader({ metrics }) {
                 />
               </div>
               <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div className="w-full sm:w-1/3 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+              <div className="w-full sm:w-2/5 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+                {governanceForumLink && (
+                  <a
+                    href={governanceForumLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                    className="text-center"
+                  >
+                    {governanceForumLink.title}
+                  </a>
+                )}
                 {bugsLink && (
                   <a
                     href={bugsLink.url}
                     rel="noreferrer nonopener"
                     target="_blank"
+                    className="text-center"
                   >
                     {bugsLink.title}
                   </a>
                 )}
                 {changeLogLink && (
-                  <Link href={changeLogLink.url}>{changeLogLink.title}</Link>
+                  <Link href={changeLogLink.url} className="text-center">
+                    {changeLogLink.title}
+                  </Link>
                 )}
                 {faqLink && (
                   <a
                     href={faqLink.url}
                     rel="noreferrer nonopener"
                     target="_blank"
+                    className="text-center"
                   >
                     {faqLink.title}
                   </a>
