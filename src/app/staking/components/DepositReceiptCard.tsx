@@ -4,7 +4,6 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "../../../components/Staking/TransactionReceipt/transactionReceipt.module.scss";
 import ENSName from "@/components/shared/ENSName";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import { StakedDeposit } from "@/lib/types";
 
 interface IReceiptEntries {
   title: string;

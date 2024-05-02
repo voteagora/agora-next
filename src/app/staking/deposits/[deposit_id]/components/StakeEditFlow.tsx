@@ -1,40 +1,38 @@
 "use client";
 
+import { type DelegatePaginated, type StakedDeposit } from "@/lib/types";
+import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import { BreadcrumbsNav } from "@/app/staking/components/BreadcrumbsNav";
 import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/Receipt";
 import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
-import { useAccount } from "wagmi";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
 import { StakeConfirmDialog } from "@/app/staking/components/StakeConfirmDialog";
-import { type DelegatePaginated } from "@/lib/types";
 
 const PAGE_TITLE = [
-  "Create your stake",
+  "Edit your stake",
   "Choose delegate",
   "Confirm your transaction",
 ];
 
-interface NewStakeFlowProps {
+interface StakeEditFlowProps {
   delegates: DelegatePaginated;
+  deposit: StakedDeposit;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
 }
 
-export const NewStakeFlow = ({
-                               delegates,
-                               fetchDelegates,
-                             }: NewStakeFlowProps) => {
+export const StakeEditFlow = ({
+                                deposit,
+                                fetchDelegates,
+                                delegates,
+                              }: StakeEditFlowProps) => {
 
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(0);
-  const [delegate, setDelegate] = useState<string | undefined>();
-
-  if (!address) {
-    return <div>Connect your wallet to stake</div>;
-  }
+  const [delegate, setDelegate] = useState<string>(deposit.delegatee);
 
   return (
     <div>
@@ -45,22 +43,22 @@ export const NewStakeFlow = ({
         totalSteps={3}
       />
 
-
       {step === 1 && (
         <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
                 amount={amount}
-                delegatee={""}
+                delegatee={delegate}
                 depositor={address}
-                title={"Creating new stake"}
+                title={"Editing your stake"}
               />
             </ReceiptContainer>
           </div>
           <div className="sm:col-start-5">
             <SetStakeDialog
               amount={amount}
+              deposit={deposit}
               onClick={(amount) => {
                 setAmount(amount);
                 setStep(2);
@@ -77,7 +75,7 @@ export const NewStakeFlow = ({
             governance.
           </div>
           <DelegateCardList
-            address={address}
+            address={deposit.depositor}
             amount={amount}
             onSelect={(address) => {
               setDelegate(address);
@@ -110,6 +108,7 @@ export const NewStakeFlow = ({
           </div>
         </HStack>
       )}
+
     </div>
   );
 };

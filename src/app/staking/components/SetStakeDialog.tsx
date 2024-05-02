@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 
 import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
-
+import { type DelegatePaginated, type StakedDeposit } from "@/lib/types";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
@@ -15,12 +15,14 @@ import { tokenToHumanNumber } from "@/lib/utils";
 interface SetStakeDialogProps {
   onClick: (value: number) => void;
   amount: number;
+  deposit?: StakedDeposit;
 }
 
 export const SetStakeDialog = ({
-  amount: defaultAmount,
-  onClick,
-}: SetStakeDialogProps) => {
+                                 amount: defaultAmount,
+                                 deposit,
+                                 onClick,
+                               }: SetStakeDialogProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
@@ -28,15 +30,16 @@ export const SetStakeDialog = ({
 
   const { data: totalStaked, isFetched: isLoadedTotalStaked } =
     useDepositorTotalStaked(address as `0x${string}`);
+
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
-    address as `0x${string}`
+    address as `0x${string}`,
   );
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
   const hasValidAmount =
-    amount > 0 &&
-    amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals);
+    deposit || (amount > 0 && amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals));
+
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4">
@@ -63,7 +66,7 @@ export const SetStakeDialog = ({
                   variant="secondary"
                   onClick={() => {
                     setAmount(
-                      tokenToHumanNumber(Number(tokenBalance), token.decimals)
+                      tokenToHumanNumber(Number(tokenBalance), token.decimals),
                     );
                   }}
                 >

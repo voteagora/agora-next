@@ -5,9 +5,7 @@ import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-
-export type TenantNamespace =
-  (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
+import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
 
 export type StakedDeposit = {
   amount: string;
@@ -15,6 +13,17 @@ export type StakedDeposit = {
   depositor: string;
   id: number;
 };
+
+export type DelegatePaginated  = {
+  seed: number;
+  meta: any;
+  delegates: DelegateChunk[];
+}
+
+
+export type TenantNamespace =
+  (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
+
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;
