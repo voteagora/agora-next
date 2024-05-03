@@ -39,11 +39,7 @@ export const PanelClaimRewards = ({ address }: ClaimRewardsProps) => {
           </h6>
         </VStack>
       </HStack>
-      <Button
-        variant="outline"
-        size="lg"
-        disabled={!hasRewards}
-      >
+      <Button variant="outline" size="lg" disabled={!hasRewards}>
         Collect rewards
       </Button>
     </VStack>

@@ -10,12 +10,11 @@ interface StakingPoolStatsProps {
 }
 
 export const StakingPoolStats = ({
-                            rewardDuration,
-                            rewardPerToken,
-                            totalStaked,
-                            totalSupply,
-                          }: StakingPoolStatsProps) => {
-
+  rewardDuration,
+  rewardPerToken,
+  totalStaked,
+  totalSupply,
+}: StakingPoolStatsProps) => {
   return (
     <div className="flex justify-evenly rounded-xl border border-gray-300 w-auto h-100 mb-4 bg-gray-50">
       <div className="flex flex-col text-center p-5">
@@ -29,7 +28,9 @@ export const StakingPoolStats = ({
 
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Total Staked</div>
-        <div className="font-medium"><TokenAmountDisplay amount={totalStaked} /></div>
+        <div className="font-medium">
+          <TokenAmountDisplay amount={totalStaked} />
+        </div>
       </div>
 
       <div className="border-r border-gray-300"></div>

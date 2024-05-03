@@ -16,43 +16,36 @@ interface DelegateCardProps {
 }
 
 export const DelegateCard = ({
-                        address,
-                        action,
-                        discord,
-                        onSelect,
-                        statement,
-                        twitter,
-                        votingPower,
-                      }: DelegateCardProps) => {
-  return <div className={cn(styles.link)}>
-    <VStack gap={4} className={styles.link_container}>
-      <VStack gap={4} justifyContent="justify-center">
-        <DelegateProfileImage
-          address={address}
-          votingPower={votingPower}
-        />
-        <p className={styles.summary}>{statement}</p>
+  address,
+  action,
+  discord,
+  onSelect,
+  statement,
+  twitter,
+  votingPower,
+}: DelegateCardProps) => {
+  return (
+    <div className={cn(styles.link)}>
+      <VStack gap={4} className={styles.link_container}>
+        <VStack gap={4} justifyContent="justify-center">
+          <DelegateProfileImage address={address} votingPower={votingPower} />
+          <p className={styles.summary}>{statement}</p>
+        </VStack>
+        <div className="min-h-[24px]">
+          <HStack alignItems="items-stretch" className="justify-between">
+            <DelegateSocialLinks discord={discord} twitter={twitter} />
+            <Button
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onSelect(address);
+              }}
+            >
+              {action}
+            </Button>
+          </HStack>
+        </div>
       </VStack>
-      <div className="min-h-[24px]">
-        <HStack
-          alignItems="items-stretch"
-          className="justify-between"
-        >
-          <DelegateSocialLinks
-            discord={discord}
-            twitter={twitter}
-          />
-          <Button
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onSelect(address);
-            }}
-          >
-            {action}
-          </Button>
-        </HStack>
-      </div>
-    </VStack>
-  </div>;
+    </div>
+  );
 };

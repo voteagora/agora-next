@@ -24,11 +24,10 @@ interface StakeEditFlowProps {
 }
 
 export const StakeEditFlow = ({
-                                deposit,
-                                fetchDelegates,
-                                delegates,
-                              }: StakeEditFlowProps) => {
-
+  deposit,
+  fetchDelegates,
+  delegates,
+}: StakeEditFlowProps) => {
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(0);
@@ -72,8 +71,8 @@ export const StakeEditFlow = ({
       {step === 2 && (
         <>
           <div className="border rounded-xl w-full shadow-newDefault p-4 text-sm font-medium">
-            Uniswap voters manage staking rewards. Choose your delegate carefully to represent you in Uniswap
-            governance.
+            Uniswap voters manage staking rewards. Choose your delegate
+            carefully to represent you in Uniswap governance.
           </div>
           <DelegateCardList
             address={deposit.depositor}
@@ -110,7 +109,6 @@ export const StakeEditFlow = ({
           </div>
         </HStack>
       )}
-
     </div>
   );
 };

@@ -19,10 +19,10 @@ interface DepositWithdrawButtonProps {
 }
 
 export const DepositWithdrawButton = ({
-                                        amount,
-                                        id,
-                                        onSuccess,
-                                      }: DepositWithdrawButtonProps) => {
+  amount,
+  id,
+  onSuccess,
+}: DepositWithdrawButtonProps) => {
   const router = useRouter();
   const { contracts, token } = Tenant.current();
   const queryClient = useQueryClient();

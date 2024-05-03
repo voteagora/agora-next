@@ -9,24 +9,27 @@ async function fetchDeposits(address) {
 }
 
 export default async function Page() {
-
   const { ui, contracts } = Tenant.current();
 
-  const [totalSupply, totalStaked, rewardPerToken, rewardDuration] = await Promise.all([
-    contracts.token.contract.totalSupply(),
-    contracts.staker.contract.totalStaked(),
-    contracts.staker.contract.rewardPerTokenAccumulated(),
-    contracts.staker.contract.REWARD_DURATION(),
-  ]);
+  const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
+    await Promise.all([
+      contracts.token.contract.totalSupply(),
+      contracts.staker.contract.totalStaked(),
+      contracts.staker.contract.rewardPerTokenAccumulated(),
+      contracts.staker.contract.REWARD_DURATION(),
+    ]);
 
   if (!ui.toggle("staking")) {
     return <div>Route not supported for namespace</div>;
   }
 
-  return <StakeHome
-    fetchDeposits={fetchDeposits}
-    totalSupply={totalSupply}
-    totalStaked={totalStaked}
-    rewardPerToken={rewardPerToken}
-    rewardDuration={rewardDuration} />;
+  return (
+    <StakeHome
+      fetchDeposits={fetchDeposits}
+      totalSupply={totalSupply}
+      totalStaked={totalStaked}
+      rewardPerToken={rewardPerToken}
+      rewardDuration={rewardDuration}
+    />
+  );
 }

@@ -16,13 +16,12 @@ interface ReceiptProps {
 }
 
 export const Receipt = ({
-                          amount,
-                          delegatee,
-                          depositor,
-                          title,
-                          deposit,
-                        }: ReceiptProps) => {
-
+  amount,
+  delegatee,
+  depositor,
+  title,
+  deposit,
+}: ReceiptProps) => {
   const { token } = Tenant.current();
 
   return (
@@ -59,10 +58,10 @@ export const Receipt = ({
         <HStack className="w-full justify-between items-center text-black">
           <p className="text-base leading-4">Deposit</p>
           <p className="text-base leading-4">
-            {formatNumber(numberToToken(amount).toString(), token.decimals)} {token.symbol}
+            {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
+            {token.symbol}
           </p>
         </HStack>
-
 
         {deposit && (
           <>
@@ -81,10 +80,8 @@ export const Receipt = ({
                 {formatNumber(deposit.amount, token.decimals)} {token.symbol}
               </p>
             </HStack>
-
           </>
         )}
-
       </VStack>
       <div className="h-0.5 w-full border-t border-dashed border-gray-300 mt-[46px]"></div>
       <p className=" text-xs font-normal italic text-center mt-1 text-gray-4f ">

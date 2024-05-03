@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
 import HumanAddress from "@/components/shared/HumanAddress";
-import {capitalizeFirstLetter} from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 function extractWebsiteName(urlString: string): string {
   try {

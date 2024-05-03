@@ -14,16 +14,14 @@ export type StakedDeposit = {
   id: number;
 };
 
-export type DelegatePaginated  = {
+export type DelegatePaginated = {
   seed: number;
   meta: any;
   delegates: DelegateChunk[];
-}
-
+};
 
 export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
-
 
 export type TenantContracts = {
   token: TenantContract<ITokenContract>;

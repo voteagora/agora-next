@@ -6,7 +6,6 @@ import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/
 import { delegatesFilterOptions } from "@/lib/constants";
 
 export default async function Page() {
-
   const sort = delegatesFilterOptions.weightedRandom.sort;
   const seed = Math.random();
   const delegates = await apiFetchDelegates({ page: 1, seed, sort });

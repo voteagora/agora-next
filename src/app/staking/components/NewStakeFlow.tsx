@@ -23,10 +23,9 @@ interface NewStakeFlowProps {
 }
 
 export const NewStakeFlow = ({
-                               delegates,
-                               fetchDelegates,
-                             }: NewStakeFlowProps) => {
-
+  delegates,
+  fetchDelegates,
+}: NewStakeFlowProps) => {
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(0);
@@ -44,7 +43,6 @@ export const NewStakeFlow = ({
         title={PAGE_TITLE[step - 1]}
         totalSteps={3}
       />
-
 
       {step === 1 && (
         <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
@@ -73,8 +71,8 @@ export const NewStakeFlow = ({
       {step === 2 && (
         <>
           <div className="border rounded-xl w-full shadow-newDefault p-4 text-sm font-medium">
-            Uniswap voters manage staking rewards. Choose your delegate carefully to represent you in Uniswap
-            governance.
+            Uniswap voters manage staking rewards. Choose your delegate
+            carefully to represent you in Uniswap governance.
           </div>
           <DelegateCardList
             address={address}

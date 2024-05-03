@@ -2,7 +2,11 @@
 
 import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -14,10 +18,9 @@ interface EditStakeConfirmProps {
 }
 
 export const EditStakeConfirm = ({
-                                   amount,
-                                   deposit,
-                                 }: EditStakeConfirmProps) => {
-
+  amount,
+  deposit,
+}: EditStakeConfirmProps) => {
   const router = useRouter();
   const { token, contracts } = Tenant.current();
   const isValidInput = Boolean(amount > 0 && deposit);
@@ -54,7 +57,8 @@ export const EditStakeConfirm = ({
         </div>
 
         <div className="w-full text-center bg-white font-bold text-3xl text-black">
-          {formatNumber(numberToToken(amount).toString(), token.decimals)} {token.symbol}
+          {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
+          {token.symbol}
         </div>
       </div>
       <div className="text-sm py-4">
@@ -65,7 +69,6 @@ export const EditStakeConfirm = ({
         <Button className="w-full" disabled={true}>
           Confirming onchain transaction...
         </Button>
-
       ) : (
         <Button
           className="w-full"

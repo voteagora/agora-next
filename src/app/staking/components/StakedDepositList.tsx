@@ -17,13 +17,11 @@ interface StakedDepositListProps {
   deposits: StakedDeposit[];
 }
 
-export const StakedDepositList = ({
-                                    deposits,
-                                  }: StakedDepositListProps) => {
-
+export const StakedDepositList = ({ deposits }: StakedDepositListProps) => {
   const { address } = useAccount();
   const { data, isFetched } = useTokenBalance(address);
-  const { data: depositedBalance, isFetched: isDepositFetched } = useDepositorTotalStaked(address);
+  const { data: depositedBalance, isFetched: isDepositFetched } =
+    useDepositorTotalStaked(address);
   const hasTokenBalance = data && isFetched;
   const hasDepositedBalance = depositedBalance && isDepositFetched;
   const canDepositMode = hasTokenBalance && data > 0n;
@@ -38,9 +36,7 @@ export const StakedDepositList = ({
               className={`flex w-auto h-100 ${idx < deposits.length - 1 ? "border-b border-b-gray-300" : ""}`}
             >
               <div className="flex flex-col p-5 min-w-[140px]">
-                <div className="text-xs font-medium text-gray-700">
-                  Staked
-                </div>
+                <div className="text-xs font-medium text-gray-700">Staked</div>
                 <div className="font-medium">
                   <TokenAmountDisplay
                     maximumSignificantDigits={4}
@@ -67,8 +63,7 @@ export const StakedDepositList = ({
                   <DepositWithdrawButton
                     id={BigInt(deposit.id)}
                     amount={BigInt(deposit.amount)}
-                    onSuccess={() => {
-                    }}
+                    onSuccess={() => {}}
                   />
                 </HStack>
               </div>
@@ -89,12 +84,11 @@ export const StakedDepositList = ({
 
             <div className="font-light text-gray-600">
               <>
-                {hasDepositedBalance &&
+                {hasDepositedBalance && (
                   <span className="mr-2">
-                    <TokenAmountDisplay amount={depositedBalance} />{" "}staked
+                    <TokenAmountDisplay amount={depositedBalance} /> staked
                   </span>
-                }
-
+                )}
                 <TokenAmountDisplay
                   maximumSignificantDigits={4}
                   amount={data}

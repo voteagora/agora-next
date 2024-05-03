@@ -10,11 +10,9 @@ interface DelegateProfileImageProps {
 }
 
 export const DelegateProfileImage = ({
-                                address,
-                                votingPower,
-                              }: DelegateProfileImageProps) => {
-
-
+  address,
+  votingPower,
+}: DelegateProfileImageProps) => {
   const { data } = useEnsName({
     cacheTime: 23 * 60 * 60,
     chainId: 1,

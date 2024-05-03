@@ -3,7 +3,11 @@
 import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -13,11 +17,7 @@ interface NewStakeConfirmProps {
   address: string;
 }
 
-export const NewStakeConfirm = ({
-                                     amount,
-                                     address,
-                                   }: NewStakeConfirmProps) => {
-
+export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
   const router = useRouter();
   const { token, contracts } = Tenant.current();
   const isValidInput = Boolean(amount > 0 && address && isAddress(address));
@@ -54,7 +54,8 @@ export const NewStakeConfirm = ({
         </div>
 
         <div className="w-full text-center bg-white font-bold text-3xl text-black">
-          {formatNumber(numberToToken(amount).toString(), token.decimals)} {token.symbol}
+          {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
+          {token.symbol}
         </div>
       </div>
       <div className="text-sm py-4">
@@ -65,7 +66,6 @@ export const NewStakeConfirm = ({
         <Button className="w-full" disabled={true}>
           Confirming onchain transaction...
         </Button>
-
       ) : (
         <Button
           className="w-full"

@@ -19,10 +19,10 @@ interface SetStakeDialogProps {
 }
 
 export const SetStakeDialog = ({
-                                 amount: defaultAmount,
-                                 deposit,
-                                 onClick,
-                               }: SetStakeDialogProps) => {
+  amount: defaultAmount,
+  deposit,
+  onClick,
+}: SetStakeDialogProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
@@ -34,12 +34,13 @@ export const SetStakeDialog = ({
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
-    address as `0x${string}`,
+    address as `0x${string}`
   );
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
   const hasValidAmount =
-    deposit || (amount > 0 && amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals));
-
+    deposit ||
+    (amount > 0 &&
+      amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals));
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4">
@@ -66,7 +67,7 @@ export const SetStakeDialog = ({
                   variant="secondary"
                   onClick={() => {
                     setAmount(
-                      tokenToHumanNumber(Number(tokenBalance), token.decimals),
+                      tokenToHumanNumber(Number(tokenBalance), token.decimals)
                     );
                   }}
                 >

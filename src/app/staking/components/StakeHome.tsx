@@ -21,13 +21,12 @@ interface StakeHomeProps {
 }
 
 export const StakeHome = ({
-                            fetchDeposits,
-                            rewardDuration,
-                            rewardPerToken,
-                            totalStaked,
-                            totalSupply,
-                          }: StakeHomeProps) => {
-
+  fetchDeposits,
+  rewardDuration,
+  rewardPerToken,
+  totalStaked,
+  totalSupply,
+}: StakeHomeProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
   const [deposits, setDeposits] = useState<StakedDeposit[] | null>(null);
@@ -51,52 +50,55 @@ export const StakeHome = ({
     }
   }, [address]);
 
-  return <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
-    <div className="sm:col-span-4">
-      {hasDeposits ? (
-        <div>
-          <div className="font-black text-2xl mb-5">
-            Your {token.symbol} Stake
+  return (
+    <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
+      <div className="sm:col-span-4">
+        {hasDeposits ? (
+          <div>
+            <div className="font-black text-2xl mb-5">
+              Your {token.symbol} Stake
+            </div>
+            <StakedDepositList deposits={deposits} />
           </div>
-          <StakedDepositList deposits={deposits} />
-        </div>
-      ) : (
-        <div>
-          <div className="font-black text-2xl mb-5">
-            Introducing staking, the next chapter of Uniswap Governance
+        ) : (
+          <div>
+            <div className="font-black text-2xl mb-5">
+              Introducing staking, the next chapter of Uniswap Governance
+            </div>
+            <div className="text-gray-700">
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
+              quae ab illo inventore veritatis et quasi architecto beatae vitae
+              dicta sunt explicabo.
+            </div>
           </div>
-          <div className="text-gray-700">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-            accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-            illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-            explicabo.
-          </div>
-        </div>
-      )}
+        )}
 
-      <div className="mt-10">
-        <div className="font-black text-2xl mb-5">
-          {token.symbol} Staking Metrics
+        <div className="mt-10">
+          <div className="font-black text-2xl mb-5">
+            {token.symbol} Staking Metrics
+          </div>
+          <StakingPoolStats
+            rewardDuration={rewardDuration}
+            rewardPerToken={rewardPerToken}
+            totalStaked={totalStaked}
+            totalSupply={totalSupply}
+          />
         </div>
-        <StakingPoolStats
-          rewardDuration={rewardDuration}
-          rewardPerToken={rewardPerToken}
-          totalStaked={totalStaked}
-          totalSupply={totalSupply}
-        />
+        <FAQs />
       </div>
-      <FAQs />
-    </div>
-    <div className="sm:col-start-5">
-      {hasDeposits ? (
-        <div>
-          <h2 className="font-black text-2xl text-black mb-5">Your rewards</h2>
-          <PanelClaimRewards address={address} />
-        </div>
-      ) : (
-        <PanelNewDeposit address={address} />
-      )}
-    </div>
-  </HStack>;
+      <div className="sm:col-start-5">
+        {hasDeposits ? (
+          <div>
+            <h2 className="font-black text-2xl text-black mb-5">
+              Your rewards
+            </h2>
+            <PanelClaimRewards address={address} />
+          </div>
+        ) : (
+          <PanelNewDeposit address={address} />
+        )}
+      </div>
+    </HStack>
+  );
 };
-;

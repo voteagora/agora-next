@@ -27,7 +27,7 @@ export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
-  | SwithcNetworkDialogType
+  | SwithcNetworkDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {

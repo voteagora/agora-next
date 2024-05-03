@@ -29,18 +29,16 @@ interface Props {
 }
 
 export default function DelegateCardList({
-                                                  address,
-                                                  amount,
-                                                  initialDelegates,
-                                                  fetchDelegates,
-                                                  onSelect,
-                                                }: Props) {
-
+  address,
+  amount,
+  initialDelegates,
+  fetchDelegates,
+  onSelect,
+}: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
   const { namespace } = Tenant.current();
-
 
   useEffect(() => {
     setDelegates(initialDelegates.delegates);
@@ -52,7 +50,7 @@ export default function DelegateCardList({
       fetching.current = true;
       const data = await fetchDelegates(
         meta.currentPage + 1,
-        initialDelegates.seed,
+        initialDelegates.seed
       );
       setDelegates(delegates.concat(data.delegates));
       setMeta(data.meta);
