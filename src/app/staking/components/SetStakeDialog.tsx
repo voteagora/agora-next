@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 
 import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
-import { type DelegatePaginated, type StakedDeposit } from "@/lib/types";
+import { type StakedDeposit } from "@/lib/types";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";

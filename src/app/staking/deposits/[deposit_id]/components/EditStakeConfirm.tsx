@@ -2,33 +2,33 @@
 
 import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { isAddress } from "viem";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { StakedDeposit } from "@/lib/types";
 
-interface SetStakeDialogProps {
+interface EditStakeConfirmProps {
   amount: number;
-  address: string;
+  deposit: StakedDeposit;
 }
 
-export const StakeConfirmDialog = ({
-                                     amount,
-                                     address,
-                                   }: SetStakeDialogProps) => {
+export const EditStakeConfirm = ({
+                                   amount,
+                                   deposit,
+                                 }: EditStakeConfirmProps) => {
 
   const router = useRouter();
   const { token, contracts } = Tenant.current();
-  const isValidInput = Boolean(amount > 0 && address && isAddress(address));
+  const isValidInput = Boolean(amount > 0 && deposit);
 
   const { config } = usePrepareContractWrite({
     enabled: isValidInput,
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
-    functionName: "stake",
-    args: [numberToToken(amount), address as `0x${string}`],
+    functionName: "stakeMore",
+    args: [BigInt(deposit.id), numberToToken(amount)],
   });
 
   const { data, write, status } = useContractWrite(config);
@@ -42,7 +42,7 @@ export const StakeConfirmDialog = ({
     if (data?.hash && !isLoading) {
       setTimeout(() => {
         router.replace("/staking");
-      }, 6000);
+      }, 3000);
     }
   }, [isLoading, data?.hash]);
 
@@ -50,7 +50,7 @@ export const StakeConfirmDialog = ({
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
       <div className="border border-slate-300 rounded-lg p-4">
         <div className="text-center text-xs text-gray-600">
-          Staking {token.symbol}
+          Adding {token.symbol} to existing stake
         </div>
 
         <div className="w-full text-center bg-white font-bold text-3xl text-black">
@@ -74,7 +74,7 @@ export const StakeConfirmDialog = ({
             write?.();
           }}
         >
-          {isLoading ? "Staking..." : `Stake & delegate my ${token.symbol}`}
+          {isLoading ? "Staking..." : `Update Stake`}
         </Button>
       )}
     </div>

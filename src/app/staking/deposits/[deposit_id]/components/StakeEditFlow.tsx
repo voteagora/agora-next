@@ -9,7 +9,7 @@ import ReceiptContainer from "@/app/staking/components/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/Receipt";
 import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
-import { StakeConfirmDialog } from "@/app/staking/components/StakeConfirmDialog";
+import { EditStakeConfirm } from "@/app/staking/deposits/[deposit_id]/components/EditStakeConfirm";
 
 const PAGE_TITLE = [
   "Edit your stake",
@@ -50,6 +50,7 @@ export const StakeEditFlow = ({
               <Receipt
                 amount={amount}
                 delegatee={delegate}
+                deposit={deposit}
                 depositor={address}
                 title={"Editing your stake"}
               />
@@ -94,14 +95,15 @@ export const StakeEditFlow = ({
               <Receipt
                 amount={amount}
                 delegatee={delegate}
+                deposit={deposit}
                 depositor={address}
                 title={"Confirm your staking transaction"}
               />
             </ReceiptContainer>
           </div>
           <div className="sm:col-start-5">
-            {delegate && amount > 0 ? (
-              <StakeConfirmDialog amount={amount} address={delegate} />
+            {deposit && amount > 0 ? (
+              <EditStakeConfirm amount={amount} deposit={deposit} />
             ) : (
               "Something went wrong!"
             )}

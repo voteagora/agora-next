@@ -5,10 +5,12 @@ import styles from "../../../components/Staking/TransactionReceipt/transactionRe
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber, numberToToken } from "@/lib/utils";
+import type { StakedDeposit } from "@/lib/types";
 
 interface ReceiptProps {
   amount: number;
   delegatee?: string;
+  deposit?: StakedDeposit;
   depositor?: string;
   title: string;
 }
@@ -18,6 +20,7 @@ export const Receipt = ({
                           delegatee,
                           depositor,
                           title,
+                          deposit,
                         }: ReceiptProps) => {
 
   const { token } = Tenant.current();
@@ -59,6 +62,29 @@ export const Receipt = ({
             {formatNumber(numberToToken(amount).toString(), token.decimals)} {token.symbol}
           </p>
         </HStack>
+
+
+        {deposit && (
+          <>
+            <div className="h-0.5 w-full border-t border-dashed border-gray-300 my-5"></div>
+            {deposit.delegatee !== delegatee && (
+              <HStack className="w-full justify-between items-center text-black">
+                <p className="text-base leading-4">Previous delegate</p>
+                <p className="text-base leading-4">
+                  <ENSName address={deposit.delegatee} />
+                </p>
+              </HStack>
+            )}
+            <HStack className="w-full justify-between items-center text-black">
+              <p className="text-base leading-4">Previous deposit</p>
+              <p className="text-base leading-4">
+                {formatNumber(deposit.amount, token.decimals)} {token.symbol}
+              </p>
+            </HStack>
+
+          </>
+        )}
+
       </VStack>
       <div className="h-0.5 w-full border-t border-dashed border-gray-300 mt-[46px]"></div>
       <p className=" text-xs font-normal italic text-center mt-1 text-gray-4f ">

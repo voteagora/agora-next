@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 
-export const useDepositorTotalStaked = (address: string) => {
+export const useDepositorTotalStaked = (address?: string) => {
   const { contracts } = Tenant.current();
   const { data, isFetching, isFetched } = useQuery({
     enabled: !!address,

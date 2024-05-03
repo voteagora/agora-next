@@ -26,7 +26,7 @@ export const PanelClaimRewards = ({ address }: ClaimRewardsProps) => {
         height="164"
         width="320"
       />
-      <HStack gap={4} className="mt-4">
+      <HStack gap={4} className="my-4">
         <div className="min-w-[48px] h-12 p-3 rounded-lg  border border-gray-300 shadow-newDefault ">
           <Image height={24} width={24} src={icons.currency} alt="" />
         </div>
@@ -43,7 +43,6 @@ export const PanelClaimRewards = ({ address }: ClaimRewardsProps) => {
         variant="outline"
         size="lg"
         disabled={!hasRewards}
-        className="px-5"
       >
         Collect rewards
       </Button>

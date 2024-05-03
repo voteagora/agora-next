@@ -8,7 +8,7 @@ import { Receipt } from "@/app/staking/components/Receipt";
 import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
 import { useAccount } from "wagmi";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
-import { StakeConfirmDialog } from "@/app/staking/components/StakeConfirmDialog";
+import { NewStakeConfirm } from "@/app/staking/new/components/NewStakeConfirm";
 import { type DelegatePaginated } from "@/lib/types";
 
 const PAGE_TITLE = [
@@ -103,7 +103,7 @@ export const NewStakeFlow = ({
           </div>
           <div className="sm:col-start-5">
             {delegate && amount > 0 ? (
-              <StakeConfirmDialog amount={amount} address={delegate} />
+              <NewStakeConfirm amount={amount} address={delegate} />
             ) : (
               "Something went wrong!"
             )}
