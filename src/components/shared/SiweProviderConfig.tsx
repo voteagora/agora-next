@@ -4,8 +4,8 @@ import { decodeJwt } from "jose";
 
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
-
-const LOCAL_STORAGE_JWT_KEY = "siwe-jwt";
+const LOCAL_STORAGE_JWT_KEY = "agora-siwe-jwt";
+const AGORA_SIGN_IN = "Sign in to Agora with Ethereum";
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
@@ -15,6 +15,7 @@ export const siweProviderConfig: SIWEConfig = {
       version: "1",
       domain: window.location.host,
       uri: window.location.origin,
+      statement: AGORA_SIGN_IN,
       address,
       chainId,
       nonce,
@@ -31,13 +32,11 @@ export const siweProviderConfig: SIWEConfig = {
       }),
     }).then(async (res) => {
       // save JWT from verify to local storage
-      localStorage.setItem(LOCAL_STORAGE_JWT_KEY, await res.json());
+      const token = await res.json();
+      localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
       return res.ok;
     }),
   getSession: async () => {
-    /*fetch(`${API_AUTH_PREFIX}/session`).then((res) =>
-      res.ok ? res.json() : null
-    );*/
     // return JWT from local storage
     const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);
     if (!session) {
