@@ -6,7 +6,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
 interface DelegateProfileImageProps {
   address: string;
-  votingPower: string;
+  votingPower?: string;
 }
 
 export const DelegateProfileImage = ({
@@ -29,9 +29,11 @@ export const DelegateProfileImage = ({
         <div className="text-base font-semibold">
           <HumanAddress address={address} />
         </div>
-        <div className="text-xs font-semibold text-gray-800">
-          <TokenAmountDisplay amount={votingPower} />
-        </div>
+        {votingPower && (
+          <div className="text-xs font-semibold text-gray-800">
+            <TokenAmountDisplay amount={votingPower} />
+          </div>
+        )}
       </VStack>
     </HStack>
   );

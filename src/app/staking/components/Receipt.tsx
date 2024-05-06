@@ -8,7 +8,7 @@ import { formatNumber, numberToToken } from "@/lib/utils";
 import type { StakedDeposit } from "@/lib/types";
 
 interface ReceiptProps {
-  amount: number;
+  amount?: number;
   delegatee?: string;
   deposit?: StakedDeposit;
   depositor?: string;
@@ -48,34 +48,36 @@ export const Receipt = ({
 
         {delegatee && (
           <HStack className="w-full justify-between items-center text-black">
-            <p className="text-base leading-4">Delegated to</p>
+            <p className="text-base leading-4">Delegating to</p>
             <p className="text-base leading-4">
               <ENSName address={delegatee} />
             </p>
           </HStack>
         )}
 
-        <HStack className="w-full justify-between items-center text-black">
-          <p className="text-base leading-4">Deposit</p>
-          <p className="text-base leading-4">
-            {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
-            {token.symbol}
-          </p>
-        </HStack>
+        {amount && (
+          <HStack className="w-full justify-between items-center text-black">
+            <p className="text-base leading-4">Depositing</p>
+            <p className="text-base leading-4">
+              {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
+              {token.symbol}
+            </p>
+          </HStack>
+        )}
 
         {deposit && (
           <>
             <div className="h-0.5 w-full border-t border-dashed border-gray-300 my-5"></div>
             {deposit.delegatee !== delegatee && (
               <HStack className="w-full justify-between items-center text-black">
-                <p className="text-base leading-4">Previous delegate</p>
+                <p className="text-base leading-4">Existing delegate</p>
                 <p className="text-base leading-4">
                   <ENSName address={deposit.delegatee} />
                 </p>
               </HStack>
             )}
             <HStack className="w-full justify-between items-center text-black">
-              <p className="text-base leading-4">Previous deposit</p>
+              <p className="text-base leading-4">Existing stake amount</p>
               <p className="text-base leading-4">
                 {formatNumber(deposit.amount, token.decimals)} {token.symbol}
               </p>

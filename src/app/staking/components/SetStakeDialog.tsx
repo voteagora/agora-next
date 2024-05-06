@@ -13,14 +13,16 @@ import { Button } from "@/components/ui/button";
 import { tokenToHumanNumber } from "@/lib/utils";
 
 interface SetStakeDialogProps {
-  onClick: (value: number) => void;
   amount: number;
   deposit?: StakedDeposit;
+  onChange: (value: number) => void;
+  onClick: () => void;
 }
 
 export const SetStakeDialog = ({
   amount: defaultAmount,
   deposit,
+  onChange,
   onClick,
 }: SetStakeDialogProps) => {
   const { token } = Tenant.current();
@@ -55,6 +57,7 @@ export const SetStakeDialog = ({
               placeholder={`0 ${token.symbol}`}
               value={amount > 0 ? amount : ""}
               onChange={(e) => {
+                onChange(Number(e.target.value));
                 setAmount(Number(e.target.value));
               }}
               type="number"
@@ -66,9 +69,13 @@ export const SetStakeDialog = ({
                   className="text-uppercase bg-white text-xs rounded-full border w-10 h-10 items-center justify-center shadow-newDefault"
                   variant="secondary"
                   onClick={() => {
-                    setAmount(
-                      tokenToHumanNumber(Number(tokenBalance), token.decimals)
+                    const maxAmount = tokenToHumanNumber(
+                      Number(tokenBalance),
+                      token.decimals
                     );
+
+                    setAmount(maxAmount);
+                    onChange(maxAmount);
                   }}
                 >
                   MAX
@@ -101,11 +108,7 @@ export const SetStakeDialog = ({
           </div>
         </div>
       </div>
-      <Button
-        className="w-full "
-        disabled={!hasValidAmount}
-        onClick={() => onClick(amount)}
-      >
+      <Button className="w-full " disabled={!hasValidAmount} onClick={onClick}>
         Continue
       </Button>
     </div>

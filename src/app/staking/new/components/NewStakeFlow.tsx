@@ -50,7 +50,6 @@ export const NewStakeFlow = ({
             <ReceiptContainer>
               <Receipt
                 amount={amount}
-                delegatee={""}
                 depositor={address}
                 title={"Creating new stake"}
               />
@@ -59,10 +58,8 @@ export const NewStakeFlow = ({
           <div className="sm:col-start-5">
             <SetStakeDialog
               amount={amount}
-              onClick={(amount) => {
-                setAmount(amount);
-                setStep(2);
-              }}
+              onChange={(amount) => setAmount(amount)}
+              onClick={() => setStep(2)}
             />
           </div>
         </HStack>

@@ -2,12 +2,10 @@
 
 import React from "react";
 import HumanAddress from "@/components/shared/HumanAddress";
-import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { StakedDeposit } from "@/lib/types";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import Link from "next/link";
-import { Button } from "@/components/Button";
 import { HStack } from "@/components/Layout/Stack";
 import { DepositWithdrawButton } from "@/app/staking/components/DepositWithdrawButton";
 import { useAccount } from "wagmi";
@@ -47,25 +45,26 @@ export const StakedDepositList = ({ deposits }: StakedDepositListProps) => {
 
               <div className="border-r border-gray-300"></div>
 
-              <div className="flex flex-col p-5">
-                <HStack>
-                  <div>
-                    <div className="text-xs font-medium text-gray-700">
-                      Vote delegated to
-                    </div>
-                    <div className="font-medium">
-                      <HumanAddress address={deposit.delegatee} />
-                    </div>
+              <div className="flex flex-row p-5 gap-5 justify-between w-full">
+                <div>
+                  <div className="text-xs font-medium text-gray-700">
+                    Vote delegated to
                   </div>
-                  <Link href={`/staking/deposits/${deposit.id}`}>
-                    Manage deposit
+                  <div className="font-medium">
+                    <HumanAddress address={deposit.delegatee} />
+                  </div>
+                </div>
+                <div className="flex flex-row justify-evenly gap-5">
+                  <Link href={`/staking/deposits/${deposit.id}`}>Add More</Link>
+                  <Link href={`/staking/deposits/${deposit.id}/delegate`}>
+                    Change Delegate
                   </Link>
                   <DepositWithdrawButton
                     id={BigInt(deposit.id)}
                     amount={BigInt(deposit.amount)}
                     onSuccess={() => {}}
                   />
-                </HStack>
+                </div>
               </div>
             </div>
           );

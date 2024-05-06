@@ -12,7 +12,7 @@ interface DelegateCardProps {
   twitter?: string;
   onSelect: (address: string) => void;
   statement: string;
-  votingPower: string;
+  votingPower?: string;
 }
 
 export const DelegateCard = ({

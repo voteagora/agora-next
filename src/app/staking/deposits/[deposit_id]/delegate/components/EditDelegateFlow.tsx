@@ -7,30 +7,27 @@ import { BreadcrumbsNav } from "@/app/staking/components/BreadcrumbsNav";
 import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/Receipt";
-import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
-import { EditStakeConfirm } from "@/app/staking/deposits/[deposit_id]/components/EditStakeConfirm";
+import { EditDelegateConfirm } from "@/app/staking/deposits/[deposit_id]/delegate/components/EditDelegateConfirm";
+import { tokenToHumanNumber } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
-const PAGE_TITLE = [
-  "Edit your stake",
-  "Choose delegate",
-  "Confirm your transaction",
-];
+const PAGE_TITLE = ["Edit Delegate", "Confirm your transaction"];
 
-interface StakeEditFlowProps {
+interface EditDelegateFlowProps {
   delegates: DelegatePaginated;
   deposit: StakedDeposit;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
 }
 
-export const StakeEditFlow = ({
+export const EditDelegateFlow = ({
   deposit,
   fetchDelegates,
   delegates,
-}: StakeEditFlowProps) => {
+}: EditDelegateFlowProps) => {
+  const { token } = Tenant.current();
   const { address } = useAccount();
   const [step, setStep] = useState(1);
-  const [amount, setAmount] = useState(0);
   const [delegate, setDelegate] = useState<string>(deposit.delegatee);
 
   return (
@@ -39,36 +36,10 @@ export const StakeEditFlow = ({
         step={step}
         onClick={setStep}
         title={PAGE_TITLE[step - 1]}
-        totalSteps={3}
+        totalSteps={2}
       />
 
       {step === 1 && (
-        <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
-          <div className="sm:col-span-4">
-            <ReceiptContainer>
-              <Receipt
-                amount={amount}
-                delegatee={delegate}
-                deposit={deposit}
-                depositor={address}
-                title={"Editing your stake"}
-              />
-            </ReceiptContainer>
-          </div>
-          <div className="sm:col-start-5">
-            <SetStakeDialog
-              amount={amount}
-              deposit={deposit}
-              onClick={(amount) => {
-                setAmount(amount);
-                setStep(2);
-              }}
-            />
-          </div>
-        </HStack>
-      )}
-
-      {step === 2 && (
         <>
           <div className="border rounded-xl w-full shadow-newDefault p-4 text-sm font-medium">
             Uniswap voters manage staking rewards. Choose your delegate
@@ -76,10 +47,10 @@ export const StakeEditFlow = ({
           </div>
           <DelegateCardList
             address={deposit.depositor}
-            amount={amount}
+            amount={tokenToHumanNumber(Number(deposit.amount), token.decimals)}
             onSelect={(address) => {
               setDelegate(address);
-              setStep(3);
+              setStep(2);
             }}
             initialDelegates={delegates}
             fetchDelegates={fetchDelegates}
@@ -87,25 +58,20 @@ export const StakeEditFlow = ({
         </>
       )}
 
-      {step === 3 && (
+      {step === 2 && (
         <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
-                amount={amount}
                 delegatee={delegate}
                 deposit={deposit}
                 depositor={address}
-                title={"Confirm your staking transaction"}
+                title={"Confirm delegate update transaction"}
               />
             </ReceiptContainer>
           </div>
           <div className="sm:col-start-5">
-            {deposit && amount > 0 ? (
-              <EditStakeConfirm amount={amount} deposit={deposit} />
-            ) : (
-              "Something went wrong!"
-            )}
+            <EditDelegateConfirm delegate={delegate} deposit={deposit} />
           </div>
         </HStack>
       )}

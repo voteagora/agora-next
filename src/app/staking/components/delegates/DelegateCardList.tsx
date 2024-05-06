@@ -82,7 +82,6 @@ export default function DelegateCardList({
           onSelect={onSelect}
           statement={`Delegate your votes to yourself to engage directly in ${capitalizeFirstLetter(namespace)} governance.`}
           action={"I’ll vote myself"}
-          votingPower={numberToToken(amount).toString()}
         />
         {delegates.map((delegate) => {
           let truncatedStatement = "";
