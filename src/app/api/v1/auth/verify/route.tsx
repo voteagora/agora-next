@@ -57,7 +57,11 @@ export async function POST(request: Request) {
   // TODO: resolve ttl based on wallet address or user record
   const scope = await getScopeForUser(user.id);
   const ttl = await getExpiryForUser(user.id);
-  const jwt = await generateJwt(user.id, scope, ttl);
+  const jwt = await generateJwt(user.id, scope, ttl, {
+    address: verification.data.address,
+    chainId: `${verification.data.chainId}`,
+    nonce: nonce,
+  });
 
   const responseBody = {
     access_token: jwt,
