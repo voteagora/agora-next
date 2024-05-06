@@ -5,6 +5,7 @@ import {
   getScopeForUser,
   getExpiryForUser,
 } from "@/app/lib/auth/serverAuth";
+import prisma from "@/app/lib/prisma";
 
 // This should create a user id record if there is not one already
 // This should not generate an API key
