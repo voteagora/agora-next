@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/middleware/auth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-import { fetchRetroFundingRound } from "@/app/api/common/rounds/getRetroFundingRounds";
+import { fetchRetroFundingRounds } from "@/app/api/common/rounds/getRetroFundingRounds";
 
 export async function GET(
   request: NextRequest,
@@ -15,10 +15,8 @@ export async function GET(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId } = route.params;
-
     try {
-      const round = await fetchRetroFundingRound(roundId);
+      const round = await fetchRetroFundingRounds();
       return NextResponse.json(round);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
