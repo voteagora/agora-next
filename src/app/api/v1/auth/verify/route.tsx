@@ -3,7 +3,7 @@ import { SiweMessage } from "siwe";
 import {
   generateJwt,
   getScopeForUser,
-  getExpiryForUser,
+  getExpiry,
 } from "@/app/lib/auth/serverAuth";
 
 // This should create a user id record if there is not one already
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   // TODO: resovle scope based on wallet address or user record
   // TODO: resolve ttl based on wallet address or user record
   const scope = await getScopeForUser(user.id);
-  const ttl = await getExpiryForUser(user.id);
+  const ttl = await getExpiry();
   const jwt = await generateJwt(user.id, scope, ttl);
 
   const responseBody = {

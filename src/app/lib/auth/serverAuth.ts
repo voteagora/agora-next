@@ -73,7 +73,7 @@ export async function generateJwt(
   ttl?: number | null
 ): Promise<string> {
   const resolvedScope = scope || (await getScopeForUser(userId));
-  const resolvedTtl = ttl || (await getExpiryForUser(userId));
+  const resolvedTtl = ttl || (await getExpiry());
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + resolvedTtl;
 
@@ -90,7 +90,7 @@ export async function generateJwt(
     .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 }
 
-export async function getExpiryForUser(userId: string) {
+export async function getExpiry() {
   // TODO, depending on TTL policy
   return DEFAULT_JWT_TTL;
 }
