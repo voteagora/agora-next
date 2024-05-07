@@ -3,7 +3,7 @@
 import { FC, PropsWithChildren } from "react";
 import { createConfig, WagmiConfig } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet, optimism } from "wagmi/chains";
+import { mainnet, optimism, sepolia } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
@@ -33,7 +33,7 @@ const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: [optimism, mainnet],
+    chains: [optimism, mainnet, sepolia],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,

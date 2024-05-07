@@ -11,6 +11,11 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
 
 let provider: MulticallProvider;
 let ethProvider: MulticallProvider;
+const sepoliaProvider = MulticallWrapper.wrap(
+  getDefaultProvider("sepolia", {
+    alchemy: alchemyId,
+  })
+);
 
 if (isProd) {
   provider = MulticallWrapper.wrap(
@@ -44,4 +49,4 @@ if (isProd) {
 }
 
 export default provider;
-export { ethProvider };
+export { ethProvider, sepoliaProvider };

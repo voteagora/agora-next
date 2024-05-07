@@ -11,6 +11,8 @@ import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
+import { UpdatedButton } from "@/components/Button";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -19,6 +21,12 @@ export default function ProposalsList({
   votableSupply,
   governanceCalendar,
 }) {
+  const {
+    ui: { _toggles },
+  } = Tenant.current();
+  const tenantSupportsProposalLifecycle = _toggles?.some(
+    (toggle) => toggle.name === "proposal-lifecycle" && toggle.enabled
+  );
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
@@ -50,8 +58,17 @@ export default function ProposalsList({
       {/* {address && <NonVotedProposalsList address={address} />} */}
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
-        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
+          {tenantSupportsProposalLifecycle && (
+            <UpdatedButton
+              href="/proposals/draft"
+              variant="rounded"
+              type="primary"
+            >
+              Create
+            </UpdatedButton>
+          )}
         </div>
       </div>
 

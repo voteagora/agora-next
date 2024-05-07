@@ -123,6 +123,10 @@ const ensUI = new TenantUI({
       name: "delegates",
       enabled: true,
     },
+    {
+      name: "proposal-lifecycle",
+      enabled: true,
+    },
   ],
 });
 

@@ -1,0 +1,71 @@
+"use client";
+
+import { z } from "zod";
+import { useFormState } from "react-dom";
+import { useForm } from "react-hook-form";
+import { redirect } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormCard from "../form/FormCard";
+import FormItem from "../form/FormItem";
+import TextInput from "../form/TextInput";
+import { UpdatedButton } from "@/components/Button";
+import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
+import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
+
+const TempCheckForm = () => {
+  const [state, formAction] = useFormState(tempCheckAction, {
+    message: "",
+  });
+
+  const {
+    register,
+    formState: { errors },
+  } = useForm<z.output<typeof tempCheckSchema>>({
+    resolver: zodResolver(tempCheckSchema),
+  });
+
+  return (
+    <form
+      action={async (formData: FormData) => {
+        await formAction(formData);
+        // this should probably be order in the tenent list + 1
+        redirect(`/proposals/draft?stage=1`);
+      }}
+    >
+      <FormCard>
+        <FormCard.Section>
+          <span className="w-full rounded-md h-[300px] bg-agora-stone-50 border border-agora-stone-100 block"></span>
+          <p className="mt-4 text-stone-700">
+            We encourage you to go to Discourse to post a temp check that helps
+            gauge the community's interest. It's not mandatory, but helps create
+            alignment with the voter base.
+          </p>
+        </FormCard.Section>
+        <FormCard.Section>
+          <div className="flex flex-row justify-between space-x-2">
+            <div className="flex-grow">
+              <FormItem label="Link" required={false} htmlFor="tempcheck_link">
+                <TextInput
+                  name="tempcheck_link"
+                  register={register}
+                  placeholder="https://discuss.ens.domains/"
+                  errorMessage={errors.tempcheck_link?.message}
+                />
+              </FormItem>
+            </div>
+            <div className="space-x-2 self-end">
+              <UpdatedButton type="secondary" isSubmit={true}>
+                Skip
+              </UpdatedButton>
+              <UpdatedButton type="primary" isSubmit={true}>
+                Continue
+              </UpdatedButton>
+            </div>
+          </div>
+        </FormCard.Section>
+      </FormCard>
+    </form>
+  );
+};
+
+export default TempCheckForm;

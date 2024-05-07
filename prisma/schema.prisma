@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "test", "uniswap"]
 }
 
 model DelegateStatements {
@@ -785,6 +785,122 @@ view uniswapStakedDeposits {
   @@map("staked_deposits")
   @@schema("uniswap")
 }
+
+model Daos {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  dao_slug          String              @unique
+  Proposals         ProposalDraft[]
+  DaoProposalStatus DaoProposalStatus[]
+  @@map("daos")
+  @@schema("test")
+}
+
+model ProposalDraft {
+  id                          Int                        @id @default(autoincrement())
+  temp_check_link             String
+  proposal_type               String
+  title                       String
+  description                 String
+  abstract                    String
+  audit_url                   String?
+  dao_slug                    String
+  author_address              String
+  sponsor_address             String?
+  txs_simulated_and_passed_at DateTime?
+  temp_check_added_at         DateTime?
+  created_at                  DateTime                   @default(now())
+  updated_at                  DateTime                   @updatedAt
+  onchain_transaction_hash    String?
+  voting_strategy_social      String?
+  start_date_social           DateTime?
+  end_date_social             DateTime?
+  proposal_status_id          Int
+  transactions                ProposalDraftTransaction[]
+  ProposalDaoAttributes       ProposalDaoAttributes[]
+  dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
+  proposal_status             DaoProposalStatus          @relation(fields: [proposal_status_id], references: [id], onDelete: Restrict)
+  ProposalDraftOption         ProposalDraftOption[]
+  ProposalChecklist           ProposalChecklist[]
+  @@map("proposals")
+  @@schema("test")
+}
+
+model ProposalDraftTransaction {
+  id               Int           @id @default(autoincrement())
+  proposal_id      Int
+  order            Int
+  target           String        @db.VarChar(255)
+  value            String        @db.VarChar(255)
+  calldata         String
+  function_details String
+  contract_abi     String
+  description      String
+  is_valid         Boolean
+  type             String        @db.VarChar(32)
+  created_at       DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  transfer_amount  Decimal?      @db.Decimal
+  transfer_to      String?       @db.VarChar(255)
+  token_address    String?       @db.VarChar(255)
+  proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@map("proposal_transactions")
+  @@schema("test")
+}
+
+model ProposalDraftOption {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  text        String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  @@map("proposal_options")
+  @@schema("test")
+}
+
+model ProposalStatus {
+  id                Int                 @id @default(autoincrement())
+  status            String              @unique
+  DaoProposalStatus DaoProposalStatus[]
+  @@map("proposal_status")
+  @@schema("test")
+}
+
+model ProposalChecklist {
+  id           Int           @id @default(autoincrement())
+  stage        String
+  completed_at DateTime      @default(now())
+  completed_by String
+  proposal_id  Int
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  @@map("proposal_checklist")
+  @@schema("test")
+}
+
+model DaoProposalStatus {
+  id                 Int             @id @default(autoincrement())
+  dao_id             Int
+  proposal_status_id Int
+  ordinal            Int
+  Daos               Daos            @relation(fields: [dao_id], references: [id], onDelete: Cascade)
+  ProposalStatus     ProposalStatus  @relation(fields: [proposal_status_id], references: [id], onDelete: Cascade)
+  Proposals          ProposalDraft[]
+  @@unique([dao_id, proposal_status_id])
+  @@map("dao_proposal_status")
+  @@schema("test")
+}
+
+model ProposalDaoAttributes {
+  id              Int           @id @default(autoincrement())
+  proposal_id     Int
+  attribute_key   String
+  attribute_value String
+  proposal        ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  @@map("proposal_dao_attributes")
+  @@schema("test")
+}
+
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_voting_power_raw_snaps {

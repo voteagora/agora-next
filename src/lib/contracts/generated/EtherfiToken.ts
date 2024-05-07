@@ -117,7 +117,7 @@ export interface EtherfiTokenInterface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -155,7 +155,7 @@ export interface EtherfiTokenInterface extends Interface {
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
@@ -230,7 +230,7 @@ export namespace ApprovalEvent {
   export type InputTuple = [
     owner: AddressLike,
     spender: AddressLike,
-    value: BigNumberish,
+    value: BigNumberish
   ];
   export type OutputTuple = [owner: string, spender: string, value: bigint];
   export interface OutputObject {
@@ -248,12 +248,12 @@ export namespace DelegateChangedEvent {
   export type InputTuple = [
     delegator: AddressLike,
     fromDelegate: AddressLike,
-    toDelegate: AddressLike,
+    toDelegate: AddressLike
   ];
   export type OutputTuple = [
     delegator: string,
     fromDelegate: string,
-    toDelegate: string,
+    toDelegate: string
   ];
   export interface OutputObject {
     delegator: string;
@@ -270,12 +270,12 @@ export namespace DelegateVotesChangedEvent {
   export type InputTuple = [
     delegate: AddressLike,
     previousVotes: BigNumberish,
-    newVotes: BigNumberish,
+    newVotes: BigNumberish
   ];
   export type OutputTuple = [
     delegate: string,
     previousVotes: bigint,
-    newVotes: bigint,
+    newVotes: bigint
   ];
   export interface OutputObject {
     delegate: string;
@@ -302,7 +302,7 @@ export namespace TransferEvent {
   export type InputTuple = [
     from: AddressLike,
     to: AddressLike,
-    value: BigNumberish,
+    value: BigNumberish
   ];
   export type OutputTuple = [from: string, to: string, value: bigint];
   export interface OutputObject {
@@ -404,7 +404,7 @@ export interface EtherfiToken extends BaseContract {
       expiry: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
@@ -423,7 +423,7 @@ export interface EtherfiToken extends BaseContract {
         verifyingContract: string;
         salt: string;
         extensions: bigint[];
-      },
+      }
     ],
     "view"
   >;
@@ -456,7 +456,7 @@ export interface EtherfiToken extends BaseContract {
       deadline: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
@@ -540,7 +540,7 @@ export interface EtherfiToken extends BaseContract {
       expiry: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
@@ -548,7 +548,9 @@ export interface EtherfiToken extends BaseContract {
   getFunction(
     nameOrSignature: "delegates"
   ): TypedContractMethod<[account: AddressLike], [string], "view">;
-  getFunction(nameOrSignature: "eip712Domain"): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "eip712Domain"
+  ): TypedContractMethod<
     [],
     [
       [string, string, string, bigint, string, string, bigint[]] & {
@@ -559,7 +561,7 @@ export interface EtherfiToken extends BaseContract {
         verifyingContract: string;
         salt: string;
         extensions: bigint[];
-      },
+      }
     ],
     "view"
   >;
@@ -595,7 +597,7 @@ export interface EtherfiToken extends BaseContract {
       deadline: BigNumberish,
       v: BigNumberish,
       r: BytesLike,
-      s: BytesLike,
+      s: BytesLike
     ],
     [void],
     "nonpayable"
