@@ -5,8 +5,8 @@ import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import { BreadcrumbsNav } from "@/app/staking/components/BreadcrumbsNav";
 import { HStack } from "@/components/Layout/Stack";
-import ReceiptContainer from "@/app/staking/components/ReceiptContainer";
-import { Receipt } from "@/app/staking/components/Receipt";
+import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";
+import { Receipt } from "@/app/staking/components/receipt/Receipt";
 import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
 import { EditDepositConfirm } from "@/app/staking/deposits/[deposit_id]/components/EditDepositConfirm";
 

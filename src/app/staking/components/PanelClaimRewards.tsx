@@ -8,12 +8,10 @@ import { icons } from "@/assets/icons/icons";
 import { formatNumber } from "@/lib/utils";
 import React from "react";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 
-interface ClaimRewardsProps {
-  address?: string;
-}
-
-export const PanelClaimRewards = ({ address }: ClaimRewardsProps) => {
+export const PanelClaimRewards = () => {
+  const { address } = useAccount();
   const { token } = Tenant.current();
   const { data } = useUnclaimedReward(address);
   const hasRewards = data && data > 0;

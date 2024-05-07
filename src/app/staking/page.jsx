@@ -2,10 +2,17 @@ import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { StakeHome } from "@/app/staking/components/StakeHome";
 import { apiFetchStakedDeposits } from "@/app/api/staking/getStakedDeposits";
+import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 
 async function fetchDeposits(address) {
   "use server";
   return apiFetchStakedDeposits({ address });
+}
+
+async function apiFetchDelegate(address) {
+  "use server";
+  console.log(address);
+  // return fetchDelegate({ address });
 }
 
 export default async function Page() {
@@ -26,6 +33,7 @@ export default async function Page() {
   return (
     <StakeHome
       fetchDeposits={fetchDeposits}
+      fetchDelegate={apiFetchDelegate}
       totalSupply={totalSupply}
       totalStaked={totalStaked}
       rewardPerToken={rewardPerToken}

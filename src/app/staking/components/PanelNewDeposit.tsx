@@ -5,13 +5,11 @@ import React from "react";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 import { useRouter } from "next/navigation";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
-interface NewDepositPanelProps {
-  address?: string;
-}
-
-export const PanelNewDeposit = ({ address }: NewDepositPanelProps) => {
-  const { token } = Tenant.current();
+export const PanelNewDeposit = () => {
+  const { isConnected } = useAgoraContext();
+  const { token, namespace } = Tenant.current();
   const router = useRouter();
 
   return (
@@ -23,12 +21,12 @@ export const PanelNewDeposit = ({ address }: NewDepositPanelProps) => {
         width="320"
       />
       <div className="text-md">
-        Stake your UNI to start earning rewards from Uniswap liquidity pools.
+        {`Stake your ${token.symbol} to start earning rewards from ${namespace} liquidity pools.`}
       </div>
       <Button
         className="mt-2"
         variant="default"
-        disabled={!address}
+        disabled={!isConnected}
         onClick={() => router.push("/staking/new")}
       >
         Stake {token.symbol} to start earning

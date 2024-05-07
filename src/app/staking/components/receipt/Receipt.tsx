@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "../../../components/Staking/TransactionReceipt/transactionReceipt.module.scss";
+import styles from "../../../../components/Staking/TransactionReceipt/transactionReceipt.module.scss";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber, numberToToken } from "@/lib/utils";
