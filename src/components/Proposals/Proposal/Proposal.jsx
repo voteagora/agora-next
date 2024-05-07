@@ -52,7 +52,9 @@ export default function Proposal({ proposal, votableSupply }) {
               </div>
             </HStack>
           )}
-          <div className={cn(styles.cell_content_body, styles.proposal_title)}>
+          <div
+            className={`${styles.cell_content_body} ${styles.proposal_title} overflow-visible whitespace-normal break-words`}
+          >
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`
               : proposal.markdowntitle}
