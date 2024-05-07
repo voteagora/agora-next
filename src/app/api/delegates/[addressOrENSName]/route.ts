@@ -1,13 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-import { fetchRetroFundingRound } from "@/app/api/common/rounds/getRetroFundingRounds";
-
-export async function GET(
-  request: NextRequest,
-  route: { params: { roundId: string } }
-) {
+export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -15,11 +11,10 @@ export async function GET(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId } = route.params;
-
     try {
-      const round = await fetchRetroFundingRound(roundId);
-      return NextResponse.json(round);
+      const addressOrENSName = request.nextUrl.pathname.split("/")[3];
+      const delegate = await fetchDelegate(addressOrENSName);
+      return NextResponse.json(delegate);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
