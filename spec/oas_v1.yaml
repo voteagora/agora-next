@@ -49,8 +49,10 @@ components:
       type: object
       properties:
         message:
+          summary: SIWE message for verification
           type: string
         signature:
+          summary: SIWE message signature for verification
           type: string
         nonce:
           type: string
