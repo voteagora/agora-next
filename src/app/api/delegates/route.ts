@@ -13,7 +13,8 @@ import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
 } from "@/app/api/common/utils/validators";
-import { traceWithUserId } from "../apiUtils";
+// TODO: consolidate utils/libs
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 const DEFAULT_SORT = "most_delegators";
 const DEFAULT_MAX_LIMIT = 100;
