@@ -70,7 +70,12 @@ function hashApiKey(apiKey: string) {
 export async function generateJwt(
   userId: string,
   scope?: string | null,
-  ttl?: number | null
+  ttl?: number | null,
+  siweData?: {
+    address: string;
+    chainId: string;
+    nonce: string;
+  } | null
 ): Promise<string> {
   const resolvedScope = scope || (await getScopeForUser(userId));
   const resolvedTtl = ttl || (await getExpiry());
@@ -80,6 +85,7 @@ export async function generateJwt(
   const payload: JWTPayload = {
     sub: userId,
     scope: resolvedScope,
+    siwe: siweData ? { ...siweData } : undefined,
   };
 
   return new SignJWT({ ...payload })
