@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-import { fetchImpactMetricsApi } from "@/app/api/common/impactMetrics/getImpactMetrics";
+import { fetchRetroFundingRounds } from "@/app/api/common/rounds/getRetroFundingRounds";
 
 export async function GET(
   request: NextRequest,
@@ -16,9 +16,8 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId } = route.params;
-      const impactMetrics = await fetchImpactMetricsApi(roundId);
-      return NextResponse.json(impactMetrics);
+      const round = await fetchRetroFundingRounds();
+      return NextResponse.json(round);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
