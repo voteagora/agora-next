@@ -789,7 +789,7 @@ view uniswapStakedDeposits {
 model Daos {
   id                Int                 @id @default(autoincrement())
   name              String              @unique
-  dao_slug          String              @unique
+  dao_slug          DaoSlug             @unique
   Proposals         ProposalDraft[]
   @@map("daos")
   @@schema("test2")
@@ -803,7 +803,7 @@ model ProposalDraft {
   description                 String
   abstract                    String
   audit_url                   String?
-  dao_slug                    String
+  dao_slug                    DaoSlug
   author_address              String
   sponsor_address             String?
   txs_simulated_and_passed_at DateTime?
@@ -811,12 +811,8 @@ model ProposalDraft {
   created_at                  DateTime                   @default(now())
   updated_at                  DateTime                   @updatedAt
   onchain_transaction_hash    String?
-  voting_strategy_social      String?
-  start_date_social           DateTime?
-  end_date_social             DateTime?
   transactions                ProposalDraftTransaction[]
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
-  ProposalDraftOption         ProposalDraftOption[]
   ProposalChecklist           ProposalChecklist[]
   @@map("proposals")
   @@schema("test2")
@@ -841,17 +837,6 @@ model ProposalDraftTransaction {
   token_address    String?       @db.VarChar(255)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   @@map("proposal_transactions")
-  @@schema("test2")
-}
-
-model ProposalDraftOption {
-  id          Int           @id @default(autoincrement())
-  proposal_id Int
-  text        String
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
-  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
-  @@map("proposal_options")
   @@schema("test2")
 }
 

@@ -12,8 +12,9 @@ import { UpdatedButton } from "@/components/Button";
 import { schema as draftProposalSchema } from "../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../actions/createDraftProposal";
 import { ProposalType, TransactionType } from "../../types";
+import { ProposalDraft } from "@prisma/client";
 
-const DraftForm = () => {
+const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const {
     register,
     control,

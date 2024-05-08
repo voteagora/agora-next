@@ -47,7 +47,7 @@ const SUBMISSION_CHECKLIST_ITEMS = [
   },
 ];
 
-const SubmitForm = () => {
+const SubmitForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   return (
     <form>
       <FormCard>

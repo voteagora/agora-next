@@ -10,7 +10,7 @@ export type FormState = {
 };
 
 export async function onSubmitAction(
-  data: z.output<typeof tempCheckSchema> & { dao_slug: string }
+  data: z.output<typeof tempCheckSchema> & { draftProposalId: number }
 ): Promise<FormState> {
   const parsed = tempCheckSchema.safeParse(data);
 
@@ -21,20 +21,13 @@ export async function onSubmitAction(
     };
   }
 
-  const EMPTY_PROPOSAL_DEFAULTS = {
-    title: "",
-    description: "",
-    abstract: "",
-    author_address: "",
-    proposal_type: "",
-  };
-
   try {
-    await prisma.proposalDraft.create({
+    await prisma.proposalDraft.update({
+      where: {
+        id: data.draftProposalId,
+      },
       data: {
-        ...EMPTY_PROPOSAL_DEFAULTS,
         temp_check_link: parsed.data.temp_check_link || "",
-        dao_slug: "", // TODO: this should come from the form
       },
     });
 

@@ -1,11 +1,13 @@
 import Tenant from "@/lib/tenant/tenant";
-import DraftProposalForm from "./components/DraftProposalForm";
-import DraftProposalChecklist from "./components/DraftProposalChecklist";
+import DraftProposalForm from "../components/DraftProposalForm";
+import DraftProposalChecklist from "../components/DraftProposalChecklist";
 import {
   ProposalLifecycleStageMetadata,
   ProposalLifecycleStage,
-} from "./types";
-import BackButton from "./components/BackButton";
+} from "../types";
+import BackButton from "../components/BackButton";
+import prisma from "@/app/lib/prisma";
+import { ProposalDraft } from "@prisma/client";
 
 /**
  * Eventually want to abstract this into the UI factory
@@ -17,11 +19,25 @@ const STAGES_FOR_TENANT = [
   ProposalLifecycleStage.READY,
 ];
 
+const getDraftProposal = async (id: number) => {
+  const draftProposal = await prisma.proposalDraft.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  return draftProposal as ProposalDraft;
+};
+
 export default async function DraftProposalPage({
+  params,
   searchParams,
 }: {
+  params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
+  const draftProposal = await getDraftProposal(parseInt(params.id));
+
   const {
     ui: { _toggles },
   } = Tenant.current();
@@ -46,7 +62,12 @@ export default async function DraftProposalPage({
   return (
     <main className="max-w-screen-xl mx-auto mt-10">
       <div className="mb-4 flex flex-row items-center space-x-6">
-        {stageIndex > 0 && <BackButton index={stageIndex} />}
+        {stageIndex > 0 && (
+          <BackButton
+            draftProposalId={parseInt(params.id)}
+            index={stageIndex}
+          />
+        )}
         <h1 className="font-black text-stone-900 text-2xl m-0">
           {stageMetadata?.title}
         </h1>
@@ -56,7 +77,7 @@ export default async function DraftProposalPage({
       </div>
       <div className="grid grid-cols-3 gap-6">
         <section className="col-span-2">
-          <DraftProposalForm stage={stage} />
+          <DraftProposalForm stage={stage} draftProposal={draftProposal} />
         </section>
         <section className="col-span-1">
           <DraftProposalChecklist stage={stage} />

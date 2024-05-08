@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
+import { useAccount } from "wagmi";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
@@ -11,8 +11,8 @@ import Proposal from "../Proposal/Proposal";
 import styles from "./proposalLists.module.scss";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
-import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
+import CreateProposalDraftButton from "./CreateProposalDraftButton";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -21,6 +21,7 @@ export default function ProposalsList({
   votableSupply,
   governanceCalendar,
 }) {
+  const { address } = useAccount();
   const {
     ui: { _toggles },
   } = Tenant.current();
@@ -60,14 +61,8 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
-          {tenantSupportsProposalLifecycle && (
-            <UpdatedButton
-              href="/proposals/draft"
-              variant="rounded"
-              type="primary"
-            >
-              Create
-            </UpdatedButton>
+          {tenantSupportsProposalLifecycle && address && (
+            <CreateProposalDraftButton address={address} />
           )}
         </div>
       </div>

@@ -1,9 +1,9 @@
 "use client";
 
 import { z } from "zod";
-import Tenant from "@/lib/tenant/tenant";
+// import Tenant from "@/lib/tenant/tenant";
 import { useForm } from "react-hook-form";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
 import FormItem from "../form/FormItem";
@@ -11,26 +11,30 @@ import TextInput from "../form/TextInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
+import { ProposalDraft } from "@prisma/client";
 
-const TempCheckForm = () => {
-  const { slug: dao_slug } = Tenant.current();
-
+const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<z.output<typeof tempCheckSchema>>({
     resolver: zodResolver(tempCheckSchema),
+    defaultValues: {
+      temp_check_link: draftProposal.temp_check_link,
+    },
   });
 
   const onSubmit = async (data: z.output<typeof tempCheckSchema>) => {
     const res = await tempCheckAction({
       ...data,
-      dao_slug: dao_slug.toLowerCase(),
+      draftProposalId: draftProposal.id,
     });
     console.log(res);
 
-    redirect(`/proposals/draft?stage=1`);
+    // not sure why redirect is not working
+    // redirect(`/proposals/draft?stage=1`);
+    window.location.href = `/proposals/draft/${draftProposal.id}?stage=1`;
   };
 
   return (
