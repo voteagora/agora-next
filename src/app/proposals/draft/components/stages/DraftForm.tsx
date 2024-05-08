@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFormState } from "react-dom";
 import { useForm, useFieldArray } from "react-hook-form";
 import FormCard from "../form/FormCard";
 import FormItem from "../form/FormItem";
@@ -15,13 +14,10 @@ import { onSubmitAction as draftProposalAction } from "../../actions/createDraft
 import { ProposalType, TransactionType } from "../../types";
 
 const DraftForm = () => {
-  const [state, formAction] = useFormState(draftProposalAction, {
-    message: "",
-  });
-
   const {
     register,
     control,
+    handleSubmit,
     formState: { errors },
   } = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
@@ -32,8 +28,25 @@ const DraftForm = () => {
     name: "transactions",
   });
 
+  const onSubmit = async (data: Record<string, any>) => {
+    await draftProposalAction(data);
+  };
+
   return (
-    <form action={formAction}>
+    <form
+      action={async (formData: FormData) => {
+        /**
+         * @TODO
+         * Need to figure out how to get react-hook-form to actually create form elements
+         * so it can be used without javascript... the problem is that checkbox + editor
+         * do not work since they rely on react-hook-form "controller" so its not sending
+         * The full form data to the server.
+         */
+        // const data = Object.fromEntries(formData);
+        // await formAction(formData);
+      }}
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <FormCard>
         <FormCard.Section>
           <div className="flex flex-col space-y-6">
@@ -97,7 +110,10 @@ const DraftForm = () => {
               return (
                 <>
                   {field.type === "TRANSFER" ? (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div
+                      className="grid grid-cols-2 gap-3"
+                      key={`transfer-${index}`}
+                    >
                       <FormItem
                         label="Recipient"
                         required={false}
@@ -134,7 +150,10 @@ const DraftForm = () => {
                       </FormItem>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div
+                      className="grid grid-cols-2 gap-3"
+                      key={`custom-${index}`}
+                    >
                       <FormItem
                         label="Target"
                         required={false}

@@ -7,7 +7,7 @@ const isURL = (value: string) => {
 };
 
 export const schema = z.object({
-  tempcheck_link: z
+  temp_check_link: z
     .string()
     .trim()
     .refine((value) => isURL(value), {

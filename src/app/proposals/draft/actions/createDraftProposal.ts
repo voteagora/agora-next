@@ -1,31 +1,21 @@
 "use server";
-import { schema as tempCheckSchema } from "../schemas/tempCheckSchema";
+import { schema as DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import prisma from "@/app/lib/prisma";
 
 export type FormState = {
   message: string;
 };
 
-export async function onSubmitAction(
-  prevState: FormState,
-  data: FormData
-): Promise<FormState> {
-  const formData = Object.fromEntries(data);
-  const parsed = tempCheckSchema.safeParse(formData);
-
+export async function onSubmitAction(data: any): Promise<FormState> {
+  const parsed = DraftProposalSchema.safeParse(data);
   if (!parsed.success) {
     return {
       message: "Invalid form data",
     };
   }
-
-  console.log(formData);
-  console.log(parsed);
-
-  // pretend to do something with promise sleep
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log(data);
 
   return {
-    message: `Temp check saved...`,
+    message: "Success!",
   };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import { useFormState } from "react-dom";
+import Tenant from "@/lib/tenant/tenant";
 import { useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,24 +13,34 @@ import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
 
 const TempCheckForm = () => {
-  const [state, formAction] = useFormState(tempCheckAction, {
-    message: "",
-  });
+  const { slug: dao_slug } = Tenant.current();
 
   const {
     register,
+    handleSubmit,
     formState: { errors },
   } = useForm<z.output<typeof tempCheckSchema>>({
     resolver: zodResolver(tempCheckSchema),
   });
 
+  const onSubmit = async (data: z.output<typeof tempCheckSchema>) => {
+    const res = await tempCheckAction({
+      ...data,
+      dao_slug: dao_slug.toLowerCase(),
+    });
+    console.log(res);
+
+    redirect(`/proposals/draft?stage=1`);
+  };
+
   return (
     <form
-      action={async (formData: FormData) => {
-        await formAction(formData);
-        // this should probably be order in the tenent list + 1
-        redirect(`/proposals/draft?stage=1`);
-      }}
+      //   action={async (formData: FormData) => {
+      //     await tempCheckAction(formData);
+      //     // this should probably be order in the tenent list + 1
+      //     redirect(`/proposals/draft?stage=1`);
+      //   }}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <FormCard>
         <FormCard.Section>
@@ -46,10 +56,10 @@ const TempCheckForm = () => {
             <div className="flex-grow">
               <FormItem label="Link" required={false} htmlFor="tempcheck_link">
                 <TextInput
-                  name="tempcheck_link"
+                  name="temp_check_link"
                   register={register}
                   placeholder="https://discuss.ens.domains/"
-                  errorMessage={errors.tempcheck_link?.message}
+                  errorMessage={errors.temp_check_link?.message}
                 />
               </FormItem>
             </div>

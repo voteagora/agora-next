@@ -45,7 +45,7 @@ export default async function DraftProposalPage({
 
   return (
     <main className="max-w-screen-xl mx-auto mt-10">
-      <div className="mb-4 flex flex-row items-center space-x-2">
+      <div className="mb-4 flex flex-row items-center space-x-6">
         {stageIndex > 0 && <BackButton index={stageIndex} />}
         <h1 className="font-black text-stone-900 text-2xl m-0">
           {stageMetadata?.title}

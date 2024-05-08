@@ -25,12 +25,12 @@ export const time_this = async <T>(
     throw error;
   } finally {
     const end = performance.now();
-    console.log(
-      util.inspect(
-        { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: !log_emission }
-      )
-    );
+    // console.log(
+    //   util.inspect(
+    //     { ...log_fields, time: end - start },
+    //     { showHidden: false, depth: null, colors: !log_emission }
+    //   )
+    // );
   }
 };
 
@@ -45,16 +45,16 @@ export const time_this_sync = <T>(
     throw error;
   } finally {
     const end = performance.now();
-    console.log(
-      util.inspect(
-        { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: !log_emission }
-      )
-    );
+    // console.log(
+    //   util.inspect(
+    //     { ...log_fields, time: end - start },
+    //     { showHidden: false, depth: null, colors: !log_emission }
+    //   )
+    // );
   }
 };
 
-/* 
+/*
   Adds baggage to active context.
   OTel contexts are immutable; as such, we create a new context with the added baggage.
 */
@@ -94,7 +94,7 @@ export const addSpanAttributes = (
 /*
   Runs supplied function within a span specified by the metadata.
   If no tracer is supplied, uses the global tracer to create a span.
-  Adds all baggage in context as span attributes, including additional baggage.  
+  Adds all baggage in context as span attributes, including additional baggage.
 */
 export const doInSpan = <T>(
   metadata: {

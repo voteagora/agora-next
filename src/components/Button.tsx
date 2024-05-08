@@ -23,6 +23,7 @@ export function UpdatedButton({
   href = "",
   className = "",
   isSubmit = false,
+  fullWidth = false,
   children,
   ...props
 }: {
@@ -31,6 +32,7 @@ export function UpdatedButton({
   href?: string;
   className?: string;
   isSubmit?: boolean;
+  fullWidth?: boolean;
   children: React.ReactNode;
   [x: string]: any;
 }) {
@@ -42,7 +44,7 @@ export function UpdatedButton({
         : type === "link"
           ? ""
           : ""
-  } ${variant === "rounded" ? "rounded-full" : "rounded-md"} font-semibold py-2 px-4 border border-stone-100 cursor-pointer ${className}`;
+  } ${variant === "rounded" ? "rounded-full" : "rounded-md"} ${fullWidth && "w-full"} font-semibold py-2 px-4 border border-stone-100 cursor-pointer ${className}`;
   return (
     <>
       {href ? (
