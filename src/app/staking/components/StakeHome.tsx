@@ -2,7 +2,7 @@
 
 import { HStack } from "@/components/Layout/Stack";
 import { StakingPoolStats } from "@/app/staking/components/StakingPoolStats";
-import FAQs from "@/components/Staking/FAQs";
+import FAQs from "@/app/staking/components/FAQs";
 import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
 import React, { useEffect, useRef, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";

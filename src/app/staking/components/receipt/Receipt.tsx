@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "../../../../components/Staking/TransactionReceipt/transactionReceipt.module.scss";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber, numberToToken } from "@/lib/utils";
@@ -16,19 +15,18 @@ interface ReceiptProps {
 }
 
 export const Receipt = ({
-  amount,
-  delegatee,
-  depositor,
-  title,
-  deposit,
-}: ReceiptProps) => {
+                          amount,
+                          delegatee,
+                          depositor,
+                          title,
+                          deposit,
+                        }: ReceiptProps) => {
   const { token } = Tenant.current();
 
   return (
     <VStack
-      className={`font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 ${styles["transaction-box"]}`}
-    >
-      <div className={`rounded-lg ${styles["transaction-box-border"]}`}></div>
+      className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 ">
+      <div className="rounded-lg"></div>
 
       <Image
         src="/images/horse_icon.png"

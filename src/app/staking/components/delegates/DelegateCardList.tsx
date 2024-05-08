@@ -5,7 +5,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { capitalizeFirstLetter, numberToToken } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateCard } from "@/app/staking/components/delegates/DelegateCard";
 
@@ -22,19 +22,17 @@ interface DelegatePaginated {
 
 interface Props {
   address: string;
-  amount: number;
   initialDelegates: DelegatePaginated;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
   onSelect: (address: string) => void;
 }
 
 export default function DelegateCardList({
-  address,
-  amount,
-  initialDelegates,
-  fetchDelegates,
-  onSelect,
-}: Props) {
+                                           address,
+                                           initialDelegates,
+                                           fetchDelegates,
+                                           onSelect,
+                                         }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
@@ -50,7 +48,7 @@ export default function DelegateCardList({
       fetching.current = true;
       const data = await fetchDelegates(
         meta.currentPage + 1,
-        initialDelegates.seed
+        initialDelegates.seed,
       );
       setDelegates(delegates.concat(data.delegates));
       setMeta(data.meta);
@@ -88,6 +86,7 @@ export default function DelegateCardList({
 
           const twitter = delegate?.statement?.twitter;
           const discord = delegate?.statement?.discord;
+          const warpcast = delegate?.statement.warpcast;
 
           if (delegate?.statement?.payload) {
             const delegateStatement = (
@@ -99,14 +98,15 @@ export default function DelegateCardList({
 
           return (
             <DelegateCard
-              key={delegate.address}
               action={"Select as delegate"}
               address={delegate.address}
               discord={discord}
+              key={delegate.address}
               onSelect={onSelect}
               statement={truncatedStatement}
               twitter={twitter}
               votingPower={delegate.votingPower}
+              warpcast={warpcast}
             />
           );
         })}

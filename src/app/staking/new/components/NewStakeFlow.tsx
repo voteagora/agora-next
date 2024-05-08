@@ -73,7 +73,6 @@ export const NewStakeFlow = ({
           </div>
           <DelegateCardList
             address={address}
-            amount={amount}
             onSelect={(address) => {
               setDelegate(address);
               setStep(3);

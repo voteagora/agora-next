@@ -6,23 +6,25 @@ import { DelegateSocialLinks } from "@/components/Delegates/DelegateCard/Delegat
 import { Button } from "@/components/ui/button";
 
 interface DelegateCardProps {
-  address: string;
   action: string;
+  address: string;
   discord?: string;
-  twitter?: string;
   onSelect: (address: string) => void;
   statement: string;
+  twitter?: string;
   votingPower?: string;
+  warpcast?: string;
 }
 
 export const DelegateCard = ({
-  address,
   action,
+  address,
   discord,
   onSelect,
   statement,
   twitter,
   votingPower,
+  warpcast,
 }: DelegateCardProps) => {
   return (
     <div className={cn(styles.link)}>
@@ -33,7 +35,7 @@ export const DelegateCard = ({
         </VStack>
         <div className="min-h-[24px]">
           <HStack alignItems="items-stretch" className="justify-between">
-            <DelegateSocialLinks discord={discord} twitter={twitter} />
+            <DelegateSocialLinks discord={discord} twitter={twitter} warpcast={warpcast} />
             <Button
               onClick={(event) => {
                 event.preventDefault();

@@ -73,7 +73,6 @@ export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
               <EditDepositConfirm
                 amount={amount}
                 deposit={deposit}
-                type={"EDIT_AMOUNT"}
               />
             ) : (
               "Something went wrong!"

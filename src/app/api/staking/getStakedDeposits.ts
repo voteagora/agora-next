@@ -4,8 +4,8 @@ import { cache } from "react";
 import { StakedDeposit } from "@/lib/types";
 
 export async function fetchStakedDepositsForAddress({
-  address,
-}: {
+                                                      address,
+                                                    }: {
   address: string;
 }): Promise<StakedDeposit[]> {
   const { namespace } = Tenant.current();
@@ -28,7 +28,7 @@ export async function fetchStakedDepositsForAddress({
   });
 
   return deposits.map((deposit) => ({
-    amount: BigInt(parseFloat(deposit.amount)),
+    amount: BigInt(deposit.amount.toString()).toString(),
     delegatee: deposit.delegatee,
     depositor: deposit.depositor,
     id: Number(deposit.deposit_id),

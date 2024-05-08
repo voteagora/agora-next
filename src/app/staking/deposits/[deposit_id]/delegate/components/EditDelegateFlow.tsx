@@ -47,7 +47,6 @@ export const EditDelegateFlow = ({
           </div>
           <DelegateCardList
             address={deposit.depositor}
-            amount={tokenToHumanNumber(Number(deposit.amount), token.decimals)}
             onSelect={(address) => {
               setDelegate(address);
               setStep(2);
