@@ -12,14 +12,15 @@ import { AuthInfo } from "@/app/lib/auth/types";
 
 const HASH_FN = "sha256";
 const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
-const DEFAULT_USER_SCOPE = "";
+const DEFAULT_USER_SCOPE = "user";
 
 // Note: this is not included in lib/middleware/auth.ts since that file will be
 // used in a non-node environment. This file is only intended to be used in/on node.
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
-  const prisma = require("@/app/lib/prisma") as PrismaClient;
+  const prismaModule = require("@/app/lib/prisma");
+  const prisma = prismaModule.default as PrismaClient;
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {
@@ -29,11 +30,19 @@ export async function authenticateApiUser(
   const key = authResponse.token as string;
 
   // TODO: caching logic, rate limiting
-  const user = await prisma.api_user.findFirst({
-    where: {
-      api_key: hashApiKey(key),
-    },
-  });
+  // lookup hashed API key if authResponse is an API key, check user id otherwise for JWT:
+  const user =
+    authResponse.type === "api_key"
+      ? await prisma.api_user.findFirst({
+          where: {
+            api_key: hashApiKey(key),
+          },
+        })
+      : await prisma.api_user.findFirst({
+          where: {
+            id: authResponse.userId,
+          },
+        });
 
   if (!user) {
     authResponse = {
@@ -64,7 +73,7 @@ export async function generateJwt(
   ttl?: number | null
 ): Promise<string> {
   const resolvedScope = scope || (await getScopeForUser(userId));
-  const resolvedTtl = ttl || (await getExpiryForUser(userId));
+  const resolvedTtl = ttl || (await getExpiry());
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + resolvedTtl;
 
@@ -81,7 +90,7 @@ export async function generateJwt(
     .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 }
 
-export async function getExpiryForUser(userId: string) {
+export async function getExpiry() {
   // TODO, depending on TTL policy
   return DEFAULT_JWT_TTL;
 }
