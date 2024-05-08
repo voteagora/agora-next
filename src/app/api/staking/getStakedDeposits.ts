@@ -4,8 +4,8 @@ import { cache } from "react";
 import { StakedDeposit } from "@/lib/types";
 
 export async function fetchStakedDepositsForAddress({
-                                                      address,
-                                                    }: {
+  address,
+}: {
   address: string;
 }): Promise<StakedDeposit[]> {
   const { namespace } = Tenant.current();

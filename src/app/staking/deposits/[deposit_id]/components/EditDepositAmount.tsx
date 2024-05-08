@@ -70,10 +70,7 @@ export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
           </div>
           <div className="sm:col-start-5">
             {deposit && amount > 0 ? (
-              <EditDepositConfirm
-                amount={amount}
-                deposit={deposit}
-              />
+              <EditDepositConfirm amount={amount} deposit={deposit} />
             ) : (
               "Something went wrong!"
             )}

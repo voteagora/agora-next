@@ -35,7 +35,11 @@ export const DelegateCard = ({
         </VStack>
         <div className="min-h-[24px]">
           <HStack alignItems="items-stretch" className="justify-between">
-            <DelegateSocialLinks discord={discord} twitter={twitter} warpcast={warpcast} />
+            <DelegateSocialLinks
+              discord={discord}
+              twitter={twitter}
+              warpcast={warpcast}
+            />
             <Button
               onClick={(event) => {
                 event.preventDefault();

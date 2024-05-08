@@ -34,25 +34,25 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
 
   const { data, write, status } = useContractWrite(config);
 
-  const { isLoading, isFetched } = useWaitForTransaction({
+  const { isLoading, isFetched: didProcessWithdrawal } = useWaitForTransaction({
     hash: data?.hash,
   });
 
   const getDelegate = async () => {
     if (!isDelegateFetched.current) {
-      const delegate = await fetchDelegate(deposit.delegatee);
+      const delegate = await fetchDelegate(deposit.delegatee as `0x${string}`);
       setDelegate(delegate);
       isDelegateFetched.current = true;
     }
   };
 
   useEffect(() => {
-    if (!isDelegateFetched.current) {
+    if (!delegate) {
       getDelegate();
     }
-  }, [isDelegateFetched.current]);
+  }, [delegate]);
 
-  if (isFetched) {
+  if (didProcessWithdrawal) {
     return null;
   }
 

@@ -11,12 +11,15 @@ async function fetchDeposits(address) {
 
 async function apiFetchDelegate(address) {
   "use server";
-  console.log(address);
-  // return fetchDelegate({ address });
+  return fetchDelegate(address);
 }
 
 export default async function Page() {
   const { ui, contracts } = Tenant.current();
+
+  if (!ui.toggle("staking")) {
+    return <div>Route not supported for namespace</div>;
+  }
 
   const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
     await Promise.all([
@@ -25,10 +28,6 @@ export default async function Page() {
       contracts.staker.contract.rewardPerTokenAccumulated(),
       contracts.staker.contract.REWARD_DURATION(),
     ]);
-
-  if (!ui.toggle("staking")) {
-    return <div>Route not supported for namespace</div>;
-  }
 
   return (
     <StakeHome

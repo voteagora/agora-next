@@ -15,17 +15,16 @@ interface ReceiptProps {
 }
 
 export const Receipt = ({
-                          amount,
-                          delegatee,
-                          depositor,
-                          title,
-                          deposit,
-                        }: ReceiptProps) => {
+  amount,
+  delegatee,
+  depositor,
+  title,
+  deposit,
+}: ReceiptProps) => {
   const { token } = Tenant.current();
 
   return (
-    <VStack
-      className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 ">
+    <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 ">
       <div className="rounded-lg"></div>
 
       <Image
