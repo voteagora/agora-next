@@ -28,7 +28,7 @@ const ProposalVotesCard = ({
     <VStack
       gap={4}
       justifyContent="justify-between"
-      className={`${styles.proposal_votes_container} transition-all ${isClicked ? "bottom-[-16px]" : "bottom-[calc(-100%+248px)]"}`}
+      className={`${styles.proposal_votes_container} transition-all ${isClicked ? "bottom-[60px]" : "bottom-[calc(-100%+350px)]"}`}
     >
       <VStack gap={4} className={styles.proposal_actions_panel}>
         <button

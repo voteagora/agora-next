@@ -21,18 +21,25 @@ components:
       bearerFormat: JWT
   schemas:
     AuthToken:
-      summary: JWT token for authentication and authorization 
+      summary: Token for authentication 
       description: >
-        A JWT token for authentication and authorization on the Agora platform.
+        A token for authentication and authorization on the Agora platform.
+        Subsequent requests should supply this as a Bearer token in the 
+        "Authorization" header.
       type: object
       properties: 
         access_token:
+          summary: The access token
+          description: The access token.
           type: string
         token_type:
+          summary: Type of the token
+          description: >
+            The type of the token, either "jwt" or "api_key".
           type: string
         expires_in:
           summary: Expiration time of the token
-          description: The time at which the token will expire.
+          description: The time after which the token will expire, in seconds.
           type: integer
     SIWEVerificationBody:
       summary: Body of SIWE /verify request
@@ -42,8 +49,12 @@ components:
       type: object
       properties:
         message:
+          summary: SIWE message for verification
           type: string
         signature:
+          summary: SIWE message signature for verification
+          type: string
+        nonce:
           type: string
     PageMetadata:
       summary: Pagination metadata
@@ -812,14 +823,16 @@ components:
       type: object
       properties:
         ballotId:
-          summary: Address or ENS of the ballot
+          summary: Address or ENS of the ballot caster
+          description: Address or ENS of the ballot caster.
           type: string
         ballotContent: 
           summary: Signed content of the ballot
           type: string
         signature:
-          summary: Badgeholder signature
-          description: Signature of the badgeholder submitting the ballot.
+          summary: Badgeholder signature of the ballot
+          description: >
+            Badgeholder's signature of the contents of their ballot.
           type: string
   parameters:
     limitParam:
@@ -1522,6 +1535,38 @@ paths:
         '400':
           description: Bad Request
         '401': 
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /retrofunding/rounds:
+    get:
+      summary: Gets a list of RetroFunding rounds
+      description: >
+        Retrieves a paginated list of RetroFunding rounds, ordered by round ID.
+      operationId: getRetroFundingRounds
+      tags: 
+        - RetroFunding
+        - RetroFundingRounds
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  ballots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingRound'
+        '400':
+          description: Bad Request
+        '401':
           description: Unauthorized
         '500':
           description: Internal Server Error

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/middleware/auth";
+import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function DELETE(
@@ -15,7 +15,7 @@ export async function DELETE(
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-    return new Response(authResponse.reason, { status: 401 });
+    return new Response(authResponse.failReason, { status: 401 });
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
