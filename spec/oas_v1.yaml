@@ -52,6 +52,8 @@ components:
           type: string
         signature:
           type: string
+        nonce:
+          type: string
     PageMetadata:
       summary: Pagination metadata
       description: Metadata associated with paginated requests.
