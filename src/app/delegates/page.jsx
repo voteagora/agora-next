@@ -1,11 +1,9 @@
 import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
 import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
-import { fetchMetrics as apiFetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import Hero from "@/components/Hero/Hero";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import { TabsContent } from "@/components/ui/tabs";
 import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
@@ -21,12 +19,6 @@ async function fetchDelegates(sort, seed, page = 1) {
   "use server";
 
   return apiFetchDelegates({ page, seed, sort });
-}
-
-async function fetchDaoMetrics() {
-  "use server";
-
-  return apiFetchMetrics();
 }
 
 async function fetchDelegators(address) {
@@ -56,10 +48,10 @@ export async function generateMetadata({}, parent) {
         },
       ],
     },
-    other: {
-      ["twitter:card"]: "summary_large_image",
-      ["twitter:title"]: title,
-      ["twitter:description"]: description,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
@@ -77,12 +69,10 @@ export default async function Page({ searchParams }) {
     tab === "citizens"
       ? await fetchCitizens(citizensSort, seed)
       : await fetchDelegates(sort, seed);
-  const metrics = await fetchDaoMetrics();
 
   return (
     <section>
       <Hero />
-      <DAOMetricsHeader metrics={metrics} />
       <DelegateTabs>
         <TabsContent value="delegates">
           <DelegateCardList

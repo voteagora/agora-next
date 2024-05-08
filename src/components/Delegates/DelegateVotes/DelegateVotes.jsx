@@ -3,17 +3,16 @@
 import { useRef } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
 import { formatNumber } from "@/lib/tokenUtils";
-import { shortAddress } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
-import Image from "next/image";
 import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
-import StandardVoteContainer from "./StandardVoteContainer";
-import ApprovalVoteContainer from "./ApprovalVoteContainer";
+import ApprovalVoteReason from "./ApprovalVoteReason";
 import styles from "./delegateVotes.module.scss";
 import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
 import { delegatesVotesSortOptions } from "@/lib/constants";
+import { pluralizeVote } from "@/lib/tokenUtils";
+import DelegateVoteIcon from "./DelegateVoteIcon";
 
 function shortPropTitle(title, proosalId) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -27,6 +26,25 @@ function shortPropTitle(title, proosalId) {
   return proposalsWithBadFormatting.includes(proosalId)
     ? title.split("-")[0].split("(")[0]
     : title;
+}
+
+function propHeader(vote) {
+  let headerString = "";
+  if (vote.proposalType === "STANDARD" || vote.proposalType === "OPTIMISTIC")
+    headerString = `Voted ${vote.support.toLowerCase()} this proposal `;
+
+  if (vote.proposalType === "APPROVAL")
+    if (!vote.params || vote.params?.length === 0) {
+      headerString = `Abstained from voting on this proposal `;
+    } else {
+      headerString = `Voted on ${vote.params?.length} options in this proposal `;
+    }
+
+  if (vote.proposalValue != 0n)
+    headerString += ` asking ${formatNumber(vote.proposalValue)} ETH `;
+
+  headerString += `${formatDistanceToNow(new Date(vote.timestamp))} ago`;
+  return headerString;
 }
 
 const getUniqueDelegateVotes = (delegateVotes) => {
@@ -57,65 +75,57 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
   };
 
   return (
-    <VStack gap={4}>
-      <InfiniteScroll
-        hasMore={meta.hasNextPage}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div key="loader">
-            Loading... <br />
-            <Image
-              src="/images/blink.gif"
-              alt="Blinking Agora Logo"
-              width={50}
-              height={20}
-            />
-          </div>
-        }
-        element="main"
-        className="flex flex-col gap-4"
-      >
-        {delegateVotes.map(
-          (vote) =>
-            vote && (
-              <VoteDetailsContainer
-                key={vote.transactionHash}
-                proposalId={vote.proposal_id}
-              >
-                <div className={styles.details_container}>
-                  <VStack className={styles.details_sub}>
-                    <HStack gap={1} className={styles.vote_type}>
-                      Prop {shortAddress(vote.proposal_id)}
-                      <>
-                        {vote.proposalValue != 0n ? (
-                          <> asking {formatNumber(vote.proposalValue)} ETH</>
-                        ) : null}{" "}
-                      </>
-                      {vote.timestamp && (
-                        <div>
-                          - {formatDistanceToNow(new Date(vote.timestamp))} ago
-                        </div>
+    <InfiniteScroll
+      hasMore={meta.hasNextPage}
+      pageStart={0}
+      loadMore={loadMore}
+      useWindow={false}
+      loader={
+        <div key={0}>
+          <HStack
+            key="loader"
+            className="gl_loader justify-center py-6 text-sm text-stone-500"
+          >
+            Loading...
+          </HStack>
+        </div>
+      }
+      element="main"
+      className="divide-y divide-gray-300 overflow-hidden bg-white shadow-newDefault ring-1 ring-gray-300 rounded-xl"
+    >
+      {delegateVotes.map(
+        (vote) =>
+          vote && (
+            <VoteDetailsContainer
+              key={vote.transactionHash}
+              proposalId={vote.proposal_id}
+            >
+              <div className={styles.details_container}>
+                <VStack className={styles.details_sub}>
+                  <HStack justifyContent="justify-between" gap={2}>
+                    <VStack>
+                      <span className="text-[#66676b] text-xs font-medium">
+                        {`${propHeader(vote)} with ${pluralizeVote(vote.weight, "optimism")}`}
+                      </span>
+                      <h2 className="px-0 pt-1 overflow-hidden text-base text-black text-ellipsis">
+                        {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
+                      </h2>
+                    </VStack>
+                    <DelegateVoteIcon {...vote} />
+                  </HStack>
+                  {(vote.proposalType === "APPROVAL" || vote.reason) && (
+                    <VStack className="space-y-1 mt-2">
+                      {vote.proposalType === "APPROVAL" && (
+                        <ApprovalVoteReason {...vote} />
                       )}
-                    </HStack>
-                    <h2 className="px-0 py-1 overflow-hidden text-base text-black text-ellipsis">
-                      {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
-                    </h2>
-                    {vote.proposalType === "APPROVAL" && (
-                      <ApprovalVoteContainer {...vote} />
-                    )}
-                    {(vote.proposalType === "STANDARD" ||
-                      vote.proposalType === "OPTIMISTIC") && (
-                      <StandardVoteContainer {...vote} />
-                    )}
-                  </VStack>
-                  {vote.reason && <VoteReason reason={vote.reason} />}
-                </div>
-              </VoteDetailsContainer>
-            )
-        )}
-      </InfiniteScroll>
-    </VStack>
+                      {vote.reason && <VoteReason reason={vote.reason} />}
+                    </VStack>
+                  )}
+                </VStack>
+              </div>
+            </VoteDetailsContainer>
+          )
+      )}
+    </InfiniteScroll>
   );
 }

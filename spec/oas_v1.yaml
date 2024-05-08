@@ -3,13 +3,13 @@ info:
   title: Agora API
   description: >
     ## Public API for interacting with the Agora platform.
-    Note: This API is in beta and subject to change.
-  version: 0.1.0-beta
+    Note: This API is in alpha and subject to change.
+  version: 0.0.0-alpha
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: vote.optimisim.io/api/v1
+  - url: https://vote.optimism.io/api/v1
     description: Base URL for optimism production
 security:
   - bearerAuth: []
@@ -21,18 +21,25 @@ components:
       bearerFormat: JWT
   schemas:
     AuthToken:
-      summary: JWT token for authentication and authorization 
+      summary: Token for authentication 
       description: >
-        A JWT token for authentication and authorization on the Agora platform.
+        A token for authentication and authorization on the Agora platform.
+        Subsequent requests should supply this as a Bearer token in the 
+        "Authorization" header.
       type: object
       properties: 
         access_token:
+          summary: The access token
+          description: The access token.
           type: string
         token_type:
+          summary: Type of the token
+          description: >
+            The type of the token, either "jwt" or "api_key".
           type: string
         expires_in:
           summary: Expiration time of the token
-          description: The time at which the token will expire.
+          description: The time after which the token will expire, in seconds.
           type: integer
     SIWEVerificationBody:
       summary: Body of SIWE /verify request
@@ -42,8 +49,12 @@ components:
       type: object
       properties:
         message:
+          summary: SIWE message for verification
           type: string
         signature:
+          summary: SIWE message signature for verification
+          type: string
+        nonce:
           type: string
     PageMetadata:
       summary: Pagination metadata
@@ -622,21 +633,23 @@ components:
         A team member on a RetroFunding project.
       type: object
       properties:
-        address:
-          summary: EOA address of the team member
+        # address:
+        #   summary: EOA address of the team member
+        #   type: string
+        # name:
+        #   type: string
+        # description:
+        #   type: string
+        farcasterId:
+          summary: Farcaster ID for project team member
+          desription: Farcaster ID for project team member.
           type: string
-        name:
-          type: string
-        description:
-          type: string
-        socialLinks:
-          $ref: "#/components/schemas/SocialLinks"
-        externalLink:
-          type: string
-        avatarUrls:
-          type: array
-          items:
-            type: string
+        # externalLink:
+        #   type: string
+        # avatarUrls:
+        #   type: array
+        #   items:
+        #     type: string
     RetroFundingCategory:
       summary: A category for an RetroFunding project
       description: >
@@ -707,18 +720,24 @@ components:
           type: object
           properties:
             ventureCapital:
-              $ref: "#/components/schemas/FundingInfo"
+              type: array
+              items:
+                $ref: "#/components/schemas/FundingInfo"
             grants:
-              $ref: "#/components/schemas/FundingInfo"
+              type: array
+              items:
+                $ref: "#/components/schemas/FundingInfo"
             optimismGrants:
-              allOf:
-                - $ref: "#/components/schemas/FundingInfo"
-                - type: object
-                  properties:
-                    link:
-                      type: string
-                    type: 
-                      $ref: "#/components/schemas/OptimismGrantType"
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/FundingInfo"
+                  - type: object
+                    properties:
+                      link:
+                        type: string
+                      type: 
+                        $ref: "#/components/schemas/OptimismGrantType"
     SocialLinks:
       summary: Social media links for a project
       description: >
@@ -794,7 +813,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotAllocation"
-        submitterAddress:
+        ballotCasterAddress:
+          summary: Address of the ballot caster
+          description: The resolved address of the entity which cast the ballot.
           type: string
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
@@ -802,14 +823,16 @@ components:
       type: object
       properties:
         ballotId:
-          summary: Address or ENS of the ballot
+          summary: Address or ENS of the ballot caster
+          description: Address or ENS of the ballot caster.
           type: string
         ballotContent: 
           summary: Signed content of the ballot
           type: string
         signature:
-          summary: Badgeholder signature
-          description: Signature of the badgeholder submitting the ballot.
+          summary: Badgeholder signature of the ballot
+          description: >
+            Badgeholder's signature of the contents of their ballot.
           type: string
   parameters:
     limitParam:
@@ -862,9 +885,9 @@ components:
       schema:
         type: integer
     ballotIdParam:
-      name: ballotAddressOrEns
+      name: ballotCasterAddressOrEns
       in: path
-      description: The address or ENS name of the ballot to retrieve
+      description: The address or ENS name of the caster of a given ballot to retrieve.
       required: true
       schema:
         type: string
@@ -1082,7 +1105,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  votes:
                     type: array
                     items:
                       $ref: '#/components/schemas/Vote'
@@ -1200,7 +1223,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  votes:
                     type: array
                     items:
                       $ref: '#/components/schemas/Vote'
@@ -1240,7 +1263,14 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Delegation'
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  votes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delegation'
         '400':
           description: Bad Request
         '401': 
@@ -1279,7 +1309,14 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Delegation'
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  votes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delegation'
         '400':
           description: Bad Request
         '401': 
@@ -1321,7 +1358,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  votes:
                     type: array
                     items:
                       $ref: '#/components/schemas/Vote'
@@ -1394,7 +1431,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  proposalTypes:
                     type: array
                     items:
                       $ref: '#/components/schemas/ProposalTemplate'
@@ -1428,7 +1465,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  projects:
                     type: array
                     items:
                       $ref: '#/components/schemas/Project'
@@ -1501,6 +1538,38 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
+  /retrofunding/rounds:
+    get:
+      summary: Gets a list of RetroFunding rounds
+      description: >
+        Retrieves a paginated list of RetroFunding rounds, ordered by round ID.
+      operationId: getRetroFundingRounds
+      tags: 
+        - RetroFunding
+        - RetroFundingRounds
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  ballots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RetroFundingRound'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}:
     get:
       summary: Gets a specific RetroFunding round
@@ -1559,7 +1628,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  ballots:
                     type: array
                     items:
                       $ref: '#/components/schemas/RetroFundingBallot'
@@ -1569,7 +1638,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}:
     get:
       summary: Gets a specific ballot for an RetroFunding round
       description: >
@@ -1596,7 +1665,7 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/submit:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/submit:
     post:
       summary: Submits a particular ballot
       description: Submits the content of a ballot to be counted as final for the round.
@@ -1615,6 +1684,10 @@ paths:
       responses: 
         '200':
           description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RetroFundingBallot"
         '400':
           description: Bad Request
         '401': 
@@ -1647,7 +1720,7 @@ paths:
                 properties:
                   metadata:
                     $ref: '#/components/schemas/PageMetadata'
-                  delegates:
+                  projects:
                     type: array
                     items:
                       $ref: '#/components/schemas/Project'
@@ -1657,7 +1730,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
     get:
       summary: Gets impact metrics for a specific RetroFunding ballot
       description: >
@@ -1724,7 +1797,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotAddressOrEns}/impactMetrics/{impactMetricId}:
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics/{impactMetricId}:
     delete: 
       summary: Removes an impact metric from a ballot
       description: >
@@ -1808,11 +1881,46 @@ paths:
         '500':
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
+    get:
+      summary: Gets comments on an impact metric
+      description: >
+        Gets a paginated list of comments on a particular impact metric. Ordered by creation date.
+      operationId: getImpactMetricComments
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad Request
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     put:
-      summary: Comments on an impact metric
+      summary: Creates a comment on an impact metric
       description: >
         Creates or edits a comment on a specific impact metric for a specific round.
-        If supplied, comment ID is ignored.
+        If supplied, comment ID is ignored. Returns created comment.
       operationId: putImpactMetricComment
       tags:
         - RetroFunding
@@ -1822,6 +1930,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
       requestBody:
         content:
           application/json:
