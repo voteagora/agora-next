@@ -1,5 +1,6 @@
 import { paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
+import { addressOrEnsNameWrap } from "../utils/ensName";
 
 async function getBallotsApi({
   roundId,
@@ -36,21 +37,49 @@ async function getBallotsApi({
   );
 }
 
-async function getBallotApi(roundId: string, ballotCasterAddressOrEns: string) {
-  const defaultBallot = {
-    ballotId: 0,
-    roundId: roundId,
-    status: "PENDING",
-    allocations: [
-      {
-        metricId: 0,
-        allocation: "0",
-      },
-    ],
-    ballotCasterAddress: ballotCasterAddressOrEns,
-  };
+const getBallotApi = async (
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) =>
+  addressOrEnsNameWrap(getBallotForAddress, ballotCasterAddressOrEns, {
+    roundId,
+  });
 
-  return defaultBallot;
+async function getBallotForAddress({
+  roundId,
+  address,
+}: {
+  roundId: number;
+  address: string;
+}) {
+  const ballot = await prisma.ballots.findFirst({
+    where: {
+      round: roundId,
+      address: address,
+    },
+    include: {
+      allocations: {
+        select: {
+          metric_id: true,
+          allocation: true,
+          locked: true,
+        },
+        orderBy: {
+          allocation: "desc",
+        },
+      },
+    },
+  });
+
+  if (!ballot) {
+    return {
+      address,
+      roundId,
+      allocations: [],
+    };
+  }
+
+  return ballot;
 }
 
 export const fetchBallots = cache(getBallotsApi);
