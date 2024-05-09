@@ -1722,40 +1722,6 @@ paths:
         "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
-    get:
-      summary: Gets impact metrics for a specific RetroFunding ballot
-      description: >
-        Retrieves a list of impact metrics for a specific ballot for an RetroFunding round on Agora.
-      operationId: getImpactMetricsOnRetroFundingBallot
-      tags:
-        - RetroFunding
-        - RetroFundingBallots
-        - impactMetrics
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/ballotIdParam"
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  impactMetrics:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/RetroFundingImpactMetric"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
     post:
       summary: Adds or updates an impact metric on a specific RetroFunding ballot
       description: >
