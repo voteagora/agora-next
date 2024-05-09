@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "test3", "uniswap"]
 }
 
 model DelegateStatements {
@@ -16,10 +16,10 @@ model DelegateStatements {
   payload   Json
   twitter   String?
   discord   String?
-  warpcast  String?
   email     String?
   createdAt DateTime? @default(now()) @map("created_at") @db.Date
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
+  warpcast  String?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -101,6 +101,28 @@ model chain {
   api_user   api_user[]
 
   @@schema("agora")
+}
+
+model Ballots {
+  address       String        @id @db.VarChar(255)
+  only_os       Boolean       @default(false)
+  os_multiplier Int           @default(1)
+  round         Int
+  allocations   allocations[]
+
+  @@map("ballots")
+  @@schema("test3")
+}
+
+model allocations {
+  id         Int      @id(map: "ballot_content_pkey") @default(autoincrement())
+  address    String   @db.VarChar(255)
+  metric_id  String   @db.VarChar(255)
+  allocation Decimal  @default(0) @db.Decimal
+  locked     Boolean? @default(false)
+  ballots    Ballots  @relation(fields: [address], references: [address], onDelete: Cascade, onUpdate: NoAction, map: "ballot_content_address_fkey")
+
+  @@schema("test3")
 }
 
 view OptimismVotes {

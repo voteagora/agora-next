@@ -1,31 +1,39 @@
+import { paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
 
-async function getBallotsApi(roundId: string) {
-  const defaultPaginationMetadata = {
-    hasNext: false,
-    totalReturned: 1,
-    nextOffset: 1,
-  };
-
-  const defaultBallots = [
-    {
-      ballotId: 0,
-      roundId: roundId,
-      status: "PENDING",
-      allocations: [
-        {
-          metricId: 0,
-          allocation: "0",
+async function getBallotsApi({
+  roundId,
+  limit,
+  offset,
+}: {
+  roundId: number;
+  limit: number;
+  offset: number;
+}) {
+  return paginateResultEx(
+    (skip: number, take: number) => {
+      return prisma.ballots.findMany({
+        take,
+        skip,
+        where: {
+          round: roundId,
         },
-      ],
-      ballotCasterAddress: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11",
+        include: {
+          allocations: {
+            select: {
+              metric_id: true,
+              allocation: true,
+              locked: true,
+            },
+            orderBy: {
+              allocation: "desc",
+            },
+          },
+        },
+      });
     },
-  ];
-
-  return {
-    metadata: defaultPaginationMetadata,
-    ballots: defaultBallots,
-  };
+    { limit, offset }
+  );
 }
 
 async function getBallotApi(roundId: string, ballotCasterAddressOrEns: string) {
