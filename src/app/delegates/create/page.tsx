@@ -1,13 +1,13 @@
 import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 
-export async function generateMetadata({}, parent) {
+export async function generateMetadata() {
   const tenant = Tenant.current();
   const page = tenant.ui.page("delegates");
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
-    title
+    title,
   )}&description=${encodeURIComponent(description)}`;
 
   return {
