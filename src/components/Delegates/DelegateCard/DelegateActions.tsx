@@ -10,13 +10,14 @@ import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateActions({
-  delegate,
-  className,
-  isAdvancedUser,
-  delegators,
-}: {
+                                  delegate,
+                                  className,
+                                  isAdvancedUser,
+                                  delegators,
+                                }: {
   delegate: DelegateChunk;
   className?: string;
   isAdvancedUser: boolean;
@@ -27,6 +28,9 @@ export function DelegateActions({
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
+
+  const { contracts } = Tenant.current();
+  const hasAlligator = contracts?.alligator;
 
   return (
     <HStack
@@ -39,15 +43,18 @@ export function DelegateActions({
         warpcast={warpcast}
       />
       <div>
-        {isConnected ? (
-          address &&
-          (isAdvancedUser ? (
-            <AdvancedDelegateButton
-              delegate={delegate}
-              delegators={delegators}
-            />
-          ) : (
-            <DelegateButton full={!twitter && !discord} delegate={delegate} />
+        {isConnected ? (address && (isAdvancedUser && hasAlligator ? (
+            <>
+              ADVANCED
+              <AdvancedDelegateButton
+                delegate={delegate}
+                delegators={delegators}
+              />
+            </>
+          ) : (<>
+              REGULER
+              <DelegateButton full={!twitter && !discord} delegate={delegate} />
+            </>
           ))
         ) : (
           <ConnectKitButton.Custom>
