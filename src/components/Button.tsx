@@ -38,13 +38,13 @@ export function UpdatedButton({
 }) {
   const classNameString = `${
     type === "primary"
-      ? "bg-stone-900 hover:bg-stone-800 text-white"
+      ? "bg-agora-stone-900 hover:bg-agora-stone-700 text-white"
       : type === "secondary"
         ? ""
         : type === "link"
           ? ""
           : ""
-  } ${variant === "rounded" ? "rounded-full" : "rounded-md"} ${fullWidth && "w-full"} font-semibold py-2 px-4 border border-stone-100 cursor-pointer ${className}`;
+  } ${variant === "rounded" ? "rounded-full" : "rounded-md"} ${fullWidth && "w-full"} font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer ${className}`;
   return (
     <>
       {href ? (

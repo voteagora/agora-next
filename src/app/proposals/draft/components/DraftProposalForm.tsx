@@ -1,6 +1,6 @@
 "use client";
 
-import { ProposalLifecycleStage } from "../types";
+import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
 import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
@@ -10,16 +10,16 @@ export default function DraftProposalForm({
   stage,
   draftProposal,
 }: {
-  stage: ProposalLifecycleStage;
+  stage: ProposalStage;
   draftProposal: ProposalDraft;
 }) {
-  const renderStage = (stage: ProposalLifecycleStage) => {
+  const renderStage = (stage: ProposalStage) => {
     switch (stage) {
-      case ProposalLifecycleStage.TEMP_CHECK:
+      case ProposalStage.TEMP_CHECK:
         return <TempCheckForm draftProposal={draftProposal} />;
-      case ProposalLifecycleStage.DRAFT:
+      case ProposalStage.DRAFT:
         return <DraftForm draftProposal={draftProposal} />;
-      case ProposalLifecycleStage.READY:
+      case ProposalStage.READY:
         return <SubmitForm draftProposal={draftProposal} />;
       default:
         return null;

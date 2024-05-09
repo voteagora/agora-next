@@ -1,7 +1,7 @@
 import Image from "next/image";
 import FormCard from "../form/FormCard";
 import DraftPreview from "../DraftPreview";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { icons } from "@/assets/icons/icons";
 import { UpdatedButton } from "@/components/Button";
 
@@ -38,7 +38,11 @@ const SUBMISSION_CHECKLIST_ITEMS = [
   },
 ];
 
-const SubmitForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+const SubmitForm = ({
+  draftProposal,
+}: {
+  draftProposal: ProposalDraft & { transactions: ProposalDraftTransaction[] };
+}) => {
   return (
     <form>
       <FormCard>

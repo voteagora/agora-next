@@ -1,14 +1,8 @@
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { ProposalType as PrismaProposalType } from "@prisma/client";
-
-export enum ProposalLifecycleStage {
-  TEMP_CHECK = "Temp check",
-  DRAFT = "Draft",
-  READY = "Ready",
-  CONTACT_VOTERS = "Contact voters",
-  QUEUE = "Queue",
-  EXECUTE = "Execute",
-}
+import {
+  ProposalType as PrismaProposalType,
+  ProposalStage as PrismaProposalStage,
+} from "@prisma/client";
 
 /**
  * This is my attempt at "generalizing" the lifecycle stages of a proposal before actually generalizing it
@@ -23,72 +17,79 @@ export enum ProposalLifecycleStage {
  * but each tenant is able to customize the order and existence of certain stages.
  */
 type TenantProposalLifecycleStage = {
-  stage: ProposalLifecycleStage;
+  stage: PrismaProposalStage;
   order: number;
   isPreSubmission: boolean;
 };
 
-const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
+export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
   {
-    stage: ProposalLifecycleStage.TEMP_CHECK,
+    stage: PrismaProposalStage.TEMP_CHECK,
     order: 1,
     isPreSubmission: true,
   },
   {
-    stage: ProposalLifecycleStage.DRAFT,
+    stage: PrismaProposalStage.DRAFT,
     order: 2,
     isPreSubmission: true,
   },
   {
-    stage: ProposalLifecycleStage.READY,
+    stage: PrismaProposalStage.READY,
     order: 3,
     isPreSubmission: true,
   },
   {
-    stage: ProposalLifecycleStage.CONTACT_VOTERS,
+    stage: PrismaProposalStage.CONTACT_VOTERS,
     order: 4,
     isPreSubmission: false,
   },
   {
-    stage: ProposalLifecycleStage.QUEUE,
+    stage: PrismaProposalStage.QUEUE,
     order: 5,
     isPreSubmission: false,
   },
   {
-    stage: ProposalLifecycleStage.EXECUTE,
+    stage: PrismaProposalStage.EXECUTE,
     order: 6,
     isPreSubmission: false,
   },
 ];
 
 export const ProposalLifecycleStageMetadata = {
-  [ProposalLifecycleStage.TEMP_CHECK]: {
+  [PrismaProposalStage.TEMP_CHECK]: {
     title: "Create temp check",
+    shortTitle: "Temp check",
     description: "Check the temperature of the proposal",
   },
-  [ProposalLifecycleStage.DRAFT]: {
+  [PrismaProposalStage.DRAFT]: {
     title: "Create draft",
+    shortTitle: "Draft",
     description: "Draft the proposal",
   },
-  [ProposalLifecycleStage.READY]: {
+  [PrismaProposalStage.READY]: {
     title: "Submit draft",
+    shortTitle: "Ready",
     description: "Ready to submit the proposal",
   },
-  [ProposalLifecycleStage.CONTACT_VOTERS]: {
+  [PrismaProposalStage.CONTACT_VOTERS]: {
     title: "Contact voters",
+    shortTitle: "Contact voters",
     description: "Contact the voters",
   },
-  [ProposalLifecycleStage.QUEUE]: {
+  [PrismaProposalStage.QUEUE]: {
     title: "Queue",
+    shortTitle: "Queue",
     description: "Queue the proposal",
   },
-  [ProposalLifecycleStage.EXECUTE]: {
+  [PrismaProposalStage.EXECUTE]: {
     title: "Execute",
+    shortTitle: "Execute",
     description: "Execute the proposal",
   },
 } as {
-  [key in ProposalLifecycleStage]: {
+  [key in PrismaProposalStage]: {
     title: string;
+    shortTitle: string;
     description: string;
   };
 };

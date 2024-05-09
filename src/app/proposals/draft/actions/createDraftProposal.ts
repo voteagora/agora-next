@@ -22,9 +22,6 @@ export async function onSubmitAction(
     };
   }
 
-  console.log("okay, we made it past the parsing step");
-  console.log(parsed.data);
-
   try {
     await prisma.proposalDraft.update({
       where: {

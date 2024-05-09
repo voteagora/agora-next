@@ -811,6 +811,7 @@ model ProposalDraft {
   created_at                  DateTime                   @default(now())
   updated_at                  DateTime                   @updatedAt
   onchain_transaction_hash    String?
+  stage                       ProposalStage
   transactions                ProposalDraftTransaction[]
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
   ProposalChecklist           ProposalChecklist[]
@@ -1416,4 +1417,17 @@ enum ProposalType {
 
   @@map("proposal_type")
   @@schema("config")
+}
+
+enum ProposalStage {
+  TEMP_CHECK
+  DRAFT
+  READY
+  CONTACT_VOTERS
+  EXECUTE
+  QUEUE
+  CANCELLED
+
+  @@map("proposal_stage")
+  @@schema("test2")
 }

@@ -3,12 +3,25 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
+import { ProposalLifecycleStageMetadata } from "@/app/proposals/draft/types";
 import {
-  ProposalLifecycleStageMetadata,
-  ProposalLifecycleStage,
-} from "@/app/proposals/draft/types";
+  DRAFT_STAGES_FOR_TENANT,
+  POST_DRAFT_STAGES_FOR_TENANT,
+  getStageMetadata,
+} from "@/app/proposals/draft/utils/stages";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
+  const ALL_STAGES_FOR_TENANT = [
+    ...DRAFT_STAGES_FOR_TENANT,
+    ...POST_DRAFT_STAGES_FOR_TENANT,
+  ];
+
+  const currentStageObject = ALL_STAGES_FOR_TENANT.find(
+    (stage) => stage.stage === proposal.stage
+  )!;
+
+  const currentStageMetadata = getStageMetadata(proposal.stage);
+
   return (
     <div className="bg-stone-100 border border-stone-200 rounded-2xl p-2 shadow-sm">
       <div className="flex flex-row justify-between bg-white border border-stone-200 rounded-2xl px-6 py-5 shadow-sm">
@@ -19,9 +32,7 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
         <div className="flex flex-row gap-x-16">
           <div className="w-[140px]">
             <p className="font-semibold text-stone-500 text-xs">{`Status`}</p>
-            <p className="font-medium">
-              {/* {proposalStates[proposal.proposal_status_id - 1].state} */}
-            </p>
+            <p className="font-medium">{currentStageMetadata.shortTitle}</p>
           </div>
           <div className="w-[140px]">
             <p className="font-semibold text-stone-500 text-xs">{`Type`}</p>
@@ -40,10 +51,10 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
         </div>
       </div>
       <div className="flex flex-row justify-between px-6 pt-2">
-        {Object.values(ProposalLifecycleStage).map((state, idx) => {
+        {ALL_STAGES_FOR_TENANT.map((stageObject, idx) => {
           const stageMetadata =
             ProposalLifecycleStageMetadata[
-              state as keyof typeof ProposalLifecycleStageMetadata
+              stageObject.stage as keyof typeof ProposalLifecycleStageMetadata
             ];
 
           return (
@@ -51,18 +62,16 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
               <div className="flex flex-row items-center my-2">
                 <div
                   className={`h-1 w-1 rounded-full bg-stone-300 ${
-                    //   proposal.proposal_status_id >= state.id
-                    //     ? "bg-stone-700"
-                    //     : "bg-stone-300"
-                    ""
+                    currentStageObject.order >= stageObject.order
+                      ? "bg-stone-700"
+                      : "bg-stone-300"
                   }`}
                 ></div>
                 <div
                   className={`w-full h-px bg-stone-300 ${
-                    //   proposal.proposal_status_id > state.id
-                    //     ? "bg-stone-700"
-                    //     : "bg-stone-300"
-                    ""
+                    currentStageObject.order >= stageObject.order
+                      ? "bg-stone-700"
+                      : "bg-stone-300"
                   }`}
                 ></div>
               </div>
@@ -97,6 +106,10 @@ const MyDraftProposals = ({
     if (!address) return;
     getDraftProposalsAndSet(address);
   }, [fetchDraftProposals, address]);
+
+  if (!draftProposals.length) {
+    return null;
+  }
 
   return (
     <div className="mb-16">

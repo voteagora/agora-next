@@ -18,6 +18,8 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { ChainConstants } from "viem/types/chain";
+import { Delete } from "lucide-react";
+import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
 
 export type DialogType =
   | DelegateDialogType
@@ -26,7 +28,8 @@ export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
-  | SwithcNetworkDialogType;
+  | SwithcNetworkDialogType
+  | DeleteDraftProposalDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -113,6 +116,11 @@ export type ApprovalCastVoteDialogProps = {
 export type ApprovalCastVoteDialogType = {
   type: "APPROVAL_CAST_VOTE";
   params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
+};
+
+export type DeleteDraftProposalDialog = {
+  type: "DELETE_DRAFT_PROPOSAL";
+  params: { proposalId: number };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -217,6 +225,12 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   SWITCH_NETWORK: ({ chain }: { chain: ChainConstants }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
+  ),
+  DELETE_DRAFT_PROPOSAL: ({ proposalId }, closeDialog) => (
+    <DeleteDraftProposalDialog
+      closeDialog={closeDialog}
+      proposalId={proposalId}
+    />
   ),
   // FAQ: () => {
   //   return <FaqDialog />;
