@@ -5,15 +5,6 @@ import { ProposalDraft } from "@prisma/client";
 import { icons } from "@/assets/icons/icons";
 import { UpdatedButton } from "@/components/Button";
 
-const FAKE_PROPOSAL_DRAFT = {
-  title: "Proposal title",
-  description:
-    "This proposal introduces new actions and strategies to the Endowment with the a",
-  abstract:
-    "Following the successful approval of E.P. 4.2, the second tranche of the Endowment was funded with 16,000 ETH. Community feedback during the E.P. 4.2 voting window indicated a desire to reduce exposure to Lido due to concerns about centralization risks in the network. While diversifying ETH-neutral holdings was already underway, the need for further diversification and divestment from Lido became clear during community discussions and the last Meta-gov call before the vote's closure. Consequently, karpatkey and @steakhouse proposed a 20% cap on Lido's maximum allocation within",
-  temp_check_link: "https://discuss.ens.domains/",
-} as ProposalDraft;
-
 const SUBMISSION_CHECKLIST_ITEMS = [
   {
     title: "Discourse temp check",
@@ -58,7 +49,7 @@ const SubmitForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
             step.
           </p>
           <div className="mt-6 mb-[-60px] z-20 relative">
-            <DraftPreview proposalDraft={FAKE_PROPOSAL_DRAFT} />
+            <DraftPreview proposalDraft={draftProposal} />
           </div>
         </FormCard.Section>
         <FormCard.Section className="!z-0 pt-[54px]">

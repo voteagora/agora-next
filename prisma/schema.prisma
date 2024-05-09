@@ -824,17 +824,12 @@ model ProposalDraftTransaction {
   order            Int
   target           String        @db.VarChar(255)
   value            String        @db.VarChar(255)
+  signature        String
   calldata         String
-  function_details String
-  contract_abi     String
   description      String
   is_valid         Boolean
-  type             String        @db.VarChar(32)
   created_at       DateTime      @default(now()) @db.Timestamptz(6)
   updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
-  transfer_amount  Decimal?      @db.Decimal
-  transfer_to      String?       @db.VarChar(255)
-  token_address    String?       @db.VarChar(255)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   @@map("proposal_transactions")
   @@schema("test2")

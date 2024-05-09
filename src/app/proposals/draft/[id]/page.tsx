@@ -13,16 +13,25 @@ import { ProposalDraft } from "@prisma/client";
  * Eventually want to abstract this into the UI factory
  * This is a way for tenant to define which stages are available
  */
-const STAGES_FOR_TENANT = [
+const DRAFT_STAGES_FOR_TENANT = [
   ProposalLifecycleStage.TEMP_CHECK,
   ProposalLifecycleStage.DRAFT,
   ProposalLifecycleStage.READY,
+];
+
+const POST_DRAFT_STAGES_FOR_TENANT = [
+  ProposalLifecycleStage.CONTACT_VOTERS,
+  ProposalLifecycleStage.QUEUE,
+  ProposalLifecycleStage.EXECUTE,
 ];
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
     where: {
       id: id,
+    },
+    include: {
+      transactions: true,
     },
   });
 
@@ -52,7 +61,7 @@ export default async function DraftProposalPage({
 
   const stageParam = (searchParams?.stage || "0") as string;
   const stageIndex = parseInt(stageParam, 10);
-  const stage = STAGES_FOR_TENANT[stageIndex];
+  const stage = DRAFT_STAGES_FOR_TENANT[stageIndex];
 
   const stageMetadata =
     ProposalLifecycleStageMetadata[
@@ -72,7 +81,7 @@ export default async function DraftProposalPage({
           {stageMetadata?.title}
         </h1>
         <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">
-          Step {stageMetadata.order}/{STAGES_FOR_TENANT.length}
+          Step {stageMetadata.order}/{DRAFT_STAGES_FOR_TENANT.length}
         </span>
       </div>
       <div className="grid grid-cols-3 gap-6">

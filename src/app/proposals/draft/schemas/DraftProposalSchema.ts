@@ -7,6 +7,7 @@ const transaction = z.object({
   value: z.string(),
   calldata: z.string(),
   signature: z.string(),
+  description: z.string(),
 });
 
 export const schema = z.object({

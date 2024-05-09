@@ -1,8 +1,29 @@
 import FormCard from "./form/FormCard";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import ApprovedTransactions from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
 
-const DraftPreview = ({ proposalDraft }: { proposalDraft: ProposalDraft }) => {
+const DraftPreview = ({
+  proposalDraft,
+}: {
+  proposalDraft: ProposalDraft & { transactions: ProposalDraftTransaction[] };
+}) => {
+  console.log(proposalDraft);
+  const parsedTransactions =
+    proposalDraft.transactions?.map((transaction, idx) => {
+      return {
+        description: transaction.description,
+        targets: [transaction.target],
+        values: [transaction.value],
+        signatures: [transaction.signature],
+        calldatas: [transaction.calldata],
+        functionArgsName: [
+          {
+            functionName: "name",
+            functionArgs: ["arg1"],
+          },
+        ],
+      };
+    }) ?? [];
   return (
     <FormCard>
       <FormCard.Header>
@@ -15,28 +36,11 @@ const DraftPreview = ({ proposalDraft }: { proposalDraft: ProposalDraft }) => {
         <h2 className="font-black text-agora-stone-900 text-2xl">
           {proposalDraft.title}
         </h2>
-        {/* parseProposalData */}
+        {/* found in parseProposalData */}
         <div className="mt-6">
           <ApprovedTransactions
             proposalData={{
-              options: [
-                {
-                  description: "Description of the option!!",
-                  targets: ["0x"],
-                  values: [0],
-                  signatures: ["func"],
-                  calldatas: ["0xabc"],
-                  functionArgsName: [
-                    {
-                      functionName: "allowDepositedETH",
-                      functionArgs: [
-                        "0x2686A8919Df194aA7673244549E68D42C1685d03",
-                        "444000004",
-                      ],
-                    },
-                  ],
-                },
-              ],
+              options: parsedTransactions,
             }}
             proposalType="APPROVAL"
             executedTransactionHash={"https://etherscan.io/tx/0x123"}

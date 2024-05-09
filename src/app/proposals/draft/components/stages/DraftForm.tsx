@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -15,6 +16,7 @@ import { ProposalType, TransactionType } from "../../types";
 import { ProposalDraft } from "@prisma/client";
 
 const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+  const [isPending, setIsPending] = useState<boolean>(false);
   const {
     register,
     control,
@@ -22,6 +24,12 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
     formState: { errors },
   } = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
+    defaultValues: {
+      type: ProposalType.EXECUTABLE,
+      title: draftProposal.title,
+      description: draftProposal.description,
+      abstract: draftProposal.abstract,
+    },
   });
 
   const { fields, append } = useFieldArray({
@@ -29,8 +37,19 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
     name: "transactions",
   });
 
-  const onSubmit = async (data: Record<string, any>) => {
-    await draftProposalAction(data);
+  const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
+    setIsPending(true);
+    const res = await draftProposalAction({
+      ...data,
+      draftProposalId: draftProposal.id,
+    });
+    setIsPending(false);
+
+    if (!res.ok) {
+      // toast?
+    }
+
+    window.location.href = `/proposals/draft/${draftProposal.id}?stage=2`;
   };
 
   return (
@@ -66,7 +85,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
               <TextInput
                 name="title"
                 register={register}
-                placeholder="[1.1]"
+                placeholder="EP [1.1] [Executable] title"
                 options={{
                   required: "Title is required.",
                   // pattern: {
@@ -106,7 +125,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
             gets executed. If you skip this step, a transfer of 0 ETH to you
             (the proposer) will be added.
           </p>
-          <div className="space-y-6">
+          <div className="mt-6 space-y-12">
             {fields.map((field, index) => {
               return (
                 <>
@@ -149,6 +168,25 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                           }
                         />
                       </FormItem>
+                      <div className="col-span-2">
+                        <FormItem
+                          label="Description"
+                          required={false}
+                          htmlFor={`transactions.${index}.description`}
+                        >
+                          <TextInput
+                            name={`transactions.${index}.description`}
+                            register={register}
+                            placeholder="What is this transaction all about?"
+                            options={{
+                              required: "Description is required.",
+                            }}
+                            errorMessage={
+                              errors.transactions?.[index]?.description?.message
+                            }
+                          />
+                        </FormItem>
+                      </div>
                     </div>
                   ) : (
                     <div
@@ -223,6 +261,25 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                           }
                         />
                       </FormItem>
+                      <div className="col-span-2">
+                        <FormItem
+                          label="Description"
+                          required={false}
+                          htmlFor={`transactions.${index}.description`}
+                        >
+                          <TextInput
+                            name={`transactions.${index}.description`}
+                            register={register}
+                            placeholder="What is this transaction all about?"
+                            options={{
+                              required: "Description is required.",
+                            }}
+                            errorMessage={
+                              errors.transactions?.[index]?.description?.message
+                            }
+                          />
+                        </FormItem>
+                      </div>
                     </div>
                   )}
                 </>
@@ -241,6 +298,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                   value: "0",
                   calldata: "0x",
                   signature: "",
+                  description: "",
                 });
               }}
             >
@@ -257,6 +315,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                   value: "0",
                   calldata: "0x",
                   signature: "",
+                  description: "",
                 });
               }}
             >
@@ -275,8 +334,8 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
           </p>
         </FormCard.Section>
         <FormCard.Section>
-          <UpdatedButton type="secondary" isSubmit={true}>
-            Submit
+          <UpdatedButton type="primary" isSubmit={true}>
+            {isPending ? "pending..." : "Create draft"}
           </UpdatedButton>
         </FormCard.Section>
         <FormCard.Footer>

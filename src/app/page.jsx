@@ -1,5 +1,8 @@
 import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
-import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
+import {
+  fetchProposals as apiFetchProposals,
+  fetchDraftProposals as apiFetchDraftProposals,
+} from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
@@ -8,6 +11,7 @@ import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposal
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
+import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -139,6 +143,12 @@ export default async function Home() {
   return (
     <VStack>
       <Hero />
+      <MyDraftProposals
+        fetchDraftProposals={async (address) => {
+          "use server";
+          return apiFetchDraftProposals(address);
+        }}
+      />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
