@@ -10,7 +10,7 @@ export const LogoPill = () => {
       <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
 
         <svg
-          style={{ width: "34px", height: "34px" }}
+          style={{ width: "30px", height: "30px" }}
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
