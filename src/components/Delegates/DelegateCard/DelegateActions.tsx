@@ -13,11 +13,11 @@ import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateActions({
-                                  delegate,
-                                  className,
-                                  isAdvancedUser,
-                                  delegators,
-                                }: {
+  delegate,
+  className,
+  isAdvancedUser,
+  delegators,
+}: {
   delegate: DelegateChunk;
   className?: string;
   isAdvancedUser: boolean;
@@ -43,10 +43,16 @@ export function DelegateActions({
         warpcast={warpcast}
       />
       <div>
-        {isConnected ? (address && (isAdvancedUser && hasAlligator
-              ? <AdvancedDelegateButton delegate={delegate} delegators={delegators} />
-              : <DelegateButton full={!twitter && !discord} delegate={delegate} />
-          )
+        {isConnected ? (
+          address &&
+          (isAdvancedUser && hasAlligator ? (
+            <AdvancedDelegateButton
+              delegate={delegate}
+              delegators={delegators}
+            />
+          ) : (
+            <DelegateButton full={!twitter && !discord} delegate={delegate} />
+          ))
         ) : (
           <ConnectKitButton.Custom>
             {({ show }) => (

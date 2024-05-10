@@ -19,16 +19,16 @@ import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateDialog({
-                                 delegate,
-                                 fetchBalanceForDirectDelegation,
-                                 fetchDirectDelegatee,
-                               }: {
+  delegate,
+  fetchBalanceForDirectDelegation,
+  fetchDirectDelegatee,
+}: {
   delegate: DelegateChunk;
   fetchBalanceForDirectDelegation: (
-    addressOrENSName: string,
+    addressOrENSName: string
   ) => Promise<bigint>;
   fetchDirectDelegatee: (
-    addressOrENSName: string,
+    addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
   const { contracts, namespace, slug } = Tenant.current();
@@ -146,8 +146,7 @@ export function DelegateDialog({
                   </div>
                 </VStack>
               </HStack>
-              <div
-                className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full right-1/2 top-1/2">
+              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full right-1/2 top-1/2">
                 <ArrowDownIcon className="w-4 h-4 text-black" />
               </div>
               <HStack
@@ -192,8 +191,7 @@ export function DelegateDialog({
                   </div>
                 </VStack>
               </HStack>
-              <div
-                className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
+              <div className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
                 <ArrowDownIcon className="w-4 h-4 text-black" />
               </div>
               <HStack gap={3} alignItems="items-center" className="p-2">

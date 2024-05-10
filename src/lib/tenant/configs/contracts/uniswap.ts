@@ -12,9 +12,8 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 
 export const uniswapTenantContractConfig = (
-  isProd: boolean,
+  isProd: boolean
 ): TenantContracts => {
-
   const TOKEN = "0xc796953c443f542728eedf33aab32753d3f7a91a";
   const GOVERNOR = "0x2D281aa50D016C42213d2F56081f1Fb181a35913";
   const STAKING = "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";

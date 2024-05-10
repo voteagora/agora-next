@@ -5,7 +5,11 @@ import { useMemo } from "react";
 import styles from "./advancedDelegateDialog.module.scss";
 import Tenant from "@/lib/tenant/tenant";
 
-export function AdvancedDelegationDisplayAmount({ amount }: { amount: string }) {
+export function AdvancedDelegationDisplayAmount({
+  amount,
+}: {
+  amount: string;
+}) {
   const { token, ui } = Tenant.current();
 
   const formattedNumber = useMemo(() => {
