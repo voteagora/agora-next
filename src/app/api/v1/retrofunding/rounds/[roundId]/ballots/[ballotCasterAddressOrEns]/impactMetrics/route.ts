@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { fetchImpactMetricsApi } from "@/app/api/common/impactMetrics/getImpactMetrics";
+import { updateBallotMetric } from "@/app/api/common/ballots/updateBallot";
 
 export async function POST(
   request: NextRequest,
@@ -16,8 +16,14 @@ export async function POST(
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const { roundId, ballotCasterAddressOrEns } = route.params;
-      const impactMetrics = await fetchImpactMetricsApi(
-        roundId,
+
+      const payload = await request.json();
+
+      // TODO: Validate payload
+
+      const impactMetrics = await updateBallotMetric(
+        payload,
+        Number(roundId),
         ballotCasterAddressOrEns
       );
       return NextResponse.json(impactMetrics);
