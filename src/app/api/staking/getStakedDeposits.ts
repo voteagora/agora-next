@@ -4,8 +4,8 @@ import { cache } from "react";
 import { StakedDeposit } from "@/lib/types";
 
 export async function fetchStakedDepositsForAddress({
-  address,
-}: {
+                                                      address,
+                                                    }: {
   address: string;
 }): Promise<StakedDeposit[]> {
   const { namespace } = Tenant.current();
@@ -27,12 +27,16 @@ export async function fetchStakedDepositsForAddress({
     },
   });
 
-  return deposits.map((deposit) => ({
-    amount: BigInt(deposit.amount.toString()).toString(),
-    delegatee: deposit.delegatee,
-    depositor: deposit.depositor,
-    id: Number(deposit.deposit_id),
-  }));
+  return deposits.map((deposit) => {
+      return {
+        //Note: Large amounts are stored in scientific notation 1.002e+21
+        amount: Number(deposit.amount).toLocaleString().replace(/,/g, ""),
+        delegatee: deposit.delegatee,
+        depositor: deposit.depositor,
+        id: Number(deposit.deposit_id),
+      };
+    },
+  );
 }
 
 export const apiFetchStakedDeposits = cache(fetchStakedDepositsForAddress);
