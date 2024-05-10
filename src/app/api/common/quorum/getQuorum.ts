@@ -15,7 +15,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
   switch (namespace) {
     case "optimism": {
-      const contractQuorum = contracts.governor.contract.quorum(
+      const contractQuorum = contracts.governor.contract.quorum!(
         proposal.proposal_id
       );
 
@@ -45,7 +45,7 @@ async function getCurrentQuorum() {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return contracts.governor.contract.quorum(latestBlock - 1);
+      return contracts.governor.contract.quorum!(latestBlock - 1);
     }
   }
 }
