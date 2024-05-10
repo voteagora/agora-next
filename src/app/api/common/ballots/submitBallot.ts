@@ -51,10 +51,9 @@ async function submitBallotForAddress({
       },
     },
     data: {
-      round: roundId,
-      address,
       signature: data.signature,
       payload,
+      updated_at: new Date(),
     },
   });
 

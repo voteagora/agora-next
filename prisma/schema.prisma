@@ -108,6 +108,8 @@ model Ballots {
   round         Int
   os_only       Boolean       @default(false)
   os_multiplier Int           @default(1)
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime      @default(now()) @db.Timestamptz(6)
   allocations   allocations[]
 
   @@id([address, round])
@@ -121,6 +123,8 @@ model allocations {
   metric_id  String   @db.VarChar(255)
   allocation Decimal  @default(0) @db.Decimal
   locked     Boolean? @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
   ballots    Ballots  @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([address, round, metric_id])
@@ -128,10 +132,12 @@ model allocations {
 }
 
 model BallotSubmittions {
-  address   String @db.VarChar(255)
-  round     Int
-  signature String @db.VarChar(255)
-  payload   String @db.VarChar(255)
+  address    String   @db.VarChar(255)
+  round      Int
+  signature  String   @db.VarChar(255)
+  payload    String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@id([address, round])
   @@map("ballot_submittions")

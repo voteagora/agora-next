@@ -34,7 +34,9 @@ async function updateBallotMetricForAddress({
         round: roundId,
       },
     },
-    update: {},
+    update: {
+      updated_at: new Date(),
+    },
     create: {
       round: roundId,
       address,
@@ -51,6 +53,7 @@ async function updateBallotMetricForAddress({
     update: {
       allocation: data.allocation,
       locked: data.locked,
+      updated_at: new Date(),
     },
     create: {
       metric_id: data.metric_id,
