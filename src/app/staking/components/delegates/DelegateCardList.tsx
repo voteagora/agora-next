@@ -86,7 +86,7 @@ export default function DelegateCardList({
 
           const twitter = delegate?.statement?.twitter;
           const discord = delegate?.statement?.discord;
-          const warpcast = delegate?.statement.warpcast;
+          const warpcast = delegate?.statement?.warpcast;
 
           if (delegate?.statement?.payload) {
             const delegateStatement = (

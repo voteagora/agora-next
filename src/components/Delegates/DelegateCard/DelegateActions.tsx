@@ -43,19 +43,10 @@ export function DelegateActions({
         warpcast={warpcast}
       />
       <div>
-        {isConnected ? (address && (isAdvancedUser && hasAlligator ? (
-            <>
-              ADVANCED
-              <AdvancedDelegateButton
-                delegate={delegate}
-                delegators={delegators}
-              />
-            </>
-          ) : (<>
-              REGULER
-              <DelegateButton full={!twitter && !discord} delegate={delegate} />
-            </>
-          ))
+        {isConnected ? (address && (isAdvancedUser && hasAlligator
+              ? <AdvancedDelegateButton delegate={delegate} delegators={delegators} />
+              : <DelegateButton full={!twitter && !discord} delegate={delegate} />
+          )
         ) : (
           <ConnectKitButton.Custom>
             {({ show }) => (

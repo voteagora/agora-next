@@ -6,6 +6,7 @@ import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -15,15 +16,15 @@ const getCurrentDelegatees = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentDelegateesForAddress, addressOrENSName);
 
 async function getCurrentDelegateesForAddress({
-  address,
-}: {
+                                                address,
+                                              }: {
   address: string;
 }): Promise<Delegation[]> {
   const { namespace, contracts } = Tenant.current();
 
   const advancedDelegatees = await prisma[
     `${namespace}AdvancedDelegatees`
-  ].findMany({
+    ].findMany({
     where: {
       from: address.toLowerCase(),
       delegated_amount: { gt: 0 },
@@ -125,8 +126,8 @@ const getCurrentDelegators = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName);
 
 async function getCurrentDelegatorsForAddress({
-  address,
-}: {
+                                                address,
+                                              }: {
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
@@ -220,23 +221,18 @@ async function getCurrentDelegatorsForAddress({
 const getDirectDelegatee = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getDirectDelegateeForAddress, addressOrENSName);
 
-const getDirectDelegateeForAddress = async ({
-  address,
-}: {
-  address: string;
-}) => {
+const getDirectDelegateeForAddress = async ({ address }: { address: string }) => {
+
   const { namespace } = Tenant.current();
-  const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
-      where: { delegator: address.toLowerCase() },
-    }),
-  ]);
 
-  if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
-    return null;
+  const delegatee = await prisma[`${namespace}Delegatees`].findFirst({ where: { delegator: address.toLowerCase() } });
+
+  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+    const proxyAddress = await getProxyAddress(address);
+    if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
+      return null;
+    }
   }
-
   return delegatee;
 };
 
@@ -248,8 +244,8 @@ const getAllDelegatorsInChains = (addressOrENSName: string) =>
   addressOrEnsNameWrap(getAllDelegatorsInChainsForAddress, addressOrENSName);
 
 async function getAllDelegatorsInChainsForAddress({
-  address,
-}: {
+                                                    address,
+                                                  }: {
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
@@ -260,7 +256,7 @@ async function getAllDelegatorsInChainsForAddress({
     WHERE delegate=$1 AND contract=$2 AND allowance > 0;
     `,
     address,
-    contracts.alligator?.address
+    contracts.alligator?.address,
   );
 
   return allAddresess[0].addresses;
