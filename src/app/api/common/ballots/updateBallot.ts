@@ -84,9 +84,6 @@ async function deleteBallotMetricForAddress({
   roundId: number;
   address: string;
 }) {
-  // TODO: Add roundId to the allocations table
-
-  // TODO: Consider a composite key for allocations in order to avoid using delteMany
   return prisma.allocations.deleteMany({
     where: {
       metric_id: metricId,
