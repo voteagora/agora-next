@@ -65,4 +65,35 @@ async function updateBallotMetricForAddress({
   });
 }
 
+const deleteBallotMetricApi = async (
+  metricId: string,
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) =>
+  addressOrEnsNameWrap(deleteBallotMetricForAddress, ballotCasterAddressOrEns, {
+    metricId,
+    roundId,
+  });
+
+async function deleteBallotMetricForAddress({
+  metricId,
+  roundId,
+  address,
+}: {
+  metricId: string;
+  roundId: number;
+  address: string;
+}) {
+  // TODO: Add roundId to the allocations table
+
+  // TODO: Consider a composite key for allocations in order to avoid using delteMany
+  return prisma.allocations.deleteMany({
+    where: {
+      metric_id: metricId,
+      address,
+    },
+  });
+}
+
 export const updateBallotMetric = cache(updateBallotMetricApi);
+export const deleteBallotMetric = cache(deleteBallotMetricApi);
