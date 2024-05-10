@@ -104,24 +104,26 @@ model chain {
 }
 
 model Ballots {
-  address       String        @id @db.VarChar(255)
-  only_os       Boolean       @default(false)
-  os_multiplier Int           @default(1)
+  address       String        @db.VarChar(255)
   round         Int
+  os_only       Boolean       @default(false)
+  os_multiplier Int           @default(1)
   allocations   allocations[]
 
+  @@id([address, round])
   @@map("ballots")
   @@schema("test3")
 }
 
 model allocations {
-  id         Int      @id(map: "ballot_content_pkey") @default(autoincrement())
   address    String   @db.VarChar(255)
+  round      Int
   metric_id  String   @db.VarChar(255)
   allocation Decimal  @default(0) @db.Decimal
   locked     Boolean? @default(false)
-  ballots    Ballots  @relation(fields: [address], references: [address], onDelete: Cascade, onUpdate: NoAction, map: "ballot_content_address_fkey")
+  ballots    Ballots  @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
 
+  @@id([address, round, metric_id])
   @@schema("test3")
 }
 

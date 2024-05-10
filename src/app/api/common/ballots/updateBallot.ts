@@ -26,39 +26,36 @@ async function updateBallotMetricForAddress({
   roundId: number;
   address: string;
 }) {
-  const allocation = await prisma.allocations.findFirst({
+  // Create ballot if it doesn't exist
+  await prisma.ballots.upsert({
     where: {
-      metric_id: data.metric_id,
+      address_round: {
+        address,
+        round: roundId,
+      },
+    },
+    update: {},
+    create: {
+      round: roundId,
       address,
     },
   });
-
-  if (!allocation) {
-    const ballot = await prisma.ballots.upsert({
-      where: {
-        address,
-      },
-      update: {},
-      create: {
+  return prisma.allocations.upsert({
+    where: {
+      address_round_metric_id: {
+        metric_id: data.metric_id,
         round: roundId,
         address,
       },
-    });
-    return prisma.allocations.create({
-      data: {
-        address,
-        metric_id: data.metric_id,
-        allocation: data.allocation,
-        locked: data.locked,
-      },
-    });
-  }
-
-  return prisma.allocations.update({
-    where: {
-      id: allocation.id,
     },
-    data: {
+    update: {
+      allocation: data.allocation,
+      locked: data.locked,
+    },
+    create: {
+      metric_id: data.metric_id,
+      round: roundId,
+      address,
       allocation: data.allocation,
       locked: data.locked,
     },
@@ -91,6 +88,7 @@ async function deleteBallotMetricForAddress({
     where: {
       metric_id: metricId,
       address,
+      round: roundId,
     },
   });
 }
