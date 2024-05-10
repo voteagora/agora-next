@@ -125,6 +125,17 @@ model allocations {
   @@schema("test3")
 }
 
+model BallotSubmittions {
+  address   String @db.VarChar(255)
+  round     Int
+  signature String @db.VarChar(255)
+  payload   String @db.VarChar(255)
+
+  @@id([address, round])
+  @@map("ballot_submittions")
+  @@schema("test3")
+}
+
 view OptimismVotes {
   transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
