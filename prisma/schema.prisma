@@ -145,10 +145,12 @@ model BallotSubmittions {
 }
 
 model BallotSubmittions {
-  address   String @db.VarChar(255)
-  round     Int
-  signature String @db.VarChar(255)
-  payload   String @db.VarChar(255)
+  address    String   @db.VarChar(255)
+  round      Int
+  signature  String   @db.VarChar(255)
+  payload    String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@id([address, round])
   @@map("ballot_submittions")
