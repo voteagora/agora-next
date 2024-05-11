@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
 }
 
 model DelegateStatements {
@@ -16,10 +16,10 @@ model DelegateStatements {
   payload   Json
   twitter   String?
   discord   String?
-  warpcast  String?
   email     String?
   createdAt DateTime? @default(now()) @map("created_at") @db.Date
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
+  warpcast  String?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -101,6 +101,47 @@ model chain {
   api_user   api_user[]
 
   @@schema("agora")
+}
+
+model Ballots {
+  address       String        @db.VarChar(255)
+  round         Int
+  os_only       Boolean       @default(false)
+  os_multiplier Int           @default(1)
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime      @default(now()) @db.Timestamptz(6)
+  allocations   allocations[]
+
+  @@id([address, round])
+  @@map("ballots")
+  @@schema("retro_funding")
+}
+
+model allocations {
+  address    String   @db.VarChar(255)
+  round      Int
+  metric_id  String   @db.VarChar(255)
+  allocation Decimal  @default(0) @db.Decimal
+  locked     Boolean? @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  ballots    Ballots  @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([address, round, metric_id])
+  @@schema("retro_funding")
+}
+
+model BallotSubmittions {
+  address    String   @db.VarChar(255)
+  round      Int
+  signature  String   @db.VarChar(255)
+  payload    String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([address, round])
+  @@map("ballot_submittions")
+  @@schema("retro_funding")
 }
 
 view OptimismVotes {
