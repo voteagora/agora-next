@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "test3", "uniswap"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
 }
 
 model DelegateStatements {
@@ -114,7 +114,7 @@ model Ballots {
 
   @@id([address, round])
   @@map("ballots")
-  @@schema("test3")
+  @@schema("retro_funding")
 }
 
 model allocations {
@@ -128,7 +128,7 @@ model allocations {
   ballots    Ballots  @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([address, round, metric_id])
-  @@schema("test3")
+  @@schema("retro_funding")
 }
 
 model BallotSubmittions {
@@ -141,7 +141,7 @@ model BallotSubmittions {
 
   @@id([address, round])
   @@map("ballot_submittions")
-  @@schema("test3")
+  @@schema("retro_funding")
 }
 
 view OptimismVotes {
