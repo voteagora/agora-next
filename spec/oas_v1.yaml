@@ -787,6 +787,8 @@ components:
           type: integer
         allocation:
           type: string
+        locked:
+          type: boolean
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -813,10 +815,12 @@ components:
       description: An object containing the information required to submit a ballot.
       type: object
       properties:
-        ballotId:
+        address:
           summary: Address or ENS of the ballot caster
           description: Address or ENS of the ballot caster.
           type: string
+        roundId:
+          type: integer
         ballotContent:
           summary: Signed content of the ballot
           type: string
