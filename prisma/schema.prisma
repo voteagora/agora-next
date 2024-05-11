@@ -154,7 +154,7 @@ model BallotSubmittions {
 
   @@id([address, round])
   @@map("ballot_submittions")
-  @@schema("test3")
+  @@schema("retro_funding")
 }
 
 view OptimismVotes {
