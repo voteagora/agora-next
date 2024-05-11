@@ -17,17 +17,17 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
-      scheme: bearer 
+      scheme: bearer
       bearerFormat: JWT
   schemas:
     AuthToken:
-      summary: Token for authentication 
+      summary: Token for authentication
       description: >
         A token for authentication and authorization on the Agora platform.
         Subsequent requests should supply this as a Bearer token in the 
         "Authorization" header.
       type: object
-      properties: 
+      properties:
         access_token:
           summary: The access token
           description: The access token.
@@ -70,7 +70,7 @@ components:
           description: A number indicating the total amount of records returned for the request.
           type: integer
           format: int32
-        nextOffset: 
+        nextOffset:
           summary: Offset to supply to the next request
           description: A number indicating the offset at which a subsequent request may retrieve the next set of records.
           type: integer
@@ -80,34 +80,34 @@ components:
       description: A delegation of voting power from one address to another.
       type: object
       properties:
-        delegatorAddress: 
+        delegatorAddress:
           summary: Delegator address
           description: Address of the delegator.
-          type: string 
-          examples:
-          - summary: Address of the delegator.
-            value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-        delegateeAddress: 
-          summary: Delegatee address
-          description: Address of the delegatee.
-          type: string 
-          examples:
-          - summary: Address of the delegatee.
-            value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-        totalAllowance:
-          summary: Voting allowance for delegate
-          description: Total amount of voting power delegated to or from address. 
           type: string
           examples:
-          - summary: Amount of voting power delegated to or from address.
-            value: "100000"
+            - summary: Address of the delegator.
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        delegateeAddress:
+          summary: Delegatee address
+          description: Address of the delegatee.
+          type: string
+          examples:
+            - summary: Address of the delegatee.
+              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        totalAllowance:
+          summary: Voting allowance for delegate
+          description: Total amount of voting power delegated to or from address.
+          type: string
+          examples:
+            - summary: Amount of voting power delegated to or from address.
+              value: "100000"
         delegatedOn:
           summary: When delegation occured
-          description: The datetime on which the delegation of voting power occurred. 
+          description: The datetime on which the delegation of voting power occurred.
           type: string
           format: date-time
           examples:
-          - summary: The datetime on which the delegation of voting power occurred.
+            - summary: The datetime on which the delegation of voting power occurred.
         type:
           summary: Type of delegation
           description: The type of delegation; can be advanced or standard.
@@ -124,14 +124,14 @@ components:
             - partial
     BaseDelegate:
       summary: A voting delegate
-      description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded. 
+      description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded.
       type: object
       properties:
         address:
           summary: Delegate address
           description: Address of the delegate.
           type: string
-          examples: 
+          examples:
             - summary: Address of the delegate.
               value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
         votingPower:
@@ -175,28 +175,28 @@ components:
         topIssues:
           description: The most important issues for a given delegate.
           type: array
-          items: 
-              $ref: '#/components/schemas/Issue'
+          items:
+            $ref: "#/components/schemas/Issue"
     Issue:
       summary: Description of a governance issue
       description: An object describing a particular view on a particular governance issue.
       type: object
       properties:
-        type: 
+        type:
           type: string
-          examples: 
+          examples:
             - "Funding"
         value:
           type: string
-          examples: 
+          examples:
             - "Grant funding should be directed to projects with a great track record"
     SnapshotProposalData:
       summary: Data associated with a snapshot proposal
       description: >
-        Metadata and data associated with a snapshot proposal, including start/end/created times, scores, and votes. 
+        Metadata and data associated with a snapshot proposal, including start/end/created times, scores, and votes.
       type: object
       properties:
-        votingStrategy: 
+        votingStrategy:
           $ref: "#/components/schemas/VotingStrategy"
         title:
           summary: Title of the proposal
@@ -216,33 +216,33 @@ components:
         link:
           summary: Link to the proposal
           type: string
-        scores: 
+        scores:
           summary: Scores for the proposal
           type: array
           items:
-            type: string 
+            type: string
         votes:
           summary: Votes for the proposal
           type: string
-        state: 
+        state:
           summary: State of the proposal
           type: string
-          enum: 
+          enum:
             - ACTIVE
             - CLOSED
             - PENDING
-    StandardProposalData: 
-      summary: Data associated with standard proposal 
+    StandardProposalData:
+      summary: Data associated with standard proposal
       description: >
         Metadata and data associated with a standard proposal, including onchain execution data.
       type: object
       properties:
-        votingStrategy: 
+        votingStrategy:
           $ref: "#/components/schemas/VotingStrategy"
         options:
-          type: array 
+          type: array
           items:
-            type: object 
+            type: object
             properties:
               executionData:
                 $ref: "#/components/schemas/ExecutionData"
@@ -252,12 +252,12 @@ components:
         Metadata and data associated with an approval proposal, including onchain execution data.
       type: object
       properties:
-        votingStrategy: 
+        votingStrategy:
           $ref: "#/components/schemas/VotingStrategy"
-        options: 
-          type: array 
+        options:
+          type: array
           items:
-            type: object 
+            type: object
             properties:
               executionData:
                 $ref: "#/components/schemas/ExecutionData"
@@ -268,9 +268,9 @@ components:
                 summary: Description of the proposal
                 type: string
         proposalSettings:
-          type: object 
+          type: object
           properties:
-            maxApprovals: 
+            maxApprovals:
               summary: Maximum approvals for the proposal
               type: string
             criteria:
@@ -279,7 +279,7 @@ components:
               enum:
                 - THRESHOLD
                 - TOP_CHOICES
-            budgetToken: 
+            budgetToken:
               summary: Budget token for the proposal
               type: string
             criteriaValue:
@@ -294,7 +294,7 @@ components:
         Metadata and data associated with an optimistic proposal, including onchain execution data.
       type: object
       properties:
-        votingStrategy: 
+        votingStrategy:
           $ref: "#/components/schemas/VotingStrategy"
         executionData:
           $ref: "#/components/schemas/ExecutionData"
@@ -305,38 +305,38 @@ components:
       summary: Structured exceution data for proposal
       description: >
         Provides the values, targets, calldata, and functions for proposal execution.
-      type: object 
+      type: object
       properties:
         values:
           summary: Values for execution
-          type: array 
+          type: array
           items:
             type: string
         targets:
           summary: Targets for execution
-          type: array 
+          type: array
           items:
             type: string
         calldata:
           summary: Calldata for execution
-          type: array 
+          type: array
           items:
             type: string
         functionData:
           summary: Functions for execution
-          type: array 
+          type: array
           items:
-            type: object 
+            type: object
             properties:
               functionName:
                 summary: Function name
                 type: string
               data:
                 summary: Data for function
-                type: array 
+                type: array
                 items:
-                  type: string 
-    Proposal: 
+                  type: string
+    Proposal:
       summary: A specific governance proposal for voting
       description: >
         An object describing the specifics and metadata associated with a particular governance proposal,
@@ -359,7 +359,7 @@ components:
           type: string
         ordinal:
           summary: Number of this proposal's order
-          description: > 
+          description: >
             Numeric descriptor of this proposal's ordering among others; Calculated as the concatentation
             of the proposal's block number left-padded by 10 0's, transaction index left-padded by 3 0's, 
             and log index left-padded by 3 0's.
@@ -376,16 +376,16 @@ components:
           summary: Ending block number
           description: Block number at which the proposal has closed for voting.
           type: string
-        cancelledBlock: 
-          summary: Cancelled block number 
+        cancelledBlock:
+          summary: Cancelled block number
           description: Block number at which this proposal has been canceled. Zero if not canceled.
           type: string
         executedBlock:
-          summary: Execution block number 
+          summary: Execution block number
           description: Block number at which this proposal has been executed. Zero if not executed.
           type: string
         proposalData:
-          oneOf: 
+          oneOf:
             - $ref: "#/components/schemas/SnapshotProposalData"
             - $ref: "#/components/schemas/StandardProposalData"
             - $ref: "#/components/schemas/ApprovalProposalData"
@@ -394,31 +394,31 @@ components:
             propertyName: votingStrategy
         proposalTemplate:
           $ref: "#/components/schemas/ProposalTemplate"
-    ProposalTemplate:  
+    ProposalTemplate:
       summary: Metadata about the proposal
-      description: > 
+      description: >
         An object describing the particular voting parameters of a proposal.
-      type: object 
+      type: object
       properties:
-        name: 
-          summary: Name of proposal template 
-          description: Name of proposal template 
+        name:
+          summary: Name of proposal template
+          description: Name of proposal template
           type: string
         proposalTemplateId:
           summary: Numeric id of the proposal template
-          description: Numeric id of the proposal template 
+          description: Numeric id of the proposal template
           type: integer
         votingStrategy:
-          $ref: "#/components/schemas/VotingStrategy" 
-        # Note: quorum and threshold are strings since I'm not sure about the unit/size here 
+          $ref: "#/components/schemas/VotingStrategy"
+        # Note: quorum and threshold are strings since I'm not sure about the unit/size here
         # (i.e. if they can be contained in an int32/int64 type)
         quorum:
           summary: Minimmum participation for passage
           description: >
             The minimum number of voting power needed to be involved in a given proposal as a prerequisite for passage
-          type: string 
+          type: string
         approvalThreshold:
-          summary: Amount needed for measure to pass 
+          summary: Amount needed for measure to pass
           description: The amount of voting power needed to pass the given proposal.
           type: string
         contractAddress:
@@ -429,11 +429,11 @@ components:
           summary: Proposal creation block number
           description: Block number on which this proposal template was created.
           type: string
-    VotingStrategy: 
+    VotingStrategy:
       summary: The voting strategy for a proposal
       description: Enum description of the proposal's voting strategy.
       type: string
-      enum: 
+      enum:
         - STANDARD
         - ADVANCED
         - OPTIMISTIC
@@ -442,8 +442,8 @@ components:
       summary: Disposition of the vote
       description: Describes which way the vote was cast (i.e. for/against/abstention)
       type: string
-      enum: 
-        - FOR 
+      enum:
+        - FOR
         - AGAINST
         - ABSTAIN
     Vote:
@@ -455,7 +455,7 @@ components:
           summary: Transaction ID of the vote
           description: The transaction ID of the transaction in which the vote was cast.
           type: string
-        proposalId: 
+        proposalId:
           summary: Proposal ID for the vote
           description: The unique ID of the proposal on which the vote was cast.
           type: string
@@ -472,69 +472,69 @@ components:
         castBlock:
           summary: Block in which the vote was cast
           description: The block number in which the transaction for the cast is contained.
-          type: string 
+          type: string
         description:
           summary: Rationale for the vote
           description: A voter-supplied reason for voting the particular way they did.
           type: string
         approvalParams:
-          summary: Array of items to submit for approval 
+          summary: Array of items to submit for approval
           description: An array of items to submit for approval for multiple choice votes.
           type: array
           items:
             type: string
     VotingToken:
       allOf:
-      - $ref: '#/components/schemas/Contract'
-      - type: object
-        properties:
-          tokenName:
-            summary: Name of the voting token
-            description: The name of the voting token.
-            type: string
-          tokenSymbol:
-            summary: Symbol of the voting token
-            description: The symbol of the voting token.
-            type: string
-          totalSupply:
-            summary: Total supply of the voting token
-            description: The total supply of the voting token.
-            type: string
-          votableSupply:
-            summary: Votable supply of the voting token
-            description: The votable supply of the voting token.
-            type: string
+        - $ref: "#/components/schemas/Contract"
+        - type: object
+          properties:
+            tokenName:
+              summary: Name of the voting token
+              description: The name of the voting token.
+              type: string
+            tokenSymbol:
+              summary: Symbol of the voting token
+              description: The symbol of the voting token.
+              type: string
+            totalSupply:
+              summary: Total supply of the voting token
+              description: The total supply of the voting token.
+              type: string
+            votableSupply:
+              summary: Votable supply of the voting token
+              description: The votable supply of the voting token.
+              type: string
     Contract:
       summary: Information about a deployed contract
       description: Metadata about a specific smart contract deployed on chain.
       type: object
       properties:
-          address:
-            summary: Contract address
-            description: The address of the contract on chain.
-            type: string
-          chainId:
-            summary: Chain ID of the contract
-            description: The chain ID on which the contract is deployed.
-            type: string
-          deployer:
-            summary: Deployer address
-            description: The address of the entity which deployed the contract.
-            type: string
-          creationBlock:
-            summary: Block in which the contract was deployed
-            description: The block number in which the contract was deployed.
-            type: string
-          transactionId:
-            summary: Transaction ID of the deployment
-            description: The transaction ID of the transaction in which the contract was deployed.
-            type: string
-    Comment: 
-      summary: A comment 
+        address:
+          summary: Contract address
+          description: The address of the contract on chain.
+          type: string
+        chainId:
+          summary: Chain ID of the contract
+          description: The chain ID on which the contract is deployed.
+          type: string
+        deployer:
+          summary: Deployer address
+          description: The address of the entity which deployed the contract.
+          type: string
+        creationBlock:
+          summary: Block in which the contract was deployed
+          description: The block number in which the contract was deployed.
+          type: string
+        transactionId:
+          summary: Transaction ID of the deployment
+          description: The transaction ID of the transaction in which the contract was deployed.
+          type: string
+    Comment:
+      summary: A comment
       description: >
         A discussion comment, including the author, timestamp, and content.
       type: object
-      properties: 
+      properties:
         id:
           summary: Comment ID
           description: The unique ID of the comment.
@@ -549,7 +549,7 @@ components:
           description: The timestamp at which the comment was last edited.
           type: string
           format: date-time
-        content: 
+        content:
           summary: Content of the comment
           description: The text content of the comment.
           type: string
@@ -567,15 +567,15 @@ components:
         - APPLICATIONS_STARTED
         - APPLICATIONS_REVIEW
         - APPLICATIONS_LOCKED
-        - VOTING 
-        - BALLOT_COUNTING 
+        - VOTING
+        - BALLOT_COUNTING
         - RESULTS_ANNOUNCED
         - FUNDS_DISTRIBUTION
-        - DONE 
+        - DONE
         - CANCELLED
     RetroFundingRoundEvent:
       summary: An event within an RetroFunding round
-      description: > 
+      description: >
         An event within an RetroFunding round, including status and timestamp.
         For example, a round may have events for the start of voting, application review, etc.
       type: object
@@ -607,15 +607,15 @@ components:
           items:
             $ref: "#/components/schemas/RetroFundingRoundEvent"
     RetroFundingImpactMetric:
-      # Note: these are externally defined on Open Source Observer, 
-      # So it's not completely clear what information needs to be represented here 
+      # Note: these are externally defined on Open Source Observer,
+      # So it's not completely clear what information needs to be represented here
       # The most important aspect are that IDs are present for linking metrics on ballots
-      summary: Impact metric for an RetroFunding project 
+      summary: Impact metric for an RetroFunding project
       description: >
         An impact metric for an RetroFunding project with associated metadata.
       type: object
       properties:
-        id: 
+        id:
           type: string
         name:
           type: string
@@ -661,11 +661,11 @@ components:
         description:
           type: string
     Project:
-      summary: A project submitted for RetroFunding 
+      summary: A project submitted for RetroFunding
       description: >
         Information about a project submitted for Retroactive Public Goods Funding on Agora.
-      type: object 
-      properties: 
+      type: object
+      properties:
         avatarUrl:
           type: string
         coverImageUrl:
@@ -674,7 +674,7 @@ components:
           type: string
         approvalAttestationUid:
           type: string
-        name: 
+        name:
           type: string
         description:
           type: string
@@ -682,7 +682,7 @@ components:
           type: string
         socialLinks:
           $ref: "#/components/schemas/SocialLinks"
-        team: 
+        team:
           type: array
           items:
             $ref: "#/components/schemas/ProjectMember"
@@ -700,23 +700,23 @@ components:
           type: array
           items:
             allOf:
-            - $ref: "#/components/schemas/Contract"
-            - type: object
-              properties:
-                verificationProof:
-                  summary: Proof of contract verification
-                  description: Verification of ownership of contract on chain.
-                  type: string
-                openSourceObserverSlug:
-                  summary: Open source observer verification slug 
-                  description: > 
-                    Slug for the open source observer external verification.
-                  type: string
-        categories: 
-          type: array 
+              - $ref: "#/components/schemas/Contract"
+              - type: object
+                properties:
+                  verificationProof:
+                    summary: Proof of contract verification
+                    description: Verification of ownership of contract on chain.
+                    type: string
+                  openSourceObserverSlug:
+                    summary: Open source observer verification slug
+                    description: >
+                      Slug for the open source observer external verification.
+                    type: string
+        categories:
+          type: array
           items:
             $ref: "#/components/schemas/RetroFundingCategory"
-        funding: 
+        funding:
           type: object
           properties:
             ventureCapital:
@@ -736,7 +736,7 @@ components:
                     properties:
                       link:
                         type: string
-                      type: 
+                      type:
                         $ref: "#/components/schemas/OptimismGrantType"
     SocialLinks:
       summary: Social media links for a project
@@ -772,7 +772,7 @@ components:
           type: string
         source:
           type: string
-        date: 
+        date:
           type: string
           format: date-time
         details:
@@ -787,46 +787,41 @@ components:
           type: integer
         allocation:
           type: string
-    RetroFundingBallot: 
+        locked:
+          type: boolean
+    RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
         A ballot for an RetroFunding round, including information about the ballot.
       type: object
       properties:
-        address: 
-          summary: Onchain address of the ballot
-          description: The onchain address of the ballot.
+        address:
+          summary: Address of the voter
+          description: Address of the voter
           type: string
-        ballotId:
-          summary: Ballot ID
-          description: The unique ID / ordinal of the ballot.
-          type: integer
         roundId:
           type: integer
         status:
           type: string
           enum:
             - PENDING
-            - APPROVED
-            - REJECTED
-        allocations: 
+            - SUBMITTED
+        allocations:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotAllocation"
-        ballotCasterAddress:
-          summary: Address of the ballot caster
-          description: The resolved address of the entity which cast the ballot.
-          type: string
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
       type: object
       properties:
-        ballotId:
+        address:
           summary: Address or ENS of the ballot caster
           description: Address or ENS of the ballot caster.
           type: string
-        ballotContent: 
+        roundId:
+          type: integer
+        ballotContent:
           summary: Signed content of the ballot
           type: string
         signature:
@@ -856,7 +851,7 @@ components:
         format: int32
         minimum: 0
         default: 0
-    blockParam: 
+    blockParam:
       # What is a reasonable default?
       name: blockNumber
       in: query
@@ -870,7 +865,7 @@ components:
     supportParam:
       name: support
       in: query
-      schema: 
+      schema:
         $ref: "#/components/schemas/VoteSupport"
     proposalStatusParam:
       name: status
@@ -892,12 +887,12 @@ components:
       schema:
         type: string
     projectIdParam:
-      name: projectId 
+      name: projectId
       in: path
       description: The id of the project on the ballot
       required: true
       schema:
-        type: string 
+        type: string
     impactMetricParam:
       name: impactMetricId
       in: path
@@ -914,44 +909,44 @@ components:
         type: string
 paths:
   /spec:
-    get: 
+    get:
       summary: Gets this specification
       description: Retrieves the full OAS/Swagger spec for the API in YAML.
       operationId: getSpec
       tags:
         - spec
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             text/plain:
               schema:
                 type: string
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /auth/nonce:
     get:
       summary: Gets nonce for SIWE authentication
       description: Gets nonce for SIWE authentication.
       operationId: getNonce
-      tags: 
+      tags:
         - auth
       responses:
-        '200':
+        "200":
           description: OK
           content:
             text/plain:
-              schema: 
+              schema:
                 type: string
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /auth/verify:
     post:
@@ -966,18 +961,18 @@ paths:
             schema:
               $ref: "#/components/schemas/SIWEVerificationBody"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthToken"
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
-          description: Internal Server Error  
+        "500":
+          description: Internal Server Error
   /delegates:
     get:
       summary: Gets a list of delegates
@@ -996,30 +991,30 @@ paths:
             The desired method by which returned delegates will be sorted.
             Supported values are: 'most_delegators', 'weighted_random'
           required: false
-          schema: 
+          schema:
             type: string
-            enum: 
+            enum:
               - most_delegators
               - weighted_random
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   delegates:
                     type: array
                     items:
-                      $ref: '#/components/schemas/BaseDelegate'
-        '400':
+                      $ref: "#/components/schemas/BaseDelegate"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /delegates/{addressOrEnsName}:
     get:
@@ -1027,7 +1022,7 @@ paths:
       description: >
         Retrieves a specific delegate on Agora by address or ENS name.
       operationId: getDelegateByAddress
-      tags: 
+      tags:
         - delegates
       parameters:
         - name: addressOrEnsName
@@ -1036,27 +1031,27 @@ paths:
           required: true
           schema:
             type: string
-          examples: 
-            address: 
+          examples:
+            address:
               value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate. 
+              summary: Address of the delegate.
             ensName:
               value: "flipliquid.eth"
               summary: ENS name of the delegate.
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/BaseDelegate'
-        '400':
+              schema:
+                $ref: "#/components/schemas/BaseDelegate"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /delegates/{addressOrEnsName}/votes:
     get:
@@ -1066,7 +1061,7 @@ paths:
         Limit, offset, and sort parameters can be used to customize the returned list.
       operationId: getDelegateVotes
       tags:
-        - delegates 
+        - delegates
         - votes
       parameters:
         - name: addressOrEnsName
@@ -1075,10 +1070,10 @@ paths:
           required: true
           schema:
             type: string
-          examples: 
-            address: 
+          examples:
+            address:
               value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate. 
+              summary: Address of the delegate.
             ensName:
               value: "flipliquid.eth"
               summary: ENS name of the delegate.
@@ -1090,30 +1085,30 @@ paths:
             The desired method by which returned delegates will be sorted.
             Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
           required: false
-          schema: 
+          schema:
             type: string
-            enum: 
+            enum:
               - weight
               - block
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   votes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Vote'
-        '400':
+                      $ref: "#/components/schemas/Vote"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /proposals:
     get:
@@ -1133,27 +1128,27 @@ paths:
             The desired method by which returned votes will be sorted.
             Supported values are: 'status', 'term'
           required: false
-          schema: 
+          schema:
             type: string
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   proposals:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Proposal'
-        '400':
+                      $ref: "#/components/schemas/Proposal"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /proposals/{proposalId}:
     get:
@@ -1170,18 +1165,18 @@ paths:
           required: true
           schema:
             type: string
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/Proposal"
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /proposals/{proposalId}/votes:
     get:
@@ -1191,7 +1186,7 @@ paths:
         Limit, offset, and sort parameters can be used to customize the returned list.
       operationId: getProposalVotes
       tags:
-        - proposals 
+        - proposals
         - votes
       parameters:
         - name: proposalId
@@ -1208,30 +1203,30 @@ paths:
             The desired method by which returned delegates will be sorted.
             Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
           required: false
-          schema: 
+          schema:
             type: string
-            enum: 
+            enum:
               - weight
               - block
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   votes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Vote'
-        '400':
+                      $ref: "#/components/schemas/Vote"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /delegatees/{addressOrEnsName}:
     get:
@@ -1240,7 +1235,7 @@ paths:
         Retrieves a paginated list of the delegatees for a given address. That is, the delegates to which
         the supplied address is delegating votes.
       operationId: getDelegateesByAddress
-      tags: 
+      tags:
         - delegates
         - delegations
       parameters:
@@ -1250,34 +1245,34 @@ paths:
           required: true
           schema:
             type: string
-          examples: 
-            address: 
+          examples:
+            address:
               value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate. 
+              summary: Address of the delegate.
             ensName:
               value: "flipliquid.eth"
               summary: ENS name of the delegate.
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   votes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Delegation'
-        '400':
+                      $ref: "#/components/schemas/Delegation"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /delegators/{addressOrEnsName}:
     get:
@@ -1286,7 +1281,7 @@ paths:
         Retrieves a paginated list of the delegators for a given address. That is, the delegates from which
         the supplied address is being delegated votes.
       operationId: getDelegatorsByAddress
-      tags: 
+      tags:
         - delegates
         - delegations
       parameters:
@@ -1296,34 +1291,34 @@ paths:
           required: true
           schema:
             type: string
-          examples: 
-            address: 
+          examples:
+            address:
               value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate. 
+              summary: Address of the delegate.
             ensName:
               value: "flipliquid.eth"
               summary: ENS name of the delegate.
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   votes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Delegation'
-        '400':
+                      $ref: "#/components/schemas/Delegation"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /votes:
     get:
@@ -1343,30 +1338,30 @@ paths:
             The desired method by which returned delegates will be sorted.
             Supported values are: 'most_delegators', 'weighted_random'
           required: false
-          schema: 
+          schema:
             type: string
-            enum: 
+            enum:
               - most_delegators
               - weighted_random
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   votes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Vote'
-        '400':
+                      $ref: "#/components/schemas/Vote"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /votes/{transactionId}:
     get:
@@ -1382,20 +1377,20 @@ paths:
           description: >
             The transactionId in which the vote was cast
           required: true
-          schema: 
+          schema:
             type: string
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/Vote'
-        '400':
+              schema:
+                $ref: "#/components/schemas/Vote"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /proposals/types:
     get:
@@ -1416,33 +1411,33 @@ paths:
             The desired method by which returned delegates will be sorted.
             Supported values are: 'most_delegators', 'weighted_random'
           required: false
-          schema: 
+          schema:
             type: string
-            enum: 
+            enum:
               - most_delegators
               - weighted_random
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   proposalTypes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ProposalTemplate'
-        '400':
+                      $ref: "#/components/schemas/ProposalTemplate"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /projects:
-  # Should this be paginated? How many ballots per round are expected?
+    # Should this be paginated? How many ballots per round are expected?
     get:
       summary: Gets a list of projects
       description: >
@@ -1455,25 +1450,25 @@ paths:
       parameters:
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   projects:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Project'
-        '400':
+                      $ref: "#/components/schemas/Project"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /contracts/governor:
     get:
@@ -1483,18 +1478,18 @@ paths:
       operationId: getGovernorContract
       tags:
         - contracts
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/Contract'
-        '400':
+              schema:
+                $ref: "#/components/schemas/Contract"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /contracts/alligator:
     get:
@@ -1504,18 +1499,18 @@ paths:
       operationId: getAlligatorContract
       tags:
         - contracts
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/Contract'
-        '400':
+              schema:
+                $ref: "#/components/schemas/Contract"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /contracts/votingToken:
     get:
@@ -1525,18 +1520,18 @@ paths:
       operationId: getVotingTokenContract
       tags:
         - contracts
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/VotingToken'
-        '400':
+              schema:
+                $ref: "#/components/schemas/VotingToken"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds:
     get:
@@ -1544,31 +1539,31 @@ paths:
       description: >
         Retrieves a paginated list of RetroFunding rounds, ordered by round ID.
       operationId: getRetroFundingRounds
-      tags: 
+      tags:
         - RetroFunding
         - RetroFundingRounds
       parameters:
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   ballots:
                     type: array
                     items:
-                      $ref: '#/components/schemas/RetroFundingRound'
-        '400':
+                      $ref: "#/components/schemas/RetroFundingRound"
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}:
     get:
@@ -1586,21 +1581,21 @@ paths:
           required: true
           schema:
             type: integer
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/RetroFundingRound"
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots:
-    get: 
+    get:
       summary: Gets a list of ballots for an RetroFunding round
       description: >
         Retrieves a list of ballots for a specific RetroFunding round on Agora as a JSON array.
@@ -1618,25 +1613,25 @@ paths:
             type: integer
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   ballots:
                     type: array
                     items:
-                      $ref: '#/components/schemas/RetroFundingBallot'
-        '400':
+                      $ref: "#/components/schemas/RetroFundingBallot"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}:
     get:
@@ -1650,20 +1645,20 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/RetroFundingBallot"
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/submit:
     post:
@@ -1671,8 +1666,8 @@ paths:
       description: Submits the content of a ballot to be counted as final for the round.
       operationId: submitRetroFundingBallot
       tags:
-          - RetroFunding
-          - RetroFundingBallots
+        - RetroFunding
+        - RetroFundingBallots
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1681,21 +1676,21 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/RetroFundingBallotSubmission"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/RetroFundingBallot"
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
-          description: Internal Server Error    
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/projects:
     get:
       summary: Gets a list of projects for an RetroFunding round
@@ -1710,62 +1705,28 @@ paths:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   projects:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Project'
-        '400':
+                      $ref: "#/components/schemas/Project"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
-    get:
-      summary: Gets impact metrics for a specific RetroFunding ballot
-      description: >
-        Retrieves a list of impact metrics for a specific ballot for an RetroFunding round on Agora.
-      operationId: getImpactMetricsOnRetroFundingBallot
-      tags:
-        - RetroFunding
-        - RetroFundingBallots
-        - impactMetrics
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/ballotIdParam"
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-      responses: 
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: 
-                type: object
-                properties:
-                  metadata:
-                    $ref: '#/components/schemas/PageMetadata'
-                  impactMetrics:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RetroFundingImpactMetric'
-        '400':
-          description: Bad Request
-        '401': 
-          description: Unauthorized
-        '500':
-          description: Internal Server Error
-    post: 
+    post:
       summary: Adds or updates an impact metric on a specific RetroFunding ballot
       description: >
         Adds an impact metric or updates an existing impact metric's allocation amount 
@@ -1788,17 +1749,17 @@ paths:
                   type: string
                 allocationAmount:
                   type: string
-      responses: 
-        '201':
+      responses:
+        "201":
           description: Created
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics/{impactMetricId}:
-    delete: 
+    delete:
       summary: Removes an impact metric from a ballot
       description: >
         Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
@@ -1811,16 +1772,16 @@ paths:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics:
     get:
@@ -1834,23 +1795,23 @@ paths:
         - impactMetrics
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   impactMetrics:
                     type: array
                     items:
-                      $ref: '#/components/schemas/RetroFundingImpactMetric'
-        '400':
+                      $ref: "#/components/schemas/RetroFundingImpactMetric"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}:
     get:
@@ -1865,20 +1826,20 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/RetroFundingImpactMetric'
-        '400':
+              schema:
+                $ref: "#/components/schemas/RetroFundingImpactMetric"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
     get:
@@ -1894,27 +1855,27 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   metadata:
-                    $ref: '#/components/schemas/PageMetadata'
+                    $ref: "#/components/schemas/PageMetadata"
                   comments:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Comment'
-        '400':
+                      $ref: "#/components/schemas/Comment"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
     put:
       summary: Creates a comment on an impact metric
@@ -1937,20 +1898,20 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Comment"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
           content:
             application/json:
-              schema: 
-                $ref: '#/components/schemas/Comment'
-        '400':
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments/{commentId}:
     delete:
@@ -1967,14 +1928,14 @@ paths:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
         - $ref: "#/components/parameters/commentIdParam"
-      responses: 
-        '200':
+      responses:
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '401': 
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not Found
-        '500':
-          description: Internal Server Error 
+        "500":
+          description: Internal Server Error
