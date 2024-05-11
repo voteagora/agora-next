@@ -13,9 +13,16 @@ export async function GET(
     return new Response(authResponse.failReason, { status: 401 });
   }
   return await traceWithUserId(authResponse.userId as string, async () => {
+    const params = request.nextUrl.searchParams;
     try {
       const { roundId } = route.params;
-      const ballots = await fetchBallots(roundId);
+      const limit = Number(params.get("limit")) || 10;
+      const offset = Number(params.get("offset")) || 0;
+      const ballots = await fetchBallots({
+        roundId: Number(roundId),
+        limit,
+        offset,
+      });
       return NextResponse.json(ballots);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
