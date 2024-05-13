@@ -48,10 +48,6 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/create",
-      enabled: true,
-    },
-    {
       name: "staking",
       enabled: true,
     },
