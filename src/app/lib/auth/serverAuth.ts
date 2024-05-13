@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   REASON_DISABLED_USER,
   REASON_INVALID_BEARER_TOKEN,
-  ROLE_DEFAULT_USER,
+  ROLE_PUBLIC_READER,
   ROLE_BADGEHOLDER,
 } from "@/app/lib/auth/constants";
 import { isBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
@@ -77,13 +77,12 @@ function hashApiKey(apiKey: string) {
 
 export async function generateJwt(
   userId: string,
-  scope?: string | null,
+  roles?: string[] | null,
   ttl?: number | null,
   siweData?: SiweData | null
 ): Promise<string> {
-  const scopes = scope ? [scope] : [];
-  const resolvedScopes = await getRolesForUser(userId, siweData);
-  const resolvedScopesString = [...scopes, ...resolvedScopes].join(";");
+  const suppliedRoles = roles ? roles : [];
+  const scope = suppliedRoles.join(";");
   const resolvedTtl = ttl || (await getExpiry());
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + resolvedTtl;
@@ -91,7 +90,7 @@ export async function generateJwt(
   // scope is a semicolon separated string of roles associated with a user
   const payload: JWTPayload = {
     sub: userId,
-    scope: resolvedScopesString,
+    scope: scope,
     siwe: siweData ? { ...siweData } : undefined,
   };
 
@@ -122,12 +121,14 @@ export async function getExpiry() {
 export async function getRolesForUser(
   userId: string,
   siweData?: SiweData | null
-) {
-  const defaultRoles = [ROLE_DEFAULT_USER];
+): Promise<string[]> {
+  const defaultRoles = [ROLE_PUBLIC_READER];
   if (siweData) {
     const isBadge = await isBadgeholder(siweData.address);
     return isBadge
-      ? [ROLE_BADGEHOLDER, ROLE_DEFAULT_USER]
-      : [ROLE_DEFAULT_USER];
+      ? [ROLE_BADGEHOLDER, ...defaultRoles]
+      : defaultRoles;
   }
+
+  return defaultRoles;
 }
