@@ -6,7 +6,11 @@ import ENSName from "@/components/shared/ENSName";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 
 interface EditDelegateConfirmProps {
   delegate: string;
@@ -14,10 +18,9 @@ interface EditDelegateConfirmProps {
 }
 
 export const EditDelegateConfirm = ({
-                                      delegate,
-                                      deposit,
-                                    }: EditDelegateConfirmProps) => {
-
+  delegate,
+  deposit,
+}: EditDelegateConfirmProps) => {
   const { contracts } = Tenant.current();
 
   const { config } = usePrepareContractWrite({
@@ -33,7 +36,6 @@ export const EditDelegateConfirm = ({
   const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
-
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">

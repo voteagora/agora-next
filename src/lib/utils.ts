@@ -81,7 +81,7 @@ export function numberToToken(number: number) {
 export function formatNumber(
   amount: string | BigNumberish,
   decimals: number,
-  maximumSignificantDigits = 4,
+  maximumSignificantDigits = 4
 ) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
 
@@ -94,11 +94,11 @@ export function formatNumber(
 }
 
 export function TokenAmountDisplay({
-                                     amount,
-                                     decimals = token.decimals,
-                                     currency = token.symbol,
-                                     maximumSignificantDigits = 2,
-                                   }: {
+  amount,
+  decimals = token.decimals,
+  currency = token.symbol,
+  maximumSignificantDigits = 2,
+}: {
   amount: string | BigNumberish;
   decimals?: number;
   currency?: string;
@@ -114,7 +114,7 @@ export function TokenAmountDisplay({
 export function generateBarsForVote(
   forVotes: bigint,
   abstainVotes: bigint,
-  againstVotes: bigint,
+  againstVotes: bigint
 ) {
   const sections = [
     {
@@ -140,7 +140,7 @@ export function generateBarsForVote(
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
     (acc, section) => acc + BigInt(section.amount),
-    BigInt(0),
+    BigInt(0)
   );
 
   if (totalVotes === BigInt(0)) {
@@ -163,7 +163,7 @@ export function generateBarsForVote(
     while (
       currentSection < sections.length - 1 &&
       BigInt(index) >= sections[currentSection].threshold
-      ) {
+    ) {
       currentSection++;
     }
     result[index] = sections[currentSection].value;
@@ -203,7 +203,7 @@ export function formatFullDate(date: Date): string {
 
 export async function fetchAndSet<T>(
   fetcher: () => Promise<T>,
-  setter: (value: T) => void,
+  setter: (value: T) => void
 ) {
   const value = await fetcher();
   setter(value);
@@ -221,7 +221,6 @@ export async function fetchAndSetAll<
 
 // TODO: Move this into tenant.ts
 export function getBlockScanUrl(hash: string | `0x${string}`) {
-
   const { contracts } = Tenant.current();
 
   const chainId = contracts.token.chain.id;

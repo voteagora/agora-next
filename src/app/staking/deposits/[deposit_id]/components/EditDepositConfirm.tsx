@@ -7,7 +7,11 @@ import { formatNumber, numberToToken } from "@/lib/utils";
 import { StakedDeposit } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 
 interface EditDepositConfirmProps {
   amount: number;
@@ -15,10 +19,9 @@ interface EditDepositConfirmProps {
 }
 
 export const EditDepositConfirm = ({
-                                     amount,
-                                     deposit,
-                                   }: EditDepositConfirmProps) => {
-
+  amount,
+  deposit,
+}: EditDepositConfirmProps) => {
   const { token, contracts } = Tenant.current();
 
   const isValidInput = Boolean(amount > 0 && deposit);
@@ -36,7 +39,7 @@ export const EditDepositConfirm = ({
   const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
-  
+
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
       <div className="border border-slate-300 rounded-lg p-4">
