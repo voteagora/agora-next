@@ -1,6 +1,8 @@
 import { paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import { Ballots, allocations } from "@prisma/client";
+import { Ballot } from "./ballot";
 
 async function getBallotsApi({
   roundId,
@@ -13,25 +15,35 @@ async function getBallotsApi({
 }) {
   return paginateResultEx(
     (skip: number, take: number) => {
-      return prisma.ballots.findMany({
+      return prisma.$queryRawUnsafe<Ballots[]>(
+        `
+          SELECT 
+            *,
+          CASE 
+            WHEN EXISTS (
+              SELECT 1 
+              FROM retro_funding.ballot_submittions bs 
+              WHERE bs.address = b.address AND bs.round = b.round
+            ) THEN 'SUBMITTED'
+            ELSE 'PENDING'
+          END AS status,
+          COALESCE(
+            (SELECT json_agg(a.* ORDER BY a.allocation DESC) 
+            FROM retro_funding.allocations a 
+            WHERE a.address = b.address AND a.round = b.round),
+            '[]'::json
+          ) AS allocations
+          FROM 
+            retro_funding.ballots b
+          WHERE round = $1
+          ORDER BY address, round
+          LIMIT $2
+          OFFSET $3;
+        `,
+        roundId,
         take,
-        skip,
-        where: {
-          round: roundId,
-        },
-        include: {
-          allocations: {
-            select: {
-              metric_id: true,
-              allocation: true,
-              locked: true,
-            },
-            orderBy: {
-              allocation: "desc",
-            },
-          },
-        },
-      });
+        skip
+      );
     },
     { limit, offset }
   );
@@ -52,24 +64,31 @@ async function getBallotForAddress({
   roundId: number;
   address: string;
 }) {
-  const ballot = await prisma.ballots.findFirst({
-    where: {
-      round: roundId,
-      address: address,
-    },
-    include: {
-      allocations: {
-        select: {
-          metric_id: true,
-          allocation: true,
-          locked: true,
-        },
-        orderBy: {
-          allocation: "desc",
-        },
-      },
-    },
-  });
+  const ballot = await prisma.$queryRawUnsafe<Ballot>(
+    `
+      SELECT 
+        *,
+      CASE 
+        WHEN EXISTS (
+          SELECT 1 
+          FROM retro_funding.ballot_submittions bs 
+          WHERE bs.address = b.address AND bs.round = b.round
+        ) THEN 'SUBMITTED'
+        ELSE 'PENDING'
+      END AS status,
+      COALESCE(
+        (SELECT json_agg(a.* ORDER BY a.allocation DESC) 
+        FROM retro_funding.allocations a
+        WHERE a.address = b.address AND a.round = b.round),
+        '[]'::json
+      ) AS allocations
+      FROM 
+        retro_funding.ballots b
+      WHERE round = $1 AND address = $2
+  `,
+    roundId,
+    address
+  );
 
   if (!ballot) {
     return {
