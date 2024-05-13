@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 import { formatNumber, numberToToken } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { StakedDeposit } from "@/lib/types";
-import { EditStakeSubmitButton } from "@/app/staking/deposits/[deposit_id]/components/EditStakeSubmitButton";
 import { Button } from "@/components/ui/button";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 
 interface EditDepositConfirmProps {
   amount: number;
@@ -15,21 +15,28 @@ interface EditDepositConfirmProps {
 }
 
 export const EditDepositConfirm = ({
-  amount,
-  deposit,
-}: EditDepositConfirmProps) => {
-  const router = useRouter();
+                                     amount,
+                                     deposit,
+                                   }: EditDepositConfirmProps) => {
+
   const { token, contracts } = Tenant.current();
-  const [isConfirmed, setIsConfirmed] = useState(false);
 
-  useEffect(() => {
-    if (isConfirmed) {
-      setTimeout(() => {
-        router.replace("/staking");
-      }, 3000);
-    }
-  }, [isConfirmed, router]);
+  const isValidInput = Boolean(amount > 0 && deposit);
 
+  const { config } = usePrepareContractWrite({
+    enabled: isValidInput,
+    address: contracts.staker!.address as `0x${string}`,
+    abi: contracts.staker!.abi,
+    chainId: contracts.staker!.chain.id,
+    functionName: "stakeMore",
+    args: [BigInt(deposit.id), numberToToken(amount)],
+  });
+
+  const { data, write, status } = useContractWrite(config);
+  const { isLoading } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+  
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
       <div className="border border-slate-300 rounded-lg p-4">
@@ -45,17 +52,17 @@ export const EditDepositConfirm = ({
       <div className="text-sm py-4">
         Please verify your transaction details before confirming.
       </div>
-      {isConfirmed ? (
-        <Button className="w-full" disabled={true}>
-          Syncing transaction...
-        </Button>
-      ) : (
-        <EditStakeSubmitButton
-          amount={amount}
-          deposit={deposit}
-          onConfirmed={() => setIsConfirmed(true)}
-        />
-      )}
+
+      <Button
+        className="w-full"
+        disabled={!isValidInput || isLoading}
+        onClick={() => {
+          write?.();
+        }}
+      >
+        {isLoading ? "Staking..." : `Update Stake`}
+      </Button>
+      {data?.hash && <BlockScanUrls hash1={data?.hash} />}
     </div>
   );
 };
