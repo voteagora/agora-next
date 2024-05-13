@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 interface NewStakeConfirmProps {
   amount: number;
@@ -22,7 +23,7 @@ export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
   const { token, contracts } = Tenant.current();
   const isValidInput = Boolean(amount > 0 && address && isAddress(address));
 
-  const { config } = usePrepareContractWrite({
+  const { config, status, error } = usePrepareContractWrite({
     enabled: isValidInput,
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
@@ -31,7 +32,7 @@ export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
     args: [numberToToken(amount), address as `0x${string}`],
   });
 
-  const { data, write, status } = useContractWrite(config);
+  const { data, write } = useContractWrite(config);
   const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
@@ -58,24 +59,33 @@ export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
           {token.symbol}
         </div>
       </div>
-      <div className="text-sm py-4">
-        Please verify your transaction details before confirming.
-      </div>
 
-      {isStakeConfirmed ? (
-        <Button className="w-full" disabled={true}>
-          Confirming onchain transaction...
-        </Button>
+      {status === "error" ? (
+        <div className="py-4">
+          <div className="font-semibold text-red-500 mb-2">
+            Unable to process current transaction
+          </div>
+          <div className="text-xs text-red-500">
+            {(error as any)?.cause?.reason}
+          </div>
+        </div>
       ) : (
-        <Button
-          className="w-full"
-          disabled={!isValidInput || isLoading}
-          onClick={() => {
-            write?.();
-          }}
-        >
-          {isLoading ? "Staking..." : `Stake & delegate my ${token.symbol}`}
-        </Button>
+        <>
+          <div className="text-sm py-4">
+            Please verify your transaction details before confirming.
+          </div>
+
+          <Button
+            className="w-full"
+            disabled={!isValidInput || isLoading}
+            onClick={() => {
+              write?.();
+            }}
+          >
+            {isLoading ? "Staking..." : `Stake & delegate my ${token.symbol}`}
+          </Button>
+          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+        </>
       )}
     </div>
   );

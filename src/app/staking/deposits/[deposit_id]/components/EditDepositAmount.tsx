@@ -47,7 +47,6 @@ export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
           <div className="sm:col-start-5">
             <SetStakeDialog
               amount={amount}
-              deposit={deposit}
               onChange={(amount) => setAmount(amount)}
               onClick={() => setStep(2)}
             />

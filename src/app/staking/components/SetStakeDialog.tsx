@@ -5,7 +5,6 @@ import { useAccount } from "wagmi";
 
 import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
-import { type StakedDeposit } from "@/lib/types";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
@@ -14,14 +13,12 @@ import { tokenToHumanNumber } from "@/lib/utils";
 
 interface SetStakeDialogProps {
   amount: number;
-  deposit?: StakedDeposit;
   onChange: (value: number) => void;
   onClick: () => void;
 }
 
 export const SetStakeDialog = ({
   amount: defaultAmount,
-  deposit,
   onChange,
   onClick,
 }: SetStakeDialogProps) => {
@@ -38,11 +35,11 @@ export const SetStakeDialog = ({
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
     address as `0x${string}`
   );
+
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
   const hasValidAmount =
-    deposit ||
-    (amount > 0 &&
-      amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals));
+    amount > 0 &&
+    amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4">

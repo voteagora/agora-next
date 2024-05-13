@@ -23,7 +23,7 @@ export async function fetchDeposit({
   }
 
   return {
-    amount: deposit.amount.toString(),
+    amount: Number(deposit.amount).toLocaleString().replace(/,/g, ""),
     delegatee: deposit.delegatee,
     depositor: deposit.depositor,
     id: Number(deposit.deposit_id),

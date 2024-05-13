@@ -47,7 +47,7 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
   };
 
   useEffect(() => {
-    if (!delegate) {
+    if (!delegate && !isDelegateFetched.current) {
       getDelegate();
     }
   }, [delegate]);
@@ -85,7 +85,7 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
           <div className="font-medium">
             {delegate
               ? `${delegate.lastTenProps} / 10 last props`
-              : "Loading voting record..."}
+              : "0 / 10 last props"}
           </div>
         </div>
 

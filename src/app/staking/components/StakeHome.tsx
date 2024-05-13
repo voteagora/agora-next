@@ -10,8 +10,8 @@ import { BigNumberish } from "ethers";
 import { useAccount } from "wagmi";
 import { StakedDeposit } from "@/lib/types";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
-import { DepositList } from "@/app/staking/components/deposits/DepositList";
 import type { Delegate } from "@/app/api/common/delegates/delegate";
+import { DepositList } from "@/app/staking/components/deposits/DepositList";
 
 interface StakeHomeProps {
   fetchDeposits: (address: string) => Promise<StakedDeposit[] | null>;
@@ -56,11 +56,12 @@ export const StakeHome = ({
   return (
     <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
       <div className="sm:col-span-4">
-        {hasDeposits ? (
+        {hasDeposits && address ? (
           <div>
             <div className="font-black text-2xl mb-5">
               Your {token.symbol} Stake
             </div>
+
             <DepositList deposits={deposits} fetchDelegate={fetchDelegate} />
           </div>
         ) : (
