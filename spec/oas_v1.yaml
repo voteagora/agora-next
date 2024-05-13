@@ -1749,6 +1749,8 @@ paths:
                   type: string
                 allocationAmount:
                   type: string
+                locked:
+                  type: boolean
       responses:
         "201":
           description: Created
