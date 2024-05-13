@@ -43,17 +43,23 @@ async function submitBallotForAddress({
     throw new Error("Invalid signature");
   }
 
-  const submission = await prisma.ballotSubmittions.update({
+  const submission = await prisma.ballotSubmittions.upsert({
     where: {
       address_round: {
         address,
         round: roundId,
       },
     },
-    data: {
+    update: {
       signature: data.signature,
       payload,
       updated_at: new Date(),
+    },
+    create: {
+      round: roundId,
+      address,
+      signature: data.signature,
+      payload,
     },
   });
 
