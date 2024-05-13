@@ -57,7 +57,7 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
   }
 
   return (
-    <div className="p-5 w-full">
+    <div className="px-5 py-4 w-full">
       <div className="flex flex-row gap-5 justify-between w-full">
         <div className="w-[100px] border-r border-gray-300">
           <div className="text-xs font-medium text-gray-700">Staked</div>
