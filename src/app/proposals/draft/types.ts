@@ -94,6 +94,11 @@ export const ProposalLifecycleStageMetadata = {
   };
 };
 
+export enum SocialProposalType {
+  BASIC = "Basic",
+  APPROVAL = "Approval",
+}
+
 export enum ProposalType {
   EXECUTABLE = "Executable",
   SOCIAL = "Social",

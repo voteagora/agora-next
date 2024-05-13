@@ -23,7 +23,7 @@ const TextInput = ({
     <div className="relative">
       <input
         type="text"
-        className="border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full"
+        className={`border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full`}
         {...register(name, { required, ...options })}
         placeholder={placeholder}
         {...props}
