@@ -1,19 +1,46 @@
-import { Controller } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 
 type DateInputProps = {
   control: any;
   name: string;
 };
-const DateInput = ({ name, control }: DateInputProps) => {
+
+const formatDate = (date: Date) => {
+  // Get the year, month, and day
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // Return the formatted date string
+  return `${year}-${month}-${day}`;
+};
+
+const DateInput = ({ name }: DateInputProps) => {
+  const [value, setValue] = useState("");
+  const { control, getValues } = useFormContext();
+
+  //make sure default value is set
+  useEffect(() => {
+    const date = getValues(name);
+    const formattedDate = formatDate(new Date(date));
+    setValue(formattedDate);
+  }, []);
+
   return (
     <Controller
       control={control}
       name={name}
       render={({ field: { onChange } }) => (
         <input
-          onChange={onChange}
+          value={value}
+          defaultValue={value}
+          onChange={(value: any) => {
+            setValue(value);
+            onChange(value);
+          }}
           type="date"
-          className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg text-agora-stone-500 w-full"
+          className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg text-agora-stone-900 placehoder:text-agora-stone-500 w-full"
         />
       )}
     />

@@ -1,4 +1,5 @@
-import { Controller } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import { RadioGroup } from "@headlessui/react";
 
 type RadioGroupInputProps = {
@@ -11,15 +12,25 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const RadioGroupInput = ({ options, control, name }: RadioGroupInputProps) => {
+const RadioGroupInput = ({ options, name }: RadioGroupInputProps) => {
+  const [value, setValue] = useState("");
+  const { control, getValues } = useFormContext();
+
+  // make sure default value is set
+  useEffect(() => {
+    setValue(getValues(name));
+  }, []);
+
   return (
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange, value } }) => (
+      render={({ field: { onChange } }) => (
         <RadioGroup
           value={value}
+          name={name}
           onChange={(value: any) => {
+            setValue(value);
             onChange(value);
           }}
         >
@@ -32,7 +43,7 @@ const RadioGroupInput = ({ options, control, name }: RadioGroupInputProps) => {
             {options.map((option) => (
               <RadioGroup.Option
                 key={option.value}
-                value={option.value}
+                value={option.value.toLowerCase()}
                 className={({ checked }) =>
                   classNames(
                     checked

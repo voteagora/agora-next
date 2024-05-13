@@ -806,13 +806,14 @@ model ProposalDraft {
   dao_slug                    DaoSlug
   author_address              String
   sponsor_address             String?
-  txs_simulated_and_passed_at DateTime?
-  temp_check_added_at         DateTime?
   created_at                  DateTime                   @default(now())
   updated_at                  DateTime                   @updatedAt
   onchain_transaction_hash    String?
+  start_date_social           DateTime?
+  end_date_social             DateTime?
   stage                       ProposalStage
   transactions                ProposalDraftTransaction[]
+  social_options              ProposalSocialOption[]
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
   ProposalChecklist           ProposalChecklist[]
   @@map("proposals")
@@ -833,6 +834,17 @@ model ProposalDraftTransaction {
   updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   @@map("proposal_transactions")
+  @@schema("test2")
+}
+
+model ProposalSocialOption {
+  id          Int      @id @default(autoincrement())
+  proposal_id Int
+  text        String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  @@map("proposal_options")
   @@schema("test2")
 }
 

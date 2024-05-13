@@ -27,3 +27,7 @@ export const getStageMetadata = (stage: ProposalStage) => {
     stage as keyof typeof ProposalLifecycleStageMetadata
   ];
 };
+
+export const getStageIndexForTenant = (stage: ProposalStage) => {
+  return ENS_PROPOSAL_LIFECYCLE_STAGES.find((s) => s.stage === stage)?.order;
+};

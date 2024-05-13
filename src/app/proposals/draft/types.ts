@@ -25,32 +25,32 @@ type TenantProposalLifecycleStage = {
 export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
   {
     stage: PrismaProposalStage.TEMP_CHECK,
-    order: 1,
+    order: 0,
     isPreSubmission: true,
   },
   {
     stage: PrismaProposalStage.DRAFT,
-    order: 2,
+    order: 1,
     isPreSubmission: true,
   },
   {
     stage: PrismaProposalStage.READY,
-    order: 3,
+    order: 2,
     isPreSubmission: true,
   },
   {
     stage: PrismaProposalStage.CONTACT_VOTERS,
-    order: 4,
+    order: 3,
     isPreSubmission: false,
   },
   {
     stage: PrismaProposalStage.QUEUE,
-    order: 5,
+    order: 4,
     isPreSubmission: false,
   },
   {
     stage: PrismaProposalStage.EXECUTE,
-    order: 6,
+    order: 5,
     isPreSubmission: false,
   },
 ];
@@ -95,18 +95,18 @@ export const ProposalLifecycleStageMetadata = {
 };
 
 export enum SocialProposalType {
-  BASIC = "Basic",
-  APPROVAL = "Approval",
+  BASIC = "basic",
+  APPROVAL = "approval",
 }
 
 export enum ProposalType {
-  EXECUTABLE = "Executable",
-  SOCIAL = "Social",
+  EXECUTABLE = "executable",
+  SOCIAL = "social",
 }
 
 export enum TransactionType {
-  TRANSFER = "TRANSFER",
-  CUSTOM = "CUSTOM",
+  TRANSFER = "transfer",
+  CUSTOM = "custom",
 }
 
 export type TempCheckFormInputs = {

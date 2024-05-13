@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Controller } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 
 // example markdown to test with for the developer convenience :)
@@ -18,19 +18,24 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 
 type MarkdownTextareaInputProps = {
   name: string;
-  control: any; // from react-hook-form
   placeholder?: string;
 };
 
 const MarkdownTextareaInput = ({
   name,
-  control,
   placeholder,
 }: MarkdownTextareaInputProps) => {
   const [value, setValue] = useState("");
   const [selectedMode, setSelectedMode] = useState<"write" | "preview">(
     "write"
   );
+
+  const { control, getValues } = useFormContext();
+
+  // make sure default value is set
+  useEffect(() => {
+    setValue(getValues(name));
+  }, []);
 
   return (
     <Controller
@@ -43,6 +48,7 @@ const MarkdownTextareaInput = ({
               className={`py-3 px-4 border-0 placeholder-gray-af w-full bg-gray-fa rounded-t-lg focus:outline-none focus:ring-0 resize-none
                 ${selectedMode === "write" ? "visible" : "hidden"}`}
               placeholder={placeholder}
+              value={value}
               onChange={(e) => {
                 setValue(e.target.value);
                 onChange(e);

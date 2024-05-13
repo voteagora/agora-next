@@ -7,6 +7,7 @@ import { ProposalLifecycleStageMetadata } from "@/app/proposals/draft/types";
 import {
   DRAFT_STAGES_FOR_TENANT,
   POST_DRAFT_STAGES_FOR_TENANT,
+  getStageIndexForTenant,
   getStageMetadata,
 } from "@/app/proposals/draft/utils/stages";
 
@@ -118,7 +119,7 @@ const MyDraftProposals = ({
         {draftProposals.map((proposal) => (
           <Link
             key={proposal.id}
-            href={`/proposals/draft/${proposal.id}`}
+            href={`/proposals/draft/${proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
             className="block"
           >
             <DraftProposalCard proposal={proposal} />

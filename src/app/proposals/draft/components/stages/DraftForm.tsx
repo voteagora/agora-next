@@ -12,21 +12,40 @@ import RadioGroupInput from "../form/RadioGroupInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as draftProposalSchema } from "../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../actions/createDraftProposal";
-import { ProposalType } from "../../types";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalType, SocialProposalType } from "../../types";
+import {
+  ProposalDraft,
+  ProposalSocialOption,
+  ProposalDraftTransaction,
+} from "@prisma/client";
 import ExecutableProposalForm from "../ExecutableProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
 import FileInput from "../form/FileInput";
+import toast from "react-hot-toast";
 
-const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+const DraftForm = ({
+  draftProposal,
+}: {
+  draftProposal: ProposalDraft & {
+    transactions: ProposalDraftTransaction[];
+    social_options: ProposalSocialOption[];
+  };
+}) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
     defaultValues: {
-      type: ProposalType.EXECUTABLE,
+      type: draftProposal.proposal_type as ProposalType,
       title: draftProposal.title,
       description: draftProposal.description,
       abstract: draftProposal.abstract,
+      transactions: draftProposal.transactions || [],
+      socialProposal: {
+        type: SocialProposalType.BASIC, // todo -- update
+        start_date: draftProposal.start_date_social?.toString(),
+        end_date: draftProposal.end_date_social?.toString(),
+        options: draftProposal.social_options,
+      },
     },
   });
 
@@ -41,7 +60,9 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const proposalType = watch("type");
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
+    console.log("submitting");
     setIsPending(true);
+
     const res = await draftProposalAction({
       ...data,
       draftProposalId: draftProposal.id,
@@ -49,10 +70,11 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
     setIsPending(false);
 
     if (!res.ok) {
-      // toast?
+      // TODO: make error toast + improve messaging
+      toast("Something went wrong...");
+    } else {
+      window.location.href = `/proposals/draft/${draftProposal.id}?stage=2`;
     }
-
-    window.location.href = `/proposals/draft/${draftProposal.id}?stage=2`;
   };
 
   return (
@@ -92,10 +114,6 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                   placeholder="EP [1.1] [Executable] title"
                   options={{
                     required: "Title is required.",
-                    // pattern: {
-                    //   value: VALID_URL_REGEX,
-                    //   message: "Invalid URL.",
-                    // },
                   }}
                   errorMessage={errors.title?.message}
                 />
@@ -111,16 +129,12 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                   placeholder="Description"
                   options={{
                     required: "Description is required.",
-                    // pattern: {
-                    //   value: VALID_URL_REGEX,
-                    //   message: "Invalid URL.",
-                    // },
                   }}
                   errorMessage={errors.description?.message}
                 />
               </FormItem>
               <FormItem label="Abstract" required={true} htmlFor="abstract">
-                <MarkdownTextareaInput name="abstract" control={control} />
+                <MarkdownTextareaInput name="abstract" />
               </FormItem>
             </div>
           </FormCard.Section>
@@ -143,9 +157,15 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
             <FileInput />
           </FormCard.Section>
           <FormCard.Section>
-            <UpdatedButton type="primary" isSubmit={true}>
-              {isPending ? "pending..." : "Create draft"}
-            </UpdatedButton>
+            <div className="flex flex-row justify-between space-x-16">
+              <p className="text-agora-stone-700">
+                This will post your draft to both the ENS forums and request an
+                update to the ENS DAO docs.
+              </p>
+              <UpdatedButton type="primary" isSubmit={true}>
+                {isPending ? "pending..." : "Create draft"}
+              </UpdatedButton>
+            </div>
           </FormCard.Section>
           <FormCard.Footer>
             <span className="text-xs font-semibold text-stone-500 mb-1">
@@ -158,6 +178,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
               <input
                 {...register("docs_updated")}
                 type="checkbox"
+                defaultChecked={true}
                 className="rounded text-stone-900"
               />
             </div>

@@ -13,6 +13,7 @@ const getDraftProposal = async (id: number) => {
     },
     include: {
       transactions: true,
+      social_options: true,
     },
   });
 
@@ -58,7 +59,8 @@ export default async function DraftProposalPage({
           {stageMetadata?.title}
         </h1>
         <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">
-          Step {stageObject.order}/{DRAFT_STAGES_FOR_TENANT.length}
+          {/* stageObject.order + 1 is becuase order is zero indexed */}
+          Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
         </span>
       </div>
       <div className="grid grid-cols-3 gap-6">

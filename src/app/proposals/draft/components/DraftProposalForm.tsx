@@ -4,14 +4,14 @@ import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
 import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 
 export default function DraftProposalForm({
   stage,
   draftProposal,
 }: {
   stage: ProposalStage;
-  draftProposal: ProposalDraft;
+  draftProposal: ProposalDraft & { transactions: ProposalDraftTransaction[] };
 }) {
   const renderStage = (stage: ProposalStage) => {
     switch (stage) {
