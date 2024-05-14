@@ -6,13 +6,21 @@ import { PrismaClient } from "@prisma/client";
 import {
   REASON_DISABLED_USER,
   REASON_INVALID_BEARER_TOKEN,
+  ROLE_PUBLIC_READER,
+  ROLE_BADGEHOLDER,
 } from "@/app/lib/auth/constants";
+import { isBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
 
 const HASH_FN = "sha256";
 const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
-const DEFAULT_USER_SCOPE = "user";
+
+type SiweData = {
+  address: string;
+  chainId: string;
+  nonce: string;
+};
 
 // Note: this is not included in lib/middleware/auth.ts since that file will be
 // used in a non-node environment. This file is only intended to be used in/on node.
@@ -69,22 +77,20 @@ function hashApiKey(apiKey: string) {
 
 export async function generateJwt(
   userId: string,
-  scope?: string | null,
+  roles?: string[] | null,
   ttl?: number | null,
-  siweData?: {
-    address: string;
-    chainId: string;
-    nonce: string;
-  } | null
+  siweData?: SiweData | null
 ): Promise<string> {
-  const resolvedScope = scope || (await getScopeForUser(userId));
+  const suppliedRoles = roles ? roles : [];
+  const scope = suppliedRoles.join(";");
   const resolvedTtl = ttl || (await getExpiry());
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + resolvedTtl;
 
+  // scope is a semicolon separated string of roles associated with a user
   const payload: JWTPayload = {
     sub: userId,
-    scope: resolvedScope,
+    scope: scope,
     siwe: siweData ? { ...siweData } : undefined,
   };
 
@@ -101,7 +107,28 @@ export async function getExpiry() {
   return DEFAULT_JWT_TTL;
 }
 
-export async function getScopeForUser(userId: string) {
-  // TODO, depending on user permissions
-  return DEFAULT_USER_SCOPE;
+/*
+  Get roles for user finds the roles associated with a given user. The default 
+  role gives the user access to reading public data like proposals, and delegates.
+
+  Other roles can also be associated with the user to restrict access to writing or
+  reading priviliged data. The roles associated with a given api user ID and their
+  Sign In With Ethereum data are resolved in this function. 
+
+  Arbitrary data can be included with a particular role, allowing for granular 
+  authorization to access particular resources. 
+*/
+export async function getRolesForUser(
+  userId: string,
+  siweData?: SiweData | null
+): Promise<string[]> {
+  const defaultRoles = [ROLE_PUBLIC_READER];
+  if (siweData) {
+    const isBadge = await isBadgeholder(siweData.address);
+    return isBadge
+      ? [ROLE_BADGEHOLDER, ...defaultRoles]
+      : defaultRoles;
+  }
+
+  return defaultRoles;
 }
