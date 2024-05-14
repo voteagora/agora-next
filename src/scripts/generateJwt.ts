@@ -7,7 +7,7 @@
 import { generateJwt } from "@/app/lib/auth/serverAuth";
 
 // accept user ID as argument, scope and ttl as optional arguments
-let scope = "";
+let scope = [""];
 let ttl = 60 * 60 * 24;
 if (process.argv.length < 3) {
   console.error("User ID is required");
@@ -26,7 +26,7 @@ if (process.env.JWT_SECRET === undefined) {
 }
 
 if (process.argv.length == 4) {
-  scope = process.argv[3];
+  scope = [process.argv[3]];
 }
 
 if (process.argv.length == 5) {
