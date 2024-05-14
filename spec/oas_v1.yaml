@@ -1747,7 +1747,7 @@ paths:
               properties:
                 metricId:
                   type: string
-                allocationAmount:
+                allocation:
                   type: string
                 locked:
                   type: boolean
