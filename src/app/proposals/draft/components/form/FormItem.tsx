@@ -7,7 +7,7 @@ type FormItemProps = {
 
 const FormItem = ({ label, children, required, htmlFor }: FormItemProps) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-1">
       <label className="text-xs font-semibold text-agora-stone-700 mb-1">
         {label} {required && <span className="text-agora-stone-700">*</span>}
       </label>

@@ -30,7 +30,11 @@ const MarkdownTextareaInput = ({
     "write"
   );
 
-  const { control, getValues } = useFormContext();
+  const {
+    control,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
 
   // make sure default value is set
   useEffect(() => {
@@ -93,6 +97,12 @@ const MarkdownTextareaInput = ({
               Preview
             </button>
           </div>
+          {!!errors[name] && (
+            <p className="text-red-500 text-sm mb-0 mt-1">
+              {/* @ts-ignore */}
+              {errors[name].message?.toString()}
+            </p>
+          )}
         </div>
       )}
     />

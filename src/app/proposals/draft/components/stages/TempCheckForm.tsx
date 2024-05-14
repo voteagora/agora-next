@@ -67,7 +67,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                 />
               </FormItem>
             </div>
-            <div className="space-x-2 self-end">
+            <div className="space-x-2 self-start mt-[22px]">
               <UpdatedButton type="secondary" isSubmit={true}>
                 Skip
               </UpdatedButton>

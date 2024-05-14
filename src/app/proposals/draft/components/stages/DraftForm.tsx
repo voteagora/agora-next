@@ -40,12 +40,15 @@ const DraftForm = ({
       description: draftProposal.description,
       abstract: draftProposal.abstract,
       transactions: draftProposal.transactions || [],
-      socialProposal: {
-        type: SocialProposalType.BASIC, // todo -- update
-        start_date: draftProposal.start_date_social?.toString(),
-        end_date: draftProposal.end_date_social?.toString(),
-        options: draftProposal.social_options,
-      },
+      ...(draftProposal.proposal_type === ProposalType.SOCIAL && {
+        socialProposal: {
+          // TODO: update to proper type (need to add type to db)
+          type: SocialProposalType.BASIC,
+          start_date: draftProposal.start_date_social?.toString(),
+          end_date: draftProposal.end_date_social?.toString(),
+          options: draftProposal.social_options,
+        },
+      }),
     },
   });
 
@@ -57,10 +60,11 @@ const DraftForm = ({
     formState: { errors },
   } = methods;
 
+  console.log("errors", errors);
+
   const proposalType = watch("type");
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
-    console.log("submitting");
     setIsPending(true);
 
     const res = await draftProposalAction({
@@ -157,12 +161,16 @@ const DraftForm = ({
             <FileInput />
           </FormCard.Section>
           <FormCard.Section>
-            <div className="flex flex-row justify-between space-x-16">
+            <div className="flex flex-row justify-between space-x-4">
               <p className="text-agora-stone-700">
                 This will post your draft to both the ENS forums and request an
                 update to the ENS DAO docs.
               </p>
-              <UpdatedButton type="primary" isSubmit={true}>
+              <UpdatedButton
+                type="primary"
+                isSubmit={true}
+                className="w-[200px]"
+              >
                 {isPending ? "pending..." : "Create draft"}
               </UpdatedButton>
             </div>
