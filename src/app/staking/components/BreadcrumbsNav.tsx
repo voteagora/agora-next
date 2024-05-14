@@ -12,23 +12,18 @@ interface BreadcrumbsNavProps {
 }
 
 export const BreadcrumbsNav = ({
-  step,
-  title,
-  onClick,
-  totalSteps = 3,
-}: BreadcrumbsNavProps) => {
+                                 step,
+                                 title,
+                                 onClick,
+                                 totalSteps = 3,
+                               }: BreadcrumbsNavProps) => {
   const router = useRouter();
-
-  // Prefetch the staking page when the user is on the first step
-  if (step === 1) {
-    router.prefetch("/staking");
-  }
 
   const onBackButton = () => {
     if (step > 1) {
       onClick(step - 1);
     } else {
-      router.push("/staking");
+      router.back();
     }
   };
 

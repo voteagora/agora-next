@@ -97,7 +97,7 @@ export const NewStakeFlow = ({
           </div>
           <div className="sm:col-start-5">
             {delegate && amount > 0 ? (
-              <NewStakeConfirm amount={amount} address={delegate} />
+              <NewStakeConfirm amount={amount} depositor={address} delegate={delegate} />
             ) : (
               "Something went wrong!"
             )}

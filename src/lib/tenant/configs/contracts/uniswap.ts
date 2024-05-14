@@ -15,7 +15,7 @@ export const uniswapTenantContractConfig = (
   isProd: boolean
 ): TenantContracts => {
   const TOKEN = "0xc796953c443f542728eedf33aab32753d3f7a91a";
-  const GOVERNOR = "0x2D281aa50D016C42213d2F56081f1Fb181a35913";
+  const GOVERNOR = "0x43DAEfb9eeEf6Bd5Fc827cC9653fd15B79adfa10";
   const STAKING = "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
 
   const provider = sepoliaProvider;

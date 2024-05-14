@@ -5,10 +5,15 @@ import { usePathname } from "next/navigation";
 import { HStack } from "../Layout/Stack";
 import { HeaderLink } from "./HeaderLink";
 import styles from "./header.module.scss";
+import { useAccount } from "wagmi";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const tenant = Tenant.current();
+
+  const { address } = useAccount();
+  const { isConnected } = useAgoraContext();
 
   return (
     <HStack className={styles.main_nav}>
@@ -33,7 +38,8 @@ export default function Navbar() {
         )}
 
       {tenant.ui.toggle("staking") && tenant.ui.toggle("staking").enabled && (
-        <HeaderLink href="/staking" isActive={pathname.includes("staking")}>
+        <HeaderLink href={address ? `/staking/${address}` : "/staking"}
+                    isActive={pathname.includes("staking")}>
           Staking
         </HeaderLink>
       )}

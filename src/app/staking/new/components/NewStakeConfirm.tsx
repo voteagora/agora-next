@@ -3,11 +3,7 @@
 import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
-import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -15,13 +11,14 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 interface NewStakeConfirmProps {
   amount: number;
-  address: string;
+  delegate: string;
+  depositor: string;
 }
 
-export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
+export const NewStakeConfirm = ({ amount, delegate, depositor }: NewStakeConfirmProps) => {
   const router = useRouter();
   const { token, contracts } = Tenant.current();
-  const isValidInput = Boolean(amount > 0 && address && isAddress(address));
+  const isValidInput = Boolean(amount > 0 && delegate && isAddress(delegate));
 
   const { config, status, error } = usePrepareContractWrite({
     enabled: isValidInput,
@@ -29,7 +26,7 @@ export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
     functionName: "stake",
-    args: [numberToToken(amount), address as `0x${string}`],
+    args: [numberToToken(amount), delegate as `0x${string}`],
   });
 
   const { data, write } = useContractWrite(config);
@@ -41,9 +38,11 @@ export const NewStakeConfirm = ({ amount, address }: NewStakeConfirmProps) => {
 
   useEffect(() => {
     if (data?.hash && !isLoading) {
+
       setTimeout(() => {
-        router.replace("/staking");
+        router.replace(`/staking/${depositor}`);
       }, 3000);
+
     }
   }, [isLoading, data?.hash]);
 

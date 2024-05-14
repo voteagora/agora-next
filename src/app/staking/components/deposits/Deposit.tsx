@@ -9,6 +9,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import {
+  useAccount,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -20,6 +21,7 @@ interface DepositProps {
 }
 
 export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
+  const { isConnected } = useAccount();
   const [delegate, setDelegate] = useState<Delegate | null>(null);
   const isDelegateFetched = useRef(false);
 
@@ -95,40 +97,47 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
           </div>
         ) : (
           <div className="flex flex-row justify-between gap-5">
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild>
-                <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 shadow-newDefault cursor-pointer">
-                  Manage Deposit
-                </div>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                  className="DropdownMenuContent bg-white rounded-lg border border-gray-300 shadow-newDefault w-[250px]"
-                  sideOffset={10}
-                  alignOffset={0}
-                  align="end"
-                >
-                  <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
-                    <Link href={`staking/deposits/${deposit.id}`}>
-                      Edit amount
-                    </Link>
-                  </div>
-                  <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
-                    <Link href={`staking/deposits/${deposit.id}/delegate`}>
-                      Change delegate
-                    </Link>
-                  </div>
+            {isConnected ? (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
                   <div
-                    className="py-3 px-5 font-medium cursor-pointer hover:bg-gray-100"
-                    onClick={() => {
-                      write?.();
-                    }}
-                  >
-                    Withdraw stake
+                    className="py-3 px-5 font-medium rounded-lg border border-gray-300 shadow-newDefault cursor-pointer">
+                    Manage Deposit
                   </div>
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Root>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="DropdownMenuContent bg-white rounded-lg border border-gray-300 shadow-newDefault w-[250px]"
+                    sideOffset={10}
+                    alignOffset={0}
+                    align="end"
+                  >
+                    <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
+                      <Link href={`/staking/deposits/${deposit.id}`}>
+                        Edit amount
+                      </Link>
+                    </div>
+                    <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
+                      <Link href={`/staking/deposits/${deposit.id}/delegate`}>
+                        Change delegate
+                      </Link>
+                    </div>
+                    <div
+                      className="py-3 px-5 font-medium cursor-pointer hover:bg-gray-100"
+                      onClick={() => {
+                        write?.();
+                      }}
+                    >
+                      Withdraw stake
+                    </div>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            ) : (
+              <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 text-gray-500">
+                Manage Deposit
+              </div>
+            )}
           </div>
         )}
       </div>
