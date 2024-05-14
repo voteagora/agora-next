@@ -12,11 +12,11 @@ interface BreadcrumbsNavProps {
 }
 
 export const BreadcrumbsNav = ({
-                                 step,
-                                 title,
-                                 onClick,
-                                 totalSteps = 3,
-                               }: BreadcrumbsNavProps) => {
+  step,
+  title,
+  onClick,
+  totalSteps = 3,
+}: BreadcrumbsNavProps) => {
   const router = useRouter();
 
   const onBackButton = () => {

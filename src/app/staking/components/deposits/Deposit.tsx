@@ -100,8 +100,7 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
             {isConnected ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <div
-                    className="py-3 px-5 font-medium rounded-lg border border-gray-300 shadow-newDefault cursor-pointer">
+                  <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 shadow-newDefault cursor-pointer">
                     Manage Deposit
                   </div>
                 </DropdownMenu.Trigger>

@@ -3,7 +3,11 @@
 import React, { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -15,7 +19,11 @@ interface NewStakeConfirmProps {
   depositor: string;
 }
 
-export const NewStakeConfirm = ({ amount, delegate, depositor }: NewStakeConfirmProps) => {
+export const NewStakeConfirm = ({
+  amount,
+  delegate,
+  depositor,
+}: NewStakeConfirmProps) => {
   const router = useRouter();
   const { token, contracts } = Tenant.current();
   const isValidInput = Boolean(amount > 0 && delegate && isAddress(delegate));
@@ -38,11 +46,9 @@ export const NewStakeConfirm = ({ amount, delegate, depositor }: NewStakeConfirm
 
   useEffect(() => {
     if (data?.hash && !isLoading) {
-
       setTimeout(() => {
         router.replace(`/staking/${depositor}`);
       }, 3000);
-
     }
   }, [isLoading, data?.hash]);
 

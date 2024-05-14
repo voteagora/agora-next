@@ -40,7 +40,6 @@ export default async function Page({ params: { address } }) {
 
   return (
     <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
-
       <div className="sm:col-span-4">
         {hasDeposits ? (
           <div>
