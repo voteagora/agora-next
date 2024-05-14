@@ -88,7 +88,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
           options={{
             required: "Recipient is required.",
           }}
-          errorMessage={errors.transactions?.[index]?.target?.message}
+          errorMessage={errors.transactions?.[index]?.recipient?.message}
         />
       </FormItem>
       <FormItem
@@ -122,10 +122,10 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
             errorMessage={errors.transactions?.[index]?.description?.message}
           />
         </FormItem>
-        {/* target and calldata are not included in UI of the form, but we need them for consistency */}
-        <input type="hidden" {...register(`transactions.${index}.target`)} />
-        <input type="hidden" {...register(`transactions.${index}.calldata`)} />
       </div>
+      {/* target and calldata are not included in UI of the form, but we need them for consistency */}
+      <input type="hidden" {...register(`transactions.${index}.target`)} />
+      <input type="hidden" {...register(`transactions.${index}.calldata`)} />
     </div>
   );
 };

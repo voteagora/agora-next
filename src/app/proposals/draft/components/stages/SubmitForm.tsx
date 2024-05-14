@@ -4,6 +4,9 @@ import DraftPreview from "../DraftPreview";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { icons } from "@/assets/icons/icons";
 import { UpdatedButton } from "@/components/Button";
+import { useContractRead, useAccount, useBlockNumber } from "wagmi";
+import ENSGovernorABI from "@/lib/contracts/abis/ENSGovernor.json";
+import Tenant from "@/lib/tenant/tenant";
 
 const SUBMISSION_CHECKLIST_ITEMS = [
   {
@@ -43,6 +46,17 @@ const SubmitForm = ({
 }: {
   draftProposal: ProposalDraft & { transactions: ProposalDraftTransaction[] };
 }) => {
+  const { address } = useAccount();
+  const { data: blockNumber } = useBlockNumber();
+  const { data: accountVotesData } = useContractRead({
+    abi: ENSGovernorABI,
+    address: Tenant.current().contracts.governor.address as `0x${string}`,
+    functionName: "getVotes",
+    chainId: Tenant.current().contracts.governor.chain.id,
+    args: [address, blockNumber],
+  });
+
+  console.log(accountVotesData);
   return (
     <form>
       <FormCard>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { z } from "zod";
 import FormItem from "./form/FormItem";
-import TextInput from "./form/TextInput";
 import { TransactionType } from "./../types";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
 import { UpdatedButton } from "@/components/Button";
@@ -11,6 +10,7 @@ import {
   UseFieldArrayRemove,
 } from "react-hook-form";
 import TransferTransactionForm from "./TransferTransactionForm";
+import CustomTransactionForm from "./CustomTransactionForm";
 
 enum Status {
   Unconfirmed = "Unconfirmed",
@@ -39,8 +39,6 @@ const TransactionForm = ({
     const transactions = getValues("transactions");
     const transaction = transactions[index];
 
-    console.log("Simulating transaction", transaction);
-
     // todo: validate target is address and all other fields etc
 
     try {
@@ -61,7 +59,6 @@ const TransactionForm = ({
         }),
       });
       const res = await response.json();
-      console.log(res);
       if (res.response.transaction.status) {
         setStatus(Status.Valid);
         setValue(`transactions.${index}.isValid`, "true");
@@ -150,83 +147,10 @@ const ExecutableProposalForm = () => {
                 </TransactionForm>
               ) : (
                 <TransactionForm index={index} remove={remove}>
-                  <div
-                    className="grid grid-cols-2 gap-3"
+                  <CustomTransactionForm
+                    index={index}
                     key={`custom-${index}`}
-                  >
-                    <FormItem
-                      label="Target"
-                      required={false}
-                      htmlFor={`transactions.${index}.target`}
-                    >
-                      <TextInput
-                        name={`transactions.${index}.target`}
-                        register={register}
-                        placeholder="0xabc"
-                        options={{
-                          required: "Amount is required.",
-                        }}
-                        errorMessage={
-                          errors.transactions?.[index]?.target?.message
-                        }
-                      />
-                    </FormItem>
-                    <FormItem
-                      label="Value"
-                      required={false}
-                      htmlFor={`transactions.${index}.value`}
-                    >
-                      <TextInput
-                        name={`transactions.${index}.value`}
-                        register={register}
-                        placeholder="10"
-                        options={{
-                          required: "Value is required.",
-                        }}
-                        errorMessage={
-                          errors.transactions?.[index]?.value?.message
-                        }
-                      />
-                    </FormItem>
-                    <div className="col-span-2">
-                      <FormItem
-                        label="Calldata"
-                        required={false}
-                        htmlFor={`transactions.${index}.calldata`}
-                      >
-                        <TextInput
-                          name={`transactions.${index}.calldata`}
-                          register={register}
-                          placeholder=""
-                          options={{
-                            required: "Calldata is required.",
-                          }}
-                          errorMessage={
-                            errors.transactions?.[index]?.calldata?.message
-                          }
-                        />
-                      </FormItem>
-                    </div>
-                    <div className="col-span-2">
-                      <FormItem
-                        label="Description"
-                        required={false}
-                        htmlFor={`transactions.${index}.description`}
-                      >
-                        <TextInput
-                          name={`transactions.${index}.description`}
-                          register={register}
-                          placeholder="What is this transaction all about?"
-                          options={{
-                            required: "Description is required.",
-                          }}
-                          errorMessage={
-                            errors.transactions?.[index]?.description?.message
-                          }
-                        />
-                      </FormItem>
-                    </div>
-                  </div>
+                  />
                 </TransactionForm>
               )}
             </>
