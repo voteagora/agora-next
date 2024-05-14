@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
 function DelegationsContainer({

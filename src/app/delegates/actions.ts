@@ -78,12 +78,6 @@ export async function submitDelegateStatement({
   return response;
 }
 
-export async function fetchDelegateStatement(addressOrENSName: string) {
-  return cache((addressOrENS: string) => getDelegateStatement(addressOrENS))(
-    addressOrENSName
-  );
-}
-
 export async function fetchVotesForDelegate(
   addressOrENSName: string,
   page = 1
