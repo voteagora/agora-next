@@ -3,9 +3,8 @@
 import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder } from "ethers";
 import { cn } from "@/lib/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  AdvancedVoteAlert,
   LoadingVote,
   NoStatementView,
   SuccessMessage,
@@ -62,9 +61,6 @@ export function ApprovalCastVoteDialog({
     }
   };
 
-  const [localMissingVote, setLocalMissingVote] =
-    useState<MissingVote>(missingVote);
-
   // TODO: ADD against option if is supported
   // 0 = against, 1 = for, 2 = abstain
   const { isLoading, isSuccess, write, isError, data } = useAdvancedVoting({
@@ -74,7 +70,7 @@ export function ApprovalCastVoteDialog({
     authorityChains,
     reason,
     params: encodedParams,
-    missingVote: localMissingVote,
+    missingVote,
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
@@ -88,61 +84,6 @@ export function ApprovalCastVoteDialog({
         ) as `0x${string}`);
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
-
-  useEffect(() => {
-    if (
-      missingVote == "BOTH" &&
-      data?.standardTxHash &&
-      !data?.advancedTxHash
-    ) {
-      setLocalMissingVote("ADVANCED");
-    }
-  }, [data, missingVote]);
-  if (missingVote === "BOTH" && !data.advancedTxHash && data.standardTxHash) {
-    return (
-      <VStack gap={3}>
-        <VStack className={styles.title_box}>
-          <p className={styles.title}>
-            Select up to {maxChecked} option{maxChecked > 1 && "s"}
-          </p>
-          <p className={styles.notes}>
-            Your vote is final and cannot be edited once submitted.
-          </p>
-        </VStack>
-        <VStack className={styles.options_list}>
-          {proposalData.options.map((option, index) => (
-            <CheckCard
-              key={index}
-              title={option.description}
-              description={<p></p>}
-              checked={selectedOptions.includes(index)}
-              checkedOptions={selectedOptions.length}
-              onClick={() => handleOnChange(index)}
-              abstain={abstain}
-            />
-          ))}
-          <CheckCard
-            key={proposalData.options.length}
-            title={"Abstain: vote for no options"}
-            description={""}
-            checked={!!abstain}
-            checkedOptions={selectedOptions.length}
-            onClick={() => handleOnChange(abstainOptionId)}
-            abstain={abstain}
-          />
-        </VStack>
-        <CastVoteWithReason
-          onVoteClick={write}
-          reason={reason}
-          setReason={setReason}
-          numberOfOptions={selectedOptions.length}
-          abstain={abstain}
-          votingPower={vpToDisplay}
-          copy="Sign transaction 2/2"
-        />
-      </VStack>
-    );
-  }
 
   return (
     <div className={styles.container}>
@@ -210,8 +151,6 @@ export function ApprovalCastVoteDialog({
               votingPower={vpToDisplay}
             />
           </VStack>
-          {/* @ts-ignore */}
-          {missingVote === "BOTH" && <AdvancedVoteAlert />}
         </>
       )}
     </div>
