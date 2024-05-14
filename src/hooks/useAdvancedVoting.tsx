@@ -140,8 +140,7 @@ const useAdvancedVoting = ({
           break;
 
         case "BOTH":
-          track("Standard + Advanced Vote", trackingData);
-          await _standardVote();
+          track("Standard + Advanced Vote (single transaction)", trackingData);
           await _advancedVote();
           break;
       }
@@ -160,11 +159,7 @@ const useAdvancedVoting = ({
 
   return {
     isLoading:
-      missingVote === "DIRECT"
-        ? standardVoteLoading
-        : missingVote === "ADVANCED"
-          ? advancedVoteLoading
-          : standardVoteLoading && advancedVoteLoading,
+      missingVote === "DIRECT" ? standardVoteLoading : advancedVoteLoading,
     /**
      * TODO: what to do with the errors in SAFE:
      * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
@@ -176,18 +171,9 @@ const useAdvancedVoting = ({
      * Remember that if waitForTransaction fails it means the txHash does not exist and therefore the SAFE transaction
      * failed, probably due to a nonce error
      */
-    isError:
-      missingVote === "DIRECT"
-        ? standardVoteError
-        : missingVote === "ADVANCED"
-          ? advancedVoteError
-          : standardVoteError && advancedVoteError,
+    isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
     isSuccess:
-      missingVote === "DIRECT"
-        ? standardVoteSuccess
-        : missingVote === "ADVANCED"
-          ? advancedVoteSuccess
-          : standardVoteSuccess && advancedVoteSuccess,
+      missingVote === "DIRECT" ? standardVoteSuccess : advancedVoteSuccess,
     write,
     data: { advancedTxHash, standardTxHash },
   };
