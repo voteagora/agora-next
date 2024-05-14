@@ -17,7 +17,9 @@ export default function RetroPGFSearch() {
 
   const handleSearch = (value: string) => {
     router.push(
-      value ? addSearchParam("search", value) : deleteSearchParam("search"),
+      value
+        ? addSearchParam({ name: "search", value })
+        : deleteSearchParam({ name: "search" }),
       {
         scroll: false,
       }

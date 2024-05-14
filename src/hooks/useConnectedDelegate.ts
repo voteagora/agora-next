@@ -1,15 +1,21 @@
-import { fetchConnectedDelegate, revalidateDelegateAddressPage } from "@/app/delegates/actions";
+import {
+  fetchConnectedDelegate,
+  revalidateDelegateAddressPage,
+} from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { fetchDelegate } from "@/app/delegates/actions";
 import { useQuery } from "@tanstack/react-query";
+import { timeout } from "@/lib/utils";
+import { fetchDelegate } from "@/app/delegates/actions";
 
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+/**
+ * Define maximum number of retries, max retries 10 means 180 seconds waiting in total (advanced delegation voting power
+ * takes around 120 seconds to update)
+ */
+const MAX_RETRIES = 10;
 
-// TODO: think about strategy to fetchConnectedDelegate, since balance and voting power can change on every block, 
+// TODO: think about strategy to fetch, since balance and voting power can change on every block,
 // also to prevent additional unnecessary fetches being done right now
 const useConnectedDelegate = () => {
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -19,9 +25,10 @@ const useConnectedDelegate = () => {
 
   const data = useQuery({
     enabled: !!address,
-    queryKey: ['useConnectedDelegate', address, refetchDelegate, retries],
+    queryKey: ["useConnectedDelegate", address, refetchDelegate, retries],
     queryFn: async () => {
-      const [delegate, advancedDelegators, balance] = await fetchConnectedDelegate(address!);
+      const [delegate, advancedDelegators, balance] =
+        await fetchConnectedDelegate(address!);
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate.address);
       }
@@ -34,19 +41,35 @@ const useConnectedDelegate = () => {
          * Materialized view that brings the new voting power takes one minute to sync
          * Refetch delegate will be set to null by the delegateProfileImage
          */
-        if (delegatee.votingPower === refetchDelegate.prevVotingPowerDelegatee) {
-          await timeout(2000);
-          const _retries = retries + 1;
-          setRetries(_retries);
+        if (
+          delegatee.votingPower === refetchDelegate.prevVotingPowerDelegatee
+        ) {
+          // Check if maximum retries has been reached
+          if (retries < MAX_RETRIES) {
+            // Implement exponential backoff
+            await timeout(2000 * (retries + 1));
+            const _retries = retries + 1;
+            setRetries(_retries);
+          } else {
+            // Handle maximum retries reached
+            console.error("Maximum retries reached");
+          }
         }
         return { delegate, advancedDelegators, balance };
       } else if (refetchDelegate) {
         // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the
         // new voting power
         if (delegate.votingPower === lastVotingPower) {
-          await timeout(2000);
-          const _retries = retries + 1;
-          setRetries(_retries);
+          // Check if maximum retries has been reached
+          if (retries < MAX_RETRIES) {
+            // Implement exponential backoff
+            await timeout(2000 * (retries + 1));
+            const _retries = retries + 1;
+            setRetries(_retries);
+          } else {
+            // Handle maximum retries reached
+            console.error("Maximum retries reached");
+          }
         } else {
           setRefetchDelegate(null);
         }
@@ -54,18 +77,20 @@ const useConnectedDelegate = () => {
       } else {
         return { delegate, advancedDelegators, balance };
       }
-    }
+    },
   });
 
-  return data.data ? {
-    ...data.data,
-    isLoading: data.isLoading
-  } : {
-    balance: null,
-    delegate: null,
-    advancedDelegators: null,
-    isLoading: data.isLoading
-  };
+  return data.data
+    ? {
+        ...data.data,
+        isLoading: data.isLoading,
+      }
+    : {
+        balance: null,
+        delegate: null,
+        advancedDelegators: null,
+        isLoading: data.isLoading,
+      };
 };
 
 export default useConnectedDelegate;

@@ -1,15 +1,18 @@
 import { getBlockScanUrl } from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { cn } from "@/lib/utils";
 
 export default function BlockScanUrls({
   hash1,
   hash2,
+  className,
 }: {
   hash1: string | undefined;
   hash2?: string | undefined;
+  className?: string | undefined;
 }) {
   return (
-    <div className="pt-4 text-xs text-gray-4f">
+    <div className={cn("pt-4 text-xs text-gray-4f", className)}>
       {hash2 && hash1 ? (
         <div className="flex items-center justify-between">
           <a

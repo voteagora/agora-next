@@ -60,8 +60,8 @@ export default function OptionsResultsPanel({
       return BigInt(b.votes || 0) > BigInt(a.votes || 0)
         ? 1
         : BigInt(b.votes || 0) < BigInt(a.votes || 0)
-        ? -1
-        : 0;
+          ? -1
+          : 0;
     });
 
   return (
@@ -154,7 +154,7 @@ function SingleOption({
       >
         <div className={styles.descriptionText}>{description}</div>
         <div className={styles.votesText}>
-          <TokenAmountDisplay amount={votes} decimals={18} currency="OP" />
+          <TokenAmountDisplay amount={votes} />
           <span className={styles.votesMargin}>
             {percentage === 0n
               ? "(0%)"

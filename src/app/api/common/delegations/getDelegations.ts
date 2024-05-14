@@ -1,4 +1,4 @@
-import { type AdvancedDelegationPayload, type Delegation } from "./delegation";
+import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
@@ -237,6 +237,7 @@ async function getCurrentAdvancedDelegatorsForAddress(
       Number(advancedDelegator.delegated_share.toFixed(3)) === 1
         ? "FULL"
         : "PARTIAL",
+    transaction_hash: advancedDelegator.transaction_hash || "",
   }));
 }
 
@@ -255,7 +256,7 @@ const getDirectDelegateeForAddress = async ({
   const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    (prisma as any)[`${namespace}Delegatees`].findFirst({
+    prisma[`${namespace}Delegatees`].findFirst({
       where: { delegator: address.toLowerCase() },
     }),
   ]);

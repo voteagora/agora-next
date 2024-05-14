@@ -24,6 +24,7 @@ const formSchema = z.object({
   delegateStatement: z.string(),
   email: z.string(),
   twitter: z.string(),
+  warpcast: z.string(),
   topIssues: z.array(
     z
       .object({
@@ -58,9 +59,14 @@ export default function CurrentDelegateStatement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
+
+  const { ui } = Tenant.current();
+  const requireCodeOfConduct = !!ui.toggle("delegates/code-of-conduct")
+    ?.enabled;
+
   const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
     return {
-      agreeCodeConduct: false,
+      agreeCodeConduct: !requireCodeOfConduct,
       daoSlug,
       discord: delegateStatement?.discord || "",
       delegateStatement:
@@ -68,6 +74,7 @@ export default function CurrentDelegateStatement() {
           ?.delegateStatement || "",
       email: delegateStatement?.email || "",
       twitter: delegateStatement?.twitter || "",
+      warpcast: delegateStatement?.warpcast || "",
       topIssues:
         (
           delegateStatement?.payload as {

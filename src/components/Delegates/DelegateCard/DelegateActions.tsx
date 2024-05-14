@@ -26,13 +26,18 @@ export function DelegateActions({
   const { address } = useAccount();
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
+  const warpcast = delegate?.statement?.warpcast;
 
   return (
     <HStack
       alignItems="items-stretch"
       className={className ? className + "justify-between" : "justify-between"}
     >
-      <DelegateSocialLinks discord={discord} twitter={twitter} />
+      <DelegateSocialLinks
+        discord={discord}
+        twitter={twitter}
+        warpcast={warpcast}
+      />
       <div>
         {isConnected ? (
           address &&

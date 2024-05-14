@@ -1,6 +1,8 @@
 import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
 import Header from "@/components/Header/Header";
+import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
+import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 
 declare global {
   interface BigInt {
@@ -12,20 +14,18 @@ BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
-export const metadata = {
-  metadataBase: new URL("https://vote.optimism.io"),
-  alternates: {
-    canonical: "/",
-  },
-  title: "Agora - Home of Optimism Voters",
-  description: "Agora is the home of Optimism voters.",
-};
+async function fetchDaoMetrics() {
+  "use server";
+  return fetchMetrics();
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const metrics = await fetchDaoMetrics();
+
   return (
     <html lang="en">
       <head>
@@ -34,6 +34,7 @@ export default function RootLayout({
       <ClientLayout>
         <Header />
         {children}
+        <DAOMetricsHeader metrics={metrics} />
       </ClientLayout>
     </html>
   );

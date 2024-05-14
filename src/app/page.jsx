@@ -1,11 +1,9 @@
-import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
@@ -16,17 +14,12 @@ export const revalidate = 60;
 
 async function fetchProposals(filter, page = 1) {
   "use server";
-  return apiFetchProposals({filter, page});
+  return apiFetchProposals({ filter, page });
 }
 
 async function fetchNeedsMyVoteProposals(address) {
   "use server";
   return apiFetchNeedsMyVoteProposals(address);
-}
-
-async function fetchDaoMetrics() {
-  "use server";
-  return fetchMetrics();
 }
 
 async function fetchVotableSupply() {
@@ -52,13 +45,18 @@ export async function generateMetadata({}, parent) {
     title: title,
     description: description,
     openGraph: {
-      images: preview,
+      images: [
+        {
+          url: preview,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
-    other: {
-      ["twitter:card"]: "summary_large_image",
-      ["twitter:title"]: title,
-      ["twitter:description"]: description,
-      ["twitter:image"]: preview,
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
@@ -111,7 +109,7 @@ export default async function Home() {
               </div>
               <div>
                 <div className="text-sm text-stone-600 font-medium">
-                  Phase 3 – Full Ossification
+                  Phase 3 – Full Ossification
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
                 <div>
@@ -136,13 +134,11 @@ export default async function Home() {
     proposalsFilterOptions.everything.filter
   );
 
-  const metrics = await fetchDaoMetrics();
   const votableSupply = await fetchVotableSupply();
 
   return (
     <VStack>
       <Hero />
-      <DAOMetricsHeader metrics={metrics} />
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
@@ -152,7 +148,7 @@ export default async function Home() {
         initAllProposals={allProposals}
         fetchProposals={async (page, filter) => {
           "use server";
-          return getProposals({ filter, page });
+          return apiFetchProposals({ filter, page });
         }}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}

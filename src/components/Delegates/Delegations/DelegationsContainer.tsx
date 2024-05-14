@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -83,6 +82,7 @@ function DelegationsContainer({
                   <TableHead className="h-10">Type</TableHead>
                   <TableHead className="h-10">Amount</TableHead>
                   <TableHead className="h-10">From</TableHead>
+                  <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
               {/* @ts-ignore */}
@@ -133,6 +133,7 @@ function DelegationsContainer({
                   <TableHead className="h-10">Type</TableHead>
                   <TableHead className="h-10">Amount</TableHead>
                   <TableHead className="h-10">To</TableHead>
+                  <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
