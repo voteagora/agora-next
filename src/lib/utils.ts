@@ -122,7 +122,7 @@ export function* generateBarsForVote(
 
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
-    (acc, section) => acc + section.amount,
+    (acc, section) => BigInt(acc) + BigInt(section.amount),
     BigInt(0)
   );
 
@@ -130,7 +130,7 @@ export function* generateBarsForVote(
     if (totalVotes === BigInt(0)) {
       yield sections[defaultSectionIndex].value;
     } else {
-      const value = (totalVotes * BigInt(index)) / BigInt(bars);
+      const value = (totalVotes * BigInt(Number(index))) / BigInt(bars);
 
       let lastSectionValue = BigInt(0);
       for (const section of sections) {
