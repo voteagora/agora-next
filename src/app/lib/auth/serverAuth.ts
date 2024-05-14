@@ -125,9 +125,7 @@ export async function getRolesForUser(
   const defaultRoles = [ROLE_PUBLIC_READER];
   if (siweData) {
     const isBadge = await isBadgeholder(siweData.address);
-    return isBadge
-      ? [ROLE_BADGEHOLDER, ...defaultRoles]
-      : defaultRoles;
+    return isBadge ? [ROLE_BADGEHOLDER, ...defaultRoles] : defaultRoles;
   }
 
   return defaultRoles;
