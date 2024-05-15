@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { VStack } from "@/components/Layout/Stack";
+import { HStack, VStack } from "@/components/Layout/Stack";
 
 import infoTransparentIcon from "@/icons/info-transparent.svg";
 import checkIcon from "@/icons/check.svg";
@@ -10,6 +10,28 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
+import { formatNumber } from "@/lib/utils";
+
+import Tenant from "@/lib/tenant/tenant";
+const { token } = Tenant.current();
+
+function formatNumberWithScientificNotation(x: any) {
+  if (Math.abs(x) < 1.0) {
+    var e = parseInt(x.toString().split("e-")[1]);
+    if (e) {
+      x *= Math.pow(10, e - 1);
+      x = "0." + new Array(e).join("0") + x.toString().substring(2);
+    }
+  } else {
+    var e = parseInt(x.toString().split("+")[1]);
+    if (e > 20) {
+      e -= 20;
+      x /= Math.pow(10, e);
+      x += new Array(e + 1).join("0");
+    }
+  }
+  return x;
+}
 
 export default function ProposalVotesSummaryDetails({
   proposal,
@@ -22,6 +44,13 @@ export default function ProposalVotesSummaryDetails({
   const formatTime = (date: Date | null) => {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
+  // Calculate the highest value among the vote results and check if it is in scientific notation.
+  const highestValue = Math.max(
+    Number(results.for),
+    Number(results.abstain),
+    Number(results.against)
+  );
+  const isScientificNotation = highestValue.toString().includes("e");
 
   const total =
     Number(results.for) + Number(results.against) + Number(results.abstain);
@@ -73,12 +102,21 @@ export default function ProposalVotesSummaryDetails({
               alt="info icon"
             />
           </div>
-          <div className="flex items-center gap-1 ">
-            <Image width="12" height="12" src={checkIcon} alt="check icon" />
-            <p className="text-xs font-semibold text-gray-4f ">
-              675.24K / 400K Required
-            </p>
-          </div>
+          {proposal.quorum && (
+            <div className="flex items-center gap-1 ">
+              <Image width="12" height="12" src={checkIcon} alt="check icon" />
+              <p className="text-xs font-semibold text-gray-4f">
+                {formatNumber(
+                  isScientificNotation
+                    ? formatNumberWithScientificNotation(highestValue)
+                    : BigInt(highestValue),
+                  token.decimals,
+                  2
+                )}{" "}
+                /{formatNumber(proposal.quorum, token.decimals, 2)} Required
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex justify-between">
           <div className="flex flex-row gap-1 text-gray-4f font-semibold text-xs">
@@ -93,7 +131,7 @@ export default function ProposalVotesSummaryDetails({
           <div className="flex flex-row gap-1 ">
             <Image src={checkIcon} alt="check icon" />
             <p className=" text-xs font-semibold text-gray-4f">
-              87% / 51% Required
+              87% / {`${Number(proposal.approvalThreshold) / 100}%`} Required
             </p>
           </div>
         </div>
