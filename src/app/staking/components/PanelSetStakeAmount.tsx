@@ -11,17 +11,17 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { Button } from "@/components/ui/button";
 import { tokenToHumanNumber } from "@/lib/utils";
 
-interface SetStakeDialogProps {
+interface PanelSetStakeAmountProps {
   amount: number;
   onChange: (value: number) => void;
   onClick: () => void;
 }
 
-export const SetStakeDialog = ({
-  amount: defaultAmount,
-  onChange,
-  onClick,
-}: SetStakeDialogProps) => {
+export const PanelSetStakeAmount = ({
+                                      amount: defaultAmount,
+                                      onChange,
+                                      onClick,
+                                    }: PanelSetStakeAmountProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
@@ -33,7 +33,7 @@ export const SetStakeDialog = ({
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
-    address as `0x${string}`
+    address as `0x${string}`,
   );
 
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
@@ -68,7 +68,7 @@ export const SetStakeDialog = ({
                   onClick={() => {
                     const maxAmount = tokenToHumanNumber(
                       Number(tokenBalance),
-                      token.decimals
+                      token.decimals,
                     );
 
                     setAmount(maxAmount);

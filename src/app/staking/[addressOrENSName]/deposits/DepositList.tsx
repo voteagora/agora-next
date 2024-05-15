@@ -3,8 +3,8 @@
 import React from "react";
 import { StakedDeposit } from "@/lib/types";
 import type { Delegate } from "@/app/api/common/delegates/delegate";
-import { Deposit } from "@/app/staking/components/deposits/Deposit";
-import { DepositListAction } from "@/app/staking/components/deposits/DepositListAction";
+import { Deposit } from "@/app/staking/[addressOrENSName]/deposits/Deposit";
+import { DepositListAction } from "@/app/staking/[addressOrENSName]/deposits/DepositListAction";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];

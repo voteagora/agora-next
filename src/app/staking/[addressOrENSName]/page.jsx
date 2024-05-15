@@ -1,68 +1,57 @@
-"use client";
-
+import React from "react";
+import Tenant from "@/lib/tenant/tenant";
+import { apiFetchStakedDeposits } from "@/app/api/staking/getStakedDeposits";
+import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 import { HStack } from "@/components/Layout/Stack";
-import { StakingPoolStats } from "@/app/staking/components/StakingPoolStats";
+import { DepositList } from "@/app/staking/[addressOrENSName]/deposits/DepositList";
+import { StakingStats } from "@/app/staking/components/StakingStats";
 import FAQs from "@/app/staking/components/FAQs";
 import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
-import React, { useEffect, useRef, useState } from "react";
-import Tenant from "@/lib/tenant/tenant";
-import { BigNumberish } from "ethers";
-import { useAccount } from "wagmi";
-import { StakedDeposit } from "@/lib/types";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
-import type { Delegate } from "@/app/api/common/delegates/delegate";
-import { DepositList } from "@/app/staking/components/deposits/DepositList";
+import { resolveENSName } from "@/app/lib/ENSUtils";
 
-interface StakeHomeProps {
-  fetchDeposits: (address: string) => Promise<StakedDeposit[] | null>;
-  fetchDelegate: (address: string) => Promise<Delegate>;
-  rewardDuration: string;
-  rewardPerToken: BigNumberish;
-  totalStaked: BigNumberish;
-  totalSupply: BigNumberish;
+async function fetchDeposits(address) {
+  "use server";
+  return apiFetchStakedDeposits({ address });
 }
 
-export const StakeHome = ({
-  fetchDeposits,
-  fetchDelegate,
-  rewardDuration,
-  rewardPerToken,
-  totalStaked,
-  totalSupply,
-}: StakeHomeProps) => {
+async function apiFetchDelegate(address) {
+  "use server";
+  return fetchDelegate(address);
+}
+
+export default async function Page({ params: { addressOrENSName } }) {
+
+  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+
   const { token } = Tenant.current();
-  const { address } = useAccount();
-  const [deposits, setDeposits] = useState<StakedDeposit[] | null>(null);
+  const { ui, contracts } = Tenant.current();
+  const deposits = await fetchDeposits(address.toLowerCase());
 
-  const isFetched = useRef(false);
-  const isFetching = useRef(false);
-  const hasDeposits = isFetched.current && deposits && deposits.length > 0;
+  if (!ui.toggle("staking")) {
+    return <div>Route not supported for namespace</div>;
+  }
 
-  const fetchData = async (address: string) => {
-    isFetching.current = true;
-    const data = await fetchDeposits(address);
-    if (data) {
-      setDeposits(data);
-    }
-    isFetched.current = true;
-  };
+  const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
+    await Promise.all([
+      contracts.token.contract.totalSupply(),
+      contracts.staker.contract.totalStaked(),
+      contracts.staker.contract.rewardPerTokenAccumulated(),
+      contracts.staker.contract.REWARD_DURATION(),
+    ]);
 
-  useEffect(() => {
-    if (address && !isFetched.current && !isFetching.current) {
-      fetchData(address.toLowerCase());
-    }
-  }, [address]);
+  const hasDeposits = deposits && deposits.length > 0;
 
   return (
     <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
       <div className="sm:col-span-4">
-        {hasDeposits && address ? (
+        {hasDeposits ? (
           <div>
             <div className="font-black text-2xl mb-5">
               Your {token.symbol} Stake
             </div>
 
-            <DepositList deposits={deposits} fetchDelegate={fetchDelegate} />
+            <DepositList deposits={deposits} fetchDelegate={apiFetchDelegate} />
           </div>
         ) : (
           <div>
@@ -82,7 +71,7 @@ export const StakeHome = ({
           <div className="font-black text-2xl mb-5">
             {token.symbol} Staking Metrics
           </div>
-          <StakingPoolStats
+          <StakingStats
             rewardDuration={rewardDuration}
             rewardPerToken={rewardPerToken}
             totalStaked={totalStaked}
@@ -105,4 +94,4 @@ export const StakeHome = ({
       </div>
     </HStack>
   );
-};
+}

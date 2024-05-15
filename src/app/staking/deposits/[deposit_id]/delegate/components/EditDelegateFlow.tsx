@@ -3,7 +3,7 @@
 import { type DelegatePaginated, type StakedDeposit } from "@/lib/types";
 import { useAccount } from "wagmi";
 import React, { useState } from "react";
-import { BreadcrumbsNav } from "@/app/staking/components/BreadcrumbsNav";
+import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
 import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/receipt/Receipt";
@@ -32,7 +32,7 @@ export const EditDelegateFlow = ({
 
   return (
     <div>
-      <BreadcrumbsNav
+      <Breadcrumbs
         step={step}
         onClick={setStep}
         title={PAGE_TITLE[step - 1]}

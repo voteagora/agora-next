@@ -4,19 +4,19 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-interface BreadcrumbsNavProps {
+interface BreadcrumbsProps {
   step: number;
   title: string;
   totalSteps: number;
   onClick: (value: number) => void;
 }
 
-export const BreadcrumbsNav = ({
-  step,
-  title,
-  onClick,
-  totalSteps = 3,
-}: BreadcrumbsNavProps) => {
+export const Breadcrumbs = ({
+                              step,
+                              title,
+                              onClick,
+                              totalSteps = 3,
+                            }: BreadcrumbsProps) => {
   const router = useRouter();
 
   const onBackButton = () => {

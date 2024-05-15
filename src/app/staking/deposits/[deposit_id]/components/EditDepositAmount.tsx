@@ -3,11 +3,11 @@
 import { type StakedDeposit } from "@/lib/types";
 import { useAccount } from "wagmi";
 import React, { useState } from "react";
-import { BreadcrumbsNav } from "@/app/staking/components/BreadcrumbsNav";
+import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
 import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/receipt/Receipt";
-import { SetStakeDialog } from "@/app/staking/components/SetStakeDialog";
+import { PanelSetStakeAmount } from "@/app/staking/components/PanelSetStakeAmount";
 import { EditDepositConfirm } from "@/app/staking/deposits/[deposit_id]/components/EditDepositConfirm";
 
 const PAGE_TITLE = ["Stake More", "Confirm your transaction"];
@@ -24,7 +24,7 @@ export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
 
   return (
     <div>
-      <BreadcrumbsNav
+      <Breadcrumbs
         step={step}
         onClick={setStep}
         title={PAGE_TITLE[step - 1]}
@@ -45,7 +45,7 @@ export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
             </ReceiptContainer>
           </div>
           <div className="sm:col-start-5">
-            <SetStakeDialog
+            <PanelSetStakeAmount
               amount={amount}
               onChange={(amount) => setAmount(amount)}
               onClick={() => setStep(2)}
