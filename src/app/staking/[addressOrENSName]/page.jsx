@@ -21,7 +21,6 @@ async function apiFetchDelegate(address) {
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
-
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
 
   const { token } = Tenant.current();

@@ -18,10 +18,10 @@ interface PanelSetStakeAmountProps {
 }
 
 export const PanelSetStakeAmount = ({
-                                      amount: defaultAmount,
-                                      onChange,
-                                      onClick,
-                                    }: PanelSetStakeAmountProps) => {
+  amount: defaultAmount,
+  onChange,
+  onClick,
+}: PanelSetStakeAmountProps) => {
   const { token } = Tenant.current();
   const { address } = useAccount();
 
@@ -33,7 +33,7 @@ export const PanelSetStakeAmount = ({
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
 
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
-    address as `0x${string}`,
+    address as `0x${string}`
   );
 
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
@@ -68,7 +68,7 @@ export const PanelSetStakeAmount = ({
                   onClick={() => {
                     const maxAmount = tokenToHumanNumber(
                       Number(tokenBalance),
-                      token.decimals,
+                      token.decimals
                     );
 
                     setAmount(maxAmount);

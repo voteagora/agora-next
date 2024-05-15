@@ -15,12 +15,20 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { TOKEN_BALANCE_QK } from "@/hooks/useTokenBalance";
+import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
+
 interface DepositProps {
   deposit: StakedDeposit;
   fetchDelegate: (address: string) => Promise<Delegate>;
 }
 
 export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const { isConnected } = useAccount();
   const [delegate, setDelegate] = useState<Delegate | null>(null);
   const isDelegateFetched = useRef(false);
@@ -34,7 +42,7 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
     args: [BigInt(deposit.id), BigInt(deposit.amount)],
   });
 
-  const { data, write, status } = useContractWrite(config);
+  const { data, write } = useContractWrite(config);
 
   const { isLoading, isFetched: didProcessWithdrawal } = useWaitForTransaction({
     hash: data?.hash,
@@ -52,11 +60,28 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
     if (!delegate && !isDelegateFetched.current) {
       getDelegate();
     }
-  }, [delegate]);
-
-  if (didProcessWithdrawal) {
-    return null;
-  }
+    // Refresh route and invalidate cache if withdrawal was processed
+    if (didProcessWithdrawal) {
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [TOKEN_BALANCE_QK, deposit.depositor],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [DEPOSITOR_TOTAL_STAKED_QK, deposit.depositor],
+        }),
+      ]).then(() => {
+        router.refresh();
+      });
+    }
+  }, [
+    delegate,
+    deposit,
+    didProcessWithdrawal,
+    getDelegate,
+    isDelegateFetched,
+    queryClient,
+    router,
+  ]);
 
   return (
     <div className="px-5 py-4 w-full">

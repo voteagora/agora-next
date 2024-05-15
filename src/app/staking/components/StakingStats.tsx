@@ -10,11 +10,11 @@ interface StakingStatsProps {
 }
 
 export const StakingStats = ({
-                               rewardDuration,
-                               rewardPerToken,
-                               totalStaked,
-                               totalSupply,
-                             }: StakingStatsProps) => {
+  rewardDuration,
+  rewardPerToken,
+  totalStaked,
+  totalSupply,
+}: StakingStatsProps) => {
   return (
     <div className="flex justify-evenly rounded-xl border border-gray-300 w-auto h-100 mb-4 bg-gray-50">
       <div className="flex flex-col text-center p-5">

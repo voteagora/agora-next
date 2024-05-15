@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 
 export const RedirectOrConnect = () => {
-
   const { setOpen } = useModal();
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
@@ -19,7 +18,9 @@ export const RedirectOrConnect = () => {
     }
   }, [isConnected, address]);
 
-  return <Button className="mt-3" onClick={() => setOpen(true)}>
-    Connect wallet to delegate
-  </Button>;
+  return (
+    <Button className="mt-3" onClick={() => setOpen(true)}>
+      Connect wallet to delegate
+    </Button>
+  );
 };

@@ -13,8 +13,7 @@ export const PanelNewDeposit = () => {
   const router = useRouter();
 
   return (
-    <div
-      className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
+    <div className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
       <Image
         src="/images/uni_deposit.svg"
         alt="results 2"
