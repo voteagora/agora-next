@@ -7,7 +7,6 @@ import { ProposalLifecycleStageMetadata } from "@/app/proposals/draft/types";
 import {
   DRAFT_STAGES_FOR_TENANT,
   POST_DRAFT_STAGES_FOR_TENANT,
-  getStageIndexForTenant,
   getStageMetadata,
 } from "@/app/proposals/draft/utils/stages";
 
@@ -81,7 +80,7 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   );
 };
 
-const MyDraftProposals = ({
+const MySponsorshipRequests = ({
   fetchDraftProposals,
 }: {
   fetchDraftProposals: (address: `0x${string}`) => Promise<ProposalDraft[]>;
@@ -90,14 +89,16 @@ const MyDraftProposals = ({
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
 
   const getDraftProposalsAndSet = useCallback(
-    async (authorAddress: `0x${string}`) => {
-      const proposals = await fetchDraftProposals(authorAddress);
+    async (address: `0x${string}`) => {
+      const proposals = await fetchDraftProposals(address);
+      console.log(proposals);
       setDraftProposals(proposals);
     },
     []
   );
 
   useEffect(() => {
+    console.log("address", address);
     if (!address) return;
     getDraftProposalsAndSet(address);
   }, [fetchDraftProposals, address]);
@@ -108,12 +109,12 @@ const MyDraftProposals = ({
 
   return (
     <div className="mb-16">
-      <h1 className="text-2xl font-black mb-6">My proposals</h1>
+      <h1 className="text-2xl font-black mb-6">Requests for sponsorship</h1>
       <div className="space-y-6">
         {draftProposals.map((proposal) => (
           <Link
             key={proposal.id}
-            href={`/proposals/draft/${proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
+            href={`/proposals/sponsor/${proposal.id}`}
             className="block"
           >
             <DraftProposalCard proposal={proposal} />
@@ -124,4 +125,4 @@ const MyDraftProposals = ({
   );
 };
 
-export default MyDraftProposals;
+export default MySponsorshipRequests;

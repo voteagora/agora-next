@@ -2,6 +2,7 @@ import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app
 import {
   fetchProposals as apiFetchProposals,
   fetchDraftProposals as apiFetchDraftProposals,
+  fetchDraftProposalForSponsor as apiFetchDraftProposalsForSponsorship,
 } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
@@ -12,6 +13,7 @@ import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
+import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -147,6 +149,12 @@ export default async function Home() {
         fetchDraftProposals={async (address) => {
           "use server";
           return apiFetchDraftProposals(address);
+        }}
+      />
+      <MySponsorshipRequests
+        fetchDraftProposals={async (address) => {
+          "use server";
+          return apiFetchDraftProposalsForSponsorship(address);
         }}
       />
       <NeedsMyVoteProposalsList

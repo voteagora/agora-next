@@ -60,37 +60,44 @@ export const ProposalLifecycleStageMetadata = {
     title: "Create temp check",
     shortTitle: "Temp check",
     description: "Check the temperature of the proposal",
+    waitingFor: "Submitting proposal",
   },
   [PrismaProposalStage.DRAFT]: {
     title: "Create draft",
     shortTitle: "Draft",
     description: "Draft the proposal",
+    waitingFor: "Submitting proposal",
   },
   [PrismaProposalStage.READY]: {
     title: "Submit draft",
     shortTitle: "Ready",
     description: "Ready to submit the proposal",
+    waitingFor: "Sponsor approval",
   },
   [PrismaProposalStage.CONTACT_VOTERS]: {
     title: "Contact voters",
     shortTitle: "Contact voters",
     description: "Contact the voters",
+    waitingFor: "Onchain vote",
   },
   [PrismaProposalStage.QUEUE]: {
     title: "Queue",
     shortTitle: "Queue",
     description: "Queue the proposal",
+    waitingFor: "Queue",
   },
   [PrismaProposalStage.EXECUTE]: {
     title: "Execute",
     shortTitle: "Execute",
     description: "Execute the proposal",
+    waitingFor: "Execution",
   },
 } as {
   [key in PrismaProposalStage]: {
     title: string;
     shortTitle: string;
     description: string;
+    waitingFor: string;
   };
 };
 

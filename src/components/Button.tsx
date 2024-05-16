@@ -1,5 +1,8 @@
 import Link from "next/link";
 import styles from "./styles.module.scss";
+import Image from "next/image";
+import { icons } from "@/icons/icons";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 export function Button({ href = "", className = "", ...props }) {
   return (
@@ -23,6 +26,7 @@ export function UpdatedButton({
   href = "",
   className = "",
   isSubmit = false,
+  isLoading = false,
   fullWidth = false,
   children,
   ...props
@@ -32,6 +36,7 @@ export function UpdatedButton({
   href?: string;
   className?: string;
   isSubmit?: boolean;
+  isLoading?: boolean;
   fullWidth?: boolean;
   children: React.ReactNode;
   [x: string]: any;
@@ -59,7 +64,14 @@ export function UpdatedButton({
           {...props}
           type={isSubmit ? "submit" : "button"}
         >
-          {children}
+          {isLoading ? (
+            <span className="flex flex-row space-x-2 text-white">
+              <LoadingSpinner className="text-white" />
+              <p>loading...</p>
+            </span>
+          ) : (
+            children
+          )}
         </button>
       )}
     </>

@@ -15,7 +15,7 @@ const SocialProposalForm = () => {
     register,
     control,
     watch,
-    formState: { errors },
+    formState: { errors, defaultValues },
   } = useFormContext<FormType>();
 
   const { fields, append, remove } = useFieldArray({
@@ -28,13 +28,19 @@ const SocialProposalForm = () => {
   useEffect(() => {
     // removes all array fields
     remove();
-
     if (proposalType === SocialProposalType.BASIC) {
       append({ text: "FOR" });
       append({ text: "AGAINST" });
       append({ text: "ABSTAIN" });
     } else {
-      append({ text: "" });
+      const defaultOptions = defaultValues?.socialProposal?.options;
+      if (defaultOptions && defaultOptions.length > 0) {
+        defaultOptions.forEach((option) => {
+          append({ text: option?.text || "" });
+        });
+      } else {
+        append({ text: "" });
+      }
     }
   }, [proposalType]);
 
@@ -92,6 +98,7 @@ const SocialProposalForm = () => {
                 </div>
                 {proposalType === SocialProposalType.APPROVAL && (
                   <UpdatedButton
+                    className="self-start"
                     type="secondary"
                     onClick={() => {
                       remove(index);

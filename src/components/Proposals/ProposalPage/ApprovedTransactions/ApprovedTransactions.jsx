@@ -1,3 +1,5 @@
+"use client";
+
 import { VStack } from "@/components/Layout/Stack";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
@@ -48,34 +50,43 @@ export default function ApprovedTransactions({
       </div>
       {!isNoProposedTransactions && (
         <VStack className="px-4">
-          {proposalData.options.slice(0, displayedOptions).map((option) => {
-            return (
-              <>
-                {proposalType === "APPROVAL" && (
-                  <p className="font-mono text-xs font-medium leading-4 text-gray-af">
-                    {"//"} {option.description}
-                  </p>
-                )}
-                {option.values.length > 0 &&
-                  option.targets.map((t, i) => {
-                    const valueETH =
-                      option.values[i] > 0
-                        ? `{ value: ${formatEther(option.values[i])} ETH }`
-                        : undefined;
-                    return (
-                      <div key={i}>
-                        <CodeChange
-                          target={option.targets[i]}
-                          valueETH={valueETH}
-                          functionName={option.functionArgsName[i].functionName}
-                          functionArgs={option.functionArgsName[i].functionArgs}
-                        />
-                      </div>
-                    );
-                  })}
-              </>
-            );
-          })}
+          {proposalData.options
+            .slice(0, displayedOptions)
+            .map((option, index) => {
+              return (
+                <>
+                  {proposalType === "APPROVAL" && (
+                    <p
+                      className="font-mono text-xs font-medium leading-4 text-gray-af"
+                      key={`description-${index}`}
+                    >
+                      {"//"} {option.description}
+                    </p>
+                  )}
+                  {option.values.length > 0 &&
+                    option.targets.map((t, i) => {
+                      const valueETH =
+                        option.values[i] > 0
+                          ? `{ value: ${formatEther(option.values[i])} ETH }`
+                          : undefined;
+                      return (
+                        <div key={i}>
+                          <CodeChange
+                            target={option.targets[i]}
+                            valueETH={valueETH}
+                            functionName={
+                              option.functionArgsName[i].functionName
+                            }
+                            functionArgs={
+                              option.functionArgsName[i].functionArgs
+                            }
+                          />
+                        </div>
+                      );
+                    })}
+                </>
+              );
+            })}
         </VStack>
       )}
       {proposalData.options.length > 1 && (

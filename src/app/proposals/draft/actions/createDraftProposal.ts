@@ -4,6 +4,7 @@ import { z } from "zod";
 import { schema as DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import prisma from "@/app/lib/prisma";
 import { ProposalDraftTransaction, ProposalStage } from "@prisma/client";
+import { ProposalType, SocialProposalType } from "../types";
 
 export type FormState = {
   ok: boolean;
@@ -14,8 +15,6 @@ export async function onSubmitAction(
   data: z.output<typeof DraftProposalSchema> & { draftProposalId: number }
 ): Promise<FormState> {
   const parsed = DraftProposalSchema.safeParse(data);
-
-  console.log(parsed);
 
   if (!parsed.success) {
     return {
@@ -34,7 +33,8 @@ export async function onSubmitAction(
         title: parsed.data.title,
         description: parsed.data.description,
         abstract: parsed.data.abstract,
-        proposal_type: parsed.data.type.toLowerCase(),
+        proposal_type: parsed.data.type,
+        proposal_social_type: parsed.data.socialProposal?.type,
         transactions: {
           // deletes old transactions so we aren't stacking on top of old transactions
           deleteMany: {},
@@ -44,7 +44,6 @@ export async function onSubmitAction(
               target: transaction.target,
               value: transaction.value,
               calldata: transaction.calldata,
-              signature: transaction.signature,
               description: transaction.description,
               is_valid: true,
             } as ProposalDraftTransaction;

@@ -11,7 +11,6 @@ async function createProposalDraft(address: `0x${string}`) {
   const proposal = await prisma.proposalDraft.create({
     data: {
       temp_check_link: "",
-      proposal_type: "executable",
       title: "",
       description: "",
       abstract: "",

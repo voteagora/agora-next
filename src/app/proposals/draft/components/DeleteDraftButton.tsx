@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
@@ -31,6 +32,7 @@ export const DeleteDraftProposalDialog = ({
   proposalId: number;
   closeDialog: () => void;
 }) => {
+  const [isPending, setIsPending] = useState(false);
   return (
     <div>
       <h3 className="text-center font-semibold">Delete my draft</h3>
@@ -48,7 +50,9 @@ export const DeleteDraftProposalDialog = ({
         </UpdatedButton>
         <UpdatedButton
           type="primary"
+          isLoading={isPending}
           onClick={async () => {
+            setIsPending(true);
             await deleteAction(proposalId);
             window.location.href = "/";
           }}

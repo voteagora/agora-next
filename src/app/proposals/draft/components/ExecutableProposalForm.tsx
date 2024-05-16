@@ -165,9 +165,9 @@ const ExecutableProposalForm = () => {
           onClick={() => {
             append({
               type: TransactionType.TRANSFER,
-              target: "0x",
-              value: "0",
-              calldata: "0x",
+              target: "",
+              value: "",
+              calldata: "",
               description: "",
               isValid: "false",
             });
@@ -182,9 +182,9 @@ const ExecutableProposalForm = () => {
           onClick={() => {
             append({
               type: TransactionType.CUSTOM,
-              target: "0x",
-              value: "0",
-              calldata: "0x",
+              target: "",
+              value: "",
+              calldata: "",
               description: "",
               isValid: "false",
             });

@@ -3,7 +3,11 @@ import DraftProposalForm from "../components/DraftProposalForm";
 import DraftProposalChecklist from "../components/DraftProposalChecklist";
 import BackButton from "../components/BackButton";
 import prisma from "@/app/lib/prisma";
-import { ProposalDraft } from "@prisma/client";
+import {
+  ProposalDraft,
+  ProposalDraftTransaction,
+  ProposalSocialOption,
+} from "@prisma/client";
 import { getStageMetadata, DRAFT_STAGES_FOR_TENANT } from "../utils/stages";
 
 const getDraftProposal = async (id: number) => {
@@ -17,7 +21,10 @@ const getDraftProposal = async (id: number) => {
     },
   });
 
-  return draftProposal as ProposalDraft;
+  return draftProposal as ProposalDraft & {
+    transactions: ProposalDraftTransaction[];
+    social_options: ProposalSocialOption[];
+  };
 };
 
 export default async function DraftProposalPage({

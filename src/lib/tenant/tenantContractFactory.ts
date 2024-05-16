@@ -8,9 +8,7 @@ import {
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
-
-import provider, { ethProvider } from "@/app/lib/provider";
-
+import provider, { ethProvider, sepoliaProvider } from "@/app/lib/provider";
 import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
@@ -41,11 +39,15 @@ const ensContracts = (isProd: boolean): TenantContracts => {
     // TOKEN
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
-      address: "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72" as `0x${string}`,
-      chain: mainnet,
+      address: isProd
+        ? "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72"
+        : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67",
+      chain: isProd ? mainnet : sepolia,
       contract: EtherfiToken__factory.connect(
-        "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
-        ethProvider
+        isProd
+          ? "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72"
+          : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67",
+        isProd ? ethProvider : sepoliaProvider
       ),
     }),
     // GOVERNOR
@@ -53,14 +55,14 @@ const ensContracts = (isProd: boolean): TenantContracts => {
       abi: OptimismGovernor__factory.abi,
       address: isProd
         ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
-        : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+        : "0xb65C031Ac61128AE791D42Ae43780f012E2F7f89",
       contract: OptimismGovernor__factory.connect(
         isProd
           ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
-          : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
-        provider
+          : "0xb65C031Ac61128AE791D42Ae43780f012E2F7f89",
+        isProd ? provider : sepoliaProvider
       ),
-      chain: mainnet,
+      chain: isProd ? mainnet : sepolia,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
     }),
   };

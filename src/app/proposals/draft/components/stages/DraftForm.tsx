@@ -35,20 +35,19 @@ const DraftForm = ({
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
     defaultValues: {
-      type: draftProposal.proposal_type as ProposalType,
+      type: (draftProposal.proposal_type ||
+        ProposalType.EXECUTABLE) as ProposalType,
       title: draftProposal.title,
       description: draftProposal.description,
       abstract: draftProposal.abstract,
       transactions: draftProposal.transactions || [],
-      ...(draftProposal.proposal_type === ProposalType.SOCIAL && {
-        socialProposal: {
-          // TODO: update to proper type (need to add type to db)
-          type: SocialProposalType.BASIC,
-          start_date: draftProposal.start_date_social?.toString(),
-          end_date: draftProposal.end_date_social?.toString(),
-          options: draftProposal.social_options,
-        },
-      }),
+      socialProposal: {
+        type: (draftProposal.proposal_social_type ||
+          SocialProposalType.BASIC) as SocialProposalType,
+        start_date: draftProposal.start_date_social || undefined,
+        end_date: draftProposal.end_date_social || undefined,
+        options: draftProposal.social_options,
+      },
     },
   });
 
@@ -60,19 +59,20 @@ const DraftForm = ({
     formState: { errors },
   } = methods;
 
-  console.log("errors", errors);
-
   const proposalType = watch("type");
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
     setIsPending(true);
+    console.log("are we submitting this?");
 
     const res = await draftProposalAction({
       ...data,
       draftProposalId: draftProposal.id,
     });
-    setIsPending(false);
 
+    console.log("done with submitting this");
+
+    setIsPending(false);
     if (!res.ok) {
       // TODO: make error toast + improve messaging
       toast("Something went wrong...");
@@ -169,9 +169,10 @@ const DraftForm = ({
               <UpdatedButton
                 type="primary"
                 isSubmit={true}
-                className="w-[200px]"
+                className="w-[200px] flex items-center justify-center"
+                isLoading={isPending}
               >
-                {isPending ? "pending..." : "Create draft"}
+                Create draft
               </UpdatedButton>
             </div>
           </FormCard.Section>

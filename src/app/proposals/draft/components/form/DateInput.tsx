@@ -16,9 +16,19 @@ const formatDate = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
+function getValueByStringKey(obj: any, key: string) {
+  return key.split(".").reduce((acc, current) => {
+    return acc && acc[current] ? acc[current] : undefined;
+  }, obj);
+}
+
 const DateInput = ({ name }: DateInputProps) => {
   const [value, setValue] = useState("");
-  const { control, getValues } = useFormContext();
+  const {
+    control,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
 
   //make sure default value is set
   useEffect(() => {
@@ -28,22 +38,30 @@ const DateInput = ({ name }: DateInputProps) => {
   }, []);
 
   return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field: { onChange } }) => (
-        <input
-          value={value}
-          defaultValue={value}
-          onChange={(value: any) => {
-            setValue(value);
-            onChange(value);
-          }}
-          type="date"
-          className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg text-agora-stone-900 placehoder:text-agora-stone-500 w-full"
-        />
+    <>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field: { onChange } }) => (
+          <input
+            value={value}
+            defaultValue={value}
+            onChange={(e: any) => {
+              console.log(e.target.value);
+              setValue(e.target.value);
+              onChange(e.target.value);
+            }}
+            type="date"
+            className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg text-agora-stone-900 placehoder:text-agora-stone-500 w-full"
+          />
+        )}
+      />
+      {getValueByStringKey(errors, name) && (
+        <p className="text-red-500 text-sm mb-0 mt-1">
+          {getValueByStringKey(errors, name)?.message}
+        </p>
       )}
-    />
+    </>
   );
 };
 

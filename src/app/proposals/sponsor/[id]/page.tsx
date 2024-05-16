@@ -1,0 +1,63 @@
+import prisma from "@/app/lib/prisma";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import SponsorForm from "../components/SponsorForm";
+import Image from "next/image";
+import { icons } from "@/icons/icons";
+
+const getDraftProposal = async (id: number) => {
+  const draftProposal = await prisma.proposalDraft.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      transactions: true,
+      social_options: true,
+    },
+  });
+
+  return draftProposal as ProposalDraft & {
+    transactions: ProposalDraftTransaction[];
+  };
+};
+
+const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
+  const draftProposal = await getDraftProposal(parseInt(params.id));
+
+  return (
+    <main className="max-w-screen-xl mx-auto mt-10">
+      <div className="grid grid-cols-3 gap-12">
+        <div className="col-span-2">
+          <SponsorForm draftProposal={draftProposal} />
+        </div>
+        <div className="self-start">
+          <div className="border bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] p-6 rounded-lg">
+            <div className="flex flex-row items-center space-x-4">
+              <Image
+                className="border bg-[#FAFAF2] border-[#ECE3CA] rounded-md p-2 shadow-newDefault"
+                src={icons.sponsor}
+                alt="Sponsor"
+                width={42}
+                height={42}
+              />
+
+              <p className="font-semibold">
+                kartpatkey.eth would like your help to submit this proposal
+              </p>
+            </div>
+            <p className="text-[#B16B19]/70 mt-2">
+              The proposer has created a draft proposal, but might not meet the
+              proposal threshold to submit it themselves. They'd like you to
+              help them submit it.
+            </p>
+            <p className="text-[#B16B19]/70 mt-2">
+              If you choose to do so, this proposal will be marked as "submitted
+              by nick.eth, authored by kartpatkey.eth"
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default ProposalSponsorPage;

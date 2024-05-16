@@ -117,6 +117,18 @@ async function getDraftProposals(address: `0x${string}`) {
   });
 }
 
+async function getDraftProposalForSponsor(address: `0x${string}`) {
+  return await prisma.proposalDraft.findMany({
+    where: {
+      sponsor_address: address,
+    },
+    include: {
+      transactions: true,
+    },
+  });
+}
+
+export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
 export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);

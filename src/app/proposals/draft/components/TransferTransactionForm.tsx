@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import { z } from "zod";
-import { encodeFunctionData } from "viem";
+import { encodeFunctionData, isAddress } from "viem";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import { useFormContext } from "react-hook-form";
@@ -49,14 +48,13 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
     watch,
     setValue,
     formState: { errors },
-    getValues,
   } = useFormContext<FormType>();
 
   const recipient = watch(`transactions.${index}.recipient`);
   const amount = watch(`transactions.${index}.amount`);
 
   useEffect(() => {
-    if (recipient && amount) {
+    if (recipient && amount && isAddress(recipient)) {
       // calc the calldata for transfer
       const calldata = encodeFunctionData({
         abi: transferABI,
@@ -71,6 +69,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         `transactions.${index}.target`,
         "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67"
       );
+      setValue(`transactions.${index}.value`, "0");
     }
   }, [recipient, amount, setValue]);
 
@@ -78,7 +77,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
     <div className="grid grid-cols-2 gap-3">
       <FormItem
         label="Recipient"
-        required={false}
+        required={true}
         htmlFor={`transactions.${index}.recipient`}
       >
         <TextInput
@@ -93,7 +92,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       </FormItem>
       <FormItem
         label="Amount"
-        required={false}
+        required={true}
         htmlFor={`transactions.${index}.amount`}
       >
         <TextInput
@@ -109,7 +108,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       <div className="col-span-2">
         <FormItem
           label="Description"
-          required={false}
+          required={true}
           htmlFor={`transactions.${index}.description`}
         >
           <TextInput
@@ -124,6 +123,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         </FormItem>
       </div>
       {/* target and calldata are not included in UI of the form, but we need them for consistency */}
+      <input type="hidden" {...register(`transactions.${index}.value`)} />
       <input type="hidden" {...register(`transactions.${index}.target`)} />
       <input type="hidden" {...register(`transactions.${index}.calldata`)} />
     </div>
