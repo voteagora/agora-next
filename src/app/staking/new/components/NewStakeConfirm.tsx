@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
 import {
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 
 interface NewStakeConfirmProps {
   amount: number;
@@ -24,7 +25,6 @@ export const NewStakeConfirm = ({
   delegate,
   depositor,
 }: NewStakeConfirmProps) => {
-  const router = useRouter();
   const { token, contracts } = Tenant.current();
   const isValidInput = Boolean(amount > 0 && delegate && isAddress(delegate));
 
@@ -43,14 +43,6 @@ export const NewStakeConfirm = ({
   });
 
   const isStakeConfirmed = Boolean(data?.hash && !isLoading);
-
-  useEffect(() => {
-    if (data?.hash && !isLoading) {
-      setTimeout(() => {
-        router.replace(`/staking/${depositor}`);
-      }, 3000);
-    }
-  }, [isLoading, data?.hash]);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -76,19 +68,33 @@ export const NewStakeConfirm = ({
         </div>
       ) : (
         <>
-          <div className="text-sm py-4">
-            Please verify your transaction details before confirming.
-          </div>
+          {isStakeConfirmed ? (
+            <div className="mt-4">
+              <RedirectAfterSuccess
+                message={"New stake confirmed successfully!"}
+                linkTitle={"Return to staking page"}
+                linkURI={`/staking/${depositor}`}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="text-sm py-4">
+                Please verify your transaction details before confirming.
+              </div>
 
-          <Button
-            className="w-full"
-            disabled={!isValidInput || isLoading}
-            onClick={() => {
-              write?.();
-            }}
-          >
-            {isLoading ? "Staking..." : `Stake & delegate my ${token.symbol}`}
-          </Button>
+              <Button
+                className="w-full"
+                disabled={!isValidInput || isLoading}
+                onClick={() => {
+                  write?.();
+                }}
+              >
+                {isLoading
+                  ? "Staking..."
+                  : `Stake & delegate my ${token.symbol}`}
+              </Button>
+            </>
+          )}
           {data?.hash && <BlockScanUrls hash1={data?.hash} />}
         </>
       )}
