@@ -4,25 +4,13 @@ import { useState } from "react";
 import FormItem from "./form/FormItem";
 import { useFormContext } from "react-hook-form";
 import TextInput from "./form/TextInput";
-import {
-  useEnsName,
-  useEnsAvatar,
-  useContractRead,
-  useBlockNumber,
-} from "wagmi";
+import { useContractRead, useBlockNumber } from "wagmi";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import { ProposalDraft } from "@prisma/client";
-
-export function truncateEthAddress(address: string | undefined) {
-  if (!address) return "";
-  var truncateRegex = /^(0x[a-zA-Z0-9]{4})[a-zA-Z0-9]+([a-zA-Z0-9]{4})$/;
-  var match = address.match(truncateRegex);
-  if (!match) return address;
-  return match[1] + "\u2026" + match[2];
-}
+import AvatarAddress from "./AvatarAdress";
 
 const THRESHOLD = 100000000000000000000000;
 
@@ -35,15 +23,6 @@ const RequestSponsorshipForm = ({
   const { register, watch } = useFormContext();
 
   const address = watch("sponsorAddress");
-  const { data: ensName } = useEnsName({
-    chainId: 1,
-    address: address,
-  });
-
-  const { data: ensAvatar, error } = useEnsAvatar({
-    chainId: 1,
-    name: ensName,
-  });
 
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useContractRead({
@@ -69,12 +48,7 @@ const RequestSponsorshipForm = ({
         </FormItem>
         <FormItem label="Sponsor verification">
           <span className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
-            <span className="flex flex-row space-x-2 items-center">
-              {ensAvatar && (
-                <img src={ensAvatar} className="w-6 h-6 rounded-full" />
-              )}
-              <p>{ensName ? ensName : truncateEthAddress(address)}</p>
-            </span>
+            <AvatarAddress address={address} />
             <span
               className={`absolute right-2 top-2 ${hasEnoughVotes ? "text-green-500" : "text-red-500"}`}
             >

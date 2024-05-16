@@ -10,6 +10,8 @@ import ApprovedTransactions from "../../../../components/Proposals/ProposalPage/
 import { useContractRead, useAccount, useBlockNumber } from "wagmi";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import Tenant from "@/lib/tenant/tenant";
+import AvatarAddress from "./AvatarAdress";
+import toast from "react-hot-toast";
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -108,13 +110,52 @@ const DraftPreview = ({
         <p className="text-agora-stone-700 mt-2">{proposalDraft.abstract}</p>
       </FormCard.Section>
       <FormCard.Section className="!z-0">
-        <h3 className="font-semibold">Ready to submit?</h3>
-        {!hasEnoughVotes && (
-          <p className="text-agora-stone-700 mt-2">
-            You do not meet the requirement to submit this proposal. However,
-            you can ask someone who does to help you by sharing this link with
-            them.
-          </p>
+        {proposalDraft.sponsor_address ? (
+          <>
+            <p className="text-agora-stone-700">
+              Your proposal is awaiting{" "}
+              <span className="font-mono text-xs border border-yellow-500 text-yellow-700 bg-yellow-100 p-1 rounded">
+                {proposalDraft.sponsor_address}
+              </span>
+              's sponsorship. Once your sponsor approves, your proposal will be
+              automatically submitted, without needing your input. In the
+              meantime, you can contact your sponsor by copying the link below.
+            </p>
+            <div className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg p-2 relative mt-6">
+              <div className="flex flex-row items-center space-x-2">
+                <AvatarAddress
+                  address={proposalDraft.sponsor_address as `0x${string}`}
+                />
+                <span className="text-xs font-bold text-agora-stone-700">
+                  Awaiting sponsorship
+                </span>
+              </div>
+              <button
+                type="button"
+                className="absolute right-[-1px] top-[-1px] rounded-lg box-border border bg-white border-agora-stone-100 p-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/proposals/sponsor/${proposalDraft.id}`
+                  );
+                  toast("Proposal link copied to clipboard!");
+                }}
+              >
+                Copy sponsor link
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h3 className="font-semibold">Ready to submit?</h3>
+            {!hasEnoughVotes && (
+              <p className="text-agora-stone-700 mt-2">
+                You do not meet the requirement to submit this proposal.
+                However, you can ask someone who does to help you by sharing
+                this link with them.
+              </p>
+            )}
+            {actions}
+          </>
         )}
         {/* <div className="mt-6">
             {SUBMISSION_CHECKLIST_ITEMS.map((item, index) => {
@@ -145,7 +186,6 @@ const DraftPreview = ({
               );
             })}
           </div> */}
-        {actions}
       </FormCard.Section>
     </FormCard>
   );

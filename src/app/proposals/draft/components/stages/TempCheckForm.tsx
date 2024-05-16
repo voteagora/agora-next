@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { z } from "zod";
 // import Tenant from "@/lib/tenant/tenant";
 import { useForm } from "react-hook-form";
@@ -14,6 +15,7 @@ import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck
 import { ProposalDraft } from "@prisma/client";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+  const [isPending, setIsPending] = useState(false);
   const {
     register,
     handleSubmit,
@@ -26,15 +28,19 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   });
 
   const onSubmit = async (data: z.output<typeof tempCheckSchema>) => {
-    const res = await tempCheckAction({
-      ...data,
-      draftProposalId: draftProposal.id,
-    });
-    console.log(res);
-
-    // not sure why redirect is not working
-    // redirect(`/proposals/draft?stage=1`);
-    window.location.href = `/proposals/draft/${draftProposal.id}?stage=1`;
+    setIsPending(true);
+    try {
+      const res = await tempCheckAction({
+        ...data,
+        draftProposalId: draftProposal.id,
+      });
+      // not sure why redirect is not working
+      // redirect(`/proposals/draft?stage=1`);
+      window.location.href = `/proposals/draft/${draftProposal.id}?stage=1`;
+    } catch (e) {
+      console.error(e);
+      setIsPending(false);
+    }
   };
 
   return (
@@ -68,10 +74,18 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
               </FormItem>
             </div>
             <div className="space-x-2 self-start mt-[22px]">
-              <UpdatedButton type="secondary" isSubmit={true}>
+              <UpdatedButton
+                type="secondary"
+                isSubmit={true}
+                isLoading={isPending}
+              >
                 Skip
               </UpdatedButton>
-              <UpdatedButton type="primary" isSubmit={true}>
+              <UpdatedButton
+                type="primary"
+                isSubmit={true}
+                isLoading={isPending}
+              >
                 Continue
               </UpdatedButton>
             </div>
