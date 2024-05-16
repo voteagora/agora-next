@@ -8,6 +8,10 @@ export const uniswapTenantUIConfig = new TenantUI({
   hero: uniswapHero,
   logo: uniswapLogo,
 
+  organization: {
+    title: "Uniswap Foundation",
+  },
+
   pages: [
     {
       route: "/",

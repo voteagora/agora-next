@@ -8,6 +8,10 @@ export const etherfiTenantUIConfig = new TenantUI({
   hero: etherfiHero,
   logo: etherfiLogo,
 
+  organization: {
+    title: "Ether.fi Foundation",
+  },
+
   pages: [
     {
       route: "/",

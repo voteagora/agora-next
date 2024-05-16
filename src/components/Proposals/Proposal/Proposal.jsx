@@ -14,6 +14,7 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function Proposal({ proposal, votableSupply }) {
+  const { ui } = Tenant.current();
   const proposalText = getProposalTypeText(proposal.proposalType);
 
   return (
@@ -39,7 +40,7 @@ export default function Proposal({ proposal, votableSupply }) {
                 {proposalText}{" "}
                 <span className={styles.invisible_on_mobile}>
                   {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
-                    "by The Optimism Foundation"
+                    `by The ${ui.organization.title}`
                   ) : (
                     <>
                       by <HumanAddress address={proposal.proposer} />{" "}

@@ -21,7 +21,7 @@ import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
-const { contracts } = Tenant.current();
+const { contracts, ui } = Tenant.current();
 
 const abiCoder = new AbiCoder();
 const governorContract = contracts.governor;
@@ -101,8 +101,8 @@ export default function SubmitButton({
     <>
       {manager && String(manager) !== address ? (
         <p className="text-gray-700 text-sm max-w-[420px] break-words">
-          Only the Optimism Foundation manager address can create proposals for
-          the time being.
+          Only the {ui.organization.title} manager address can create proposals
+          for the time being.
         </p>
       ) : (
         <div className="flex flex-col gap-2">
