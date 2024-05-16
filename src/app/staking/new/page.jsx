@@ -4,6 +4,7 @@ import React from "react";
 import { NewStakeFlow } from "@/app/staking/new/components/NewStakeFlow";
 import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { delegatesFilterOptions } from "@/lib/constants";
+import { revalidatePath } from "next/cache";
 
 export default async function Page() {
   const sort = delegatesFilterOptions.weightedRandom.sort;
@@ -17,6 +18,10 @@ export default async function Page() {
         fetchDelegates={async (page, seed) => {
           "use server";
           return apiFetchDelegates({ page, seed, sort });
+        }}
+        refreshPath={async (path) => {
+          "use server";
+          revalidatePath(path);
         }}
       />
     </div>

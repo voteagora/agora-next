@@ -20,13 +20,19 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { TOKEN_BALANCE_QK } from "@/hooks/useTokenBalance";
 import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
+import { INDEXER_DELAY } from "@/lib/constants";
 
 interface DepositProps {
   deposit: StakedDeposit;
   fetchDelegate: (address: string) => Promise<Delegate>;
+  refreshPath: (path: string) => void;
 }
 
-export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
+export const Deposit = ({
+  deposit,
+  fetchDelegate,
+  refreshPath,
+}: DepositProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const { isConnected } = useAccount();
@@ -44,9 +50,10 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
 
   const { data, write } = useContractWrite(config);
 
-  const { isLoading, isFetched: didProcessWithdrawal } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  const { isLoading: isProcessingWithdrawal, isFetched: didProcessWithdrawal } =
+    useWaitForTransaction({
+      hash: data?.hash,
+    });
 
   const getDelegate = async () => {
     if (!isDelegateFetched.current) {
@@ -57,21 +64,25 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
   };
 
   useEffect(() => {
+    //  Fetch delegate if not already fetched
     if (!delegate && !isDelegateFetched.current) {
       getDelegate();
     }
     // Refresh route and invalidate cache if withdrawal was processed
     if (didProcessWithdrawal) {
-      Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [TOKEN_BALANCE_QK, deposit.depositor],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [DEPOSITOR_TOTAL_STAKED_QK, deposit.depositor],
-        }),
-      ]).then(() => {
-        router.refresh();
-      });
+      setTimeout(() => {
+        Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: [TOKEN_BALANCE_QK, deposit.depositor],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [DEPOSITOR_TOTAL_STAKED_QK, deposit.depositor],
+          }),
+        ]).then(() => {
+          refreshPath(`/staking/${deposit.depositor}`);
+          router.refresh();
+        });
+      }, INDEXER_DELAY);
     }
   }, [
     delegate,
@@ -116,7 +127,7 @@ export const Deposit = ({ deposit, fetchDelegate }: DepositProps) => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isProcessingWithdrawal || didProcessWithdrawal ? (
           <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 text-gray-500">
             Withdrawing...
           </div>

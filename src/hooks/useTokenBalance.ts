@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
+import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
 
 export const TOKEN_BALANCE_QK = "tokenBalance";
 
@@ -12,6 +13,5 @@ export const useTokenBalance = (address?: string) => {
       return await contracts.token.contract.balanceOf(address as `0x${string}`);
     },
   });
-
   return { data, isFetching, isFetched };
 };

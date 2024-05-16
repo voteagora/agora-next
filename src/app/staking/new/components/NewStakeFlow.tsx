@@ -20,11 +20,13 @@ const PAGE_TITLE = [
 interface NewStakeFlowProps {
   delegates: DelegatePaginated;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
+  refreshPath: (path: string) => void;
 }
 
 export const NewStakeFlow = ({
   delegates,
   fetchDelegates,
+  refreshPath,
 }: NewStakeFlowProps) => {
   const { address } = useAccount();
   const [step, setStep] = useState(1);
@@ -101,6 +103,7 @@ export const NewStakeFlow = ({
                 amount={amount}
                 depositor={address}
                 delegate={delegate}
+                refreshPath={refreshPath}
               />
             ) : (
               "Something went wrong!"

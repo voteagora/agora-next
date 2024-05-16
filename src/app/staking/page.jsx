@@ -29,7 +29,9 @@ export default async function Page() {
           sunt explicabo.
         </div>
 
-        <RedirectOrConnect />
+        <div className="mt-2">
+          <RedirectOrConnect />
+        </div>
 
         <div className="mt-10">
           <div className="font-black text-2xl mb-5">

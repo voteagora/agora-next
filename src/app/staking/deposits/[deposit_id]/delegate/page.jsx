@@ -5,6 +5,7 @@ import { apiFetchDeposit } from "@/app/api/staking/getDeposit";
 import { delegatesFilterOptions } from "@/lib/constants";
 import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { EditDelegateFlow } from "@/app/staking/deposits/[deposit_id]/delegate/components/EditDelegateFlow";
+import { revalidatePath } from "next/cache";
 
 export default async function Page({ params: { deposit_id } }) {
   const sort = delegatesFilterOptions.weightedRandom.sort;
@@ -20,6 +21,10 @@ export default async function Page({ params: { deposit_id } }) {
         fetchDelegates={async (page, seed) => {
           "use server";
           return apiFetchDelegates({ page, seed, sort });
+        }}
+        refreshPath={async (path) => {
+          "use server";
+          revalidatePath(path);
         }}
       />
     </div>

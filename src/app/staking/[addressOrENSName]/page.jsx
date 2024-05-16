@@ -9,6 +9,7 @@ import FAQs from "@/app/staking/components/FAQs";
 import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
 import { resolveENSName } from "@/app/lib/ENSUtils";
+import { revalidatePath } from "next/cache";
 
 async function fetchDeposits(address) {
   "use server";
@@ -50,7 +51,14 @@ export default async function Page({ params: { addressOrENSName } }) {
               Your {token.symbol} Stake
             </div>
 
-            <DepositList deposits={deposits} fetchDelegate={apiFetchDelegate} />
+            <DepositList
+              deposits={deposits}
+              fetchDelegate={apiFetchDelegate}
+              refreshPath={async (path) => {
+                "use server";
+                revalidatePath(path);
+              }}
+            />
           </div>
         ) : (
           <div>

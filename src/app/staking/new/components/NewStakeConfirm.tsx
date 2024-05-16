@@ -10,7 +10,6 @@ import {
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 
@@ -18,12 +17,14 @@ interface NewStakeConfirmProps {
   amount: number;
   delegate: string;
   depositor: string;
+  refreshPath: (path: string) => void;
 }
 
 export const NewStakeConfirm = ({
   amount,
   delegate,
   depositor,
+  refreshPath,
 }: NewStakeConfirmProps) => {
   const { token, contracts } = Tenant.current();
   const isValidInput = Boolean(amount > 0 && delegate && isAddress(delegate));
@@ -42,7 +43,7 @@ export const NewStakeConfirm = ({
     hash: data?.hash,
   });
 
-  const isStakeConfirmed = Boolean(data?.hash && !isLoading);
+  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -68,12 +69,13 @@ export const NewStakeConfirm = ({
         </div>
       ) : (
         <>
-          {isStakeConfirmed ? (
+          {isTransactionConfirmed ? (
             <div className="mt-4">
               <RedirectAfterSuccess
                 message={"New stake confirmed successfully!"}
                 linkTitle={"Return to staking page"}
                 linkURI={`/staking/${depositor}`}
+                refreshPath={refreshPath}
               />
             </div>
           ) : (

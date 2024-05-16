@@ -18,14 +18,15 @@ interface EditDelegateFlowProps {
   delegates: DelegatePaginated;
   deposit: StakedDeposit;
   fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
+  refreshPath: (path: string) => void;
 }
 
 export const EditDelegateFlow = ({
+  delegates,
   deposit,
   fetchDelegates,
-  delegates,
+  refreshPath,
 }: EditDelegateFlowProps) => {
-  const { token } = Tenant.current();
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [delegate, setDelegate] = useState<string>(deposit.delegatee);
@@ -70,7 +71,11 @@ export const EditDelegateFlow = ({
             </ReceiptContainer>
           </div>
           <div className="sm:col-start-5">
-            <EditDelegateConfirm delegate={delegate} deposit={deposit} />
+            <EditDelegateConfirm
+              delegate={delegate}
+              deposit={deposit}
+              refreshPath={refreshPath}
+            />
           </div>
         </HStack>
       )}

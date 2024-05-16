@@ -14,9 +14,13 @@ const PAGE_TITLE = ["Stake More", "Confirm your transaction"];
 
 interface EditDepositAmountProps {
   deposit: StakedDeposit;
+  refreshPath: (path: string) => void;
 }
 
-export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
+export const EditDepositAmount = ({
+  deposit,
+  refreshPath,
+}: EditDepositAmountProps) => {
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(0);
@@ -69,7 +73,11 @@ export const EditDepositAmount = ({ deposit }: EditDepositAmountProps) => {
           </div>
           <div className="sm:col-start-5">
             {deposit && amount > 0 ? (
-              <EditDepositConfirm amount={amount} deposit={deposit} />
+              <EditDepositConfirm
+                amount={amount}
+                deposit={deposit}
+                refreshPath={refreshPath}
+              />
             ) : (
               "Something went wrong!"
             )}

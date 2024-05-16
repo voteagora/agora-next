@@ -1,3 +1,5 @@
+export const INDEXER_DELAY = 3000;
+
 export const TENANT_NAMESPACES = {
   ENS: "ens",
   ETHERFI: "etherfi",

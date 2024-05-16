@@ -12,15 +12,18 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
+import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 
 interface EditDepositConfirmProps {
   amount: number;
   deposit: StakedDeposit;
+  refreshPath: (path: string) => void;
 }
 
 export const EditDepositConfirm = ({
   amount,
   deposit,
+  refreshPath,
 }: EditDepositConfirmProps) => {
   const { token, contracts } = Tenant.current();
 
@@ -39,6 +42,8 @@ export const EditDepositConfirm = ({
   const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
+
+  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -64,19 +69,32 @@ export const EditDepositConfirm = ({
         </div>
       ) : (
         <>
-          <div className="text-sm py-4">
-            Please verify your transaction details before confirming.
-          </div>
-          <Button
-            className="w-full"
-            disabled={!isValidInput || isLoading}
-            onClick={() => {
-              write?.();
-            }}
-          >
-            {isLoading ? "Staking..." : `Update Stake`}
-          </Button>
-          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+          {isTransactionConfirmed ? (
+            <div className="mt-4">
+              <RedirectAfterSuccess
+                message={"Stake amount updated successfully!"}
+                linkTitle={"Return to staking page"}
+                linkURI={`/staking/${deposit.depositor}`}
+                refreshPath={refreshPath}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="text-sm py-4">
+                Please verify your transaction details before confirming.
+              </div>
+              <Button
+                className="w-full"
+                disabled={!isValidInput || isLoading}
+                onClick={() => {
+                  write?.();
+                }}
+              >
+                {isLoading ? "Staking..." : `Update Stake`}
+              </Button>
+              {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+            </>
+          )}
         </>
       )}
     </div>

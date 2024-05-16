@@ -9,11 +9,13 @@ import { DepositListAction } from "@/app/staking/[addressOrENSName]/deposits/Dep
 interface StakedDepositListProps {
   deposits: StakedDeposit[];
   fetchDelegate: (address: string) => Promise<Delegate>;
+  refreshPath: (path: string) => void;
 }
 
 export const DepositList = ({
   deposits,
   fetchDelegate,
+  refreshPath,
 }: StakedDepositListProps) => {
   return (
     <div className="flex flex-col rounded-xl border border-gray-300 w-auto h-100 bg-gray-50 shadow-newDefault">
@@ -21,7 +23,11 @@ export const DepositList = ({
         {deposits.map(async (deposit, idx) => {
           return (
             <div key={`deposit-${deposit.id}`} className="flex w-auto h-100">
-              <Deposit deposit={deposit} fetchDelegate={fetchDelegate} />
+              <Deposit
+                deposit={deposit}
+                fetchDelegate={fetchDelegate}
+                refreshPath={refreshPath}
+              />
             </div>
           );
         })}
