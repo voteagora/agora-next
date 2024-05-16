@@ -15,26 +15,8 @@ import { icons } from "@/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, formatNumberWithScientificNotation } from "@/lib/utils";
 const { token } = Tenant.current();
-
-function formatNumberWithScientificNotation(x: any) {
-  if (Math.abs(x) < 1.0) {
-    var e = parseInt(x.toString().split("e-")[1]);
-    if (e) {
-      x *= Math.pow(10, e - 1);
-      x = "0." + new Array(e).join("0") + x.toString().substring(2);
-    }
-  } else {
-    var e = parseInt(x.toString().split("+")[1]);
-    if (e > 20) {
-      e -= 20;
-      x /= Math.pow(10, e);
-      x += new Array(e + 1).join("0");
-    }
-  }
-  return x;
-}
 
 /**
  * Transforms an array of votes into chart data.
@@ -135,16 +117,23 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
       new Date(b?.timestamp || "").getTime()
   );
 
+  const chartData = transformVotesToChartData(sortedChartData);
+
   const modifiedChartData = [
     {
       timestamp: proposal.start_time,
-      forCount: 0,
-      againstCount: 0,
-      abstainCount: 0,
+      for: 0,
+      against: 0,
+      abstain: 0,
     },
-    ...transformVotesToChartData(sortedChartData),
+    ...chartData,
     {
       timestamp: proposal.end_time,
+      ...(proposal.status !== "ACTIVE" && {
+        for: chartData[chartData.length - 1].for,
+        abstain: chartData[chartData.length - 1].abstain,
+        against: chartData[chartData.length - 1].against,
+      }),
     },
   ];
 
