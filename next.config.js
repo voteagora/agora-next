@@ -11,50 +11,38 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/delegate/:addressOrENSName',
-        destination: '/delegates/:addressOrENSName',
+        source: "/delegate/:addressOrENSName",
+        destination: "/delegates/:addressOrENSName",
         permanent: true,
       },
       {
-        source: '/api/v1/proposals/:proposalId',
-        destination: '/404',
+        source: "/api/v1/proposals/:proposalId",
+        destination: "/404",
         permanent: true,
       },
       {
-        source: '/api/v1/proposals',
-        destination: '/404',
+        source: "/api/v1/proposals",
+        destination: "/404",
         permanent: true,
       },
-    ]
+    ];
   },
   async headers() {
     return [
       {
-        source:
-          "/proposals/102821998933460159156263544808281872605936639206851804749751748763651967264110",
+        source: "/api/(.*)",
         headers: [
           {
-            key: "Cache-Control",
-            value: "s-maxage=59, stale-while-revalidate=59",
+            key: "Access-Control-Allow-Origin",
+            value: "*",
           },
-        ],
-      },
-      {
-        source:
-          "/proposals/20327152654308054166942093105443920402082671769027198649343468266910325783863",
-        headers: [
           {
-            key: "Cache-Control",
-            value: "s-maxage=59, stale-while-revalidate=59",
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, DELETE, OPTIONS",
           },
-        ],
-      },
-      {
-        source: "/delegates/0x2b888954421b424c5d3d9ce9bb67c9bd47537d12",
-        headers: [
           {
-            key: "Cache-Control",
-            value: "s-maxage=59, stale-while-revalidate=59",
+            key: "Access-Control-Allow-Headers",
+            value: "Content-Type, Authorization",
           },
         ],
       },
@@ -75,7 +63,7 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"]
+    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
   },
 };
 

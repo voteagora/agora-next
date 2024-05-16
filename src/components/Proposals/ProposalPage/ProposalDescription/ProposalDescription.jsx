@@ -48,6 +48,7 @@ export default function ProposalDescription({ proposal, proposalVotes }) {
         title={shortTitle}
         proposalType={proposal.proposalType}
         proposerAddress={proposal.proposer}
+        createdTransactionHash={proposal.created_transaction_hash}
       />
       <VotingTimelineChart proposal={proposal} proposalVotes={proposalVotes} />
 
@@ -55,6 +56,7 @@ export default function ProposalDescription({ proposal, proposalVotes }) {
         <ApprovedTransactions
           proposalData={proposal.proposalData}
           proposalType={proposal.proposalType}
+          executedTransactionHash={proposal.executed_transaction_hash}
         />
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}

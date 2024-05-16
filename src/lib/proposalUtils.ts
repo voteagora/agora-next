@@ -212,6 +212,12 @@ export async function parseProposal(
         : latestBlock
           ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
           : null,
+    cancelled_time:
+      proposalData.key === "SNAPSHOT"
+        ? null
+        : latestBlock
+          ? getHumanBlockTime(proposal.cancelled_block ?? 0, latestBlock)
+          : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
@@ -231,6 +237,9 @@ export async function parseProposal(
           votableSupply
         )
       : null,
+    created_transaction_hash: proposal.created_transaction_hash,
+    cancelled_transaction_hash: proposal.cancelled_transaction_hash,
+    executed_transaction_hash: proposal.executed_transaction_hash,
   };
 }
 
