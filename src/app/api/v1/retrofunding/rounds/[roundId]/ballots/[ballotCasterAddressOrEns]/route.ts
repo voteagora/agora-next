@@ -16,7 +16,10 @@ export async function GET(
   return await traceWithUserId(authResponse.userId as string, async () => {
     const { roundId, ballotCasterAddressOrEns } = route.params;
     try {
-      const ballots = await fetchBallot(roundId, ballotCasterAddressOrEns);
+      const ballots = await fetchBallot(
+        Number(roundId),
+        ballotCasterAddressOrEns
+      );
       return NextResponse.json(ballots);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {

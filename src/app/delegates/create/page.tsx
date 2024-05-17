@@ -7,7 +7,7 @@ export async function generateMetadata() {
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
-    title,
+    title
   )}&description=${encodeURIComponent(description)}`;
 
   return {
