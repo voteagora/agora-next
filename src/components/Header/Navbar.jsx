@@ -39,7 +39,7 @@ export default function Navbar() {
 
       {tenant.ui.toggle("staking") && tenant.ui.toggle("staking").enabled && (
         <HeaderLink
-          href={address ? `/staking/${address}` : "/staking"}
+          href={isConnected && address ? `/staking/${address}` : "/staking"}
           isActive={pathname.includes("staking")}
         >
           Staking

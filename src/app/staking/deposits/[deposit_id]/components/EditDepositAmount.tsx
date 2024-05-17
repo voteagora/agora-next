@@ -2,7 +2,7 @@
 
 import { type StakedDeposit } from "@/lib/types";
 import { useAccount } from "wagmi";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
 import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";

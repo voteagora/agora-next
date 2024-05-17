@@ -21,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TOKEN_BALANCE_QK } from "@/hooks/useTokenBalance";
 import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
 import { INDEXER_DELAY } from "@/lib/constants";
+import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
 
 interface DepositProps {
   deposit: StakedDeposit;
@@ -77,6 +78,9 @@ export const Deposit = ({
           }),
           queryClient.invalidateQueries({
             queryKey: [DEPOSITOR_TOTAL_STAKED_QK, deposit.depositor],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [TOKEN_ALLOWANCE_QK],
           }),
         ]).then(() => {
           refreshPath(`/staking/${deposit.depositor}`);
@@ -159,9 +163,7 @@ export const Deposit = ({
                     </div>
                     <div
                       className="py-3 px-5 font-medium cursor-pointer hover:bg-gray-100"
-                      onClick={() => {
-                        write?.();
-                      }}
+                      onClick={() => write?.()}
                     >
                       Withdraw stake
                     </div>

@@ -10,6 +10,8 @@ import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { Button } from "@/components/ui/button";
 import { tokenToHumanNumber } from "@/lib/utils";
+import { useTokenAllowance } from "@/hooks/useTokenAllowance";
+import { PanelSetAllowance } from "@/app/staking/components/PanelSetAllowance";
 
 interface PanelSetStakeAmountProps {
   amount: number;
@@ -27,19 +29,25 @@ export const PanelSetStakeAmount = ({
 
   const [amount, setAmount] = useState<number>(defaultAmount);
 
+  const { data: allowance, isFetched: isLoadedAllowance } =
+    useTokenAllowance(address);
+  const hasAllowance = isLoadedAllowance && allowance !== undefined;
+
   const { data: totalStaked, isFetched: isLoadedTotalStaked } =
     useDepositorTotalStaked(address as `0x${string}`);
-
   const hasTotalStaked = isLoadedTotalStaked && totalStaked !== undefined;
-
   const { data: tokenBalance, isFetched: isLoadedBalance } = useTokenBalance(
     address as `0x${string}`
   );
-
   const hasTokenBalance = isLoadedBalance && tokenBalance !== undefined;
+
   const hasValidAmount =
     amount > 0 &&
     amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals);
+
+  if (hasAllowance && allowance === BigInt(0)) {
+    return <PanelSetAllowance />;
+  }
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4">

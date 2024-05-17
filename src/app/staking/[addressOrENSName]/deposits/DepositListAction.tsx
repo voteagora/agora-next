@@ -47,6 +47,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
                 <TokenAmountDisplay
                   maximumSignificantDigits={4}
                   amount={tokenBalance}
+                  currency={""}
                 />{" "}
                 available
               </>

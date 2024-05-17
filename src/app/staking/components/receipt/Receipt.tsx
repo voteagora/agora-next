@@ -25,8 +25,6 @@ export const Receipt = ({
 
   return (
     <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-white">
-      <div className="rounded-lg"></div>
-
       <Image
         src="/images/horse_icon.png"
         alt="img"
