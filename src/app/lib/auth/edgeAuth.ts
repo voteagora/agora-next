@@ -9,6 +9,8 @@ import {
   REASON_TOKEN_NO_EXPIRY,
   REASON_TOKEN_NO_SCOPE,
   REASON_TOKEN_SCOPE_ROUTE_MISMATCH,
+  ROLE_BADGEHOLDER,
+  ROLE_PUBLIC_READER,
 } from "@/app/lib/auth/constants";
 import { AuthInfo } from "@/app/lib/auth/types";
 
@@ -38,13 +40,21 @@ export async function validateBearerToken(
       failReason: REASON_NO_TOKEN,
     };
   } else if (validateUuid(token)) {
-    // No further validations to do against API Key bearer tokens,
-    // subsequent validations will be done in Node env
-    authResponse = {
-      authenticated: true,
-      type: "api_key",
-      token: token,
-    };
+    // This will fail API key validation against any non-public get routes
+    // If we want to allow API Key access to private routes (e.g. ballots)
+    // then we should either require API Key users to acquire a JWT with
+    // the appropriate scope, or we remove the check below and perform it
+    // on the server side.
+    if (await validateScopeAgainstRoute(ROLE_PUBLIC_READER, request)) {
+      authResponse = {
+        authenticated: true,
+        type: "api_key",
+        token: token,
+      };
+    } else {
+      authResponse.authenticated = false;
+      authResponse.failReason = REASON_TOKEN_SCOPE_ROUTE_MISMATCH;
+    }
   } else {
     // attempt to extract JWT payload
     try {
@@ -67,7 +77,7 @@ export async function validateBearerToken(
       } else if (
         !validateScopeAgainstRoute(
           verifyResult.payload.scope as string,
-          request.url
+          request
         )
       ) {
         authResponse.authenticated = false;
@@ -92,10 +102,28 @@ export async function validateBearerToken(
   return authResponse;
 }
 
+/*
+  This function performs any stateless validations of the supplied scope 
+  against the particular route being accessed in this request.
+
+  Further validations may be performed on the server, with access to our
+  database for further authorization information. Note that this implies 
+  that a request which passes validation here may still be unauthorized 
+  if the server-side validation fails.
+
+  Anything supplied to the user in the JWT payload should be validated
+  here to confirm authorized access to the requested route.
+*/
 export async function validateScopeAgainstRoute(
   scope: string,
-  route: string
+  request: NextRequest
 ): Promise<boolean> {
-  // TODO: Implement specific logic for route/scope validation
-  return true;
+  const roles = scope.split(";");
+  const isBadge = roles.includes("badgeholder");
+  const isPublic = roles.includes("reader:public");
+  if (request.nextUrl.pathname.includes("/api/v1/retrofunding/ballots")) {
+    return isBadge;
+  } else {
+    return isPublic;
+  }
 }
