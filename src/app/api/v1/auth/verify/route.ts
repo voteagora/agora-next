@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SiweMessage } from "siwe";
 import {
   generateJwt,
-  getScopeForUser,
+  getRolesForUser,
   getExpiry,
 } from "@/app/lib/auth/serverAuth";
 
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 
   // create JWT
   // TODO: resovle scope based on wallet address or user record
-  const scope = await getScopeForUser(user.id);
+  const scope = await getRolesForUser(user.id);
   const ttl = await getExpiry();
   const jwt = await generateJwt(user.id, scope, ttl, {
     address: siweObject.address,
