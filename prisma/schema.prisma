@@ -189,18 +189,6 @@ model metrics_comments {
   @@schema("test3")
 }
 
-model metrics_comments_votes {
-  metric_id        String           @db.VarChar
-  commenter        String           @db.VarChar
-  voter            String           @db.VarChar
-  ts               DateTime         @default(now()) @db.Timestamptz(6)
-  metrics_comments metrics_comments @relation(fields: [metric_id, commenter], references: [metric_id, address], onDelete: NoAction, onUpdate: NoAction)
-  metrics_data     metrics_data     @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([metric_id, commenter, voter])
-  @@schema("test3")
-}
-
 model metrics_views {
   metric_id    String       @db.VarChar
   address      String       @db.VarChar
@@ -208,6 +196,19 @@ model metrics_views {
   metrics_data metrics_data @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([metric_id, address])
+  @@schema("test3")
+}
+
+model metrics_comments_votes {
+  metric_id        String           @db.VarChar
+  commenter        String           @db.VarChar
+  voter            String           @db.VarChar
+  vote             Int
+  ts               DateTime         @default(now()) @db.Timestamptz(6)
+  metrics_comments metrics_comments @relation(fields: [metric_id, commenter], references: [metric_id, address], onDelete: NoAction, onUpdate: NoAction)
+  metrics_data     metrics_data     @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([metric_id, commenter, voter])
   @@schema("test3")
 }
 
