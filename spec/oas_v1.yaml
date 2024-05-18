@@ -615,18 +615,27 @@ components:
         An impact metric for an RetroFunding project with associated metadata.
       type: object
       properties:
-        id:
+        metricId:
           type: string
         name:
           type: string
         description:
           type: string
-        externalLink:
-          type: string
         comments:
           type: array
           items:
             $ref: "#/components/schemas/Comment"
+        projectAllocations:
+          type: array
+          items:
+            projectId: string
+            name: string
+            image: string
+            allocation: string
+        views:
+          type: integer
+        addedToBallots:
+          type: integer
     ProjectMember:
       summary: Member of a RGPF project
       description: >

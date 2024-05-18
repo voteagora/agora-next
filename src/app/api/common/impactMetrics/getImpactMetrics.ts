@@ -53,7 +53,9 @@ async function getImpactMetricApi(impactMetricId: string) {
     description: impactMetric.description,
     projectAllocations: impactMetric.metrics_projects.map((project) => {
       return {
-        ...project.projects_data,
+        projectId: project.projects_data.project_id,
+        name: project.projects_data.project_name,
+        image: project.projects_data.project_image,
         allocation: project.allocation,
       };
     }),
