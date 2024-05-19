@@ -61,6 +61,7 @@ async function main() {
             project_id: projectName,
             is_os: isOS,
             allocation: linearValue,
+            values: Number(value),
           },
         });
       }

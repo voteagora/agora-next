@@ -188,6 +188,7 @@ model metrics_projects {
   project_id    String        @db.VarChar
   is_os         Boolean       @default(false)
   allocation    Decimal       @db.Decimal
+  values        Decimal?      @db.Decimal
   metrics_data  metrics_data  @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
   projects_data projects_data @relation(fields: [project_id], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
 
