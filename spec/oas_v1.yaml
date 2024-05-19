@@ -786,18 +786,28 @@ components:
           format: date-time
         details:
           type: string
-    RetroFundingBallotAllocation:
+    RetroFundingBallotMetricsAllocation:
       summary: A vote for an RetroFunding ballot
       description: >
         A vote for an RetroFunding ballot, including information about the vote.
       type: object
       properties:
-        metricId:
+        metric_id:
           type: integer
         allocation:
           type: string
         locked:
           type: boolean
+    RetroFundingBallotProjectsAllocation:
+      summary: Projects allocation distribution based on the vote
+      description: >
+        Projects allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        project_id:
+          type: string
+        allocation:
+          type: string
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -818,7 +828,7 @@ components:
         allocations:
           type: array
           items:
-            $ref: "#/components/schemas/RetroFundingBallotAllocation"
+            $ref: "#/components/schemas/RetroFundingBallotMetricsAllocation"
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.

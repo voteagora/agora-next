@@ -66,25 +66,50 @@ async function getBallotForAddress({
 }) {
   const ballot = await prisma.$queryRawUnsafe<Ballot>(
     `
-      SELECT 
-        *,
-      CASE 
+    SELECT 
+    b.*,
+    CASE 
         WHEN EXISTS (
-          SELECT 1 
-          FROM retro_funding.ballot_submittions bs 
-          WHERE bs.address = b.address AND bs.round = b.round
+            SELECT 1 
+            FROM retro_funding.ballot_submittions bs 
+            WHERE bs.address = b.address AND bs.round = b.round
         ) THEN 'SUBMITTED'
         ELSE 'PENDING'
-      END AS status,
-      COALESCE(
-        (SELECT json_agg(a.* ORDER BY a.allocation DESC) 
-        FROM retro_funding.allocations a
-        WHERE a.address = b.address AND a.round = b.round),
+    END AS status,
+    COALESCE(
+      (SELECT json_agg(a.* ORDER BY a.allocation DESC) 
+      FROM retro_funding.allocations a
+      WHERE a.address = b.address AND a.round = b.round),
+      '[]'::json
+    ) AS metrics_allocations,
+    COALESCE(
+        (SELECT json_agg(json_build_object('project_id', subquery.project_id, 'allocation', subquery.total_allocation_multiplied) ORDER BY subquery.total_allocation DESC) 
+        FROM (
+            SELECT 
+                mp.project_id,
+                CASE 
+                    WHEN b.os_only = TRUE AND mp.is_os = FALSE THEN 0
+                    ELSE SUM(a.allocation * mp.allocation)
+                END AS total_allocation,
+                CASE 
+                    WHEN b.os_only = TRUE AND mp.is_os = FALSE THEN 0
+                    ELSE ROUND(SUM(a.allocation * mp.allocation) * 10000000)
+                END AS total_allocation_multiplied
+            FROM 
+                retro_funding.allocations a
+            JOIN 
+                retro_funding.metrics_projects mp
+            ON a.metric_id = mp.metric_id
+            WHERE a.address = b.address AND a.round = b.round
+            GROUP BY 
+                mp.project_id, b.os_only, mp.is_os
+        ) AS subquery
+        ),
         '[]'::json
-      ) AS allocations
-      FROM 
-        retro_funding.ballots b
-      WHERE round = $1 AND address = $2
+    ) AS project_allocations
+    FROM 
+    retro_funding.ballots b
+    WHERE round = $1 AND address = $2
   `,
     roundId,
     address

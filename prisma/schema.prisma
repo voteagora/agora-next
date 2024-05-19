@@ -118,14 +118,15 @@ model Ballots {
 }
 
 model allocations {
-  address    String   @db.VarChar(255)
-  round      Int
-  metric_id  String   @db.VarChar(255)
-  allocation Decimal  @default(0) @db.Decimal
-  locked     Boolean? @default(false)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
-  ballots    Ballots  @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+  address      String       @db.VarChar(255)
+  round        Int
+  metric_id    String       @db.VarChar(255)
+  allocation   Decimal      @default(0) @db.Decimal
+  locked       Boolean?     @default(false)
+  created_at   DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime     @default(now()) @db.Timestamptz(6)
+  ballots      Ballots      @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+  metrics_data metrics_data @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([address, round, metric_id])
   @@schema("retro_funding")
@@ -173,6 +174,7 @@ model metrics_data {
   metric_id              String                   @id @db.VarChar
   name                   String                   @db.VarChar
   description            String                   @db.VarChar
+  allocations            allocations[]
   metrics_comments       metrics_comments[]
   metrics_comments_votes metrics_comments_votes[]
   metrics_projects       metrics_projects[]
