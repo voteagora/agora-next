@@ -615,18 +615,33 @@ components:
         An impact metric for an RetroFunding project with associated metadata.
       type: object
       properties:
-        id:
+        metricId:
           type: string
         name:
           type: string
         description:
           type: string
-        externalLink:
-          type: string
         comments:
           type: array
           items:
             $ref: "#/components/schemas/Comment"
+        projectAllocations:
+          type: array
+          items:
+            type: object
+            properties:
+              projectId:
+                type: string
+              name:
+                type: string
+              image:
+                type: string
+              allocation:
+                type: number
+        views:
+          type: integer
+        addedToBallots:
+          type: integer
     ProjectMember:
       summary: Member of a RGPF project
       description: >
@@ -777,18 +792,40 @@ components:
           format: date-time
         details:
           type: string
-    RetroFundingBallotAllocation:
+    RetroFundingBallotMetricsAllocation:
       summary: A vote for an RetroFunding ballot
       description: >
         A vote for an RetroFunding ballot, including information about the vote.
       type: object
       properties:
-        metricId:
+        metric_id:
           type: integer
         allocation:
           type: string
         locked:
           type: boolean
+    RetroFundingBallotProjectsAllocation:
+      summary: Projects allocation distribution based on the vote
+      description: >
+        Projects allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        project_id:
+          type: string
+        total_allocation_share:
+          type: number
+        total_allocation_amount:
+          type: number
+        allocations_per_metric:
+          type: array
+          items:
+            type: object
+            properties:
+              metric_id:
+                type: string
+              allocation_share:
+                type: number
+
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -809,7 +846,7 @@ components:
         allocations:
           type: array
           items:
-            $ref: "#/components/schemas/RetroFundingBallotAllocation"
+            $ref: "#/components/schemas/RetroFundingBallotMetricsAllocation"
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -1841,6 +1878,42 @@ paths:
           description: Unauthorized
         "404":
           description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/{addressOrEnsName}:
+    post:
+      summary: Records a view of an impact metric
+      description: >
+        Records a view of an impact metric by a specific address or ENS name
+      operationId: recordImpactMetricView
+      tags:
+        - RetroFunding
+        - RetroFundingImpactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the viewer
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                metric_id:
+                  type: string
+                address:
+                  type: string
+                ts:
+                  type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
