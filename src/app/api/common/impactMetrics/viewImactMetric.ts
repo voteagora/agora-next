@@ -1,4 +1,5 @@
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import prisma from "@/app/lib/prisma";
 
 const viewImpactMetric = async ({
   addressOrENSName,

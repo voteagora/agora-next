@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import prisma from "@/app/lib/prisma";
 
 type BallotContent = {
   metric_id: string;
