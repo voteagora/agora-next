@@ -102,9 +102,6 @@ async function getBallotForAddress({
           b.os_multiplier,
           CASE 
               WHEN b.os_only = TRUE AND mp.is_os = FALSE THEN 0
-              ELSE mp.values
-          END AS adjusted_values,
-          CASE 
               WHEN mp.is_os = TRUE THEN (mp.values * b.os_multiplier)
               ELSE mp.values
           END AS weighted_values
@@ -126,7 +123,6 @@ async function getBallotForAddress({
           wa.metric_id,
           wa.project_id,
           wa.is_os,
-          wa.adjusted_values,
           wa.weighted_values,
           mt.adjusted_total_values,
           wa.weighted_values / mt.adjusted_total_values AS normalized_allocation
