@@ -847,6 +847,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotMetricsAllocation"
+        projects_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallotProjectsAllocation"
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -1676,6 +1680,60 @@ paths:
       description: >
         Retrieves a specific ballot for an RetroFunding round on Agora.
       operationId: getRetroFundingRoundBallotById
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osMultiplier/{osMultiplier}:
+    post:
+      summary: Updates the OS multiplier for a specific RetroFunding ballot
+      description: >
+        Updates the OS multiplier for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotOSMultiplier
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osOnly/{osOnly}:
+    post:
+      summary: Updates the OS only flag for a specific RetroFunding ballot
+      description: >
+        Updates the OS only flag for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotOSOnly
       tags:
         - RetroFunding
         - RetroFundingBallots

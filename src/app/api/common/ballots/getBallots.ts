@@ -176,6 +176,12 @@ async function getBallotForAddress({
           ELSE 'PENDING'
       END AS status,
       COALESCE(
+        (SELECT json_agg(a.* ORDER BY a.allocation DESC) 
+        FROM retro_funding.allocations a
+        WHERE a.address = b.address AND a.round = b.round),
+        '[]'::json
+      ) AS allocations,
+      COALESCE(
           (SELECT json_agg(json_build_object(
               'project_id', apa.project_id, 
               'total_allocation_share', apa.total_allocation_share, 
