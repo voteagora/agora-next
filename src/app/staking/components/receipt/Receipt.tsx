@@ -21,16 +21,16 @@ export const Receipt = ({
   title,
   deposit,
 }: ReceiptProps) => {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
 
   return (
     <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-white">
       <Image
-        src="/images/horse_icon.png"
+        src={ui.logo}
         alt="img"
         width={40}
         height={40}
-        className="rounded filter grayscale"
+        className="rounded-full filter grayscale bg-gray-400"
       />
       <h1 className="text-2xl text-black leading-[30px] mt-5">{title}</h1>
       <VStack className="w-full gap-[15px] mt-7">
