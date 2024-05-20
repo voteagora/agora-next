@@ -1,4 +1,5 @@
 import { cache } from "react";
+import prisma from "@/app/lib/prisma";
 
 async function getImpactMetricsApi(roundId: string) {
   const impactMetrics = await prisma.metrics_data.findMany({
