@@ -57,7 +57,7 @@ export default async function OPProposalApprovalPage({
       alignItems="items-start"
       className={styles.proposal_container}
     >
-      <ProposalDescription proposal={proposal} />
+      <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
         <OpManagerDeleteProposal proposal={proposal} />
         <VStack
