@@ -4,7 +4,7 @@ import uniswapLogo from "@/assets/tenant/uniswap_logo.svg";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
-  color: '#FF007A',
+  color: "#FF007A",
   hero: uniswapHero,
   logo: uniswapLogo,
 

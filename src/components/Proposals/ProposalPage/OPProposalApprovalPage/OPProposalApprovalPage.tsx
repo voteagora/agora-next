@@ -29,7 +29,6 @@ async function fetchAllForVoting(
   return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
-
 async function fetchUserVotesForProposal(
   proposal_id: string,
   address: string | `0x${string}`
