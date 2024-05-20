@@ -5,11 +5,12 @@ import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 import { HStack } from "@/components/Layout/Stack";
 import { DepositList } from "@/app/staking/[addressOrENSName]/deposits/DepositList";
 import { StakingStats } from "@/app/staking/components/StakingStats";
-import FAQs from "@/app/staking/components/FAQs";
+import StakingFaq from "@/app/staking/components/StakingFaq";
 import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { revalidatePath } from "next/cache";
+import { StakingIntro } from "@/app/staking/components/StakingIntro";
 
 async function fetchDeposits(address) {
   "use server";
@@ -61,17 +62,7 @@ export default async function Page({ params: { addressOrENSName } }) {
             />
           </div>
         ) : (
-          <div>
-            <div className="font-black text-2xl mb-5">
-              Introducing staking, the next chapter of Uniswap Governance
-            </div>
-            <div className="text-gray-700">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-              quae ab illo inventore veritatis et quasi architecto beatae vitae
-              dicta sunt explicabo.
-            </div>
-          </div>
+          <StakingIntro />
         )}
 
         <div className="mt-10">
@@ -85,7 +76,7 @@ export default async function Page({ params: { addressOrENSName } }) {
             totalSupply={totalSupply}
           />
         </div>
-        <FAQs />
+        <StakingFaq />
       </div>
       <div className="sm:col-start-5">
         {hasDeposits ? (

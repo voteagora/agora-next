@@ -1,4 +1,4 @@
-export default function FAQs() {
+export default function StakingFaq() {
   return (
     <div className="mt-10 font-inter">
       <h1 className="font-black text-2xl text-black">FAQ</h1>
@@ -18,26 +18,13 @@ export default function FAQs() {
           How do I find out more about delegates and the governance process in
           general?
         </h2>
-        <p className="mt-2">
-          <a href="http://vote.uniswapfoundation.org" target="_blank">
-            Uniswap Agora
-          </a>{" "}
-          is a platform where delegates can build profiles which describe their
-          values and discuss their governance activities.{" "}
-          <a href="http://tally.xyz/gov/uniswap" target="_blank">
-            Tally
-          </a>
-          , whose{" "}
-          <a href="https://apidocs.tally.xyz/" target="_blank">
-            API
-          </a>{" "}
-          powers parts of this app, is another place to explore governance
-          delegates.
-        </p>
 
         <p className="mt-2">
           The Uniswap Governance Process is described{" "}
-          <a href="https://gov.uniswap.org/t/community-governance-process-update-jan-2023/19976">
+          <a
+            className="underline"
+            href="https://gov.uniswap.org/t/community-governance-process-update-jan-2023/19976"
+          >
             here
           </a>
           . In general, a “proposal” that involves the Uniswap Governance
@@ -62,11 +49,13 @@ export default function FAQs() {
 
         <h2 className="font-semibold mt-8">Which pools earn fees?</h2>
         <p className="mt-2">
-          The roll-out of protocol fees will be incremental and data-driven.
-          Gauntlet has suggested a framework to guide this process, which will
-          occur over the course of several months and start with a limited
-          number of pools. You can monitor which pools are currently charging
-          fees as well as various analytics about the protocol fee here.
+          Currently, fees have not yet been turned on, so no rewards will accrue
+          to stakers just yet. The roll-out of protocol fees will be incremental
+          and data-driven. Gauntlet has suggested a framework to guide this
+          process, which will occur over the course of several months and start
+          with a limited number of pools. You can monitor which pools are
+          currently charging fees as well as various analytics about the
+          protocol fee here.
         </p>
       </div>
     </div>

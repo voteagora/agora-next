@@ -25,15 +25,15 @@ export function CastVoteDialog(props: CastVoteDialogProps) {
 }
 
 function CastVoteDialogContents({
-                                  proposalId,
-                                  reason,
-                                  supportType,
-                                  closeDialog,
-                                  votingPower,
-                                  delegate,
-                                  authorityChains,
-                                  missingVote,
-                                }: CastVoteDialogProps) {
+  proposalId,
+  reason,
+  supportType,
+  closeDialog,
+  votingPower,
+  delegate,
+  authorityChains,
+  missingVote,
+}: CastVoteDialogProps) {
   const { write, isLoading, isSuccess, data } = useAdvancedVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
@@ -101,9 +101,9 @@ function CastVoteDialogContents({
 }
 
 const VoteButton = ({
-                      children,
-                      onClick,
-                    }: {
+  children,
+  onClick,
+}: {
   children: ReactNode;
   onClick?: () => void;
   isLoading?: boolean;
@@ -116,9 +116,9 @@ const VoteButton = ({
 };
 
 export function SuccessMessage({
-                                 closeDialog,
-                                 data,
-                               }: {
+  closeDialog,
+  data,
+}: {
   closeDialog: () => void;
   data: {
     standardTxHash: string | undefined;
@@ -195,8 +195,8 @@ export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
 }
 
 export function DisabledVoteDialog({
-                                     closeDialog,
-                                   }: {
+  closeDialog,
+}: {
   closeDialog: () => void;
 }) {
   return (
