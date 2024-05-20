@@ -1713,13 +1713,15 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
+        - name: osMultiplier
+          in: path
+          description: The OS multiplier to update the ballot with (1 - 5)
+          required: true
+          schema:
+            type: number
       responses:
         "200":
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
         "400":
           description: Bad Request
         "401":
@@ -1740,13 +1742,16 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
+        - name: osOnly
+          in: path
+          description: >
+            The OS only flag to set for the ballot.
+          required: true
+          schema:
+            type: boolean
       responses:
         "200":
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
         "400":
           description: Bad Request
         "401":
