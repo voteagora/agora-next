@@ -49,6 +49,12 @@ export default function ProposalVotesSummaryDetails({
   const abstainPercentage =
     ((Number(results.abstain) / total) * 100).toFixed(2) + "%";
 
+  console.log(
+    isScientificNotation(highestValue)
+      ? formatNumberWithScientificNotation(highestValue)
+      : BigInt(highestValue)
+  );
+
   return (
     <VStack className="font-inter font-semibold text-xs  flex w-full max-w-[320px] sm:min-w-[320px]">
       <ProposalVotesBar proposal={proposal} />
