@@ -847,6 +847,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotMetricsAllocation"
+        projects_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallotProjectsAllocation"
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
