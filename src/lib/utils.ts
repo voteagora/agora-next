@@ -84,21 +84,31 @@ export function isScientificNotation(value: any): boolean {
 }
 
 export function formatNumberWithScientificNotation(x: number): string {
-  const scientificNotation = x.toExponential();
+  if (x === 0) {
+    return "0";
+  }
 
+  const scientificNotation = x.toExponential();
   const [base, exponent] = scientificNotation.split("e");
   const exp = parseInt(exponent, 10);
 
   // Format small numbers (abs(x) < 1.0)
   if (Math.abs(x) < 1.0) {
-    const leadingZeros = Math.abs(exp) - 1;
+    const leadingZeros = Math.max(0, Math.abs(exp) - 1);
     return `0.${"0".repeat(leadingZeros)}${base.replace(".", "")}`;
   }
-  // Format large numbers
-  if (exp > 20) {
-    const extraZeros = exp - 20;
-    return `${base.replace(".", "")}${"0".repeat(extraZeros)}`;
+
+  // Format large numbers and numbers with exponent 0
+  if (exp >= 0) {
+    const [integerPart, fractionalPart] = base.split(".");
+    const zerosNeeded = exp - (fractionalPart ? fractionalPart.length : 0);
+    return (
+      integerPart +
+      (fractionalPart || "") +
+      "0".repeat(Math.max(zerosNeeded, 0))
+    );
   }
+
   return scientificNotation;
 }
 

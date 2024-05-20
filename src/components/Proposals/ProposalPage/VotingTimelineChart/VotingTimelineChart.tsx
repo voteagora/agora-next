@@ -133,9 +133,9 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     {
       timestamp: proposal.end_time,
       ...(proposal.status !== "ACTIVE" && {
-        for: chartData[chartData.length - 1].for,
-        abstain: chartData[chartData.length - 1].abstain,
-        against: chartData[chartData.length - 1].against,
+        for: chartData[chartData.length - 1]?.for,
+        abstain: chartData[chartData.length - 1]?.abstain,
+        against: chartData[chartData.length - 1]?.against,
       }),
     },
   ];
