@@ -8,7 +8,13 @@ import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
 import { StakingIntro } from "@/app/staking/components/StakingIntro";
 
 export default async function Page() {
-  const { token, contracts } = Tenant.current();
+
+
+  const { token, contracts, ui } = Tenant.current();
+  if (!ui.toggle("staking")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
   const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
     await Promise.all([
       contracts.token.contract.totalSupply(),
@@ -16,6 +22,7 @@ export default async function Page() {
       contracts.staker.contract.rewardPerTokenAccumulated(),
       contracts.staker.contract.REWARD_DURATION(),
     ]);
+
 
   return (
     <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
