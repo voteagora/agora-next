@@ -806,10 +806,19 @@ components:
       properties:
         project_id:
           type: string
-        allocation_share:
+        total_allocation_share:
           type: number
-        allocation_amount:
+        total_allocation_amount:
           type: number
+        allocations_per_metric:
+          type: array
+          items:
+            type: object
+            properties:
+              metric_id:
+                type: string
+              allocation_share:
+                type: percentage
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >

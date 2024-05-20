@@ -70,7 +70,7 @@ async function getBallotForAddress({
       SELECT 
           mp.metric_id,
           SUM(mp.values) AS total_values,
-          SUM(CASE WHEN mp.is_os THEN mp.values * b.os_multiplier ELSE mp.values END) AS adjusted_total_values
+          SUM(CASE WHEN mp.is_os THEN mp.values * b.os_multiplier ELSE mp.values END) AS adjusted_total_values -- Add os_only check here
       FROM 
           retro_funding.metrics_projects mp
       JOIN 
@@ -117,6 +117,7 @@ async function getBallotForAddress({
       SELECT 
           wa.address,
           wa.round,
+          wa.metric_id,
           wa.project_id,
           wa.is_os,
           wa.weighted_values,
@@ -130,6 +131,38 @@ async function getBallotForAddress({
       ON 
           wa.metric_id = mt.metric_id
   )
+  , project_allocations AS (
+      SELECT 
+          na.address,
+          na.round,
+          na.project_id,
+          na.metric_id,
+          na.normalized_allocation,
+          na.normalized_allocation * 10000000 AS normalized_allocation_amount
+      FROM 
+          normalized_allocations na
+      ORDER BY 
+          na.normalized_allocation DESC
+  )
+  , aggregated_project_allocations AS (
+      SELECT 
+          pa.address,
+          pa.round,
+          pa.project_id,
+          SUM(pa.normalized_allocation) AS total_allocation_share,
+          SUM(pa.normalized_allocation_amount) AS total_allocation_amount,
+          json_agg(json_build_object(
+              'metric_id', pa.metric_id, 
+              'allocation_share', pa.normalized_allocation,
+              'allocation_amount', pa.normalized_allocation_amount
+          ) ORDER BY pa.metric_id) AS allocations_per_metric
+      FROM 
+          project_allocations pa
+      WHERE 
+          pa.address = $2 AND pa.round = $1
+      GROUP BY 
+          pa.address, pa.round, pa.project_id
+  )
   SELECT 
       b.*,
       CASE 
@@ -141,15 +174,20 @@ async function getBallotForAddress({
           ELSE 'PENDING'
       END AS status,
       COALESCE(
-          (SELECT json_agg(json_build_object('project_id', na.project_id, 'allocation_share', na.normalized_allocation, 'allocation_amount', ROUND(na.normalized_allocation * 10000000)) ORDER BY na.normalized_allocation DESC) 
-          FROM normalized_allocations na
-          WHERE na.address = b.address AND na.round = b.round),
+          (SELECT json_agg(json_build_object(
+              'project_id', apa.project_id, 
+              'total_allocation_share', apa.total_allocation_share, 
+              'total_allocation_amount', apa.total_allocation_amount,
+              'allocations_per_metric', apa.allocations_per_metric
+          ) ORDER BY apa.total_allocation_share DESC) 
+          FROM aggregated_project_allocations apa
+          WHERE apa.address = b.address AND apa.round = b.round),
           '[]'::json
       ) AS project_allocations
   FROM 
       retro_funding.ballots b
-  WHERE
-    b.round = 4 AND b.address = $2
+  WHERE 
+      b.round = $1 AND b.address = $2;  
   `,
     roundId,
     address
