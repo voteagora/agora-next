@@ -9,7 +9,6 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
@@ -30,11 +29,6 @@ async function fetchAllForVoting(
   return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
-async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return await apiFetchDelegate(addressOrENSName);
-}
 
 async function fetchUserVotesForProposal(
   proposal_id: string,
