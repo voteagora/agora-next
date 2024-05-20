@@ -1701,6 +1701,60 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osMultiplier/{osMultiplier}:
+    post:
+      summary: Updates the OS multiplier for a specific RetroFunding ballot
+      description: >
+        Updates the OS multiplier for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotOSMultiplier
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osOnly/{osOnly}:
+    post:
+      summary: Updates the OS only flag for a specific RetroFunding ballot
+      description: >
+        Updates the OS only flag for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotOSOnly
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/submit:
     post:
       summary: Submits a particular ballot
