@@ -628,10 +628,16 @@ components:
         projectAllocations:
           type: array
           items:
-            projectId: string
-            name: string
-            image: string
-            allocation: string
+            type: object
+            properties:
+              projectId:
+                type: string
+              name:
+                type: string
+              image:
+                type: string
+              allocation:
+                type: number
         views:
           type: integer
         addedToBallots:
@@ -818,7 +824,8 @@ components:
               metric_id:
                 type: string
               allocation_share:
-                type: percentage
+                type: number
+
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -1873,7 +1880,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/{addressOrENSName}:
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/{addressOrEnsName}:
     post:
       summary: Records a view of an impact metric
       description: >
@@ -1885,7 +1892,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-        - name: addressOrENSName
+        - name: addressOrEnsName
           in: path
           description: The address or ENS name of the viewer
           required: true
