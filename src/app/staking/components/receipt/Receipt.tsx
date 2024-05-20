@@ -50,7 +50,7 @@ export const Receipt = ({
           </HStack>
         )}
 
-        {amount && (
+        {amount !== undefined && (
           <HStack className="w-full justify-between items-center text-black">
             <p className="text-base leading-4">Depositing</p>
             <p className="text-base leading-4">

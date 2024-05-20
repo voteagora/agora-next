@@ -57,8 +57,7 @@ export const PanelSetAllowance = () => {
 
   return (
     <VStack className="max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
-      The staking allowance determines the amount of tokens available for
-      staking.
+      To start, please allow your UNI tokens to be used for staking.
       <HStack gap={4} className="my-4">
         <div className="min-w-[48px] h-12 p-3 rounded-lg  border border-gray-300 shadow-newDefault ">
           <Image height={24} width={24} src={icons.currency} alt="" />
