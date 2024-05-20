@@ -1,8 +1,9 @@
 import { paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { Ballots, allocations } from "@prisma/client";
+import { Ballots } from "@prisma/client";
 import { Ballot } from "./ballot";
+import prisma from "@/app/lib/prisma";
 
 async function getBallotsApi({
   roundId,
