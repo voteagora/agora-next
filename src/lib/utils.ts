@@ -78,22 +78,28 @@ export function formatNumber(
   return numberFormat.format(standardUnitAmount);
 }
 
-export function formatNumberWithScientificNotation(x: any) {
+export function isScientificNotation(value: any): boolean {
+  const scientificNotationRegex = /^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/;
+  return scientificNotationRegex.test(value.toString());
+}
+
+export function formatNumberWithScientificNotation(x: number): string {
+  const scientificNotation = x.toExponential();
+
+  const [base, exponent] = scientificNotation.split("e");
+  const exp = parseInt(exponent, 10);
+
+  // Format small numbers (abs(x) < 1.0)
   if (Math.abs(x) < 1.0) {
-    var e = parseInt(x.toString().split("e-")[1]);
-    if (e) {
-      x *= Math.pow(10, e - 1);
-      x = "0." + new Array(e).join("0") + x.toString().substring(2);
-    }
-  } else {
-    var e = parseInt(x.toString().split("+")[1]);
-    if (e > 20) {
-      e -= 20;
-      x /= Math.pow(10, e);
-      x += new Array(e + 1).join("0");
-    }
+    const leadingZeros = Math.abs(exp) - 1;
+    return `0.${"0".repeat(leadingZeros)}${base.replace(".", "")}`;
   }
-  return x;
+  // Format large numbers
+  if (exp > 20) {
+    const extraZeros = exp - 20;
+    return `${base.replace(".", "")}${"0".repeat(extraZeros)}`;
+  }
+  return scientificNotation;
 }
 
 export function TokenAmountDisplay({

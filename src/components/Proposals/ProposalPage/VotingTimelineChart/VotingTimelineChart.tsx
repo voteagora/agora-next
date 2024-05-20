@@ -15,7 +15,12 @@ import { icons } from "@/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
-import { formatNumber, formatNumberWithScientificNotation } from "@/lib/utils";
+import {
+  formatNumber,
+  formatNumberWithScientificNotation,
+  isScientificNotation,
+} from "@/lib/utils";
+
 const { token } = Tenant.current();
 
 /**
@@ -49,11 +54,9 @@ const tickFormatter = (timeStr: string, index: number) => {
 };
 
 const yTickFormatter = (value: any) => {
-  const isScientificNotation = value.toString().includes("e");
+  const isSciNotation = isScientificNotation(value);
   return formatNumber(
-    isScientificNotation
-      ? formatNumberWithScientificNotation(value)
-      : BigInt(value),
+    isSciNotation ? formatNumberWithScientificNotation(value) : BigInt(value),
     token.decimals,
     4
   );

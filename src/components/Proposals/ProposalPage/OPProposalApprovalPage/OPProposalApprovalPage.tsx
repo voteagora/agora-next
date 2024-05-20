@@ -30,12 +30,6 @@ async function fetchAllForVoting(
   return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
-async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return await apiFetchDelegate(addressOrENSName);
-}
-
 async function fetchUserVotesForProposal(
   proposal_id: string,
   address: string | `0x${string}`

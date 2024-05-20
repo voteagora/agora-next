@@ -55,8 +55,12 @@ export default function ENSAvatar({ ensName, className = "" }) {
       <Image
         loader={imageLoader}
         alt="ENS Avatar"
-        className={styles.image}
-        src={avatar}
+        className={
+          tenantAvatar
+            ? "rounded-full filter grayscale bg-gray-400"
+            : styles.image
+        }
+        src={tenantAvatar ? ui.logo : avatar}
         width={44}
         height={44}
       />

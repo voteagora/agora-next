@@ -10,9 +10,14 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
-import { formatNumber, formatNumberWithScientificNotation } from "@/lib/utils";
+import {
+  formatNumber,
+  formatNumberWithScientificNotation,
+  isScientificNotation,
+} from "@/lib/utils";
 
 import Tenant from "@/lib/tenant/tenant";
+
 const { token } = Tenant.current();
 
 export default function ProposalVotesSummaryDetails({
@@ -32,7 +37,6 @@ export default function ProposalVotesSummaryDetails({
     Number(results.abstain),
     Number(results.against)
   );
-  const isScientificNotation = highestValue.toString().includes("e");
 
   const total =
     Number(results.for) + Number(results.against) + Number(results.abstain);
@@ -44,6 +48,7 @@ export default function ProposalVotesSummaryDetails({
     ((Number(results.against) / total) * 100).toFixed(2) + "%";
   const abstainPercentage =
     ((Number(results.abstain) / total) * 100).toFixed(2) + "%";
+
   return (
     <VStack className="font-inter font-semibold text-xs  flex w-full max-w-[320px] sm:min-w-[320px]">
       <ProposalVotesBar proposal={proposal} />
@@ -89,7 +94,7 @@ export default function ProposalVotesSummaryDetails({
               <Image width="12" height="12" src={checkIcon} alt="check icon" />
               <p className="text-xs font-semibold text-gray-4f">
                 {formatNumber(
-                  isScientificNotation
+                  isScientificNotation(highestValue)
                     ? formatNumberWithScientificNotation(highestValue)
                     : BigInt(highestValue),
                   token.decimals,
