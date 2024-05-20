@@ -1873,6 +1873,42 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/{addressOrENSName}:
+    post:
+      summary: Records a view of an impact metric
+      description: >
+        Records a view of an impact metric by a specific address or ENS name
+      operationId: recordImpactMetricView
+      tags:
+        - RetroFunding
+        - RetroFundingImpactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - name: addressOrENSName
+          in: path
+          description: The address or ENS name of the viewer
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                metric_id:
+                  type: string
+                address:
+                  type: string
+                ts:
+                  type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
     get:
       summary: Gets comments on an impact metric
