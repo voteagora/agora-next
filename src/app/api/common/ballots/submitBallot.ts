@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
+import prisma from "@/app/lib/prisma";
 
 type BallotSubmission = {
   ballotContnet: {
