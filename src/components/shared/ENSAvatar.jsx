@@ -12,6 +12,7 @@ import avatar4 from "./avatars/avatar4.svg";
 import avatar5 from "./avatars/avatar5.svg";
 import avatar6 from "./avatars/avatar6.svg";
 import avatar7 from "./avatars/avatar7.svg";
+import Tenant from "@/lib/tenant/tenant";
 
 const imageLoader = ({ src }) => {
   return src;
@@ -19,6 +20,7 @@ const imageLoader = ({ src }) => {
 
 // TODO: Might be better to load the avatar on the server
 export default function ENSAvatar({ ensName, className = "" }) {
+  const { ui } = Tenant.current();
   const { data } = useEnsAvatar({
     chainId: 1,
     name: ensName,
@@ -39,6 +41,7 @@ export default function ENSAvatar({ ensName, className = "" }) {
     avatars[!ensName ? 0 : (ensName.charCodeAt(0) % 97) % avatars.length];
 
   const [avatar, setAvatar] = useState(altAvatar);
+  const [tenantAvatar, setTenantAvatar] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -47,6 +50,7 @@ export default function ENSAvatar({ ensName, className = "" }) {
     // Set the default avatar when wallet is change from a ensName wallet to a non ensName wallet
     if (!data && !ensName) {
       setAvatar(altAvatar);
+      setTenantAvatar(true);
     }
   }, [altAvatar, data, ensName]);
 
@@ -55,8 +59,8 @@ export default function ENSAvatar({ ensName, className = "" }) {
       <Image
         loader={imageLoader}
         alt="ENS Avatar"
-        className={styles.image}
-        src={avatar}
+        className={tenantAvatar ? "rounded-full filter grayscale bg-gray-400" : styles.image}
+        src={tenantAvatar ? ui.logo : avatar}
         width={44}
         height={44}
       />
