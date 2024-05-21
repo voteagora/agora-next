@@ -10,7 +10,10 @@ import {
   fetchVotingPowerAvailableForSubdelegation,
   fetchIsDelegatingToProxy,
 } from "@/app/api/common/voting-power/getVotingPower";
-import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
+import {
+  fetchDelegate as apiFetchDelegate,
+  fetchAllForDelegate,
+} from "@/app/api/common/delegates/getDelegates";
 import { fetchDelegateStatement as apiFetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import {
   fetchAllDelegatorsInChains,
@@ -115,11 +118,7 @@ export async function balanceOf(address: string) {
 }
 
 export const fetchConnectedDelegate = async (address: string) => {
-  return await Promise.all([
-    fetchDelegate(address),
-    fetchAllDelegatorsInChainsForAddress(address),
-    balanceOf(address),
-  ]);
+  return fetchAllForDelegate(address);
 };
 
 export const revalidateDelegateAddressPage = async (
