@@ -58,6 +58,5 @@ export const schema = z.object({
   description: z.string().min(1, { message: "Description cannot be empty" }),
   abstract: z.string().min(1, { message: "Abstract cannot be empty" }),
   transactions: z.array(transaction),
-  docs_updated: z.boolean(),
   socialProposal: socialProposal.optional(),
 });

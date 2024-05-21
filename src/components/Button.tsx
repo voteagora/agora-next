@@ -1,8 +1,7 @@
 import Link from "next/link";
 import styles from "./styles.module.scss";
-import Image from "next/image";
-import { icons } from "@/icons/icons";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { cn } from "@/lib/utils";
 
 export function Button({ href = "", className = "", ...props }) {
   return (
@@ -41,32 +40,59 @@ export function UpdatedButton({
   children: React.ReactNode;
   [x: string]: any;
 }) {
-  const classNameString = `${
-    type === "primary"
-      ? "bg-agora-stone-900 hover:bg-agora-stone-700 text-white"
-      : type === "secondary"
-        ? ""
-        : type === "link"
-          ? ""
-          : ""
-  } ${variant === "rounded" ? "rounded-full" : "rounded-md"} ${fullWidth && "w-full"} font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer ${className}`;
   return (
     <>
       {href ? (
-        <div className={classNameString}>
+        <div
+          className={cn(
+            className,
+            type === "primary" &&
+              "bg-agora-stone-900 hover:bg-agora-stone-900/90 text-white transition-colors",
+            type === "secondary" && "",
+            type === "link" && "",
+            variant === "rounded" && "rounded-full",
+            fullWidth && "w-full",
+            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer"
+          )}
+        >
           <Link href={href} {...props}>
             {children}
           </Link>
         </div>
       ) : (
         <button
-          className={classNameString}
+          className={cn(
+            className,
+            type === "primary" &&
+              "bg-agora-stone-900 hover:shadow text-white transition-shadow",
+            type === "secondary" && "",
+            type === "link" && "",
+            variant === "rounded" ? "rounded-full" : "rounded-lg",
+            fullWidth && "w-full",
+            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer"
+          )}
           {...props}
           type={isSubmit ? "submit" : "button"}
         >
           {isLoading ? (
-            <span className="flex flex-row space-x-2 text-white">
-              <LoadingSpinner className="text-white" />
+            <span
+              className={cn(
+                className,
+                type === "primary" && "text-white",
+                type === "secondary" && "text-black",
+                type === "link" && "",
+                "font-semibold flex flex-row space-x-2"
+              )}
+            >
+              <LoadingSpinner
+                className={cn(
+                  className,
+                  type === "primary" && "text-white",
+                  type === "secondary" && "text-black",
+                  type === "link" && "",
+                  "font-semibold"
+                )}
+              />
               <p>loading...</p>
             </span>
           ) : (

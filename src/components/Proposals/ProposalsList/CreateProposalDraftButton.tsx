@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { UpdatedButton } from "@/components/Button";
 import createProposalDraft from "./actions/createProposalDraft";
@@ -16,7 +18,7 @@ const CreateProposalDraftButton = ({ address }: { address: `0x${string}` }) => {
         setIsPending(false);
       }}
     >
-      Create
+      Create proposal
     </UpdatedButton>
   );
 };

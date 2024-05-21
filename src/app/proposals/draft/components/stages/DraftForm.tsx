@@ -22,6 +22,7 @@ import ExecutableProposalForm from "../ExecutableProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
 import FileInput from "../form/FileInput";
 import toast from "react-hot-toast";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const DraftForm = ({
   draftProposal,
@@ -31,6 +32,7 @@ const DraftForm = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const openDialog = useOpenDialog();
   const [isPending, setIsPending] = useState<boolean>(false);
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
@@ -58,26 +60,39 @@ const DraftForm = ({
     handleSubmit,
     formState: { errors },
   } = methods;
+  console.log(errors);
 
   const proposalType = watch("type");
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
     setIsPending(true);
-    console.log("are we submitting this?");
-
     const res = await draftProposalAction({
       ...data,
       draftProposalId: draftProposal.id,
     });
-
-    console.log("done with submitting this");
-
-    setIsPending(false);
     if (!res.ok) {
       // TODO: make error toast + improve messaging
+      setIsPending(false);
       toast("Something went wrong...");
     } else {
-      window.location.href = `/proposals/draft/${draftProposal.id}?stage=2`;
+      // if we are still in draft -- show create (first time)
+      if (draftProposal.stage === "DRAFT") {
+        openDialog({
+          type: "CREATE_DRAFT_PROPOSAL",
+          params: {
+            redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
+            githubUrl: "",
+          },
+        });
+        // otherwise, we have already submitted, show update
+      } else {
+        openDialog({
+          type: "UPDATE_DRAFT_PROPOSAL",
+          params: {
+            redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
+          },
+        });
+      }
     }
   };
 
@@ -176,22 +191,6 @@ const DraftForm = ({
               </UpdatedButton>
             </div>
           </FormCard.Section>
-          <FormCard.Footer>
-            <span className="text-xs font-semibold text-stone-500 mb-1">
-              Both of these are required. Please uncheck only if you've already
-              completed these manually.
-            </span>
-            <div className="flex flex-row space-x-2 items-center mt-2">
-              <span>Update ENS docs</span>
-              <span className="flex-grow border-b h-1 border-dotted"></span>
-              <input
-                {...register("docs_updated")}
-                type="checkbox"
-                defaultChecked={true}
-                className="rounded text-stone-900"
-              />
-            </div>
-          </FormCard.Footer>
         </FormCard>
       </form>
     </FormProvider>

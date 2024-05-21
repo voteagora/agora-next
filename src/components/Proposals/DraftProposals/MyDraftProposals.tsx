@@ -37,7 +37,9 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
           </div>
           <div className="w-[140px]">
             <p className="font-semibold text-stone-500 text-xs">{`Type`}</p>
-            <p className="font-medium">{proposal.proposal_type}</p>
+            <p className="font-medium">
+              {proposal.proposal_type || "[Type pending]"}
+            </p>
           </div>
           <div className="w-[140px]">
             <p className="font-semibold text-stone-500 text-xs">{`Waiting for`}</p>

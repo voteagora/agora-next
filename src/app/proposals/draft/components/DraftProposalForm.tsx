@@ -4,6 +4,7 @@ import { ProposalSocialOption, ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
 import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
+import GithubPRForm from "./stages/GithubPRForm";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 
 export default function DraftProposalForm({
@@ -22,6 +23,8 @@ export default function DraftProposalForm({
         return <TempCheckForm draftProposal={draftProposal} />;
       case ProposalStage.DRAFT:
         return <DraftForm draftProposal={draftProposal} />;
+      case ProposalStage.GITHUB_PR:
+        return <GithubPRForm draftProposal={draftProposal} />;
       case ProposalStage.READY:
         return <SubmitForm draftProposal={draftProposal} />;
       default:

@@ -850,9 +850,10 @@ model ProposalSocialOption {
 
 model ProposalChecklist {
   id           Int           @id @default(autoincrement())
-  stage        String
+  stage        ProposalStage
   completed_at DateTime      @default(now())
   completed_by String
+  link         String?
   proposal_id  Int
   proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
   @@map("proposal_checklist")
@@ -1434,6 +1435,7 @@ enum ProposalType {
 enum ProposalStage {
   TEMP_CHECK
   DRAFT
+  GITHUB_PR
   READY
   CONTACT_VOTERS
   EXECUTE

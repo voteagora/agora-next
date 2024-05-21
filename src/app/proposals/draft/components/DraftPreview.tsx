@@ -12,6 +12,16 @@ import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import Tenant from "@/lib/tenant/tenant";
 import AvatarAddress from "./AvatarAdress";
 import toast from "react-hot-toast";
+import Image from "next/image";
+import { icons } from "@/assets/icons/icons";
+
+const SUBMISSION_CHECKLIST_ITEMS = [
+  {
+    title: "Temp check",
+    date: "2021-10-01",
+    completedBy: "John Doe",
+  },
+];
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -49,7 +59,6 @@ const DraftPreview = ({
         description: transaction.description,
         targets: [transaction.target],
         values: [transaction.value],
-        signatures: [transaction.signature],
         calldatas: [transaction.calldata],
         functionArgsName: [
           {
@@ -154,38 +163,38 @@ const DraftPreview = ({
                 this link with them.
               </p>
             )}
+            <div className="mt-6">
+              {SUBMISSION_CHECKLIST_ITEMS.map((item, index) => {
+                return (
+                  <div
+                    className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+                    key={`checklist-${index}`}
+                  >
+                    <p className="flex-grow">{item.title}</p>
+                    <span className="text-stone-500 font-mono text-xs">
+                      on {item.date}
+                    </span>
+                    <span className="text-stone-500 font-mono text-xs">
+                      (by {item.completedBy})
+                    </span>
+                    <input
+                      type="checkbox"
+                      className="rounded text-agora-stone-900"
+                      checked
+                    />
+                    <Image
+                      src={icons.link}
+                      height="16"
+                      width="16"
+                      alt="link icon"
+                    />
+                  </div>
+                );
+              })}
+            </div>
             {actions}
           </>
         )}
-        {/* <div className="mt-6">
-            {SUBMISSION_CHECKLIST_ITEMS.map((item, index) => {
-              return (
-                <div
-                  className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
-                  key={`checklist-${index}`}
-                >
-                  <p className="flex-grow">{item.title}</p>
-                  <span className="text-stone-500 font-mono text-xs">
-                    on {item.date}
-                  </span>
-                  <span className="text-stone-500 font-mono text-xs">
-                    (by {item.completedBy})
-                  </span>
-                  <input
-                    type="checkbox"
-                    className="rounded text-agora-stone-900"
-                    checked
-                  />
-                  <Image
-                    src={icons.link}
-                    height="16"
-                    width="16"
-                    alt="link icon"
-                  />
-                </div>
-              );
-            })}
-          </div> */}
       </FormCard.Section>
     </FormCard>
   );

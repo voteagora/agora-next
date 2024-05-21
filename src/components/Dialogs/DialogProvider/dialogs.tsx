@@ -18,8 +18,9 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { ChainConstants } from "viem/types/chain";
-import { Delete } from "lucide-react";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
+import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
+import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
 
 export type DialogType =
   | DelegateDialogType
@@ -29,7 +30,9 @@ export type DialogType =
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
   | SwithcNetworkDialogType
-  | DeleteDraftProposalDialog;
+  | DeleteDraftProposalDialog
+  | CreateDraftProposalDialog
+  | UpdateDraftProposalDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -121,6 +124,16 @@ export type ApprovalCastVoteDialogType = {
 export type DeleteDraftProposalDialog = {
   type: "DELETE_DRAFT_PROPOSAL";
   params: { proposalId: number };
+};
+
+export type CreateDraftProposalDialog = {
+  type: "CREATE_DRAFT_PROPOSAL";
+  params: { redirectUrl: string; githubUrl: string };
+};
+
+export type UpdateDraftProposalDialog = {
+  type: "UPDATE_DRAFT_PROPOSAL";
+  params: { redirectUrl: string };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -231,6 +244,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
       proposalId={proposalId}
     />
+  ),
+  CREATE_DRAFT_PROPOSAL: ({ redirectUrl, githubUrl }) => (
+    <CreateDraftProposalDialog
+      redirectUrl={redirectUrl}
+      githubUrl={githubUrl}
+    />
+  ),
+  UPDATE_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
+    <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
   ),
   // FAQ: () => {
   //   return <FaqDialog />;

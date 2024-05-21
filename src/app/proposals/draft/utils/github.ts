@@ -1,15 +1,18 @@
 import { Octokit } from "@octokit/rest";
-import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import {
+  ProposalDraft,
+  ProposalDraftTransaction,
+  ProposalSocialOption,
+} from "@prisma/client";
 import { markdownTable } from "markdown-table";
 
-import { ethers } from "ethers";
-
-const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
-const AGORA_ENS_FORK = "governance-docs";
+// const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
+const AGORA_PROXY_ACCOUNT = "mcgingras";
+const AGORA_ENS_FORK = "docs";
 const ENS_REPO_OWNER = "ensdomains";
-const ENS_REPO_NAME = "governance-docs";
+const ENS_REPO_NAME = "docs";
 const BASE_BRANCH = "main"; // Base branch to create the new branch from
-const BASE_PATH = "governance-proposals";
+const BASE_PATH = "docs/dao/proposals";
 
 function getFormattedTransactionTable(
   proposal: ProposalDraft & { transactions: ProposalDraftTransaction[] }
@@ -79,7 +82,10 @@ function getFormattedTransactionTable(
 }
 
 export default function formatGithubProposal(
-  proposal: ProposalDraft & { transactions: ProposalDraftTransaction[] }
+  proposal: ProposalDraft & {
+    transactions: ProposalDraftTransaction[];
+    social_options: ProposalSocialOption[];
+  }
 ) {
   const descriptionTable = markdownTable([
     ["description"],
@@ -119,7 +125,7 @@ export default function formatGithubProposal(
 
   const votingStrategy =
     proposal.proposal_type === "social"
-      ? `# Voting Strategy \n ${proposal.voting_strategy_social}`
+      ? `# Voting Strategy \n ${proposal.proposal_social_type}`
       : ``;
 
   const votingStrategyDates =
@@ -129,16 +135,16 @@ export default function formatGithubProposal(
 
   const socialOptionsBasic =
     proposal.proposal_type === "social" &&
-    proposal.voting_strategy_social === "basic"
+    proposal.proposal_social_type === "basic"
       ? `# Voting options \n For, Against, Abstain`
       : ``;
 
   const socialOptionsApproval =
     proposal.proposal_type === "social" &&
-    proposal.voting_strategy_social === "approval"
-      ? `# Voting options \n ${proposal.ProposalDraftOption.map(
-          (option) => option.text
-        ).join(", ")}`
+    proposal.proposal_social_type === "approval"
+      ? `# Voting options \n ${proposal.social_options
+          .map((option) => option.text)
+          .join(", ")}`
       : ``;
 
   const content =
@@ -164,7 +170,10 @@ export default function formatGithubProposal(
 }
 
 export async function createGithubProposal(
-  proposal: ProposalDraft & { transactions: ProposalDraftTransaction[] }
+  proposal: ProposalDraft & {
+    transactions: ProposalDraftTransaction[];
+    social_options: ProposalSocialOption[];
+  }
 ): Promise<string> {
   const octokit = new Octokit({
     auth: process.env.PR_BOT_TOKEN || "",
@@ -201,6 +210,8 @@ export async function createGithubProposal(
       BASE_PATH,
       proposal.title
     );
+
+    console.log(path, fileName);
 
     const formattedFileName = fileName.replace(".md", "");
 
@@ -348,6 +359,7 @@ function parseTerm(title: string) {
   return match ? parseInt(match[0], 10) : null;
 }
 
+// syncs the branches so there are no other merge conflicts before we create our PR
 async function syncForkedBranch(
   octokit: Octokit,
   owner: string,
@@ -392,3 +404,5 @@ async function syncForkedBranch(
     throw new Error("Error syncing the branch");
   }
 }
+
+// 1. repo needs to be forked so we can compare changes?

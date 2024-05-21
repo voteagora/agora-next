@@ -34,23 +34,28 @@ export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.READY,
+    stage: PrismaProposalStage.GITHUB_PR,
     order: 2,
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.CONTACT_VOTERS,
+    stage: PrismaProposalStage.READY,
     order: 3,
-    isPreSubmission: false,
+    isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.QUEUE,
+    stage: PrismaProposalStage.CONTACT_VOTERS,
     order: 4,
     isPreSubmission: false,
   },
   {
-    stage: PrismaProposalStage.EXECUTE,
+    stage: PrismaProposalStage.QUEUE,
     order: 5,
+    isPreSubmission: false,
+  },
+  {
+    stage: PrismaProposalStage.EXECUTE,
+    order: 6,
     isPreSubmission: false,
   },
 ];
@@ -60,13 +65,19 @@ export const ProposalLifecycleStageMetadata = {
     title: "Create temp check",
     shortTitle: "Temp check",
     description: "Check the temperature of the proposal",
-    waitingFor: "Submitting proposal",
+    waitingFor: "Submitting temp check",
   },
   [PrismaProposalStage.DRAFT]: {
     title: "Create draft",
     shortTitle: "Draft",
     description: "Draft the proposal",
-    waitingFor: "Submitting proposal",
+    waitingFor: "Submitting draft",
+  },
+  [PrismaProposalStage.GITHUB_PR]: {
+    title: "Create Github PR",
+    shortTitle: "Github PR",
+    description: "Create a Github PR for the proposal",
+    waitingFor: "Submitting Github PR",
   },
   [PrismaProposalStage.READY]: {
     title: "Submit draft",
