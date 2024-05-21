@@ -57,6 +57,11 @@ export default function OpManagerDeleteProposal({
     return null;
   }
 
+  // If proposal is cancelled, it means it has been deleted and we don't need to show the button
+  if (!!proposal.cancelled_transaction_hash) {
+    return null;
+  }
+
   return (
     <div className="flex justify-center">
       <Button
