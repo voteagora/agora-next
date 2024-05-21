@@ -158,6 +158,17 @@ export function checkMissingVoteForDelegate(
   delegateVotes: Vote[],
   votingPower: VotingPowerData
 ): MissingVote {
+  const totalVotes = delegateVotes.reduce(
+    (acc, vote) => acc + BigInt(vote.weight),
+    0n
+  );
+
+  if (totalVotes >= BigInt(votingPower.totalVP)) {
+    return "NONE";
+  }
+
+  console.log("totalVotes", totalVotes, "votingPower", votingPower);
+
   const nonZeroVotes = delegateVotes.filter((vote) => BigInt(vote.weight) > 0n);
   const hasAdvancedVP = BigInt(votingPower.advancedVP) > 0n;
   const hasDirectVP = BigInt(votingPower.directVP) > 0n;
