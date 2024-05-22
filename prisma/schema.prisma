@@ -118,14 +118,15 @@ model Ballots {
 }
 
 model allocations {
-  address    String   @db.VarChar(255)
-  round      Int
-  metric_id  String   @db.VarChar(255)
-  allocation Decimal  @default(0) @db.Decimal
-  locked     Boolean? @default(false)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
-  ballots    Ballots  @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+  address      String       @db.VarChar(255)
+  round        Int
+  metric_id    String       @db.VarChar(255)
+  allocation   Decimal      @default(0) @db.Decimal
+  locked       Boolean?     @default(false)
+  created_at   DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime     @default(now()) @db.Timestamptz(6)
+  ballots      Ballots      @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+  metrics_data metrics_data @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([address, round, metric_id])
   @@schema("retro_funding")
@@ -141,6 +142,76 @@ model BallotSubmittions {
 
   @@id([address, round])
   @@map("ballot_submittions")
+  @@schema("retro_funding")
+}
+
+model metrics_comments {
+  metric_id              String                   @db.VarChar
+  address                String                   @db.VarChar
+  comment                String                   @db.VarChar
+  ts                     DateTime                 @default(now()) @db.Timestamptz(6)
+  metrics_data           metrics_data             @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+  metrics_comments_votes metrics_comments_votes[]
+
+  @@id([metric_id, address])
+  @@schema("retro_funding")
+}
+
+model metrics_comments_votes {
+  metric_id        String           @db.VarChar
+  commenter        String           @db.VarChar
+  voter            String           @db.VarChar
+  vote             Int
+  ts               DateTime         @default(now()) @db.Timestamptz(6)
+  metrics_comments metrics_comments @relation(fields: [metric_id, commenter], references: [metric_id, address], onDelete: NoAction, onUpdate: NoAction)
+  metrics_data     metrics_data     @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([metric_id, commenter, voter])
+  @@schema("retro_funding")
+}
+
+model metrics_data {
+  metric_id              String                   @id @db.VarChar
+  name                   String                   @db.VarChar
+  description            String                   @db.VarChar
+  allocations            allocations[]
+  metrics_comments       metrics_comments[]
+  metrics_comments_votes metrics_comments_votes[]
+  metrics_projects       metrics_projects[]
+  metrics_views          metrics_views[]
+
+  @@schema("retro_funding")
+}
+
+model metrics_projects {
+  metric_id     String        @db.VarChar
+  project_id    String        @db.VarChar
+  is_os         Boolean       @default(false)
+  allocation    Decimal       @db.Decimal
+  values        Decimal?      @db.Decimal
+  metrics_data  metrics_data  @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+  projects_data projects_data @relation(fields: [project_id], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([metric_id, project_id])
+  @@schema("retro_funding")
+}
+
+model metrics_views {
+  metric_id    String       @db.VarChar
+  address      String       @db.VarChar
+  ts           DateTime     @default(now()) @db.Timestamptz(6)
+  metrics_data metrics_data @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([metric_id, address])
+  @@schema("retro_funding")
+}
+
+model projects_data {
+  project_id       String             @id @db.VarChar
+  project_name     String             @db.VarChar
+  project_image    String?            @db.VarChar
+  metrics_projects metrics_projects[]
+
   @@schema("retro_funding")
 }
 
