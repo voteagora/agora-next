@@ -42,7 +42,10 @@ const ProposalVotesCard = ({
         <div>
           <div className={styles.proposal_header}>Proposal votes</div>
           {/* Show the summar bar with For, Against, Abstain */}
-          <ProposalVotesSummary proposal={proposal} />
+          <ProposalVotesSummary
+            proposalVotes={proposalVotes.votes}
+            proposal={proposal}
+          />
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         <ProposalVotesList
