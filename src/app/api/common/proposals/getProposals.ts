@@ -7,6 +7,7 @@ import provider from "@/app/lib/provider";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 async function getProposals({
   filter,
@@ -110,6 +111,13 @@ async function getDraftProposals(address: `0x${string}`) {
   return await prisma.proposalDraft.findMany({
     where: {
       author_address: address,
+      stage: {
+        in: [
+          PrismaProposalStage.TEMP_CHECK,
+          PrismaProposalStage.DRAFT,
+          PrismaProposalStage.READY,
+        ],
+      },
     },
     include: {
       transactions: true,

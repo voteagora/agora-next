@@ -6,12 +6,11 @@ import {
 } from "@prisma/client";
 import { markdownTable } from "markdown-table";
 
-// const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
-const AGORA_PROXY_ACCOUNT = "mcgingras";
+const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
 const AGORA_ENS_FORK = "docs";
 const ENS_REPO_OWNER = "ensdomains";
 const ENS_REPO_NAME = "docs";
-const BASE_BRANCH = "main"; // Base branch to create the new branch from
+const BASE_BRANCH = "master"; // Base branch to create the new branch from
 const BASE_PATH = "docs/dao/proposals";
 
 function getFormattedTransactionTable(
@@ -176,12 +175,8 @@ export async function createGithubProposal(
   }
 ): Promise<string> {
   const octokit = new Octokit({
-    auth: process.env.PR_BOT_TOKEN || "",
+    auth: process.env.NEXT_PUBLIC_PR_BOT_TOKEN || "",
   });
-
-  const content = Buffer.from(formatGithubProposal(proposal)).toString(
-    "base64"
-  );
 
   try {
     // Sync the forked branch
@@ -191,6 +186,10 @@ export async function createGithubProposal(
       AGORA_ENS_FORK,
       ENS_REPO_OWNER,
       ENS_REPO_NAME
+    );
+
+    const content = Buffer.from(formatGithubProposal(proposal)).toString(
+      "base64"
     );
 
     // Get the latest commit SHA of the base branch
@@ -211,11 +210,8 @@ export async function createGithubProposal(
       proposal.title
     );
 
-    console.log(path, fileName);
-
     const formattedFileName = fileName.replace(".md", "");
 
-    // Create the new branch
     const branch = await octokit.git.createRef({
       owner: AGORA_PROXY_ACCOUNT,
       repo: AGORA_ENS_FORK,
@@ -232,40 +228,6 @@ export async function createGithubProposal(
       content: content,
       branch: branch.data.ref,
     });
-
-    // Update summary.md
-    const summaryPath = `SUMMARY.md`;
-    const summaryFile = await octokit.repos.getContent({
-      owner: AGORA_PROXY_ACCOUNT,
-      repo: AGORA_ENS_FORK,
-      path: summaryPath,
-    });
-
-    if ("content" in summaryFile.data) {
-      const summaryContentDecoded = atob(summaryFile.data.content);
-      // Append link to the new file to the summary file
-      // Escape brackets in the title
-      const formattedTitle = proposal.title
-        .replace(/\[/g, "\\[")
-        .replace(/\]/g, "\\]");
-      const termDirectory = `term-${parseTerm(proposal.title)}`;
-      const newSummaryContent = `${summaryContentDecoded}   * [${formattedTitle}](${BASE_PATH}/${termDirectory}/${fileName})\n`;
-
-      // Encode the updated content back to Base64
-      const newSummaryContentEncoded = btoa(newSummaryContent);
-
-      await octokit.repos.createOrUpdateFileContents({
-        owner: AGORA_PROXY_ACCOUNT,
-        repo: AGORA_ENS_FORK,
-        path: summaryPath,
-        message: "Update summary",
-        content: newSummaryContentEncoded,
-        branch: branch.data.ref,
-        sha: summaryFile.data.sha,
-      });
-    } else {
-      throw new Error("Expected a file but got a directory or none.");
-    }
 
     const pullRequest = await octokit.pulls.create({
       owner:
@@ -301,23 +263,7 @@ async function getFolderContents(
       path: basePath,
     });
 
-    // Filter the response to get only the files and folders
-    const baseFolderContents = foldersResponse.data;
-
-    if (!Array.isArray(baseFolderContents)) {
-      throw new Error("Invalid response");
-    }
-
-    const termDirectory = `term-${parseTerm(title)}`;
-
-    const filesResponse = await octokit.repos.getContent({
-      owner,
-      repo,
-      path: `${basePath}/${termDirectory}`,
-    });
-
-    // Filter the response to get only the files and folders
-    const lastFolderFiles = filesResponse.data;
+    const lastFolderFiles = foldersResponse.data;
 
     if (!Array.isArray(lastFolderFiles)) {
       throw new Error("Invalid response");
@@ -345,18 +291,14 @@ async function getFolderContents(
     }.md`;
 
     return {
-      path: `${basePath}/${termDirectory}/${fileName}`,
+      //   path: `${basePath}/${termDirectory}/${fileName}`,
+      path: `${basePath}/${fileName}`,
       fileName,
     };
   } catch (error) {
     console.error("Error getting folder contents:", error);
     throw new Error("Error getting folder contents");
   }
-}
-
-function parseTerm(title: string) {
-  const match = title.match(/\d+/);
-  return match ? parseInt(match[0], 10) : null;
 }
 
 // syncs the branches so there are no other merge conflicts before we create our PR
@@ -404,5 +346,3 @@ async function syncForkedBranch(
     throw new Error("Error syncing the branch");
   }
 }
-
-// 1. repo needs to be forked so we can compare changes?

@@ -15,7 +15,6 @@ const CreateProposalDraftButton = ({ address }: { address: `0x${string}` }) => {
         setIsPending(true);
         const proposal = await createProposalDraft(address);
         window.location.href = `/proposals/draft/${proposal.id}`;
-        setIsPending(false);
       }}
     >
       Create proposal

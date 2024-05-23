@@ -1,5 +1,6 @@
 "use client";
 
+import { useAccount } from "wagmi";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,7 @@ const DraftForm = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const { address } = useAccount();
   const openDialog = useOpenDialog();
   const [isPending, setIsPending] = useState<boolean>(false);
   const methods = useForm<z.output<typeof draftProposalSchema>>({
@@ -66,33 +68,43 @@ const DraftForm = ({
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
     setIsPending(true);
-    const res = await draftProposalAction({
-      ...data,
-      draftProposalId: draftProposal.id,
-    });
-    if (!res.ok) {
-      // TODO: make error toast + improve messaging
+
+    try {
+      if (!address) {
+        throw new Error("No address found");
+      }
+      const res = await draftProposalAction({
+        ...data,
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+      });
+      if (!res.ok) {
+        // TODO: make error toast + improve messaging
+        setIsPending(false);
+        toast("Something went wrong...");
+      } else {
+        // if we are still in draft -- show create (first time)
+        if (draftProposal.stage === "DRAFT") {
+          openDialog({
+            type: "CREATE_DRAFT_PROPOSAL",
+            params: {
+              redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
+              githubUrl: "",
+            },
+          });
+          // otherwise, we have already submitted, show update
+        } else {
+          openDialog({
+            type: "UPDATE_DRAFT_PROPOSAL",
+            params: {
+              redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
+            },
+          });
+        }
+      }
+    } catch (error) {
       setIsPending(false);
       toast("Something went wrong...");
-    } else {
-      // if we are still in draft -- show create (first time)
-      if (draftProposal.stage === "DRAFT") {
-        openDialog({
-          type: "CREATE_DRAFT_PROPOSAL",
-          params: {
-            redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
-            githubUrl: "",
-          },
-        });
-        // otherwise, we have already submitted, show update
-      } else {
-        openDialog({
-          type: "UPDATE_DRAFT_PROPOSAL",
-          params: {
-            redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
-          },
-        });
-      }
     }
   };
 

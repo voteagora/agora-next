@@ -13,8 +13,10 @@ import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
 import { ProposalDraft } from "@prisma/client";
+import { useAccount } from "wagmi";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+  const { address } = useAccount();
   const [isPending, setIsPending] = useState(false);
   const {
     register,
@@ -30,9 +32,14 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const onSubmit = async (data: z.output<typeof tempCheckSchema>) => {
     setIsPending(true);
     try {
+      if (!address) {
+        throw new Error("No address connected");
+      }
+
       const res = await tempCheckAction({
         ...data,
         draftProposalId: draftProposal.id,
+        creatorAddress: address,
       });
       // not sure why redirect is not working
       // redirect(`/proposals/draft?stage=1`);

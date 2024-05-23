@@ -7,6 +7,7 @@ import {
   ProposalDraft,
   ProposalDraftTransaction,
   ProposalSocialOption,
+  ProposalChecklist,
 } from "@prisma/client";
 import { getStageMetadata, DRAFT_STAGES_FOR_TENANT } from "../utils/stages";
 
@@ -18,12 +19,14 @@ const getDraftProposal = async (id: number) => {
     include: {
       transactions: true,
       social_options: true,
+      checklist_items: true,
     },
   });
 
   return draftProposal as ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
+    checklist_items: ProposalChecklist[];
   };
 };
 

@@ -5,6 +5,7 @@ import {
   ProposalDraft,
   ProposalDraftTransaction,
   ProposalSocialOption,
+  ProposalChecklist,
 } from "@prisma/client";
 import ApprovedTransactions from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
 import { useContractRead, useAccount, useBlockNumber } from "wagmi";
@@ -14,14 +15,9 @@ import AvatarAddress from "./AvatarAdress";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
-
-const SUBMISSION_CHECKLIST_ITEMS = [
-  {
-    title: "Temp check",
-    date: "2021-10-01",
-    completedBy: "John Doe",
-  },
-];
+import { formatFullDate } from "@/lib/utils";
+import { truncateAddress } from "@/app/lib/utils/text";
+import Link from "next/link";
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -33,6 +29,7 @@ const DraftPreview = ({
   proposalDraft: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
+    checklist_items: ProposalChecklist[];
   };
   actions?: React.ReactNode;
 }) => {
@@ -68,6 +65,22 @@ const DraftPreview = ({
         ],
       };
     }) ?? [];
+
+  // sorted and filtered checklist items
+  // take most recent of each checklist item by title
+  // sort by completed_at
+  const filteredAndSortedChecklistItems = proposalDraft.checklist_items
+    .sort((a, b) => {
+      return a.completed_at > b.completed_at ? 1 : -1;
+    })
+    .filter((item, index, self) => {
+      if (index === self.length - 1) return true;
+      return item.title !== self[index + 1].title;
+    });
+
+  console.log("PD", proposalDraft);
+  console.log("FFS", filteredAndSortedChecklistItems);
+
   return (
     <FormCard>
       <FormCard.Header>
@@ -96,14 +109,22 @@ const DraftPreview = ({
             <p className="text-agora-stone-700 mt-2">
               {proposalDraft.proposal_social_type}
             </p>
-            <h3 className="font-semibold mt-6">Voting start</h3>
-            <p className="text-agora-stone-700 mt-2">
-              {proposalDraft.start_date_social?.toString()}
-            </p>
-            <h3 className="font-semibold mt-6">Voting end</h3>
-            <p className="text-agora-stone-700 mt-2">
-              {proposalDraft.end_date_social?.toString()}
-            </p>
+            {proposalDraft.start_date_social && (
+              <>
+                <h3 className="font-semibold mt-6">Voting start</h3>
+                <p className="text-agora-stone-700 mt-2">
+                  {formatFullDate(proposalDraft.start_date_social)}
+                </p>
+              </>
+            )}
+            {proposalDraft.end_date_social && (
+              <>
+                <h3 className="font-semibold mt-6">Voting end</h3>
+                <p className="text-agora-stone-700 mt-2">
+                  {formatFullDate(proposalDraft.end_date_social)}
+                </p>
+              </>
+            )}
             <h3 className="font-semibold mt-6 mb-2">Voting options</h3>
             {proposalDraft.social_options.map((option, index) => (
               <p className="text-agora-stone-700" key={`draft-${index}`}>
@@ -164,7 +185,7 @@ const DraftPreview = ({
               </p>
             )}
             <div className="mt-6">
-              {SUBMISSION_CHECKLIST_ITEMS.map((item, index) => {
+              {filteredAndSortedChecklistItems.map((item, index) => {
                 return (
                   <div
                     className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
@@ -172,25 +193,50 @@ const DraftPreview = ({
                   >
                     <p className="flex-grow">{item.title}</p>
                     <span className="text-stone-500 font-mono text-xs">
-                      on {item.date}
+                      on {formatFullDate(item.completed_at)}
                     </span>
                     <span className="text-stone-500 font-mono text-xs">
-                      (by {item.completedBy})
+                      {item.link
+                        ? `(by ${truncateAddress(item.completed_by)})`
+                        : "(skipped)"}
                     </span>
                     <input
                       type="checkbox"
                       className="rounded text-agora-stone-900"
                       checked
                     />
-                    <Image
-                      src={icons.link}
-                      height="16"
-                      width="16"
-                      alt="link icon"
-                    />
+                    {item.link && (
+                      <Link href={item.link}>
+                        <Image
+                          src={icons.link}
+                          height="16"
+                          width="16"
+                          alt="link icon"
+                        />
+                      </Link>
+                    )}
                   </div>
                 );
               })}
+              <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+                <p className="flex-grow">Proposal threshold</p>
+                <span className="text-stone-500 font-mono text-xs">
+                  300k required
+                </span>
+                <input
+                  type="checkbox"
+                  className="rounded text-agora-stone-900"
+                  checked
+                />
+                {/* <Link href={item.link}> */}
+                <Image
+                  src={icons.link}
+                  height="16"
+                  width="16"
+                  alt="link icon"
+                />
+                {/* </Link> */}
+              </div>
             </div>
             {actions}
           </>

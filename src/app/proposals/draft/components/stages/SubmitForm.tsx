@@ -3,6 +3,7 @@ import {
   ProposalDraft,
   ProposalDraftTransaction,
   ProposalSocialOption,
+  ProposalChecklist,
 } from "@prisma/client";
 import { useContractRead, useAccount, useBlockNumber } from "wagmi";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
@@ -20,6 +21,7 @@ const Actions = ({
   proposalDraft: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
+    checklist_items: ProposalChecklist[];
   };
 }) => {
   const { address } = useAccount();
@@ -56,6 +58,7 @@ const SubmitForm = ({
   draftProposal: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
+    checklist_items: ProposalChecklist[];
   };
 }) => {
   const methods = useForm({});

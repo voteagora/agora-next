@@ -81,7 +81,7 @@ export function UpdatedButton({
                 type === "primary" && "text-white",
                 type === "secondary" && "text-black",
                 type === "link" && "",
-                "font-semibold flex flex-row space-x-2"
+                "font-semibold flex flex-row space-x-2 items-center justify-center"
               )}
             >
               <LoadingSpinner

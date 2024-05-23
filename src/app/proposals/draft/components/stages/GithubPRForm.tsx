@@ -1,5 +1,6 @@
 "use client";
 
+import { useAccount } from "wagmi";
 import { useState } from "react";
 import { z } from "zod";
 // import Tenant from "@/lib/tenant/tenant";
@@ -12,6 +13,7 @@ import {
   ProposalDraftTransaction,
 } from "@prisma/client";
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
+import { onSubmitAction as createGithubChecklistItem } from "../../actions/createGithubChecklistItem";
 
 const GithubPRForm = ({
   draftProposal,
@@ -21,13 +23,22 @@ const GithubPRForm = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const { address } = useAccount();
   const [isPending, setIsPending] = useState(false);
 
   const handleClick = async () => {
     setIsPending(true);
     try {
-      await createGithubProposal(draftProposal);
-      //   window.location.href = `/proposals/draft/${draftProposal.id}?stage=3`;
+      if (!address) {
+        throw new Error("No address found");
+      }
+      const link = await createGithubProposal(draftProposal);
+      await createGithubChecklistItem({
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        link: link,
+      });
+      window.location.href = `/proposals/draft/${draftProposal.id}?stage=3`;
     } catch (e) {
       console.error(e);
       setIsPending(false);

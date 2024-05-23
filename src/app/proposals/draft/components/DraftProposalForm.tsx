@@ -1,6 +1,10 @@
 "use client";
 
-import { ProposalSocialOption, ProposalStage } from "@prisma/client";
+import {
+  ProposalChecklist,
+  ProposalSocialOption,
+  ProposalStage,
+} from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
 import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
@@ -15,6 +19,7 @@ export default function DraftProposalForm({
   draftProposal: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
+    checklist_items: ProposalChecklist[];
   };
 }) {
   const renderStage = (stage: ProposalStage) => {

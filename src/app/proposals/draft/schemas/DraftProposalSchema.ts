@@ -28,18 +28,10 @@ const socialOption = z.object({
   text: z.string().min(1, { message: "Option text cannot be empty" }),
 });
 
-const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 1);
-
 const socialProposal = z
   .object({
     type: z.nativeEnum(SocialProposalType),
-    start_date: z.coerce
-      .date()
-      .optional()
-      .refine((data) => !data || data > yesterday, {
-        message: "Start date must be in the future",
-      }),
+    start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
     options: z.array(socialOption),
   })

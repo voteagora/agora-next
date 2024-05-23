@@ -1,12 +1,10 @@
-"use client";
-
 import {
+  ProposalChecklist,
   ProposalDraft,
   ProposalDraftTransaction,
   ProposalSocialOption,
 } from "@prisma/client";
 import DraftPreview from "../../draft/components/DraftPreview";
-import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "./SponsorActions";
 
 const SponsorForm = ({
@@ -15,18 +13,14 @@ const SponsorForm = ({
   draftProposal: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
+    checklist_items: ProposalChecklist[];
   };
 }) => {
-  const methods = useForm({});
   return (
-    <FormProvider {...methods}>
-      <form>
-        <DraftPreview
-          proposalDraft={draftProposal}
-          actions={<SponsorActions draftProposal={draftProposal} />}
-        />
-      </form>
-    </FormProvider>
+    <DraftPreview
+      proposalDraft={draftProposal}
+      actions={<SponsorActions draftProposal={draftProposal} />}
+    />
   );
 };
 

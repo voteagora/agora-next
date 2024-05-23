@@ -816,7 +816,7 @@ model ProposalDraft {
   transactions                ProposalDraftTransaction[]
   social_options              ProposalSocialOption[]
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
-  ProposalChecklist           ProposalChecklist[]
+  checklist_items             ProposalChecklist[]
   @@map("proposals")
   @@schema("test2")
 }
@@ -850,13 +850,14 @@ model ProposalSocialOption {
 
 model ProposalChecklist {
   id           Int           @id @default(autoincrement())
-  stage        ProposalStage
+  title        String
   completed_at DateTime      @default(now())
   completed_by String
+  // link implies optionality -- if no link, its because the field is optional (think temp check for ENS)
   link         String?
   proposal_id  Int
   proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
-  @@map("proposal_checklist")
+  @@map("proposal_checklist_items")
   @@schema("test2")
 }
 

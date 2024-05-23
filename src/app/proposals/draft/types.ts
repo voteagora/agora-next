@@ -66,42 +66,56 @@ export const ProposalLifecycleStageMetadata = {
     shortTitle: "Temp check",
     description: "Check the temperature of the proposal",
     waitingFor: "Submitting temp check",
+    checklistItems: ["Discourse temp check"],
   },
   [PrismaProposalStage.DRAFT]: {
     title: "Create draft",
     shortTitle: "Draft",
     description: "Draft the proposal",
     waitingFor: "Submitting draft",
+    checklistItems: ["Transaction simulation"],
   },
   [PrismaProposalStage.GITHUB_PR]: {
     title: "Create Github PR",
     shortTitle: "Github PR",
     description: "Create a Github PR for the proposal",
     waitingFor: "Submitting Github PR",
+    checklistItems: ["ENS docs updated"],
   },
   [PrismaProposalStage.READY]: {
     title: "Submit draft",
     shortTitle: "Ready",
     description: "Ready to submit the proposal",
     waitingFor: "Sponsor approval",
+    checklistItems: [],
   },
   [PrismaProposalStage.CONTACT_VOTERS]: {
     title: "Contact voters",
     shortTitle: "Contact voters",
     description: "Contact the voters",
     waitingFor: "Onchain vote",
+    checklistItems: [],
   },
   [PrismaProposalStage.QUEUE]: {
     title: "Queue",
     shortTitle: "Queue",
     description: "Queue the proposal",
     waitingFor: "Queue",
+    checklistItems: [],
   },
   [PrismaProposalStage.EXECUTE]: {
     title: "Execute",
     shortTitle: "Execute",
     description: "Execute the proposal",
     waitingFor: "Execution",
+    checklistItems: [],
+  },
+  [PrismaProposalStage.CANCELLED]: {
+    title: "Cancelled",
+    shortTitle: "Cancelled",
+    description: "The proposal has been cancelled",
+    waitingFor: "",
+    checklistItems: [],
   },
 } as {
   [key in PrismaProposalStage]: {
@@ -109,6 +123,7 @@ export const ProposalLifecycleStageMetadata = {
     shortTitle: string;
     description: string;
     waitingFor: string;
+    checklistItems: string[];
   };
 };
 

@@ -4,7 +4,6 @@ import { z } from "zod";
 import { schema as DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import prisma from "@/app/lib/prisma";
 import { ProposalDraftTransaction, ProposalStage } from "@prisma/client";
-import { ProposalType, SocialProposalType } from "../types";
 
 export type FormState = {
   ok: boolean;
@@ -12,7 +11,10 @@ export type FormState = {
 };
 
 export async function onSubmitAction(
-  data: z.output<typeof DraftProposalSchema> & { draftProposalId: number }
+  data: z.output<typeof DraftProposalSchema> & {
+    draftProposalId: number;
+    creatorAddress: string;
+  }
 ): Promise<FormState> {
   const parsed = DraftProposalSchema.safeParse(data);
 
@@ -24,7 +26,7 @@ export async function onSubmitAction(
   }
 
   try {
-    await prisma.proposalDraft.update({
+    const updateDraft = prisma.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
@@ -70,6 +72,21 @@ export async function onSubmitAction(
         }),
       },
     });
+
+    await prisma.$transaction([
+      updateDraft,
+      prisma.proposalChecklist.create({
+        data: {
+          title: "Transactions simulated",
+          completed_by: data.creatorAddress,
+          proposal: {
+            connect: {
+              id: data.draftProposalId,
+            },
+          },
+        },
+      }),
+    ]);
 
     return {
       ok: true,

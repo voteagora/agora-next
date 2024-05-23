@@ -11,7 +11,10 @@ export type FormState = {
 };
 
 export async function onSubmitAction(
-  data: z.output<typeof tempCheckSchema> & { draftProposalId: number }
+  data: z.output<typeof tempCheckSchema> & {
+    draftProposalId: number;
+    creatorAddress: string;
+  }
 ): Promise<FormState> {
   const parsed = tempCheckSchema.safeParse(data);
 
@@ -23,15 +26,29 @@ export async function onSubmitAction(
   }
 
   try {
-    await prisma.proposalDraft.update({
-      where: {
-        id: data.draftProposalId,
-      },
-      data: {
-        stage: ProposalStage.TEMP_CHECK,
-        temp_check_link: parsed.data.temp_check_link || "",
-      },
-    });
+    await prisma.$transaction([
+      prisma.proposalDraft.update({
+        where: {
+          id: data.draftProposalId,
+        },
+        data: {
+          stage: ProposalStage.TEMP_CHECK,
+          temp_check_link: parsed.data.temp_check_link || "",
+        },
+      }),
+      prisma.proposalChecklist.create({
+        data: {
+          title: "Temp check",
+          completed_by: data.creatorAddress,
+          link: parsed.data.temp_check_link,
+          proposal: {
+            connect: {
+              id: data.draftProposalId,
+            },
+          },
+        },
+      }),
+    ]);
 
     return {
       ok: true,
