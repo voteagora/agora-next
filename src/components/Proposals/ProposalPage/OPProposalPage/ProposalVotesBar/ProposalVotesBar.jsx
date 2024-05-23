@@ -23,7 +23,7 @@ export default function ProposalVotesBar({ proposal, proposalVotes }) {
     parseFloat(proposal?.proposalResults?.against);
 
   const quorumPercentage =
-    (totalVotesVolume / parseFloat(proposal.quorum)) * 100;
+    (parseFloat(proposal.quorum) / totalVotesVolume) * 100;
 
   return (
     <div>
