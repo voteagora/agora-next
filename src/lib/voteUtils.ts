@@ -163,7 +163,7 @@ export function checkMissingVoteForDelegate(
     0n
   );
 
-  if (totalVotes >= BigInt(votingPower.totalVP)) {
+  if (delegateVotes.length > 0 && totalVotes >= BigInt(votingPower.totalVP)) {
     return "NONE";
   }
 
