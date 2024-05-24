@@ -11,6 +11,7 @@ import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import { ProposalDraft } from "@prisma/client";
 import AvatarAddress from "./AvatarAdress";
+import { invalidatePath } from "../actions/revalidatePath";
 
 const THRESHOLD = 100000000000000000000000;
 
@@ -60,6 +61,7 @@ const RequestSponsorshipForm = ({
       <UpdatedButton
         fullWidth={true}
         isSubmit={false}
+        isLoading={isPending}
         className="mt-6"
         onClick={async () => {
           setIsPending(true);
@@ -71,11 +73,15 @@ const RequestSponsorshipForm = ({
           if (!res.ok) {
             // toast?
           } else {
-            window.location.href = `/`;
+            // pretty funky way to revalidate path?
+            // I'm curious what this is actually doing internally
+            // better than a full page refresh though...
+            // wonder if there is a way to optimistically update data
+            invalidatePath(draftProposal.id);
           }
         }}
       >
-        {isPending ? "Pending..." : "Request sponsorship"}
+        Request sponsorship
       </UpdatedButton>
     </>
   );

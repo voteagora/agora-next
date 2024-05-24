@@ -17,7 +17,8 @@ import { useAccount } from "wagmi";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const { address } = useAccount();
-  const [isPending, setIsPending] = useState(false);
+  const [isSkipPending, setIsSkipPending] = useState(false);
+  const [isSubmitPending, setIsSubmitPending] = useState(false);
   const {
     register,
     handleSubmit,
@@ -29,8 +30,17 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
     },
   });
 
+  const onSubmitSkip = async (data: z.output<typeof tempCheckSchema>) => {
+    setIsSkipPending(true);
+    await sharedOnSubmit(data);
+  };
+
   const onSubmit = async (data: z.output<typeof tempCheckSchema>) => {
-    setIsPending(true);
+    setIsSubmitPending(true);
+    await sharedOnSubmit(data);
+  };
+
+  const sharedOnSubmit = async (data: z.output<typeof tempCheckSchema>) => {
     try {
       if (!address) {
         throw new Error("No address connected");
@@ -46,18 +56,16 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
       window.location.href = `/proposals/draft/${draftProposal.id}?stage=1`;
     } catch (e) {
       console.error(e);
-      setIsPending(false);
     }
   };
 
   return (
     <form
-      //   action={async (formData: FormData) => {
-      //     await tempCheckAction(formData);
-      //     // this should probably be order in the tenent list + 1
-      //     redirect(`/proposals/draft?stage=1`);
-      //   }}
-      onSubmit={handleSubmit(onSubmit)}
+    //   action={async (formData: FormData) => {
+    //     await tempCheckAction(formData);
+    //     // this should probably be order in the tenent list + 1
+    //     redirect(`/proposals/draft?stage=1`);
+    //   }}
     >
       <FormCard>
         <FormCard.Section>
@@ -80,18 +88,18 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                 />
               </FormItem>
             </div>
-            <div className="space-x-2 self-start mt-[22px]">
+            <div className="space-x-2 self-start mt-[22px] flex items-center">
               <UpdatedButton
                 type="secondary"
-                isSubmit={true}
-                isLoading={isPending}
+                isLoading={isSkipPending}
+                onClick={handleSubmit(onSubmitSkip)}
               >
                 Skip
               </UpdatedButton>
               <UpdatedButton
                 type="primary"
-                isSubmit={true}
-                isLoading={isPending}
+                isLoading={isSubmitPending}
+                onClick={handleSubmit(onSubmit)}
               >
                 Continue
               </UpdatedButton>

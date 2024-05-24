@@ -3,7 +3,6 @@
 import { z } from "zod";
 import { schema as RequestSponsorshipSchema } from "../schemas/requestSponsorshipSchema";
 import prisma from "@/app/lib/prisma";
-import { ProposalStage } from "@prisma/client";
 
 export type FormState = {
   ok: boolean;
@@ -28,7 +27,6 @@ export async function onSubmitAction(
         id: data.draftProposalId,
       },
       data: {
-        stage: ProposalStage.CONTACT_VOTERS,
         sponsor_address: parsed.data.sponsor_address,
       },
     });

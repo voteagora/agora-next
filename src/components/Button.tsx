@@ -77,7 +77,6 @@ export function UpdatedButton({
           {isLoading ? (
             <span
               className={cn(
-                className,
                 type === "primary" && "text-white",
                 type === "secondary" && "text-black",
                 type === "link" && "",
@@ -86,7 +85,6 @@ export function UpdatedButton({
             >
               <LoadingSpinner
                 className={cn(
-                  className,
                   type === "primary" && "text-white",
                   type === "secondary" && "text-black",
                   type === "link" && "",
