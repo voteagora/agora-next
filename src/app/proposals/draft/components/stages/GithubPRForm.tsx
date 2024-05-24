@@ -14,6 +14,7 @@ import {
 } from "@prisma/client";
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
 import { onSubmitAction as createGithubChecklistItem } from "../../actions/createGithubChecklistItem";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const GithubPRForm = ({
   draftProposal,
@@ -23,6 +24,7 @@ const GithubPRForm = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const openDialog = useOpenDialog();
   const { address } = useAccount();
   const [isPending, setIsPending] = useState(false);
 
@@ -38,7 +40,15 @@ const GithubPRForm = ({
         creatorAddress: address,
         link: link,
       });
-      window.location.href = `/proposals/draft/${draftProposal.id}?stage=3`;
+      openDialog({
+        type: "OPEN_GITHUB_PR",
+        params: {
+          // read stage from URL and redirect to next stage
+          // get stage metadata to make sure it's not the last stage (it really shouldn't be though)
+          redirectUrl: `/proposals/draft/${draftProposal.id}?stage=3`,
+          githubUrl: link,
+        },
+      });
     } catch (e) {
       console.error(e);
       setIsPending(false);

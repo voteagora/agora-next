@@ -1,4 +1,3 @@
-"use client";
 import { UpdatedButton } from "@/components/Button";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";

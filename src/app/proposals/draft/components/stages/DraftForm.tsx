@@ -9,7 +9,6 @@ import FormCard from "../form/FormCard";
 import FormItem from "../form/FormItem";
 import TextInput from "../form/TextInput";
 import MarkdownTextareaInput from "../form/MarkdownTextareaInput";
-import RadioGroupInput from "../form/RadioGroupInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as draftProposalSchema } from "../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../actions/createDraftProposal";
@@ -84,24 +83,7 @@ const DraftForm = ({
         setIsPending(false);
         toast("Something went wrong...");
       } else {
-        // if we are still in draft -- show create (first time)
-        if (draftProposal.stage === "DRAFT") {
-          openDialog({
-            type: "CREATE_DRAFT_PROPOSAL",
-            params: {
-              redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
-              githubUrl: "",
-            },
-          });
-          // otherwise, we have already submitted, show update
-        } else {
-          openDialog({
-            type: "UPDATE_DRAFT_PROPOSAL",
-            params: {
-              redirectUrl: `/proposals/draft/${draftProposal.id}?stage=2`,
-            },
-          });
-        }
+        window.location.href = `/proposals/draft/${draftProposal.id}?stage=2`;
       }
     } catch (error) {
       setIsPending(false);

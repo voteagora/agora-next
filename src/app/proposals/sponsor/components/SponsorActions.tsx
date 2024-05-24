@@ -15,6 +15,7 @@ import {
   ProposalDraftTransaction,
   ProposalSocialOption,
 } from "@prisma/client";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const SponsorActions = ({
   draftProposal,
@@ -24,6 +25,7 @@ const SponsorActions = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const openDialog = useOpenDialog();
   const { address } = useAccount();
   const { inputData } = getInputData(draftProposal);
   const {
@@ -38,15 +40,10 @@ const SponsorActions = ({
     chainId: 11155111,
   });
 
-  const { data, write } = useContractWrite(config);
+  const { data, writeAsync } = useContractWrite(config);
 
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
-    onSuccess: () => {
-      // TODO: complete this
-      // await update proposal status
-      // open modal or redirect
-    },
   });
 
   return (
@@ -66,10 +63,18 @@ const SponsorActions = ({
               ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
               : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
 
-            alert("Snapshot created! " + snapshotLink);
+            openDialog({
+              type: "SPONSOR_DRAFT_PROPOSAL",
+              params: { redirectUrl: "" },
+            });
           } else {
-            write?.();
+            await writeAsync?.();
             // TODO: update proposal status
+            // TODO: add tx hash
+            openDialog({
+              type: "SPONSOR_DRAFT_PROPOSAL",
+              params: { redirectUrl: "" },
+            });
           }
         }}
       >
