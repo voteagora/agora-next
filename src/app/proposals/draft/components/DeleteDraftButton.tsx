@@ -9,6 +9,7 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
   return (
     <UpdatedButton
+      type="destructive"
       fullWidth={true}
       onClick={(e: any) => {
         e.preventDefault();

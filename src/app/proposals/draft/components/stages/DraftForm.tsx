@@ -22,6 +22,7 @@ import {
 import ExecutableProposalForm from "../ExecutableProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
 import FileInput from "../form/FileInput";
+import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
@@ -127,17 +128,16 @@ const DraftForm = ({
         <FormCard>
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
-              <FormItem label="Type" required={true} htmlFor="type">
-                <RadioGroupInput
-                  name="type"
-                  control={control}
-                  options={Object.values(
-                    draftProposalSchema.shape.type._def.values
-                  ).map((value) => {
-                    return { label: value, value: value } as any;
-                  })}
-                />
-              </FormItem>
+              <div className="grid grid-cols-2 gap-4">
+                <FormItem label="Proposal type" required={true} htmlFor="type">
+                  <SwitchInput
+                    options={Object.values(
+                      draftProposalSchema.shape.type._def.values
+                    )}
+                    name="type"
+                  />
+                </FormItem>
+              </div>
               <FormItem label="Title" required={true} htmlFor="title">
                 <TextInput
                   name="title"

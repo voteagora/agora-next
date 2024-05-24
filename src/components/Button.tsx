@@ -30,7 +30,7 @@ export function UpdatedButton({
   children,
   ...props
 }: {
-  type?: "primary" | "secondary" | "link";
+  type?: "primary" | "secondary" | "link" | "destructive";
   variant?: "rounded" | "";
   href?: string;
   className?: string;
@@ -67,6 +67,8 @@ export function UpdatedButton({
               "bg-agora-stone-900 hover:shadow text-white transition-shadow",
             type === "secondary" && "",
             type === "link" && "",
+            type === "destructive" &&
+              "bg-white text-red-500 hover:text-red-700",
             variant === "rounded" ? "rounded-full" : "rounded-lg",
             fullWidth && "w-full",
             "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer"
@@ -79,6 +81,7 @@ export function UpdatedButton({
               className={cn(
                 type === "primary" && "text-white",
                 type === "secondary" && "text-black",
+                type === "destructive" && "text-red-500",
                 type === "link" && "",
                 "font-semibold flex flex-row space-x-2 items-center justify-center"
               )}
@@ -87,6 +90,7 @@ export function UpdatedButton({
                 className={cn(
                   type === "primary" && "text-white",
                   type === "secondary" && "text-black",
+                  type === "destructive" && "text-red-500",
                   type === "link" && "",
                   "font-semibold"
                 )}
