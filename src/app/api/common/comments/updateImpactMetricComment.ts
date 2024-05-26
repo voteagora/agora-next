@@ -20,6 +20,7 @@ async function updateImpactMetricCommentApi({
       comment,
       metric_id: metricId,
       address,
+      updated_at: new Date(),
     },
     include: {
       metrics_comments_votes: true,
