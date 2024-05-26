@@ -41,8 +41,8 @@ async function getImpactMetricCommentsApi({
         commentId: comment.comment_id,
         content: comment.comment,
         address: comment.address,
-        createdAt: comment.ts,
-        editedAt: comment.ts,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at,
         votes: comment.metrics_comments_votes.reduce(
           (acc, vote) => acc + vote.vote,
           0
@@ -70,8 +70,8 @@ async function getImpactMetricCommentApi(commentId: number) {
     commentId: comment.comment_id,
     content: comment.comment,
     address: comment.address,
-    createdAt: comment.ts,
-    editedAt: comment.ts,
+    createdAt: comment.created_at,
+    updatedAt: comment.updated_at,
     votes: comment.metrics_comments_votes.reduce(
       (acc, vote) => acc + vote.vote,
       0

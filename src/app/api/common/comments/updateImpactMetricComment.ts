@@ -20,7 +20,6 @@ async function updateImpactMetricCommentApi({
       comment,
       metric_id: metricId,
       address,
-      ts: new Date(),
     },
     include: {
       metrics_comments_votes: true,
@@ -31,8 +30,8 @@ async function updateImpactMetricCommentApi({
     commentId: updatedComment.comment_id,
     content: updatedComment.comment,
     address: updatedComment.address,
-    createdAt: updatedComment.ts,
-    editedAt: updatedComment.ts,
+    createdAt: updatedComment.created_at,
+    updatedAt: updatedComment.updated_at,
     votes: updatedComment.metrics_comments_votes.reduce(
       (acc, vote) => acc + vote.vote,
       0
