@@ -63,7 +63,8 @@ export async function authenticateApiUser(
       failReason: REASON_DISABLED_USER,
     };
   } else {
-    authResponse.userId = user.id;
+    authResponse.userId =
+      authResponse.type === "api_key" ? user.id : user.address;
   }
 
   return authResponse;
