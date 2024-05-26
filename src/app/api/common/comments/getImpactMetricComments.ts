@@ -43,10 +43,11 @@ async function getImpactMetricCommentsApi({
         address: comment.address,
         createdAt: comment.created_at,
         updatedAt: comment.updated_at,
-        votes: comment.metrics_comments_votes.reduce(
+        votesCount: comment.metrics_comments_votes.reduce(
           (acc, vote) => acc + vote.vote,
           0
         ),
+        votes: comment.metrics_comments_votes,
       };
     }),
   };
@@ -72,10 +73,11 @@ async function getImpactMetricCommentApi(commentId: number) {
     address: comment.address,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
-    votes: comment.metrics_comments_votes.reduce(
+    votesCount: comment.metrics_comments_votes.reduce(
       (acc, vote) => acc + vote.vote,
       0
     ),
+    votes: comment.metrics_comments_votes,
   };
 }
 

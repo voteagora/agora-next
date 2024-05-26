@@ -32,10 +32,11 @@ async function updateImpactMetricCommentApi({
     address: updatedComment.address,
     createdAt: updatedComment.created_at,
     updatedAt: updatedComment.updated_at,
-    votes: updatedComment.metrics_comments_votes.reduce(
+    votesCount: updatedComment.metrics_comments_votes.reduce(
       (acc, vote) => acc + vote.vote,
       0
     ),
+    votes: updatedComment.metrics_comments_votes,
   };
 }
 
