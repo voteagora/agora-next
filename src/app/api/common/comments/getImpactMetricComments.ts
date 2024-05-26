@@ -1,40 +1,82 @@
+import { paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
 
-async function getImpactMetricComments(
-  roundId: string,
-  impactMetricId: string
-) {
-  const defaultPageMetadata = {
-    hasNext: false,
-    totalReturned: 1,
-    nextOffset: 0,
-  };
-  const defaultComments = [
-    {
-      id: "1",
-      content: "Comment 1",
-      commenter: "0x1234",
-      createdAt: "2021-10-01T00:00:00Z",
-      editedAt: "2021-10-01T00:00:00Z",
+async function getImpactMetricCommentsApi({
+  roundId,
+  impactMetricId,
+  sortBy = "ts",
+  limit = 10,
+  offset = 0,
+}: {
+  roundId: string;
+  impactMetricId: string;
+  sortBy?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const comments = await paginateResultEx(
+    (skip: number, take: number) => {
+      return prisma.metrics_comments.findMany({
+        where: {
+          metric_id: impactMetricId,
+        },
+        orderBy: {
+          [sortBy]: "desc",
+        },
+        include: {
+          metrics_comments_votes: true,
+        },
+        skip,
+        take,
+      });
     },
-  ];
-  return defaultComments;
-}
+    { limit: 10, offset: 0 }
+  );
 
-async function getImpactMetricComment(
-  roundId: string,
-  impactMetricId: string,
-  commentId: string
-) {
-  const defaultComment = {
-    id: commentId,
-    content: `Comment id ${commentId}`,
-    commenter: "0x1234",
-    createdAt: "2021-10-01T00:00:00Z",
-    editedAt: "2021-10-01T00:00:00Z",
+  return {
+    meta: comments.meta,
+    data: comments.data.map((comment) => {
+      return {
+        commentId: comment.comment_id,
+        content: comment.comment,
+        address: comment.address,
+        createdAt: comment.ts,
+        editedAt: comment.ts,
+        votes: comment.metrics_comments_votes.reduce(
+          (acc, vote) => acc + vote.vote,
+          0
+        ),
+      };
+    }),
   };
-  return defaultComment;
 }
 
-export const fetchImpactMetricComments = cache(getImpactMetricComments);
-export const fetchImpactMetricComment = cache(getImpactMetricComment);
+async function getImpactMetricCommentApi(commentId: number) {
+  const comment = await prisma.metrics_comments.findFirst({
+    where: {
+      comment_id: commentId,
+    },
+    include: {
+      metrics_comments_votes: true,
+    },
+  });
+
+  if (!comment) {
+    throw new Error("Comment not found");
+  }
+
+  return {
+    commentId: comment.comment_id,
+    content: comment.comment,
+    address: comment.address,
+    createdAt: comment.ts,
+    editedAt: comment.ts,
+    votes: comment.metrics_comments_votes.reduce(
+      (acc, vote) => acc + vote.vote,
+      0
+    ),
+  };
+}
+
+export const fetchImpactMetricComments = cache(getImpactMetricCommentsApi);
+export const fetchImpactMetricComment = cache(getImpactMetricCommentApi);

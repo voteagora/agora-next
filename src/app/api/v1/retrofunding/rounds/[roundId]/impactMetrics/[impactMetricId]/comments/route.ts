@@ -20,7 +20,10 @@ export async function GET(
   return await traceWithUserId(authResponse.userId as string, async () => {
     const { roundId, impactMetricId } = route.params;
     try {
-      const comments = fetchImpactMetricComments(roundId, impactMetricId);
+      const comments = await fetchImpactMetricComments({
+        roundId,
+        impactMetricId,
+      });
       return NextResponse.json(comments);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
@@ -45,11 +48,7 @@ export async function PUT(
     try {
       const body = await request.json();
       const { comment } = body;
-      const retrievedComment = fetchImpactMetricComment(
-        roundId,
-        impactMetricId,
-        comment.id
-      );
+      const retrievedComment = await fetchImpactMetricComment(comment.id);
       return NextResponse.json(retrievedComment);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
