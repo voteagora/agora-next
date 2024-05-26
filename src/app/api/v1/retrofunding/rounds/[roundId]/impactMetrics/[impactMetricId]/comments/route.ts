@@ -6,6 +6,7 @@ import {
   fetchImpactMetricComments,
   fetchImpactMetricComment,
 } from "@/app/api/common/comments/getImpactMetricComments";
+import { createImpactMetricComment } from "@/app/api/common/comments/createImpactMetricComment";
 
 export async function GET(
   request: NextRequest,
@@ -43,12 +44,26 @@ export async function PUT(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  return await traceWithUserId(authResponse.userId as string, async () => {
+  if (!authResponse.userId) {
+    return new Response("Can't get user address from auth token", {
+      status: 401,
+    });
+  }
+
+  return await traceWithUserId(authResponse.userId, async () => {
     const { roundId, impactMetricId } = route.params;
+
+    const body = await request.json();
+    if (!body.comment) {
+      return new Response("Missing comment in request body", { status: 400 });
+    }
+
     try {
-      const body = await request.json();
-      const { comment } = body;
-      const retrievedComment = await fetchImpactMetricComment(comment.id);
+      const retrievedComment = await createImpactMetricComment({
+        metricId: impactMetricId,
+        address: authResponse.userId!,
+        comment: body.comment,
+      });
       return NextResponse.json(retrievedComment);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {

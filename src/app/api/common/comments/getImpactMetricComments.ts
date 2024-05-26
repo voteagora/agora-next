@@ -1,5 +1,6 @@
 import { paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
+import prisma from "@/app/lib/prisma";
 
 async function getImpactMetricCommentsApi({
   roundId,
