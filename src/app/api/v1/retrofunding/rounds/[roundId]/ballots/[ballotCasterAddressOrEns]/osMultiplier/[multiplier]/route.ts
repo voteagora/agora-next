@@ -1,10 +1,13 @@
 import { updateBallotOsMultiplier } from "@/app/api/common/ballots/updateBallot";
+import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import {
   authenticateApiUser,
   validateAddressScope,
 } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
+
+const multiplierValidator = createOptionalNumberValidator(1, 5, 1);
 
 export async function POST(
   request: NextRequest,
@@ -27,8 +30,10 @@ export async function POST(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
+      const multiplierPayload = multiplierValidator.parse(Number(multiplier));
+
       const ballot = await updateBallotOsMultiplier(
-        Number(multiplier),
+        multiplierPayload,
         Number(roundId),
         ballotCasterAddressOrEns
       );

@@ -43,10 +43,11 @@ export async function GET(
     const { roundId, impactMetricId } = route.params;
 
     const searchParams = request.nextUrl.searchParams;
-    const sort = sortValidator.parse(searchParams.get("sort"));
-    const limit = limitValidator.parse(searchParams.get("limit"));
-    const offest = offsetValidator.parse(searchParams.get("offset"));
     try {
+      const sort = sortValidator.parse(searchParams.get("sort"));
+      const limit = limitValidator.parse(searchParams.get("limit"));
+      const offest = offsetValidator.parse(searchParams.get("offset"));
+
       const comments = await fetchImpactMetricComments({
         roundId,
         impactMetricId,

@@ -2,14 +2,7 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import prisma from "@/app/lib/prisma";
-
-type BallotSubmission = {
-  ballotContnet: {
-    metric_id: string;
-    allocation: number;
-  }[];
-  signature: `0x${string}`;
-};
+import { BallotSubmission } from "../../v1/retrofunding/rounds/[roundId]/ballots/[ballotCasterAddressOrEns]/submit/route";
 
 const submitBallotApi = async (
   data: BallotSubmission,
@@ -35,7 +28,7 @@ async function submitBallotForAddress({
   const isSignatureValid = await verifyMessage({
     address: address as `0x${string}`,
     message: payload,
-    signature: data.signature,
+    signature: data.signature as `0x${string}`,
   });
 
   // TODO: Validate ballot content
