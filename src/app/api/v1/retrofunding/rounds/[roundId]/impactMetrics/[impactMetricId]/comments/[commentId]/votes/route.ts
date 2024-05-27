@@ -3,6 +3,9 @@ import { updateImpactMetricCommentVote } from "@/app/api/common/comments/updateI
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
+import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
+
+const voteValidator = createOptionalNumberValidator(-1, 1, 0);
 
 export async function GET(
   request: NextRequest,
@@ -58,9 +61,11 @@ export async function PUT(
     }
 
     try {
+      const vote = voteValidator.parse(body.vote);
+
       const comments = await updateImpactMetricCommentVote({
         commentId: Number(commentId),
-        vote: body.vote,
+        vote,
         address: authResponse.userId as string,
       });
       return NextResponse.json(comments);

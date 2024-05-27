@@ -899,13 +899,24 @@ components:
         roundId:
           type: integer
         ballotContent:
-          summary: Signed content of the ballot
-          type: string
+          type: object
+          properties:
+            allocations:
+              type: array
+              items:
+                type: object
+                metrciId:
+                  type: number
+            os_only:
+              type: boolean
+            os_multiplier:
+              type: number
         signature:
           summary: Badgeholder signature of the ballot
           description: >
             Badgeholder's signature of the contents of their ballot.
           type: string
+          pattern: "^0x[a-fA-F0-9]{130}$"
   parameters:
     limitParam:
       name: limit
@@ -1755,6 +1766,8 @@ paths:
           required: true
           schema:
             type: number
+            minimum: 1
+            maximum: 5
       responses:
         "200":
           description: OK
@@ -1884,7 +1897,7 @@ paths:
                 metricId:
                   type: string
                 allocation:
-                  type: string
+                  type: number
                 locked:
                   type: boolean
       responses:
