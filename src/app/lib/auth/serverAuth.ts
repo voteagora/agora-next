@@ -12,6 +12,7 @@ import {
 import { isBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
+import { resolveENSName } from "../ENSUtils";
 
 const HASH_FN = "sha256";
 const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
@@ -37,20 +38,18 @@ export async function authenticateApiUser(
 
   const key = authResponse.token as string;
 
+  // if JWT, authResponse is already resolved
+  if (authResponse.type === "jwt") {
+    return authResponse;
+  }
+
   // TODO: caching logic, rate limiting
-  // lookup hashed API key if authResponse is an API key, check user id otherwise for JWT:
-  const user =
-    authResponse.type === "api_key"
-      ? await prisma.api_user.findFirst({
-          where: {
-            api_key: hashApiKey(key),
-          },
-        })
-      : await prisma.api_user.findFirst({
-          where: {
-            id: authResponse.userId,
-          },
-        });
+  // lookup hashed API key if authResponse is an API key
+  const user = await prisma.api_user.findFirst({
+    where: {
+      api_key: hashApiKey(key),
+    },
+  });
 
   if (!user) {
     authResponse = {
@@ -63,8 +62,7 @@ export async function authenticateApiUser(
       failReason: REASON_DISABLED_USER,
     };
   } else {
-    authResponse.userId =
-      authResponse.type === "api_key" ? user.id : user.address;
+    authResponse.userId = user.id;
   }
 
   return authResponse;
@@ -130,4 +128,17 @@ export async function getRolesForUser(
   }
 
   return defaultRoles;
+}
+
+export async function validateAddressScope(
+  addressOrEnsName: string,
+  authResponse: AuthInfo
+) {
+  const address = (await resolveENSName(addressOrEnsName)).toLowerCase();
+
+  if (authResponse.userId?.toLowerCase() !== address) {
+    return new Response("Unauthorized to perform action on this address", {
+      status: 401,
+    });
+  }
 }
