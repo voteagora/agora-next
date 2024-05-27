@@ -63,8 +63,6 @@ async function getImpactMetricCommentsApi({
     { limit, offset }
   );
 
-  console.log("comments", comments);
-
   return {
     meta: comments.meta,
     data: comments.data.map((comment) => {
