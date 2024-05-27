@@ -26,36 +26,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: `Invalid signature` }, { status: 401 });
   }
 
-  // create or update user record
-  let user = await prisma.api_user.findFirst({
-    where: {
-      address: siweObject.address,
-    },
-  });
-
-  if (!user) {
-    // TODO: extract into /common/users
-    user = await prisma.api_user.create({
-      data: {
-        address: siweObject.address,
-        // TODO: chain id is probably not important, and the abstraction
-        // might need to be rethought
-        chain: {
-          connect: {
-            id: "10",
-          },
-        },
-        enabled: true,
-        description: "Created by SIWE verification",
-      },
-    });
-  }
-
   // create JWT
-  // TODO: resovle scope based on wallet address or user record
-  const scope = await getRolesForUser(user.id);
+  const scope = await getRolesForUser(siweObject.address);
   const ttl = await getExpiry();
-  const jwt = await generateJwt(user.id, scope, ttl, {
+  const jwt = await generateJwt(siweObject.address, scope, ttl, {
     address: siweObject.address,
     chainId: `${siweObject.chainId}`,
     nonce: siweObject.nonce,

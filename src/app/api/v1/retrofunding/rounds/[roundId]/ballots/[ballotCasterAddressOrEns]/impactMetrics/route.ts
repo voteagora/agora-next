@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  validateAddressScope,
+} from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { updateBallotMetric } from "@/app/api/common/ballots/updateBallot";
 
@@ -13,10 +16,11 @@ export async function POST(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
+  const { roundId, ballotCasterAddressOrEns } = route.params;
+  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
+
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId, ballotCasterAddressOrEns } = route.params;
-
       const payload = await request.json();
 
       // TODO: Validate payload
