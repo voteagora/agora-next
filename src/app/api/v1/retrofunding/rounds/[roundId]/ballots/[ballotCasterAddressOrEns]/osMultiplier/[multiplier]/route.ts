@@ -1,6 +1,8 @@
 import { updateBallotOsMultiplier } from "@/app/api/common/ballots/updateBallot";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { resolveENSName } from "@/app/lib/ENSUtils";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import { isAddress } from "ethers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -22,6 +24,17 @@ export async function POST(
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const { roundId, ballotCasterAddressOrEns, multiplier } = route.params;
+
+      const address = isAddress(ballotCasterAddressOrEns)
+        ? ballotCasterAddressOrEns.toLowerCase()
+        : await resolveENSName(ballotCasterAddressOrEns);
+
+      if (authResponse.userId?.toLowerCase() !== address) {
+        return new Response("Unauthorized to perform action on this address", {
+          status: 401,
+        });
+      }
+
       const ballot = await updateBallotOsMultiplier(
         Number(multiplier),
         Number(roundId),
