@@ -30,8 +30,10 @@ export async function POST(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
+      const multiplierPayload = multiplierValidator.parse(Number(multiplier));
+
       const ballot = await updateBallotOsMultiplier(
-        multiplierValidator.parse(multiplier),
+        multiplierPayload,
         Number(roundId),
         ballotCasterAddressOrEns
       );
