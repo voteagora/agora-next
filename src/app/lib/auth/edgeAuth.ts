@@ -32,7 +32,7 @@ export async function validateBearerToken(
   const token = extractBearerTokenFromHeader(
     request.headers.get("Authorization")
   );
-  let authResponse: AuthInfo = { authenticated: true, failReason: "" };
+  let authResponse: AuthInfo = { authenticated: false, failReason: "" };
 
   if (!token) {
     authResponse = {

@@ -37,20 +37,18 @@ export async function authenticateApiUser(
 
   const key = authResponse.token as string;
 
+  // if JWT, authResponse is already resolved
+  if (authResponse.type === "jwt") {
+    return authResponse;
+  }
+
   // TODO: caching logic, rate limiting
-  // lookup hashed API key if authResponse is an API key, check user id otherwise for JWT:
-  const user =
-    authResponse.type === "api_key"
-      ? await prisma.api_user.findFirst({
-          where: {
-            api_key: hashApiKey(key),
-          },
-        })
-      : await prisma.api_user.findFirst({
-          where: {
-            id: authResponse.userId,
-          },
-        });
+  // lookup hashed API key if authResponse is an API key
+  const user = await prisma.api_user.findFirst({
+    where: {
+      api_key: hashApiKey(key),
+    },
+  });
 
   if (!user) {
     authResponse = {
@@ -63,8 +61,7 @@ export async function authenticateApiUser(
       failReason: REASON_DISABLED_USER,
     };
   } else {
-    authResponse.userId =
-      authResponse.type === "api_key" ? user.id : user.address;
+    authResponse.userId = user.id;
   }
 
   return authResponse;
