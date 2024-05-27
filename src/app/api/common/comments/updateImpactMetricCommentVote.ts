@@ -1,5 +1,6 @@
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
+import { ImpactMetricCommentVote } from "./impactMetricComment";
 
 async function updateImpactMetricCommentVoteApi({
   commentId,
@@ -9,8 +10,8 @@ async function updateImpactMetricCommentVoteApi({
   commentId: number;
   address: string;
   vote: number;
-}) {
-  return prisma.metrics_comments_votes.upsert({
+}): Promise<ImpactMetricCommentVote> {
+  const commentVote = await prisma.metrics_comments_votes.upsert({
     where: {
       comment_id_voter: {
         comment_id: commentId,
@@ -27,6 +28,14 @@ async function updateImpactMetricCommentVoteApi({
       vote,
     },
   });
+
+  return {
+    commentId: commentVote.comment_id,
+    address: commentVote.voter,
+    vote: commentVote.vote,
+    createdAt: commentVote.created_at,
+    updatedAt: commentVote.updated_at,
+  };
 }
 
 export const updateImpactMetricCommentVote = cache(

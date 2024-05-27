@@ -1,5 +1,6 @@
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
+import { ImpactMetricComment } from "./impactMetricComment";
 
 async function createImpactMetricCommentApi({
   metricId,
@@ -9,7 +10,7 @@ async function createImpactMetricCommentApi({
   metricId: string;
   address: string;
   comment: string;
-}) {
+}): Promise<ImpactMetricComment> {
   const newComment = await prisma.metrics_comments.create({
     data: {
       comment,
@@ -23,7 +24,7 @@ async function createImpactMetricCommentApi({
 
   return {
     commentId: newComment.comment_id,
-    content: newComment.comment,
+    comment: newComment.comment,
     address: newComment.address,
     createdAt: newComment.created_at,
     updatedAt: newComment.updated_at,
@@ -31,7 +32,15 @@ async function createImpactMetricCommentApi({
       (acc, vote) => acc + vote.vote,
       0
     ),
-    votes: newComment.metrics_comments_votes,
+    votes: newComment.metrics_comments_votes.map((vote) => {
+      return {
+        commentId: vote.comment_id,
+        address: vote.voter,
+        vote: vote.vote,
+        createdAt: vote.created_at,
+        updatedAt: vote.updated_at,
+      };
+    }),
   };
 }
 
