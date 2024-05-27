@@ -12,6 +12,7 @@ import {
 import { isBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
+import { resolveENSName } from "../ENSUtils";
 
 const HASH_FN = "sha256";
 const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
@@ -127,4 +128,17 @@ export async function getRolesForUser(
   }
 
   return defaultRoles;
+}
+
+export async function validateAddressScope(
+  addressOrEnsName: string,
+  authResponse: AuthInfo
+) {
+  const address = (await resolveENSName(addressOrEnsName)).toLowerCase();
+
+  if (authResponse.userId?.toLowerCase() !== address) {
+    return new Response("Unauthorized to perform action on this address", {
+      status: 401,
+    });
+  }
 }

@@ -1,9 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  validateAddressScope,
+} from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { updateBallotMetric } from "@/app/api/common/ballots/updateBallot";
-import { isAddress } from "ethers";
-import { resolveENSName } from "@/app/lib/ENSUtils";
 
 export async function POST(
   request: NextRequest,
@@ -15,20 +16,11 @@ export async function POST(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
+  const { roundId, ballotCasterAddressOrEns } = route.params;
+  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
+
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId, ballotCasterAddressOrEns } = route.params;
-
-      const address = isAddress(ballotCasterAddressOrEns)
-        ? ballotCasterAddressOrEns.toLowerCase()
-        : await resolveENSName(ballotCasterAddressOrEns);
-
-      if (authResponse.userId?.toLowerCase() !== address) {
-        return new Response("Unauthorized to perform action on this address", {
-          status: 401,
-        });
-      }
-
       const payload = await request.json();
 
       // TODO: Validate payload
