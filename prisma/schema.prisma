@@ -146,39 +146,38 @@ model BallotSubmittions {
 }
 
 model metrics_comments {
+  comment_id             Int                      @id @default(autoincrement())
   metric_id              String                   @db.VarChar
   address                String                   @db.VarChar
   comment                String                   @db.VarChar
-  ts                     DateTime                 @default(now()) @db.Timestamptz(6)
+  created_at             DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime                 @default(now()) @db.Timestamptz(6)
   metrics_data           metrics_data             @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
   metrics_comments_votes metrics_comments_votes[]
 
-  @@id([metric_id, address])
   @@schema("retro_funding")
 }
 
 model metrics_comments_votes {
-  metric_id        String           @db.VarChar
-  commenter        String           @db.VarChar
+  comment_id       Int
   voter            String           @db.VarChar
   vote             Int
-  ts               DateTime         @default(now()) @db.Timestamptz(6)
-  metrics_comments metrics_comments @relation(fields: [metric_id, commenter], references: [metric_id, address], onDelete: NoAction, onUpdate: NoAction)
-  metrics_data     metrics_data     @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime         @default(now()) @db.Timestamptz(6)
+  metrics_comments metrics_comments @relation(fields: [comment_id], references: [comment_id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([metric_id, commenter, voter])
+  @@id([comment_id, voter])
   @@schema("retro_funding")
 }
 
 model metrics_data {
-  metric_id              String                   @id @db.VarChar
-  name                   String                   @db.VarChar
-  description            String                   @db.VarChar
-  allocations            allocations[]
-  metrics_comments       metrics_comments[]
-  metrics_comments_votes metrics_comments_votes[]
-  metrics_projects       metrics_projects[]
-  metrics_views          metrics_views[]
+  metric_id        String             @id @db.VarChar
+  name             String             @db.VarChar
+  description      String             @db.VarChar
+  allocations      allocations[]
+  metrics_comments metrics_comments[]
+  metrics_projects metrics_projects[]
+  metrics_views    metrics_views[]
 
   @@schema("retro_funding")
 }
