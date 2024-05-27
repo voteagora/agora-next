@@ -1,45 +1,76 @@
-import { paginateResultEx } from "@/app/lib/pagination";
+import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
+import {
+  ImpactMetrciCommentPayload,
+  ImpactMetricComment,
+} from "./impactMetricComment";
 
 async function getImpactMetricCommentsApi({
   roundId,
   impactMetricId,
-  sortBy = "ts",
-  limit = 10,
-  offset = 0,
+  sort,
+  limit,
+  offset,
 }: {
   roundId: string;
   impactMetricId: string;
-  sortBy?: string;
-  limit?: number;
-  offset?: number;
-}) {
+  sort: string;
+  limit: number;
+  offset: number;
+}): Promise<PaginatedResultEx<ImpactMetricComment[]>> {
   const comments = await paginateResultEx(
     (skip: number, take: number) => {
-      return prisma.metrics_comments.findMany({
-        where: {
-          metric_id: impactMetricId,
-        },
-        orderBy: {
-          [sortBy]: "desc",
-        },
-        include: {
-          metrics_comments_votes: true,
-        },
-        skip,
-        take,
-      });
+      switch (sort) {
+        case "votes":
+          return prisma.$queryRawUnsafe<ImpactMetrciCommentPayload[]>(
+            `
+          SELECT mc.*, 
+          SUM(mcv.vote) AS votes_count, 
+          ARRAY_AGG(jsonb_build_object(
+            'comment_id', mcv.comment_id,
+            'voter', mcv.voter,
+            'vote', mcv.vote,
+            'created_at', mcv.created_at,
+            'updated_at', mcv.updated_at
+          )) AS metrics_comments_votes
+          FROM retro_funding.metrics_comments mc
+          LEFT JOIN retro_funding.metrics_comments_votes mcv ON mc.comment_id = mcv.comment_id
+          WHERE mc.metric_id = $1
+          GROUP BY mc.comment_id
+          ORDER BY votes_count DESC
+          LIMIT ${take}
+          OFFSET ${skip}
+        `,
+            impactMetricId
+          );
+        default:
+          return prisma.metrics_comments.findMany({
+            where: {
+              metric_id: impactMetricId,
+            },
+            orderBy: {
+              updated_at: "desc",
+            },
+            include: {
+              metrics_comments_votes: true,
+            },
+            skip,
+            take,
+          });
+      }
     },
-    { limit: 10, offset: 0 }
+    { limit, offset }
   );
+
+  console.log("comments", comments);
 
   return {
     meta: comments.meta,
     data: comments.data.map((comment) => {
       return {
         commentId: comment.comment_id,
-        content: comment.comment,
+        comment: comment.comment,
         address: comment.address,
         createdAt: comment.created_at,
         updatedAt: comment.updated_at,
@@ -47,13 +78,23 @@ async function getImpactMetricCommentsApi({
           (acc, vote) => acc + vote.vote,
           0
         ),
-        votes: comment.metrics_comments_votes,
+        votes: comment.metrics_comments_votes.map((vote) => {
+          return {
+            commentId: vote.comment_id,
+            address: vote.voter,
+            vote: vote.vote,
+            createdAt: vote.created_at,
+            updatedAt: vote.updated_at,
+          };
+        }),
       };
     }),
   };
 }
 
-async function getImpactMetricCommentApi(commentId: number) {
+async function getImpactMetricCommentApi(
+  commentId: number
+): Promise<ImpactMetricComment> {
   const comment = await prisma.metrics_comments.findFirst({
     where: {
       comment_id: commentId,
@@ -69,7 +110,7 @@ async function getImpactMetricCommentApi(commentId: number) {
 
   return {
     commentId: comment.comment_id,
-    content: comment.comment,
+    comment: comment.comment,
     address: comment.address,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
@@ -77,7 +118,15 @@ async function getImpactMetricCommentApi(commentId: number) {
       (acc, vote) => acc + vote.vote,
       0
     ),
-    votes: comment.metrics_comments_votes,
+    votes: comment.metrics_comments_votes.map((vote) => {
+      return {
+        commentId: vote.comment_id,
+        address: vote.voter,
+        vote: vote.vote,
+        createdAt: vote.created_at,
+        updatedAt: vote.updated_at,
+      };
+    }),
   };
 }
 

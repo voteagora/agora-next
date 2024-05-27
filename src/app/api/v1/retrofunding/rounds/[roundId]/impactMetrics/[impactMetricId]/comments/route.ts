@@ -2,11 +2,32 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-import {
-  fetchImpactMetricComments,
-  fetchImpactMetricComment,
-} from "@/app/api/common/comments/getImpactMetricComments";
+import { fetchImpactMetricComments } from "@/app/api/common/comments/getImpactMetricComments";
 import { createImpactMetricComment } from "@/app/api/common/comments/createImpactMetricComment";
+import {
+  createOptionalNumberValidator,
+  createOptionalStringValidator,
+} from "@/app/api/common/utils/validators";
+
+const DEFAULT_SORT = "newest";
+const DEFAULT_MAX_LIMIT = 100;
+const DEFAULT_LIMIT = 20;
+const DEFAULT_OFFSET = 0;
+
+const sortValidator = createOptionalStringValidator(
+  ["newest", "votes"],
+  DEFAULT_SORT
+);
+const limitValidator = createOptionalNumberValidator(
+  1,
+  DEFAULT_MAX_LIMIT,
+  DEFAULT_LIMIT
+);
+const offsetValidator = createOptionalNumberValidator(
+  0,
+  Number.MAX_SAFE_INTEGER,
+  DEFAULT_OFFSET
+);
 
 export async function GET(
   request: NextRequest,
@@ -20,10 +41,18 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     const { roundId, impactMetricId } = route.params;
+
+    const searchParams = request.nextUrl.searchParams;
+    const sort = sortValidator.parse(searchParams.get("sort"));
+    const limit = limitValidator.parse(searchParams.get("limit"));
+    const offest = offsetValidator.parse(searchParams.get("offset"));
     try {
       const comments = await fetchImpactMetricComments({
         roundId,
         impactMetricId,
+        sort,
+        limit,
+        offset: offest,
       });
       return NextResponse.json(comments);
     } catch (e: any) {
