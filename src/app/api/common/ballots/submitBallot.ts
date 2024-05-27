@@ -2,14 +2,7 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import prisma from "@/app/lib/prisma";
-
-type BallotSubmission = {
-  ballotContnet: {
-    metric_id: string;
-    allocation: number;
-  }[];
-  signature: string;
-};
+import { BallotSubmission } from "../../v1/retrofunding/rounds/[roundId]/ballots/[ballotCasterAddressOrEns]/submit/route";
 
 const submitBallotApi = async (
   data: BallotSubmission,

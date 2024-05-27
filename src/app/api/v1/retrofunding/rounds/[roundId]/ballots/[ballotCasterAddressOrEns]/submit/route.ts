@@ -4,15 +4,18 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
 
-const ballotSubmissionSchema = z.object({
-  ballotContnet: z.array(
-    z.object({
-      metric_id: z.string(),
-      allocation: z.number(),
-    })
-  ),
-  signature: z.string(),
+const ballotContentSchema = z.object({
+  allocations: z.array(z.record(z.string(), z.number())),
+  os_only: z.boolean(),
+  os_multiplier: z.number(),
 });
+
+const ballotSubmissionSchema = z.object({
+  ballotContnet: ballotContentSchema,
+  signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
+});
+
+export type BallotSubmission = z.infer<typeof ballotSubmissionSchema>;
 
 export async function POST(
   request: NextRequest,
