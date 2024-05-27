@@ -905,7 +905,7 @@ components:
               type: array
               items:
                 type: object
-                additionalProperties:
+                metrciId:
                   type: number
             os_only:
               type: boolean
