@@ -5,6 +5,13 @@ import {
 } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { updateBallotMetric } from "@/app/api/common/ballots/updateBallot";
+import { z } from "zod";
+
+const ballotPayloadSchema = z.object({
+  metric_id: z.string(),
+  allocation: z.number(),
+  locked: z.boolean(),
+});
 
 export async function POST(
   request: NextRequest,
@@ -22,11 +29,10 @@ export async function POST(
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const payload = await request.json();
-
-      // TODO: Validate payload
+      const parsedPayload = ballotPayloadSchema.parse(payload);
 
       const impactMetrics = await updateBallotMetric(
-        payload,
+        parsedPayload,
         Number(roundId),
         ballotCasterAddressOrEns
       );
