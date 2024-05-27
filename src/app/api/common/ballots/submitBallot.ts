@@ -8,7 +8,7 @@ type BallotSubmission = {
     metric_id: string;
     allocation: number;
   }[];
-  signature: `0x${string}`;
+  signature: string;
 };
 
 const submitBallotApi = async (
@@ -35,7 +35,7 @@ async function submitBallotForAddress({
   const isSignatureValid = await verifyMessage({
     address: address as `0x${string}`,
     message: payload,
-    signature: data.signature,
+    signature: data.signature as `0x${string}`,
   });
 
   // TODO: Validate ballot content
