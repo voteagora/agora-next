@@ -1897,7 +1897,7 @@ paths:
                 metricId:
                   type: string
                 allocation:
-                  type: string
+                  type: number
                 locked:
                   type: boolean
       responses:
