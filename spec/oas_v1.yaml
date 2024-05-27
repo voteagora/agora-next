@@ -61,16 +61,16 @@ components:
       description: Metadata associated with paginated requests.
       type: object
       properties:
-        hasNext:
+        has_next:
           summary: Flag indicating if there's more data for retieval
           description: A boolean flag indicating if there is additional data past the returned page to retrieve.
           type: boolean
-        totalReturned:
+        total_returned:
           summary: Total records returned
           description: A number indicating the total amount of records returned for the request.
           type: integer
           format: int32
-        nextOffset:
+        next_offset:
           summary: Offset to supply to the next request
           description: A number indicating the offset at which a subsequent request may retrieve the next set of records.
           type: integer
@@ -2003,7 +2003,7 @@ paths:
                 properties:
                   metadata:
                     $ref: "#/components/schemas/PageMetadata"
-                  comments:
+                  data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Comment"
