@@ -1,6 +1,9 @@
 import { viewImpactMetricApi } from "@/app/api/common/impactMetrics/viewImactMetric";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  validateAddressScope,
+} from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -19,9 +22,11 @@ export async function POST(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
+  const { roundId, addressOrENSName, impactMetricId } = route.params;
+  await validateAddressScope(addressOrENSName, authResponse);
+
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId, addressOrENSName, impactMetricId } = route.params;
       const view = await viewImpactMetricApi({
         addressOrENSName,
         metricId: impactMetricId,
