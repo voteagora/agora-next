@@ -2245,6 +2245,7 @@ paths:
       description: >
         Creates or updates vote for a speciffic comment.
         Address of the voter is taken from the auth token.
+        Input is a number, where 1 is upvote, -1 is downvote, 0 is neutral.
       operationId: putImactMetricCommentVote
       tags:
         - RetroFunding
@@ -2256,6 +2257,14 @@ paths:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
         - $ref: "#/components/parameters/commentIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vote:
+                  type: number
       responses:
         "200":
           description: OK
