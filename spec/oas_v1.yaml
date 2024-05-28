@@ -651,7 +651,7 @@ components:
         An impact metric for an RetroFunding project with associated metadata.
       type: object
       properties:
-        metricId:
+        metric_id:
           type: string
         name:
           type: string
