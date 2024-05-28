@@ -13,6 +13,8 @@ import { Toaster } from "react-hot-toast";
 import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SIWEProvider } from "connectkit";
+import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
@@ -43,21 +45,23 @@ const config = createConfig(
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiConfig config={config}>
     <QueryClientProvider client={queryClient}>
-      <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-        <body className={inter.variable}>
-          <noscript>You need to enable JavaScript to run this app.</noscript>
-          {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-          {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-          <ConnectButtonProvider>
-            <PageContainer>
-              <Toaster />
-              <AgoraProvider>{children}</AgoraProvider>
-            </PageContainer>
-          </ConnectButtonProvider>
-          <Footer />
-          <SpeedInsights />
-        </body>
-      </ConnectKitProvider>
+      <SIWEProvider {...siweProviderConfig}>
+        <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+          <body className={inter.variable}>
+            <noscript>You need to enable JavaScript to run this app.</noscript>
+            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+            <ConnectButtonProvider>
+              <PageContainer>
+                <Toaster />
+                <AgoraProvider>{children}</AgoraProvider>
+              </PageContainer>
+            </ConnectButtonProvider>
+            <Footer />
+            <SpeedInsights />
+          </body>
+        </ConnectKitProvider>
+      </SIWEProvider>
     </QueryClientProvider>
   </WagmiConfig>
 );

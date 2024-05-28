@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { fetchBallots } from "@/app/api/common/ballots/getBallots";
+
+import { fetchRetroFundingRounds } from "@/app/api/common/rounds/getRetroFundingRounds";
 
 export async function GET(
   request: NextRequest,
@@ -12,18 +13,11 @@ export async function GET(
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });
   }
+
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const params = request.nextUrl.searchParams;
     try {
-      const { roundId } = route.params;
-      const limit = Number(params.get("limit")) || 10;
-      const offset = Number(params.get("offset")) || 0;
-      const ballots = await fetchBallots({
-        roundId: Number(roundId),
-        limit,
-        offset,
-      });
-      return NextResponse.json(ballots);
+      const round = await fetchRetroFundingRounds();
+      return NextResponse.json(round);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
