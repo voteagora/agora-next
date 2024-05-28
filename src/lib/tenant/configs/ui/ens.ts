@@ -6,6 +6,10 @@ export const ensTenantUIConfig = new TenantUI({
   color: "#5BAAF4",
   logo: ensLogo,
 
+  delegate: {
+    logo: ensLogo,
+  },
+
   organization: {
     title: "ENS Foundation",
   },

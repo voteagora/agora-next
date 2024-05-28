@@ -28,11 +28,11 @@ interface Props {
 }
 
 export default function DelegateCardList({
-                                           address,
-                                           initialDelegates,
-                                           fetchDelegates,
-                                           onSelect,
-                                         }: Props) {
+  address,
+  initialDelegates,
+  fetchDelegates,
+  onSelect,
+}: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
@@ -48,7 +48,7 @@ export default function DelegateCardList({
       fetching.current = true;
       const data = await fetchDelegates(
         meta.currentPage + 1,
-        initialDelegates.seed,
+        initialDelegates.seed
       );
       setDelegates(delegates.concat(data.delegates));
       setMeta(data.meta);
@@ -82,7 +82,6 @@ export default function DelegateCardList({
           action={"I’ll vote myself"}
         />
         {delegates.map((delegate) => {
-
           // Filter out the current user from the list of delegates
           if (delegate.address !== address.toLowerCase()) {
             let truncatedStatement = "";

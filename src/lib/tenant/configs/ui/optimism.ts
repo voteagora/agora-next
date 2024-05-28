@@ -8,6 +8,10 @@ export const optimismTenantUIConfig = new TenantUI({
   logo: optimismLogo,
   hero: optimismHero,
 
+  delegate: {
+    logo: optimismLogo,
+  },
+
   organization: {
     title: "Optimism Foundation",
   },

@@ -8,6 +8,10 @@ export const etherfiTenantUIConfig = new TenantUI({
   hero: etherfiHero,
   logo: etherfiLogo,
 
+  delegate: {
+    logo: etherfiLogo,
+  },
+
   organization: {
     title: "Ether.fi Foundation",
   },

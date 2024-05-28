@@ -23,8 +23,13 @@ type UIOrganization = {
   title: string;
 };
 
+type UIDelegate = {
+  logo: string;
+};
+
 type TenantUIParams = {
   color: string;
+  delegate: UIDelegate;
   hero?: string;
   links?: UILink[];
   logo: string;
@@ -36,6 +41,7 @@ type TenantUIParams = {
 
 export class TenantUI {
   private _color: string;
+  private _delegate: UIDelegate;
   private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
@@ -50,15 +56,17 @@ export class TenantUI {
 
   constructor({
     color,
+    delegate,
     hero,
     links,
     logo,
+    organization,
     pages,
     title,
     toggles,
-    organization,
   }: TenantUIParams) {
     this._color = color;
+    this._delegate = delegate;
     this._hero = hero;
     this._links = links;
     this._logo = logo;
@@ -70,6 +78,10 @@ export class TenantUI {
 
   public get color(): string {
     return this._color;
+  }
+
+  public get delegate(): UIDelegate {
+    return this._delegate;
   }
 
   public get title(): string {

@@ -23,11 +23,11 @@ interface EditDelegateFlowProps {
 }
 
 export const EditDelegateFlow = ({
-                                   delegates,
-                                   deposit,
-                                   fetchDelegates,
-                                   refreshPath,
-                                 }: EditDelegateFlowProps) => {
+  delegates,
+  deposit,
+  fetchDelegates,
+  refreshPath,
+}: EditDelegateFlowProps) => {
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [delegate, setDelegate] = useState<string>(deposit.delegatee);
@@ -45,7 +45,10 @@ export const EditDelegateFlow = ({
         <>
           <div className="border rounded-xl flex gap-4 w-full shadow-newDefault p-4 font-medium">
             <div className={`p-1 rounded-lg bg-gray-200`}>
-              <Image src={icons.speakerCone} alt="Uniswap voters manage staking rewards" />
+              <Image
+                src={icons.speakerCone}
+                alt="Uniswap voters manage staking rewards"
+              />
             </div>
             <>
               Uniswap voters manage staking rewards. Choose your delegate

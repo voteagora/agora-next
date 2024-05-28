@@ -1,12 +1,17 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import uniswapHero from "@/assets/tenant/uniswap_hero.svg";
 import uniswapLogo from "@/assets/tenant/uniswap_logo.svg";
+import uniswapDelegateLogo from "@/assets/tenant/uniswap_delegate.svg";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
-  color: '#FF007A',
+  color: "#FF007A",
   hero: uniswapHero,
   logo: uniswapLogo,
+
+  delegate: {
+    logo: uniswapDelegateLogo,
+  },
 
   organization: {
     title: "Uniswap Foundation",
