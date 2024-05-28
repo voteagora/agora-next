@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { ImpactMetricCommentVote } from "./impactMetricComment";
+import prisma from "@/app/lib/prisma";
 
 async function getImpactMetricCommentVotesApi({
   commentId,
