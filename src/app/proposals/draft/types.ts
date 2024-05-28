@@ -44,18 +44,13 @@ export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.CONTACT_VOTERS,
+    stage: PrismaProposalStage.QUEUE,
     order: 4,
     isPreSubmission: false,
   },
   {
-    stage: PrismaProposalStage.QUEUE,
-    order: 5,
-    isPreSubmission: false,
-  },
-  {
     stage: PrismaProposalStage.EXECUTE,
-    order: 6,
+    order: 5,
     isPreSubmission: false,
   },
 ];
@@ -87,13 +82,6 @@ export const ProposalLifecycleStageMetadata = {
     shortTitle: "Ready",
     description: "Ready to submit the proposal",
     waitingFor: "Sponsor approval",
-    checklistItems: [],
-  },
-  [PrismaProposalStage.CONTACT_VOTERS]: {
-    title: "Contact voters",
-    shortTitle: "Contact voters",
-    description: "Contact the voters",
-    waitingFor: "Onchain vote",
     checklistItems: [],
   },
   [PrismaProposalStage.QUEUE]: {

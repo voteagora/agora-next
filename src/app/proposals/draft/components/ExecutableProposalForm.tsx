@@ -11,6 +11,7 @@ import {
 } from "react-hook-form";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
+import toast from "react-hot-toast";
 
 enum Status {
   Unconfirmed = "Unconfirmed",
@@ -27,49 +28,16 @@ const TransactionForm = ({
   remove: UseFieldArrayRemove;
   children: React.ReactNode;
 }) => {
-  const [status, setStatus] = useState<Status>(Status.Unconfirmed);
-  const {
-    register,
-    formState: { errors },
-    getValues,
-    setValue,
-  } = useFormContext();
+  const { register, watch } =
+    useFormContext<z.output<typeof draftProposalSchema>>();
 
-  const simulateTransaction = async () => {
-    const transactions = getValues("transactions");
-    const transaction = transactions[index];
-
-    // todo: validate target is address and all other fields etc
-
-    try {
-      const response = await fetch("/api/simulate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          target: transaction.target,
-          value: transaction.value,
-          calldata: transaction.calldata,
-          // todo: update these two to be dynamic from tenant (chainId + governor address)
-          // right now network is sepolia (for testing ENS)
-          networkId: 11155111,
-          // Michael's dev address
-          from: "0xca1d77cd31ab0e7c53f8158959455d074894d4dd",
-        }),
-      });
-      const res = await response.json();
-      if (res.response.transaction.status) {
-        setStatus(Status.Valid);
-        setValue(`transactions.${index}.isValid`, "true");
-      } else {
-        setStatus(Status.Invalid);
-      }
-    } catch (e) {
-      setStatus(Status.Invalid);
-    }
-  };
-
+  const isValid = watch(`transactions.${index}.isValid`);
+  const status =
+    isValid === "unconfirmed"
+      ? Status.Unconfirmed
+      : isValid === "true"
+        ? Status.Valid
+        : Status.Invalid;
   return (
     <div className="p-4 border border-agora-stone-100 rounded-lg">
       <div className="flex flex-row justify-between items-center mb-6">
@@ -99,14 +67,6 @@ const TransactionForm = ({
             {status}
           </span>
         </FormItem>
-        <UpdatedButton
-          type="secondary"
-          onClick={() => simulateTransaction()}
-          className="self-end"
-          isSubmit={false}
-        >
-          Simulate
-        </UpdatedButton>
       </div>
       <input type="hidden" {...register(`transactions.${index}.isValid`)} />
     </div>
@@ -114,10 +74,13 @@ const TransactionForm = ({
 };
 
 const ExecutableProposalForm = () => {
+  const [status, setStatus] = useState<Status>(Status.Unconfirmed);
   type FormType = z.output<typeof draftProposalSchema>;
   const {
     register,
     control,
+    setValue,
+    getValues,
     formState: { errors },
   } = useFormContext<FormType>();
 
@@ -125,6 +88,42 @@ const ExecutableProposalForm = () => {
     control,
     name: "transactions",
   });
+
+  const simulateTransactions = async () => {
+    const transactions = getValues("transactions");
+
+    // todo: validate target is address and all other fields etc
+
+    console.log("transactions", transactions);
+    try {
+      const response = await fetch("/api/simulate-bundle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          transactions,
+          // TODO: update these two to be dynamic from tenant (chainId + governor address)
+          // right now network is sepolia (for testing ENS)
+          networkId: "11155111",
+          // Michael's dev address -- replace with governor address
+          from: "0xca1d77cd31ab0e7c53f8158959455d074894d4dd",
+        }),
+      });
+      const res = await response.json();
+      res.response.simulation_results.forEach((result: any, index: number) => {
+        if (result.transaction.status) {
+          setValue(`transactions.${index}.isValid`, "true");
+        } else {
+          setValue(`transactions.${index}.isValid`, "false");
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      // should we invalidate the transactions? This doesn't mean they are invalid, could have some other issue.
+      toast.error("Error simulating transactions");
+    }
+  };
 
   return (
     <div>
@@ -157,6 +156,18 @@ const ExecutableProposalForm = () => {
           );
         })}
       </div>
+      <div className="mt-6">
+        <UpdatedButton
+          isSubmit={false}
+          type="secondary"
+          fullWidth={true}
+          onClick={() => {
+            simulateTransactions();
+          }}
+        >
+          Simulate transactions
+        </UpdatedButton>
+      </div>
       <div className="flex flex-row space-x-2 w-full mt-6">
         <UpdatedButton
           isSubmit={false}
@@ -169,7 +180,7 @@ const ExecutableProposalForm = () => {
               value: "",
               calldata: "",
               description: "",
-              isValid: "false",
+              isValid: "unconfirmed",
             });
           }}
         >
@@ -186,7 +197,7 @@ const ExecutableProposalForm = () => {
               value: "",
               calldata: "",
               description: "",
-              isValid: "false",
+              isValid: "unconfirmed",
             });
           }}
         >

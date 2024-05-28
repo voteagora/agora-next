@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { encodeFunctionData, isAddress } from "viem";
+import { encodeFunctionData, isAddress, parseUnits } from "viem";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import { useFormContext } from "react-hook-form";
@@ -59,7 +59,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       const calldata = encodeFunctionData({
         abi: transferABI,
         functionName: "transfer",
-        args: [recipient as `0x${string}`, BigInt(amount)],
+        args: [recipient as `0x${string}`, BigInt(parseUnits(amount, 18))],
       });
 
       setValue(`transactions.${index}.calldata`, calldata);

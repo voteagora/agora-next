@@ -1,4 +1,17 @@
+"use client";
+import { useState } from "react";
+
 const FileInput = () => {
+  const [fileName, setFileName] = useState("");
+
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    console.log(file);
+    if (file) {
+      setFileName(file.name);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center w-full">
       <label
@@ -25,8 +38,18 @@ const FileInput = () => {
             <span className="font-semibold">Click to upload</span> or drag and
             drop
           </p>
+          {fileName && (
+            <p className="text-sm text-agora-stone-500">
+              <span className="font-semibold">File selected:</span> {fileName}
+            </p>
+          )}
         </div>
-        <input id="dropzone-file" type="file" className="hidden" />
+        <input
+          id="dropzone-file"
+          type="file"
+          className="hidden"
+          onChange={handleFileChange}
+        />
       </label>
     </div>
   );
