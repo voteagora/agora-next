@@ -22,6 +22,8 @@ import { TOKEN_BALANCE_QK } from "@/hooks/useTokenBalance";
 import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
 import { INDEXER_DELAY } from "@/lib/constants";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
+import { toBigInt } from "ethers";
+import { useStakedDeposit } from "@/hooks/useStakedDeposit";
 
 interface DepositProps {
   deposit: StakedDeposit;
@@ -36,7 +38,8 @@ export const Deposit = ({
 }: DepositProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+
   const [delegate, setDelegate] = useState<Delegate | null>(null);
   const isDelegateFetched = useRef(false);
 
@@ -50,6 +53,8 @@ export const Deposit = ({
   });
 
   const { data, write } = useContractWrite(config);
+  const isDepositOwner =
+    isConnected && address?.toLowerCase() === deposit.depositor.toLowerCase();
 
   const { isLoading: isProcessingWithdrawal, isFetched: didProcessWithdrawal } =
     useWaitForTransaction({
@@ -137,7 +142,7 @@ export const Deposit = ({
           </div>
         ) : (
           <div className="flex flex-row justify-between gap-5">
-            {isConnected ? (
+            {isDepositOwner ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                   <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 shadow-newDefault cursor-pointer">

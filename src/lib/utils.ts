@@ -4,7 +4,6 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import exp from "node:constants";
 
 const { token } = Tenant.current();
 
@@ -67,6 +66,30 @@ export function pluralize(word: string, count: number) {
 
 export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLocaleLowerCase();
+}
+
+/**
+ * Check if a string is in scientific notation
+ * @param input
+ */
+export function isScientificNotation(input: string) {
+  const scientificNotationRegex = /^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/;
+  return scientificNotationRegex.test(input);
+}
+
+/**
+ * Convert a string in scientific notation to precision BigInt
+ * @param input
+ */
+export function scientificNotationToPrecision(input: string) {
+  if (isScientificNotation(input)) {
+    const parts = input.split("e");
+    const base = parts[0].replace(".", "");
+    const exponent = parseInt(parts[1], 10) - (base.length - 1);
+    return BigInt(base) * 10n ** BigInt(exponent);
+  } else {
+    return BigInt(input);
+  }
 }
 
 export function tokenToHumanNumber(amount: number, decimals: number) {
