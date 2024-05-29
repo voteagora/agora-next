@@ -33,5 +33,5 @@ export const getStageIndexForTenant = (stage: ProposalStage) => {
 };
 
 export const isPostSubmission = (stage: ProposalStage) => {
-  return POST_DRAFT_STAGES_FOR_TENANT.includes(stage);
+  return POST_DRAFT_STAGES_FOR_TENANT.some((s) => s.stage === stage);
 };

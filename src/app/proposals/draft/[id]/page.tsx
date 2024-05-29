@@ -14,6 +14,8 @@ import {
   isPostSubmission,
   DRAFT_STAGES_FOR_TENANT,
 } from "../utils/stages";
+import OnlyOwner from "./components/OwnerOnly";
+import ArchivedDraftProposal from "./components/ArchivedDraftProposal";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -55,10 +57,9 @@ export default async function DraftProposalPage({
 
   const draftProposal = await getDraftProposal(parseInt(params.id));
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
-  console.log("ipss", isPostSubmissionStage);
 
   if (isPostSubmissionStage) {
-    return <div>archived...</div>;
+    return <ArchivedDraftProposal draftProposal={draftProposal} />;
   }
 
   const stageParam = (searchParams?.stage || "0") as string;
@@ -67,36 +68,38 @@ export default async function DraftProposalPage({
   const stageMetadata = getStageMetadata(stageObject.stage);
 
   return (
-    <main className="max-w-screen-xl mx-auto mt-10">
-      <div className="mb-4 flex flex-row items-center space-x-6">
-        {stageIndex > 0 && (
-          <BackButton
-            draftProposalId={parseInt(params.id)}
-            index={stageIndex}
-          />
-        )}
-        <h1 className="font-black text-stone-900 text-2xl m-0">
-          {stageMetadata?.title}
-        </h1>
-        <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">
-          {/* stageObject.order + 1 is becuase order is zero indexed */}
-          Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
-        </span>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6">
-        <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
-          <DraftProposalForm
-            stage={stageObject.stage}
-            draftProposal={draftProposal}
-          />
-        </section>
-        <section className="col-span-1">
-          <DraftProposalChecklist
-            draftProposal={draftProposal}
-            stage={stageObject.stage}
-          />
-        </section>
-      </div>
-    </main>
+    <OnlyOwner ownerAddress={draftProposal.author_address as `0x${string}`}>
+      <main className="max-w-screen-xl mx-auto mt-10">
+        <div className="mb-4 flex flex-row items-center space-x-6">
+          {stageIndex > 0 && (
+            <BackButton
+              draftProposalId={parseInt(params.id)}
+              index={stageIndex}
+            />
+          )}
+          <h1 className="font-black text-stone-900 text-2xl m-0">
+            {stageMetadata?.title}
+          </h1>
+          <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">
+            {/* stageObject.order + 1 is becuase order is zero indexed */}
+            Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6">
+          <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
+            <DraftProposalForm
+              stage={stageObject.stage}
+              draftProposal={draftProposal}
+            />
+          </section>
+          <section className="col-span-1">
+            <DraftProposalChecklist
+              draftProposal={draftProposal}
+              stage={stageObject.stage}
+            />
+          </section>
+        </div>
+      </main>
+    </OnlyOwner>
   );
 }

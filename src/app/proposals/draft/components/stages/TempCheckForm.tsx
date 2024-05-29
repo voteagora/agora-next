@@ -4,7 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 // import Tenant from "@/lib/tenant/tenant";
 import { useForm } from "react-hook-form";
-// import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
 import FormItem from "../form/FormItem";
@@ -16,6 +16,7 @@ import { ProposalDraft } from "@prisma/client";
 import { useAccount } from "wagmi";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+  const router = useRouter();
   const { address } = useAccount();
   const [isSkipPending, setIsSkipPending] = useState(false);
   const [isSubmitPending, setIsSubmitPending] = useState(false);
@@ -51,9 +52,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
         draftProposalId: draftProposal.id,
         creatorAddress: address,
       });
-      // not sure why redirect is not working
-      // redirect(`/proposals/draft?stage=1`);
-      window.location.href = `/proposals/draft/${draftProposal.id}?stage=1`;
+      router.push(`/proposals/draft/${draftProposal.id}?stage=1`);
     } catch (e) {
       console.error(e);
     }

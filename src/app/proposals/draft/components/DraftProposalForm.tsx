@@ -23,7 +23,12 @@ export default function DraftProposalForm({
     checklist_items: ProposalChecklist[];
   };
 }) {
-  const { address } = useAccount();
+  const { address, isConnecting, isReconnecting } = useAccount();
+
+  if (isConnecting || isReconnecting) {
+    return <div>Connecting...</div>;
+  }
+
   if (draftProposal.author_address !== address) {
     return <div>You are not the author of this proposal.</div>;
   }

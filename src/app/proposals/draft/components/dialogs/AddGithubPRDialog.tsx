@@ -2,14 +2,18 @@
 import { UpdatedButton } from "@/components/Button";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const AddGithubPRDialog = ({
   redirectUrl,
   githubUrl,
+  closeDialog,
 }: {
   redirectUrl: string;
   githubUrl: string;
+  closeDialog: () => void;
 }) => {
+  const router = useRouter();
   return (
     <div>
       <span className="block h-[150px] w-full bg-agora-stone-100 rounded-lg"></span>
@@ -28,7 +32,8 @@ const AddGithubPRDialog = ({
           fullWidth={true}
           type="primary"
           onClick={async () => {
-            window.location.href = redirectUrl;
+            closeDialog();
+            router.push(redirectUrl);
           }}
         >
           Continue

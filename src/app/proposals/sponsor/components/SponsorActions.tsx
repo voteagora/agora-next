@@ -73,8 +73,7 @@ const SponsorActions = ({
                 params: { redirectUrl: "/", snapshotLink },
               });
             } else {
-              await writeAsync?.();
-
+              const data = await writeAsync?.();
               await sponsorDraftProposal({
                 draftProposalId: draftProposal.id,
                 onchain_transaction_hash: data?.hash,

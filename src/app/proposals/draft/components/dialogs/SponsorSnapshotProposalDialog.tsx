@@ -17,7 +17,7 @@ const SponsorSnapshotProposalDialog = ({
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-white rounded-xl">
-        <VStack className="">
+        <VStack>
           <VStack className="w-full">
             <img
               src={`/images/action-pending.svg`}

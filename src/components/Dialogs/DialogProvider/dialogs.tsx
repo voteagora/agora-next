@@ -149,7 +149,7 @@ export type SponsorSnapshotDraftProposalDialog = {
 
 export type SponsorOnchainDraftProposalDialog = {
   type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL";
-  params: { redirectUrl: string; txHash: string };
+  params: { redirectUrl: string; txHash: `0x${string}` };
 };
 
 export type OpenGithubPRDialog = {
@@ -276,7 +276,11 @@ export const dialogs: DialogDefinitions<DialogType> = {
     <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
   ),
   SPONSOR_ONCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
-    <SponsorOnchainProposalDialog redirectUrl={redirectUrl} txHash={txHash} />
+    <SponsorOnchainProposalDialog
+      redirectUrl={redirectUrl}
+      txHash={txHash}
+      closeDialog={closeDialog}
+    />
   ),
   SPONSOR_SNAPSHOT_DRAFT_PROPOSAL: (
     { redirectUrl, snapshotLink },
@@ -288,8 +292,12 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
     />
   ),
-  OPEN_GITHUB_PR: ({ redirectUrl, githubUrl }) => (
-    <AddGithubPRDialog redirectUrl={redirectUrl} githubUrl={githubUrl} />
+  OPEN_GITHUB_PR: ({ redirectUrl, githubUrl }, closeDialog) => (
+    <AddGithubPRDialog
+      redirectUrl={redirectUrl}
+      githubUrl={githubUrl}
+      closeDialog={closeDialog}
+    />
   ),
   // FAQ: () => {
   //   return <FaqDialog />;

@@ -24,6 +24,7 @@ import SocialProposalForm from "../SocialProposalForm";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useRouter } from "next/navigation";
 
 const DraftForm = ({
   draftProposal,
@@ -33,6 +34,7 @@ const DraftForm = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const router = useRouter();
   const { address } = useAccount();
   const openDialog = useOpenDialog();
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -82,7 +84,7 @@ const DraftForm = ({
         setIsPending(false);
         toast("Something went wrong...");
       } else {
-        window.location.href = `/proposals/draft/${draftProposal.id}?stage=2`;
+        router.push(`/proposals/draft/${draftProposal.id}?stage=2`);
       }
     } catch (error) {
       setIsPending(false);
