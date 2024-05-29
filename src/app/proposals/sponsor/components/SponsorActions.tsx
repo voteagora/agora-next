@@ -73,16 +73,19 @@ const SponsorActions = ({
                 params: { redirectUrl: "/", snapshotLink },
               });
             } else {
-              const hash = await writeAsync?.();
+              await writeAsync?.();
 
               await sponsorDraftProposal({
                 draftProposalId: draftProposal.id,
-                txHash: hash as unknown as string,
+                onchain_transaction_hash: data?.hash,
               });
 
               openDialog({
                 type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
-                params: { redirectUrl: "/", txHash: hash as unknown as string },
+                params: {
+                  redirectUrl: "/",
+                  txHash: data?.hash as `0x${string}`,
+                },
               });
             }
           } catch (error) {

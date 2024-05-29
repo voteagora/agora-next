@@ -32,12 +32,12 @@ export async function onSubmitAction(
       data: {
         // TODO: this shouldn't really be queue...
         // queue is next action we would take but it's more like "ready for voting"
-        stage: ProposalStage.QUEUE,
+        stage: ProposalStage.PENDING,
         ...(parsed.data.snapshot_link && {
           snapshot_link: parsed.data.snapshot_link,
         }),
-        ...(parsed.data.txHash && {
-          txHash: parsed.data.txHash,
+        ...(parsed.data.onchain_transaction_hash && {
+          onchain_transaction_hash: parsed.data.onchain_transaction_hash,
         }),
       },
     });

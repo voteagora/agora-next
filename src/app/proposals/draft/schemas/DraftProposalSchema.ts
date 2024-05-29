@@ -10,11 +10,8 @@ const transaction = z.object({
   value: z.string().min(1),
   calldata: z.string().min(1, { message: "Calldata cannot be empty" }),
   description: z.string().min(1, { message: "Description cannot be empty" }),
-  // hidden input so needs to be string, but use true false, really a boolean
-  // TODO: maybe an enum to make sure its only true or false?
-  is_valid: z.string(),
-  // hidden input for the transaction simulation
-  simulationId: z.string(),
+  simulation_state: z.string(), // unconfirmed, valid, invalid
+  simulation_id: z.string().nullable(),
   // part of transfer transaction -- gets filtered out of form
   recipient: z
     .string()

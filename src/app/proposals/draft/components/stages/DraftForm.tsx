@@ -35,7 +35,6 @@ const DraftForm = ({
 }) => {
   const { address } = useAccount();
   const openDialog = useOpenDialog();
-  console.log("draft proposal", draftProposal);
   const [isPending, setIsPending] = useState<boolean>(false);
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),

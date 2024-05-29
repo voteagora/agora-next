@@ -32,7 +32,7 @@ export async function onSubmitAction(
           id: data.draftProposalId,
         },
         data: {
-          stage: ProposalStage.TEMP_CHECK,
+          stage: ProposalStage.ADDING_TEMP_CHECK,
           temp_check_link: parsed.data.temp_check_link || "",
         },
       }),

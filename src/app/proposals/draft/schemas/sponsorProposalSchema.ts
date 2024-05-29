@@ -5,5 +5,8 @@ export const schema = z.object({
     .string()
     .min(1, { message: "Snapshot link cannot be empty" })
     .optional(),
-  txHash: z.string().min(1, { message: "TxHash cannot be empty" }).optional(),
+  onchain_transaction_hash: z
+    .string()
+    .min(1, { message: "TxHash cannot be empty" })
+    .optional(),
 });

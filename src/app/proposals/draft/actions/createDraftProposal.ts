@@ -31,7 +31,7 @@ export async function onSubmitAction(
         id: data.draftProposalId,
       },
       data: {
-        stage: ProposalStage.READY,
+        stage: ProposalStage.AWAITING_SUBMISSION,
         title: parsed.data.title,
         description: parsed.data.description,
         abstract: parsed.data.abstract,

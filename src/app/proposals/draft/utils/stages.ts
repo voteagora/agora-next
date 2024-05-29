@@ -31,3 +31,7 @@ export const getStageMetadata = (stage: ProposalStage) => {
 export const getStageIndexForTenant = (stage: ProposalStage) => {
   return ENS_PROPOSAL_LIFECYCLE_STAGES.find((s) => s.stage === stage)?.order;
 };
+
+export const isPostSubmission = (stage: ProposalStage) => {
+  return POST_DRAFT_STAGES_FOR_TENANT.includes(stage);
+};

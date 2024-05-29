@@ -1,5 +1,6 @@
 "use client";
 
+import { useAccount } from "wagmi";
 import {
   ProposalChecklist,
   ProposalSocialOption,
@@ -22,15 +23,20 @@ export default function DraftProposalForm({
     checklist_items: ProposalChecklist[];
   };
 }) {
+  const { address } = useAccount();
+  if (draftProposal.author_address !== address) {
+    return <div>You are not the author of this proposal.</div>;
+  }
+
   const renderStage = (stage: ProposalStage) => {
     switch (stage) {
-      case ProposalStage.TEMP_CHECK:
+      case ProposalStage.ADDING_TEMP_CHECK:
         return <TempCheckForm draftProposal={draftProposal} />;
-      case ProposalStage.DRAFT:
+      case ProposalStage.DRAFTING:
         return <DraftForm draftProposal={draftProposal} />;
-      case ProposalStage.GITHUB_PR:
+      case ProposalStage.ADDING_GITHUB_PR:
         return <GithubPRForm draftProposal={draftProposal} />;
-      case ProposalStage.READY:
+      case ProposalStage.AWAITING_SUBMISSION:
         return <SubmitForm draftProposal={draftProposal} />;
       default:
         return null;

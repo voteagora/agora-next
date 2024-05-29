@@ -113,9 +113,10 @@ async function getDraftProposals(address: `0x${string}`) {
       author_address: address,
       stage: {
         in: [
-          PrismaProposalStage.TEMP_CHECK,
-          PrismaProposalStage.DRAFT,
-          PrismaProposalStage.READY,
+          PrismaProposalStage.ADDING_TEMP_CHECK,
+          PrismaProposalStage.DRAFTING,
+          PrismaProposalStage.ADDING_GITHUB_PR,
+          PrismaProposalStage.AWAITING_SUBMISSION,
         ],
       },
     },

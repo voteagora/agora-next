@@ -9,7 +9,11 @@ import {
   ProposalSocialOption,
   ProposalChecklist,
 } from "@prisma/client";
-import { getStageMetadata, DRAFT_STAGES_FOR_TENANT } from "../utils/stages";
+import {
+  getStageMetadata,
+  isPostSubmission,
+  DRAFT_STAGES_FOR_TENANT,
+} from "../utils/stages";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -37,8 +41,6 @@ export default async function DraftProposalPage({
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const draftProposal = await getDraftProposal(parseInt(params.id));
-
   const {
     ui: { _toggles },
   } = Tenant.current();
@@ -49,6 +51,14 @@ export default async function DraftProposalPage({
 
   if (!tenantSupportsProposalLifecycle) {
     return <div>This feature is not supported by this tenant.</div>;
+  }
+
+  const draftProposal = await getDraftProposal(parseInt(params.id));
+  const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
+  console.log("ipss", isPostSubmissionStage);
+
+  if (isPostSubmissionStage) {
+    return <div>archived...</div>;
   }
 
   const stageParam = (searchParams?.stage || "0") as string;
@@ -73,8 +83,8 @@ export default async function DraftProposalPage({
           Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-6">
-        <section className="col-span-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6">
+        <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
           <DraftProposalForm
             stage={stageObject.stage}
             draftProposal={draftProposal}

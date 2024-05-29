@@ -36,14 +36,8 @@ const TransactionForm = ({
   const { register, watch } =
     useFormContext<z.output<typeof draftProposalSchema>>();
 
-  const isValid = watch(`transactions.${index}.is_valid`);
-  const simulationId = watch(`transactions.${index}.simulationId`);
-  const status =
-    isValid === "unconfirmed"
-      ? Status.Unconfirmed
-      : Boolean(isValid) == true
-        ? Status.Valid
-        : Status.Invalid;
+  const simulationState = watch(`transactions.${index}.simulation_state`);
+  const simulationId = watch(`transactions.${index}.simulation_id`);
 
   return (
     <div className="p-4 border border-agora-stone-100 rounded-lg">
@@ -89,10 +83,13 @@ const TransactionForm = ({
           </span>
         </FormItem>
       </div>
-      <input type="hidden" {...register(`transactions.${index}.is_valid`)} />
       <input
         type="hidden"
-        {...register(`transactions.${index}.simulationId`)}
+        {...register(`transactions.${index}.simulation_state`)}
+      />
+      <input
+        type="hidden"
+        {...register(`transactions.${index}.simulation_id`)}
       />
     </div>
   );
@@ -154,10 +151,10 @@ const ExecutableProposalForm = () => {
       const res = await response.json();
       res.response.simulation_results.forEach((result: any, index: number) => {
         if (result.transaction.status) {
-          setValue(`transactions.${index}.is_valid`, "true");
-          setValue(`transactions.${index}.simulationId`, result.simulation.id);
+          setValue(`transactions.${index}.simulation_state`, "VALID");
+          setValue(`transactions.${index}.simulation_id`, result.simulation.id);
         } else {
-          setValue(`transactions.${index}.is_valid`, "false");
+          setValue(`transactions.${index}.simulation_state`, "INVALID");
         }
       });
       setSimulationPending(false);
@@ -174,8 +171,7 @@ const ExecutableProposalForm = () => {
       <h3 className="text-stone-900 font-semibold">Proposed transactions</h3>
       <p className="mt-2 stone-700">
         Proposed transactions will execute after a proposal passes and then gets
-        executed. If you skip this step, a transfer of 0 ETH to you (the
-        proposer) will be added.
+        executed.
       </p>
       <div className="mt-6 space-y-12">
         {fields.map((field, index) => {
@@ -248,8 +244,8 @@ const ExecutableProposalForm = () => {
               value: "",
               calldata: "",
               description: "",
-              is_valid: "unconfirmed",
-              simulationId: "",
+              simulation_state: "UNCONFIRMED",
+              simulation_id: "",
             });
           }}
         >
@@ -266,8 +262,8 @@ const ExecutableProposalForm = () => {
               value: "",
               calldata: "",
               description: "",
-              is_valid: "unconfirmed",
-              simulationId: "",
+              simulation_state: "UNCONFIRMED",
+              simulation_id: "",
             });
           }}
         >
