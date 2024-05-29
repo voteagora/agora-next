@@ -5,6 +5,7 @@ import { StakedDeposit } from "@/lib/types";
 import type { Delegate } from "@/app/api/common/delegates/delegate";
 import { Deposit } from "@/app/staking/[addressOrENSName]/deposits/Deposit";
 import { DepositListAction } from "@/app/staking/[addressOrENSName]/deposits/DepositListAction";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];

@@ -18,12 +18,10 @@ import {
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { TOKEN_BALANCE_QK } from "@/hooks/useTokenBalance";
+import { TOKEN_BALANCE_QK, useTokenBalance } from "@/hooks/useTokenBalance";
 import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
 import { INDEXER_DELAY } from "@/lib/constants";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
-import { toBigInt } from "ethers";
-import { useStakedDeposit } from "@/hooks/useStakedDeposit";
 
 interface DepositProps {
   deposit: StakedDeposit;
@@ -39,7 +37,7 @@ export const Deposit = ({
   const queryClient = useQueryClient();
   const router = useRouter();
   const { isConnected, address } = useAccount();
-
+  const { data: tokenBalance } = useTokenBalance(address);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
   const isDelegateFetched = useRef(false);
 
@@ -156,11 +154,14 @@ export const Deposit = ({
                     alignOffset={0}
                     align="end"
                   >
-                    <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
-                      <Link href={`/staking/deposits/${deposit.id}`}>
-                        Edit amount
-                      </Link>
-                    </div>
+                    {tokenBalance && tokenBalance > 0n && (
+                      // Hide edit button when no token balance
+                      <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
+                        <Link href={`/staking/deposits/${deposit.id}`}>
+                          Edit amount
+                        </Link>
+                      </div>
+                    )}
                     <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
                       <Link href={`/staking/deposits/${deposit.id}/delegate`}>
                         Change delegate

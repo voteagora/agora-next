@@ -1,9 +1,9 @@
-import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import React from "react";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 interface DepositListActionProps {
   address: string;
@@ -11,18 +11,17 @@ interface DepositListActionProps {
 
 export const DepositListAction = ({ address }: DepositListActionProps) => {
   const { token } = Tenant.current();
-  const { data: tokenBalance, isFetched } = useTokenBalance(address);
+  const { data: tokenBalance } = useTokenBalance(address);
   const { data: depositedBalance, isFetched: isDepositFetched } =
     useDepositorTotalStaked(address);
 
-  const hasTokenBalance = tokenBalance && isFetched;
   const hasDepositedBalance = depositedBalance && isDepositFetched;
-  const canDepositMore = hasTokenBalance && tokenBalance > 0n;
+  const canDepositMore = tokenBalance && tokenBalance > 0n;
 
   return (
     <div>
       <div className="p-5 flex justify-between">
-        {hasTokenBalance ? (
+        {tokenBalance !== undefined ? (
           <>
             <div className="font-medium">
               {canDepositMore ? (
@@ -33,7 +32,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
                   Deposit another stake
                 </Link>
               ) : (
-                <>No more ${token.symbol} available to stake</>
+                <>No more {token.symbol} available to stake</>
               )}
             </div>
 
@@ -46,7 +45,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
                 )}
                 <TokenAmountDisplay
                   maximumSignificantDigits={4}
-                  amount={tokenBalance}
+                  amount={tokenBalance || 0n}
                   currency={""}
                 />{" "}
                 available

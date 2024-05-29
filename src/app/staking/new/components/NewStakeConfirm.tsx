@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 interface NewStakeConfirmProps {
   amount: number;
@@ -27,7 +28,20 @@ export const NewStakeConfirm = ({
   refreshPath,
 }: NewStakeConfirmProps) => {
   const { token, contracts } = Tenant.current();
-  const isValidInput = Boolean(amount > 0 && delegate && isAddress(delegate));
+  const { data: maxBalance, isFetched: isLoadedMaxBalance } = useTokenBalance(
+    depositor as `0x${string}`
+  );
+
+  const isValidInput = Boolean(
+    amount > 0 && delegate && isAddress(delegate) && isLoadedMaxBalance
+  );
+
+  // There are cases where the amount might be higher than the balance of available tokes due to artifacts of
+  // number to BigInt conversion. In such cases, we need to ensure that the amount to stake is capped at the maximum.
+  const amountToStake =
+    maxBalance && numberToToken(amount) > maxBalance
+      ? maxBalance
+      : numberToToken(amount);
 
   const { config, status, error } = usePrepareContractWrite({
     enabled: isValidInput,
@@ -35,7 +49,7 @@ export const NewStakeConfirm = ({
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
     functionName: "stake",
-    args: [numberToToken(amount), delegate as `0x${string}`],
+    args: [amountToStake, delegate as `0x${string}`],
   });
 
   const { data, write } = useContractWrite(config);
