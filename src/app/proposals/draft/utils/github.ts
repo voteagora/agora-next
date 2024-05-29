@@ -1,3 +1,5 @@
+"use server";
+
 import { Octokit } from "@octokit/rest";
 import {
   ProposalDraft,
@@ -80,7 +82,7 @@ function getFormattedTransactionTable(
   return table;
 }
 
-export default function formatGithubProposal(
+function formatGithubProposal(
   proposal: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
@@ -174,8 +176,9 @@ export async function createGithubProposal(
     social_options: ProposalSocialOption[];
   }
 ): Promise<string> {
+  console.log("pr token", process.env.PR_BOT_TOKEN);
   const octokit = new Octokit({
-    auth: process.env.NEXT_PUBLIC_PR_BOT_TOKEN || "",
+    auth: process.env.PR_BOT_TOKEN || "",
   });
 
   try {

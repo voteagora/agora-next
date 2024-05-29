@@ -36,6 +36,26 @@ export async function POST(request: Request) {
     );
     const res = await response.json();
 
+    const simulation_ids = res.simulation_results.map(
+      (result: any) => result.simulation.id
+    );
+
+    // enable sharing on all of the simulations
+    await Promise.all(
+      simulation_ids.map(async (id: string) => {
+        await fetch(
+          `https://api.tenderly.co/api/v1/account/${user}/project/${project}/simulations/${id}/share`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Access-Key": process.env.TENDERLY_ACCESS_KEY as string,
+            },
+          }
+        );
+      })
+    );
+
     return new Response(JSON.stringify({ response: res }), {
       status: 200,
     });

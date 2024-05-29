@@ -9,6 +9,7 @@ import {
 } from "@prisma/client";
 import ApprovedTransactions from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
 import { useContractRead, useAccount, useBlockNumber } from "wagmi";
+import { formatUnits } from "viem";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import Tenant from "@/lib/tenant/tenant";
 import AvatarAddress from "./AvatarAdress";
@@ -78,9 +79,6 @@ const DraftPreview = ({
       return item.title !== self[index + 1].title;
     });
 
-  console.log("PD", proposalDraft);
-  console.log("FFS", filteredAndSortedChecklistItems);
-
   return (
     <FormCard>
       <FormCard.Header>
@@ -140,7 +138,8 @@ const DraftPreview = ({
         <p className="text-agora-stone-700 mt-2">{proposalDraft.abstract}</p>
       </FormCard.Section>
       <FormCard.Section className="!z-0">
-        {proposalDraft.sponsor_address ? (
+        {proposalDraft.sponsor_address &&
+        address != proposalDraft.sponsor_address ? (
           <>
             <p className="text-agora-stone-700">
               Your proposal is awaiting{" "}
@@ -221,21 +220,14 @@ const DraftPreview = ({
               <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
                 <p className="flex-grow">Proposal threshold</p>
                 <span className="text-stone-500 font-mono text-xs">
-                  300k required
+                  {Math.round(parseFloat(formatUnits(BigInt(THRESHOLD), 18)))}{" "}
+                  required
                 </span>
                 <input
                   type="checkbox"
                   className="rounded text-agora-stone-900"
-                  checked
+                  checked={hasEnoughVotes}
                 />
-                {/* <Link href={item.link}> */}
-                <Image
-                  src={icons.link}
-                  height="16"
-                  width="16"
-                  alt="link icon"
-                />
-                {/* </Link> */}
               </div>
             </div>
             {actions}

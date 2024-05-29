@@ -21,7 +21,8 @@ import { ChainConstants } from "viem/types/chain";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
-import SponsorProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorProposalDialog";
+import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
+import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 
 export type DialogType =
@@ -35,7 +36,8 @@ export type DialogType =
   | DeleteDraftProposalDialog
   | CreateDraftProposalDialog
   | UpdateDraftProposalDialog
-  | SponsorProposalDialog
+  | SponsorSnapshotDraftProposalDialog
+  | SponsorOnchainDraftProposalDialog
   | OpenGithubPRDialog;
 // | FaqDialogType
 
@@ -140,9 +142,14 @@ export type UpdateDraftProposalDialog = {
   params: { redirectUrl: string };
 };
 
-export type SponsorProposalDialog = {
-  type: "SPONSOR_DRAFT_PROPOSAL";
-  params: { redirectUrl: string };
+export type SponsorSnapshotDraftProposalDialog = {
+  type: "SPONSOR_SNAPSHOT_DRAFT_PROPOSAL";
+  params: { redirectUrl: string; snapshotLink: string };
+};
+
+export type SponsorOnchainDraftProposalDialog = {
+  type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL";
+  params: { redirectUrl: string; txHash: string };
 };
 
 export type OpenGithubPRDialog = {
@@ -268,8 +275,18 @@ export const dialogs: DialogDefinitions<DialogType> = {
   UPDATE_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
     <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
   ),
-  SPONSOR_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
-    <SponsorProposalDialog redirectUrl={redirectUrl} />
+  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+    <SponsorOnchainProposalDialog redirectUrl={redirectUrl} txHash={txHash} />
+  ),
+  SPONSOR_SNAPSHOT_DRAFT_PROPOSAL: (
+    { redirectUrl, snapshotLink },
+    closeDialog
+  ) => (
+    <SponsorSnapshotProposalDialog
+      redirectUrl={redirectUrl}
+      snapshotLink={snapshotLink}
+      closeDialog={closeDialog}
+    />
   ),
   OPEN_GITHUB_PR: ({ redirectUrl, githubUrl }) => (
     <AddGithubPRDialog redirectUrl={redirectUrl} githubUrl={githubUrl} />

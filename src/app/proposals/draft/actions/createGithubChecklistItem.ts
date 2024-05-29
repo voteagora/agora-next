@@ -17,6 +17,7 @@ export async function onSubmitAction(data: {
       data: {
         title: "Docs updated",
         completed_by: data.creatorAddress,
+        link: data.link,
         proposal: {
           connect: {
             id: data.draftProposalId,

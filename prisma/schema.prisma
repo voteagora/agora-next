@@ -922,6 +922,7 @@ model ProposalDraft {
   created_at                  DateTime                   @default(now())
   updated_at                  DateTime                   @updatedAt
   onchain_transaction_hash    String?
+  snapshot_link               String?
   start_date_social           DateTime?
   end_date_social             DateTime?
   stage                       ProposalStage
@@ -967,6 +968,7 @@ model ProposalChecklist {
   completed_by String
   // link implies optionality -- if no link, its because the field is optional (think temp check for ENS)
   link         String?
+//   skipped      Boolean       @default(false)
   proposal_id  Int
   proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
   @@map("proposal_checklist_items")

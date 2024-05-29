@@ -30,7 +30,7 @@ export function UpdatedButton({
   children,
   ...props
 }: {
-  type?: "primary" | "secondary" | "link" | "destructive";
+  type?: "primary" | "secondary" | "link" | "destructive" | "disabled";
   variant?: "rounded" | "";
   href?: string;
   className?: string;
@@ -63,15 +63,17 @@ export function UpdatedButton({
         <button
           className={cn(
             className,
+            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer",
             type === "primary" &&
               "bg-agora-stone-900 hover:shadow text-white transition-shadow",
             type === "secondary" && "",
             type === "link" && "",
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",
+            type === "disabled" &&
+              "bg-agora-stone-50 text-agora-stone-100 cursor-not-allowed",
             variant === "rounded" ? "rounded-full" : "rounded-lg",
-            fullWidth && "w-full",
-            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer"
+            fullWidth && "w-full"
           )}
           {...props}
           type={isSubmit ? "submit" : "button"}

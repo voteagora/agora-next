@@ -73,12 +73,18 @@ export async function onSubmitAction(
       },
     });
 
+    const transactionLink =
+      data.transactions.length > 0
+        ? `tdly.co/shared/simulation/${data.transactions[0].simulationId}`
+        : "";
+
     await prisma.$transaction([
       updateDraft,
       prisma.proposalChecklist.create({
         data: {
           title: "Transactions simulated",
           completed_by: data.creatorAddress,
+          ...(data.transactions.length > 0 && { link: transactionLink }),
           proposal: {
             connect: {
               id: data.draftProposalId,

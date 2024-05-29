@@ -1,3 +1,5 @@
+"use client";
+
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import Tenant from "@/lib/tenant/tenant";
@@ -16,6 +18,7 @@ import {
   ProposalSocialOption,
 } from "@prisma/client";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
 
 const SponsorActions = ({
   draftProposal,
@@ -28,11 +31,7 @@ const SponsorActions = ({
   const openDialog = useOpenDialog();
   const { address } = useAccount();
   const { inputData } = getInputData(draftProposal);
-  const {
-    config,
-    isError: onPrepareError,
-    error,
-  } = usePrepareContractWrite({
+  const { config } = usePrepareContractWrite({
     address: "0xb65c031ac61128ae791d42ae43780f012e2f7f89",
     abi: ENSGovernorABI,
     functionName: "propose",
@@ -42,39 +41,53 @@ const SponsorActions = ({
 
   const { data, writeAsync } = useContractWrite(config);
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
+  const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
 
   return (
-    <div>
+    <div className="mt-6">
       <UpdatedButton
         isLoading={isLoading}
         fullWidth={true}
         type="primary"
         onClick={async () => {
-          if (draftProposal.proposal_type === ProposalType.SOCIAL) {
-            const proposalId = await createSnapshot({
-              address: address as `0x${string}`,
-              proposal: draftProposal,
-            });
+          try {
+            if (draftProposal.proposal_type === ProposalType.SOCIAL) {
+              const proposalId = await createSnapshot({
+                address: address as `0x${string}`,
+                proposal: draftProposal,
+              });
 
-            const snapshotLink = Tenant.current().isProd
-              ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
-              : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
+              const snapshotLink = Tenant.current().isProd
+                ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
+                : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
 
-            openDialog({
-              type: "SPONSOR_DRAFT_PROPOSAL",
-              params: { redirectUrl: "" },
-            });
-          } else {
-            await writeAsync?.();
-            // TODO: update proposal status
-            // TODO: add tx hash
-            openDialog({
-              type: "SPONSOR_DRAFT_PROPOSAL",
-              params: { redirectUrl: "" },
-            });
+              await sponsorDraftProposal({
+                draftProposalId: draftProposal.id,
+                snapshot_link: snapshotLink,
+              });
+
+              openDialog({
+                type: "SPONSOR_SNAPSHOT_DRAFT_PROPOSAL",
+                params: { redirectUrl: "/", snapshotLink },
+              });
+            } else {
+              const hash = await writeAsync?.();
+
+              await sponsorDraftProposal({
+                draftProposalId: draftProposal.id,
+                txHash: hash as unknown as string,
+              });
+
+              openDialog({
+                type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
+                params: { redirectUrl: "/", txHash: hash as unknown as string },
+              });
+            }
+          } catch (error) {
+            console.error(error);
+            // toast?
           }
         }}
       >

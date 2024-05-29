@@ -20,7 +20,7 @@ import {
 } from "@prisma/client";
 import ExecutableProposalForm from "../ExecutableProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
-import FileInput from "../form/FileInput";
+// import FileInput from "../form/FileInput";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
@@ -35,6 +35,7 @@ const DraftForm = ({
 }) => {
   const { address } = useAccount();
   const openDialog = useOpenDialog();
+  console.log("draft proposal", draftProposal);
   const [isPending, setIsPending] = useState<boolean>(false);
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
@@ -57,12 +58,10 @@ const DraftForm = ({
 
   const {
     register,
-    control,
     watch,
     handleSubmit,
     formState: { errors },
   } = methods;
-  console.log(errors);
 
   const proposalType = watch("type");
 
@@ -79,6 +78,7 @@ const DraftForm = ({
         creatorAddress: address,
       });
       if (!res.ok) {
+        console.log(res.message);
         // TODO: make error toast + improve messaging
         setIsPending(false);
         toast("Something went wrong...");
@@ -158,7 +158,7 @@ const DraftForm = ({
               <SocialProposalForm />
             )}
           </FormCard.Section>
-          <FormCard.Section>
+          {/* <FormCard.Section>
             <h3 className="text-stone-900 font-semibold">
               Transaction payload audit
             </h3>
@@ -168,14 +168,11 @@ const DraftForm = ({
               proposal does what it intends to.
             </p>
             <FileInput />
-          </FormCard.Section>
+          </FormCard.Section> */}
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">
-              <p className="text-agora-stone-700">
-                This will post your draft to both the ENS forums and request an
-                update to the ENS DAO docs.
-              </p>
               <UpdatedButton
+                fullWidth={true}
                 type="primary"
                 isSubmit={true}
                 className="w-[200px] flex items-center justify-center"

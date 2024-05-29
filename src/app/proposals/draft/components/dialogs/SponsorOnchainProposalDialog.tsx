@@ -1,6 +1,12 @@
 import { VStack } from "@/components/Layout/Stack";
 
-const SponsorProposalDialog = ({ redirectUrl }: { redirectUrl: string }) => {
+const SponsorOnchainProposalDialog = ({
+  redirectUrl,
+  txHash,
+}: {
+  redirectUrl: string;
+  txHash: string;
+}) => {
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-white rounded-xl">
@@ -31,4 +37,4 @@ const SponsorProposalDialog = ({ redirectUrl }: { redirectUrl: string }) => {
   );
 };
 
-export default SponsorProposalDialog;
+export default SponsorOnchainProposalDialog;

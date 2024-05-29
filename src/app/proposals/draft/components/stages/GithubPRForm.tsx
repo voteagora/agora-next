@@ -35,11 +35,13 @@ const GithubPRForm = ({
         throw new Error("No address found");
       }
       const link = await createGithubProposal(draftProposal);
+
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
       });
+      setIsPending(false);
       openDialog({
         type: "OPEN_GITHUB_PR",
         params: {
