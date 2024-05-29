@@ -29,7 +29,7 @@ const OnlyOwner = ({
     return <div>You are not the owner of this proposal.</div>;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 export default OnlyOwner;
