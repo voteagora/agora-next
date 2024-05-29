@@ -40,7 +40,7 @@ async function getVotingPowerForProposalByAddress({
 }): Promise<VotingPowerData> {
   const { namespace, contracts } = Tenant.current();
 
-  const votingPowerQuery = prisma.$queryRawUnsafe<VotingPowerSnapsPayload>(
+  const votingPowerQuery = prisma.$queryRawUnsafe<VotingPowerSnapsPayload[]>(
     `
     SELECT
       *
@@ -121,9 +121,9 @@ async function getVotingPowerForProposalByAddress({
   });
 
   return {
-    directVP: votingPower?.balance ?? "0",
+    directVP: votingPower[0]?.balance ?? "0",
     advancedVP: advancedVP.toString(),
-    totalVP: (BigInt(votingPower?.balance ?? "0") + advancedVP).toString(),
+    totalVP: (BigInt(votingPower[0]?.balance ?? "0") + advancedVP).toString(),
   };
 }
 
