@@ -1,8 +1,4 @@
-import { ParsedProposalData } from "@/lib/proposalUtils";
-import {
-  ProposalType as PrismaProposalType,
-  ProposalStage as PrismaProposalStage,
-} from "@prisma/client";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 /**
  * This is my attempt at "generalizing" the lifecycle stages of a proposal before actually generalizing it
@@ -48,6 +44,9 @@ export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
     order: 4,
     isPreSubmission: false,
   },
+  // order kinda falls apart since we could get into failed, approved, etc
+  // I think we might need a proper state machine for that
+  // athough the pre-submission stages seem like they are linear
   {
     stage: PrismaProposalStage.QUEUED,
     order: 5,
@@ -169,30 +168,3 @@ export enum TransactionType {
   TRANSFER = "transfer",
   CUSTOM = "custom",
 }
-
-export type TempCheckFormInputs = {
-  tempcheck_link: string;
-};
-
-export type TransactionFormData = {
-  target: string;
-  value: string;
-  calldata: string;
-  signature: string;
-};
-
-/**
- * The form inputs for the draft stage of a proposal.
- * @dev fields with underscore prefix are used just for form state management
- * and are not part of the actual proposal data, they do not persist to db.
- */
-export type DraftFormInputs = {
-  title: string;
-  description: string;
-  abstract: string;
-  transactions: ParsedProposalData[PrismaProposalType]["kind"];
-  _transactionFormData: TransactionFormData[];
-  ens_docs_updated: boolean;
-};
-
-const a = {} as DraftFormInputs;
