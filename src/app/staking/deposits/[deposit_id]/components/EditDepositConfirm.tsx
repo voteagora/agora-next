@@ -13,6 +13,10 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
+import { useTokenAllowance } from "@/hooks/useTokenAllowance";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { isAddress } from "viem";
+import { PanelSetAllowance } from "@/app/staking/components/PanelSetAllowance";
 
 interface EditDepositConfirmProps {
   amount: number;
@@ -27,15 +31,33 @@ export const EditDepositConfirm = ({
 }: EditDepositConfirmProps) => {
   const { token, contracts } = Tenant.current();
 
-  const isValidInput = Boolean(amount > 0 && deposit);
+  // Check if a user has allowed the staking contract to spend their tokens
+  const { data: allowance, isFetched: isLoadedAllowance } = useTokenAllowance(
+    deposit.depositor
+  );
+  const hasAllowance = isLoadedAllowance && allowance !== undefined;
+
+  const { data: maxBalance, isFetched: isLoadedMaxBalance } = useTokenBalance(
+    deposit.depositor
+  );
+
+  // There are cases where the amount might be higher than the balance of available tokes due to artifacts of
+  // number to BigInt conversion. In such cases, we need to ensure that the amount to stake is capped at the maximum.
+  const amountToAdd =
+    maxBalance && numberToToken(amount) > maxBalance
+      ? maxBalance
+      : numberToToken(amount);
+
+  const isSufficientSpendingAllowance =
+    hasAllowance && allowance >= amountToAdd;
 
   const { config, status, error } = usePrepareContractWrite({
-    enabled: isValidInput,
+    enabled: isSufficientSpendingAllowance,
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
     functionName: "stakeMore",
-    args: [BigInt(deposit.id), numberToToken(amount)],
+    args: [BigInt(deposit.id), amountToAdd],
   });
 
   const { data, write } = useContractWrite(config);
@@ -58,15 +80,8 @@ export const EditDepositConfirm = ({
         </div>
       </div>
 
-      {status === "error" ? (
-        <div className="py-4">
-          <div className="font-semibold text-red-500 mb-2">
-            Unable to process current transaction
-          </div>
-          <div className="text-xs text-red-500">
-            {(error as any)?.cause?.reason}
-          </div>
-        </div>
+      {!isSufficientSpendingAllowance ? (
+        <PanelSetAllowance amount={amountToAdd} />
       ) : (
         <>
           {isTransactionConfirmed ? (
@@ -85,16 +100,16 @@ export const EditDepositConfirm = ({
               </div>
               <Button
                 className="w-full"
-                disabled={!isValidInput || isLoading}
+                disabled={isLoading}
                 onClick={() => {
                   write?.();
                 }}
               >
                 {isLoading ? "Staking..." : `Update Stake`}
               </Button>
-              {data?.hash && <BlockScanUrls hash1={data?.hash} />}
             </>
           )}
+          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
         </>
       )}
     </div>

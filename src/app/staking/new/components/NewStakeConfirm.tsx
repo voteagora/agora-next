@@ -13,6 +13,8 @@ import { formatNumber, numberToToken } from "@/lib/utils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useTokenAllowance } from "@/hooks/useTokenAllowance";
+import { PanelSetAllowance } from "@/app/staking/components/PanelSetAllowance";
 
 interface NewStakeConfirmProps {
   amount: number;
@@ -28,13 +30,14 @@ export const NewStakeConfirm = ({
   refreshPath,
 }: NewStakeConfirmProps) => {
   const { token, contracts } = Tenant.current();
-  const { data: maxBalance, isFetched: isLoadedMaxBalance } = useTokenBalance(
-    depositor as `0x${string}`
-  );
 
-  const isValidInput = Boolean(
-    amount > 0 && delegate && isAddress(delegate) && isLoadedMaxBalance
-  );
+  // Check if a user has allowed the staking contract to spend their tokens
+  const { data: allowance, isFetched: isLoadedAllowance } =
+    useTokenAllowance(depositor);
+  const hasAllowance = isLoadedAllowance && allowance !== undefined;
+
+  const { data: maxBalance, isFetched: isLoadedMaxBalance } =
+    useTokenBalance(depositor);
 
   // There are cases where the amount might be higher than the balance of available tokes due to artifacts of
   // number to BigInt conversion. In such cases, we need to ensure that the amount to stake is capped at the maximum.
@@ -43,13 +46,20 @@ export const NewStakeConfirm = ({
       ? maxBalance
       : numberToToken(amount);
 
+  const isSufficientSpendingAllowance =
+    hasAllowance && allowance >= amountToStake;
+
+  const isValidInput = Boolean(
+    isSufficientSpendingAllowance && isAddress(delegate)
+  );
+
   const { config, status, error } = usePrepareContractWrite({
-    enabled: isValidInput,
+    enabled: isSufficientSpendingAllowance,
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
     functionName: "stake",
-    args: [amountToStake, delegate as `0x${string}`],
+    args: [amountToStake, delegate],
   });
 
   const { data, write } = useContractWrite(config);
@@ -72,15 +82,8 @@ export const NewStakeConfirm = ({
         </div>
       </div>
 
-      {status === "error" ? (
-        <div className="py-4">
-          <div className="font-semibold text-red-500 mb-2">
-            Unable to process current transaction
-          </div>
-          <div className="text-xs text-red-500">
-            {(error as any)?.cause?.reason}
-          </div>
-        </div>
+      {!isSufficientSpendingAllowance ? (
+        <PanelSetAllowance amount={amountToStake} />
       ) : (
         <>
           {isTransactionConfirmed ? (
@@ -100,7 +103,7 @@ export const NewStakeConfirm = ({
 
               <Button
                 className="w-full"
-                disabled={!isValidInput || isLoading}
+                disabled={isLoading}
                 onClick={() => {
                   write?.();
                 }}

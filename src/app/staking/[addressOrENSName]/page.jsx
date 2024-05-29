@@ -90,9 +90,6 @@ export default async function Page({ params: { addressOrENSName } }) {
         ) : (
           <PanelNewDeposit />
         )}
-        <div className="mt-4">
-          <PanelSetAllowance />
-        </div>
       </div>
     </HStack>
   );
