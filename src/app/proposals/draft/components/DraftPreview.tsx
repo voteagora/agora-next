@@ -146,9 +146,10 @@ const DraftPreview = ({
               <span className="font-mono text-xs border border-yellow-500 text-yellow-700 bg-yellow-100 p-1 rounded">
                 {proposalDraft.sponsor_address}
               </span>
-              's sponsorship. Once your sponsor approves, your proposal will be
-              automatically submitted, without needing your input. In the
-              meantime, you can contact your sponsor by copying the link below.
+              &apos;s sponsorship. Once your sponsor approves, your proposal
+              will be automatically submitted, without needing your input. In
+              the meantime, you can contact your sponsor by copying the link
+              below.
             </p>
             <div className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg p-2 relative mt-6">
               <div className="flex flex-row items-center space-x-2">
