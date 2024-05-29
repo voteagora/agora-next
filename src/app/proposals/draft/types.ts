@@ -24,84 +24,124 @@ type TenantProposalLifecycleStage = {
 
 export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
   {
-    stage: PrismaProposalStage.TEMP_CHECK,
+    stage: PrismaProposalStage.ADDING_TEMP_CHECK,
     order: 0,
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.DRAFT,
+    stage: PrismaProposalStage.DRAFTING,
     order: 1,
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.GITHUB_PR,
+    stage: PrismaProposalStage.ADDING_GITHUB_PR,
     order: 2,
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.READY,
+    stage: PrismaProposalStage.AWAITING_SUBMISSION,
     order: 3,
     isPreSubmission: true,
   },
   {
-    stage: PrismaProposalStage.QUEUE,
+    stage: PrismaProposalStage.PENDING,
     order: 4,
     isPreSubmission: false,
   },
   {
-    stage: PrismaProposalStage.EXECUTE,
+    stage: PrismaProposalStage.QUEUED,
     order: 5,
+    isPreSubmission: false,
+  },
+  {
+    stage: PrismaProposalStage.EXECUTED,
+    order: 6,
     isPreSubmission: false,
   },
 ];
 
 export const ProposalLifecycleStageMetadata = {
-  [PrismaProposalStage.TEMP_CHECK]: {
+  [PrismaProposalStage.ADDING_TEMP_CHECK]: {
     title: "Create temp check",
     shortTitle: "Temp check",
     description: "Check the temperature of the proposal",
     waitingFor: "Submitting temp check",
     checklistItems: ["Discourse temp check"],
   },
-  [PrismaProposalStage.DRAFT]: {
+  [PrismaProposalStage.DRAFTING]: {
     title: "Create draft",
     shortTitle: "Draft",
     description: "Draft the proposal",
     waitingFor: "Submitting draft",
     checklistItems: ["Transaction simulation"],
   },
-  [PrismaProposalStage.GITHUB_PR]: {
+  [PrismaProposalStage.ADDING_GITHUB_PR]: {
     title: "Create Github PR",
     shortTitle: "Github PR",
     description: "Create a Github PR for the proposal",
     waitingFor: "Submitting Github PR",
     checklistItems: ["ENS docs updated"],
   },
-  [PrismaProposalStage.READY]: {
+  [PrismaProposalStage.AWAITING_SUBMISSION]: {
     title: "Submit draft",
     shortTitle: "Ready",
     description: "Ready to submit the proposal",
     waitingFor: "Sponsor approval",
     checklistItems: [],
   },
-  [PrismaProposalStage.QUEUE]: {
+  [PrismaProposalStage.PENDING]: {
+    title: "Pending",
+    shortTitle: "Pending",
+    description: "The proposal is pending",
+    waitingFor: "Voting",
+    checklistItems: [],
+  },
+  [PrismaProposalStage.QUEUED]: {
     title: "Queue",
     shortTitle: "Queue",
     description: "Queue the proposal",
     waitingFor: "Queue",
     checklistItems: [],
   },
-  [PrismaProposalStage.EXECUTE]: {
+  [PrismaProposalStage.EXECUTED]: {
     title: "Execute",
     shortTitle: "Execute",
     description: "Execute the proposal",
     waitingFor: "Execution",
     checklistItems: [],
   },
-  [PrismaProposalStage.CANCELLED]: {
+  [PrismaProposalStage.CANCELED]: {
     title: "Cancelled",
     shortTitle: "Cancelled",
     description: "The proposal has been cancelled",
+    waitingFor: "",
+    checklistItems: [],
+  },
+  [PrismaProposalStage.ACTIVE]: {
+    title: "Active",
+    shortTitle: "Active",
+    description: "The proposal is active",
+    waitingFor: "",
+    checklistItems: [],
+  },
+  [PrismaProposalStage.DEFEATED]: {
+    title: "Defeated",
+    shortTitle: "Defeated",
+    description: "The proposal has been defeated",
+    waitingFor: "",
+    checklistItems: [],
+  },
+  [PrismaProposalStage.EXPIRED]: {
+    title: "Expired",
+    shortTitle: "Expired",
+    description: "The proposal has expired",
+    waitingFor: "",
+    checklistItems: [],
+  },
+  [PrismaProposalStage.SUCCEEDED]: {
+    title: "Succeeded",
+    shortTitle: "Succeeded",
+    description: "The proposal has succeeded",
     waitingFor: "",
     checklistItems: [],
   },

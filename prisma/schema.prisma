@@ -1547,14 +1547,20 @@ enum ProposalType {
   @@schema("config")
 }
 
+
 enum ProposalStage {
-  TEMP_CHECK
-  DRAFT
-  GITHUB_PR
-  READY
-  EXECUTE
-  QUEUE
-  CANCELLED
+  ADDING_TEMP_CHECK
+  DRAFTING
+  ADDING_GITHUB_PR
+  AWAITING_SUBMISSION
+  PENDING
+  ACTIVE
+  EXECUTED
+  QUEUED
+  CANCELED
+  DEFEATED
+  EXPIRED
+  SUCCEEDED
 
   @@map("proposal_stage")
   @@schema("test2")
