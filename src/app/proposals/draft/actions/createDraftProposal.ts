@@ -47,7 +47,8 @@ export async function onSubmitAction(
               value: transaction.value,
               calldata: transaction.calldata,
               description: transaction.description,
-              is_valid: true,
+              simulation_state: transaction.simulation_state,
+              simulation_id: transaction.simulation_id,
             } as ProposalDraftTransaction;
             return asTransaction;
           }),
@@ -75,7 +76,7 @@ export async function onSubmitAction(
 
     const transactionLink =
       data.transactions.length > 0
-        ? `tdly.co/shared/simulation/${data.transactions[0].simulationId}`
+        ? `tdly.co/shared/simulation/${data.transactions[0].simulation_id}`
         : "";
 
     await prisma.$transaction([

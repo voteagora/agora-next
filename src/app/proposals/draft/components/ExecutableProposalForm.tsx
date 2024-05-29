@@ -1,3 +1,4 @@
+import Tenant from "@/lib/tenant/tenant";
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import FormItem from "./form/FormItem";
@@ -17,12 +18,36 @@ import toast from "react-hot-toast";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-enum Status {
-  Unconfirmed = "Unconfirmed",
-  Valid = "Valid",
-  Invalid = "Invalid",
-}
+const SimulationStatusPill = ({
+  status,
+  simulationId,
+}: {
+  status: string;
+  simulationId: string | null;
+}) => {
+  return (
+    <span
+      className={cn(
+        "relative border rounded-lg p-2",
+        status === "UNCONFIRMED" &&
+          "bg-yellow-100 border-yellow-500 text-yellow-500",
+        status === "VALID" && "bg-green-100 border-green-500 text-green-500",
+        status === "INVALID" && "bg-red-100 border-red-500 text-red-500"
+      )}
+    >
+      {status}
+      {simulationId && (
+        <div className="absolute right-2 top-3 cursor-pointer">
+          <Link href={`https://tdly.co/shared/simulation/${simulationId}`}>
+            <Image src={icons.link} height="16" width="16" alt="link icon" />
+          </Link>
+        </div>
+      )}
+    </span>
+  );
+};
 
 const TransactionForm = ({
   index,
@@ -62,25 +87,10 @@ const TransactionForm = ({
           required={false}
           htmlFor={`transactions.${index}.description`}
         >
-          <span
-            className={`relative border rounded-lg p-2 ${status === Status.Valid ? "bg-green-100 border-green-500 text-green-500" : "bg-red-100 border-red-500 text-red-500"}`}
-          >
-            {status}
-            {simulationId && (
-              <div className="absolute right-2 top-3 cursor-pointer">
-                <Link
-                  href={`https://tdly.co/shared/simulation/${simulationId}`}
-                >
-                  <Image
-                    src={icons.link}
-                    height="16"
-                    width="16"
-                    alt="link icon"
-                  />
-                </Link>
-              </div>
-            )}
-          </span>
+          <SimulationStatusPill
+            status={simulationState}
+            simulationId={simulationId}
+          />
         </FormItem>
       </div>
       <input
@@ -96,11 +106,11 @@ const TransactionForm = ({
 };
 
 const ExecutableProposalForm = () => {
+  const { contracts } = Tenant.current();
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
-  const [allTransactionsSimulated, setAllTransactionsSimulated] =
-    useState(false);
   const [simulationPending, setSimulationPending] = useState(false);
+
   type FormType = z.output<typeof draftProposalSchema>;
   const { control, setValue, getValues, formState, trigger } =
     useFormContext<FormType>();
@@ -121,11 +131,6 @@ const ExecutableProposalForm = () => {
   });
 
   useEffect(() => {
-    console.log(transactions);
-    const allSimulated = transactions.every(
-      (transaction: any) => transaction.is_valid === true
-    );
-    setAllTransactionsSimulated(allSimulated);
     validateTransactionForms();
   }, [transactions]);
 
@@ -141,11 +146,8 @@ const ExecutableProposalForm = () => {
         },
         body: JSON.stringify({
           transactions,
-          // TODO: update these two to be dynamic from tenant (chainId + governor address)
-          // right now network is sepolia (for testing ENS)
-          networkId: "11155111",
-          // Michael's dev address -- replace with governor address
-          from: "0xca1d77cd31ab0e7c53f8158959455d074894d4dd",
+          networkId: contracts.governor.chain.id,
+          from: contracts.governor.address,
         }),
       });
       const res = await response.json();

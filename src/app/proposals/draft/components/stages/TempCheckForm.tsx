@@ -71,8 +71,8 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
           <span className="w-full rounded-md h-[300px] bg-agora-stone-50 border border-agora-stone-100 block"></span>
           <p className="mt-4 text-stone-700">
             We encourage you to go to Discourse to post a temp check that helps
-            gauge the community's interest. It's not mandatory, but helps create
-            alignment with the voter base.
+            gauge the community&apos;s interest. It&apos;s not mandatory, but
+            helps create alignment with the voter base.
           </p>
         </FormCard.Section>
         <FormCard.Section>

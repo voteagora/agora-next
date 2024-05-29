@@ -56,12 +56,12 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
               </div>
               <p className="text-[#B16B19]/70 mt-2">
                 The proposer has created a draft proposal, but might not meet
-                the proposal threshold to submit it themselves. They'd like you
-                to help them submit it.
+                the proposal threshold to submit it themselves. They&apos;d like
+                you to help them submit it.
               </p>
               <p className="text-[#B16B19]/70 mt-2">
                 If you choose to do so, this proposal will be marked as
-                "submitted by nick.eth, authored by kartpatkey.eth"
+                &apos;submitted by nick.eth, authored by kartpatkey.eth&apos;
               </p>
             </div>
           </div>
