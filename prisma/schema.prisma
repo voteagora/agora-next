@@ -341,11 +341,13 @@ view OptimismProposalTypes {
 }
 
 view OptimismVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("optimism")
@@ -478,11 +480,13 @@ view ensVotingPower {
 }
 
 view ensVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("ens")
@@ -593,11 +597,13 @@ view etherfiVotingPower {
 }
 
 view etherfiVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("etherfi")
@@ -764,11 +770,13 @@ view uniswapVotingPower {
 }
 
 view uniswapVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index BigInt?
+  log_index         BigInt?
 
   @@map("voting_power_snaps")
   @@schema("uniswap")
