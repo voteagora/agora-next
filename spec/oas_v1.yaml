@@ -893,9 +893,7 @@ components:
           summary: Address or ENS of the ballot caster
           description: Address or ENS of the ballot caster.
           type: string
-        roundId:
-          type: integer
-        ballotContent:
+        ballot_content:
           type: object
           properties:
             allocations:

@@ -23,7 +23,7 @@ async function submitBallotForAddress({
   roundId: number;
   address: string;
 }) {
-  const payload = JSON.stringify(data.ballotContnet);
+  const payload = JSON.stringify(data.ballot_content);
 
   const isSignatureValid = await verifyMessage({
     address: address as `0x${string}`,
