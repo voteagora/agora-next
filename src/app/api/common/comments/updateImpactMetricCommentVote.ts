@@ -30,11 +30,11 @@ async function updateImpactMetricCommentVoteApi({
   });
 
   return {
-    commentId: commentVote.comment_id,
+    comment_id: commentVote.comment_id,
     address: commentVote.voter,
     vote: commentVote.vote,
-    createdAt: commentVote.created_at,
-    updatedAt: commentVote.updated_at,
+    created_at: commentVote.created_at,
+    updated_at: commentVote.updated_at,
   };
 }
 
