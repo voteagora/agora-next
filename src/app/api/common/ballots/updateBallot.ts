@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
+import prisma from "@/app/lib/prisma";
 
 type BallotContent = {
   metric_id: string;
@@ -93,5 +94,87 @@ async function deleteBallotMetricForAddress({
   });
 }
 
+const updateBallotOsMultiplierApi = async (
+  multiplier: number,
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) =>
+  addressOrEnsNameWrap(
+    updateBallotOsMultiplierForAddress,
+    ballotCasterAddressOrEns,
+    {
+      multiplier,
+      roundId,
+    }
+  );
+
+async function updateBallotOsMultiplierForAddress({
+  multiplier,
+  roundId,
+  address,
+}: {
+  multiplier: number;
+  roundId: number;
+  address: string;
+}) {
+  return prisma.ballots.upsert({
+    where: {
+      address_round: {
+        address,
+        round: roundId,
+      },
+    },
+    update: {
+      os_multiplier: multiplier,
+      updated_at: new Date(),
+    },
+    create: {
+      round: roundId,
+      address,
+      os_multiplier: multiplier,
+    },
+  });
+}
+
+const updateBallotOsOnlyApi = async (
+  toggle: boolean,
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) =>
+  addressOrEnsNameWrap(updateBallotOsOnlyForAddress, ballotCasterAddressOrEns, {
+    toggle,
+    roundId,
+  });
+
+async function updateBallotOsOnlyForAddress({
+  toggle,
+  roundId,
+  address,
+}: {
+  toggle: boolean;
+  roundId: number;
+  address: string;
+}) {
+  return prisma.ballots.upsert({
+    where: {
+      address_round: {
+        address,
+        round: roundId,
+      },
+    },
+    update: {
+      os_only: toggle,
+      updated_at: new Date(),
+    },
+    create: {
+      round: roundId,
+      address,
+      os_only: toggle,
+    },
+  });
+}
+
 export const updateBallotMetric = cache(updateBallotMetricApi);
 export const deleteBallotMetric = cache(deleteBallotMetricApi);
+export const updateBallotOsMultiplier = cache(updateBallotOsMultiplierApi);
+export const updateBallotOsOnly = cache(updateBallotOsOnlyApi);
