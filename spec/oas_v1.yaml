@@ -848,9 +848,7 @@ components:
       properties:
         project_id:
           type: string
-        total_allocation_share:
-          type: number
-        total_allocation_amount:
+        allocation:
           type: number
         allocations_per_metric:
           type: array
@@ -859,9 +857,8 @@ components:
             properties:
               metric_id:
                 type: string
-              allocation_share:
+              allocation:
                 type: number
-
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -872,7 +869,7 @@ components:
           summary: Address of the voter
           description: Address of the voter
           type: string
-        roundId:
+        round_id:
           type: integer
         status:
           type: string
