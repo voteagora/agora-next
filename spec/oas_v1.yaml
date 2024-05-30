@@ -1894,7 +1894,7 @@ paths:
             schema:
               type: object
               properties:
-                metricId:
+                metric_id:
                   type: string
                 allocation:
                   type: number
