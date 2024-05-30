@@ -15,7 +15,7 @@ import {
   DRAFT_STAGES_FOR_TENANT,
 } from "../utils/stages";
 import OnlyOwner from "./components/OwnerOnly";
-import ArchivedDraftProposal from "./components/ArchivedDraftProposal";
+import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({

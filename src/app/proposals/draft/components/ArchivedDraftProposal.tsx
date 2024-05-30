@@ -4,7 +4,7 @@ import {
   ProposalSocialOption,
   ProposalChecklist,
 } from "@prisma/client";
-import DraftPreview from "../../components/DraftPreview";
+import DraftPreview from "./DraftPreview";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
 
@@ -21,7 +21,11 @@ const ArchivedDraftProposal = ({
     <main className="max-w-screen-xl mx-auto mt-10">
       <div className="grid grid-cols-3 gap-12">
         <div className="col-span-2">
-          <DraftPreview proposalDraft={draftProposal} actions={null} />
+          <DraftPreview
+            proposalDraft={draftProposal}
+            actions={null}
+            isArchived={true}
+          />
         </div>
         <div className="self-start">
           <div className="border bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] p-6 rounded-lg">
@@ -40,9 +44,7 @@ const ArchivedDraftProposal = ({
             </div>
             <p className="text-[#B16B19]/70 mt-2">
               This draft has already been submitted and is no longer editable.
-            </p>
-            <p className="text-[#B16B19]/70 mt-2">
-              You can still view the details of this draft proposal.
+              You can still view the details of this proposal.
             </p>
           </div>
         </div>

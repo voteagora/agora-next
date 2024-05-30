@@ -26,6 +26,7 @@ const THRESHOLD = 100000000000000000000000;
 const DraftPreview = ({
   proposalDraft,
   actions,
+  isArchived = false,
 }: {
   proposalDraft: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
@@ -33,6 +34,7 @@ const DraftPreview = ({
     checklist_items: ProposalChecklist[];
   };
   actions?: React.ReactNode;
+  isArchived?: boolean;
 }) => {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
@@ -81,12 +83,14 @@ const DraftPreview = ({
 
   return (
     <FormCard>
-      <FormCard.Header>
-        <div className="flex items-center justify-between">
-          <span className="text-xs">Your proposal preview</span>
-          <span className="text-xs">Please review carefully</span>
-        </div>
-      </FormCard.Header>
+      {!isArchived && (
+        <FormCard.Header>
+          <div className="flex items-center justify-between">
+            <span className="text-xs">Your proposal preview</span>
+            <span className="text-xs">Please review carefully</span>
+          </div>
+        </FormCard.Header>
+      )}
       <FormCard.Section>
         <h2 className="font-black text-agora-stone-900 text-2xl">
           {proposalDraft.title}

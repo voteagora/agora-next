@@ -10,6 +10,8 @@ import Image from "next/image";
 import { icons } from "@/icons/icons";
 import SponsorAuthCheck from "../components/SponsorAuthCheck";
 import ENSName from "@/components/shared/ENSName";
+import { isPostSubmission } from "../../draft/utils/stages";
+import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -32,6 +34,11 @@ const getDraftProposal = async (id: number) => {
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
   const draftProposal = await getDraftProposal(parseInt(params.id));
+  const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
+
+  if (isPostSubmissionStage) {
+    return <ArchivedDraftProposal draftProposal={draftProposal} />;
+  }
 
   return (
     <SponsorAuthCheck sponsorAddress={draftProposal.sponsor_address!}>
