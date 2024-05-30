@@ -61,16 +61,16 @@ components:
       description: Metadata associated with paginated requests.
       type: object
       properties:
-        hasNext:
+        has_next:
           summary: Flag indicating if there's more data for retieval
           description: A boolean flag indicating if there is additional data past the returned page to retrieve.
           type: boolean
-        totalReturned:
+        total_returned:
           summary: Total records returned
           description: A number indicating the total amount of records returned for the request.
           type: integer
           format: int32
-        nextOffset:
+        next_offset:
           summary: Offset to supply to the next request
           description: A number indicating the offset at which a subsequent request may retrieve the next set of records.
           type: integer
@@ -535,28 +535,64 @@ components:
         A discussion comment, including the author, timestamp, and content.
       type: object
       properties:
-        id:
+        comment_id:
           summary: Comment ID
           description: The unique ID of the comment.
           type: string
-        createdAt:
+        created_at:
           summary: Timestamp of the comment
           description: The timestamp at which the comment was created.
           type: string
           format: date-time
-        editedAt:
+        updated_at:
           summary: Timestamp of the comment edit
           description: The timestamp at which the comment was last edited.
           type: string
           format: date-time
-        content:
+        comment:
           summary: Content of the comment
           description: The text content of the comment.
           type: string
-        commenter:
+        address:
           summary: Author of the comment
           description: The delegate address of the author of the comment.
           type: string
+        votes_count:
+          summary: Count of votes on the comment
+          description: The number of votes on the comment.
+          type: integer
+        votes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommentVote"
+    CommentVote:
+      summary: A vote on a comment
+      description: >
+        A vote on a comment, including the voter, timestamp, and vote (-1, 0, 1).
+      type: object
+      properties:
+        comment_id:
+          summary: Comment ID
+          description: The unique ID of the comment.
+          type: string
+        voter:
+          summary: Voter address
+          description: The address of the voter.
+          type: string
+        vote:
+          summary: Vote value
+          description: The value of the vote (-1, 0, 1).
+          type: integer
+        created_at:
+          summary: Timestamp of the vote
+          description: The timestamp at which the comment was created.
+          type: string
+          format: date-time
+        updated_at:
+          summary: Timestamp of the vote update
+          description: The timestamp at which the comment was last edited.
+          type: string
+          format: date-time
     RetroFundingRoundStatus:
       summary: Status of an RetroFunding round
       description: Enum description of the status of an RetroFunding round.
@@ -615,18 +651,33 @@ components:
         An impact metric for an RetroFunding project with associated metadata.
       type: object
       properties:
-        id:
+        metric_id:
           type: string
         name:
           type: string
         description:
           type: string
-        externalLink:
-          type: string
         comments:
           type: array
           items:
             $ref: "#/components/schemas/Comment"
+        allocations_per_project:
+          type: array
+          items:
+            type: object
+            properties:
+              project_id:
+                type: string
+              name:
+                type: string
+              image:
+                type: string
+              allocation:
+                type: number
+        views:
+          type: integer
+        added_to_ballot:
+          type: integer
     ProjectMember:
       summary: Member of a RGPF project
       description: >
@@ -777,18 +828,37 @@ components:
           format: date-time
         details:
           type: string
-    RetroFundingBallotAllocation:
+    RetroFundingBallotMetricsAllocation:
       summary: A vote for an RetroFunding ballot
       description: >
         A vote for an RetroFunding ballot, including information about the vote.
       type: object
       properties:
-        metricId:
+        metric_id:
           type: integer
         allocation:
           type: string
         locked:
           type: boolean
+    RetroFundingBallotProjectsAllocation:
+      summary: Projects allocation distribution based on the vote
+      description: >
+        Projects allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        project_id:
+          type: string
+        allocation:
+          type: number
+        allocations_per_metric:
+          type: array
+          items:
+            type: object
+            properties:
+              metric_id:
+                type: string
+              allocation:
+                type: number
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -799,7 +869,7 @@ components:
           summary: Address of the voter
           description: Address of the voter
           type: string
-        roundId:
+        round_id:
           type: integer
         status:
           type: string
@@ -809,7 +879,11 @@ components:
         allocations:
           type: array
           items:
-            $ref: "#/components/schemas/RetroFundingBallotAllocation"
+            $ref: "#/components/schemas/RetroFundingBallotMetricsAllocation"
+        projects_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallotProjectsAllocation"
     RetroFundingBallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -819,16 +893,25 @@ components:
           summary: Address or ENS of the ballot caster
           description: Address or ENS of the ballot caster.
           type: string
-        roundId:
-          type: integer
-        ballotContent:
-          summary: Signed content of the ballot
-          type: string
+        ballot_content:
+          type: object
+          properties:
+            allocations:
+              type: array
+              items:
+                type: object
+                metrciId:
+                  type: number
+            os_only:
+              type: boolean
+            os_multiplier:
+              type: number
         signature:
           summary: Badgeholder signature of the ballot
           description: >
             Badgeholder's signature of the contents of their ballot.
           type: string
+          pattern: "^0x[a-fA-F0-9]{130}$"
   parameters:
     limitParam:
       name: limit
@@ -1660,6 +1743,67 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osMultiplier/{osMultiplier}:
+    post:
+      summary: Updates the OS multiplier for a specific RetroFunding ballot
+      description: >
+        Updates the OS multiplier for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotOSMultiplier
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+        - name: osMultiplier
+          in: path
+          description: The OS multiplier to update the ballot with (1 - 5)
+          required: true
+          schema:
+            type: number
+            minimum: 1
+            maximum: 5
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osOnly/{osOnly}:
+    post:
+      summary: Updates the OS only flag for a specific RetroFunding ballot
+      description: >
+        Updates the OS only flag for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotOSOnly
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+        - name: osOnly
+          in: path
+          description: >
+            The OS only flag to set for the ballot.
+          required: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/submit:
     post:
       summary: Submits a particular ballot
@@ -1745,10 +1889,10 @@ paths:
             schema:
               type: object
               properties:
-                metricId:
+                metric_id:
                   type: string
                 allocation:
-                  type: string
+                  type: number
                 locked:
                   type: boolean
       responses:
@@ -1803,12 +1947,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  impactMetrics:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/RetroFundingImpactMetric"
+                type: array
+                items:
+                  $ref: "#/components/schemas/RetroFundingImpactMetric"
         "400":
           description: Bad Request
         "401":
@@ -1843,6 +1984,42 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/{addressOrEnsName}:
+    post:
+      summary: Records a view of an impact metric
+      description: >
+        Records a view of an impact metric by a specific address or ENS name
+      operationId: recordImpactMetricView
+      tags:
+        - RetroFunding
+        - RetroFundingImpactMetrics
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the viewer
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                metric_id:
+                  type: string
+                address:
+                  type: string
+                ts:
+                  type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments:
     get:
       summary: Gets comments on an impact metric
@@ -1857,6 +2034,19 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned comments will be sorted.
+            Supported values are: 'newest', 'votes'
+          required: false
+          schema:
+            type: string
+            enum:
+              - newest
+              - votes
       responses:
         "200":
           description: OK
@@ -1867,7 +2057,7 @@ paths:
                 properties:
                   metadata:
                     $ref: "#/components/schemas/PageMetadata"
-                  comments:
+                  data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Comment"
@@ -1882,8 +2072,8 @@ paths:
     put:
       summary: Creates a comment on an impact metric
       description: >
-        Creates or edits a comment on a specific impact metric for a specific round.
-        If supplied, comment ID is ignored. Returns created comment.
+        Creates a comment on a specific impact metric for a specific round.
+        Returns created comment.
       operationId: putImpactMetricComment
       tags:
         - RetroFunding
@@ -1893,13 +2083,14 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Comment"
+              type: object
+              properties:
+                comment:
+                  type: string
       responses:
         "200":
           description: OK
@@ -1916,6 +2107,73 @@ paths:
         "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments/{commentId}:
+    get:
+      summary: Gets a specific comment on an impact metric
+      description: >
+        Gets a specific comment on a particular impact metric.
+      operationId: getImpactMetricComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Updates existing comment
+      description: >
+        Updates a comment on a specific impact metric for a specific round.
+        Returns updated comment.
+      operationId: updateImpactMetricComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
     delete:
       summary: Deletes a comment on an impact metric
       description: >
@@ -1933,6 +2191,79 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/impactMetrics/{impactMetricId}/comments/{commentId}/votes:
+    get:
+      summary: Gets all votes for a speciffic comment
+      description: >
+        Gets all votes for a speciffic comment
+      operationId: getImpactMetricCommentVote
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+        - commentsVotes
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentVote"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Creates or updates vote for a speciffic comment
+      description: >
+        Creates or updates vote for a speciffic comment.
+        Address of the voter is taken from the auth token.
+        Input is a number, where 1 is upvote, -1 is downvote, 0 is neutral.
+      operationId: putImactMetricCommentVote
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - impactMetrics
+        - comments
+        - commentsVotes
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vote:
+                  type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentVote"
         "400":
           description: Bad Request
         "401":
