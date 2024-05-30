@@ -535,16 +535,16 @@ components:
         A discussion comment, including the author, timestamp, and content.
       type: object
       properties:
-        commentId:
+        comment_id:
           summary: Comment ID
           description: The unique ID of the comment.
           type: string
-        createdAt:
+        created_at:
           summary: Timestamp of the comment
           description: The timestamp at which the comment was created.
           type: string
           format: date-time
-        updatedAt:
+        updated_at:
           summary: Timestamp of the comment edit
           description: The timestamp at which the comment was last edited.
           type: string
@@ -557,7 +557,7 @@ components:
           summary: Author of the comment
           description: The delegate address of the author of the comment.
           type: string
-        votesCount:
+        votes_count:
           summary: Count of votes on the comment
           description: The number of votes on the comment.
           type: integer
@@ -571,7 +571,7 @@ components:
         A vote on a comment, including the voter, timestamp, and vote (-1, 0, 1).
       type: object
       properties:
-        commentId:
+        comment_id:
           summary: Comment ID
           description: The unique ID of the comment.
           type: string
@@ -583,12 +583,12 @@ components:
           summary: Vote value
           description: The value of the vote (-1, 0, 1).
           type: integer
-        createdAt:
+        created_at:
           summary: Timestamp of the vote
           description: The timestamp at which the comment was created.
           type: string
           format: date-time
-        updatedAt:
+        updated_at:
           summary: Timestamp of the vote update
           description: The timestamp at which the comment was last edited.
           type: string
@@ -661,12 +661,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Comment"
-        projectAllocations:
+        allocations_per_project:
           type: array
           items:
             type: object
             properties:
-              projectId:
+              project_id:
                 type: string
               name:
                 type: string
@@ -676,7 +676,7 @@ components:
                 type: number
         views:
           type: integer
-        addedToBallots:
+        added_to_ballot:
           type: integer
     ProjectMember:
       summary: Member of a RGPF project
@@ -848,9 +848,7 @@ components:
       properties:
         project_id:
           type: string
-        total_allocation_share:
-          type: number
-        total_allocation_amount:
+        allocation:
           type: number
         allocations_per_metric:
           type: array
@@ -859,9 +857,8 @@ components:
             properties:
               metric_id:
                 type: string
-              allocation_share:
+              allocation:
                 type: number
-
     RetroFundingBallot:
       summary: A ballot for an RetroFunding round
       description: >
@@ -872,7 +869,7 @@ components:
           summary: Address of the voter
           description: Address of the voter
           type: string
-        roundId:
+        round_id:
           type: integer
         status:
           type: string
@@ -896,9 +893,7 @@ components:
           summary: Address or ENS of the ballot caster
           description: Address or ENS of the ballot caster.
           type: string
-        roundId:
-          type: integer
-        ballotContent:
+        ballot_content:
           type: object
           properties:
             allocations:
@@ -1894,7 +1889,7 @@ paths:
             schema:
               type: object
               properties:
-                metricId:
+                metric_id:
                   type: string
                 allocation:
                   type: number
@@ -1952,12 +1947,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  impactMetrics:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/RetroFundingImpactMetric"
+                type: array
+                items:
+                  $ref: "#/components/schemas/RetroFundingImpactMetric"
         "400":
           description: Bad Request
         "401":

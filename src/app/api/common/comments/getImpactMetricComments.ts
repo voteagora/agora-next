@@ -67,22 +67,22 @@ async function getImpactMetricCommentsApi({
     meta: comments.meta,
     data: comments.data.map((comment) => {
       return {
-        commentId: comment.comment_id,
+        comment_id: comment.comment_id,
         comment: comment.comment,
         address: comment.address,
-        createdAt: comment.created_at,
-        updatedAt: comment.updated_at,
-        votesCount: comment.metrics_comments_votes.reduce(
+        created_at: comment.created_at,
+        updated_at: comment.updated_at,
+        votes_count: comment.metrics_comments_votes.reduce(
           (acc, vote) => acc + vote.vote,
           0
         ),
         votes: comment.metrics_comments_votes.map((vote) => {
           return {
-            commentId: vote.comment_id,
+            comment_id: vote.comment_id,
             address: vote.voter,
             vote: vote.vote,
-            createdAt: vote.created_at,
-            updatedAt: vote.updated_at,
+            created_at: vote.created_at,
+            updated_at: vote.updated_at,
           };
         }),
       };
@@ -107,22 +107,22 @@ async function getImpactMetricCommentApi(
   }
 
   return {
-    commentId: comment.comment_id,
+    comment_id: comment.comment_id,
     comment: comment.comment,
     address: comment.address,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    votesCount: comment.metrics_comments_votes.reduce(
+    created_at: comment.created_at,
+    updated_at: comment.updated_at,
+    votes_count: comment.metrics_comments_votes.reduce(
       (acc, vote) => acc + vote.vote,
       0
     ),
     votes: comment.metrics_comments_votes.map((vote) => {
       return {
-        commentId: vote.comment_id,
+        comment_id: vote.comment_id,
         address: vote.voter,
         vote: vote.vote,
-        createdAt: vote.created_at,
-        updatedAt: vote.updated_at,
+        created_at: vote.created_at,
+        updated_at: vote.updated_at,
       };
     }),
   };
