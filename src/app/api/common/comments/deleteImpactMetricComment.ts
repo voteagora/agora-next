@@ -16,7 +16,7 @@ async function deleteImpactMetricCommentApi({
   });
 
   return {
-    commentId: deletedComment.comment_id,
+    comment_id: deletedComment.comment_id,
   };
 }
 

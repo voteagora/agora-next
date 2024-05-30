@@ -123,6 +123,8 @@ async function getBallotForAddress({
           wa.round,
           wa.metric_id,
           wa.project_id,
+          pd.project_name as name,
+          pd.project_image as image,
           wa.is_os,
           wa.weighted_values,
           mt.adjusted_total_values,
@@ -133,12 +135,18 @@ async function getBallotForAddress({
           metric_totals mt
       ON 
           wa.metric_id = mt.metric_id
+      JOIN
+          retro_funding.projects_data pd
+      ON
+          wa.project_id = pd.project_id
   )
   , project_allocations AS (
       SELECT 
           na.address,
           na.round,
           na.project_id,
+          na.name,
+          na.image,
           na.metric_id,
           na.normalized_allocation,
           na.normalized_allocation * 10000000 AS normalized_allocation_amount
@@ -152,12 +160,13 @@ async function getBallotForAddress({
           pa.address,
           pa.round,
           pa.project_id,
+          MAX(pa.name) AS name,
+          MAX(pa.image) AS image,
           SUM(pa.normalized_allocation) AS total_allocation_share,
           SUM(pa.normalized_allocation_amount) AS total_allocation_amount,
           json_agg(json_build_object(
               'metric_id', pa.metric_id, 
-              'allocation_share', pa.normalized_allocation,
-              'allocation_amount', pa.normalized_allocation_amount
+              'allocation', pa.normalized_allocation_amount
           ) ORDER BY pa.metric_id) AS allocations_per_metric
       FROM 
           project_allocations pa
@@ -185,8 +194,9 @@ async function getBallotForAddress({
       COALESCE(
           (SELECT json_agg(json_build_object(
               'project_id', apa.project_id, 
-              'total_allocation_share', apa.total_allocation_share, 
-              'total_allocation_amount', apa.total_allocation_amount,
+              'name', apa.name,
+              'image', apa.image,
+              'allocation', apa.total_allocation_amount,
               'allocations_per_metric', apa.allocations_per_metric
           ) ORDER BY apa.total_allocation_share DESC) 
           FROM aggregated_project_allocations apa
@@ -205,7 +215,7 @@ async function getBallotForAddress({
   if (!ballot) {
     return {
       address,
-      roundId,
+      round_id: roundId,
       allocations: [],
     };
   }

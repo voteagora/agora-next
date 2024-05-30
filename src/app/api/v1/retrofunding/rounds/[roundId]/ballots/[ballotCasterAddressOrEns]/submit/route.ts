@@ -11,7 +11,7 @@ const ballotContentSchema = z.object({
 });
 
 const ballotSubmissionSchema = z.object({
-  ballotContnet: ballotContentSchema,
+  ballot_content: ballotContentSchema,
   signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
 });
 

@@ -29,22 +29,22 @@ async function updateImpactMetricCommentApi({
   });
 
   return {
-    commentId: updatedComment.comment_id,
+    comment_id: updatedComment.comment_id,
     comment: updatedComment.comment,
     address: updatedComment.address,
-    createdAt: updatedComment.created_at,
-    updatedAt: updatedComment.updated_at,
-    votesCount: updatedComment.metrics_comments_votes.reduce(
+    created_at: updatedComment.created_at,
+    updated_at: updatedComment.updated_at,
+    votes_count: updatedComment.metrics_comments_votes.reduce(
       (acc, vote) => acc + vote.vote,
       0
     ),
     votes: updatedComment.metrics_comments_votes.map((vote) => {
       return {
-        commentId: vote.comment_id,
+        comment_id: vote.comment_id,
         address: vote.voter,
         vote: vote.vote,
-        createdAt: vote.created_at,
-        updatedAt: vote.updated_at,
+        created_at: vote.created_at,
+        updated_at: vote.updated_at,
       };
     }),
   };

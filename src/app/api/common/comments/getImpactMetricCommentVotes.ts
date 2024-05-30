@@ -15,11 +15,11 @@ async function getImpactMetricCommentVotesApi({
 
   return votes.map((vote) => {
     return {
-      commentId: vote.comment_id,
+      comment_id: vote.comment_id,
       address: vote.voter,
       vote: vote.vote,
-      createdAt: vote.created_at,
-      updatedAt: vote.updated_at,
+      created_at: vote.created_at,
+      updated_at: vote.updated_at,
     };
   });
 }
