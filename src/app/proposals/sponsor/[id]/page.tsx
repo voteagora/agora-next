@@ -9,6 +9,7 @@ import SponsorForm from "../components/SponsorForm";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
 import SponsorAuthCheck from "../components/SponsorAuthCheck";
+import ENSName from "@/components/shared/ENSName";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -51,7 +52,8 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                 />
 
                 <p className="font-semibold">
-                  kartpatkey.eth would like your help to submit this proposal
+                  <ENSName address={draftProposal.author_address} /> would like
+                  your help to submit this proposal
                 </p>
               </div>
               <p className="text-[#B16B19]/70 mt-2">
@@ -61,7 +63,10 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
               </p>
               <p className="text-[#B16B19]/70 mt-2">
                 If you choose to do so, this proposal will be marked as
-                &apos;submitted by nick.eth, authored by kartpatkey.eth&apos;
+                &apos;submitted by{" "}
+                <ENSName address={draftProposal.sponsor_address || ""} />,
+                authored by <ENSName address={draftProposal.author_address} />
+                &apos;
               </p>
             </div>
           </div>
