@@ -661,12 +661,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Comment"
-        projectAllocations:
+        allocations_per_project:
           type: array
           items:
             type: object
             properties:
-              projectId:
+              project_id:
                 type: string
               name:
                 type: string
@@ -676,7 +676,7 @@ components:
                 type: number
         views:
           type: integer
-        addedToBallots:
+        added_to_ballot:
           type: integer
     ProjectMember:
       summary: Member of a RGPF project
@@ -1952,12 +1952,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  impactMetrics:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/RetroFundingImpactMetric"
+                type: array
+                items:
+                  $ref: "#/components/schemas/RetroFundingImpactMetric"
         "400":
           description: Bad Request
         "401":
