@@ -1,18 +1,21 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { updateBallotOsMultiplier } from "@/app/api/common/ballots/updateBallot";
+import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import {
   authenticateApiUser,
   validateAddressScope,
 } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { deleteBallotMetric } from "@/app/api/common/ballots/updateBallot";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(
+const multiplierValidator = createOptionalNumberValidator(1, 5, 1);
+
+export async function POST(
   request: NextRequest,
   route: {
     params: {
       roundId: string;
       ballotCasterAddressOrEns: string;
-      impactMetricId: string;
+      multiplier: string;
     };
   }
 ) {
@@ -22,17 +25,19 @@ export async function DELETE(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
+  const { roundId, ballotCasterAddressOrEns, multiplier } = route.params;
   await validateAddressScope(ballotCasterAddressOrEns, authResponse);
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      await deleteBallotMetric(
-        impactMetricId,
+      const multiplierPayload = multiplierValidator.parse(Number(multiplier));
+
+      const ballot = await updateBallotOsMultiplier(
+        multiplierPayload,
         Number(roundId),
         ballotCasterAddressOrEns
       );
-      return NextResponse.json({ success: true });
+      return NextResponse.json(ballot);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

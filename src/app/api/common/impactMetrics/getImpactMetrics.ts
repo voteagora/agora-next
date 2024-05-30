@@ -1,56 +1,137 @@
 import { cache } from "react";
+import prisma from "@/app/lib/prisma";
 
-async function getImpactMetricsApi(
-  roundId: string,
-  ballotCasterAddressOrEns?: string
-) {
-  const defaultPageMetadata = {
-    hasNext: false,
-    totalReturned: 1,
-    nextOffset: 0,
-  };
-  const defaultComments = [
-    {
-      id: "1",
-      content: "Comment 1",
-      commenter: "0x1234",
-      createdAt: "2021-10-01T00:00:00Z",
-      editedAt: "2021-10-01T00:00:00Z",
+async function getImpactMetricsApi(roundId: string) {
+  const impactMetrics = await prisma.metrics_data.findMany({
+    include: {
+      metrics_comments: {
+        include: {
+          metrics_comments_votes: true,
+        },
+        orderBy: {
+          updated_at: "desc",
+        },
+      },
+      metrics_projects: {
+        orderBy: {
+          allocation: "desc",
+        },
+        include: {
+          projects_data: true,
+        },
+      },
+      metrics_views: true,
     },
-  ];
-  const defaultImpactMetrics = [
-    {
-      id: "1",
-      name: "Impact Metric 1",
-      description: "Description of Impact Metric 1",
-      externalLink: "https://www.opensource.observer/",
-      comments: defaultComments,
-    },
-  ];
-  return {
-    metadata: defaultPageMetadata,
-    impactMetrics: defaultImpactMetrics,
-  };
+  });
+
+  return impactMetrics.map((impactMetric) => {
+    return {
+      metric_id: impactMetric.metric_id,
+      name: impactMetric.name,
+      description: impactMetric.description,
+      allocations_per_project: impactMetric.metrics_projects.map((project) => {
+        return {
+          project_id: project.projects_data.project_id,
+          name: project.projects_data.project_name,
+          image: project.projects_data.project_image,
+          allocation: project.allocation,
+        };
+      }),
+      comments: impactMetric.metrics_comments.map((comment) => {
+        return {
+          comment_id: comment.comment_id,
+          comment: comment.comment,
+          address: comment.address,
+          created_at: comment.created_at,
+          updated_at: comment.updated_at,
+          votes_count: comment.metrics_comments_votes.reduce(
+            (acc, vote) => acc + vote.vote,
+            0
+          ),
+          votes: comment.metrics_comments_votes.map((vote) => {
+            return {
+              comment_id: vote.comment_id,
+              address: vote.voter,
+              vote: vote.vote,
+              created_at: vote.created_at,
+              updated_at: vote.updated_at,
+            };
+          }),
+        };
+      }),
+      views: impactMetric.metrics_views.length,
+      added_to_ballot: 0,
+    };
+  });
 }
 
 async function getImpactMetricApi(impactMetricId: string) {
-  const defaultComments = [
-    {
-      id: "1",
-      content: "Comment 1",
-      commenter: "0x1234",
-      createdAt: "2021-10-01T00:00:00Z",
-      editedAt: "2021-10-01T00:00:00Z",
+  const impactMetric = await prisma.metrics_data.findFirst({
+    where: {
+      metric_id: impactMetricId,
     },
-  ];
-  const defaultImpactMetric = {
-    id: impactMetricId,
-    name: `Impact Metric ${impactMetricId}`,
-    description: `Description of Impact Metric ${impactMetricId}`,
-    externalLink: "https://www.opensource.observer/",
-    comments: defaultComments,
+    include: {
+      metrics_comments: {
+        include: {
+          metrics_comments_votes: true,
+        },
+        orderBy: {
+          updated_at: "desc",
+        },
+      },
+      metrics_projects: {
+        orderBy: {
+          allocation: "desc",
+        },
+        include: {
+          projects_data: true,
+        },
+      },
+      metrics_views: true,
+    },
+  });
+
+  if (!impactMetric) {
+    return null;
+  }
+
+  return {
+    metric_id: impactMetric.metric_id,
+    name: impactMetric.name,
+    description: impactMetric.description,
+    allocations_per_project: impactMetric.metrics_projects.map((project) => {
+      return {
+        project_id: project.projects_data.project_id,
+        name: project.projects_data.project_name,
+        image: project.projects_data.project_image,
+        allocation: project.allocation,
+      };
+    }),
+    comments: impactMetric.metrics_comments.map((comment) => {
+      return {
+        comment_id: comment.comment_id,
+        comment: comment.comment,
+        address: comment.address,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at,
+        votes_count: comment.metrics_comments_votes.reduce(
+          (acc, vote) => acc + vote.vote,
+          0
+        ),
+        votes: comment.metrics_comments_votes.map((vote) => {
+          return {
+            comment_id: vote.comment_id,
+            address: vote.voter,
+            vote: vote.vote,
+            created_at: vote.created_at,
+            updated_at: vote.updated_at,
+          };
+        }),
+      };
+    }),
+    views: impactMetric.metrics_views.length,
+    added_to_ballot: 0,
   };
-  return defaultImpactMetric;
 }
 
 export const fetchImpactMetricsApi = cache(getImpactMetricsApi);
