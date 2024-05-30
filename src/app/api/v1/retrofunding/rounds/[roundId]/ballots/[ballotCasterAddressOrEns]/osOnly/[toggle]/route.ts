@@ -1,18 +1,18 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { updateBallotOsOnly } from "@/app/api/common/ballots/updateBallot";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import {
   authenticateApiUser,
   validateAddressScope,
 } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { deleteBallotMetric } from "@/app/api/common/ballots/updateBallot";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(
+export async function POST(
   request: NextRequest,
   route: {
     params: {
       roundId: string;
       ballotCasterAddressOrEns: string;
-      impactMetricId: string;
+      toggle: string;
     };
   }
 ) {
@@ -22,17 +22,17 @@ export async function DELETE(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
+  const { roundId, ballotCasterAddressOrEns, toggle } = route.params;
   await validateAddressScope(ballotCasterAddressOrEns, authResponse);
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      await deleteBallotMetric(
-        impactMetricId,
+      const ballot = await updateBallotOsOnly(
+        toggle === "true" ? true : false,
         Number(roundId),
         ballotCasterAddressOrEns
       );
-      return NextResponse.json({ success: true });
+      return NextResponse.json(ballot);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
