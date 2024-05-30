@@ -6,19 +6,19 @@ export type ImpactMetrciCommentPayload =
   };
 
 export type ImpactMetricComment = {
-  commentId: number;
+  comment_id: number;
   comment: string;
   address: string;
-  createdAt: Date;
-  updatedAt: Date;
-  votesCount: number;
+  created_at: Date;
+  updated_at: Date;
+  votes_count: number;
   votes: ImpactMetricCommentVote[];
 };
 
 export type ImpactMetricCommentVote = {
-  commentId: number;
+  comment_id: number;
   address: string;
   vote: number;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 };

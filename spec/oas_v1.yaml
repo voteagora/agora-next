@@ -535,16 +535,16 @@ components:
         A discussion comment, including the author, timestamp, and content.
       type: object
       properties:
-        commentId:
+        comment_id:
           summary: Comment ID
           description: The unique ID of the comment.
           type: string
-        createdAt:
+        created_at:
           summary: Timestamp of the comment
           description: The timestamp at which the comment was created.
           type: string
           format: date-time
-        updatedAt:
+        updated_at:
           summary: Timestamp of the comment edit
           description: The timestamp at which the comment was last edited.
           type: string
@@ -557,7 +557,7 @@ components:
           summary: Author of the comment
           description: The delegate address of the author of the comment.
           type: string
-        votesCount:
+        votes_count:
           summary: Count of votes on the comment
           description: The number of votes on the comment.
           type: integer
@@ -571,7 +571,7 @@ components:
         A vote on a comment, including the voter, timestamp, and vote (-1, 0, 1).
       type: object
       properties:
-        commentId:
+        comment_id:
           summary: Comment ID
           description: The unique ID of the comment.
           type: string
@@ -583,12 +583,12 @@ components:
           summary: Vote value
           description: The value of the vote (-1, 0, 1).
           type: integer
-        createdAt:
+        created_at:
           summary: Timestamp of the vote
           description: The timestamp at which the comment was created.
           type: string
           format: date-time
-        updatedAt:
+        updated_at:
           summary: Timestamp of the vote update
           description: The timestamp at which the comment was last edited.
           type: string
