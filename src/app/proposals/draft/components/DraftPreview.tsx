@@ -72,10 +72,17 @@ const DraftPreview = ({
     }
   );
 
-  //   const parsedTransactions = parseProposalData(
-  //     JSON.stringify(aggregatedTransactions),
-  //     "STANDARD"
-  //   );
+  const stringifiedTransactions = JSON.stringify({
+    targets: JSON.stringify(aggregatedTransactions.targets),
+    calldatas: JSON.stringify(aggregatedTransactions.calldatas),
+    values: JSON.stringify(aggregatedTransactions.values),
+    signatures: JSON.stringify(aggregatedTransactions.signatures),
+  });
+
+  const parsedTransactions = parseProposalData(
+    stringifiedTransactions,
+    "STANDARD"
+  );
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
@@ -104,15 +111,16 @@ const DraftPreview = ({
           {proposalDraft.title}
         </h2>
         {/* found in parseProposalData */}
-        {/* <div className="mt-6">
+        <div className="mt-6">
           <ApprovedTransactions
             proposalData={{
-              options: parsedTransactions,
+              // @ts-ignore
+              options: parsedTransactions.kind.options,
             }}
-            proposalType="APPROVAL"
+            proposalType={parsedTransactions.key}
             executedTransactionHash={"https://etherscan.io/tx/0x123"}
           />
-        </div> */}
+        </div>
         {proposalDraft.proposal_type === "social" && (
           <div>
             <h3 className="font-semibold mt-6">Voting strategy</h3>
