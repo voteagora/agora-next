@@ -1,12 +1,12 @@
 import { HStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import styles from "./OPProposalPage.module.scss";
+import styles from "./StandardProposalPage.module.scss";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
+import StandardProposalDelete from "./StandardProposalDelete";
 import { fetchProposalVotes } from "@/app/proposals/actions";
 import ProposalVotesCard from "./ProposalVotesCard/ProposalVotesCard";
 
-export default async function OPProposalPage({
+export default async function StandardProposalPage({
   proposal,
 }: {
   proposal: Proposal;
@@ -23,7 +23,7 @@ export default async function OPProposalPage({
     >
       <ProposalDescription proposal={proposal} />
       <div>
-        <OpManagerDeleteProposal proposal={proposal} />
+        <StandardProposalDelete proposal={proposal} />
         <ProposalVotesCard proposal={proposal} proposalVotes={proposalVotes} />
       </div>
     </HStack>

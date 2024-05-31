@@ -3,7 +3,7 @@ import { cleanString, truncateString } from "@/app/lib/utils/text";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
-import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
+import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
 import React from "react";
 
 async function fetchProposal(proposal_id) {
@@ -48,7 +48,7 @@ export default async function Page({ params: { proposal_id } }) {
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
-      RenderComponent = OPProposalPage;
+      RenderComponent = StandardProposalPage;
       break;
     case "OPTIMISTIC":
       RenderComponent = OPProposalOptimisticPage;

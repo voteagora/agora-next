@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "../OPProposalPage.module.scss";
+import styles from "../StandardProposalPage.module.scss";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
