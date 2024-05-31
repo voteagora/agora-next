@@ -39,7 +39,7 @@ async function getAuthorityChains({
       AND ac.allowance > 0;
     `,
     address.toLowerCase(),
-    contracts.alligator!.address,
+    contracts.alligator?.address,
     blockNumber
   );
 

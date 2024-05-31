@@ -42,6 +42,8 @@ export default function CastVoteInput({
     );
   }
 
+  console.log("isSuccess", isSuccess);
+
   if (!isSuccess || !chains || !delegate || !votes || !votingPower) {
     return (
       <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
