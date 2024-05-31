@@ -4,6 +4,7 @@ import { useWaitForTransaction } from "wagmi";
 import Image from "next/image";
 import Link from "next/link";
 import { icons } from "@/assets/icons/icons";
+import Tenant from "@/lib/tenant/tenant";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -14,10 +15,10 @@ const SponsorOnchainProposalDialog = ({
   txHash: `0x${string}`;
   closeDialog: () => void;
 }) => {
+  const tenant = Tenant.current();
   const { isLoading } = useWaitForTransaction({
     hash: txHash,
   });
-  console.log("hash", txHash);
   const router = useRouter();
   return (
     <VStack alignItems="items-center">
@@ -40,8 +41,7 @@ const SponsorOnchainProposalDialog = ({
               <div className="flex flex-row justify-between items-center mt-2 mb-4">
                 <span className="text-agora-stone-700">Transaction hash</span>
                 <div className="flex flex-row items-center space-x-2">
-                  {/* todo: replace with etherscan for correct chain */}
-                  <Link href={`https://etherscan.io/tx/${txHash}`}>
+                  <Link href={`${tenant.blockExplorer}/tx/${txHash}`}>
                     <Image
                       src={icons.link}
                       height="16"

@@ -86,18 +86,6 @@ const TransactionForm = ({
   );
 };
 
-// const parseTransaction = (data: any) => {
-//   return {
-//     target: data.target,
-//     calldata: data.calldata,
-//     value: data.value,
-//   };
-// };
-
-// const compareTransactions = (a, b) => {
-//   return JSON.stringify(a) === JSON.stringify(b);
-// };
-
 const ExecutableProposalForm = () => {
   const { contracts } = Tenant.current();
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
@@ -139,12 +127,13 @@ const ExecutableProposalForm = () => {
       if (parts?.length === 3) {
         const field = parts[2];
         const updatedTransactions = value.transactions;
-        // need to add custom ones too
         if (
           field === "recipient" ||
           field === "amount" ||
           field === "value" ||
-          field === "target"
+          field === "target" ||
+          field === "description" ||
+          field === "calldata"
         ) {
           validateTransactionForms();
           updatedTransactions?.forEach((transaction, index) => {
@@ -163,20 +152,6 @@ const ExecutableProposalForm = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch]);
-
-  //   useEffect(() => {
-  //     validateTransactionForms();
-  //     transactions.forEach((transaction, index) => {
-  //       if (
-  //         currentlyValidatedTransactions.current[index] !==
-  //         JSON.stringify(transaction)
-  //       ) {
-  //         console.log("we have a diff!");
-  //         // setValue(`transactions.${index}.simulation_state`, "UNCONFIRMED");
-  //         // setValue(`transactions.${index}.simulation_id`, "");
-  //       }
-  //     });
-  //   }, [transactions]);
 
   const simulateTransactions = async () => {
     setSimulationPending(true);
@@ -206,7 +181,6 @@ const ExecutableProposalForm = () => {
       setSimulationPending(false);
     } catch (e) {
       console.error(e);
-      // should we invalidate the transactions? This doesn't mean they are invalid, could have some other issue.
       toast.error("Error simulating transactions");
       setSimulationPending(false);
     }

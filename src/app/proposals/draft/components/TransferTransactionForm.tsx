@@ -67,11 +67,12 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
   }, [recipient, amount, setValue]);
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-3 gap-3">
       <FormItem
         label="Recipient"
         required={true}
         htmlFor={`transactions.${index}.recipient`}
+        className="col-span-2"
       >
         <TextInput
           name={`transactions.${index}.recipient`}
@@ -98,7 +99,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
           errorMessage={errors.transactions?.[index]?.amount?.message}
         />
       </FormItem>
-      <div className="col-span-2">
+      <div className="col-span-3">
         <FormItem
           label="Description"
           required={true}

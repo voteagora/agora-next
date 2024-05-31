@@ -15,11 +15,12 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
   } = useFormContext<FormType>();
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-3 gap-3">
       <FormItem
         label="Target"
         required={true}
         htmlFor={`transactions.${index}.target`}
+        className="col-span-2"
       >
         <TextInput
           name={`transactions.${index}.target`}
@@ -40,7 +41,7 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
           errorMessage={errors.transactions?.[index]?.value?.message}
         />
       </FormItem>
-      <div className="col-span-2">
+      <div className="col-span-3">
         <FormItem
           label="Calldata"
           required={true}
@@ -54,7 +55,7 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
           />
         </FormItem>
       </div>
-      <div className="col-span-2">
+      <div className="col-span-3">
         <FormItem
           label="Description"
           required={true}

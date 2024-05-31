@@ -19,6 +19,7 @@ import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
 import Link from "next/link";
+import { parseProposalData } from "@/lib/proposalUtils";
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -53,21 +54,28 @@ const DraftPreview = ({
     ? accountVotesData >= THRESHOLD
     : false;
 
-  const parsedTransactions =
-    proposalDraft.transactions?.map((transaction, idx) => {
-      return {
-        description: transaction.description,
-        targets: [transaction.target],
-        values: [transaction.value],
-        calldatas: [transaction.calldata],
-        functionArgsName: [
-          {
-            functionName: "name",
-            functionArgs: ["arg1"],
-          },
-        ],
-      };
-    }) ?? [];
+  const aggregatedTransactions = proposalDraft.transactions.reduce(
+    (acc, transaction) => {
+      // @ts-ignore
+      acc["targets"] = [...acc["targets"], transaction.target];
+      acc["values"] = [...acc["values"], transaction.value];
+      acc["calldatas"] = [...acc["calldatas"], transaction.calldata];
+      acc["signatures"] = [...acc["signatures"], ""];
+
+      return acc;
+    },
+    { targets: [], calldatas: [], values: [], signatures: [] } as {
+      targets: string[];
+      calldatas: string[];
+      values: string[];
+      signatures: string[];
+    }
+  );
+
+  //   const parsedTransactions = parseProposalData(
+  //     JSON.stringify(aggregatedTransactions),
+  //     "STANDARD"
+  //   );
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
@@ -96,7 +104,7 @@ const DraftPreview = ({
           {proposalDraft.title}
         </h2>
         {/* found in parseProposalData */}
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <ApprovedTransactions
             proposalData={{
               options: parsedTransactions,
@@ -104,7 +112,7 @@ const DraftPreview = ({
             proposalType="APPROVAL"
             executedTransactionHash={"https://etherscan.io/tx/0x123"}
           />
-        </div>
+        </div> */}
         {proposalDraft.proposal_type === "social" && (
           <div>
             <h3 className="font-semibold mt-6">Voting strategy</h3>
