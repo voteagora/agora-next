@@ -27,6 +27,10 @@ const SponsorAuthCheck = ({
       <main className="max-w-screen-xl mx-auto mt-10">
         <div className="bg-agora-stone-50 border border-agora-stone-100 p-8 rounded-lg text-center">
           <h1 className="text-2xl font-black">Unauthorized</h1>
+          <h3 className="text-m font-black">
+            Only the sponsor of the proposal or the author is able to view this
+            draft.
+          </h3>
         </div>
       </main>
     );
