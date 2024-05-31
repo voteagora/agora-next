@@ -1,4 +1,3 @@
-import { HStack } from "@/components/Layout/Stack";
 import styles from "./proposalVotesBar.module.scss";
 import {
   Tooltip,
@@ -6,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TokenAmountDisplay, generateBarsForVote } from "@/lib/utils";
+import { generateBarsForVote, TokenAmountDisplay } from "@/lib/utils";
 
 export default function ProposalVotesBar({ proposal }) {
   return (
@@ -14,9 +13,8 @@ export default function ProposalVotesBar({ proposal }) {
       <TooltipProvider delayDuration={10}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <HStack
-              justifyContent="justify-around"
-              className={styles.vote_bar_ticks}
+            <div
+              className={`flex flex-row justify-around ${styles.vote_bar_ticks}`}
             >
               {generateBarsForVote(
                 proposal.proposalResults.for,
@@ -25,7 +23,7 @@ export default function ProposalVotesBar({ proposal }) {
               ).map((value, idx) => {
                 return <div key={`${idx}`} className={styles[value]} />;
               })}
-            </HStack>
+            </div>
           </TooltipTrigger>
           <TooltipContent>
             <p>

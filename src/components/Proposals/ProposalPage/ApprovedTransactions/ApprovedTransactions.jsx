@@ -1,4 +1,3 @@
-import { VStack } from "@/components/Layout/Stack";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
@@ -26,10 +25,7 @@ export default function ApprovedTransactions({
     proposalData.options[0].calldatas[0] === "0x";
 
   return (
-    <VStack
-      gap="1"
-      className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
-    >
+    <div className="flex flex-col gap-1 border border-[#e0e0e0] rounded-lg bg-gray-fa py-4">
       <div className="flex items-center justify-between px-4 mb-2">
         <p className="font-mono text-xs font-medium leading-4 text-gray-af">
           {isNoProposedTransactions ? "No " : ""}
@@ -47,36 +43,42 @@ export default function ApprovedTransactions({
         )}
       </div>
       {!isNoProposedTransactions && (
-        <VStack className="px-4">
-          {proposalData.options.slice(0, displayedOptions).map((option) => {
-            return (
-              <>
-                {proposalType === "APPROVAL" && (
-                  <p className="font-mono text-xs font-medium leading-4 text-gray-af">
-                    {"//"} {option.description}
-                  </p>
-                )}
-                {option.values.length > 0 &&
-                  option.targets.map((t, i) => {
-                    const valueETH =
-                      option.values[i] > 0
-                        ? `{ value: ${formatEther(option.values[i])} ETH }`
-                        : undefined;
-                    return (
-                      <div key={i}>
-                        <CodeChange
-                          target={option.targets[i]}
-                          valueETH={valueETH}
-                          functionName={option.functionArgsName[i].functionName}
-                          functionArgs={option.functionArgsName[i].functionArgs}
-                        />
-                      </div>
-                    );
-                  })}
-              </>
-            );
-          })}
-        </VStack>
+        <div className="flex flex-col px-4">
+          {proposalData.options
+            .slice(0, displayedOptions)
+            .map((option, idx) => {
+              return (
+                <div key={idx}>
+                  {proposalType === "APPROVAL" && (
+                    <p className="font-mono text-xs font-medium leading-4 text-gray-af">
+                      {"//"} {option.description}
+                    </p>
+                  )}
+                  {option.values.length > 0 &&
+                    option.targets.map((t, i) => {
+                      const valueETH =
+                        option.values[i] > 0
+                          ? `{ value: ${formatEther(option.values[i])} ETH }`
+                          : undefined;
+                      return (
+                        <div key={i}>
+                          <CodeChange
+                            target={option.targets[i]}
+                            valueETH={valueETH}
+                            functionName={
+                              option.functionArgsName[i].functionName
+                            }
+                            functionArgs={
+                              option.functionArgsName[i].functionArgs
+                            }
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
+              );
+            })}
+        </div>
       )}
       {proposalData.options.length > 1 && (
         <div
@@ -88,6 +90,6 @@ export default function ApprovedTransactions({
             : "Hide options"}
         </div>
       )}
-    </VStack>
+    </div>
   );
 }

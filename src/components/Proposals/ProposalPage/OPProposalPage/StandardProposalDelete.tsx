@@ -18,7 +18,6 @@ export default function StandardProposalDelete({
   proposal: Proposal;
 }) {
   const { isOpManager } = useIsOpManager();
-
   const { contracts } = Tenant.current();
   const proposalType = proposal.proposalType;
 

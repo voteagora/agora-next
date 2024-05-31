@@ -6,6 +6,7 @@ export const TENANT_NAMESPACES = {
   OPTIMISM: "optimism",
   UNISWAP: "uniswap",
 } as const;
+
 export const proposalsFilterOptions = {
   relevant: {
     value: "Relevant",
