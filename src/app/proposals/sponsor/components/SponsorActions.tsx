@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import Tenant from "@/lib/tenant/tenant";
@@ -28,6 +29,7 @@ const SponsorActions = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const [isSnapshotPending, setIsSnapshotPending] = useState<boolean>(false);
   const openDialog = useOpenDialog();
   const { address } = useAccount();
   const { inputData } = getInputData(draftProposal);
@@ -40,7 +42,6 @@ const SponsorActions = ({
   });
 
   const { data, writeAsync } = useContractWrite(config);
-
   const { isLoading } = useWaitForTransaction({
     hash: data?.hash,
   });
@@ -48,12 +49,13 @@ const SponsorActions = ({
   return (
     <div className="mt-6">
       <UpdatedButton
-        isLoading={isLoading}
+        isLoading={isLoading || isSnapshotPending}
         fullWidth={true}
         type="primary"
         onClick={async () => {
           try {
             if (draftProposal.proposal_type === ProposalType.SOCIAL) {
+              setIsSnapshotPending(true);
               const proposalId = await createSnapshot({
                 address: address as `0x${string}`,
                 proposal: draftProposal,
@@ -68,6 +70,7 @@ const SponsorActions = ({
                 snapshot_link: snapshotLink,
               });
 
+              setIsSnapshotPending(false);
               openDialog({
                 type: "SPONSOR_SNAPSHOT_DRAFT_PROPOSAL",
                 params: { redirectUrl: "/", snapshotLink },

@@ -1,8 +1,11 @@
+"use client";
+import { z } from "zod";
 import { useEffect } from "react";
 import { encodeFunctionData, isAddress, parseUnits } from "viem";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import { useFormContext } from "react-hook-form";
+import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
 
 const transferABI = [
   {
@@ -30,17 +33,7 @@ const transferABI = [
   },
 ] as const;
 
-type TransferFormType = {
-  target: string;
-  value: string;
-  calldata: string;
-  description: string;
-  recipient: string;
-  amount: string;
-};
-type FormType = {
-  transactions: TransferFormType[];
-};
+type FormType = z.output<typeof draftProposalSchema>;
 
 const TransferTransactionForm = ({ index }: { index: number }) => {
   const {

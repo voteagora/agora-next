@@ -1,6 +1,8 @@
-import Tenant from "@/lib/tenant/tenant";
-import { useState, useEffect } from "react";
+"use client";
+
 import { z } from "zod";
+import Tenant from "@/lib/tenant/tenant";
+import { useState, useEffect, useRef } from "react";
 import FormItem from "./form/FormItem";
 import { TransactionType } from "./../types";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
@@ -15,38 +17,17 @@ import {
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
 import toast from "react-hot-toast";
-import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import SimulationStatusPill from "./SimulateStatusPill";
 
-const SimulationStatusPill = ({
-  status,
-  simulationId,
-}: {
-  status: string;
-  simulationId: string | null;
-}) => {
-  return (
-    <span
-      className={cn(
-        "relative border rounded-lg p-2",
-        status === "UNCONFIRMED" &&
-          "bg-yellow-100 border-yellow-500 text-yellow-500",
-        status === "VALID" && "bg-green-100 border-green-500 text-green-500",
-        status === "INVALID" && "bg-red-100 border-red-500 text-red-500"
-      )}
-    >
-      {status}
-      {simulationId && (
-        <div className="absolute right-2 top-3 cursor-pointer">
-          <Link href={`https://tdly.co/shared/simulation/${simulationId}`}>
-            <Image src={icons.link} height="16" width="16" alt="link icon" />
-          </Link>
-        </div>
-      )}
-    </span>
-  );
+type FormType = z.output<typeof draftProposalSchema>;
+
+// just the parts of the transaction that actually matter on-chain
+const stringifyTransactionDetails = (transaction: any) => {
+  return JSON.stringify({
+    target: transaction.target,
+    calldata: transaction.calldata,
+    value: transaction.value,
+  });
 };
 
 const TransactionForm = ({
@@ -105,20 +86,42 @@ const TransactionForm = ({
   );
 };
 
+// const parseTransaction = (data: any) => {
+//   return {
+//     target: data.target,
+//     calldata: data.calldata,
+//     value: data.value,
+//   };
+// };
+
+// const compareTransactions = (a, b) => {
+//   return JSON.stringify(a) === JSON.stringify(b);
+// };
+
 const ExecutableProposalForm = () => {
   const { contracts } = Tenant.current();
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
   const [simulationPending, setSimulationPending] = useState(false);
 
-  type FormType = z.output<typeof draftProposalSchema>;
-  const { control, setValue, getValues, formState, trigger } =
+  const { control, setValue, getValues, formState, trigger, watch } =
     useFormContext<FormType>();
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "transactions",
   });
+
+  /**
+   * Keeping track of the current validated transaction block so we can compare
+   * changes and encourage re-simulation if the user simulates then changes the
+   * details of the transaction.
+   */
+  const currentlyValidatedTransactions = useRef<any[]>(
+    formState.defaultValues?.transactions?.map((transaction) => {
+      return stringifyTransactionDetails(transaction);
+    }) || []
+  );
 
   const validateTransactionForms = async () => {
     const result = await trigger(["transactions"]);
@@ -131,8 +134,49 @@ const ExecutableProposalForm = () => {
   });
 
   useEffect(() => {
-    validateTransactionForms();
-  }, [transactions]);
+    const subscription = watch((value, { name, type }) => {
+      const parts = name?.split(".");
+      if (parts?.length === 3) {
+        const field = parts[2];
+        const updatedTransactions = value.transactions;
+        // need to add custom ones too
+        if (
+          field === "recipient" ||
+          field === "amount" ||
+          field === "value" ||
+          field === "target"
+        ) {
+          validateTransactionForms();
+          updatedTransactions?.forEach((transaction, index) => {
+            if (
+              currentlyValidatedTransactions.current[index] !==
+              stringifyTransactionDetails(transaction)
+            ) {
+              setValue(`transactions.${index}.simulation_state`, "UNCONFIRMED");
+              // should we invalidate ID?
+            } else {
+              setValue(`transactions.${index}.simulation_state`, "VALID");
+            }
+          });
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  //   useEffect(() => {
+  //     validateTransactionForms();
+  //     transactions.forEach((transaction, index) => {
+  //       if (
+  //         currentlyValidatedTransactions.current[index] !==
+  //         JSON.stringify(transaction)
+  //       ) {
+  //         console.log("we have a diff!");
+  //         // setValue(`transactions.${index}.simulation_state`, "UNCONFIRMED");
+  //         // setValue(`transactions.${index}.simulation_id`, "");
+  //       }
+  //     });
+  //   }, [transactions]);
 
   const simulateTransactions = async () => {
     setSimulationPending(true);

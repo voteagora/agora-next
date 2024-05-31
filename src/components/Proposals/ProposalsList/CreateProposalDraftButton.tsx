@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UpdatedButton } from "@/components/Button";
 import createProposalDraft from "./actions/createProposalDraft";
 
 const CreateProposalDraftButton = ({ address }: { address: `0x${string}` }) => {
   const [isPending, setIsPending] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // hydration issue fix
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null;
+
   return (
     <UpdatedButton
       variant="rounded"

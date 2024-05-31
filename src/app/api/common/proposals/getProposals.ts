@@ -130,6 +130,14 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
   return await prisma.proposalDraft.findMany({
     where: {
       sponsor_address: address,
+      stage: {
+        in: [
+          PrismaProposalStage.ADDING_TEMP_CHECK,
+          PrismaProposalStage.DRAFTING,
+          PrismaProposalStage.ADDING_GITHUB_PR,
+          PrismaProposalStage.AWAITING_SUBMISSION,
+        ],
+      },
     },
     include: {
       transactions: true,

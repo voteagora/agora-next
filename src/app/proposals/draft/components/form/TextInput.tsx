@@ -33,6 +33,7 @@ const TextInput = ({
           {units}
         </span>
       )}
+      {/* TODO: only show if this field has been touched */}
       {!!errorMessage && (
         <p className="text-red-500 text-sm mb-0 mt-1">{errorMessage}</p>
       )}
