@@ -27,6 +27,7 @@ export const uniswapTenantContractConfig = (
       address: TOKEN as `0x${string}`,
       chain,
       contract: UniswapToken__factory.connect(TOKEN, provider),
+      provider,
     }),
 
     staker: new TenantContract<IStaker>({
@@ -34,6 +35,7 @@ export const uniswapTenantContractConfig = (
       address: STAKING,
       chain,
       contract: UniswapStaker__factory.connect(STAKING, provider),
+      provider,
     }),
 
     governor: new TenantContract<IGovernorContract>({
@@ -41,6 +43,7 @@ export const uniswapTenantContractConfig = (
       address: GOVERNOR,
       chain,
       contract: UniswapGovernor__factory.connect(GOVERNOR, provider),
+      provider,
     }),
   };
 };

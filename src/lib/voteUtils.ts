@@ -10,6 +10,7 @@ import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Block } from "ethers";
 
 /**
  * Vote primitives
@@ -129,7 +130,7 @@ export function parseParams(
 export function parseVote(
   vote: VotePayload,
   proposalData: ParsedProposalData[ProposalType],
-  latestBlock: number
+  latestBlock: Block | null
 ): Vote {
   return {
     transactionHash: vote.transaction_hash,

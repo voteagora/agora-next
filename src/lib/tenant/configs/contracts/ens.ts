@@ -12,12 +12,16 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
   const TOKEN = "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72";
   const GOVERNOR = "0x0";
+
+  const provider = ethProvider;
+
   return {
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain: mainnet,
-      contract: EtherfiToken__factory.connect(TOKEN, ethProvider),
+      contract: EtherfiToken__factory.connect(TOKEN, provider),
+      provider,
     }),
 
     // PLACEHOLDER CONTRACT
@@ -25,7 +29,8 @@ export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
       abi: [],
       address: GOVERNOR,
       chain: mainnet,
-      contract: OptimismGovernor__factory.connect(GOVERNOR, ethProvider),
+      contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
+      provider,
     }),
   };
 };

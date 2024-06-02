@@ -28,14 +28,14 @@ export const optimismTenantContractConfig = (
     : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7";
 
   return {
-    // TOKEN
     token: new TenantContract<ITokenContract>({
       abi: OptimismToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain: optimism,
       contract: OptimismToken__factory.connect(TOKEN, provider),
+      provider,
     }),
-    // GOVERNOR
+
     governor: new TenantContract<IGovernorContract>({
       abi: OptimismGovernor__factory.abi,
       address: GOVERNOR,
@@ -43,20 +43,23 @@ export const optimismTenantContractConfig = (
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      provider,
     }),
-    // ALLIGATOR
+
     alligator: new TenantContract<IAlligatorContract>({
       abi: AlligatorOPV5__factory.abi,
       address: ALLIGATOR,
       chain: optimism,
       contract: AlligatorOPV5__factory.connect(ALLIGATOR, provider),
+      provider,
     }),
-    // TYPES
+
     proposalTypesConfigurator: new TenantContract<BaseContract>({
       abi: ProposalTypesConfigurator__factory.abi,
       address: TYPES,
       chain: optimism,
       contract: OptimismGovernor__factory.connect(TYPES, provider),
+      provider,
     }),
   };
 };

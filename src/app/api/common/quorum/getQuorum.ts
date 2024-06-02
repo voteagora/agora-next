@@ -1,5 +1,4 @@
 import { cache } from "react";
-import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
@@ -38,9 +37,10 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 async function getCurrentQuorum() {
   const { namespace, contracts } = Tenant.current();
 
+  // TODO: Remove namespepace reference
   switch (namespace) {
     case "optimism": {
-      const latestBlock = await provider.getBlockNumber();
+      const latestBlock = await contracts.token.provider.getBlockNumber();
       if (!latestBlock) {
         return null;
       }

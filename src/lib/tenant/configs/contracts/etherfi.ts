@@ -14,13 +14,14 @@ export const etherfiTenantContractConfig = (
 ): TenantContracts => {
   const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
   const GOVERNOR = "0x0";
-
+  const provider = ethProvider;
   return {
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain: mainnet,
-      contract: EtherfiToken__factory.connect(TOKEN, ethProvider),
+      contract: EtherfiToken__factory.connect(TOKEN, provider),
+      provider,
     }),
 
     // PLACEHOLDER CONTRACT
@@ -28,7 +29,8 @@ export const etherfiTenantContractConfig = (
       abi: [],
       address: GOVERNOR,
       chain: mainnet,
-      contract: OptimismGovernor__factory.connect(GOVERNOR, ethProvider),
+      contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
+      provider,
     }),
   };
 };

@@ -1,5 +1,4 @@
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -45,7 +44,7 @@ async function getAuthorityChains({
 
   const [chains, latestBlockNumber] = await Promise.all([
     chainsQuery,
-    provider.getBlockNumber(),
+    contracts.token.provider.getBlockNumber(),
   ]);
 
   const reversedChains = chains
