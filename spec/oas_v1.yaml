@@ -1896,8 +1896,12 @@ paths:
                 locked:
                   type: boolean
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
         "400":
           description: Bad Request
         "401":
