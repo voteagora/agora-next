@@ -12,7 +12,11 @@ import MarkdownTextareaInput from "../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as draftProposalSchema } from "../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../actions/createDraftProposal";
-import { ProposalType, SocialProposalType } from "../../types";
+import {
+  ProposalType,
+  SocialProposalType,
+  ProposalTypeMetadata,
+} from "../../types";
 import {
   ProposalDraft,
   ProposalSocialOption,
@@ -23,7 +27,6 @@ import SocialProposalForm from "../SocialProposalForm";
 // import FileInput from "../form/FileInput";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useRouter } from "next/navigation";
 
 const DraftForm = ({
@@ -36,7 +39,6 @@ const DraftForm = ({
 }) => {
   const router = useRouter();
   const { address } = useAccount();
-  const openDialog = useOpenDialog();
   const [isPending, setIsPending] = useState<boolean>(false);
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
@@ -120,6 +122,9 @@ const DraftForm = ({
                     name="type"
                   />
                 </FormItem>
+                <p className="text-sm self-center text-agora-stone-700 mt-4">
+                  {ProposalTypeMetadata[proposalType].description}
+                </p>
               </div>
               <FormItem label="Title" required={true} htmlFor="title">
                 <TextInput

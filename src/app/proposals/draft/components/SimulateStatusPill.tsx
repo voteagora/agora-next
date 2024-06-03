@@ -1,6 +1,5 @@
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const SimulationStatusPill = ({
@@ -23,9 +22,13 @@ const SimulationStatusPill = ({
       {status}
       {simulationId && (
         <div className="absolute right-2 top-3 cursor-pointer">
-          <Link href={`https://tdly.co/shared/simulation/${simulationId}`}>
+          <a
+            href={`https://tdly.co/shared/simulation/${simulationId}`}
+            target="_blank"
+            rel="noreferrer"
+          >
             <Image src={icons.link} height="16" width="16" alt="link icon" />
-          </Link>
+          </a>
         </div>
       )}
     </span>

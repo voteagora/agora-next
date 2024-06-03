@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/app/lib/prisma";
+import { ProposalStage } from "@prisma/client";
 
 export type FormState = {
   ok: boolean;
@@ -13,7 +14,16 @@ export async function onSubmitAction(data: {
   creatorAddress: string;
 }): Promise<FormState> {
   try {
-    await prisma.proposalChecklist.create({
+    const updateDraft = prisma.proposalDraft.update({
+      where: {
+        id: data.draftProposalId,
+      },
+      data: {
+        stage: ProposalStage.AWAITING_SUBMISSION,
+      },
+    });
+
+    const updateChecklist = prisma.proposalChecklist.create({
       data: {
         title: "Docs updated",
         completed_by: data.creatorAddress,
@@ -25,6 +35,8 @@ export async function onSubmitAction(data: {
         },
       },
     });
+
+    await prisma.$transaction([updateDraft, updateChecklist]);
 
     return {
       ok: true,

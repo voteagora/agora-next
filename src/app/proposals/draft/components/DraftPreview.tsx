@@ -18,7 +18,6 @@ import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
-import Link from "next/link";
 import { parseProposalData } from "@/lib/proposalUtils";
 
 // TODO: either read from contract or add to tenant
@@ -226,14 +225,14 @@ const DraftPreview = ({
                       checked
                     />
                     {item.link && (
-                      <Link href={item.link}>
+                      <a href={item.link} target="_blank" rel="noreferrer">
                         <Image
                           src={icons.link}
                           height="16"
                           width="16"
                           alt="link icon"
                         />
-                      </Link>
+                      </a>
                     )}
                   </div>
                 );

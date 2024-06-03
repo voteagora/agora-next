@@ -35,15 +35,18 @@ const MyDraftProposals = ({
     <div className="mb-16">
       <h1 className="text-2xl font-black mb-6">My proposals</h1>
       <div className="space-y-6">
-        {draftProposals.map((proposal) => (
-          <Link
-            key={proposal.id}
-            href={`/proposals/draft/${proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
-            className="block"
-          >
-            <DraftProposalCard proposal={proposal} />
-          </Link>
-        ))}
+        {draftProposals.map((proposal) => {
+          console.log(proposal.stage);
+          return (
+            <Link
+              key={proposal.id}
+              href={`/proposals/draft/${proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
+              className="block"
+            >
+              <DraftProposalCard proposal={proposal} />
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

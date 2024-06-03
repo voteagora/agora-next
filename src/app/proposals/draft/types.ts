@@ -164,6 +164,17 @@ export enum ProposalType {
   SOCIAL = "social",
 }
 
+export const ProposalTypeMetadata = {
+  [ProposalType.EXECUTABLE]: {
+    title: "Executable Proposal",
+    description: "A proposal that executes on-chain and accepts transactions.",
+  },
+  [ProposalType.SOCIAL]: {
+    title: "Social Proposal",
+    description: "A proposal that resolves via a snapshot vote.",
+  },
+};
+
 export enum TransactionType {
   TRANSFER = "transfer",
   CUSTOM = "custom",

@@ -4,7 +4,6 @@ import { useAccount } from "wagmi";
 import { useState } from "react";
 import { z } from "zod";
 // import Tenant from "@/lib/tenant/tenant";
-// import { redirect } from "next/navigation";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
 import {
@@ -31,18 +30,41 @@ const GithubPRForm = ({
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address } = useAccount();
-  const [isPending, setIsPending] = useState(false);
+  const [isCreatePRPending, setIsCreatePRPending] = useState(false);
+  const [isSkipPending, setIsSkipPending] = useState(false);
 
   const github_pr_checklist_item = draftProposal.checklist_items.find(
     (item) => item.title === "Docs updated"
   );
 
-  const handleClick = async () => {
-    setIsPending(true);
+  const handleSkip = async () => {
+    setIsSkipPending(true);
     try {
       if (!address) {
         throw new Error("No address found");
       }
+
+      await createGithubChecklistItem({
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        link: "",
+      });
+
+      setIsSkipPending(false);
+      router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+    } catch (e) {
+      console.error(e);
+      setIsSkipPending(false);
+    }
+  };
+
+  const handleCreatePR = async () => {
+    setIsCreatePRPending(true);
+    try {
+      if (!address) {
+        throw new Error("No address found");
+      }
+
       const link = await createGithubProposal(draftProposal);
 
       await createGithubChecklistItem({
@@ -50,7 +72,9 @@ const GithubPRForm = ({
         creatorAddress: address,
         link: link,
       });
-      setIsPending(false);
+
+      setIsCreatePRPending(false);
+
       openDialog({
         type: "OPEN_GITHUB_PR",
         params: {
@@ -62,7 +86,7 @@ const GithubPRForm = ({
       });
     } catch (e) {
       console.error(e);
-      setIsPending(false);
+      setIsCreatePRPending(false);
     }
   };
 
@@ -80,20 +104,20 @@ const GithubPRForm = ({
         <p className="mt-4 text-stone-700">
           {!!github_pr_checklist_item ? (
             <span>
-              You have already opened a PR for this draft proposal. If you have
-              since updated your proposal, please{" "}
+              You have already started creating docs for this draft proposal. If
+              you have since updated your proposal, please{" "}
               <a
                 href={github_pr_checklist_item.link || ""}
                 className="underline"
                 target="_blank"
                 rel="noreferrer"
               >
-                edit the github PR
+                edit the docs on Github
               </a>{" "}
               to account for new details.
             </span>
           ) : (
-            "You must create a PR with your proposal in the ENS docs repo. Click below to allow Agora to create the PR for you."
+            "You must submit your proposal to the ENS docs by creating a pull request. Click below to allow Agora to update the docs for you."
           )}
         </p>
       </FormCard.Section>
@@ -111,17 +135,30 @@ const GithubPRForm = ({
             </UpdatedButton>
           </div>
         ) : (
-          <div className="space-x-2 self-start">
+          <div className="space-x-2 self-start flex flex-row items-center">
+            <UpdatedButton
+              isSubmit={false}
+              type="secondary"
+              isLoading={isSkipPending}
+              onClick={() => {
+                // If we have already created a PR we don't even need to handleCLick, we can just redirect
+                handleSkip();
+              }}
+              className="shrink"
+            >
+              Skip
+            </UpdatedButton>
             <UpdatedButton
               isSubmit={false}
               type="primary"
               fullWidth={true}
-              isLoading={isPending}
+              isLoading={isCreatePRPending}
               onClick={() => {
-                handleClick();
+                handleCreatePR();
               }}
+              className="grow"
             >
-              Create PR
+              Update docs for me
             </UpdatedButton>
           </div>
         )}

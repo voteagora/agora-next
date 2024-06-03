@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { encodeFunctionData, isAddress, parseUnits } from "viem";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
+import NumberInput from "./form/NumberInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
@@ -81,17 +82,14 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         />
       </FormItem>
       <FormItem
-        label="Amount"
+        label="Amount (in ENS tokens)"
         required={true}
         htmlFor={`transactions.${index}.amount`}
       >
-        <TextInput
+        <NumberInput
           name={`transactions.${index}.amount`}
           register={register}
           placeholder="100"
-          options={{
-            required: "Amount is required.",
-          }}
           errorMessage={errors.transactions?.[index]?.amount?.message}
         />
       </FormItem>
@@ -105,9 +103,6 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
             name={`transactions.${index}.description`}
             register={register}
             placeholder="What is this transaction all about?"
-            options={{
-              required: "Description is required.",
-            }}
             errorMessage={errors.transactions?.[index]?.description?.message}
           />
         </FormItem>
