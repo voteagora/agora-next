@@ -14,6 +14,7 @@ import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
 import { ProposalDraft } from "@prisma/client";
 import { useAccount } from "wagmi";
+import Image from "next/image";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const router = useRouter();
@@ -68,7 +69,14 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
     >
       <FormCard>
         <FormCard.Section>
-          <span className="w-full rounded-md h-[300px] bg-agora-stone-50 border border-agora-stone-100 block"></span>
+          <div className="w-full rounded-md h-[350px] block relative">
+            <Image
+              src="/images/temp_check.png"
+              alt="Temp Check"
+              fill={true}
+              className="object-cover rounded-md"
+            />
+          </div>
           <p className="mt-4 text-stone-700">
             We encourage you to go to Discourse to post a temp check that helps
             gauge the community&apos;s interest. It&apos;s not mandatory, but

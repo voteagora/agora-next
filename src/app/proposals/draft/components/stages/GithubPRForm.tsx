@@ -15,6 +15,7 @@ import {
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
 import { onSubmitAction as createGithubChecklistItem } from "../../actions/createGithubChecklistItem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import Image from "next/image";
 
 const GithubPRForm = ({
   draftProposal,
@@ -60,7 +61,14 @@ const GithubPRForm = ({
   return (
     <FormCard>
       <FormCard.Section>
-        <span className="w-full rounded-md h-[300px] bg-agora-stone-50 border border-agora-stone-100 block"></span>
+        <div className="w-full rounded-md h-[350px] block relative">
+          <Image
+            src="/images/temp_check.png"
+            alt="Temp Check"
+            fill={true}
+            className="object-cover rounded-md"
+          />
+        </div>
         <p className="mt-4 text-stone-700">
           You must create a PR with your proposal in the ENS docs repo. Click
           below to allow Agora to create the PR for you.
