@@ -3,9 +3,7 @@ import type { AddressLike, BaseContract, BigNumberish } from "ethers";
 
 export interface IGovernorContract extends BaseContract {
   // Uniswap
-  quorumVotes: TypedContractMethod<[], [bigint], "view">;
-
-  // OPTIMISM _-------
+  quorumVotes?: TypedContractMethod<[], [bigint], "view">;
 
   quorum?: TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
 
