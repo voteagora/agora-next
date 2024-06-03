@@ -2,8 +2,10 @@ import type { TypedContractMethod } from "@/lib/contracts/generated/common";
 import type { AddressLike, BaseContract, BigNumberish } from "ethers";
 
 export interface IGovernorContract extends BaseContract {
-  // Uniswap
+  // BRAVO
   quorumVotes?: TypedContractMethod<[], [bigint], "view">;
+
+  // -------
 
   quorum?: TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
 

@@ -15,8 +15,8 @@ export const uniswapTenantContractConfig = (
   isProd: boolean
 ): TenantContracts => {
   const TOKEN = "0xc796953c443f542728eedf33aab32753d3f7a91a";
-  const GOVERNOR = "0x43DAEfb9eeEf6Bd5Fc827cC9653fd15B79adfa10";
-  const STAKING = "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
+  const GOVERNOR = "0x58b9952016d19bf2c6cb62f398dcde6a22278aaa";
+  const STAKER = "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
 
   const provider = sepoliaProvider;
   const chain = sepolia;
@@ -32,14 +32,14 @@ export const uniswapTenantContractConfig = (
 
     staker: new TenantContract<IStaker>({
       abi: UniswapStaker__factory.abi,
-      address: STAKING,
+      address: STAKER,
       chain,
-      contract: UniswapStaker__factory.connect(STAKING, provider),
+      contract: UniswapStaker__factory.connect(STAKER, provider),
       provider,
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: UniswapGovernor__factory.abi,
       address: GOVERNOR,
       chain,
       contract: UniswapGovernor__factory.connect(GOVERNOR, provider),
