@@ -1,6 +1,7 @@
 import { z } from "zod";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
+import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
 
@@ -22,10 +23,8 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
         htmlFor={`transactions.${index}.target`}
         className="col-span-2"
       >
-        <TextInput
+        <AddressInput
           name={`transactions.${index}.target`}
-          register={register}
-          placeholder="0xabc..."
           errorMessage={errors.transactions?.[index]?.target?.message}
         />
       </FormItem>

@@ -1,9 +1,10 @@
 "use client";
 
+import { isAddress } from "viem";
 import { useState } from "react";
 import FormItem from "./form/FormItem";
 import { useFormContext } from "react-hook-form";
-import TextInput from "./form/TextInput";
+import AddressInput from "./form/AddressInput";
 import { useContractRead, useBlockNumber } from "wagmi";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import Tenant from "@/lib/tenant/tenant";
@@ -21,7 +22,7 @@ const RequestSponsorshipForm = ({
   draftProposal: ProposalDraft;
 }) => {
   const [isPending, setIsPending] = useState(false);
-  const { register, watch } = useFormContext();
+  const { watch } = useFormContext();
 
   const address = watch("sponsorAddress");
 
@@ -45,11 +46,11 @@ const RequestSponsorshipForm = ({
     <>
       <div className="grid grid-cols-2 gap-4">
         <FormItem label="Sponsor address">
-          <TextInput name="sponsorAddress" register={register} />
+          <AddressInput name="sponsorAddress" />
         </FormItem>
         <FormItem label="Sponsor verification">
           <span className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
-            <AvatarAddress address={address} />
+            {isAddress(address) && <AvatarAddress address={address} />}
             <span
               className={`absolute right-2 top-2 ${hasEnoughVotes ? "text-green-500" : "text-red-500"}`}
             >

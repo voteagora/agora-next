@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { encodeFunctionData, isAddress, parseUnits } from "viem";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
+import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
 
@@ -74,13 +75,8 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         htmlFor={`transactions.${index}.recipient`}
         className="col-span-2"
       >
-        <TextInput
+        <AddressInput
           name={`transactions.${index}.recipient`}
-          register={register}
-          placeholder="0xabc..."
-          options={{
-            required: "Recipient is required.",
-          }}
           errorMessage={errors.transactions?.[index]?.recipient?.message}
         />
       </FormItem>

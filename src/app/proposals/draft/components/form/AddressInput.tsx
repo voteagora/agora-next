@@ -1,25 +1,60 @@
 import { useFormContext } from "react-hook-form";
-import { useEnsAddress } from "wagmi";
+import { useEnsAddress, useEnsName } from "wagmi";
+import { isAddress } from "viem";
 
-const AddressInput = ({ name }: { name: string }) => {
-  const { register, watch } = useFormContext();
+const AddressInput = ({
+  name,
+  errorMessage,
+}: {
+  name: string;
+  errorMessage?: string;
+}) => {
+  const { register, watch, setValue } = useFormContext();
 
   const address = watch(name);
 
   const { data: ensAddress } = useEnsAddress({
     chainId: 1,
-    name: address,
+    name: address?.trim(),
+    enabled: address?.trim()?.split("."),
   });
+
+  const { data: ensName } = useEnsName({
+    chainId: 1,
+    address: address?.trim(),
+    enabled: isAddress(address?.trim()),
+  });
+
+  const buildHint = () => {
+    if (isAddress(address)) {
+      if (ensName != null)
+        return (
+          <>
+            Primary ENS name: <span>{ensName}</span>
+          </>
+        );
+    }
+
+    if (ensAddress != null) return ensAddress;
+  };
 
   return (
     <>
       <input
         type="text"
-        className="block w-full rounded-md border-0 p-1.5 text-neutral-900 ring-1 ring-inset ring-neutral-300 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6"
-        placeholder="lilfrog.eth"
+        className="border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full"
+        placeholder="0x..."
         {...register(name)}
+        onBlur={() => {
+          if (!isAddress(address) && ensAddress != null) {
+            setValue(name, ensAddress);
+          }
+        }}
       />
-      <p className="text-xs text-neutral-500 mt-1">{ensAddress}</p>
+      <p className="text-xs text-neutral-500 mt-1">{buildHint()}</p>
+      {errorMessage && (
+        <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
+      )}
     </>
   );
 };
