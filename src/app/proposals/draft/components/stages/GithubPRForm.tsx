@@ -80,7 +80,7 @@ const GithubPRForm = ({
         <p className="mt-4 text-stone-700">
           {!!github_pr_checklist_item ? (
             <span>
-              You've already opened a PR for this draft proposal. If you've
+              You have already opened a PR for this draft proposal. If you have
               since updated your proposal, please{" "}
               <a
                 href={github_pr_checklist_item.link || ""}

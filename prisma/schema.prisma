@@ -967,9 +967,7 @@ model ProposalChecklist {
   title        String
   completed_at DateTime      @default(now())
   completed_by String
-  // link implies optionality -- if no link, its because the field is optional (think temp check for ENS)
   link         String?
-//   skipped      Boolean       @default(false)
   proposal_id  Int
   proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
   @@map("proposal_checklist_items")
