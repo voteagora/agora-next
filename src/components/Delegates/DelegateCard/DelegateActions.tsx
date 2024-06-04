@@ -10,6 +10,7 @@ import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateActions({
   delegate,
@@ -24,9 +25,24 @@ export function DelegateActions({
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
+  const { ui } = Tenant.current();
+
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
+
+  const isRetired = ui.delegates?.retired.includes(
+    delegate.address.toLowerCase()
+  );
+
+  if (isRetired) {
+    return (
+      <div className="rounded-lg border border-gray-300 p-3 bg-gray-100 text-xs font-semibold text-gray-700">
+        This voter has stepped down. If you have votes currently delegated to
+        them, please select a new voter.
+      </div>
+    );
+  }
 
   return (
     <HStack

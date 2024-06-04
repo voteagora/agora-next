@@ -19,8 +19,14 @@ type UIPage = {
   };
 };
 
+type UIDelegates = {
+  advanced: `0x${string}`[];
+  retired: `0x${string}`[];
+};
+
 type TenantUIParams = {
   color: string;
+  delegates?: UIDelegates;
   hero?: string;
   logo: string;
   title: string;
@@ -31,11 +37,12 @@ type TenantUIParams = {
 
 export class TenantUI {
   private _color: string;
+  private _delegates?: UIDelegates;
   private _hero?: string;
-  private _logo: string;
-  private _title: string;
   private _links?: UILink[];
+  private _logo: string;
   private _pages?: UIPage[];
+  private _title: string;
   private _toggles?: UIToggle[];
 
   private _linksCache: { [key: string]: UILink | undefined } = {};
@@ -44,6 +51,7 @@ export class TenantUI {
 
   constructor({
     color,
+    delegates,
     hero,
     logo,
     title,
@@ -52,6 +60,7 @@ export class TenantUI {
     toggles,
   }: TenantUIParams) {
     this._color = color;
+    this._delegates = delegates;
     this._hero = hero;
     this._logo = logo;
     this._title = title;
@@ -62,6 +71,10 @@ export class TenantUI {
 
   public get color(): string {
     return this._color;
+  }
+
+  public get delegates(): UIDelegates | undefined {
+    return this._delegates;
   }
 
   public get title(): string {
