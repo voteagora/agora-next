@@ -1,5 +1,5 @@
 import { updateBallotOsMultiplier } from "@/app/api/common/ballots/updateBallot";
-import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
+import { createOptionalFloatNumberValidator } from "@/app/api/common/utils/validators";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import {
   authenticateApiUser,
@@ -7,7 +7,7 @@ import {
 } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
 
-const multiplierValidator = createOptionalNumberValidator(1, 5, 1);
+const multiplierValidator = createOptionalFloatNumberValidator(1, 5, 1);
 
 export async function POST(
   request: NextRequest,
