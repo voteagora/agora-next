@@ -132,6 +132,13 @@ const optimismUI = new TenantUI({
   logo: optimismLogo,
   hero: optimismHero,
 
+  delegates: {
+    advanced: [],
+    retired: [
+      "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee", // lindajxie.eth
+    ],
+  },
+
   links: [
     {
       name: "calendar",
