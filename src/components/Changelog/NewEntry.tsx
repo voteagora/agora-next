@@ -14,13 +14,13 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { Separator } from "@/components/ui/separator";
 
-export default function ChangelogEntryForm() {
+export default function NewEntry() {
   const { contracts } = Tenant.current();
 
   const changelogContract = {
-    address: contracts.changelog.address as `0x${string}`,
-    abi: contracts.changelog.abi,
-    chainId: contracts.changelog.chain.id,
+    address: contracts.changelog!.address as `0x${string}`,
+    abi: contracts.changelog!.abi,
+    chainId: contracts.changelog!.chain.id,
   };
 
   const [title, setTitle] = useState("");
