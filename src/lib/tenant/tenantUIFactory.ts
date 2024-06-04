@@ -141,7 +141,7 @@ const optimismUI = new TenantUI({
     {
       name: "faq",
       title: "FAQ",
-      url: "https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
+      url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c?pvs=74",
     },
     {
       name: "changelog",

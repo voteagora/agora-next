@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import prisma from "@/app/lib/prisma";
+import { fetchBallot } from "./getBallots";
 
 type BallotContent = {
   metric_id: string;
@@ -43,7 +44,9 @@ async function updateBallotMetricForAddress({
       address,
     },
   });
-  return prisma.allocations.upsert({
+
+  // Add or update allocation
+  await prisma.allocations.upsert({
     where: {
       address_round_metric_id: {
         metric_id: data.metric_id,
@@ -64,6 +67,53 @@ async function updateBallotMetricForAddress({
       locked: data.locked,
     },
   });
+
+  // Autoreblance all other allocations
+  const allocations = await prisma.allocations.findMany({
+    where: {
+      address,
+      round: roundId,
+    },
+  });
+
+  const [amountToBalance, totalUnlocked] = allocations.reduce(
+    (acc, allocation) => [
+      acc[0] -
+        (allocation.locked || allocation.metric_id === data.metric_id
+          ? Number(allocation.allocation.toFixed(2))
+          : 0),
+      acc[1] +
+        (allocation.locked || allocation.metric_id === data.metric_id
+          ? 0
+          : Number(allocation.allocation.toFixed(2))),
+    ],
+    [100, 0]
+  );
+
+  await Promise.all(
+    allocations.map(async (allocation) => {
+      if (!allocation.locked && allocation.metric_id !== data.metric_id) {
+        await prisma.allocations.update({
+          where: {
+            address_round_metric_id: {
+              metric_id: allocation.metric_id,
+              round: roundId,
+              address,
+            },
+          },
+          data: {
+            ...allocation,
+            allocation:
+              (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
+              amountToBalance,
+          },
+        });
+      }
+    })
+  );
+
+  // Return full ballot
+  return fetchBallot(roundId, address);
 }
 
 const deleteBallotMetricApi = async (
