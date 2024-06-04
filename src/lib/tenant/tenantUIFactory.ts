@@ -73,6 +73,10 @@ const etherfiUI = new TenantUI({
       name: "proposals",
       enabled: false,
     },
+    {
+      name: "delegates/edit",
+      enabled: false,
+    },
   ],
 });
 
@@ -121,6 +125,10 @@ const ensUI = new TenantUI({
     },
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "delegates/edit",
       enabled: true,
     },
   ],
@@ -213,6 +221,10 @@ const optimismUI = new TenantUI({
     },
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "delegates/edit",
       enabled: true,
     },
     {
