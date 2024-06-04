@@ -37,7 +37,7 @@ export function DelegateActions({
 
   if (isRetired) {
     return (
-      <div className="rounded-lg border border-gray-300 p-3 bg-gray-100 text-xs font-semibold text-gray-700">
+      <div className="rounded-lg border border-gray-300 p-2 bg-gray-100 text-xs font-medium text-gray-700">
         This voter has stepped down. If you have votes currently delegated to
         them, please select a new voter.
       </div>
