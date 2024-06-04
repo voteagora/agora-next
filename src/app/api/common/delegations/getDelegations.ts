@@ -6,6 +6,7 @@ import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -226,15 +227,16 @@ const getDirectDelegateeForAddress = async ({
   address: string;
 }) => {
   const { namespace } = Tenant.current();
-  const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
-      where: { delegator: address.toLowerCase() },
-    }),
-  ]);
 
-  if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
-    return null;
+  const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
+    where: { delegator: address.toLowerCase() },
+  });
+
+  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+    const proxyAddress = await getProxyAddress(address);
+    if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
+      return null;
+    }
   }
 
   return delegatee;

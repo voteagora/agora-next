@@ -10,6 +10,7 @@ import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateActions({
   delegate,
@@ -28,6 +29,9 @@ export function DelegateActions({
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
 
+  const { contracts } = Tenant.current();
+  const hasAlligator = contracts?.alligator;
+
   return (
     <HStack
       alignItems="items-stretch"
@@ -41,7 +45,7 @@ export function DelegateActions({
       <div>
         {isConnected ? (
           address &&
-          (isAdvancedUser ? (
+          (isAdvancedUser && hasAlligator ? (
             <AdvancedDelegateButton
               delegate={delegate}
               delegators={delegators}
