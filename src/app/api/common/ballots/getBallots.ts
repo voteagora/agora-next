@@ -148,12 +148,14 @@ async function getBallotForAddress({
           na.name,
           na.image,
           na.metric_id,
-          na.normalized_allocation,
-          na.normalized_allocation * 10000000 AS normalized_allocation_amount
+          SUM(na.normalized_allocation) as normalized_allocation,
+          SUM(na.normalized_allocation) * 10000000 AS normalized_allocation_amount
       FROM 
           normalized_allocations na
+      group by
+      	  1, 2, 3, 4, 5, 6
       ORDER BY 
-          na.normalized_allocation DESC
+          SUM(na.normalized_allocation) DESC
   )
   , aggregated_project_allocations AS (
       SELECT 
