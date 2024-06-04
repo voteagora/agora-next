@@ -25,12 +25,26 @@ export function DelegateActions({
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
+  const { ui } = Tenant.current();
+
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
 
   const { contracts } = Tenant.current();
   const hasAlligator = contracts?.alligator;
+
+  const isRetired = ui.delegates?.retired.includes(
+    delegate.address.toLowerCase(),
+  );
+
+  if (isRetired) {
+    return (
+      <div className="rounded-lg border border-gray-300 p-2 bg-gray-100 text-xs font-medium text-gray-700">
+        This voter has stepped down. If you are currently delegated to them, please select a new voter.
+      </div>
+    );
+  }
 
   return (
     <HStack

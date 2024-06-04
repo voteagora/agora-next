@@ -12,9 +12,17 @@ export const optimismTenantUIConfig = new TenantUI({
     logo: optimismLogo,
   },
 
+  delegates: {
+    advanced: [],
+    retired: [
+      "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee", // lindajxie.eth
+    ],
+  },
+
   organization: {
     title: "Optimism Foundation",
   },
+
 
   links: [
     {

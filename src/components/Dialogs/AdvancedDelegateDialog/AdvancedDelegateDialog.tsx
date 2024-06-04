@@ -392,10 +392,6 @@ function Message({
             <Repeat2 size={20} />
             <p>Let your delegates re-delegate</p>
           </div>
-          <div className={styles.icon_text}>
-            <ChevronsRight size={20} />
-            <p>Might require two transactions to vote</p>
-          </div>
         </VStack>
         <Button
           className={styles.continue_button}
