@@ -67,7 +67,7 @@ const etherfiUI = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "proposals",
