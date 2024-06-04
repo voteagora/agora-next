@@ -13,11 +13,11 @@ import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateActions({
-  delegate,
-  className,
-  isAdvancedUser,
-  delegators,
-}: {
+                                  delegate,
+                                  className,
+                                  isAdvancedUser,
+                                  delegators,
+                                }: {
   delegate: DelegateChunk;
   className?: string;
   isAdvancedUser: boolean;
@@ -32,14 +32,13 @@ export function DelegateActions({
   const warpcast = delegate?.statement?.warpcast;
 
   const isRetired = ui.delegates?.retired.includes(
-    delegate.address.toLowerCase()
+    delegate.address.toLowerCase(),
   );
 
   if (isRetired) {
     return (
       <div className="rounded-lg border border-gray-300 p-2 bg-gray-100 text-xs font-medium text-gray-700">
-        This voter has stepped down. If you have votes currently delegated to
-        them, please select a new voter.
+        This voter has stepped down. If you have votes currently delegated to them, please select a new voter.
       </div>
     );
   }
