@@ -23,6 +23,13 @@ async function getProposals({
     contract: contracts.governor.address,
   };
 
+  // TODO: not the nicest way to handle this, but it works for now
+  // and should allow us to test ENS in the short term
+  const isENSTestEnv = namespace === "ens" && !isProd;
+  const ensTestData = isENSTestEnv && {
+    contract: contracts.governor.address,
+  };
+
   const { meta, data: proposals } = await paginateResult(
     (skip: number, take: number) => {
       if (filter === "relevant") {
@@ -34,6 +41,7 @@ async function getProposals({
           },
           where: {
             ...(prodDataOnly || {}),
+            ...(ensTestData || {}),
             cancelled_block: null,
           },
         });

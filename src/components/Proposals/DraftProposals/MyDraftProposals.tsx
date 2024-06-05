@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
@@ -19,13 +20,13 @@ const MyDraftProposals = ({
       const proposals = await fetchDraftProposals(authorAddress);
       setDraftProposals(proposals);
     },
-    []
+    [fetchDraftProposals]
   );
 
   useEffect(() => {
     if (!address) return;
     getDraftProposalsAndSet(address);
-  }, [fetchDraftProposals, address]);
+  }, [fetchDraftProposals, address, getDraftProposalsAndSet]);
 
   if (!draftProposals.length) {
     return null;
@@ -36,7 +37,6 @@ const MyDraftProposals = ({
       <h1 className="text-2xl font-black mb-6">My proposals</h1>
       <div className="space-y-6">
         {draftProposals.map((proposal) => {
-          console.log(proposal.stage);
           return (
             <Link
               key={proposal.id}

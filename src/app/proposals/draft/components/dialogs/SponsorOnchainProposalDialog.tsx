@@ -30,7 +30,7 @@ const SponsorOnchainProposalDialog = ({
               src={
                 isLoading
                   ? `/images/action-pending.svg`
-                  : `/images/successfulDelegation.svg`
+                  : `/images/ens_success.svg`
               }
               className="w-full mb-3"
               alt="Pending"

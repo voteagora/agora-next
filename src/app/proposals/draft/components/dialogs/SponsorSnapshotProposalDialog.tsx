@@ -20,9 +20,9 @@ const SponsorSnapshotProposalDialog = ({
         <VStack>
           <VStack className="w-full">
             <img
-              src={`/images/action-pending.svg`}
+              src={`/images/ens_success.svg`}
               className="w-full mb-3"
-              alt="Pending"
+              alt="Cheerful scene with ENS + agora logo and thumbs up emojis."
             />
             <div className="text-2xl font-black">Proposal complete!</div>
             <div className="flex flex-row justify-between items-center mt-4">
