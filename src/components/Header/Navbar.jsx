@@ -40,6 +40,12 @@ export default function Navbar() {
           RetroPGF
         </HeaderLink>
       )}
+
+      {tenant.ui.toggle("info") && tenant.ui.toggle("info").enabled && (
+        <HeaderLink href="/info" isActive={pathname.includes("info")}>
+          Info
+        </HeaderLink>
+      )}
     </HStack>
   );
 }

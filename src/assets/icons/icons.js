@@ -24,6 +24,10 @@ import file from "./file.svg";
 import users from "./users.svg";
 import flag from "./flag.svg";
 import lightbulb from "./lightbulb.svg";
+import notificationMessage from "./notificationMessage.svg";
+import coins from "./coins.svg";
+import checkCircleBroken from "./checkCircleBroken.svg";
+import northEast from "./northEast.svg";
 
 export const icons = {
   contractVoter,
@@ -52,4 +56,8 @@ export const icons = {
   users,
   flag,
   lightbulb,
+  notificationMessage,
+  coins,
+  checkCircleBroken,
+  northEast,
 };

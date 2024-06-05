@@ -73,6 +73,10 @@ const etherfiUI = new TenantUI({
       name: "proposals",
       enabled: false,
     },
+    {
+      name: "Info",
+      enabled: false,
+    },
   ],
 });
 
@@ -112,6 +116,16 @@ const ensUI = new TenantUI({
         description: "Delegate your voting power to a trusted representative",
       },
     },
+    {
+      route: "delegates",
+      title: "Agora is the home of ENS voters",
+      description:
+        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
+      },
+    },
   ],
 
   toggles: [
@@ -121,6 +135,10 @@ const ensUI = new TenantUI({
     },
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
   ],
@@ -196,6 +214,16 @@ const optimismUI = new TenantUI({
         description: "Delegate your voting power to a trusted representative",
       },
     },
+    {
+      route: "info",
+      title: "Welcome to the Optimism Collective",
+      description:
+        "A collective of companies, communities, and citizens working together.",
+      meta: {
+        title: "Info of Agora",
+        description: "Welcome to the Optimism Collective",
+      },
+    },
   ],
 
   toggles: [
@@ -225,6 +253,10 @@ const optimismUI = new TenantUI({
     },
     {
       name: "citizens",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
   ],

@@ -11,7 +11,7 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: "640px"
+      sm: "640px",
     },
     container: {
       center: true,
@@ -38,10 +38,10 @@ module.exports = {
         40: "10rem",
         48: "12rem",
         56: "14rem",
-        64: "16rem"
+        64: "16rem",
       },
       minWidth: {
-        desktop: '1280px',
+        desktop: "1280px",
       },
       gap: {
         0.5: "0.125rem", // 2px
@@ -84,6 +84,11 @@ module.exports = {
         bold: "700",
         extrabold: "800",
         black: "900",
+      },
+      rotate: {
+        2: "2deg",
+        4: "4deg",
+        5: "5deg",
       },
       fontFamily: {
         sans: [
