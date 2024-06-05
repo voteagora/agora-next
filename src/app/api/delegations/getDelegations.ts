@@ -1,6 +1,6 @@
 import {
   fetchCurrentDelegatees,
-  fetchCurrentDelegators,
+  fetchCurrentAdvancedDelegators,
 } from "../common/delegations/getDelegations";
 import {
   fetchProxy,
@@ -15,7 +15,7 @@ export const fetchAllForAdvancedDelegation = async (address: string) => {
     fetchIsDelegatingToProxy(address),
     fetchCurrentDelegatees(address),
     fetchProxy(address),
-    fetchCurrentDelegators(address),
+    fetchCurrentAdvancedDelegators(address),
     fetchVotingPowerAvailableForDirectDelegation(address),
   ]);
 };

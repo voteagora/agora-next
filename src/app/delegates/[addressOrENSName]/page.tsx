@@ -114,7 +114,15 @@ export default async function Page({
           statement={statement}
         />
         {statement && <TopIssues statement={statement} />}
-        <DelegationsContainer delegatees={delegates} delegators={delegators} />
+        <DelegationsContainer
+          delegatees={delegates}
+          initialDelegators={delegators}
+          fetchDelegators={async (page: number) => {
+            "use server";
+
+            return fetchCurrentDelegators(addressOrENSName, page);
+          }}
+        />
 
         {/* TODO: -> this could be refactor with revalidatePath */}
         <DelegateVotesProvider initialVotes={delegateVotes}>

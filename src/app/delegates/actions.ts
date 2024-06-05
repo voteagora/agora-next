@@ -93,8 +93,11 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
   return apiFetchCurrentDelegatees(addressOrENSName);
 }
 
-export async function fetchCurrentDelegators(addressOrENSName: string) {
-  return apiFetchCurrentDelegators(addressOrENSName);
+export async function fetchCurrentDelegators(
+  addressOrENSName: string,
+  page = 1
+) {
+  return apiFetchCurrentDelegators(addressOrENSName, page);
 }
 
 // TODO temporary fetch all query - optimization via API needed
