@@ -657,6 +657,8 @@ components:
           type: string
         description:
           type: string
+        url:
+          type: string
         comments:
           type: array
           items:
