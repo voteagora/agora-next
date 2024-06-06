@@ -2,7 +2,6 @@
 
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
-import { VStack } from "../Layout/Stack";
 import styles from "./hero.module.scss";
 
 export default async function Hero() {
@@ -11,10 +10,10 @@ export default async function Hero() {
 
   return (
     <div className={`flex flex-row justify-between ${styles.hero_container}`}>
-      <VStack className={styles.content_container}>
+      <div className={`flex flex-col ${styles.content_container}`}>
         <h1>{title}</h1>
         <p> {description}</p>
-      </VStack>
+      </div>
       {ui.hero && (
         <Image
           className="h-[110px] w-auto"

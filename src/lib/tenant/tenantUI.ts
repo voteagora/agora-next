@@ -36,7 +36,6 @@ export class TenantUI {
   private _title: string;
   private _links?: UILink[];
   private _pages?: UIPage[];
-  private _root: string;
   private _toggles?: UIToggle[];
 
   private _linksCache: { [key: string]: UILink | undefined } = {};

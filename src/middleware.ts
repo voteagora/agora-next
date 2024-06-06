@@ -17,7 +17,7 @@ const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  if (path === "/") {
+  if (path === "/" && ROOT_PATH !== "/") {
     return NextResponse.redirect(new URL(ROOT_PATH, request.url));
   }
 
