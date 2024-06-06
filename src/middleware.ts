@@ -1,8 +1,11 @@
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
+import Tenant from "@/lib/tenant/tenant";
 
 const API_PREFIX = "/api/v1";
 const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify"];
+const ROOT_PATH = Tenant.current().ui.root;
+
 /*
   Middleware function to run on matching routes for config.matcher.
 
@@ -14,6 +17,11 @@ const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify"];
 */
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+
+  if (path === "/") {
+    return NextResponse.redirect(new URL(ROOT_PATH, request.url));
+  }
+
   // TODO redundant check for API_PREFIX, consider removing, move to a sustainable pattern
   if (path.startsWith(API_PREFIX)) {
     // validate bearer token for all api routes except excluded routes
@@ -34,5 +42,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/v1/:path*",
+  matcher: ["/", "/api/v1/:path*"],
 };

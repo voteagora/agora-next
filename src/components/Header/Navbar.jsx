@@ -32,6 +32,12 @@ export default function Navbar() {
           </HeaderLink>
         )}
 
+      {tenant.ui.toggle("info") && tenant.ui.toggle("info").enabled && (
+        <HeaderLink href="/info" isActive={pathname.includes("info")}>
+          Info
+        </HeaderLink>
+      )}
+
       {tenant.ui.toggle("retropgf") && tenant.ui.toggle("retropgf").enabled && (
         <HeaderLink
           href="/retropgf/3/summary"

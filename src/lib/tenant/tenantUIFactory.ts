@@ -31,9 +31,21 @@ const etherfiUI = new TenantUI({
   hero: etherfiHero,
   logo: etherfiLogo,
 
+  root: "/delegates",
+
   pages: [
     {
       route: "/",
+      title: "Agora is the home of ETHER.FI governance",
+      description:
+        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      meta: {
+        title: "Ether.fi Agora",
+        description: "Home of token governance",
+      },
+    },
+    {
+      route: "info",
       title: "Agora is the home of ETHER.FI governance",
       description:
         "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
@@ -70,6 +82,10 @@ const etherfiUI = new TenantUI({
       enabled: true,
     },
     {
+      name: "info",
+      enabled: true,
+    },
+    {
       name: "proposals",
       enabled: false,
     },
@@ -84,6 +100,8 @@ const ensUI = new TenantUI({
   title: "ENS Agora",
   color: "#5BAAF4",
   logo: ensLogo,
+
+  root: "/",
 
   pages: [
     {
@@ -139,6 +157,8 @@ const optimismUI = new TenantUI({
   color: "#FF0420",
   logo: optimismLogo,
   hero: optimismHero,
+
+  root: "/",
 
   links: [
     {
