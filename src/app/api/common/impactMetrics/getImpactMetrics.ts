@@ -29,6 +29,7 @@ async function getImpactMetricsApi(roundId: string) {
       metric_id: impactMetric.metric_id,
       name: impactMetric.name,
       description: impactMetric.description,
+      url: impactMetric.url,
       allocations_per_project: impactMetric.metrics_projects.map((project) => {
         return {
           project_id: project.projects_data.project_id,
@@ -99,6 +100,7 @@ async function getImpactMetricApi(impactMetricId: string) {
     metric_id: impactMetric.metric_id,
     name: impactMetric.name,
     description: impactMetric.description,
+    url: impactMetric.url,
     allocations_per_project: impactMetric.metrics_projects.map((project) => {
       return {
         project_id: project.projects_data.project_id,
