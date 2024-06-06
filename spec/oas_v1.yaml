@@ -735,6 +735,8 @@ components:
           type: string
         socialLinks:
           $ref: "#/components/schemas/SocialLinks"
+        oss:
+          type: boolean
         team:
           type: array
           items:
