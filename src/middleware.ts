@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
-import Tenant from "@/lib/tenant/tenant";
 
 const API_PREFIX = "/api/v1";
 const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify"];
-const ROOT_PATH = Tenant.current()?.ui?.root || '/';
-
+const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
 
 /*
   Middleware function to run on matching routes for config.matcher.
@@ -19,7 +17,7 @@ const ROOT_PATH = Tenant.current()?.ui?.root || '/';
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  if (path === "/" && ROOT_PATH !== "/") {
+  if (path === "/") {
     return NextResponse.redirect(new URL(ROOT_PATH, request.url));
   }
 

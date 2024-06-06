@@ -31,8 +31,6 @@ const etherfiUI = new TenantUI({
   hero: etherfiHero,
   logo: etherfiLogo,
 
-  root: "/delegates",
-
   pages: [
     {
       route: "/",
@@ -101,8 +99,6 @@ const ensUI = new TenantUI({
   color: "#5BAAF4",
   logo: ensLogo,
 
-  root: "/",
-
   pages: [
     {
       route: "/",
@@ -157,8 +153,6 @@ const optimismUI = new TenantUI({
   color: "#FF0420",
   logo: optimismLogo,
   hero: optimismHero,
-
-  root: "/",
 
   links: [
     {
