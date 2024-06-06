@@ -6,6 +6,7 @@ import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
+import { fetchUserVotesForProposal as apiFetchUserVotesForProposal } from "@/app/api/common/votes/getVotes";
 import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -136,6 +137,15 @@ export default async function Home() {
 
   const votableSupply = await fetchVotableSupply();
 
+  async function fetchUserVotesForProposal(proposal_id, address) {
+    "use server";
+
+    return await apiFetchUserVotesForProposal({
+      proposal_id,
+      address,
+    });
+  }
+
   return (
     <VStack>
       <Hero />
@@ -150,6 +160,7 @@ export default async function Home() {
           "use server";
           return apiFetchProposals({ filter, page });
         }}
+        fetchUserVotesForProposal={fetchUserVotesForProposal}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
       />

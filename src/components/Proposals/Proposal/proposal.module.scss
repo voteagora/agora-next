@@ -9,10 +9,12 @@
   text-overflow: ellipsis;
   overflow: hidden;
   padding: $spacing-4 $spacing-6;
+
   .cell_content_title {
     font-size: $font-size-xs;
     color: $gray-700;
   }
+
   .cell_content_body {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -23,22 +25,27 @@
   width: 55%;
   align-items: flex-start;
   justify-content: center;
+
   @media (max-width: $screen-sm) {
     width: 100%;
   }
 }
+
 .cell_status {
   width: 20%;
   align-items: flex-start;
   justify-content: center;
+
   @media (max-width: $screen-sm) {
     display: none;
   }
 }
+
 .cell_result {
   width: 25%;
   align-items: flex-end;
   justify-content: center;
+
   @media (max-width: $screen-sm) {
     display: none;
   }
@@ -46,6 +53,7 @@
 
 .mobile_status {
   display: none;
+
   @media (max-width: $screen-sm) {
     display: block;
   }
@@ -55,4 +63,17 @@
   @media (max-width: $screen-sm) {
     display: none;
   }
+}
+
+
+.vote_for {
+  @apply bg-[#06ab34] text-[#06ab34];
+}
+
+.vote_against {
+  @apply bg-[#d62600] text-[#d62600];
+}
+
+.vote_abstain {
+  @apply bg-[#afafaf] text-[#afafaf];
 }

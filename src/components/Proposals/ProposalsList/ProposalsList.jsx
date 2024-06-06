@@ -18,6 +18,7 @@ export default function ProposalsList({
   fetchProposals,
   votableSupply,
   governanceCalendar,
+  fetchUserVotesForProposal,
 }) {
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
@@ -85,6 +86,7 @@ export default function ProposalsList({
                 key={`${proposal.id}_${proposal.status}`}
                 proposal={proposal}
                 votableSupply={votableSupply}
+                fetchUserVotesForProposal={fetchUserVotesForProposal}
               />
             ))}
           </InfiniteScroll>
