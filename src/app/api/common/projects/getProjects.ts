@@ -84,6 +84,7 @@ async function getProjectsApi() {
     deployedContracts: defaultDeployedContracts,
     categories: defaultCategories,
     funding: defaultFunding,
+    oss: true,
   };
   return {
     metadata: pageMetadata,
