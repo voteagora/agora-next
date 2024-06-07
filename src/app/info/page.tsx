@@ -8,7 +8,7 @@ export async function generateMetadata({}) {
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
-    title
+    title,
   )}&description=${encodeURIComponent(description)}`;
 
   return {
@@ -32,13 +32,13 @@ export async function generateMetadata({}) {
 }
 
 export default async function Page() {
-  // NOTE: This is a temporary placeholder for Ether.fi
-  const { ui } = Tenant.current();
 
+  const { ui } = Tenant.current();
   if (!ui.toggle("info")) {
     return <div>Route not supported for namespace</div>;
   }
 
+  // Ether.fi specific info page
   return (
     <div>
       <Hero />
@@ -51,7 +51,8 @@ export default async function Page() {
                 Live – ETHFI token launch
               </div>
               <div>
-                <div className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
+                <div
+                  className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
                 On March 18th, we’re launching the $ETHFI token and taking the
                 first step towards full decentralization.
               </div>
