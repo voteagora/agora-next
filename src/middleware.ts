@@ -8,7 +8,7 @@ const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
 /*
   Middleware function to run on matching routes for config.matcher.
 
-  Currently only validating presence and formatting of API Key for /api
+  Currently only validating presence and formatting of API Key for /apiB
   routes.
 
   Consider fully validating user api key against postgres pending prisma
