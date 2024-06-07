@@ -1,5 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import Hero from "@/components/Hero/Hero";
+import React from "react";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -30,7 +31,7 @@ export async function generateMetadata({}) {
   };
 }
 
-export default async function Home() {
+export default async function Page() {
   // NOTE: This is a temporary placeholder for Ether.fi
   const { ui } = Tenant.current();
 

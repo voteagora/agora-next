@@ -1,10 +1,8 @@
-"use server";
-
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
 import styles from "./hero.module.scss";
 
-export default async function Hero() {
+export default function Hero() {
   const { namespace, ui } = Tenant.current();
   const { title, description } = ui.page("/");
 
