@@ -43,6 +43,16 @@ const etherfiUI = new TenantUI({
       },
     },
     {
+      route: "info",
+      title: "Agora is the home of ETHER.FI governance",
+      description:
+        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      meta: {
+        title: "Ether.fi Agora",
+        description: "Home of token governance",
+      },
+    },
+    {
       route: "delegates",
       title: "Agora is the home of ETHER.FI delegates",
       description:
@@ -67,10 +77,18 @@ const etherfiUI = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "info",
+      enabled: true,
     },
     {
       name: "proposals",
+      enabled: false,
+    },
+    {
+      name: "delegates/edit",
       enabled: false,
     },
   ],
@@ -121,6 +139,10 @@ const ensUI = new TenantUI({
     },
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "delegates/edit",
       enabled: true,
     },
   ],
@@ -220,6 +242,10 @@ const optimismUI = new TenantUI({
     },
     {
       name: "delegates",
+      enabled: true,
+    },
+    {
+      name: "delegates/edit",
       enabled: true,
     },
     {
