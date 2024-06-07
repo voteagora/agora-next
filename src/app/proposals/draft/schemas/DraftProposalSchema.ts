@@ -46,7 +46,6 @@ const socialProposal = z
 export const schema = z.object({
   type: z.nativeEnum(ProposalType),
   title: z.string().min(1, { message: "Title cannot be empty" }),
-  description: z.string().min(1, { message: "Description cannot be empty" }),
   abstract: z.string().min(1, { message: "Abstract cannot be empty" }),
   transactions: z.array(transaction),
   socialProposal: socialProposal.optional(),

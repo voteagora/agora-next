@@ -46,7 +46,6 @@ const DraftForm = ({
       type: (draftProposal.proposal_type ||
         ProposalType.EXECUTABLE) as ProposalType,
       title: draftProposal.title,
-      description: draftProposal.description,
       abstract: draftProposal.abstract,
       transactions: draftProposal.transactions || [],
       socialProposal: {
@@ -135,21 +134,6 @@ const DraftForm = ({
                     required: "Title is required.",
                   }}
                   errorMessage={errors.title?.message}
-                />
-              </FormItem>
-              <FormItem
-                label="Description"
-                required={true}
-                htmlFor="description"
-              >
-                <TextInput
-                  name="description"
-                  register={register}
-                  placeholder="Description"
-                  options={{
-                    required: "Description is required.",
-                  }}
-                  errorMessage={errors.description?.message}
                 />
               </FormItem>
               <FormItem label="Abstract" required={true} htmlFor="abstract">

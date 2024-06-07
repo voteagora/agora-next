@@ -38,6 +38,15 @@ const AddressInput = ({
     if (ensAddress != null) return ensAddress;
   };
 
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (!isAddress(address) && ensAddress != null) {
+        setValue(name, ensAddress);
+      }
+    }
+  };
+
   return (
     <>
       <input
@@ -50,6 +59,7 @@ const AddressInput = ({
             setValue(name, ensAddress);
           }
         }}
+        onKeyDown={handleKeyDown}
       />
       <p className="text-xs text-neutral-500 mt-1">{buildHint()}</p>
       {errorMessage && (

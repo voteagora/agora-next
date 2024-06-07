@@ -151,8 +151,6 @@ const DraftPreview = ({
           </div>
         )}
 
-        <h3 className="font-semibold mt-6">Description</h3>
-        <p className="text-agora-stone-700 mt-2">{proposalDraft.description}</p>
         <h3 className="font-semibold mt-6">Abstract</h3>
         <p className="text-agora-stone-700 mt-2">{proposalDraft.abstract}</p>
       </FormCard.Section>
@@ -222,7 +220,7 @@ const DraftPreview = ({
                     <input
                       type="checkbox"
                       className="rounded text-agora-stone-900"
-                      checked
+                      checked={!!item.link}
                     />
                     {item.link && (
                       <a href={item.link} target="_blank" rel="noreferrer">

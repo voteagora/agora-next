@@ -913,7 +913,6 @@ model ProposalDraft {
   proposal_type               String?
   proposal_social_type        String?
   title                       String
-  description                 String
   abstract                    String
   audit_url                   String?
   dao_slug                    DaoSlug

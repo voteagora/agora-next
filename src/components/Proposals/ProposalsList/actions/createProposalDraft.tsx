@@ -12,7 +12,6 @@ async function createProposalDraft(address: `0x${string}`) {
     data: {
       temp_check_link: "",
       title: "",
-      description: "",
       abstract: "",
       audit_url: "",
       author_address: address,

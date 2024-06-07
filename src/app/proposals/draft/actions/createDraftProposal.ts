@@ -33,7 +33,6 @@ export async function onSubmitAction(
       data: {
         stage: ProposalStage.ADDING_GITHUB_PR,
         title: parsed.data.title,
-        description: parsed.data.description,
         abstract: parsed.data.abstract,
         proposal_type: parsed.data.type,
         proposal_social_type: parsed.data.socialProposal?.type,
