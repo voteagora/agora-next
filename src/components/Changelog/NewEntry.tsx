@@ -2,12 +2,13 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import MarkdownEditor from "@/components/shared/Markdown/MarkdownEditor";
 import { Button } from "@/components/Button";
 import {
   Select,
   SelectContent,
   SelectTrigger,
+  SelectItem,
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
@@ -102,10 +103,11 @@ export default function NewEntry() {
           </div>
         </div>
         <div className="space-y-4">
-          <Label>Changelog update</Label>
-          <Textarea
+          <MarkdownEditor
             value={markdownText}
-            onChange={(e) => setMarkdownText(e.target.value)}
+            onChange={setMarkdownText}
+            title="Changelog update"
+            placeholder="I believe that..."
             disabled={isDisabledCreateEntry}
           />
         </div>
@@ -132,9 +134,9 @@ export default function NewEntry() {
               </SelectTrigger>
               <SelectContent>
                 {options.map((item, index) => (
-                  <option key={index} value={item.value}>
+                  <SelectItem key={index} value={item.value}>
                     {item.name}
-                  </option>
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
