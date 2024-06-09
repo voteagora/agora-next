@@ -1,12 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select"; // Assuming you have a Select component
+import { Button } from "@/components/Button";
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import {
+  useAccount,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -17,11 +23,23 @@ import { Separator } from "@/components/ui/separator";
 export default function NewEntry() {
   const { contracts } = Tenant.current();
 
+  const options = [
+    { name: "https://vote.optimism.io", value: "https://vote.optimism.io" },
+    { name: "https://agora.ensdao.org/", value: "https://agora.ensdao.org/" },
+    { name: "https://vote.ether.fi/", value: "https://vote.ether.fi/" },
+    {
+      name: "https://vote.uniswapfoundation.org/",
+      value: "https://vote.uniswapfoundation.org/",
+    },
+  ];
+
   const changelogContract = {
     address: contracts.changelog!.address as `0x${string}`,
     abi: contracts.changelog!.abi,
     chainId: contracts.changelog!.chain.id,
   };
+
+  const { address: accountAddress } = useAccount();
 
   const [title, setTitle] = useState("");
   const [markdownText, setMarkdownText] = useState("");
@@ -84,7 +102,7 @@ export default function NewEntry() {
           </div>
         </div>
         <div className="space-y-4">
-          <Label>Markdown Text</Label>
+          <Label>Changelog update</Label>
           <Textarea
             value={markdownText}
             onChange={(e) => setMarkdownText(e.target.value)}
@@ -103,25 +121,23 @@ export default function NewEntry() {
           </div>
           <div className="flex-1">
             <Label>Project URL</Label>
-            <select
+            <Select
               value={projectURL}
-              onChange={(e) => setProjectURL(e.target.value)}
+              onValueChange={(value) => setProjectURL(value)}
+              defaultValue={"0"}
               disabled={isDisabledCreateEntry}
-              className="input"
             >
-              <option value="https://vote.optimism.io">
-                https://vote.optimism.io
-              </option>
-              <option value="https://agora.ensdao.org/">
-                https://agora.ensdao.org/
-              </option>
-              <option value="https://vote.ether.fi/">
-                https://vote.ether.fi/
-              </option>
-              <option value="https://vote.uniswapfoundation.org/">
-                https://vote.uniswapfoundation.org/
-              </option>
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={"Which project"} />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((item, index) => (
+                  <option key={index} value={item.value}>
+                    {item.name}
+                  </option>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <Separator className="my-8" />
