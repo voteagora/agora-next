@@ -1,6 +1,7 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
+import uniswapDelegateLogo from "*.svg";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ETHER.FI Agora",
@@ -13,12 +14,22 @@ export const etherfiTenantUIConfig = new TenantUI({
   },
 
   organization: {
-    title: "Ether.fi Foundation",
+    title: "ether.fi DAO",
   },
 
   pages: [
     {
       route: "/",
+      title: "Agora is the home of ETHER.FI governance",
+      description:
+        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      meta: {
+        title: "Ether.fi Agora",
+        description: "Home of token governance",
+      },
+    },
+    {
+      route: "info",
       title: "Agora is the home of ETHER.FI governance",
       description:
         "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
@@ -52,11 +63,20 @@ export const etherfiTenantUIConfig = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "info",
+      enabled: true,
     },
     {
       name: "proposals",
       enabled: false,
     },
+    {
+      name: "delegates/edit",
+      enabled: false,
+    },
   ],
+
 });
