@@ -45,6 +45,11 @@ export class TenantUI {
   private _title: string;
   private _toggles?: UIToggle[];
 
+  // proposalLifcycle:{
+  //   votingDuration: number;
+
+
+
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
