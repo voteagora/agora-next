@@ -13,6 +13,7 @@ type UIPage = {
   description: string;
   route: string;
   title: string;
+  href?: string;
   meta: {
     title: string;
     description: string;
@@ -45,25 +46,20 @@ export class TenantUI {
   private _title: string;
   private _toggles?: UIToggle[];
 
-  // proposalLifcycle:{
-  //   votingDuration: number;
-
-
-
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   constructor({
-    color,
-    delegates,
-    hero,
-    logo,
-    title,
-    links,
-    pages,
-    toggles,
-  }: TenantUIParams) {
+                color,
+                delegates,
+                hero,
+                logo,
+                title,
+                links,
+                pages,
+                toggles,
+              }: TenantUIParams) {
     this._color = color;
     this._delegates = delegates;
     this._hero = hero;

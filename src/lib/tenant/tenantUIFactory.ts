@@ -64,9 +64,9 @@ const etherfiUI = new TenantUI({
     },
     {
       route: "proposals",
+      href: "https://snapshot.org/#/etherfi-dao.eth",
       title: "Agora is the home of ether.fi delegates",
-      description:
-        "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      description: "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
         title: "ether.fi Agora",
         description: "Home of token governance",
