@@ -62,7 +62,7 @@ async function getProposals({
     pageSize
   );
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
   const votableSupply = await fetchVotableSupply();
 
   const resolvedProposals = Promise.all(
@@ -84,7 +84,7 @@ async function getProposals({
 }
 
 async function getProposal(proposal_id: string) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const proposal = await prisma[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });
@@ -93,7 +93,7 @@ async function getProposal(proposal_id: string) {
     return notFound();
   }
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
   const quorum = await fetchQuorumForProposal(proposal);
   const votableSupply = await fetchVotableSupply();
 

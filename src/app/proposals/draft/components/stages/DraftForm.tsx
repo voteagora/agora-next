@@ -65,6 +65,8 @@ const DraftForm = ({
     formState: { errors },
   } = methods;
 
+  console.log(errors);
+
   const proposalType = watch("type");
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {

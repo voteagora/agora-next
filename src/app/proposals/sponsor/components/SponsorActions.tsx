@@ -29,27 +29,29 @@ const SponsorActions = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const { contracts, isProd } = Tenant.current();
   const [isSnapshotPending, setIsSnapshotPending] = useState<boolean>(false);
   const openDialog = useOpenDialog();
   const { address } = useAccount();
   const { inputData } = getInputData(draftProposal);
   const { config } = usePrepareContractWrite({
-    address: "0xb65c031ac61128ae791d42ae43780f012e2f7f89",
+    address: contracts.governor.address as `0x${string}`,
+    chainId: contracts.governor.chain.id,
     abi: ENSGovernorABI,
     functionName: "propose",
     args: inputData,
-    chainId: 11155111,
   });
 
-  const { data, writeAsync } = useContractWrite(config);
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  const {
+    data,
+    writeAsync,
+    isLoading: isWriteLoading,
+  } = useContractWrite(config);
 
   return (
     <div className="mt-6">
       <UpdatedButton
-        isLoading={isLoading || isSnapshotPending}
+        isLoading={isWriteLoading || isSnapshotPending}
         fullWidth={true}
         type="primary"
         onClick={async () => {
@@ -61,7 +63,7 @@ const SponsorActions = ({
                 proposal: draftProposal,
               });
 
-              const snapshotLink = Tenant.current().isProd
+              const snapshotLink = isProd
                 ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
                 : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
 

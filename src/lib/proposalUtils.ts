@@ -4,6 +4,7 @@ import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
+import { Block } from "ethers";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -173,7 +174,7 @@ export function getTitleFromProposalDescription(description: string = "") {
 
 export async function parseProposal(
   proposal: ProposalPayload,
-  latestBlock: number,
+  latestBlock: Block | null,
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
@@ -614,7 +615,7 @@ export type ProposalStatus =
 export async function getProposalStatus(
   proposal: ProposalPayload,
   proposalResults: ParsedProposalResults[ProposalType],
-  latestBlock: number,
+  latestBlock: Block | null,
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
@@ -630,11 +631,11 @@ export async function getProposalStatus(
   if (
     !proposal.start_block ||
     !latestBlock ||
-    Number(proposal.start_block) > latestBlock
+    Number(proposal.start_block) > latestBlock.number
   ) {
     return "PENDING";
   }
-  if (!proposal.end_block || Number(proposal.end_block) > latestBlock) {
+  if (!proposal.end_block || Number(proposal.end_block) > latestBlock.number) {
     return "ACTIVE";
   }
 

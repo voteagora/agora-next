@@ -52,7 +52,7 @@ export async function getTotalVotableAllowance({
 
   const { contracts } = Tenant.current();
 
-  const latestBlockNumber = await provider.getBlockNumber();
+  const latestBlockNumber = await contracts.token.provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(
     (proxies ?? []).map((proxy) =>
       contracts.governor.contract.weightCast(proposalId, proxy.toString())

@@ -49,6 +49,7 @@ const ensContracts = (isProd: boolean): TenantContracts => {
           : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67",
         isProd ? ethProvider : sepoliaProvider
       ),
+      provider: isProd ? provider : sepoliaProvider,
     }),
     // GOVERNOR
     governor: new TenantContract<IGovernorContract>({
@@ -64,6 +65,7 @@ const ensContracts = (isProd: boolean): TenantContracts => {
       ),
       chain: isProd ? mainnet : sepolia,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
+      provider: isProd ? provider : sepoliaProvider,
     }),
   };
 };
@@ -79,6 +81,7 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
         "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
         ethProvider
       ),
+      provider: ethProvider,
     }),
     // GOVERNOR
     governor: new TenantContract<IGovernorContract>({
@@ -95,6 +98,7 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
       ),
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      provider: provider,
     }),
   };
 };
@@ -110,6 +114,7 @@ const opContracts = (isProd: boolean): TenantContracts => {
         "0x4200000000000000000000000000000000000042",
         provider
       ),
+      provider: provider,
     }),
     // GOVERNOR
     governor: new TenantContract<IGovernorContract>({
@@ -126,6 +131,7 @@ const opContracts = (isProd: boolean): TenantContracts => {
       ),
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      provider: provider,
     }),
     // ALLIGATOR
     alligator: new TenantContract<IAlligatorContract>({
@@ -140,6 +146,7 @@ const opContracts = (isProd: boolean): TenantContracts => {
           : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6",
         provider
       ),
+      provider: provider,
     }),
     // TYPES
     proposalTypesConfigurator: new TenantContract<BaseContract>({
@@ -154,6 +161,7 @@ const opContracts = (isProd: boolean): TenantContracts => {
           : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7",
         provider
       ),
+      provider: provider,
     }),
   };
 };
