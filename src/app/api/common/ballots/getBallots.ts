@@ -150,13 +150,14 @@ async function getBallotForAddress({
           na.project_id,
           na.name,
           na.image,
+          na.is_os,
           na.metric_id,
           na.normalized_allocation as normalized_allocation,
           na.normalized_allocation * 10000000 AS normalized_allocation_amount
       FROM 
           normalized_allocations na
       group by
-      	  1, 2, 3, 4, 5, 6, 7
+      	  1, 2, 3, 4, 5, 6, 7, 8
       ORDER BY 
           na.normalized_allocation DESC
   )
@@ -165,6 +166,7 @@ async function getBallotForAddress({
           pa.address,
           pa.round,
           pa.project_id,
+          pa.is_os,
           MAX(pa.name) AS name,
           MAX(pa.image) AS image,
           SUM(pa.normalized_allocation) AS total_allocation_share,
@@ -178,7 +180,7 @@ async function getBallotForAddress({
       WHERE 
           pa.address = $2 AND pa.round = $1
       GROUP BY 
-          pa.address, pa.round, pa.project_id
+          pa.address, pa.round, pa.project_id, pa.is_os
   )
   SELECT 
       b.*,
@@ -201,6 +203,7 @@ async function getBallotForAddress({
               'project_id', apa.project_id, 
               'name', apa.name,
               'image', apa.image,
+              'is_os', apa.is_os,
               'allocation', apa.total_allocation_amount,
               'allocations_per_metric', apa.allocations_per_metric
           ) ORDER BY apa.total_allocation_share DESC) 

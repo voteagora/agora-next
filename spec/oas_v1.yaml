@@ -852,6 +852,12 @@ components:
       properties:
         project_id:
           type: string
+        name:
+          type: string
+        image:
+          type: string
+        is_os:
+          type: boolean
         allocation:
           type: number
         allocations_per_metric:
