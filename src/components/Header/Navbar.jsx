@@ -25,10 +25,7 @@ export default function Navbar() {
       )}
 
       {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
-        <HeaderLink
-          href="/delegates"
-          isActive={pathname.includes("delegates")}
-        >
+        <HeaderLink href="/delegates" isActive={pathname.includes("delegates")}>
           Voters
         </HeaderLink>
       )}

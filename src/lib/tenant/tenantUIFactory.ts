@@ -44,7 +44,7 @@ const etherfiUI = new TenantUI({
     },
     {
       route: "info",
-      title: "Agora is the home of ETHER.FI governance",
+      title: "Agora is the home of ether.fi governance",
       description:
         "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
       meta: {
@@ -54,7 +54,7 @@ const etherfiUI = new TenantUI({
     },
     {
       route: "delegates",
-      title: "Agora is the home of ETHER.FI delegates",
+      title: "Agora is the home of ether.fi delegates",
       description:
         "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
@@ -66,7 +66,8 @@ const etherfiUI = new TenantUI({
       route: "proposals",
       href: "https://snapshot.org/#/etherfi-dao.eth",
       title: "Agora is the home of ether.fi delegates",
-      description: "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      description:
+        "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
         title: "ether.fi Agora",
         description: "Home of token governance",
