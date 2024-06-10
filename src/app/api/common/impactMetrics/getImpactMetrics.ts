@@ -36,6 +36,7 @@ async function getImpactMetricsApi(roundId: string) {
           name: project.projects_data.project_name,
           image: project.projects_data.project_image,
           allocation: project.allocation,
+          is_os: project.is_os,
         };
       }),
       comments: impactMetric.metrics_comments.map((comment) => {
@@ -107,6 +108,7 @@ async function getImpactMetricApi(impactMetricId: string) {
         name: project.projects_data.project_name,
         image: project.projects_data.project_image,
         allocation: project.allocation,
+        is_os: project.is_os,
       };
     }),
     comments: impactMetric.metrics_comments.map((comment) => {
