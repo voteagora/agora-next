@@ -33,13 +33,14 @@ export function DelegateActions({
   const hasAlligator = contracts?.alligator;
 
   const isRetired = ui.delegates?.retired.includes(
-    delegate.address.toLowerCase(),
+    delegate.address.toLowerCase()
   );
 
   if (isRetired) {
     return (
       <div className="rounded-lg border border-gray-300 p-2 bg-gray-100 text-xs font-medium text-gray-700">
-        This voter has stepped down. If you are currently delegated to them, please select a new voter.
+        This voter has stepped down. If you are currently delegated to them,
+        please select a new voter.
       </div>
     );
   }
