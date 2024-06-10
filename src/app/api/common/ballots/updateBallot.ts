@@ -167,7 +167,7 @@ async function updateBallotOsMultiplierForAddress({
   roundId: number;
   address: string;
 }) {
-  return prisma.ballots.upsert({
+  await prisma.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -184,6 +184,8 @@ async function updateBallotOsMultiplierForAddress({
       os_multiplier: multiplier,
     },
   });
+
+  return fetchBallot(roundId, address);
 }
 
 const updateBallotOsOnlyApi = async (
@@ -205,7 +207,7 @@ async function updateBallotOsOnlyForAddress({
   roundId: number;
   address: string;
 }) {
-  return prisma.ballots.upsert({
+  await prisma.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -222,6 +224,8 @@ async function updateBallotOsOnlyForAddress({
       os_only: toggle,
     },
   });
+
+  return fetchBallot(roundId, address);
 }
 
 export const updateBallotMetric = cache(updateBallotMetricApi);
