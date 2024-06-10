@@ -55,11 +55,11 @@ const ensContracts = (isProd: boolean): TenantContracts => {
       abi: OptimismGovernor__factory.abi,
       address: isProd
         ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
-        : "0xb65C031Ac61128AE791D42Ae43780f012E2F7f89",
+        : "0x630a6a268191c654ce084aad2d7910ff651e0797",
       contract: OptimismGovernor__factory.connect(
         isProd
           ? "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67"
-          : "0xb65C031Ac61128AE791D42Ae43780f012E2F7f89",
+          : "0x630a6a268191c654ce084aad2d7910ff651e0797",
         isProd ? provider : sepoliaProvider
       ),
       chain: isProd ? mainnet : sepolia,

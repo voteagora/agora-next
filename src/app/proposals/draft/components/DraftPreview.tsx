@@ -88,13 +88,19 @@ const DraftPreview = ({
   // sort by completed_at
   const filteredAndSortedChecklistItems = proposalDraft.checklist_items
     .sort((a, b) => {
-      return a.completed_at > b.completed_at ? 1 : -1;
+      // sort by alphabetical of the title field then by the completed at field
+      if (a.title.toLowerCase() === b.title.toLowerCase()) {
+        return a.completed_at > b.completed_at ? 1 : -1;
+      } else {
+        return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1;
+      }
     })
     .filter((item, index, self) => {
-      if (index === self.length - 1) return true;
-      return item.title !== self[index + 1].title;
+      if (index === self.length - 1) return true; // keep last item
+      return item.title.toLowerCase() !== self[index + 1].title.toLowerCase();
     });
 
+  console.log(filteredAndSortedChecklistItems);
   return (
     <FormCard>
       {!isArchived && (

@@ -75,7 +75,7 @@ export async function onSubmitAction(
 
     const transactionLink =
       data.transactions.length > 0
-        ? `tdly.co/shared/simulation/${data.transactions[0].simulation_id}`
+        ? `https://tdly.co/shared/simulation/${data.transactions[0].simulation_id}`
         : "";
 
     await prisma.$transaction([
