@@ -1,7 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
-import uniswapDelegateLogo from "*.svg";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ETHER.FI Agora",
