@@ -188,6 +188,79 @@ const projectIds = [
   "beethoven-x",
 ];
 
+const projectNames = [
+  "Foo Link",
+  "Bar Forge",
+  "Imaginary Pulse",
+  "Not Real Network",
+  "Fake Finance",
+  "Test Protocol",
+  "Imaginary Vault",
+  "Fake Gateway",
+  "Foo Swap",
+  "Bar Path",
+  "Test Mesh",
+  "Fake Dex",
+  "Imaginary Network",
+  "Not Real Finance",
+  "Foo Chain",
+  "Imaginary Grid",
+  "Fake Protocol",
+  "Matrix Swap",
+  "Echo Finance",
+  "Radiant Path",
+  "Synergy Vault",
+  "Photon Network",
+  "Fusion Swap",
+  "Terra Finance",
+  "Cosmic Mesh",
+  "Polaris Protocol",
+  "Elemental Dex",
+  "Pulse Network",
+  "Quantum Swap",
+  "Paragon Chain",
+  "Delta Finance",
+  "Vertex Vault",
+  "Solstice Network",
+  "Aurora Finance",
+  "Nova Swap",
+  "Eclipse Dex",
+  "Velocity Vault",
+  "Infinity Path",
+  "Prism Finance",
+  "Cosmos Protocol",
+  "Luna Network",
+  "Vortex Dex",
+  "Pulsar Finance",
+  "Titan Path",
+  "Helios Vault",
+  "Nebula Protocol",
+  "Aether Swap",
+  "Orbit Finance",
+  "Gravity Protocol",
+  "Stellar Chain",
+  "Fake Network",
+  "Test Swap",
+  "Mock Finance",
+  "Trial Dex",
+  "Pseudo Path",
+  "Fake Vault",
+  "Test Protocol",
+  "Simulated Network",
+  "Dummy Chain",
+  "Beta Finance",
+  "Test Chain",
+  "Fake Swap",
+  "Test Finance",
+  "Pseudo Network",
+  "Imaginary Protocol",
+  "Not Real Chain",
+  "Foo Network",
+  "Bar Finance",
+  "Imaginary Swap",
+  "Not Real Dex",
+];
+
 async function main() {
   const capitalizeFirstLetter = (string) =>
     string.charAt(0).toUpperCase() + string.slice(1);
@@ -199,13 +272,12 @@ async function main() {
       .join(" ");
   };
 
-  const result = projectIds.map((id) => {
+  const result = projectIds.map((id, idx) => {
     const project = projects.find((proj) => proj.project_id === id);
     return {
       project_id: id,
-      project_name: project ? project.displayName : formatProjectName(id),
-      profileImageUrl:
-        project && project.profile ? project.profile.profileImageUrl : "",
+      project_name: projectNames[idx],
+      profileImageUrl: "",
     };
   });
 
