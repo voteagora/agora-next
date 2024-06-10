@@ -70,14 +70,9 @@ async function getBallotForAddress({
     WITH metric_totals AS (
       SELECT 
           mp.metric_id,
+          b.address,
           SUM(mp.values) AS total_values,
-          SUM(
-              CASE 
-                  WHEN b.os_only = TRUE AND mp.is_os = FALSE THEN 0
-                  WHEN mp.is_os = TRUE THEN mp.values * b.os_multiplier
-                  ELSE mp.values
-              END
-          ) AS adjusted_total_values
+          SUM(CASE WHEN mp.is_os THEN mp.values * b.os_multiplier ELSE mp.values END) AS adjusted_total_values
       FROM 
           retro_funding.metrics_projects mp
       JOIN 
@@ -87,15 +82,16 @@ async function getBallotForAddress({
       JOIN 
           retro_funding.ballots b
       ON 
-          a.address = b.address AND a.round = b.round
+          a.address = b.address AND a.round = b.round AND a.address = b.address
       GROUP BY 
-          mp.metric_id, b.os_multiplier, b.os_only
+          mp.metric_id, b.os_multiplier, b.address
   )
   , weighted_allocations AS (
       SELECT 
           a.address,
           a.round,
           a.metric_id,
+          a.allocation,
           mp.project_id,
           mp.is_os,
           mp.values,
@@ -111,7 +107,7 @@ async function getBallotForAddress({
       JOIN 
           retro_funding.ballots b
       ON 
-          a.address = b.address AND a.round = b.round
+          a.address = b.address AND a.round = b.round AND a.address = b.address
       JOIN 
           retro_funding.metrics_projects mp
       ON 
@@ -126,9 +122,10 @@ async function getBallotForAddress({
           pd.project_name as name,
           pd.project_image as image,
           wa.is_os,
+          wa.allocation,
           wa.weighted_values,
           mt.adjusted_total_values,
-          wa.weighted_values / mt.adjusted_total_values AS normalized_allocation
+          ((wa.weighted_values / mt.adjusted_total_values) * (wa.allocation / 100)) AS normalized_allocation
       FROM 
           weighted_allocations wa
       JOIN 
@@ -138,7 +135,7 @@ async function getBallotForAddress({
       JOIN
           retro_funding.projects_data pd
       ON
-          wa.project_id = pd.project_id
+          wa.metric_id = mt.metric_id AND wa.address = mt.address AND pd.project_id = wa.project_id
   )
   , project_allocations AS (
       SELECT 
@@ -148,14 +145,14 @@ async function getBallotForAddress({
           na.name,
           na.image,
           na.metric_id,
-          SUM(na.normalized_allocation) as normalized_allocation,
-          SUM(na.normalized_allocation) * 10000000 AS normalized_allocation_amount
+          na.normalized_allocation as normalized_allocation,
+          na.normalized_allocation * 10000000 AS normalized_allocation_amount
       FROM 
           normalized_allocations na
       group by
-      	  1, 2, 3, 4, 5, 6
+      	  1, 2, 3, 4, 5, 6, 7
       ORDER BY 
-          SUM(na.normalized_allocation) DESC
+          na.normalized_allocation DESC
   )
   , aggregated_project_allocations AS (
       SELECT 
