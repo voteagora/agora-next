@@ -361,6 +361,7 @@ view OptimismVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
 
   @@map("voter_stats")
   @@schema("optimism")
@@ -641,6 +642,7 @@ view etherfiVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
 
   @@map("voter_stats")
   @@schema("etherfi")
@@ -814,6 +816,7 @@ view uniswapVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
 
   @@map("voter_stats")
   @@schema("uniswap")
