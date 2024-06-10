@@ -6,13 +6,18 @@ async function deleteImpactMetricCommentApi({
 }: {
   commentId: number;
 }) {
+
+
+  const deletedVotes = await prisma.metrics_comments_votes.deleteMany({
+    where: {
+      comment_id: commentId
+    }
+  });
+
   const deletedComment = await prisma.metrics_comments.delete({
     where: {
       comment_id: commentId,
-    },
-    include: {
-      metrics_comments_votes: true,
-    },
+    }
   });
 
   return {
