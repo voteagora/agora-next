@@ -296,7 +296,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
         : 0,
-    proposalsCreated: 0n,
+    proposalsCreated: delegate?.proposals_created || 0n,
     proposalsVotedOn: delegate?.proposals_voted || 0n,
     votedFor: delegate?.for?.toString() || "0",
     votedAgainst: delegate?.against?.toString() || "0",
