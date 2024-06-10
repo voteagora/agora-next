@@ -21,7 +21,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Agora is the home of Uniswap governance",
-      description: "Add copy here",
+      description: "Uniswap governance is a collective of companies, communities, and token holders working together to steward the future of the Uniswap protocol",
       meta: {
         title: "Uniswap Agora",
         description: "Home of token governance",
@@ -30,7 +30,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       route: "delegates",
       title: "Agora is the home of Uniswap delegates",
-      description: " Add copy here",
+      description: " Uniswap governance is a collective of companies, communities, and token holders working together to steward the future of the Uniswap protocol",
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -39,7 +39,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       route: "proposals",
       title: "Agora is the home of Uniswap delegates",
-      description: "Add copy here",
+      description: "Uniswap governance is a collective of companies, communities, and token holders working together to steward the future of the Uniswap protocol",
       meta: {
         title: "Uniswap Agora",
         description: "Home of token governance",
