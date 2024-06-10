@@ -72,7 +72,13 @@ async function getBallotForAddress({
           mp.metric_id,
           b.address,
           SUM(mp.values) AS total_values,
-          SUM(CASE WHEN mp.is_os THEN mp.values * b.os_multiplier ELSE mp.values END) AS adjusted_total_values
+          SUM(
+              CASE 
+                  WHEN b.os_only = TRUE AND mp.is_os = FALSE THEN 0
+                  WHEN mp.is_os = TRUE THEN mp.values * b.os_multiplier
+                  ELSE mp.values
+              END
+          ) AS adjusted_total_values
       FROM 
           retro_funding.metrics_projects mp
       JOIN 
@@ -82,9 +88,9 @@ async function getBallotForAddress({
       JOIN 
           retro_funding.ballots b
       ON 
-          a.address = b.address AND a.round = b.round AND a.address = b.address
+          a.address = b.address AND a.round = b.round
       GROUP BY 
-          mp.metric_id, b.os_multiplier, b.address
+          mp.metric_id, b.os_multiplier, b.os_only, b.address
   )
   , weighted_allocations AS (
       SELECT 
@@ -107,7 +113,7 @@ async function getBallotForAddress({
       JOIN 
           retro_funding.ballots b
       ON 
-          a.address = b.address AND a.round = b.round AND a.address = b.address
+          a.address = b.address AND a.round = b.round
       JOIN 
           retro_funding.metrics_projects mp
       ON 
