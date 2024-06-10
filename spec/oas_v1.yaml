@@ -676,6 +676,8 @@ components:
                 type: string
               allocation:
                 type: number
+              is_os:
+                type: boolean
         views:
           type: integer
         added_to_ballot:
