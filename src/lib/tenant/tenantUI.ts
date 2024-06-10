@@ -28,10 +28,10 @@ type TenantUIParams = {
   color: string;
   delegates?: UIDelegates;
   hero?: string;
-  logo: string;
-  title: string;
   links?: UILink[];
+  logo: string;
   pages?: UIPage[];
+  title: string;
   toggles?: UIToggle[];
 };
 

@@ -676,6 +676,8 @@ components:
                 type: string
               allocation:
                 type: number
+              is_os:
+                type: boolean
         views:
           type: integer
         added_to_ballot:
@@ -850,6 +852,12 @@ components:
       properties:
         project_id:
           type: string
+        name:
+          type: string
+        image:
+          type: string
+        is_os:
+          type: boolean
         allocation:
           type: number
         allocations_per_metric:
@@ -1768,6 +1776,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
         "400":
           description: Bad Request
         "401":
@@ -1798,6 +1810,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingBallot"
         "400":
           description: Bad Request
         "401":
