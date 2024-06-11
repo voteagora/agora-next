@@ -21,6 +21,7 @@ type UIPage = {
 };
 
 type UIDelegates = {
+  allowed: `0x${string}`[];
   advanced: `0x${string}`[];
   retired: `0x${string}`[];
 };
