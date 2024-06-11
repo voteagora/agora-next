@@ -10,6 +10,7 @@ import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateActions({
   delegate,
@@ -28,6 +29,22 @@ export function DelegateActions({
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
 
+  const { contracts, ui } = Tenant.current();
+  const hasAlligator = contracts?.alligator;
+
+  const isRetired = ui.delegates?.retired.includes(
+    delegate.address.toLowerCase()
+  );
+
+  if (isRetired) {
+    return (
+      <div className="rounded-lg border border-gray-300 p-2 bg-gray-100 text-xs font-medium text-gray-700">
+        This voter has stepped down. If you are currently delegated to them,
+        please select a new voter.
+      </div>
+    );
+  }
+
   return (
     <HStack
       alignItems="items-stretch"
@@ -41,7 +58,7 @@ export function DelegateActions({
       <div>
         {isConnected ? (
           address &&
-          (isAdvancedUser ? (
+          (isAdvancedUser && hasAlligator ? (
             <AdvancedDelegateButton
               delegate={delegate}
               delegators={delegators}

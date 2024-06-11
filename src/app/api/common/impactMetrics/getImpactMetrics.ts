@@ -4,16 +4,65 @@ import prisma from "@/app/lib/prisma";
 async function getImpactMetricsApi(roundId: string) {
   const impactMetrics = await prisma.metrics_data.findMany({
     include: {
-      metrics_comments: true,
+      metrics_comments: {
+        include: {
+          metrics_comments_votes: true,
+        },
+        orderBy: {
+          updated_at: "desc",
+        },
+      },
+      metrics_projects: {
+        orderBy: {
+          allocation: "desc",
+        },
+        include: {
+          projects_data: true,
+        },
+      },
+      metrics_views: true,
     },
   });
 
   return impactMetrics.map((impactMetric) => {
     return {
-      metricId: impactMetric.metric_id,
+      metric_id: impactMetric.metric_id,
       name: impactMetric.name,
       description: impactMetric.description,
-      commentsCount: impactMetric.metrics_comments.length,
+      url: impactMetric.url,
+      allocations_per_project: impactMetric.metrics_projects.map((project) => {
+        return {
+          project_id: project.projects_data.project_id,
+          name: project.projects_data.project_name,
+          image: project.projects_data.project_image,
+          allocation: project.allocation,
+          is_os: project.is_os,
+        };
+      }),
+      comments: impactMetric.metrics_comments.map((comment) => {
+        return {
+          comment_id: comment.comment_id,
+          comment: comment.comment,
+          address: comment.address,
+          created_at: comment.created_at,
+          updated_at: comment.updated_at,
+          votes_count: comment.metrics_comments_votes.reduce(
+            (acc, vote) => acc + vote.vote,
+            0
+          ),
+          votes: comment.metrics_comments_votes.map((vote) => {
+            return {
+              comment_id: vote.comment_id,
+              address: vote.voter,
+              vote: vote.vote,
+              created_at: vote.created_at,
+              updated_at: vote.updated_at,
+            };
+          }),
+        };
+      }),
+      views: impactMetric.metrics_views.length,
+      added_to_ballot: 0,
     };
   });
 }
@@ -29,7 +78,7 @@ async function getImpactMetricApi(impactMetricId: string) {
           metrics_comments_votes: true,
         },
         orderBy: {
-          ts: "desc",
+          updated_at: "desc",
         },
       },
       metrics_projects: {
@@ -49,32 +98,43 @@ async function getImpactMetricApi(impactMetricId: string) {
   }
 
   return {
-    metricId: impactMetric.metric_id,
+    metric_id: impactMetric.metric_id,
     name: impactMetric.name,
     description: impactMetric.description,
-    projectAllocations: impactMetric.metrics_projects.map((project) => {
+    url: impactMetric.url,
+    allocations_per_project: impactMetric.metrics_projects.map((project) => {
       return {
-        projectId: project.projects_data.project_id,
+        project_id: project.projects_data.project_id,
         name: project.projects_data.project_name,
         image: project.projects_data.project_image,
         allocation: project.allocation,
+        is_os: project.is_os,
       };
     }),
     comments: impactMetric.metrics_comments.map((comment) => {
       return {
-        commenter: comment.address,
+        comment_id: comment.comment_id,
         comment: comment.comment,
-        ts: comment.ts,
+        address: comment.address,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at,
+        votes_count: comment.metrics_comments_votes.reduce(
+          (acc, vote) => acc + vote.vote,
+          0
+        ),
         votes: comment.metrics_comments_votes.map((vote) => {
           return {
+            comment_id: vote.comment_id,
             address: vote.voter,
             vote: vote.vote,
+            created_at: vote.created_at,
+            updated_at: vote.updated_at,
           };
         }),
       };
     }),
     views: impactMetric.metrics_views.length,
-    addedToBallots: 0,
+    added_to_ballot: 0,
   };
 }
 

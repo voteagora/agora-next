@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  validateAddressScope,
+} from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { deleteBallotMetric } from "@/app/api/common/ballots/updateBallot";
 
@@ -19,9 +22,10 @@ export async function DELETE(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
+  const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
+  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
 
+  return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       await deleteBallotMetric(
         impactMetricId,

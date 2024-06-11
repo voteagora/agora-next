@@ -17,7 +17,6 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransaction } from "wagmi/actions";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export function DelegateDialog({
   delegate,
@@ -32,7 +31,7 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
-  const { contracts, namespace } = Tenant.current();
+  const { contracts, namespace, slug } = Tenant.current();
 
   const { address: accountAddress } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +45,7 @@ export function DelegateDialog({
   const writeWithTracking = async () => {
     setIsLoading(true);
     const trackingData = {
-      dao_slug: "OP",
+      dao_slug: slug,
       delegateAddress: delegate.address || "unknown",
       address: accountAddress || "unknown",
       delegateEnsName: delegateEnsName || "unknown",
@@ -97,22 +96,8 @@ export function DelegateDialog({
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   useEffect(() => {
-    if (namespace !== TENANT_NAMESPACES.ETHERFI) {
-      fetchData();
-    }
+    fetchData();
   }, [fetchData, namespace]);
-
-  if (namespace === TENANT_NAMESPACES.ETHERFI) {
-    return (
-      <VStack
-        className="w-full h-[318px]"
-        alignItems="items-center"
-        justifyContent="justify-center"
-      >
-        Ether.fi delegation coming soon
-      </VStack>
-    );
-  }
 
   if (!isReady) {
     return (

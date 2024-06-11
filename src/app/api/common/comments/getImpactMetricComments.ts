@@ -1,40 +1,132 @@
+import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
 import { cache } from "react";
+import prisma from "@/app/lib/prisma";
+import {
+  ImpactMetrciCommentPayload,
+  ImpactMetricComment,
+} from "./impactMetricComment";
 
-async function getImpactMetricComments(
-  roundId: string,
-  impactMetricId: string
-) {
-  const defaultPageMetadata = {
-    hasNext: false,
-    totalReturned: 1,
-    nextOffset: 0,
-  };
-  const defaultComments = [
-    {
-      id: "1",
-      content: "Comment 1",
-      commenter: "0x1234",
-      createdAt: "2021-10-01T00:00:00Z",
-      editedAt: "2021-10-01T00:00:00Z",
+async function getImpactMetricCommentsApi({
+  roundId,
+  impactMetricId,
+  sort,
+  limit,
+  offset,
+}: {
+  roundId: string;
+  impactMetricId: string;
+  sort: string;
+  limit: number;
+  offset: number;
+}): Promise<PaginatedResultEx<ImpactMetricComment[]>> {
+  const comments = await paginateResultEx(
+    (skip: number, take: number) => {
+      switch (sort) {
+        case "votes":
+          return prisma.$queryRawUnsafe<ImpactMetrciCommentPayload[]>(
+            `
+          SELECT mc.*, 
+          SUM(mcv.vote) AS votes_count, 
+          ARRAY_AGG(jsonb_build_object(
+            'comment_id', mcv.comment_id,
+            'voter', mcv.voter,
+            'vote', mcv.vote,
+            'created_at', mcv.created_at,
+            'updated_at', mcv.updated_at
+          )) AS metrics_comments_votes
+          FROM retro_funding.metrics_comments mc
+          LEFT JOIN retro_funding.metrics_comments_votes mcv ON mc.comment_id = mcv.comment_id
+          WHERE mc.metric_id = $1
+          GROUP BY mc.comment_id
+          ORDER BY votes_count DESC
+          LIMIT ${take}
+          OFFSET ${skip}
+        `,
+            impactMetricId
+          );
+        default:
+          return prisma.metrics_comments.findMany({
+            where: {
+              metric_id: impactMetricId,
+            },
+            orderBy: {
+              updated_at: "desc",
+            },
+            include: {
+              metrics_comments_votes: true,
+            },
+            skip,
+            take,
+          });
+      }
     },
-  ];
-  return defaultComments;
-}
+    { limit, offset }
+  );
 
-async function getImpactMetricComment(
-  roundId: string,
-  impactMetricId: string,
-  commentId: string
-) {
-  const defaultComment = {
-    id: commentId,
-    content: `Comment id ${commentId}`,
-    commenter: "0x1234",
-    createdAt: "2021-10-01T00:00:00Z",
-    editedAt: "2021-10-01T00:00:00Z",
+  return {
+    meta: comments.meta,
+    data: comments.data.map((comment) => {
+      return {
+        comment_id: comment.comment_id,
+        comment: comment.comment,
+        address: comment.address,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at,
+        votes_count: comment.metrics_comments_votes.reduce(
+          (acc, vote) => acc + vote.vote,
+          0
+        ),
+        votes: comment.metrics_comments_votes.map((vote) => {
+          return {
+            comment_id: vote.comment_id,
+            address: vote.voter,
+            vote: vote.vote,
+            created_at: vote.created_at,
+            updated_at: vote.updated_at,
+          };
+        }),
+      };
+    }),
   };
-  return defaultComment;
 }
 
-export const fetchImpactMetricComments = cache(getImpactMetricComments);
-export const fetchImpactMetricComment = cache(getImpactMetricComment);
+async function getImpactMetricCommentApi(
+  commentId: number
+): Promise<ImpactMetricComment> {
+  const comment = await prisma.metrics_comments.findFirst({
+    where: {
+      comment_id: commentId,
+    },
+    include: {
+      metrics_comments_votes: true,
+    },
+  });
+
+  if (!comment) {
+    throw new Error("Comment not found");
+  }
+
+  return {
+    comment_id: comment.comment_id,
+    comment: comment.comment,
+    address: comment.address,
+    created_at: comment.created_at,
+    updated_at: comment.updated_at,
+    votes_count: comment.metrics_comments_votes.reduce(
+      (acc, vote) => acc + vote.vote,
+      0
+    ),
+    votes: comment.metrics_comments_votes.map((vote) => {
+      return {
+        comment_id: vote.comment_id,
+        address: vote.voter,
+        vote: vote.vote,
+        created_at: vote.created_at,
+        updated_at: vote.updated_at,
+      };
+    }),
+  };
+}
+
+export const fetchImpactMetricComments = cache(getImpactMetricCommentsApi);
+export const fetchImpactMetricComment = cache(getImpactMetricCommentApi);
