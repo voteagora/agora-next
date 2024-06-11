@@ -28,6 +28,7 @@ import scroll from "./scroll.svg";
 import github from "./github.svg";
 import world from "./world.svg";
 import clipboard from "./clipboard.svg";
+import copy from "./copy.svg";
 
 export const icons = {
   badge,
@@ -60,4 +61,5 @@ export const icons = {
   github,
   world,
   clipboard,
+  copy,
 };
