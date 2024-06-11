@@ -6,17 +6,14 @@ import { inter } from "@/styles/fonts";
 import { mainnet, optimism } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
-import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
 import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
-import BetaBanner from "@/components/Header/BetaBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SIWEProvider } from "connectkit";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const queryClient = new QueryClient();
 
@@ -29,13 +26,13 @@ const metadata = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 
-const { namespace } = Tenant.current();
+const {  contracts } = Tenant.current();
 
 const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: [optimism, mainnet],
+    chains: [mainnet, contracts.token.chain],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
