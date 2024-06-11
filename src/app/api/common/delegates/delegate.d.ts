@@ -36,5 +36,5 @@ export type DelegateStats = {
   voting_power: OptimismVotingPower["voting_power"];
   advanced_vp: OptimismAdvancedVotingPower["advanced_vp"];
   num_of_delegators: OptimismDelegates["num_of_delegators"];
-  proposals_created: OptimismDelegates["proposals_created"];
+  proposals_proposed: OptimismDelegates["proposals_proposed"];
 };

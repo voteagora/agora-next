@@ -13,6 +13,7 @@ type UIPage = {
   description: string;
   route: string;
   title: string;
+  href?: string;
   meta: {
     title: string;
     description: string;
@@ -20,6 +21,7 @@ type UIPage = {
 };
 
 type UIDelegates = {
+  allowed: `0x${string}`[];
   advanced: `0x${string}`[];
   retired: `0x${string}`[];
 };
