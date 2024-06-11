@@ -26,37 +26,52 @@ export default class TenantUIFactory {
 }
 
 const etherfiUI = new TenantUI({
-  title: "ETHER.FI Agora",
+  title: "ether.fi Agora",
   color: "#2F38FF",
   hero: etherfiHero,
   logo: etherfiLogo,
 
+  delegates: {
+    allowed: [
+      "0x454b5f1458782a06da4656de844e019f26e3280a",
+      "0x5610b146978c4864d603a855fdea54e6a2c1c803",
+      "0x57ab7ee15ce5ecacb1ab84ee42d5a9d0d8112922",
+      "0x648aa14e4424e0825a5ce739c8c68610e143fb79",
+      "0x83108a0653a14eaeb8301e7b10a37cfac39c82f6",
+      "0x9506429a421757711806c5caf25ba1830e349b09",
+      "0xaeb24ebe192c2f1c12a940d00fe853558a5edc04",
+      "0xfdfc6e1bbec01288447222fc8f1aee55a7c72b7b",
+    ],
+    advanced: [],
+    retired: [],
+  },
+
   pages: [
     {
       route: "/",
-      title: "Agora is the home of ETHER.FI governance",
+      title: "Agora is the home of ether.fi governance",
       description:
-        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+        "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
       meta: {
-        title: "Ether.fi Agora",
+        title: "ether.fi Agora",
         description: "Home of token governance",
       },
     },
     {
       route: "info",
-      title: "Agora is the home of ETHER.FI governance",
+      title: "Agora is the home of ether.fi governance",
       description:
-        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+        "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
       meta: {
-        title: "Ether.fi Agora",
+        title: "ether.fi Agora",
         description: "Home of token governance",
       },
     },
     {
       route: "delegates",
-      title: "Agora is the home of ETHER.FI delegates",
+      title: "Agora is the home of ether.fi delegates",
       description:
-        "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -64,11 +79,12 @@ const etherfiUI = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Agora is the home of ETHER.FI delegates",
+      href: "https://snapshot.org/#/etherfi-dao.eth",
+      title: "Agora is the home of ether.fi delegates",
       description:
-        "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
-        title: "Ether.fi Agora",
+        title: "ether.fi Agora",
         description: "Home of token governance",
       },
     },
@@ -85,7 +101,7 @@ const etherfiUI = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "delegates/edit",
@@ -155,6 +171,7 @@ const optimismUI = new TenantUI({
   hero: optimismHero,
 
   delegates: {
+    allowed: [],
     advanced: [],
     retired: [
       "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee", // lindajxie.eth
