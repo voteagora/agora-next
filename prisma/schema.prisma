@@ -164,7 +164,7 @@ model metrics_comments_votes {
   vote             Int
   created_at       DateTime         @default(now()) @db.Timestamptz(6)
   updated_at       DateTime         @default(now()) @db.Timestamptz(6)
-  metrics_comments metrics_comments @relation(fields: [comment_id], references: [comment_id], onDelete: NoAction, onUpdate: NoAction)
+  metrics_comments metrics_comments @relation(fields: [comment_id], references: [comment_id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([comment_id, voter])
   @@schema("retro_funding")
