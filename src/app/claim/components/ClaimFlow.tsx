@@ -3,6 +3,7 @@ import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import { Button } from "@/components/Button";
 import ClaimQuiz from "./ClaimQuiz";
+import DelegateSelector from "./DelegateSelector";
 
 const ClaimFlow = () => {
   const { address, isConnecting } = useAccount();
@@ -33,6 +34,14 @@ const ClaimFlow = () => {
 
   return (
     <div>
+      {/* helpers for testing... */}
+      <div className="flex flex-row space-x-2">
+        <button onClick={() => setStage(1)}>Eligibility</button>
+        <button onClick={() => setStage(2)}>Quiz</button>
+        <button onClick={() => setStage(3)}>Constitution</button>
+        <button onClick={() => setStage(4)}>Delegation</button>
+        <button onClick={() => setStage(5)}>Claim</button>
+      </div>
       {/* eligibility review */}
       {stage === 1 && (
         <main className="grid grid-cols-8 gap-10 mt-12">
@@ -94,23 +103,11 @@ const ClaimFlow = () => {
       )}
       {/* delegation */}
       {stage === 4 && (
-        <main className="grid grid-cols-8 gap-10 mt-12">
-          <section className="col-span-5">
-            <div className="bg-white rounded-2xl border border-agora-stone-100 p-4"></div>
-          </section>
-          <section className="col-span-3">
-            <div className="bg-white rounded-2xl border border-agora-stone-100 p-4">
-              <h2 className="font-black text-2xl">Your delegates</h2>
-              <Button
-                onClick={() => {
-                  setStage(5);
-                }}
-              >
-                Next
-              </Button>
-            </div>
-          </section>
-        </main>
+        <DelegateSelector
+          onSuccess={() => {
+            setStage(5);
+          }}
+        />
       )}
       {/* claim */}
       {stage === 5 && (

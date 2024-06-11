@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 
 // These are fake quiz questions for the sake of the example
@@ -68,7 +67,7 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
       <div className="mt-10">
         <button
           className={`${canProceed ? "bg-agora-stone-900" : "bg-agora-stone-500"} text-white font-semibold w-full p-2 rounded-2xl`}
-          onClick={next}
+          onClick={canProceed ? next : () => {}}
         >
           Next
         </button>
