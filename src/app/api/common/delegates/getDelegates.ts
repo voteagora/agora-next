@@ -224,7 +224,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       last_10_props,
       voting_power,
       advanced_vp,
-      num_of_delegators
+      num_of_delegators,
+      proposals_proposed
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
@@ -296,7 +297,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
         : 0,
-    proposalsCreated: delegate?.proposals_created || 0n,
+    proposalsCreated: delegate?.proposals_proposed || 0n,
     proposalsVotedOn: delegate?.proposals_voted || 0n,
     votedFor: delegate?.for?.toString() || "0",
     votedAgainst: delegate?.against?.toString() || "0",
