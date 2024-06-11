@@ -148,7 +148,7 @@ async function getDelegates({
           `
             SELECT *
             FROM ${namespace + ".delegates"}
-            WHERE num_of_delegators IS NOT NULl AND delegate = ANY($1)
+            WHERE num_of_delegators IS NOT NULL AND delegate = ANY($1)
             ORDER BY num_of_delegators DESC
             OFFSET $2
             LIMIT $3;
