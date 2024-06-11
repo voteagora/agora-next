@@ -60,5 +60,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "staking",
       enabled: true,
     },
+    {
+      name: "delegates/edit",
+      enabled: true,
+    },
   ],
 });

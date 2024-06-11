@@ -56,5 +56,9 @@ export const ensTenantUIConfig = new TenantUI({
       name: "delegates",
       enabled: true,
     },
+    {
+      name: "delegates/edit",
+      enabled: true,
+    },
   ],
 });

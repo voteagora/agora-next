@@ -120,5 +120,9 @@ export const optimismTenantUIConfig = new TenantUI({
       name: "citizens",
       enabled: true,
     },
+    {
+      name: "delegates/edit",
+      enabled: true,
+    },
   ],
 });

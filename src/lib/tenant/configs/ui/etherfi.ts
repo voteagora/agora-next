@@ -3,7 +3,7 @@ import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
 
 export const etherfiTenantUIConfig = new TenantUI({
-  title: "ETHER.FI Agora",
+  title: "ether.fi Agora",
   color: "#2F38FF",
   hero: etherfiHero,
   logo: etherfiLogo,
@@ -34,29 +34,29 @@ export const etherfiTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Agora is the home of ETHER.FI governance",
+      title: "Agora is the home of ether.fi governance",
       description:
-        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+        "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
       meta: {
-        title: "Ether.fi Agora",
+        title: "ether.fi Agora",
         description: "Home of token governance",
       },
     },
     {
       route: "info",
-      title: "Agora is the home of ETHER.FI governance",
+      title: "Agora is the home of ether.fi governance",
       description:
-        "ETHFI governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+        "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
       meta: {
-        title: "Ether.fi Agora",
+        title: "ether.fi Agora",
         description: "Home of token governance",
       },
     },
     {
       route: "delegates",
-      title: "Agora is the home of ETHER.FI delegates",
+      title: "Agora is the home of ether.fi delegates",
       description:
-        "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -64,11 +64,12 @@ export const etherfiTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Agora is the home of ETHER.FI delegates",
+      href: "https://snapshot.org/#/etherfi-dao.eth",
+      title: "Agora is the home of ether.fi delegates",
       description:
         "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
-        title: "Ether.fi Agora",
+        title: "ether.fi Agora",
         description: "Home of token governance",
       },
     },
@@ -85,12 +86,11 @@ export const etherfiTenantUIConfig = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "delegates/edit",
       enabled: false,
     },
   ],
-
 });
