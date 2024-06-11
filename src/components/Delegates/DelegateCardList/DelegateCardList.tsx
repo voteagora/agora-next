@@ -14,7 +14,6 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import Tenant from "@/lib/tenant/tenant";
 
 export type DelegateChunk = Pick<
   Delegate,
@@ -39,9 +38,6 @@ export default function DelegateCardList({
   fetchDelegates,
   isDelegatesCitizensFetching,
 }: Props) {
-  const { ui } = Tenant.current();
-  const hasAllowList = ui.delegates?.allowed.length > 0;
-
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.delegates);
@@ -88,13 +84,6 @@ export default function DelegateCardList({
         element="div"
       >
         {delegates.map((delegate) => {
-          if (
-            hasAllowList &&
-            !ui.delegates?.allowed.includes(delegate.address)
-          ) {
-            return null;
-          }
-
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {
