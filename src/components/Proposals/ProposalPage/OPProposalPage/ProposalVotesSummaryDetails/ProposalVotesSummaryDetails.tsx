@@ -1,6 +1,4 @@
 import Image from "next/image";
-
-import infoTransparentIcon from "@/icons/info-transparent.svg";
 import checkIcon from "@/icons/check.svg";
 import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
@@ -66,12 +64,6 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
         <div className="flex justify-between">
           <div className="flex items-center gap-1 text-gray-4f font-semibold text-xs">
             Quorum
-            <Image
-              width="12"
-              height="12"
-              src={infoTransparentIcon}
-              alt="info icon"
-            />
           </div>
           {proposal.quorum && (
             <div className="flex items-center gap-1 ">
@@ -89,12 +81,6 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
         <div className="flex justify-between">
           <div className="flex flex-row gap-1 text-gray-4f font-semibold text-xs">
             Threshold
-            <Image
-              width="12"
-              height="12"
-              src={infoTransparentIcon}
-              alt="info icon"
-            />
           </div>
           <div className="flex flex-row gap-1 ">
             {hasThreshold && <Image src={checkIcon} alt="check icon" />}
