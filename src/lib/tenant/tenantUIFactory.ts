@@ -41,6 +41,7 @@ const etherfiUI = new TenantUI({
       "0x9506429a421757711806c5caf25ba1830e349b09",
       "0xaeb24ebe192c2f1c12a940d00fe853558a5edc04",
       "0xfdfc6e1bbec01288447222fc8f1aee55a7c72b7b",
+      "0x9ee69759585aa3a9379b066f3caecbbd62420f9d",
     ],
     advanced: [],
     retired: [],
