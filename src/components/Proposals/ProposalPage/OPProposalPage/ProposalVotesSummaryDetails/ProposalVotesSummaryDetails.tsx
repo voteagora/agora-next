@@ -35,7 +35,7 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
   const abstainPercent = ((Number(results.abstain) / Number(totalVotes)) * 100).toFixed(2);
 
   return (
-    <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[320px] sm:min-w-[320px]">
+    <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px]">
       <ProposalVotesBar proposal={proposal} />
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between gl_votes_for">
@@ -93,20 +93,16 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
       <ol
         className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
         <StepperRow
-          label="Proposal creation"
+          label="Proposal created"
           value={formatTime(proposal.created_time)}
-          isCompleted
-          href="/proposals/create"
         />
         <StepperRow
           label="Voting period start"
           value={formatTime(proposal.start_time)}
-          isCompleted
         />
         <StepperRow
           label="Voting period end"
           value={formatTime(proposal.end_time)}
-          isActive
         />
         <StepperRow
           isLastStep

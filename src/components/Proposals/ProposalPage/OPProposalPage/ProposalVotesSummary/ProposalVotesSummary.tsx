@@ -22,11 +22,12 @@ export default function ProposalVotesSummary({
     <HoverCard
       open={showDetails}
       onOpenChange={setShowDetails}
-      openDelay={10}
-      closeDelay={10}
+      openDelay={0}
+      closeDelay={0}
     >
-      <HoverCardTrigger className="w-full cursor-pointer block">
-        {!showDetails && (
+      <div style={{ position: "relative" }}>
+
+        <HoverCardTrigger className="w-full cursor-pointer block">
           <div className={`flex flex-col gap-2 ${styles.proposal_votes_summary_container}`}>
             <div className="flex flex-row justify-between mt-2">
               <div className="gl_votes_for">
@@ -65,11 +66,12 @@ export default function ProposalVotesSummary({
               />
             </div>
           </div>
-        )}
-      </HoverCardTrigger>
-      <HoverCardContent className="w-full pb-0" side="top">
-        <ProposalVotesSummaryDetails proposal={proposal} />
-      </HoverCardContent>
+
+          <HoverCardContent className="pb-0 absolute w-auto ml-4 mt-1" side="top" align={"start"}>
+            <ProposalVotesSummaryDetails proposal={proposal} />
+          </HoverCardContent>
+        </HoverCardTrigger>
+      </div>
     </HoverCard>
   );
 }
