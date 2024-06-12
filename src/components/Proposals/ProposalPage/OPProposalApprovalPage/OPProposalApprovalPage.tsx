@@ -30,12 +30,6 @@ async function fetchAllForVoting(
   return await apiFetchAllForVoting(address, blockNumber, proposal_id);
 }
 
-async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return await apiFetchDelegate(addressOrENSName);
-}
-
 async function fetchUserVotesForProposal(
   proposal_id: string,
   address: string | `0x${string}`
@@ -63,7 +57,7 @@ export default async function OPProposalApprovalPage({
       alignItems="items-start"
       className={styles.proposal_container}
     >
-      <ProposalDescription proposal={proposal} />
+      <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
         <OpManagerDeleteProposal proposal={proposal} />
         <VStack

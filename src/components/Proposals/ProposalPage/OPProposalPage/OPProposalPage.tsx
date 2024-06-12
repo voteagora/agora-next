@@ -21,7 +21,7 @@ export default async function OPProposalPage({
       alignItems="items-start"
       className={styles.proposal_container}
     >
-      <ProposalDescription proposal={proposal} />
+      <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
         <OpManagerDeleteProposal proposal={proposal} />
         <ProposalVotesCard proposal={proposal} proposalVotes={proposalVotes} />
