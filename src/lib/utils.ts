@@ -78,6 +78,40 @@ export function formatNumber(
   return numberFormat.format(standardUnitAmount);
 }
 
+export function isScientificNotation(value: any): boolean {
+  const scientificNotationRegex = /^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/;
+  return scientificNotationRegex.test(value.toString());
+}
+
+export function formatNumberWithScientificNotation(x: number): string {
+  if (x === 0) {
+    return "0";
+  }
+
+  const scientificNotation = x.toExponential();
+  const [base, exponent] = scientificNotation.split("e");
+  const exp = parseInt(exponent, 10);
+
+  // Format small numbers (abs(x) < 1.0)
+  if (Math.abs(x) < 1.0) {
+    const leadingZeros = Math.max(0, Math.abs(exp) - 1);
+    return `0.${"0".repeat(leadingZeros)}${base.replace(".", "")}`;
+  }
+
+  // Format large numbers and numbers with exponent 0
+  if (exp >= 0) {
+    const [integerPart, fractionalPart] = base.split(".");
+    const zerosNeeded = exp - (fractionalPart ? fractionalPart.length : 0);
+    return (
+      integerPart +
+      (fractionalPart || "") +
+      "0".repeat(Math.max(zerosNeeded, 0))
+    );
+  }
+
+  return scientificNotation;
+}
+
 export function TokenAmountDisplay({
   amount,
   decimals = token.decimals,
@@ -124,7 +158,7 @@ export function generateBarsForVote(
 
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
-    (acc, section) => acc + BigInt(section.amount),
+    (acc, section) => BigInt(acc) + BigInt(section.amount),
     BigInt(0)
   );
 
