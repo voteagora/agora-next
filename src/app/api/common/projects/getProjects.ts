@@ -8,14 +8,14 @@ async function getProjectsApi({
 }: {
   limit: number;
   offset: number;
-  round?: number;
+  round?: string;
 }) {
   const projects = await paginateResultEx(
     async (skip, take) => {
       if (round) {
         return prisma.project_applicants.findMany({
           where: {
-            round: round.toString(),
+            round: round,
           },
           skip,
           take,
