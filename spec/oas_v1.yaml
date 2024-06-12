@@ -721,25 +721,25 @@ components:
         Information about a project submitted for Retroactive Public Goods Funding on Agora.
       type: object
       properties:
-        id: 
+        id:
           type: string
         name:
           type: string
-        category: 
+        category:
           type: string
-        description: 
+        description:
           type: string
-        profileAvatarUrl: 
+        profileAvatarUrl:
           type: string
         proejctCoverImageUrl:
           type: string
-        socialLinks: 
+        socialLinks:
           $ref: "#/components/schemas/SocialLinks"
-        team: 
+        team:
           type: array
           items:
             type: string
-        github: 
+        github:
           type: array
           items:
             type: string
@@ -806,11 +806,11 @@ components:
               type: array
               items:
                 type: object
-                  properties:
-                    amount:
-                      type: string
-                    details:
-                      type: string
+                properties:
+                  amount:
+                    type: string
+                  details:
+                    type: string
     SocialLinks:
       summary: Social media links for a project
       description: >
