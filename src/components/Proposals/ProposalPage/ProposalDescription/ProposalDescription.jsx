@@ -6,8 +6,9 @@ import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
+import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
 
-export default function ProposalDescription({ proposal }) {
+export default function ProposalDescription({ proposal, proposalVotes }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
     "64930538748268257621925093712454552173772860987977453334165023026835711650357",
@@ -49,6 +50,8 @@ export default function ProposalDescription({ proposal }) {
         proposerAddress={proposal.proposer}
         createdTransactionHash={proposal.created_transaction_hash}
       />
+      <VotingTimelineChart proposal={proposal} proposalVotes={proposalVotes} />
+
       <VStack gap={2}>
         <ApprovedTransactions
           proposalData={proposal.proposalData}
