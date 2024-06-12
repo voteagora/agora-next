@@ -2,12 +2,13 @@
 
 import { useAccount } from "wagmi";
 import React, { useState } from "react";
-import DelegateSelector from "./DelegateSelector";
 import TermsStage from "../stages/Terms";
 import EligibilityStage from "../stages/Eligibility";
 import ConstitutionStage from "../stages/Constitution";
 import QuizStage from "../stages/Quiz";
 import ValuesStage from "../stages/Values";
+import DelegationStage from "../stages/Delegation";
+import ClaimStage from "../stages/Claim";
 
 const ClaimFlow = () => {
   const { address, isConnecting } = useAccount();
@@ -66,26 +67,9 @@ const ClaimFlow = () => {
         />
       )}
       {/* delegation */}
-      {stage === 5 && (
-        <DelegateSelector
-          onSuccess={() => {
-            setStage(5);
-          }}
-        />
-      )}
+      {stage === 5 && <DelegationStage onSuccess={() => setStage(5)} />}
       {/* claim */}
-      {stage === 6 && (
-        <main className="grid grid-cols-8 gap-10 mt-12">
-          <section className="col-span-5">
-            <div className="bg-white rounded-2xl border border-agora-stone-100 p-4"></div>
-          </section>
-          <section className="col-span-3">
-            <div className="bg-white rounded-2xl border border-agora-stone-100 p-4">
-              <h2 className="font-black text-2xl">Claim</h2>
-            </div>
-          </section>
-        </main>
-      )}
+      {stage === 6 && <ClaimStage onSuccess={() => setStage(0)} />}
     </div>
   );
 };
