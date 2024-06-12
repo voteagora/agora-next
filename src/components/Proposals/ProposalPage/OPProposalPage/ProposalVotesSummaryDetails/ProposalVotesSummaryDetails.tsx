@@ -9,7 +9,6 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
-import { formatNumber, formatNumberWithScientificNotation, isScientificNotation } from "@/lib/utils";
 
 import Tenant from "@/lib/tenant/tenant";
 
@@ -25,25 +24,17 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
 
-  // Calculate the highest value among the vote results and check if it is in scientific notation.
-  const highestValue = Math.max(
-    Number(results.for),
-    Number(results.abstain),
-    Number(results.against),
-  );
+  const totalVotes = BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
 
-
-
-  const total = Number(results.for) + Number(results.against) + Number(results.abstain);
-  const voteThresholdPercent = total > 0 ? ((Number(results.for) + Number(results.against)) / total) * 100 : 0;
+  const voteThresholdPercent = Number(totalVotes) > 0 ? (Number(results.for) / Number(totalVotes)) * 100 : 0;
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
-  const hasQuorum = Boolean(total >= Number(proposal.quorum || 0));
+  const hasQuorum = Boolean(Number(totalVotes) >= Number(proposal.quorum || 0));
   const hasThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
-  const forPercent = ((Number(results.for) / Number(total)) * 100).toFixed(2);
-  const againstPercent = ((Number(results.against) / Number(total)) * 100).toFixed(2);
-  const abstainPercent = ((Number(results.abstain) / Number(total)) * 100).toFixed(2);
+  const forPercent = ((Number(results.for) / Number(totalVotes)) * 100).toFixed(2);
+  const againstPercent = ((Number(results.against) / Number(totalVotes)) * 100).toFixed(2);
+  const abstainPercent = ((Number(results.abstain) / Number(totalVotes)) * 100).toFixed(2);
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[320px] sm:min-w-[320px]">
@@ -85,9 +76,12 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
           {proposal.quorum && (
             <div className="flex items-center gap-1 ">
               {hasQuorum && <Image width="12" height="12" src={checkIcon} alt="check icon" />}
-
               <p className="text-xs font-semibold text-gray-4f">
-                {formatNumber(isScientificNotation(total) ? formatNumberWithScientificNotation(total) : total, 2)}{" "}/ {formatNumber(proposal.quorum, token.decimals, 2)} Required
+                <TokenAmountDisplay amount={totalVotes} decimals={token.decimals}
+                                    currency={""} />{" "}/{" "}<TokenAmountDisplay amount={proposal.quorum}
+                                                                                   decimals={token.decimals}
+                                                                                   currency={""} /> Required
+
               </p>
             </div>
           )}
@@ -105,7 +99,7 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
           <div className="flex flex-row gap-1 ">
             {hasThreshold && <Image src={checkIcon} alt="check icon" />}
             <p className=" text-xs font-semibold text-gray-4f">
-              {voteThresholdPercent.toFixed(2)}% / {`${apprThresholdPercent}%`} Required
+              {voteThresholdPercent.toFixed(2)}%{" "}/{" "}{`${apprThresholdPercent}%`} Required
             </p>
           </div>
         </div>
