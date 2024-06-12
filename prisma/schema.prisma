@@ -218,6 +218,7 @@ model projects_data {
 view project_applicants {
   project_id                         String  @unique
   application_id                     String?
+  round                              String?
   farcaster_id                       String?
   name                               String?
   category                           String?
