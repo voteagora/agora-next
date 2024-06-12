@@ -6,7 +6,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
         <div className="bg-white rounded-2xl border border-agora-stone-100 p-4">
-          congrats, you qualify
+          <div className="bg-[url('/images/scroll/scroll-vision.png')] w-full h-44"></div>
         </div>
       </section>
       <section className="col-span-3">

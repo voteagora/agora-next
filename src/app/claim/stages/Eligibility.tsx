@@ -140,6 +140,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
             </Button>
           </div>
         </div>
+        <div>dont forget FAQs</div>
       </section>
     </main>
   );

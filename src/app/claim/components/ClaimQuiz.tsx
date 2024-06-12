@@ -57,19 +57,26 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
         {currentQuestion.answers.map((answer, idx) => (
           <li
             key={`answer-${idx}`}
-            className={`border ${currentAnswer === "" || answer !== currentAnswer ? "border-agora-stone-100" : isCorrectAnswer ? "border-green-500" : "border-red-500"} rounded-full p-2 mt-2 text-center font-semibold text-agora-stone-900`}
+            className={`border ${currentAnswer === "" || answer !== currentAnswer ? "border-agora-stone-100" : isCorrectAnswer ? "border-green-500 bg-green-100 text-green-600" : "border-red-500 bg-red-100 text-red-600"} rounded-full p-3 mt-2 text-center font-semibold text-agora-stone-900`}
             onClick={() => validateAnswer(answer)}
           >
             {answer}
           </li>
         ))}
       </ul>
+      {currentAnswer !== "" && (
+        <p className="text-center font-medium text-agora-stone-700 mt-10">
+          {canProceed
+            ? "That's correct!"
+            : "Incorrect answer, please try again."}
+        </p>
+      )}
       <div className="mt-10">
         <button
-          className={`${canProceed ? "bg-agora-stone-900" : "bg-agora-stone-500"} text-white font-semibold w-full p-2 rounded-2xl`}
+          className={`${canProceed ? "bg-agora-stone-900 text-white" : " bg-agora-stone-100 text-agora-stone-500"} font-semibold w-full py-3 rounded-lg`}
           onClick={canProceed ? next : () => {}}
         >
-          Next
+          Continue
         </button>
       </div>
     </div>
