@@ -311,26 +311,34 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       fetchIsCitizen(address),
     ]);
 
-  const numOfDelegatesQuery = prisma.$queryRawUnsafe<
-    { num_of_delegators: BigInt }[]
-  >(
-    `
-    SELECT 
-      SUM(count) as num_of_delegators
-    FROM (
-      SELECT count(*)
-      FROM optimism.advanced_delegatees
-      WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
-      UNION ALL
-      SELECT
-        SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-      FROM center.optimism_delegate_changed_events
-      WHERE to_delegate=$1 OR from_delegate=$1
-    ) t;
-    `,
-    address,
-    contracts.alligator?.address
-  );
+  const numOfDelegatesQuery = contracts.alligator
+    ? prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
+        `
+        SELECT 
+          SUM(count) as num_of_delegators
+        FROM (
+          SELECT count(*)
+          FROM ${namespace + ".advanced_delegatees"}
+          WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
+          UNION ALL
+          SELECT
+            SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+          FROM ${namespace + ".delegate_changed_events"}
+          WHERE to_delegate=$1 OR from_delegate=$1
+        ) t;
+        `,
+        address,
+        contracts.alligator?.address
+      )
+    : prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
+        `
+        SELECT
+          SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+        FROM ${namespace + ".delegate_changed_events"}
+        WHERE to_delegate=$1 OR from_delegate=$1;
+        `,
+        address
+      );
 
   const totalVotingPower =
     BigInt(delegate?.voting_power || 0) +
