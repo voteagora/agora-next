@@ -42,8 +42,9 @@ const ClaimFlow = () => {
         <button onClick={() => setStage(1)}>Eligibility</button>
         <button onClick={() => setStage(2)}>Quiz</button>
         <button onClick={() => setStage(3)}>Constitution</button>
-        <button onClick={() => setStage(4)}>Delegation</button>
-        <button onClick={() => setStage(5)}>Claim</button>
+        <button onClick={() => setStage(4)}>Values</button>
+        <button onClick={() => setStage(5)}>Delegation</button>
+        <button onClick={() => setStage(6)}>Claim</button>
       </div>
       {/* terms */}
       {stage === 0 && <TermsStage onSuccess={() => setStage(1)} />}
@@ -53,8 +54,10 @@ const ClaimFlow = () => {
       {stage === 2 && <QuizStage onSuccess={() => setStage(3)} />}
       {/* constitution */}
       {stage === 3 && <ConstitutionStage onSuccess={() => setStage(4)} />}
+      {/* values */}
+      {/* /////....//// */}
       {/* delegation */}
-      {stage === 4 && (
+      {stage === 5 && (
         <DelegateSelector
           onSuccess={() => {
             setStage(5);
@@ -62,7 +65,7 @@ const ClaimFlow = () => {
         />
       )}
       {/* claim */}
-      {stage === 5 && (
+      {stage === 6 && (
         <main className="grid grid-cols-8 gap-10 mt-12">
           <section className="col-span-5">
             <div className="bg-white rounded-2xl border border-agora-stone-100 p-4"></div>
