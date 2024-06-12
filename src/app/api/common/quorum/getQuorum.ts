@@ -15,15 +15,15 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
   switch (namespace) {
     case "optimism": {
-      const contractQuorum = contracts.governor.contract.quorum(
-        proposal.proposal_id
+      const contractQuorum = await contracts.governor.contract.quorum(
+        proposal.proposal_id,
       );
 
       // If no quorum is set, calculate it based on votable supply
       if (!contractQuorum) {
         const votableSupply = await prisma[
           `${namespace}VotableSupply`
-        ].findFirst({});
+          ].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
       }
 
