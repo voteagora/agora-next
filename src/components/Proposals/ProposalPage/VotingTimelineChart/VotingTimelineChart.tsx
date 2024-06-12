@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -92,7 +93,7 @@ export default function VotingTimelineChart({
   const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
 
   const handleExpandChart = () => {
-    setShowChart(!showChart);
+    setShowChart(prevState => !prevState);
   };
 
   return (

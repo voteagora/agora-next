@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { VStack } from "@/components/Layout/Stack";
 
 import infoTransparentIcon from "@/icons/info-transparent.svg";
 import checkIcon from "@/icons/check.svg";
@@ -10,81 +9,69 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
-import {
-  formatNumber,
-  formatNumberWithScientificNotation,
-  isScientificNotation,
-} from "@/lib/utils";
+import { formatNumber, formatNumberWithScientificNotation, isScientificNotation } from "@/lib/utils";
 
 import Tenant from "@/lib/tenant/tenant";
 
-const { token } = Tenant.current();
 
-export default function ProposalVotesSummaryDetails({
-  proposal,
-}: {
+export default function ProposalVotesSummaryDetails({ proposal }: {
   proposal: Proposal;
 }) {
+  const { token } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
   const formatTime = (date: Date | null) => {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
+
   // Calculate the highest value among the vote results and check if it is in scientific notation.
   const highestValue = Math.max(
     Number(results.for),
     Number(results.abstain),
-    Number(results.against)
+    Number(results.against),
   );
 
-  const total =
-    Number(results.for) + Number(results.against) + Number(results.abstain);
 
-  // Calculate percentages
-  const inFavorPercentage =
-    ((Number(results.for) / total) * 100).toFixed(2) + "%";
-  const againstPercentage =
-    ((Number(results.against) / total) * 100).toFixed(2) + "%";
-  const abstainPercentage =
-    ((Number(results.abstain) / total) * 100).toFixed(2) + "%";
 
-  console.log(
-    isScientificNotation(highestValue)
-      ? formatNumberWithScientificNotation(highestValue)
-      : BigInt(highestValue)
-  );
+  const total = Number(results.for) + Number(results.against) + Number(results.abstain);
+  const voteThresholdPercent = total > 0 ? ((Number(results.for) + Number(results.against)) / total) * 100 : 0;
+  const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
+
+  const hasQuorum = Boolean(total >= Number(proposal.quorum || 0));
+  const hasThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
+
+  const forPercent = ((Number(results.for) / Number(total)) * 100).toFixed(2);
+  const againstPercent = ((Number(results.against) / Number(total)) * 100).toFixed(2);
+  const abstainPercent = ((Number(results.abstain) / Number(total)) * 100).toFixed(2);
 
   return (
-    <VStack className="font-inter font-semibold text-xs  flex w-full max-w-[320px] sm:min-w-[320px]">
+    <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[320px] sm:min-w-[320px]">
       <ProposalVotesBar proposal={proposal} />
-      <VStack gap={2} className="w-full mt-4">
+      <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between gl_votes_for">
           FOR{" "}
           <span>
-            <TokenAmountDisplay amount={results.for} /> ({inFavorPercentage})
+            <TokenAmountDisplay amount={results.for} /> ({forPercent}%)
           </span>
         </div>
         <div className="gl_votes_abstain flex justify-between">
           ABSTAIN
           <span>
-            <TokenAmountDisplay amount={results.abstain} /> ({abstainPercentage}
+            <TokenAmountDisplay amount={results.abstain} /> ({abstainPercent}%
             )
           </span>
         </div>
         <div className="gl_votes_against flex justify-between">
           AGAINST{" "}
           <span>
-            <TokenAmountDisplay amount={results.against} /> ({againstPercentage}
+            <TokenAmountDisplay amount={results.against} /> ({againstPercent}%
             )
           </span>
         </div>
-      </VStack>
+      </div>
 
-      <VStack
-        gap={2}
-        className="w-[calc(100%+32px)] mt-4 bg-gray-fa border-t border-b -ml-4 p-4"
-      >
+      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-gray-fa border-t border-b -ml-4 p-4">
         <div className="flex justify-between">
           <div className="flex items-center gap-1 text-gray-4f font-semibold text-xs">
             Quorum
@@ -97,16 +84,10 @@ export default function ProposalVotesSummaryDetails({
           </div>
           {proposal.quorum && (
             <div className="flex items-center gap-1 ">
-              <Image width="12" height="12" src={checkIcon} alt="check icon" />
+              {hasQuorum && <Image width="12" height="12" src={checkIcon} alt="check icon" />}
+
               <p className="text-xs font-semibold text-gray-4f">
-                {formatNumber(
-                  isScientificNotation(highestValue)
-                    ? formatNumberWithScientificNotation(highestValue)
-                    : BigInt(highestValue),
-                  token.decimals,
-                  2
-                )}{" "}
-                /{formatNumber(proposal.quorum, token.decimals, 2)} Required
+                {formatNumber(isScientificNotation(total) ? formatNumberWithScientificNotation(total) : total, 2)}{" "}/ {formatNumber(proposal.quorum, token.decimals, 2)} Required
               </p>
             </div>
           )}
@@ -122,14 +103,15 @@ export default function ProposalVotesSummaryDetails({
             />
           </div>
           <div className="flex flex-row gap-1 ">
-            <Image src={checkIcon} alt="check icon" />
+            {hasThreshold && <Image src={checkIcon} alt="check icon" />}
             <p className=" text-xs font-semibold text-gray-4f">
-              87% / {`${Number(proposal.approvalThreshold) / 100}%`} Required
+              {voteThresholdPercent.toFixed(2)}% / {`${apprThresholdPercent}%`} Required
             </p>
           </div>
         </div>
-      </VStack>
-      <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
+      </div>
+      <ol
+        className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
         <StepperRow
           label="Proposal creation"
           value={formatTime(proposal.created_time)}
@@ -152,18 +134,18 @@ export default function ProposalVotesSummaryDetails({
           value={formatTime(proposal.end_time)}
         />
       </ol>
-    </VStack>
+    </div>
   );
 }
 
 const StepperRow = ({
-  label,
-  value,
-  isActive,
-  isCompleted,
-  isLastStep,
-  href,
-}: {
+                      label,
+                      value,
+                      isActive,
+                      isCompleted,
+                      isLastStep,
+                      href,
+                    }: {
   label: string;
   value: string;
   isActive?: boolean;
