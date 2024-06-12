@@ -120,14 +120,25 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
       </section>
       <section className="col-span-3">
         <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
-          your allocation
-          <Button
-            onClick={() => {
-              onSuccess();
-            }}
-          >
-            Next
-          </Button>
+          <h1 className="text-2xl font-black">Your allocation</h1>
+          <p className="text-agora-stone-700 mb-4">
+            You are eligible for the airdrop
+          </p>
+          <div className="h-48 w-full border border-dotted border-agora-stone-100 rounded-2xl bg-[url('/images/receipt_bg.svg')] bg-center relative flex items-center justify-center">
+            <p className="font-semibold text-5xl">
+              {MOCK_ELIGIBILITY_CRITERIA.total}
+            </p>
+          </div>
+          <div className="mt-10">
+            <Button
+              className="w-full"
+              onClick={() => {
+                onSuccess();
+              }}
+            >
+              Begin claim process
+            </Button>
+          </div>
         </div>
       </section>
     </main>
