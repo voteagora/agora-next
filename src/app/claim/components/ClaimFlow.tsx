@@ -1,4 +1,5 @@
 "use client";
+
 import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import DelegateSelector from "./DelegateSelector";
@@ -6,10 +7,12 @@ import TermsStage from "../stages/Terms";
 import EligibilityStage from "../stages/Eligibility";
 import ConstitutionStage from "../stages/Constitution";
 import QuizStage from "../stages/Quiz";
+import ValuesStage from "../stages/Values";
 
 const ClaimFlow = () => {
   const { address, isConnecting } = useAccount();
   const [stage, setStage] = useState<number>(1);
+  const [values, setValues] = useState<string[]>([]);
 
   // loading case
   if (isConnecting) {
@@ -55,7 +58,13 @@ const ClaimFlow = () => {
       {/* constitution */}
       {stage === 3 && <ConstitutionStage onSuccess={() => setStage(4)} />}
       {/* values */}
-      {/* /////....//// */}
+      {stage === 4 && (
+        <ValuesStage
+          onSuccess={() => setStage(5)}
+          values={values}
+          setValues={setValues}
+        />
+      )}
       {/* delegation */}
       {stage === 5 && (
         <DelegateSelector
