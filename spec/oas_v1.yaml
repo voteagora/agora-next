@@ -747,11 +747,6 @@ components:
           type: array
           items:
             type: string
-        grantsAndFunding: {
-          ventureFunding: project.grants_and_funding_venture_funding,
-          grants: project.grants_and_funding_grants,
-          revenue: project.grants_and_funding_revenue,
-        },
         contracts:
           summary: Deployed contracts for the project
           description: >
@@ -778,7 +773,7 @@ components:
                     summary: Chain ID of the contract
                     description: The chain ID on which the contract was deployed.
                     type: string
-        funding:
+        grantsAndFunding:
           type: object
           properties:
             ventureFunding:
