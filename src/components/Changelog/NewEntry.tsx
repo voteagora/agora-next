@@ -20,6 +20,7 @@ import {
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { Separator } from "@/components/ui/separator";
+import IPFSImageUploader from "@/components/shared/Form/IPFSImageUploader"; // Adjust the import path as necessary
 
 export default function NewEntry() {
   const { contracts } = Tenant.current();
@@ -82,25 +83,23 @@ export default function NewEntry() {
         <p>Add a new entry to the changelog</p>
       </section>
       <div className="space-y-8 my-4">
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
-          <div className="flex-1">
-            <Label>Title</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={isDisabledCreateEntry}
-              type="text"
-            />
-          </div>
-          <div className="flex-1">
-            <Label>Tag</Label>
-            <Input
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              disabled={isDisabledCreateEntry}
-              type="text"
-            />
-          </div>
+        <div className="space-y-4">
+          <Label>Title</Label>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            disabled={isDisabledCreateEntry}
+            type="text"
+          />
+        </div>
+        <div className="space-y-4">
+          <Label>Tag</Label>
+          <Input
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            disabled={isDisabledCreateEntry}
+            type="text"
+          />
         </div>
         <div className="space-y-4">
           <MarkdownEditor
@@ -111,36 +110,29 @@ export default function NewEntry() {
             disabled={isDisabledCreateEntry}
           />
         </div>
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
-          <div className="flex-1">
-            <Label>IPFS Hash</Label>
-            <Input
-              value={ipfsHash}
-              onChange={(e) => setIpfsHash(e.target.value)}
-              disabled={isDisabledCreateEntry}
-              type="text"
-            />
-          </div>
-          <div className="flex-1">
-            <Label>Project URL</Label>
-            <Select
-              value={projectURL}
-              onValueChange={(value) => setProjectURL(value)}
-              defaultValue={"0"}
-              disabled={isDisabledCreateEntry}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={"Which project"} />
-              </SelectTrigger>
-              <SelectContent>
-                {options.map((item, index) => (
-                  <SelectItem key={index} value={item.value}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-4">
+          <Label>Header Image (Optional)</Label>
+          <IPFSImageUploader setIpfsHash={setIpfsHash} />
+        </div>
+        <div className="space-y-4">
+          <Label>Project URL</Label>
+          <Select
+            value={projectURL}
+            onValueChange={(value) => setProjectURL(value)}
+            defaultValue={"0"}
+            disabled={isDisabledCreateEntry}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={"Which project"} />
+            </SelectTrigger>
+            <SelectContent>
+              {options.map((item, index) => (
+                <SelectItem key={index} value={item.value}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Separator className="my-8" />
         <Button
