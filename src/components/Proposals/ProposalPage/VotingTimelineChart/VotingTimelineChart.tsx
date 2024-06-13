@@ -10,6 +10,8 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   ReferenceLine,
+  AreaChart,
+  Area,
 } from "recharts";
 import { format } from "date-fns";
 import { icons } from "@/icons/icons";
@@ -33,15 +35,16 @@ const transformVotesToChartData = (votes: Vote[]) => {
   let against = 0;
 
   return votes.map((voter) => {
-    forCount = voter.support === "FOR" ? +forCount + +voter.weight : forCount;
-    abstain = voter.support === "ABSTAIN" ? +abstain + +voter.weight : abstain;
-    against = voter.support === "AGAINST" ? +against + +voter.weight : against;
+    forCount = voter.support === "FOR" ? forCount + +voter.weight : forCount;
+    abstain = voter.support === "ABSTAIN" ? abstain + +voter.weight : abstain;
+    against = voter.support === "AGAINST" ? against + +voter.weight : against;
 
     return {
       ...voter,
       for: forCount,
       abstain: abstain,
       against: against,
+      total: forCount + abstain + against,
     };
   });
 };
@@ -93,7 +96,7 @@ export default function VotingTimelineChart({
   const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
 
   const handleExpandChart = () => {
-    setShowChart(prevState => !prevState);
+    setShowChart((prevState) => !prevState);
   };
 
   return (
@@ -129,6 +132,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
       for: 0,
       against: 0,
       abstain: 0,
+      total: 0,
     },
     ...chartData,
     {
@@ -137,13 +141,14 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
         for: chartData[chartData.length - 1]?.for,
         abstain: chartData[chartData.length - 1]?.abstain,
         against: chartData[chartData.length - 1]?.against,
+        total: chartData[chartData.length - 1]?.total,
       }),
     },
   ];
 
   return (
     <ResponsiveContainer width="100%" height={230}>
-      <LineChart data={modifiedChartData}>
+      <AreaChart data={modifiedChartData}>
         <CartesianGrid vertical={false} strokeDasharray={"3 3"} />
         <XAxis
           dataKey="timestamp"
@@ -174,6 +179,28 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           tickMargin={0}
         />
 
+        <Area
+          type="step"
+          dataKey="against"
+          stackId="1"
+          stroke="#C52F00"
+          fill="#eec2b5"
+        />
+        <Area
+          type="step"
+          dataKey="abstain"
+          stackId="1"
+          stroke="#5a5a5a"
+          fill="#e3e3e3"
+        />
+        <Area
+          type="step"
+          dataKey="for"
+          stackId="1"
+          stroke="#00992B"
+          fill="#b0ebc1"
+        />
+
         {!!proposal.quorum && (
           <ReferenceLine
             y={+proposal.quorum.toString()}
@@ -181,36 +208,14 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
             strokeDasharray="3 3"
             stroke="#4F4F4F"
             label={{
-              position: "insideBottomRight",
+              position: "insideBottomLeft",
               value: "QUORUM",
               className: "text-xs font-inter font-semibold",
-              fill: "#4F4F4F",
+              fill: "#565656",
             }}
           />
         )}
-
-        <Line
-          dataKey="against"
-          type="step"
-          stroke="#C52F00"
-          strokeWidth={2}
-          dot={false}
-        />
-        <Line
-          type="step"
-          dataKey="for"
-          stroke="#00992B"
-          strokeWidth={2}
-          dot={false}
-        />
-        <Line
-          type="step"
-          stroke="#8C8C8C"
-          strokeWidth={2}
-          dataKey="abstain"
-          dot={false}
-        />
-      </LineChart>
+      </AreaChart>
     </ResponsiveContainer>
   );
 };
