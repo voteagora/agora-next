@@ -173,9 +173,9 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           tickFormatter={yTickFormatter}
           tickLine={false}
           axisLine={false}
-          tickCount={7}
+          tickCount={6}
           interval={0}
-          width={30}
+          width={32}
           tickMargin={0}
         />
 
