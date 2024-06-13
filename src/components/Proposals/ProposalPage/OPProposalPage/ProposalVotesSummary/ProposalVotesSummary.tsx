@@ -1,71 +1,88 @@
-import { VStack, HStack } from "@/components/Layout/Stack";
+"use client";
+import { useState } from "react";
 import styles from "./proposalVotesSummary.module.scss";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import ProposalVotesSummaryDetails from "../ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
 import { Vote } from "@/app/api/common/votes/vote";
 
-export default function ProposalVotesSummary({
-  proposal,
-  proposalVotes,
-}: {
+interface Props {
   proposal: Proposal;
-  proposalVotes: Vote[];
-}) {
+  votes: Vote[];
+}
+
+export default function ProposalVotesSummary({ proposal, votes }: Props) {
+  const [showDetails, setShowDetails] = useState(false);
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
   return (
-    <VStack gap={1} className={styles.proposal_votes_summary_container}>
-      <HStack justifyContent="justify-between" className="mt-2">
-        <div className="gl_votes_for text-xs font-semibold">
-          For <TokenAmountDisplay amount={results.for} />
-        </div>
-        <HStack gap={2}>
-          {Number(results.abstain) > 0 && (
-            <div className="gl_votes_abstain text-xs font-semibold">
-              Abstain <TokenAmountDisplay amount={results.abstain} />
+    <HoverCard
+      open={showDetails}
+      onOpenChange={setShowDetails}
+      openDelay={0}
+      closeDelay={0}
+    >
+      <div style={{ position: "relative" }}>
+        <HoverCardTrigger className="w-full cursor-pointer block">
+          <div
+            className={`flex flex-col gap-2 ${styles.proposal_votes_summary_container}`}
+          >
+            <div className="flex flex-row justify-between mt-2">
+              <div className="gl_votes_for">
+                FOR <TokenAmountDisplay amount={results.for} />
+              </div>
+              <div className="gl_votes_against">
+                AGAINST <TokenAmountDisplay amount={results.against} />
+              </div>
             </div>
-          )}
-
-          <div className="gl_votes_against text-xs font-semibold">
-            Against <TokenAmountDisplay amount={results.against} />
+            <ProposalVotesBar proposal={proposal} votes={votes} />
+            <div className="flex flex-col font-medium">
+              <div className="flex flex-row text-gray-4f pb-2 justify-between">
+                <>
+                  {proposal.quorum && (
+                    <div>
+                      Quorum <TokenAmountDisplay amount={proposal.quorum} />
+                    </div>
+                  )}
+                </>
+                <>
+                  {proposal.quorum && (
+                    <div>
+                      <p>{`Threshold ${
+                        Number(proposal.approvalThreshold) / 100
+                      }%`}</p>
+                    </div>
+                  )}
+                </>
+              </div>
+              <ProposalStatusDetail
+                proposalStartTime={proposal.start_time}
+                proposalEndTime={proposal.end_time}
+                proposalStatus={proposal.status}
+                proposalCancelledTime={proposal.cancelled_time}
+                cancelledTransactionHash={proposal.cancelled_transaction_hash}
+              />
+            </div>
           </div>
-        </HStack>
-      </HStack>
-      <ProposalVotesBar proposalVotes={proposalVotes} proposal={proposal} />
-      <VStack className="font-medium">
-        <HStack
-          justifyContent="justify-between"
-          className="text-gray-4f pb-2 pt-0"
-        >
-          <>
-            {proposal.quorum && (
-              <div className="text-xs">
-                Quorum <TokenAmountDisplay amount={proposal.quorum} />
-              </div>
-            )}
-          </>
-          <>
-            {proposal.quorum && (
-              <div className="text-xs">
-                <p>{`Threshold ${
-                  Number(proposal.approvalThreshold) / 100
-                }%`}</p>
-              </div>
-            )}
-          </>
-        </HStack>
-        <ProposalStatusDetail
-          proposalStartTime={proposal.start_time}
-          proposalEndTime={proposal.end_time}
-          proposalStatus={proposal.status}
-          proposalCancelledTime={proposal.cancelled_time}
-          cancelledTransactionHash={proposal.cancelled_transaction_hash}
-        />
-      </VStack>
-    </VStack>
+
+          <HoverCardContent
+            className="pb-0 absolute w-auto ml-4 mt-1"
+            side="top"
+            align={"start"}
+          >
+            <ProposalVotesSummaryDetails proposal={proposal} votes={votes} />
+          </HoverCardContent>
+        </HoverCardTrigger>
+      </div>
+    </HoverCard>
   );
 }
