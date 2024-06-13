@@ -41,9 +41,12 @@ export default class TenantContractFactory {
 const createAgoraChangelog = (
   isProd: boolean
 ): TenantContract<BaseContract> => {
+  // AgoraChangelog contracts
+  // TEST: https://optimistic.etherscan.io/address/0x81e44a473866c065a5dabfe16b7c55306e3bb6e2
+  // PROD: https://optimistic.etherscan.io/address/0xa8d64ef10ec8b6a0f88468f3a544b5fb371b7e64
   const agoraChangelogAddress = isProd
-    ? "0x1c19a1578BB7660620588f236A353A7Bf138798a"
-    : "0x1b4Bf361709f016f8F561bF1e2DFfe56C0935f13";
+    ? "0xa8d64ef10ec8b6a0f88468f3a544b5fb371b7e64"
+    : "0x81e44a473866c065a5dabfe16b7c55306e3bb6e2";
 
   return new TenantContract<BaseContract>({
     abi: AgoraChangelog__factory.abi,
