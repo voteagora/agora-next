@@ -42,11 +42,11 @@ const createAgoraChangelog = (
   isProd: boolean
 ): TenantContract<BaseContract> => {
   // AgoraChangelog contracts
-  // TEST: https://optimistic.etherscan.io/address/0x81e44a473866c065a5dabfe16b7c55306e3bb6e2
-  // PROD: https://optimistic.etherscan.io/address/0xa8d64ef10ec8b6a0f88468f3a544b5fb371b7e64
+  // TEST: https://optimistic.etherscan.io/address/0x03b9b7a45a394667babae2b679f50b652d5a2368
+  // PROD: https://optimistic.etherscan.io/address/0x2defe4fc6b257ce5f9e83f9e255630333cc7499d
   const agoraChangelogAddress = isProd
-    ? "0xa8d64ef10ec8b6a0f88468f3a544b5fb371b7e64"
-    : "0x81e44a473866c065a5dabfe16b7c55306e3bb6e2";
+    ? "0x2defe4fc6b257ce5f9e83f9e255630333cc7499d"
+    : "0x03b9b7a45a394667babae2b679f50b652d5a2368";
 
   return new TenantContract<BaseContract>({
     abi: AgoraChangelog__factory.abi,

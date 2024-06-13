@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import {
   useAccount,
+  useContractRead,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -56,11 +57,19 @@ export default function NewEntry() {
     setCreatedAt(Math.floor(Date.now() / 1000));
   }, []);
 
+  const { data: isWhitelisted } = useContractRead({
+    address: contracts.changelog!.address as `0x${string}`,
+    abi: contracts.changelog!.abi,
+    functionName: "whitelist",
+    args: [accountAddress],
+  });
+
   const { config: createEntryConfig, isError: createEntryError } =
     usePrepareContractWrite({
       ...changelogContract,
       functionName: "addEntry",
       args: [title, markdownText, ipfsHash, tag, projectURL, BigInt(createdAt)],
+      enabled: !!isWhitelisted,
     });
 
   const {
@@ -75,6 +84,16 @@ export default function NewEntry() {
 
   const isDisabledCreateEntry =
     isLoadingCreateEntry || isLoadingCreateEntryTransaction || createEntryError;
+
+  const renderButtonLabel = () => {
+    if (!accountAddress) {
+      return "Please login";
+    } else if (!isWhitelisted) {
+      return "You don't have permission to add an Entry";
+    } else {
+      return "Create Entry";
+    }
+  };
 
   return (
     <div className="gl_box">
@@ -139,12 +158,12 @@ export default function NewEntry() {
           variant="outline"
           size="sm"
           loading={isDisabledCreateEntry}
-          disabled={isDisabledCreateEntry}
+          disabled={!accountAddress || !isWhitelisted || isDisabledCreateEntry}
           onClick={() => {
             writeCreateEntry?.();
           }}
         >
-          Create Entry
+          {renderButtonLabel()}
         </Button>
       </div>
     </div>

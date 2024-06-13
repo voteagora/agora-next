@@ -57,7 +57,13 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "ipfsHash",
+        "name": "bodyIPFSHash",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "imageIPFSHash",
         "type": "string"
       },
       {
@@ -182,8 +188,8 @@
   {
     "inputs": [
       { "internalType": "string", "name": "_title", "type": "string" },
-      { "internalType": "string", "name": "_markdownText", "type": "string" },
-      { "internalType": "string", "name": "_ipfsHash", "type": "string" },
+      { "internalType": "string", "name": "_bodyIPFSHash", "type": "string" },
+      { "internalType": "string", "name": "_imageIPFSHash", "type": "string" },
       { "internalType": "string", "name": "_tag", "type": "string" },
       { "internalType": "string", "name": "_projectURL", "type": "string" },
       { "internalType": "uint256", "name": "_createdAt", "type": "uint256" }
@@ -207,8 +213,8 @@
     "name": "entries",
     "outputs": [
       { "internalType": "string", "name": "title", "type": "string" },
-      { "internalType": "string", "name": "markdownText", "type": "string" },
-      { "internalType": "string", "name": "ipfsHash", "type": "string" },
+      { "internalType": "string", "name": "bodyIPFSHash", "type": "string" },
+      { "internalType": "string", "name": "imageIPFSHash", "type": "string" },
       { "internalType": "string", "name": "tag", "type": "string" },
       { "internalType": "string", "name": "projectURL", "type": "string" },
       { "internalType": "address", "name": "author", "type": "address" },
@@ -228,10 +234,14 @@
           { "internalType": "string", "name": "title", "type": "string" },
           {
             "internalType": "string",
-            "name": "markdownText",
+            "name": "bodyIPFSHash",
             "type": "string"
           },
-          { "internalType": "string", "name": "ipfsHash", "type": "string" },
+          {
+            "internalType": "string",
+            "name": "imageIPFSHash",
+            "type": "string"
+          },
           { "internalType": "string", "name": "tag", "type": "string" },
           { "internalType": "string", "name": "projectURL", "type": "string" },
           { "internalType": "address", "name": "author", "type": "address" },
