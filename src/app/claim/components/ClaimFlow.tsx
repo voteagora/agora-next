@@ -67,7 +67,13 @@ const ClaimFlow = () => {
         />
       )}
       {/* delegation */}
-      {stage === 5 && <DelegationStage onSuccess={() => setStage(5)} />}
+      {stage === 5 && (
+        <DelegationStage
+          onSuccess={() => setStage(5)}
+          values={values}
+          setValues={setValues}
+        />
+      )}
       {/* claim */}
       {stage === 6 && <ClaimStage onSuccess={() => setStage(0)} />}
     </div>

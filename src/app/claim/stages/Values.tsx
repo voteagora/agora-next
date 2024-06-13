@@ -1,41 +1,6 @@
 import React from "react";
 import { Button } from "../../../components/ui/button";
-
-enum Priority {
-  DECENTRALIZATION = "Decentralization",
-  COMMUNITY = "Community",
-  DEVELOPER_EXPERIENCE = "Developer Experience",
-  TRANSPARENCY = "Transparency",
-  GROWTH = "Growth",
-  TECHNOLOGY = "Technology",
-}
-
-const PriorityMetadata = {
-  [Priority.DECENTRALIZATION]: {
-    description: "Decentralization is the key to the future of the internet",
-    icon: <span className="text-2xl pb-2">&#128507;</span>,
-  },
-  [Priority.COMMUNITY]: {
-    description: "Community is the heart of Scroll",
-    icon: <span className="text-2xl pb-2">&#128507;</span>,
-  },
-  [Priority.DEVELOPER_EXPERIENCE]: {
-    description: "Developers are the backbone of the Scroll ecosystem",
-    icon: <span className="text-2xl pb-2">&#128507;</span>,
-  },
-  [Priority.TRANSPARENCY]: {
-    description: "Transparency is the foundation of trust",
-    icon: <span className="text-2xl pb-2">&#128507;</span>,
-  },
-  [Priority.GROWTH]: {
-    description: "Growth is the key to a sustainable future",
-    icon: <span className="text-2xl pb-2">&#128507;</span>,
-  },
-  [Priority.TECHNOLOGY]: {
-    description: "Technology is the engine of progress",
-    icon: <span className="text-2xl pb-2">&#128507;</span>,
-  },
-};
+import { Priority, PriorityMetadata } from "../types";
 
 const PriorityCard = ({
   title,
@@ -46,17 +11,17 @@ const PriorityCard = ({
 }: {
   title: string;
   description: string;
-  icon: JSX.Element;
+  icon: string;
   active: boolean;
   onClick: () => void;
 }) => {
   return (
     <div
-      className={`${active ? "bg-agora-stone-50" : "bg-white"} flex flex-col py-4 border border-agora-stone-100 rounded-lg px-4 pb-4 pt-2 cursor-pointer`}
+      className={`${active ? "bg-agora-stone-50" : "bg-white"} flex flex-col py-4 border border-agora-stone-100 rounded-lg p-4 cursor-pointer`}
       onClick={onClick}
     >
       <div className="flex flex-row items-center space-x-2">
-        {icon}
+        <span>{icon}</span>
         <span className="flex-1 mr-4 font-medium">{title}</span>
       </div>
       <span className="font-medium text-agora-stone-700">{description}</span>
