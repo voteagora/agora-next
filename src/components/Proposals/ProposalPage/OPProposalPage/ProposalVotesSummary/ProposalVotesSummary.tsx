@@ -6,12 +6,16 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import ProposalVotesSummaryDetails from "../ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
 
 export default function ProposalVotesSummary({
-                                               proposal,
-                                             }: {
+  proposal,
+}: {
   proposal: Proposal;
 }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -26,9 +30,10 @@ export default function ProposalVotesSummary({
       closeDelay={0}
     >
       <div style={{ position: "relative" }}>
-
         <HoverCardTrigger className="w-full cursor-pointer block">
-          <div className={`flex flex-col gap-2 ${styles.proposal_votes_summary_container}`}>
+          <div
+            className={`flex flex-col gap-2 ${styles.proposal_votes_summary_container}`}
+          >
             <div className="flex flex-row justify-between mt-2">
               <div className="gl_votes_for">
                 FOR <TokenAmountDisplay amount={results.for} />
@@ -67,7 +72,11 @@ export default function ProposalVotesSummary({
             </div>
           </div>
 
-          <HoverCardContent className="pb-0 absolute w-auto ml-4 mt-1" side="top" align={"start"}>
+          <HoverCardContent
+            className="pb-0 absolute w-auto ml-4 mt-1"
+            side="top"
+            align={"start"}
+          >
             <ProposalVotesSummaryDetails proposal={proposal} />
           </HoverCardContent>
         </HoverCardTrigger>

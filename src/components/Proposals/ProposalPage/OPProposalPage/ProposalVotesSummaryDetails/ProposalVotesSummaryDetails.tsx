@@ -10,8 +10,9 @@ import Link from "next/link";
 
 import Tenant from "@/lib/tenant/tenant";
 
-
-export default function ProposalVotesSummaryDetails({ proposal }: {
+export default function ProposalVotesSummaryDetails({
+  proposal,
+}: {
   proposal: Proposal;
 }) {
   const { token } = Tenant.current();
@@ -22,17 +23,29 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
 
-  const totalVotes = BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
+  const totalVotes =
+    BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
 
-  const voteThresholdPercent = Number(totalVotes) > 0 ? (Number(results.for) / Number(totalVotes)) * 100 : 0;
+  const voteThresholdPercent =
+    Number(totalVotes) > 0
+      ? (Number(results.for) / Number(totalVotes)) * 100
+      : 0;
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
   const hasQuorum = Boolean(Number(totalVotes) >= Number(proposal.quorum || 0));
   const hasThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
-  const forPercent = ((Number(results.for) / Number(totalVotes)) * 100).toFixed(2);
-  const againstPercent = ((Number(results.against) / Number(totalVotes)) * 100).toFixed(2);
-  const abstainPercent = ((Number(results.abstain) / Number(totalVotes)) * 100).toFixed(2);
+  const forPercent = ((Number(results.for) / Number(totalVotes)) * 100).toFixed(
+    2
+  );
+  const againstPercent = (
+    (Number(results.against) / Number(totalVotes)) *
+    100
+  ).toFixed(2);
+  const abstainPercent = (
+    (Number(results.abstain) / Number(totalVotes)) *
+    100
+  ).toFixed(2);
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px]">
@@ -47,15 +60,13 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
         <div className="gl_votes_abstain flex justify-between">
           ABSTAIN
           <span>
-            <TokenAmountDisplay amount={results.abstain} /> ({abstainPercent}%
-            )
+            <TokenAmountDisplay amount={results.abstain} /> ({abstainPercent}% )
           </span>
         </div>
         <div className="gl_votes_against flex justify-between">
           AGAINST{" "}
           <span>
-            <TokenAmountDisplay amount={results.against} /> ({againstPercent}%
-            )
+            <TokenAmountDisplay amount={results.against} /> ({againstPercent}% )
           </span>
         </div>
       </div>
@@ -67,13 +78,27 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
           </div>
           {proposal.quorum && (
             <div className="flex items-center gap-1 ">
-              {hasQuorum && <Image width="12" height="12" src={checkIcon} alt="check icon" />}
+              {hasQuorum && (
+                <Image
+                  width="12"
+                  height="12"
+                  src={checkIcon}
+                  alt="check icon"
+                />
+              )}
               <p className="text-xs font-semibold text-gray-4f">
-                <TokenAmountDisplay amount={totalVotes} decimals={token.decimals}
-                                    currency={""} />{" "}/{" "}<TokenAmountDisplay amount={proposal.quorum}
-                                                                                   decimals={token.decimals}
-                                                                                   currency={""} /> Required
-
+                <TokenAmountDisplay
+                  amount={totalVotes}
+                  decimals={token.decimals}
+                  currency={""}
+                />{" "}
+                /{" "}
+                <TokenAmountDisplay
+                  amount={proposal.quorum}
+                  decimals={token.decimals}
+                  currency={""}
+                />{" "}
+                Required
               </p>
             </div>
           )}
@@ -85,13 +110,13 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
           <div className="flex flex-row gap-1 ">
             {hasThreshold && <Image src={checkIcon} alt="check icon" />}
             <p className=" text-xs font-semibold text-gray-4f">
-              {voteThresholdPercent.toFixed(2)}%{" "}/{" "}{`${apprThresholdPercent}%`} Required
+              {voteThresholdPercent.toFixed(2)}% / {`${apprThresholdPercent}%`}{" "}
+              Required
             </p>
           </div>
         </div>
       </div>
-      <ol
-        className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
+      <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
         <StepperRow
           label="Proposal created"
           value={formatTime(proposal.created_time)}
@@ -115,13 +140,13 @@ export default function ProposalVotesSummaryDetails({ proposal }: {
 }
 
 const StepperRow = ({
-                      label,
-                      value,
-                      isActive,
-                      isCompleted,
-                      isLastStep,
-                      href,
-                    }: {
+  label,
+  value,
+  isActive,
+  isCompleted,
+  isLastStep,
+  href,
+}: {
   label: string;
   value: string;
   isActive?: boolean;
