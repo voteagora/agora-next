@@ -13,7 +13,7 @@ import ClaimStage from "../stages/Claim";
 
 const ClaimFlow = () => {
   const { address, isConnecting } = useAccount();
-  const [stage, setStage] = useState<number>(1);
+  const [stage, setStage] = useState<number>(0);
   const [values, setValues] = useState<string[]>([]);
 
   // loading case
