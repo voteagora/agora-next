@@ -15,7 +15,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
   switch (namespace) {
     case "optimism": {
-      const contractQuorum = contracts.governor.contract.quorum(
+      const contractQuorum = await contracts.governor.contract.quorum(
         proposal.proposal_id
       );
 

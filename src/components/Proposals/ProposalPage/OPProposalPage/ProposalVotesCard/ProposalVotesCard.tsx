@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalVotesSummary from "../ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -25,19 +24,17 @@ const ProposalVotesCard = ({
   };
 
   return (
-    <VStack
-      gap={4}
-      justifyContent="justify-between"
-      className={`${styles.proposal_votes_container} transition-all ${isClicked ? "bottom-[60px]" : "bottom-[calc(-100%+350px)]"}`}
+    <div
+      className={`flex flex-col gap-4 justify-between ${styles.proposal_votes_container} transition-all ${isClicked ? "bottom-[60px]" : "bottom-[calc(-100%+350px)]"}`}
     >
-      <VStack gap={4} className={styles.proposal_actions_panel}>
+      <div className={`flex flex-col gap-4 ${styles.proposal_actions_panel}`}>
         <button
           onClick={handleClick}
           className="border w-10 h-10 rounded-full bg-white absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block sm:hidden"
         >
-          <HStack justifyContent="justify-center">
+          <div className="flex flex-col justify-center">
             <img className="opacity-60" src={icons.expand.src} alt="expand" />
-          </HStack>
+          </div>
         </button>
         <div>
           <div className={styles.proposal_header}>Proposal votes</div>
@@ -51,8 +48,8 @@ const ProposalVotesCard = ({
         />
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} />
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 };
 
