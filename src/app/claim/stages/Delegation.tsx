@@ -179,7 +179,18 @@ const DelegationStage = ({
                   key={`priority-${idx}`}
                   title={priority}
                   icon={PriorityMetadata[priority].icon}
-                  active={false}
+                  active={values.includes(priority)}
+                  onClick={() => {
+                    if (values.length >= 3 && !values.includes(priority)) {
+                      // throw toast
+                      return;
+                    }
+                    if (values.includes(priority)) {
+                      setValues(values.filter((v) => v !== priority));
+                    } else {
+                      setValues([...values, priority]);
+                    }
+                  }}
                 />
               ))}
             </div>
