@@ -9,11 +9,14 @@ import { format } from "date-fns";
 import Link from "next/link";
 
 import Tenant from "@/lib/tenant/tenant";
+import { Vote } from "@/app/api/common/votes/vote";
 
 export default function ProposalVotesSummaryDetails({
   proposal,
+  votes,
 }: {
   proposal: Proposal;
+  votes: Vote[];
 }) {
   const { token } = Tenant.current();
   const results =
@@ -49,7 +52,7 @@ export default function ProposalVotesSummaryDetails({
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px]">
-      <ProposalVotesBar proposal={proposal} />
+      <ProposalVotesBar proposal={proposal} votes={votes} />
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between gl_votes_for">
           FOR{" "}
