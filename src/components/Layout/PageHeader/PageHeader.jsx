@@ -7,7 +7,7 @@ export default function PageHeader({ headerText }) {
       justifyContent="justify-between"
       className={styles.page_header_container}
     >
-      <h1>{headerText}</h1>
+      <h1 className="text-agoraPrimary">{headerText}</h1>
       <HStack gap={4}></HStack>
     </HStack>
   );

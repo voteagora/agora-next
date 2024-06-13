@@ -65,6 +65,9 @@ type TenantUIParams = {
   toggles?: UIToggle[];
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
+  customization?: {
+    primaryColor: string;
+  };
 };
 
 export class TenantUI {
@@ -80,6 +83,9 @@ export class TenantUI {
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
+  private _customization?: {
+    primaryColor: string;
+  };
 
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
@@ -98,6 +104,7 @@ export class TenantUI {
     toggles,
     governanceIssues,
     governanceStakeholders,
+    customization,
   }: TenantUIParams) {
     this._assets = assets;
     this._color = color;
@@ -111,6 +118,7 @@ export class TenantUI {
     this._toggles = toggles;
     this._governanceIssues = governanceIssues;
     this._governanceStakeholders = governanceStakeholders;
+    this._customization = customization;
   }
 
   public get assets(): UIAssets {
@@ -147,6 +155,10 @@ export class TenantUI {
 
   public get organization(): UIOrganization | undefined {
     return this._organization;
+  }
+
+  public get customization(): { primaryColor: string } | undefined {
+    return this._customization;
   }
 
   public link(name: string): UILink | undefined {
