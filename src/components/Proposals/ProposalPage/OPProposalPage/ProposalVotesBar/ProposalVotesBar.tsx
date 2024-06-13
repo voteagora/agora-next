@@ -46,7 +46,7 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
           ))}
         </>
       ) : (
-        <div className="w-full bg-gray-100 h-[10px]"></div>
+        <div className="w-full bg-stone-100 h-[10px]"></div>
       )}
 
       <div
