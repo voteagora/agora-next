@@ -16,6 +16,7 @@ const ProposalVotesCard = ({
   proposalVotes: any;
 }) => {
   const [isClicked, setIsClicked] = useState(false);
+
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
@@ -29,20 +30,24 @@ const ProposalVotesCard = ({
           onClick={handleClick}
           className="border w-10 h-10 rounded-full bg-white absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block sm:hidden"
         >
-          <div className="flex flex-row justify-center">
+          <div className="flex flex-col justify-center">
             <img className="opacity-60" src={icons.expand.src} alt="expand" />
           </div>
         </button>
         <div>
           <div className={styles.proposal_header}>Proposal votes</div>
-          {/* Show the summary bar with For, Against, Abstain */}
-          <ProposalVotesSummary proposal={proposal} />
+
+          <ProposalVotesSummary
+            votes={proposalVotes.votes}
+            proposal={proposal}
+          />
         </div>
-        {/* Show the scrolling list of votes for the proposal */}
+
         <ProposalVotesList
           initialProposalVotes={proposalVotes}
           proposal_id={proposal.id}
         />
+        {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} />
       </div>
     </div>

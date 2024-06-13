@@ -21,7 +21,7 @@ export default async function StandardProposalPage({
     <div
       className={`flex gap-16 justify-between items-start ${styles.proposal_container}`}
     >
-      <ProposalDescription proposal={proposal} />
+      <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
         {isAlligator && <StandardProposalDelete proposal={proposal} />}
         <ProposalVotesCard proposal={proposal} proposalVotes={proposalVotes} />

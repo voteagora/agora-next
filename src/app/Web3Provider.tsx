@@ -36,7 +36,7 @@ const config = createConfig(
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
-  }),
+  })
 );
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
@@ -45,17 +45,17 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
           <body className={inter.variable}>
-          <noscript>You need to enable JavaScript to run this app.</noscript>
-          {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-          {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-          <ConnectButtonProvider>
-            <PageContainer>
-              <Toaster />
-              <AgoraProvider>{children}</AgoraProvider>
-            </PageContainer>
-          </ConnectButtonProvider>
-          <Footer />
-          <SpeedInsights />
+            <noscript>You need to enable JavaScript to run this app.</noscript>
+            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+            <ConnectButtonProvider>
+              <PageContainer>
+                <Toaster />
+                <AgoraProvider>{children}</AgoraProvider>
+              </PageContainer>
+            </ConnectButtonProvider>
+            <Footer />
+            <SpeedInsights />
           </body>
         </ConnectKitProvider>
       </SIWEProvider>

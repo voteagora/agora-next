@@ -24,7 +24,6 @@ export const optimismTenantUIConfig = new TenantUI({
     title: "Optimism Foundation",
   },
 
-
   links: [
     {
       name: "calendar",

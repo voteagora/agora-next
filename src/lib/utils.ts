@@ -92,6 +92,36 @@ export function scientificNotationToPrecision(input: string) {
   }
 }
 
+// TODO: Rename ot scientificNotationTo number or something better fitting
+export function formatNumberWithScientificNotation(x: number): string {
+  if (x === 0) {
+    return "0";
+  }
+
+  const scientificNotation = x.toExponential();
+  const [base, exponent] = scientificNotation.split("e");
+  const exp = parseInt(exponent, 10);
+
+  // Format small numbers (abs(x) < 1.0)
+  if (Math.abs(x) < 1.0) {
+    const leadingZeros = Math.max(0, Math.abs(exp) - 1);
+    return `0.${"0".repeat(leadingZeros)}${base.replace(".", "")}`;
+  }
+
+  // Format large numbers and numbers with exponent 0
+  if (exp >= 0) {
+    const [integerPart, fractionalPart] = base.split(".");
+    const zerosNeeded = exp - (fractionalPart ? fractionalPart.length : 0);
+    return (
+      integerPart +
+      (fractionalPart || "") +
+      "0".repeat(Math.max(zerosNeeded, 0))
+    );
+  }
+
+  return scientificNotation;
+}
+
 export function tokenToHumanNumber(amount: number, decimals: number) {
   return Math.floor(amount / Math.pow(10, decimals));
 }
@@ -104,7 +134,7 @@ export function numberToToken(number: number) {
 export function formatNumber(
   amount: string | BigNumberish,
   decimals: number,
-  maximumSignificantDigits = 4,
+  maximumSignificantDigits = 4
 ) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
 
@@ -117,11 +147,11 @@ export function formatNumber(
 }
 
 export function TokenAmountDisplay({
-                                     amount,
-                                     decimals = token.decimals,
-                                     currency = token.symbol,
-                                     maximumSignificantDigits = 2,
-                                   }: {
+  amount,
+  decimals = token.decimals,
+  currency = token.symbol,
+  maximumSignificantDigits = 2,
+}: {
   amount: string | BigNumberish;
   decimals?: number;
   currency?: string;
@@ -137,7 +167,7 @@ export function TokenAmountDisplay({
 export function generateBarsForVote(
   forVotes: bigint,
   abstainVotes: bigint,
-  againstVotes: bigint,
+  againstVotes: bigint
 ) {
   const sections = [
     {
@@ -162,8 +192,8 @@ export function generateBarsForVote(
 
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
-    (acc, section) => acc + BigInt(section.amount),
-    BigInt(0),
+    (acc, section) => BigInt(acc) + BigInt(section.amount),
+    BigInt(0)
   );
 
   if (totalVotes === BigInt(0)) {
@@ -186,7 +216,7 @@ export function generateBarsForVote(
     while (
       currentSection < sections.length - 1 &&
       BigInt(index) >= sections[currentSection].threshold
-      ) {
+    ) {
       currentSection++;
     }
     result[index] = sections[currentSection].value;
@@ -226,7 +256,7 @@ export function formatFullDate(date: Date): string {
 
 export async function fetchAndSet<T>(
   fetcher: () => Promise<T>,
-  setter: (value: T) => void,
+  setter: (value: T) => void
 ) {
   const value = await fetcher();
   setter(value);
@@ -241,7 +271,6 @@ export async function fetchAndSetAll<
   const values = await Promise.all(fetchers.map((fetcher) => fetcher()));
   values.forEach((value, index) => setters[index](value));
 }
-
 
 export function getBlockScanAddress(address: string) {
   const { contracts } = Tenant.current();

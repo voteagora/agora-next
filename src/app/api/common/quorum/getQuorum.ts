@@ -9,10 +9,12 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
   switch (namespace) {
     case TENANT_NAMESPACES.UNISWAP:
-      return contracts.governor.contract.quorumVotes!();
+      return await contracts.governor.contract.quorumVotes!();
 
     case TENANT_NAMESPACES.OPTIMISM:
-      const quorum = contracts.governor.contract.quorum!(proposal.proposal_id);
+      const quorum = await contracts.governor.contract.quorum!(
+        proposal.proposal_id
+      );
 
       // If no quorum is set, calculate it based on votable supply
       if (!quorum) {
