@@ -78,6 +78,7 @@
     "react-is": "^18.2.0",
     "react-markdown": "^8.0.7",
     "react-responsive": "^9.0.2",
+    "recharts": "^2.12.6",
     "siwe": "^2.3.2",
     "swagger-ui-react": "5.16.2",
     "tailwind-merge": "^1.13.2",
