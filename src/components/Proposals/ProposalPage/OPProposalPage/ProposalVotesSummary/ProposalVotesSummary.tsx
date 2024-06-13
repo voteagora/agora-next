@@ -12,12 +12,14 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import ProposalVotesSummaryDetails from "../ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
+import { Vote } from "@/app/api/common/votes/vote";
 
-export default function ProposalVotesSummary({
-  proposal,
-}: {
+interface Props {
   proposal: Proposal;
-}) {
+  votes: Vote[];
+}
+
+export default function ProposalVotesSummary({ proposal, votes }: Props) {
   const [showDetails, setShowDetails] = useState(false);
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
@@ -42,7 +44,7 @@ export default function ProposalVotesSummary({
                 AGAINST <TokenAmountDisplay amount={results.against} />
               </div>
             </div>
-            <ProposalVotesBar proposal={proposal} />
+            <ProposalVotesBar proposal={proposal} votes={votes} />
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-gray-4f pb-2 justify-between">
                 <>
@@ -77,7 +79,7 @@ export default function ProposalVotesSummary({
             side="top"
             align={"start"}
           >
-            <ProposalVotesSummaryDetails proposal={proposal} />
+            <ProposalVotesSummaryDetails proposal={proposal} votes={votes} />
           </HoverCardContent>
         </HoverCardTrigger>
       </div>
