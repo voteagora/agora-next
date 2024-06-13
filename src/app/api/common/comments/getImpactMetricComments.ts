@@ -26,7 +26,7 @@ async function getImpactMetricCommentsApi({
           return prisma.$queryRawUnsafe<ImpactMetrciCommentPayload[]>(
             `
           SELECT mc.*, 
-          SUM(mcv.vote) AS votes_count, 
+          COALESCE(SUM(mcv.vote),0) AS votes_count, 
           ARRAY_AGG(jsonb_build_object(
             'comment_id', mcv.comment_id,
             'voter', mcv.voter,
