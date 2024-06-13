@@ -90,7 +90,7 @@ const PriorityPill = ({
   return (
     <div
       className={`${
-        active ? "border-black" : "border-agora-stone-100"
+        active ? "border-agora-stone-700" : "border-agora-stone-100"
       } flex flex-row border rounded-full px-4 py-2 cursor-pointer`}
       onClick={onClick}
     >
@@ -113,7 +113,7 @@ const DelegateCard = ({
 }) => {
   return (
     <div
-      className="border border-agora-stone-100 rounded-xl p-4 cursor-pointer"
+      className={`${active ? "bg-agora-stone-50" : "bg-white"} border border-agora-stone-100 rounded-xl p-4 cursor-pointer`}
       onClick={onClick}
     >
       <div className="flex flex-row">
@@ -214,58 +214,71 @@ const DelegationStage = ({
         </div>
       </section>
       <section className="col-span-3">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6 sticky top-4">
-          <h2 className="font-black text-2xl mb-6">Your delegates</h2>
-          {selectedDelegates.length === 0 ? (
-            <p className="text-agora-stone-700">
-              You have not selected any delegates
-            </p>
-          ) : (
-            selectedDelegates.map((address, idx) => (
-              <div
-                key={`selected-delegate-${idx}`}
-                className="first:mt-0 mt-4 flex flex-row items-center"
+        <div className="sticky top-4">
+          <div className="bg-white rounded-2xl border border-agora-stone-100 p-6 shadow-newDefault relative">
+            <h2 className="font-black text-2xl mb-6">Your delegates</h2>
+            {selectedDelegates.length === 0 ? (
+              <p className="text-agora-stone-700">
+                You have not selected any delegates
+              </p>
+            ) : (
+              selectedDelegates.map((address, idx) => (
+                <div
+                  key={`selected-delegate-${idx}`}
+                  className="first:mt-0 mt-4 flex flex-row items-center"
+                >
+                  <span className="h-10 w-10 rounded-full bg-agora-stone-100 mr-4"></span>
+                  <div className="flex flex-col flex-1">
+                    <h3 className="font-semibold">Delegate {idx + 1}</h3>
+                    <p className="text-agora-stone-700 text-xs font-semibold">
+                      123 total voting power
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-center mr-4">
+                    <h3 className="font-semibold">
+                      {getPercentage(100, selectedDelegates.length)}%
+                    </h3>
+                    <p className="text-agora-stone-700 text-xs font-semibold">
+                      ~
+                      {getPercentage(
+                        MOCK_CLAIM_AMOUNT,
+                        selectedDelegates.length
+                      )}
+                    </p>
+                  </div>
+                  <div className="">
+                    <XMarkIcon
+                      className="h-6 w-6 text-agora-stone-700 cursor-pointer"
+                      onClick={() => {
+                        setSelectedDelegates((prev) =>
+                          prev.filter((a) => a !== address)
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+            <div className="mt-6">
+              <Button
+                variant={
+                  selectedDelegates.length === 0 ? "secondary" : "default"
+                }
+                className="w-full"
+                onClick={() => {
+                  onSuccess();
+                }}
               >
-                <span className="h-10 w-10 rounded-full bg-agora-stone-100 mr-4"></span>
-                <div className="flex flex-col flex-1">
-                  <h3 className="font-semibold">Delegate {idx + 1}</h3>
-                  <p className="text-agora-stone-700 text-xs font-semibold">
-                    123 SCROLL
-                  </p>
-                </div>
-                <div className="flex flex-col items-center mr-4">
-                  <h3 className="font-semibold">
-                    {getPercentage(100, selectedDelegates.length)}%
-                  </h3>
-                  <p className="text-agora-stone-700 text-xs font-semibold">
-                    {getPercentage(MOCK_CLAIM_AMOUNT, selectedDelegates.length)}{" "}
-                    SCROLL
-                  </p>
-                </div>
-                <div className="">
-                  <XMarkIcon
-                    className="h-6 w-6 text-agora-stone-700 cursor-pointer"
-                    onClick={() => {
-                      setSelectedDelegates((prev) =>
-                        prev.filter((a) => a !== address)
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-            ))
-          )}
-          <div className="mt-6">
-            <Button
-              className="w-full"
-              onClick={() => {
-                onSuccess();
-              }}
-            >
-              Next
-            </Button>
+                Delegate
+              </Button>
+            </div>
           </div>
+          <footer className="px-6 pb-6 pt-12 bg-agora-stone-50 border border-agora-stone-100 rounded-b-2xl z-10 mt-[-24px]">
+            <h4>Your voting power</h4>
+            <span className="font-semibold text-2xl mt-2">600</span>
+          </footer>
         </div>
+        <div>faq</div>
       </section>
     </main>
   );
