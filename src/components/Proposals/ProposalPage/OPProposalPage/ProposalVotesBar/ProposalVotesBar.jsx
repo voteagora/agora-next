@@ -1,4 +1,5 @@
 export default function ProposalVotesBar({ proposal, votes }) {
+  const thresholdPercent = Math.round(Number(proposal.approvalThreshold) / 100);
   const voteCounts = {
     FOR: [],
     ABSTAIN: [],
@@ -10,14 +11,14 @@ export default function ProposalVotesBar({ proposal, votes }) {
   });
 
   return (
-    <div className={`relative flex items-stretch gap-x-0.5 `}>
+    <div id="chartContainer" className="relative flex items-stretch gap-x-0.5">
       {Object.entries(voteCounts).map(([support, parsedVotes], index) => (
         <div
           key={support} // use support as a unique key
           style={{
             flex: `${proposal.proposalResults[support.toLowerCase()]} 1 0%`,
           }}
-          className={`flex items-stretch gap-x-0.5 min-h-[10px]`}
+          className="flex items-stretch gap-x-0.5 min-h-[10px]"
         >
           {parsedVotes?.map((vote, idx) => (
             <div
@@ -30,7 +31,8 @@ export default function ProposalVotesBar({ proposal, votes }) {
       ))}
 
       <div
-        className={`bg-[#000000] h-4 w-[2px] absolute left-[${Number(proposal.approvalThreshold).toFixed(0) / 100}%] -top-[3px] z-50`}
+        className="bg-[#000000] h-4 w-[2px] absolute -top-[3px] z-50"
+        style={{ left: `${thresholdPercent}%` }}
       />
     </div>
   );
