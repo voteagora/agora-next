@@ -7,7 +7,7 @@ export default function ProposalVotesBar({ proposal }) {
       {generateBarsForVote(
         proposal.proposalResults.for,
         proposal.proposalResults.abstain,
-        proposal.proposalResults.against,
+        proposal.proposalResults.against
       ).map((value, idx) => {
         return <div key={`${idx}`} className={styles[value]} />;
       })}
