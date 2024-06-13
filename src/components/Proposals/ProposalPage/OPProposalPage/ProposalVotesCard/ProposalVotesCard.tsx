@@ -48,7 +48,7 @@ const ProposalVotesCard = ({
         />
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} />
-      </div >
+      </div>
     </div>
   );
 };

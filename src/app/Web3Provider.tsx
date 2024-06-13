@@ -26,7 +26,7 @@ const metadata = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 
-const {  contracts } = Tenant.current();
+const { contracts } = Tenant.current();
 
 const config = createConfig(
   getDefaultConfig({
