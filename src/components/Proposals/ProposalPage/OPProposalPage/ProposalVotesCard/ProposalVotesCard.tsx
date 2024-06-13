@@ -19,8 +19,6 @@ const ProposalVotesCard = ({
 
   const handleClick = () => {
     setIsClicked(!isClicked);
-    // var div = document.getElementsByClassName("mobile-web-scroll-div")[0];
-    // div.scrollTop = 0;
   };
 
   return (
@@ -38,10 +36,13 @@ const ProposalVotesCard = ({
         </button>
         <div>
           <div className={styles.proposal_header}>Proposal votes</div>
-          {/* Show the summar bar with For, Against, Abstain */}
-          <ProposalVotesSummary proposal={proposal} />
+
+          <ProposalVotesSummary
+            votes={proposalVotes.votes}
+            proposal={proposal}
+          />
         </div>
-        {/* Show the scrolling list of votes for the proposal */}
+
         <ProposalVotesList
           initialProposalVotes={proposalVotes}
           proposal_id={proposal.id}
