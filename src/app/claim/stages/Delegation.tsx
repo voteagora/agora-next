@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { DelegateSocialLinks } from "@/components/Delegates/DelegateCard/DelegateSocialLinks";
 import { Priority, PriorityMetadata } from "../types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // mock data until we have real delegates
 // these objects are also super light because the designs are not final
@@ -277,8 +283,27 @@ const DelegationStage = ({
             <h4>Your voting power</h4>
             <span className="font-semibold text-2xl mt-2">600</span>
           </footer>
+          <Accordion type="single" collapsible className="mt-10">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
-        <div>faq</div>
       </section>
     </main>
   );

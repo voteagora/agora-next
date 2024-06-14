@@ -2,6 +2,12 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../../../components/ui/button";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const MOCK_ELIGIBILITY_CRITERIA = {
   "Bridged to Scroll": 100,
@@ -119,28 +125,49 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
         </div>
       </section>
       <section className="col-span-3">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
-          <h1 className="text-2xl font-black">Your allocation</h1>
-          <p className="text-agora-stone-700 mb-4">
-            You are eligible for the airdrop
-          </p>
-          <div className="h-48 w-full border border-dotted border-agora-stone-100 rounded-2xl bg-[url('/images/receipt_bg.svg')] bg-center relative flex items-center justify-center">
-            <p className="font-semibold text-5xl">
-              {MOCK_ELIGIBILITY_CRITERIA.total}
+        <div className="sticky top-4">
+          <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+            <h1 className="text-2xl font-black">Your allocation</h1>
+            <p className="text-agora-stone-700 mb-4">
+              You are eligible for the airdrop
             </p>
+            <div className="h-48 w-full border border-dotted border-agora-stone-100 rounded-2xl bg-[url('/images/receipt_bg.svg')] bg-center relative flex items-center justify-center">
+              <p className="font-semibold text-5xl">
+                {MOCK_ELIGIBILITY_CRITERIA.total}
+              </p>
+            </div>
+            <div className="mt-10">
+              <Button
+                className="w-full"
+                onClick={() => {
+                  onSuccess();
+                }}
+              >
+                Begin claim process
+              </Button>
+            </div>
           </div>
-          <div className="mt-10">
-            <Button
-              className="w-full"
-              onClick={() => {
-                onSuccess();
-              }}
-            >
-              Begin claim process
-            </Button>
-          </div>
+          <Accordion type="single" collapsible className="mt-10">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
-        <div>dont forget FAQs</div>
       </section>
     </main>
   );

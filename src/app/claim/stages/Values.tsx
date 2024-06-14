@@ -1,6 +1,12 @@
 import React from "react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Priority, PriorityMetadata } from "../types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const PriorityCard = ({
   title,
@@ -83,22 +89,45 @@ const ValuesStage = ({
         </div>
       </section>
       <section className="col-span-3">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
-          <h1 className="text-2xl font-black">Proceed to delegate selection</h1>
-          <div className="mt-6">
-            {/* TODO (mg) fix this button */}
-            <Button
-              variant={values.length === 3 ? "default" : "secondary"}
-              className="w-full"
-              onClick={() => {
-                onSuccess();
-              }}
-            >
-              Continue
-            </Button>
+        <div className="sticky top-4">
+          <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+            <h1 className="text-2xl font-black">
+              Proceed to delegate selection
+            </h1>
+            <div className="mt-6">
+              {/* TODO (mg) fix this button */}
+              <Button
+                variant={values.length === 3 ? "default" : "secondary"}
+                className="w-full"
+                onClick={() => {
+                  onSuccess();
+                }}
+              >
+                Continue
+              </Button>
+            </div>
           </div>
+          <Accordion type="single" collapsible className="mt-10">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>FAQ</AccordionTrigger>
+              <AccordionContent>
+                Yes. It adheres to the WAI-ARIA design pattern.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
-        <div>dont forget FAQs</div>
       </section>
     </main>
   );

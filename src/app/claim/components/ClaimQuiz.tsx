@@ -48,7 +48,7 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-agora-stone-100 p-4">
+    <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
       <span className="text-xs text-agora-stone-700 font-semibold">
         QUESTION {currentQuestionIndex + 1} of {TEMP_QUIZ_QUESTIONS.length}
       </span>
