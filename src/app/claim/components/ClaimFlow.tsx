@@ -24,7 +24,7 @@ const ClaimFlow = () => {
   return (
     <div>
       {/* helpers for testing... */}
-      <div className="flex flex-row space-x-2">
+      {/* <div className="flex flex-row space-x-2">
         <button onClick={() => setStage(0)}>Start</button>
         <button onClick={() => setStage(1)}>Terms</button>
         <button onClick={() => setStage(2)}>Eligibility</button>
@@ -33,7 +33,7 @@ const ClaimFlow = () => {
         <button onClick={() => setStage(5)}>Values</button>
         <button onClick={() => setStage(6)}>Delegation</button>
         <button onClick={() => setStage(7)}>Claim</button>
-      </div>
+      </div> */}
       {/* start */}
       {stage === 0 && <StartStage onSuccess={() => setStage(1)} />}
       {/* terms */}
