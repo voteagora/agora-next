@@ -27,6 +27,7 @@ export type TenantContracts = {
   token: TenantContract<ITokenContract>;
   governor: TenantContract<IGovernorContract>;
   staker?: TenantContract<IStaker>;
+  tokenDistributor?: TenantContract<BaseContract>;
   alligator?: TenantContract<IAlligatorContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
   treasury?: string[]; // We don't interact with them, but maybe one day we will.

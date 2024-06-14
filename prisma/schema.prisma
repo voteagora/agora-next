@@ -1073,6 +1073,29 @@ view uniswapStakedDeposits {
   @@schema("uniswap")
 }
 
+view scrollAdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String?  @db.VarChar
+
+  @@map("advanced_voting_power")
+  @@schema("scroll")
+}
+
+view scrollDelegatees {
+  delegator    String  @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal @db.Decimal
+
+  @@map("delegatees")
+  @@schema("scroll")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view uniswapDelegateChangedEvents {
   chain_id          Int
