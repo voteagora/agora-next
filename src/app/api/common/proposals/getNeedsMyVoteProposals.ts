@@ -37,7 +37,7 @@ async function getNeedsMyVoteProposals(address: string) {
       WHERE v.proposal_id IS NULL
       ORDER BY p.ordinal DESC;
       `,
-    latestBlock,
+    latestBlock.number,
     address.toLowerCase(),
     contracts.governor.address
   );
