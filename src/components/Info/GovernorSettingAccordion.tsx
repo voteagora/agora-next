@@ -24,7 +24,7 @@ const GovernorSettingAccordion = () => {
             <div className="w-full sm:w-[65%] border border-gray-300 rounded-lg">
               <ContractsListTable />
             </div>
-            <div className="w-full sm:w-[35%] border border-gray-300 rounded-lg">
+            <div className="w-full sm:w-[35%] border border-gray-300 h-fit rounded-lg">
               <GovernorContractParameterTable />
             </div>
           </div>

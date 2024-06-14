@@ -26,7 +26,6 @@ const GovernorContractParameterTable = () => {
           <TableHead className="text-base font-semibold text-left text-gray-4f bg-gray-fa">
             Parameter
           </TableHead>
-          <TableHead className="bg-gray-fa"></TableHead>
           <TableHead className="text-base font-semibold text-gray-4f text-right bg-gray-fa">
             Value
           </TableHead>
@@ -38,7 +37,6 @@ const GovernorContractParameterTable = () => {
             <TableCell className="text-base font-semibold text-left text-gray-4f">
               {parameter.parameterTitle}
             </TableCell>
-            <TableCell></TableCell>
             <TableCell className="text-base font-semibold text-right text-black">
               {parameter.parameterAddress}
             </TableCell>

@@ -3,7 +3,8 @@ import InfoHero from "@/components/Info/InfoHero";
 import InfoAboutSection from "@/components/Info/InfoAboutSection";
 import DaosTreasuryChart from "@/components/Info/DaosTreasuryChart";
 import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
-import GovernanceTabs from "@/components/Info/GovernanceTabs";
+import GovernanceChartsTabs from "@/components/Info/GovernanceChartsTabs";
+import PortalTrafficTabs from "@/components/Info/PortalTrafficTabs";
 
 export default async function Info() {
   return (
@@ -12,7 +13,8 @@ export default async function Info() {
       <InfoAboutSection />
       <GovernorSettingAccordion />
       <DaosTreasuryChart />
-      <GovernanceTabs />
+      <GovernanceChartsTabs />
+      <PortalTrafficTabs />
     </VStack>
   );
 }
