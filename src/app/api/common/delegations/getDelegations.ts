@@ -105,7 +105,7 @@ async function getCurrentDelegateesForAddress({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      timestamp: latestBlock
+      timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
       type: "ADVANCED",
@@ -201,7 +201,7 @@ async function getCurrentDelegatorsForAddress({
       from: advancedDelegator.from,
       to: advancedDelegator.to,
       allowance: advancedDelegator.delegated_amount.toFixed(0),
-      timestamp: latestBlock
+      timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
         : null,
       type: "ADVANCED",

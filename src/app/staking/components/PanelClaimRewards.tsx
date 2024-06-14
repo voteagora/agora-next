@@ -8,12 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const PanelClaimRewards = () => {
-  // TODO: Enable when rewards are available
-  // const { address } = useAccount();
-  // const { token } = Tenant.current();
-  // const { data } = useUnclaimedReward(address);
-  // const hasRewards = data && data > 0;
 
+  // TODO: Andrei - this needs to be implemented once the rewards are supported
   const hasRewards = false;
 
   return (
