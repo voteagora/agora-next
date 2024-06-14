@@ -7,6 +7,7 @@ import {
   OptimismGovernor__factory,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
+  AgoraChangelog__factory,
 } from "@/lib/contracts/generated";
 
 import provider, { ethProvider } from "@/app/lib/provider";
@@ -23,20 +24,42 @@ export default class TenantContractFactory {
     namespace: TenantNamespace,
     isProd: boolean
   ): TenantContracts {
+    const agoraChangelog = createAgoraChangelog(isProd);
     switch (namespace) {
       case TENANT_NAMESPACES.ETHERFI:
-        return ethfiContracts(isProd);
+        return ethfiContracts(isProd, agoraChangelog);
       case TENANT_NAMESPACES.ENS:
-        return ensContracts(isProd);
+        return ensContracts(isProd, agoraChangelog);
       case TENANT_NAMESPACES.OPTIMISM:
-        return opContracts(isProd);
+        return opContracts(isProd, agoraChangelog);
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
   }
 }
 
-const ensContracts = (isProd: boolean): TenantContracts => {
+const createAgoraChangelog = (
+  isProd: boolean
+): TenantContract<BaseContract> => {
+  // AgoraChangelog contracts
+  // TEST: https://optimistic.etherscan.io/address/0x03b9b7a45a394667babae2b679f50b652d5a2368
+  // PROD: https://optimistic.etherscan.io/address/0x2defe4fc6b257ce5f9e83f9e255630333cc7499d
+  const agoraChangelogAddress = isProd
+    ? "0x2defe4fc6b257ce5f9e83f9e255630333cc7499d"
+    : "0x03b9b7a45a394667babae2b679f50b652d5a2368";
+
+  return new TenantContract<BaseContract>({
+    abi: AgoraChangelog__factory.abi,
+    address: agoraChangelogAddress,
+    chain: optimism,
+    contract: AgoraChangelog__factory.connect(agoraChangelogAddress, provider),
+  });
+};
+
+const ensContracts = (
+  isProd: boolean,
+  agoraChangelog: TenantContract<BaseContract>
+): TenantContracts => {
   return {
     // TOKEN
     token: new TenantContract<ITokenContract>({
@@ -63,10 +86,15 @@ const ensContracts = (isProd: boolean): TenantContracts => {
       chain: mainnet,
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
     }),
+    // Changelog
+    changelog: agoraChangelog,
   };
 };
 
-const ethfiContracts = (isProd: boolean): TenantContracts => {
+const ethfiContracts = (
+  isProd: boolean,
+  agoraChangelog: TenantContract<BaseContract>
+): TenantContracts => {
   return {
     // TOKEN
     token: new TenantContract<ITokenContract>({
@@ -94,10 +122,15 @@ const ethfiContracts = (isProd: boolean): TenantContracts => {
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
       v6UpgradeBlock: isProd ? 114995000 : 114615036,
     }),
+    // Changelog
+    changelog: agoraChangelog,
   };
 };
 
-const opContracts = (isProd: boolean): TenantContracts => {
+const opContracts = (
+  isProd: boolean,
+  agoraChangelog: TenantContract<BaseContract>
+): TenantContracts => {
   return {
     // TOKEN
     token: new TenantContract<ITokenContract>({
@@ -153,5 +186,7 @@ const opContracts = (isProd: boolean): TenantContracts => {
         provider
       ),
     }),
+    // Changelog
+    changelog: agoraChangelog,
   };
 };
