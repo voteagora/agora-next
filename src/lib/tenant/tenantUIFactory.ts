@@ -46,6 +46,23 @@ const etherfiUI = new TenantUI({
     advanced: [],
     retired: [],
   },
+  links: [
+    {
+      name: "discord",
+      title: "Discord",
+      url: "https://discord.gg/vBJkUYBuwX",
+    },
+    {
+      name: "bugs",
+      title: "Report bugs & feedback",
+      url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
+    },
+    {
+      name: "governanceForum",
+      title: "Governance Forum",
+      url: "https://governance.ether.fi/",
+    },
+  ],
 
   pages: [
     {
