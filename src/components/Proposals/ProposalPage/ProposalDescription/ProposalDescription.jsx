@@ -7,6 +7,7 @@ import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
+import TreeMapChart from "../TreeMapChart/TreeMapChart";
 
 export default function ProposalDescription({ proposal, proposalVotes }) {
   const proposalsWithBadDescription = [
@@ -51,6 +52,7 @@ export default function ProposalDescription({ proposal, proposalVotes }) {
         createdTransactionHash={proposal.created_transaction_hash}
       />
       <VotingTimelineChart proposal={proposal} proposalVotes={proposalVotes} />
+      <TreeMapChart proposal={proposal} proposalVotes={proposalVotes} />
 
       <VStack gap={2}>
         <ApprovedTransactions

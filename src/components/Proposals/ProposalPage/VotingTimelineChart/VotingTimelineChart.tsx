@@ -2,13 +2,25 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceLine,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { format } from "date-fns";
 import { icons } from "@/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
-import { formatNumber, formatNumberWithScientificNotation, isScientificNotation } from "@/lib/utils";
+import {
+  formatNumber,
+  formatNumberWithScientificNotation,
+  isScientificNotation,
+} from "@/lib/utils";
 
 const { token } = Tenant.current();
 
@@ -169,22 +181,22 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           type="step"
           dataKey="against"
           stackId="1"
-          stroke="#C52F00"
-          fill="#eec2b5"
+          stroke="#dc2626"
+          fill="#fecaca"
         />
         <Area
           type="step"
           dataKey="abstain"
           stackId="1"
-          stroke="#5a5a5a"
-          fill="#e3e3e3"
+          stroke="#57534e"
+          fill="#e7e5e4"
         />
         <Area
           type="step"
           dataKey="for"
           stackId="1"
-          stroke="#00992B"
-          fill="#b0ebc1"
+          stroke="#16a34a"
+          fill="#bbf7d0"
         />
 
         {!!proposal.quorum && (
