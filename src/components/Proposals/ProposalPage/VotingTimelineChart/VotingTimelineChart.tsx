@@ -91,25 +91,7 @@ export default function VotingTimelineChart({
     votes: Vote[];
   };
 }) {
-  const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
-
-  const handleExpandChart = () => {
-    setShowChart((prevState) => !prevState);
-  };
-
-  return (
-    <div className="border border-gray-300 rounded-lg p-4 pb-2 w-full font-inter ">
-      <p
-        onClick={handleExpandChart}
-        className="flex items-center gap-x-1.5 text-xs font-semibold ml-1 mb-2 cursor-pointer"
-      >
-        Proposal Voting timeline{" "}
-        <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
-      </p>
-
-      {showChart && <Chart proposal={proposal} votes={proposalVotes.votes} />}
-    </div>
-  );
+  return <Chart proposal={proposal} votes={proposalVotes.votes} />;
 }
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {

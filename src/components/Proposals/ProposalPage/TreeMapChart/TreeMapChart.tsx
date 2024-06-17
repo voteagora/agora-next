@@ -39,29 +39,7 @@ export default function VotingTimelineChart({
     votes: Vote[];
   };
 }) {
-  const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
-
-  const handleExpandChart = () => {
-    setShowChart((prevState) => !prevState);
-  };
-
-  return (
-    <div className="border border-gray-300 rounded-lg p-4 pb-2 w-full font-inter ">
-      <p
-        onClick={handleExpandChart}
-        className="flex items-center gap-x-1.5 text-xs font-semibold ml-1 mb-2 cursor-pointer"
-      >
-        Vote composition{" "}
-        <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
-      </p>
-
-      {showChart && (
-        <div className="rounded-lg overflow-hidden">
-          <Chart proposal={proposal} votes={proposalVotes.votes} />
-        </div>
-      )}
-    </div>
-  );
+  return <Chart proposal={proposal} votes={proposalVotes.votes} />;
 }
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
@@ -112,10 +90,10 @@ const CustomContent = (props: any) => {
   const { x, y, width, height, support, address, value } = props;
   const fillColor =
     support === "AGAINST"
-      ? "#fecaca"
+      ? "#FA2D28"
       : support === "FOR"
-        ? "#bbf7d0"
-        : "#e7e5e4"; // Red for AGAINST, Green for FOR, Grey for ABSTAIN
+        ? "#23BF6B"
+        : "#959595"; // Red for AGAINST, Green for FOR, Grey for ABSTAIN
 
   return (
     <g>
