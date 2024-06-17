@@ -50,10 +50,10 @@ async function getDelegatesApi(
     ON 
       avp.delegate = delegates.delegate
     LEFT JOIN 
-      agora.address_metadata am
+      agora.citizens am
     ON
       LOWER(am.address) = LOWER(delegates.delegate) AND 
-      am.kind = 'citizen' AND
+      am.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens) AND
       am.dao_slug = $3::config.dao_slug
     WHERE 
       num_of_delegators IS NOT NULL
