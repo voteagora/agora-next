@@ -3,8 +3,23 @@ import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Vote } from "@/app/api/common/votes/vote";
 
-export default function ProposalChart({ proposal, proposalVotes }) {
+export default function ProposalChart({
+  proposal,
+  proposalVotes,
+}: {
+  proposal: Proposal;
+  proposalVotes: {
+    meta: {
+      currentPage: number;
+      pageSize: number;
+      hasNextPage: boolean;
+    };
+    votes: Vote[];
+  };
+}) {
   const [tabIndex, setTabIndex] = useState(0);
 
   const handleTabsChange = (index: number) => {

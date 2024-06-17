@@ -1,11 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
-import { icons } from "@/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
-import { useState } from "react";
 import ENSName from "@/components/shared/ENSName";
 /**
  * Transforms an array of votes into chart data suitable for a treemap.

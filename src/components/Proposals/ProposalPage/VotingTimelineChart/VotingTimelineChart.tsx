@@ -1,7 +1,4 @@
 "use client";
-
-import Image from "next/image";
-import { useState } from "react";
 import {
   Area,
   AreaChart,
@@ -12,7 +9,6 @@ import {
   YAxis,
 } from "recharts";
 import { format } from "date-fns";
-import { icons } from "@/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
