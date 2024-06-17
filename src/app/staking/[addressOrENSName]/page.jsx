@@ -1,6 +1,6 @@
 import React from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { apiFetchStakedDeposits } from "@/app/api/staking/getStakedDeposits";
+import { apiFetchStakedDeposits } from "@/app/api/staking/getDeposits";
 import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
 import { HStack } from "@/components/Layout/Stack";
 import { DepositList } from "@/app/staking/[addressOrENSName]/deposits/DepositList";
@@ -24,15 +24,15 @@ async function apiFetchDelegate(address) {
 }
 
 export default async function Page({ params: { addressOrENSName } }) {
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-
-  const { token } = Tenant.current();
   const { ui, contracts } = Tenant.current();
-  const deposits = await fetchDeposits(address.toLowerCase());
-
   if (!ui.toggle("staking")) {
     return <div>Route not supported for namespace</div>;
   }
+
+  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+
+  const { token } = Tenant.current();
+  const deposits = await fetchDeposits(address.toLowerCase());
 
   const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
     await Promise.all([

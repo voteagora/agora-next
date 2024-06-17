@@ -8,7 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const PanelClaimRewards = () => {
-
   // TODO: Andrei - this needs to be implemented once the rewards are supported
   const hasRewards = false;
 

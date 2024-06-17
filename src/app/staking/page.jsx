@@ -36,14 +36,11 @@ export async function generateMetadata({}) {
   };
 }
 
-
 export default async function Page() {
   const { token, contracts, ui } = Tenant.current();
-
   if (!ui.toggle("staking")) {
     return <div>Route not supported for namespace</div>;
   }
-
 
   const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
     await Promise.all([

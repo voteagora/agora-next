@@ -12,11 +12,17 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 
 export const uniswapTenantContractConfig = (
-  isProd: boolean,
+  isProd: boolean
 ): TenantContracts => {
-  const TOKEN = isProd ? "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984" : "0xc796953c443f542728eedf33aab32753d3f7a91a";
-  const GOVERNOR = isProd ? "0x408ED6354d4973f66138C91495F2f2FCbd8724C3" : "0x58b9952016d19bf2c6cb62f398dcde6a22278aaa";
-  const STAKER = isProd ? "0xe3071e87a7e6dd19a911dbf1127ba9dd67aa6fc8" : "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
+  const TOKEN = isProd
+    ? "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
+    : "0xc796953c443f542728eedf33aab32753d3f7a91a";
+  const GOVERNOR = isProd
+    ? "0x408ED6354d4973f66138C91495F2f2FCbd8724C3"
+    : "0x58b9952016d19bf2c6cb62f398dcde6a22278aaa";
+  const STAKER = isProd
+    ? "0xe3071e87a7e6dd19a911dbf1127ba9dd67aa6fc8"
+    : "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
 
   const provider = isProd ? ethProvider : sepoliaProvider;
   const chain = isProd ? mainnet : sepolia;
