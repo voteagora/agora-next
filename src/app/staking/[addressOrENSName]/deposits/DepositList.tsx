@@ -5,7 +5,6 @@ import { StakedDeposit } from "@/lib/types";
 import type { Delegate } from "@/app/api/common/delegates/delegate";
 import { Deposit } from "@/app/staking/[addressOrENSName]/deposits/Deposit";
 import { DepositListAction } from "@/app/staking/[addressOrENSName]/deposits/DepositListAction";
-import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];
@@ -14,14 +13,14 @@ interface StakedDepositListProps {
 }
 
 export const DepositList = ({
-  deposits,
-  fetchDelegate,
-  refreshPath,
-}: StakedDepositListProps) => {
+                              deposits,
+                              fetchDelegate,
+                              refreshPath,
+                            }: StakedDepositListProps) => {
   return (
     <div className="flex flex-col rounded-xl border border-gray-300 w-auto h-100 bg-gray-50 shadow-newDefault">
       <div className="border-b border-gray-300 rounded-xl bg-white shadow-newDefault">
-        {deposits.map(async (deposit, idx) => {
+        {deposits.map(async (deposit) => {
           return (
             <div key={`deposit-${deposit.id}`} className="flex w-auto h-100">
               <Deposit
