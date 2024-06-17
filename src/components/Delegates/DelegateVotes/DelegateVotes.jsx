@@ -84,7 +84,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         <div key={0}>
           <HStack
             key="loader"
-            className="gl_loader justify-center py-6 text-sm text-stone-500"
+            className="gl_loader justify-center py-6 text-sm text-theme-700"
           >
             Loading...
           </HStack>

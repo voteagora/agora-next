@@ -123,7 +123,7 @@ export default function RetroPGFResults({
         loader={
           <div
             key="loader"
-            className="flex justify-center py-6 text-sm text-stone-500"
+            className="flex justify-center py-6 text-sm text-theme-700"
           >
             Loading...
           </div>

@@ -17,7 +17,7 @@ export default function Page() {
       <div className="mx-auto max-w-full py-20 sm:py-12">
         <div className="flex flex-col sm:flex-row sm:gap-32 ">
           <div className="sm:flex-1 sm:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
-            <h2 className="mt-1 font-semibold text-stone-900">
+            <h2 className="mt-1 font-semibold text-theme-900">
               Agora Changelog
             </h2>
             <p className="mt-1 text-base leading-7 text-stone-600">

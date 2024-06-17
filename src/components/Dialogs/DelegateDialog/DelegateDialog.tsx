@@ -171,7 +171,7 @@ export function DelegateDialog({
             <p className="text-xl font-bold text-left">
               Set <ENSName address={delegate.address} /> as your delegate
             </p>
-            <div className="text-gray-700">
+            <div className="text-theme-700">
               <ENSName address={delegate.address} /> will be able to vote with
               any token owned by your address
             </div>

@@ -27,7 +27,7 @@ function DelegateVoteIcon({ proposalType, support }) {
       );
   } else if (proposalType === "APPROVAL")
     return (
-      <span className="h-5 w-5 flex items-center justify-center  rounded-full bg-gray-500 self-start">
+      <span className="h-5 w-5 flex items-center justify-center  rounded-full bg-theme-500 self-start">
         <Bars2Icon className="h-3 w-3 text-white" />
       </span>
     );

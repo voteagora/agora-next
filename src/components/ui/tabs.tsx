@@ -13,7 +13,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        bool: "bg-gray-100 rounded-md border border-gray-300 overflow-hidden gap-0 w-full",
+        bool: "bg-theme-100 rounded-md border border-gray-300 overflow-hidden gap-0 w-full",
       },
     },
   }
@@ -39,7 +39,7 @@ const tabsTriggerVariants = cva(
       variant: {
         default:
           "text-black font-bold opacity-30 data-[state=active]:opacity-100",
-        gray: "rounded-full py-1 px-3 text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-900 data-[state=active]:text-gray-900 data-[state=active]:bg-gray-200 data-[state=active]:hover:bg-gray-200",
+        gray: "rounded-full py-1 px-3 text-gray-600 font-medium hover:bg-theme-100 hover:text-gray-900 data-[state=active]:text-gray-900 data-[state=active]:bg-gray-200 data-[state=active]:hover:bg-gray-200",
         bool: "text-black p-3 flex-1 text-center hover:bg-white data-[state=active]:bg-white data-[state=active]:rounded-md data-[state=active]:shadow-newDefault",
       },
     },

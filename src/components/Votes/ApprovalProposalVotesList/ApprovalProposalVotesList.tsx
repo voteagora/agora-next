@@ -89,7 +89,7 @@ export default function ApprovalProposalVotesList({
         useWindow={false}
         loader={
           <div
-            className="flex text-xs font-medium text-stone-500 justify-center pb-2"
+            className="flex text-xs font-medium text-theme-700 justify-center pb-2"
             key={0}
           >
             Loading more votes...

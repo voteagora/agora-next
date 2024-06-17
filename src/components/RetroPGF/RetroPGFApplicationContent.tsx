@@ -111,7 +111,7 @@ const ContributionLink = ({
             {contributionLink.description}
           </p>
         </HStack>
-        <ArrowTopRightOnSquareIcon className="mt-1 w-5 h-5 text-gray-500" />
+        <ArrowTopRightOnSquareIcon className="mt-1 w-5 h-5 text-theme-500" />
       </HStack>
     </a>
   );
@@ -143,7 +143,7 @@ const ImpactMetric = ({
           target="_blank"
           className="flex items-center gap-2"
         >
-          <ArrowTopRightOnSquareIcon className="h-5 w-5 text-gray-500" />
+          <ArrowTopRightOnSquareIcon className="h-5 w-5 text-theme-500" />
         </a>
       </div>
     </li>
