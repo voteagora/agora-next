@@ -11,7 +11,6 @@ import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { revalidatePath } from "next/cache";
 import { StakingIntro } from "@/app/staking/components/StakingIntro";
-import { PanelSetAllowance } from "@/app/staking/components/PanelSetAllowance";
 
 async function fetchDeposits(address) {
   "use server";
@@ -27,7 +26,7 @@ export default async function Page({ params: { addressOrENSName } }) {
   const { ui, contracts } = Tenant.current();
   if (!ui.toggle("staking")) {
     return <div>Route not supported for namespace</div>;
-  }
+  }ø
 
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
 
