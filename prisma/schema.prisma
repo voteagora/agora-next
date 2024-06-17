@@ -1096,6 +1096,92 @@ view scrollDelegatees {
   @@schema("scroll")
 }
 
+view scrollAdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@map("advanced_delegatees")
+  @@schema("scroll")
+}
+
+view scrollVotableSupply {
+  votable_supply String @unique
+
+  @@map("votable_supply")
+  @@schema("scroll")
+}
+
+view scrollProposals {
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar(42)
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
+
+  @@map("proposals")
+  @@schema("scroll")
+}
+
+view scrollProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar(42)
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("scroll")
+}
+
+view scrollVotes {
+  transaction_hash String       @unique @db.VarChar(66)
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal      @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    ProposalType
+
+  @@map("votes")
+  @@schema("scroll")
+}
+
+view scrollVotingPower {
+  delegate     String  @unique
+  voting_power String?
+
+  @@map("voting_power")
+  @@schema("scroll")
+}
+
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view uniswapDelegateChangedEvents {
   chain_id          Int
