@@ -3,15 +3,13 @@
 import Image from "next/image";
 import { useState } from "react";
 import {
-  LineChart,
-  Line,
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceLine,
+  ResponsiveContainer,
   XAxis,
   YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  ReferenceLine,
-  AreaChart,
-  Area,
 } from "recharts";
 import { format } from "date-fns";
 import { icons } from "@/icons/icons";
