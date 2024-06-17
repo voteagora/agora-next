@@ -21,6 +21,7 @@ interface Props {
 
 export default function ProposalVotesSummary({ proposal, votes }: Props) {
   const [showDetails, setShowDetails] = useState(false);
+
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
