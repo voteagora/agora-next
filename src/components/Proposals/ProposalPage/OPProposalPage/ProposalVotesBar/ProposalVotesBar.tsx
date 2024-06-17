@@ -9,7 +9,6 @@ interface Props {
 type Support = "FOR" | "ABSTAIN" | "AGAINST";
 
 export default function ProposalVotesBar({ proposal, votes }: Props) {
-
   const thresholdPercent = Math.round(Number(proposal.approvalThreshold) / 100);
   const voteCounts: Record<Support, Vote[]> = {
     FOR: [],

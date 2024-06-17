@@ -50,6 +50,17 @@ model AddressMetadata {
   @@schema("agora")
 }
 
+view Citizens {
+  address             String
+  dao_slug            DaoSlug
+  retro_funding_round String
+  time_created        BigInt?
+
+  @@id([address, dao_slug, retro_funding_round])
+  @@map("citizens")
+  @@schema("agora")
+}
+
 model SnapshotProposal {
   id             String    @id
   dao_slug       DaoSlug
@@ -777,8 +788,8 @@ view uniswapVotingPowerSnaps {
   balance           String?
   block_number      BigInt?
   ordinal           Decimal? @db.Decimal
-  transaction_index BigInt?
-  log_index         BigInt?
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("uniswap")
@@ -800,9 +811,9 @@ view uniswapProposals {
   proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?
-  cancelled_transaction_hash String?
-  executed_transaction_hash  String?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
   @@schema("uniswap")
@@ -899,11 +910,11 @@ view uniswapProposalTypes {
 }
 
 view uniswapStakedDeposits {
-  deposit_id  BigInt  @unique
+  deposit_id  String @unique
   depositor   String
   beneficiary String
   delegatee   String
-  amount      Decimal @db.Decimal
+  amount      String
 
   @@map("staked_deposits")
   @@schema("uniswap")
@@ -1383,7 +1394,7 @@ view uniswap_direct_chains_snaps {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view uniswap_vote_cast_events {
-  transaction_hash String?
+  transaction_hash String?  @db.VarChar(66)
   proposal_id      String?
   voter            String?
   support          String?
