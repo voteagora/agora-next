@@ -344,6 +344,8 @@ module.exports = {
         // ie: shadow-inner
         newDefault:
           "0px 4px 12px rgba(0, 0, 0, 0.02), 0px 2px 2px rgba(0, 0, 0, 0.03)",
+        newHover:
+          "0px 6px 16px rgba(0, 0, 0, 0.05), 0px 2px 2px rgba(0, 0, 0, 0.03)",
         xs: "0 0 0 1px rgba(0, 0, 0, 0.05)",
         sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
         DEFAULT:

@@ -76,7 +76,7 @@ export default function ProposalVotesList({
   const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
-    <div className={styles.vote_container}>
+    <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={meta.hasNextPage}

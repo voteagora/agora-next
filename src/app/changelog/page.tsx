@@ -116,7 +116,7 @@ export default function Page() {
               <p id="changelogfeb2024" className={styles.changlogDate}>
                 {formatFullDate(new Date(2024, 4, 2))}
               </p>
-              <h3 className={styles.changelogTitle}>
+              <h3 className="text-2xl font-semibold leading-7 text-theme-900">
                 Governance Client Changelog #5
               </h3>
               <p>Morning OP collective,</p>
@@ -233,7 +233,7 @@ export default function Page() {
               <p id="changelogfeb2024" className={styles.changlogDate}>
                 {formatFullDate(new Date(2024, 3, 15))}
               </p>
-              <h3 className={styles.changelogTitle}>
+              <h3 className="text-2xl font-semibold leading-7 text-theme-900">
                 Governance Client Changelog #4
               </h3>
               <p>Morning OP collective,</p>
@@ -417,10 +417,10 @@ export default function Page() {
             <div className="my-8 border-t border-gray-300"></div>
             <div>
               <div className={styles.changelogItem}>
-                <p id="changelogfeb2024" className={styles.changelogDate}>
+                <p id="changelogfeb2024" className="text-stone-600 mb-2">
                   {formatFullDate(new Date(2024, 2, 27))}
                 </p>
-                <h3 className={styles.changelogTitle}>
+                <h3 className="text-2xl font-semibold leading-7 text-theme-900">
                   Governance Client Changelog #3
                 </h3>
                 <p>Morning OP collective,</p>
@@ -673,10 +673,10 @@ export default function Page() {
             <div className="my-8 border-t border-gray-300"></div>
             <div>
               <div className={styles.changelogItem}>
-                <p id="changelogfeb2024" className={styles.changelogDate}>
+                <p id="changelogfeb2024" className="text-stone-600 mb-2">
                   {formatFullDate(new Date(2024, 2, 7))}
                 </p>
-                <h3 className={styles.changelogTitle}>
+                <h3 className="text-2xl font-semibold leading-7 text-theme-900">
                   Governance Client Changelog #2
                 </h3>
                 <p>Morning OP collective,</p>
@@ -821,7 +821,7 @@ export default function Page() {
             <div className="my-8 border-t border-gray-300"></div>
             <div>
               <div className={styles.changelogItem}>
-                <p id="changelogfeb2024" className={styles.changelogDate}>
+                <p id="changelogfeb2024" className="text-stone-600 mb-2">
                   {formatFullDate(new Date(2024, 1, 23))}
                 </p>
                 <h3 className={styles.changelogTitle}>
@@ -1237,10 +1237,10 @@ export default function Page() {
             <div className="my-8 border-t border-gray-300"></div>
             <div className="space-y-12">
               <div className={styles.changelogItem}>
-                <p className={styles.changelogDate}>
+                <p className="text-stone-600 mb-2">
                   {formatFullDate(new Date(2023, 11, 18))}
                 </p>
-                <h3 className={styles.changelogTitle}>
+                <h3 className="text-2xl font-semibold leading-7 text-theme-900">
                   Agora Optimism V6 Governance Beta Launch 🚀 🎉
                 </h3>
                 <p>
