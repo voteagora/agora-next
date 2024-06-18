@@ -4,6 +4,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { usePathname } from "next/navigation";
 import { HeaderLink } from "./HeaderLink";
 import styles from "./header.module.scss";
+import { useAccount } from "wagmi";
+import { useAgoraContext } from "@/contexts/AgoraContext";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -11,6 +13,9 @@ export default function Navbar() {
 
   const hasProposals = ui.toggle("proposals") && ui.toggle("proposals").enabled;
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
+
+  const { address } = useAccount();
+  const { isConnected } = useAgoraContext();
 
   return (
     <div className={`flex flex-row ${styles.main_nav}`}>
@@ -27,6 +32,15 @@ export default function Navbar() {
       {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
         <HeaderLink href="/delegates" isActive={pathname.includes("delegates")}>
           Voters
+        </HeaderLink>
+      )}
+
+      {ui.toggle("staking") && ui.toggle("staking").enabled && (
+        <HeaderLink
+          href={isConnected && address ? `/staking/${address}` : "/staking"}
+          isActive={pathname.includes("staking")}
+        >
+          Staking
         </HeaderLink>
       )}
 

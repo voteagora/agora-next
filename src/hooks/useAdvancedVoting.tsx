@@ -2,7 +2,6 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
-import { optimism } from "viem/chains";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransaction } from "wagmi/actions";
 
@@ -37,7 +36,7 @@ const useAdvancedVoting = ({
         reason,
         params ?? "0x",
       ],
-      chainId: optimism.id,
+      chainId: contracts.alligator?.chain.id,
     });
 
   const { writeAsync: standardVote, isError: _standardVoteError } =
@@ -58,7 +57,7 @@ const useAdvancedVoting = ({
         : params
           ? [BigInt(proposalId), support, reason, params]
           : ([BigInt(proposalId), support] as any),
-      chainId: optimism.id,
+      chainId: contracts.governor.chain.id,
     });
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
