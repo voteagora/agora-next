@@ -2,7 +2,6 @@ import "server-only";
 
 import prisma from "@/app/lib/prisma";
 import { cache } from "react";
-import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
 import { doInSpan } from "@/app/lib/logging";

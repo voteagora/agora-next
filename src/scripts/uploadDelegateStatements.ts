@@ -53,7 +53,7 @@ async function main(filePath: string) {
       (stmt) => !existingIds.has(stmt.address)
     );
 
-    // Bulk insert new records
+    // Bulk insert create records
     if (newStatements.length > 0) {
       await prisma.delegateStatements.createMany({
         data: newStatements,
@@ -61,7 +61,7 @@ async function main(filePath: string) {
       });
       console.log(`${newStatements.length} new statements have been added.`);
     } else {
-      console.log("No new statements to add.");
+      console.log("No create statements to add.");
     }
   } catch (error) {
     console.error("Error processing the JSONL file:", error);

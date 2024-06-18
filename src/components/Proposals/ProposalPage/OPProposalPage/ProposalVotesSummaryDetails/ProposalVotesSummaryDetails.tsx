@@ -35,8 +35,10 @@ export default function ProposalVotesSummaryDetails({
       : 0;
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
-  const hasQuorum = Boolean(Number(totalVotes) >= Number(proposal.quorum || 0));
-  const hasThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
+  const hasMetQuorum = Boolean(
+    Number(totalVotes) >= Number(proposal.quorum || 0)
+  );
+  const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
   const forPercent = ((Number(results.for) / Number(totalVotes)) * 100).toFixed(
     2
@@ -81,7 +83,7 @@ export default function ProposalVotesSummaryDetails({
           </div>
           {proposal.quorum && (
             <div className="flex items-center gap-1 ">
-              {hasQuorum && (
+              {hasMetQuorum && (
                 <Image
                   width="12"
                   height="12"
@@ -106,18 +108,20 @@ export default function ProposalVotesSummaryDetails({
             </div>
           )}
         </div>
-        <div className="flex justify-between">
-          <div className="flex flex-row gap-1 text-gray-4f font-semibold text-xs">
-            Threshold
+        {proposal.approvalThreshold && (
+          <div className="flex justify-between">
+            <div className="flex flex-row gap-1 text-gray-4f font-semibold text-xs">
+              Threshold
+            </div>
+            <div className="flex flex-row gap-1 ">
+              {hasMetThreshold && <Image src={checkIcon} alt="check icon" />}
+              <p className=" text-xs font-semibold text-gray-4f">
+                {voteThresholdPercent.toFixed(2)}% /{" "}
+                {`${apprThresholdPercent}%`} Required
+              </p>
+            </div>
           </div>
-          <div className="flex flex-row gap-1 ">
-            {hasThreshold && <Image src={checkIcon} alt="check icon" />}
-            <p className=" text-xs font-semibold text-gray-4f">
-              {voteThresholdPercent.toFixed(2)}% / {`${apprThresholdPercent}%`}{" "}
-              Required
-            </p>
-          </div>
-        </div>
+        )}
       </div>
       <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
         <StepperRow
