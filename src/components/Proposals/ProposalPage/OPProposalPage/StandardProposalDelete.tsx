@@ -12,13 +12,12 @@ import { useContractWrite } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
-export default function OpManagerDeleteProposal({
+export default function StandardProposalDelete({
   proposal,
 }: {
   proposal: Proposal;
 }) {
   const { isOpManager } = useIsOpManager();
-
   const { contracts } = Tenant.current();
   const proposalType = proposal.proposalType;
 

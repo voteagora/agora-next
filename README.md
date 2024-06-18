@@ -149,7 +149,7 @@ There is no Router.
 
 The router is the directory structure of the `/app` directory.
 
-Each folder contains a magical page called `page.jsx` or `page.tsx` this acts as the `index` page for the route. So for example `@/app/delegates/page.jsx` is the index page for `https://app.example.com/delegates`
+Each folder contains a magical page called `page.jsx` or `page.jsx` this acts as the `index` page for the route. So for example `@/app/delegates/page.jsx` is the index page for `https://app.example.com/delegates`
 
 `@app/lib`
 Helpers and utilities, reserverd word.

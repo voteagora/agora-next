@@ -2,7 +2,6 @@ import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -51,7 +50,7 @@ async function getCurrentDelegateesForAddress({
   //   return delegatee;
   // })();
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   // const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
   //   where: {
@@ -106,7 +105,7 @@ async function getCurrentDelegateesForAddress({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      timestamp: latestBlock
+      timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
       type: "ADVANCED",
@@ -177,7 +176,7 @@ async function getCurrentDelegatorsForAddress({
   //   );
   // })();
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   // TODO: These needs to be ordered by timestamp
 
@@ -202,7 +201,7 @@ async function getCurrentDelegatorsForAddress({
       from: advancedDelegator.from,
       to: advancedDelegator.to,
       allowance: advancedDelegator.delegated_amount.toFixed(0),
-      timestamp: latestBlock
+      timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
         : null,
       type: "ADVANCED",
@@ -238,7 +237,6 @@ const getDirectDelegateeForAddress = async ({
       return null;
     }
   }
-
   return delegatee;
 };
 

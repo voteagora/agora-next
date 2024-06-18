@@ -23,6 +23,13 @@ export default class TenantTokenFactory {
           symbol: "ETHFI",
           decimals: 18,
         };
+
+      case TENANT_NAMESPACES.UNISWAP:
+        return {
+          name: "Uniswap",
+          symbol: "UNI",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

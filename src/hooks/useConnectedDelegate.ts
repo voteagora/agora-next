@@ -38,7 +38,7 @@ const useConnectedDelegate = () => {
       if (refetchDelegate?.prevVotingPowerDelegatee) {
         const delegatee = await fetchDelegate(refetchDelegate.address);
         /**
-         * Materialized view that brings the new voting power takes one minute to sync
+         * Materialized view that brings the create voting power takes one minute to sync
          * Refetch delegate will be set to null by the delegateProfileImage
          */
         if (
@@ -58,7 +58,7 @@ const useConnectedDelegate = () => {
         return { delegate, advancedDelegators, balance };
       } else if (refetchDelegate) {
         // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the
-        // new voting power
+        // create voting power
         if (delegate.votingPower === lastVotingPower) {
           // Check if maximum retries has been reached
           if (retries < MAX_RETRIES) {
