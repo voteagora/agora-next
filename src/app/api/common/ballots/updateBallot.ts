@@ -77,16 +77,19 @@ async function updateBallotMetricForAddress({
   });
 
   const [amountToBalance, totalUnlocked] = allocations.reduce(
-    (acc, allocation) => [
-      acc[0] -
-        (allocation.locked || allocation.metric_id === data.metric_id
+    (acc, allocation) => {
+      acc[0] -=
+        allocation.locked || allocation.metric_id === data.metric_id
           ? Number(allocation.allocation.toFixed(2))
-          : 0),
-      acc[1] +
-        (allocation.locked || allocation.metric_id === data.metric_id
-          ? 0
-          : Number(allocation.allocation.toFixed(2))),
-    ],
+          : 0;
+      return [
+        acc[0] < 0 ? 0 : acc[0],
+        acc[1] +
+          (allocation.locked || allocation.metric_id === data.metric_id
+            ? 0
+            : Number(allocation.allocation.toFixed(2))),
+      ];
+    },
     [100, 0]
   );
 
@@ -103,9 +106,10 @@ async function updateBallotMetricForAddress({
           },
           data: {
             ...allocation,
-            allocation:
-              (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
-              amountToBalance,
+            allocation: totalUnlocked
+              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
+                amountToBalance
+              : 0,
           },
         });
       }

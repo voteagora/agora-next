@@ -11,7 +11,7 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: "640px"
+      sm: "640px",
     },
     container: {
       center: true,
@@ -38,10 +38,10 @@ module.exports = {
         40: "10rem",
         48: "12rem",
         56: "14rem",
-        64: "16rem"
+        64: "16rem",
       },
       minWidth: {
-        desktop: '1280px',
+        desktop: "1280px",
       },
       gap: {
         0.5: "0.125rem", // 2px
@@ -111,6 +111,7 @@ module.exports = {
           "monospace",
         ],
         inter: "var(--font-inter), sans-serif",
+        code: ["IBM Plex Mono", "monospace"],
         // Add any other custom font families you need
       },
       colors: {
@@ -234,7 +235,8 @@ module.exports = {
           600: "#d53f8c",
           700: "#b83280",
           800: "#97266d",
-          900: "#702459",
+          900: "#FF007A",
+          positive: "#FF007A1A",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

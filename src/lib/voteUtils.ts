@@ -10,6 +10,7 @@ import { Vote, VotePayload } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Block } from "ethers";
 
 /**
  * Vote primitives
@@ -25,7 +26,7 @@ export function parseSupport(
   /**
    * @dev If start_block number of vote is less than 114615036, then it's a proposal
    *      from old approval voting module where 0 = for, 1 = against
-   *      new approval voting module is 0 = against, 1 = abstain, 2 = for
+   *      create approval voting module is 0 = against, 1 = abstain, 2 = for
    *      note that block number is indicative but works
    */
 
@@ -129,7 +130,7 @@ export function parseParams(
 export function parseVote(
   vote: VotePayload,
   proposalData: ParsedProposalData[ProposalType],
-  latestBlock: number
+  latestBlock: Block | null
 ): Vote {
   return {
     transactionHash: vote.transaction_hash,
