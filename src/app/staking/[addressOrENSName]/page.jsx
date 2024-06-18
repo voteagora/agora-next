@@ -26,7 +26,7 @@ export default async function Page({ params: { addressOrENSName } }) {
   const { ui, contracts } = Tenant.current();
   if (!ui.toggle("staking")) {
     return <div>Route not supported for namespace</div>;
-  }ø
+  }
 
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
 

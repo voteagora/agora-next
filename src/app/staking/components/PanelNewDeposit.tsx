@@ -5,15 +5,16 @@ import React from "react";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 import { useRouter } from "next/navigation";
-import { useAgoraContext } from "@/contexts/AgoraContext";
+import { useAccount } from "wagmi";
 
 export const PanelNewDeposit = () => {
-  const { isConnected } = useAgoraContext();
+  const { isConnected } = useAccount();
   const { token, namespace } = Tenant.current();
   const router = useRouter();
 
   return (
-    <div className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
+    <div
+      className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
       <Image
         src="/images/uni_deposit.svg"
         alt="results 2"
