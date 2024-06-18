@@ -39,7 +39,6 @@ async function getVotingPowerForProposalByAddress({
   proposalId: string;
 }): Promise<VotingPowerData> {
   const { namespace, contracts } = Tenant.current();
-
   const votingPowerQuery = prisma.$queryRawUnsafe<VotingPowerSnapsPayload[]>(
     `
     SELECT
@@ -106,7 +105,7 @@ async function getVotingPowerForProposalByAddress({
     WHERE allowance > 0;
     `,
     address,
-    contracts.alligator!.address,
+    contracts.alligator?.address,
     blockNumber
   );
 

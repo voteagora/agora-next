@@ -56,7 +56,7 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
                   )}
                 </>
                 <>
-                  {proposal.quorum && (
+                  {proposal.approvalThreshold && (
                     <div>
                       <p>{`Threshold ${
                         Number(proposal.approvalThreshold) / 100

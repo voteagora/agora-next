@@ -11,8 +11,8 @@ import { disapprovalThreshold } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 import { formatUnits } from "ethers";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import OpManagerDeleteProposal from "./OpManagerDeleteProposal";
-import styles from "./OPProposalPage.module.scss";
+import StandardProposalDelete from "./StandardProposalDelete";
+import styles from "./StandardProposalPage.module.scss";
 import OptimisticProposalVotesCard from "../../ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
 
 async function fetchProposalVotes(proposal_id, page = 1) {
@@ -86,7 +86,7 @@ export default async function OPProposalPage({ proposal }) {
     >
       <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
-        <OpManagerDeleteProposal proposal={proposal} />
+        <StandardProposalDelete proposal={proposal} />
         <OptimisticProposalVotesCard
           proposal={proposal}
           proposalVotes={proposalVotes}
