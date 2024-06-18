@@ -34,19 +34,19 @@ export default function ProposalChart({
   return (
     <div className="border border-gray-300 rounded-lg p-4 pb-2 w-full font-inter">
       <div className="flex justify-between w-full items-center text-xs font-semibold mb-2 cursor-pointer">
-        <div onClick={handleExpandChart} className="flex gap-1">
+        <div onClick={handleExpandChart} className="flex gap-1 py-1">
           Proposal Visualization{" "}
           <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
         </div>
         <div className="flex gap-x-2 items-center">
           <button
-            className={`tab ${tabIndex === 0 ? "active" : "text-stone-500"}`}
+            className={`tab ${tabIndex === 0 ? "active bg-stone-100 px-2 py-1 rounded-full" : "text-stone-500 px-2 py-1"}`}
             onClick={() => handleTabsChange(0)}
           >
             Timeline
           </button>
           <button
-            className={`tab ${tabIndex === 1 ? "active" : "text-stone-500"}`}
+            className={`tab ${tabIndex === 1 ? "active bg-stone-100 px-2 py-1 rounded-full" : "text-stone-500 px-2 py-1"}`}
             onClick={() => handleTabsChange(1)}
           >
             Composition
