@@ -13,7 +13,7 @@ export default function InputBox({
 }) {
   return (
     <input
-      className="w-full py-2 px-4 rounded-md text-base bg-theme-100 border-theme-300"
+      className="w-full py-2 px-4 rounded-md text-base bg-theme-100 border-theme-100"
       placeholder={placeholder}
       value={value}
       onChange={(event) => onChange(event.target.value)}

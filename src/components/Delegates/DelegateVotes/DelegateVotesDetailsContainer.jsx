@@ -1,6 +1,5 @@
 import React from "react";
 import { VStack } from "@/components/Layout/Stack";
-import styles from "./delegateVotes.module.scss";
 import Link from "next/link";
 
 function VoteDetailsContainer({ children, proposalId }) {

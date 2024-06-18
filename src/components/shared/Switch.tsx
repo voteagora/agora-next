@@ -16,7 +16,7 @@ const selectedStyle = "bg-theme-100 text-black font-semibold";
 export function Switch({ onSelectionChanged, selection, options }: Props) {
   return (
     <HStack
-      className="rounded-md border border-theme-300 overflow-hidden w-full p-1"
+      className="rounded-md border border-theme-100 overflow-hidden w-full p-1"
       gap={2}
     >
       {options.map((option, index) => (

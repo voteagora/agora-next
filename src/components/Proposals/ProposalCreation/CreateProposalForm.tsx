@@ -62,8 +62,8 @@ export default function CreateProposalForm({
   return (
     <VStack className="w-full">
       <form ref={formTarget}>
-        <VStack className="bg-white rounded-xl border border-theme-300 shadow-newDefault">
-          <div className="p-8 border-b border-theme-300">
+        <VStack className="bg-white rounded-xl border border-theme-100 shadow-newDefault">
+          <div className="p-8 border-b border-theme-100">
             <h1 className="text-2xl font-extrabold pb-1">Create proposal</h1>
             <p className="text-theme-700">
               Select the type of vote and proposal you want to create, and
@@ -78,16 +78,16 @@ export default function CreateProposalForm({
           </div>
           {form.state.proposalType === "Approval" && (
             <>
-              <div className="p-8 border-b border-theme-300">
+              <div className="p-8 border-b border-theme-100">
                 <ApprovalCriteriaRow form={form} />
               </div>
-              <div className="p-8 border-b border-theme-300">
+              <div className="p-8 border-b border-theme-100">
                 <ApprovalOptionsRow form={form} />
               </div>
             </>
           )}
           {form.state.proposalType === "Basic" && (
-            <div className="p-8 border-b border-theme-300">
+            <div className="p-8 border-b border-theme-100">
               <StandardForm form={form} />
             </div>
           )}

@@ -207,7 +207,7 @@ export function AdvancedDelegateDialog({
               !!delegatees &&
               proxyAddress !== "" ? (
               <VStack className="relative" gap={1}>
-                <VStack className="text-xs border border-theme-300 rounded-lg justify-center items-center py-8 px-2 relative">
+                <VStack className="text-xs border border-theme-100 rounded-lg justify-center items-center py-8 px-2 relative">
                   <HStack alignItems="items-center" gap={1}>
                     Your total delegatable votes{" "}
                     <InfoIcon
@@ -314,7 +314,7 @@ function InfoDialog({
     <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
       <VStack
         className={
-          "text-xs border border-theme-300 rounded-lg justify-center items-center py-8 px-2 relative" +
+          "text-xs border border-theme-100 rounded-lg justify-center items-center py-8 px-2 relative" +
           " !pb-0 !px-0"
         }
       >
@@ -389,7 +389,7 @@ function Message({
           </div>
         </VStack>
 
-        <VStack gap={3} className="border border-theme-300 rounded-lg p-4">
+        <VStack gap={3} className="border border-theme-100 rounded-lg p-4">
           <div className="flex items-center">
             <DivideIcon size={20} className="mr-2 text-red-500" />
             <p>Split your delegation to multiple people</p>

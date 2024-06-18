@@ -164,7 +164,7 @@ function AdvancedVoteDialog({
                 {reason}
               </div>
             ) : (
-              <div className="w-full py-6 px-4 rounded-lg border border-dashed border-theme-300 text-theme-700">
+              <div className="w-full py-6 px-4 rounded-lg border border-dashed border-theme-100 text-theme-700">
                 No voting reason provided
               </div>
             )}
