@@ -1,7 +1,6 @@
 import { parseProposal } from "@/lib/proposalUtils";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -10,7 +9,7 @@ import { fetchQuorumForProposal } from "../quorum/getQuorum";
 async function getNeedsMyVoteProposals(address: string) {
   const { namespace, contracts } = Tenant.current();
   const [latestBlock, votableSupply] = await Promise.all([
-    provider.getBlockNumber(),
+    contracts.token.provider.getBlock("latest"),
     fetchVotableSupply(),
   ]);
 
@@ -38,7 +37,7 @@ async function getNeedsMyVoteProposals(address: string) {
       WHERE v.proposal_id IS NULL
       ORDER BY p.ordinal DESC;
       `,
-    latestBlock,
+    latestBlock.number,
     address.toLowerCase(),
     contracts.governor.address
   );

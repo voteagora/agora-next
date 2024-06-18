@@ -1,34 +1,30 @@
 import { cache } from "react";
-import provider from "@/app/lib/provider";
 import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
-/*
-  Retrieve quorum from the governor contract for the supplied proposal,
-  calculating it if not specified
-
-  @dev: only supports optimisim
-*/
 async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace, contracts } = Tenant.current();
 
+  // TODO: Andrei - Refactor this using tenant's governor contract type rather than namespace
   switch (namespace) {
-    case "optimism": {
-      const contractQuorum = await contracts.governor.contract.quorum(
+    case TENANT_NAMESPACES.UNISWAP:
+      return await contracts.governor.contract.quorumVotes!();
+
+    case TENANT_NAMESPACES.OPTIMISM:
+      const quorum = await contracts.governor.contract.quorum!(
         proposal.proposal_id
       );
 
       // If no quorum is set, calculate it based on votable supply
-      if (!contractQuorum) {
+      if (!quorum) {
         const votableSupply = await prisma[
           `${namespace}VotableSupply`
         ].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
       }
-
-      return contractQuorum;
-    }
+      return quorum;
   }
 }
 
@@ -39,13 +35,16 @@ async function getCurrentQuorum() {
   const { namespace, contracts } = Tenant.current();
 
   switch (namespace) {
-    case "optimism": {
-      const latestBlock = await provider.getBlockNumber();
-      if (!latestBlock) {
+    case TENANT_NAMESPACES.UNISWAP:
+      return contracts.governor.contract.quorumVotes!();
+
+    case TENANT_NAMESPACES.OPTIMISM: {
+      const latestBlockNumber = await contracts.token.provider.getBlockNumber();
+      if (!latestBlockNumber) {
         return null;
       }
       // latest - 1 because latest block might not be mined yet
-      return contracts.governor.contract.quorum(latestBlock - 1);
+      return contracts.governor.contract.quorum!(latestBlockNumber - 1);
     }
   }
 }
