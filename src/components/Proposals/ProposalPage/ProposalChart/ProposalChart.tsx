@@ -43,13 +43,13 @@ export default function ProposalChart({
             className={`tab ${tabIndex === 0 ? "active" : "text-stone-500"}`}
             onClick={() => handleTabsChange(0)}
           >
-            Voting Timeline
+            Timeline
           </button>
           <button
             className={`tab ${tabIndex === 1 ? "active" : "text-stone-500"}`}
             onClick={() => handleTabsChange(1)}
           >
-            Vote Composition
+            Composition
           </button>
         </div>
       </div>

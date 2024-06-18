@@ -113,12 +113,10 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     ...chartData,
     {
       timestamp: proposal.end_time,
-      ...(proposal.status !== "ACTIVE" && {
-        for: chartData[chartData.length - 1]?.for,
-        abstain: chartData[chartData.length - 1]?.abstain,
-        against: chartData[chartData.length - 1]?.against,
-        total: chartData[chartData.length - 1]?.total,
-      }),
+      for: chartData[chartData.length - 1]?.for,
+      abstain: chartData[chartData.length - 1]?.abstain,
+      against: chartData[chartData.length - 1]?.against,
+      total: chartData[chartData.length - 1]?.total,
     },
   ];
 
@@ -151,7 +149,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           axisLine={false}
           tickCount={6}
           interval={0}
-          width={32}
+          width={36}
           tickMargin={0}
         />
 
