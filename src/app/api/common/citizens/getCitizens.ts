@@ -33,14 +33,14 @@ async function getCitizens({
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
-          SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
-          FROM agora.address_metadata address_metadata
+          SELECT citizens.address, delegate.voting_power
+          FROM agora.citizens citizens
           LEFT JOIN ${
             namespace + ".delegates"
-          } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
-          WHERE address_metadata.kind = 'citizen' 
-          AND address_metadata.dao_slug = 'OP'
-          ORDER BY md5(CAST(address_metadata.address AS TEXT) || CAST($1 AS TEXT))
+          } delegate ON LOWER(citizens.address) = LOWER(delegate.delegate)
+          AND citizens.dao_slug = 'OP'
+          WHERE citizens.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
+          ORDER BY md5(CAST(citizens.address AS TEXT) || CAST($1 AS TEXT))
           OFFSET $2
           LIMIT $3;        
             `,
@@ -51,15 +51,15 @@ async function getCitizens({
       } else {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
-            SELECT address_metadata.address, address_metadata.metadata, delegate.voting_power
-            FROM agora.address_metadata address_metadata
+            SELECT citizens.address, delegate.voting_power
+            FROM agora.citizens citizens
             LEFT JOIN ${
               namespace + ".delegates"
-            } delegate ON LOWER(address_metadata.address) = LOWER(delegate.delegate)
-            WHERE address_metadata.kind = 'citizen' 
-            AND address_metadata.dao_slug = 'OP'
+            } delegate ON LOWER(citizens.address) = LOWER(delegate.delegate)
+            AND citizens.dao_slug = 'OP'
+            WHERE citizens.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
             ORDER BY COALESCE(delegate.voting_power, 0) DESC,
-            address_metadata.address ASC 
+            citizens.address ASC 
             OFFSET $1
             LIMIT $2;
           `,
