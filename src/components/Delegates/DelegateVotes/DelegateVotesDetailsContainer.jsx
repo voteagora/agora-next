@@ -10,9 +10,7 @@ function VoteDetailsContainer({ children, proposalId }) {
       title={`Prop ${proposalId}`}
       className="block"
     >
-      <VStack gap={3} className={styles.vote_details_container}>
-        {children}
-      </VStack>
+      <VStack gap={3}>{children}</VStack>
     </Link>
   );
 }

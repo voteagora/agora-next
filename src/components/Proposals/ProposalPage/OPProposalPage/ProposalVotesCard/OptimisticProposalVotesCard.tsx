@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "../StandardProposalPage.module.scss";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
@@ -41,12 +40,13 @@ const OptimisticProposalVotesCard = ({
     // div.scrollTop = 0;
   };
   return (
-    <VStack
-      gap={4}
-      justifyContent="justify-between"
-      className={`${styles.proposal_votes_container} transition-all ${isClicked ? "bottom-[60px]" : "bottom-[calc(-100%+350px)]"}`}
+    <div
+      className={`fixed flex justify-between gap-4 sm:sticky top-[auto] sm:top-20 sm:max-h-[calc(100vh-162px)] w-[calc(100%-32px)] max-h-[calc(100%-190px)] items-stretch flex-shrink max-w-[24rem] bg-white border border-theme-100 rounded-xl shadow-newDefault mb-8 transition-all ${isClicked ? "bottom-[60px]" : "bottom-[calc(-100%+350px)]"}`}
+      style={{
+        transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
+      }}
     >
-      <VStack gap={4} className={styles.proposal_actions_panel}>
+      <VStack gap={4} className="min-h-0 shrink py-4">
         <button
           onClick={handleClick}
           className="border w-10 h-10 rounded-full bg-white absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block sm:hidden"
@@ -56,8 +56,8 @@ const OptimisticProposalVotesCard = ({
           </HStack>
         </button>
         <div>
-          <div className={styles.proposal_header}>Proposal votes</div>
-          <div className={styles.proposal_votes_summary_container}>
+          <div className="py-0 px-4 font-semibold mb-2">Proposal votes</div>
+          <div className="pt-4 px-4 rounded-md shrink-0 text-xs border border-theme-100 mx-4 shadow-newDefault flex flex-col gap-1">
             {proposal.status === "CANCELLED" ? (
               <p className="text-red-negative font-bold">
                 This proposal has been cancelled
@@ -109,7 +109,7 @@ const OptimisticProposalVotesCard = ({
           against if you oppose this proposal.
         </p>
       </VStack>
-    </VStack>
+    </div>
   );
 };
 

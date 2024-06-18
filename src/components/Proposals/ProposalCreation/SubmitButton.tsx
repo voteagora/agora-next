@@ -17,7 +17,6 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 import { useModal } from "connectkit";
-import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -123,7 +122,10 @@ export default function SubmitButton({
         type="submit"
         variant={"outline"}
         disabled={isLoading || onPrepareError || !!inputDataError}
-        className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
+        className={cx([
+          "w-[40%]",
+          onPrepareError && "cursor-not-allowed bg-theme-100",
+        ])}
         onClick={(e) => {
           e.preventDefault();
           if (!isConnected) {

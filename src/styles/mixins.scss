@@ -3,6 +3,7 @@
 @mixin buttonStyles {
 }
 
+// "bg-white rounded-md border border-theme-100 text-sm font-medium shadow-newDefault cursor-pointer py-2 px-3 transition-all hover:bg-theme-100 active:shadow-none disabled:bg-gray-300 disabled:text-gray-700"
 @mixin buttonStylesSmall {
   border-radius: $spacing-2;
   border-width: $spacing-px;

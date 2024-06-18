@@ -1,6 +1,5 @@
 "use client";
 
-import { cx } from "@emotion/css";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Form, Transaction } from "./CreateProposalForm";
 import { XCircleIcon } from "@heroicons/react/20/solid";
@@ -91,14 +90,11 @@ export default function AddTransactionsDetails({
       )}
       {form.state.options[optionIndex].transactions.map(
         (transaction, index) => (
-          <VStack key={index} className={styles.transaction_details_option}>
-            <p>Transaction {index + 1}</p>
+          <VStack key={index} className="mt-4 w-full relative">
+            <p className="font-bold mt-2 mb-4">Transaction {index + 1}</p>
             {transaction.type === "Transfer" && (
               <>
-                <HStack
-                  className={styles.transaction_details_option__transfer}
-                  gap={4}
-                >
+                <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
                     <label className={labelStyle}>Transfer to</label>
                     <InputBox
@@ -137,10 +133,7 @@ export default function AddTransactionsDetails({
             )}
             {transaction.type === "Custom" && (
               <>
-                <HStack
-                  className={styles.transaction_details_option__transfer}
-                  gap={4}
-                >
+                <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
                     <label className={labelStyle}>Target</label>
                     <InputBox
@@ -166,10 +159,7 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                 </HStack>
-                <HStack
-                  className={styles.transaction_details_option__transfer}
-                  gap={4}
-                >
+                <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
                     <label className={labelStyle}>Calldata</label>
                     <InputBox
@@ -194,15 +184,15 @@ export default function AddTransactionsDetails({
               </>
             )}
             <XCircleIcon
-              className={styles.transaction_details_option__remove}
+              className="w-5 h-5 absolute right-0 top-[2px] cursor-pointer text-theme-300 hover:text-theme-700"
               onClick={() => remove(index)}
             />
           </VStack>
         )
       )}
       {form.state.options[optionIndex].transactions.length !== 0 && (
-        <VStack className={styles.transaction_details_option__add}>
-          <p className={cx(styles.create_prop_form__title, "mb-0")}>
+        <VStack className="p-4 border border-theme-300 rounded-md bg-gray-100 mt-4 relative">
+          <p className="font-semibold pb-1 mb-0">
             Add another transaction to this option
           </p>
           <MultiButtons
@@ -214,7 +204,7 @@ export default function AddTransactionsDetails({
               ["Custom transaction", () => addTransaction("Custom")],
             ]}
           />
-          <PlusIcon className={styles.transaction_details_option__plus} />
+          <PlusIcon className="w-5 h-5 absolute top-4 right-4 text-theme-300" />
         </VStack>
       )}
     </>

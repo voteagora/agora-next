@@ -8,7 +8,6 @@ import InfiniteScroll from "react-infinite-scroller";
 import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
 import ApprovalVoteReason from "./ApprovalVoteReason";
-import styles from "./delegateVotes.module.scss";
 import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
 import { delegatesVotesSortOptions } from "@/lib/constants";
 import { pluralizeVote } from "@/lib/tokenUtils";
@@ -100,8 +99,8 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
               key={vote.transactionHash}
               proposalId={vote.proposal_id}
             >
-              <div className={styles.details_container}>
-                <VStack className={styles.details_sub}>
+              <div>
+                <VStack className="py-4 px-6">
                   <HStack justifyContent="justify-between" gap={2}>
                     <VStack>
                       <span className="text-[#66676b] text-xs font-medium">

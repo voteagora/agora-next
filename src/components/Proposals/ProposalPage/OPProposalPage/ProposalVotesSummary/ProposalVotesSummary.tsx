@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import styles from "./proposalVotesSummary.module.scss";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
@@ -34,9 +33,7 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
     >
       <div style={{ position: "relative" }}>
         <HoverCardTrigger className="w-full cursor-pointer block">
-          <div
-            className={`flex flex-col gap-2 ${styles.proposal_votes_summary_container}`}
-          >
+          <div className="flex flex-col gap-2 pt-2 px-4 rounded-md font-bold shrink-0 text-xs border border-theme-100 mx-4 shadow-newDefault">
             <div className="flex flex-row justify-between mt-2">
               <div className="gl_votes_for">
                 FOR <TokenAmountDisplay amount={results.for} />

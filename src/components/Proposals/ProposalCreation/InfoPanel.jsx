@@ -1,33 +1,40 @@
 import { VStack } from "@/components/Layout/Stack";
-import styles from "./styles.module.scss";
 
 export default function InfoPanel() {
   return (
-    <VStack className={styles.info_panel}>
-      <h2 className={styles.info_panel__title}>Manager’s handbook</h2>
-      <div className={styles.info_panel__description}>
-        <p>
-          <span className="font-semibold">1. Select proposal type</span>
+    <VStack className="bg-theme-50 rounded-xl border border-theme-100 p-6">
+      <h2 className="text-2xl font-extrabold mb-4">Manager’s handbook</h2>
+      <div>
+        <p className="text-theme-700">
+          <span className="font-semibold text-theme-900 mb-4">
+            1. Select proposal type
+          </span>
           <br />
           Proposal types set the quorum and approval thresholds for your
           proposal. You can view, edit, or create a new one via the{" "}
           <a href="/admin">admin panel</a>.
         </p>
-        <p>
-          <span className="font-semibold">2. Choose your vote type</span>
+        <p className="text-theme-700">
+          <span className="font-semibold text-theme-900 mb-4">
+            2. Choose your vote type
+          </span>
           <br />
           This determines if your proposal will be a simple yes/no or a multiple
           choice.
         </p>
-        <p>
-          <span className="font-semibold">3. Create your proposal</span>
+        <p className="text-theme-700">
+          <span className="font-semibold text-theme-900 mb-4">
+            3. Create your proposal
+          </span>
           <br />
           Now that the vote and proposal type are set, you can use this form to
           create your proposal. Proposed transactions are optional, as the Token
           House governor is not executable for now.
         </p>
-        <p>
-          <span className="font-semibold">4. Get signatures for your SAFE</span>
+        <p className="text-theme-700">
+          <span className="font-semibold text-theme-900">
+            4. Get signatures for your SAFE
+          </span>
           <br />
           If you&apos;re using the OP Foundation multisig, you can queue several
           proposals at once so that your co-signers can sign all the

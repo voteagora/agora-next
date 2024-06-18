@@ -56,10 +56,6 @@
   font-size: $font-size-base;
 }
 
-.multi_buttons {
-  margin-top: $spacing-4;
-}
-
 .simulate {
   height: 100%;
   border: $spacing-px solid $gray-eb;
@@ -90,33 +86,4 @@
 }
 .else_color {
   color: $gray-4f;
-}
-
-.switch {
-  border-radius: $border-radius-md;
-  border-width: $spacing-px;
-  border-color: $gray-300;
-  overflow: hidden;
-  width: 100%;
-  padding: $spacing-1;
-
-  &__option {
-    padding: 5px;
-    flex: 1;
-    text-align: center;
-    cursor: pointer;
-    border-radius: $border-radius-md;
-    color: $gray-4f;
-    font-weight: $font-weight-medium;
-
-    :hover {
-      background: $gray-fa;
-    }
-  }
-
-  &__selected {
-    background: $gray-fa;
-    color: $black;
-    font-weight: $font-weight-semibold;
-  }
 }

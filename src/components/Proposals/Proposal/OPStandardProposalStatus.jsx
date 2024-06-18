@@ -1,5 +1,4 @@
 import { HStack } from "@/components/Layout/Stack";
-import styles from "./proposal.module.scss";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
@@ -15,11 +14,7 @@ export default function OPStandardProposalStatus({ proposal }) {
   const totalLength = forLength + againstLength + abstainLength;
   return (
     <div className="flex flex-col items-end gap-1 justify-center">
-      <HStack
-        className={styles.proposal_status}
-        gap={1}
-        justifyContent="space-between"
-      >
+      <HStack gap={1} justifyContent="space-between">
         <div>
           {TokenAmountDisplay({
             amount: proposal.proposalResults.for,

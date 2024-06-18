@@ -2,28 +2,26 @@
 
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Form } from "./CreateProposalForm";
-import * as theme from "@/styles/theme";
-import { css, cx } from "@emotion/css";
 import { Tab } from "@headlessui/react";
 import { useState } from "react";
-import styles from "./styles.module.scss";
 import InputBox from "@/components/shared/InputBox";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
-export const tipTextStyle = styles.title_desc_row__tip_text;
+export const tipTextStyle = "text-sm text-theme-700";
 
 type DisplayMode = "write" | "preview";
 
-const displayModeSelectorStyles = styles.title_desc_row__display_mode_selector;
+const displayModeSelectorStyles =
+  "cursor-pointer text-sm font-medium text-theme-500 py-1 px-3 rounded-full hover:bg-theme-100 hover:text-theme-900";
 
 const displayModeSelectorSelectedStyles =
-  styles.title_desc_row__display_mode_selector_selected;
+  "bg-theme-50 text-theme-900 rounded-full";
 
 export default function TitleDescriptionRow({ form }: { form: Form }) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("write");
   return (
-    <VStack className={styles.title_desc_row__mt}>
-      <h4 className={styles.input_heading}>Title</h4>
+    <VStack className="mt-4">
+      <h4 className="text-xs font-semibold mb-1 text-theme-700">Title</h4>
       <InputBox
         placeholder={"I'd like to propose..."}
         value={form.state.title}
@@ -35,7 +33,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
         justifyContent="justify-between"
         gap={4}
       >
-        <h4 className={cx(styles.input_heading, styles.title_desc_row__mt)}>
+        <h4 className="text-xs font-semibold mb-1 text-theme-700 mt-4">
           Proposal
         </h4>
 
@@ -96,7 +94,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
 
       {displayMode === "write" && (
         <textarea
-          className={styles.title_desc_row__textarea}
+          className="text-theme-50 p-4 mt-2 rounded-md outline-none w-full min-h-[16rem] border border-theme-100"
           value={form.state.description}
           onChange={(e) => form.onChange.description(e.target.value)}
           placeholder="I’m a proposal body, and I like markdown formatting..."

@@ -9,7 +9,6 @@ import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import HumanAddress from "../shared/HumanAddress";
-import styles from "./header.module.scss";
 import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
@@ -46,7 +45,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
       {({ open }) => (
         <>
           <Popover.Button className="flex outline-none">
-            <div className={styles.desktop_connect_button_inner}>
+            <div className="flex items-center gap-3">
               <div className="w-6 h-6 shadow-newDefault rounded-full">
                 <ENSAvatar ensName={ensName} />
               </div>
@@ -61,7 +60,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.2 }}
                 exit={{ opacity: 0 }}
-                className={styles.desktop__animate}
+                className="z-10 bg-black fixed top-0 bottom-0 right-0 left-0"
               />
             </AnimatePresence>
           )}
@@ -77,32 +76,30 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
           >
             <Popover.Panel>
               {({ close }) => (
-                <div className={styles.desktop__popover_container}>
+                <div className="bg-white py-8 px-6 mt-2 rounded-xl w-[350px]">
                   <VStack gap={3} className="min-h-[250px] justify-center">
-                    <HStack className={styles.desktop__popover_inside}>
+                    <HStack className="items-center mb-1">
                       <div
                         className={`relative aspect-square mr-4 ${
                           isLoading && "animate-pulse"
                         }`}
                       >
                         <ENSAvatar
-                          className={styles.desktop__avatar}
+                          className="w-[44px] h-[44px] rounded-full"
                           ensName={ensName}
                         />
                       </div>
                       <VStack className="justify-center">
                         {ensName ? (
                           <>
-                            <span className={styles.desktop__ens}>
-                              {ensName}
-                            </span>
-                            <span className={styles.desktop__address}>
+                            <span className="text-base">{ensName}</span>
+                            <span className="text-xs text-theme-700">
                               {shortAddress(address!)}
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className={styles.desktop__ens}>
+                            <span className="text-base">
                               {shortAddress(address!)}
                             </span>
                           </>

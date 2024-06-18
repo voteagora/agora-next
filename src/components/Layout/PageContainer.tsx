@@ -13,8 +13,9 @@ type Props = {
 };
 
 const defaults = {
-  theme50: "FAFAFA",
-  theme100: "E0E0E0",
+  theme50: "#FAFAFA",
+  theme100: "#E0E0E0",
+  theme300: "#AFAFAF",
   theme500: "#AFAFAF",
   theme700: "#4F4F4F",
   theme900: "#000000",
@@ -26,6 +27,7 @@ export function PageContainer({ children }: Props) {
 
   const theme50 = ui?.customization?.theme50 || defaults.theme50;
   const theme100 = ui?.customization?.theme100 || defaults.theme100;
+  const theme300 = ui?.customization?.theme300 || defaults.theme300;
   const theme500 = ui?.customization?.theme500 || defaults.theme500;
   const theme700 = ui?.customization?.theme700 || defaults.theme700;
   const theme900 = ui?.customization?.theme900 || defaults.theme900;
@@ -33,6 +35,7 @@ export function PageContainer({ children }: Props) {
   const style = {
     "--theme-50": theme50,
     "--theme-100": theme100,
+    "--theme-300": theme300,
     "--theme-500": theme500,
     "--theme-700": theme700,
     "--theme-900": theme900,

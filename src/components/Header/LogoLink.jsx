@@ -3,13 +3,12 @@ import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
 import Link from "next/link";
 import { HStack } from "../Layout/Stack";
-import styles from "./header.module.scss";
 
 export default function LogoLink() {
   const { namespace, ui } = Tenant.current();
 
   return (
-    <HStack justifyContent="justify-between" className={styles.logo_link}>
+    <HStack justifyContent="justify-between">
       <Link href="/">
         <HStack className="gap-2 h-full" alignItems="items-center">
           <Image

@@ -33,11 +33,3 @@
   color: $color-purple-700;
   // background-color: $gray-200;
 }
-
-.cell_content_status_pill {
-  text-transform: lowercase;
-}
-
-.cell_content_status_pill:first-letter {
-  text-transform: uppercase;
-}

@@ -11,7 +11,6 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
-import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
@@ -74,7 +73,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
             <Popover.Panel>
               {({ close }) => (
                 <motion.div
-                  className={styles.mobile__container}
+                  className="bg-white py-8 px-6 rounded-t-lg w-full fixed bottom-0 left-0"
                   initial="hidden"
                   animate="show"
                   exit="exit"
@@ -96,16 +95,14 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       <VStack className={"flex-1"}>
                         {ensName ? (
                           <>
-                            <span className={styles.mobile__ens}>
-                              {ensName}
-                            </span>
-                            <span className={styles.mobile__address}>
+                            <span className="text-base">{ensName}</span>
+                            <span className="text-xs text-theme-700">
                               {shortAddress(address!)}
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className={styles.mobile__ens}>
+                            <span className="text-base">
                               {shortAddress(address!)}
                             </span>
                           </>

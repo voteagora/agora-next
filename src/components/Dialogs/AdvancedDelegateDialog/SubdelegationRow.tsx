@@ -2,7 +2,6 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { Input } from "@/components/ui/input";
-import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
 import { useState, SetStateAction, useEffect, type Dispatch } from "react";
@@ -125,14 +124,12 @@ function SubdelegationToRow({
           : ""
       }`}
     >
-      <div className={styles.sub_row}>
+      <div className="flex flex-row justify-between items-center border-b border-dashed border-theme-300 py-4 last:border-b-0">
         <HStack gap={3}>
-          <div className={styles.avatar}>
-            <ENSAvatar ensName={data} />
-          </div>
+          <ENSAvatar ensName={data} className="h-10 w-10" />
           <VStack>
-            <p className={styles.subtitle}>Delegated to</p>
-            <div className={styles.address_to}>
+            <p className="text-xs font-medium text-theme-700">Delegated to</p>
+            <div className="w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
               <HumanAddress address={to} />
             </div>
           </VStack>

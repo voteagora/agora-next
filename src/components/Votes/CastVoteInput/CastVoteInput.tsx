@@ -1,7 +1,6 @@
 "use client";
 
 import { VStack, HStack } from "@/components/Layout/Stack";
-import styles from "./castVoteInput.module.scss";
 import { useState } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -51,17 +50,17 @@ export default function CastVoteInput({
   }
 
   return (
-    <VStack className={styles.cast_vote_container}>
+    <VStack className="bg-white border border-theme-100 border-xl flex-shrink mx-4">
       <textarea
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        className="text-sm"
+        className="text-sm p-4 resize-none rounded-lg border-0 focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0"
       />
       <VStack
         justifyContent="justify-between"
         alignItems="items-stretch"
-        className={styles.vote_actions}
+        className="px-3 pb-3 pt-1"
       >
         <VoteButtons
           onClick={(
@@ -144,10 +143,13 @@ function VoteButton({
   action: SupportTextProps["supportType"];
   onClick: () => void;
 }) {
-  const className = `${styles["vote_button_" + action.toLowerCase()]}`;
+  const actionString = action.toLowerCase();
 
   return (
-    <button className={className} onClick={onClick}>
+    <button
+      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-neutral"} bg-white rounded-md border border-theme-100 text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-theme-100 active:shadow-none disabled:bg-gray-300 disabled:text-gray-700 h-8 capitalize flex items-center justify-center flex-1`}
+      onClick={onClick}
+    >
       {action.toLowerCase()}
     </button>
   );
@@ -155,7 +157,10 @@ function VoteButton({
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <button disabled className={styles.vote_button_disabled}>
+    <button
+      disabled
+      className="bg-white rounded-md border border-theme-100 text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-theme-100 active:shadow-none disabled:bg-gray-300 disabled:text-gray-700 h-8 capitalize flex items-center justify-center flex-1"
+    >
       {reason}
     </button>
   );
