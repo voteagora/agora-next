@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
 import HumanAddress from "@/components/shared/HumanAddress";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 function extractWebsiteName(urlString: string): string {
   try {
@@ -109,10 +110,6 @@ export default function RetroPGFApplicationBanner({
       </div>
     </div>
   );
-}
-
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLocaleLowerCase();
 }
 
 type CategoryListItemProps = {

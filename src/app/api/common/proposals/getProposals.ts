@@ -3,7 +3,6 @@ import { cache } from "react";
 import { paginateResult } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
@@ -53,7 +52,7 @@ async function getProposals({
     pageSize
   );
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
   const votableSupply = await fetchVotableSupply();
 
   const resolvedProposals = Promise.all(
@@ -75,7 +74,7 @@ async function getProposals({
 }
 
 async function getProposal(proposal_id: string) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const proposal = await prisma[`${namespace}Proposals`].findFirst({
     where: { proposal_id },
   });
@@ -84,7 +83,7 @@ async function getProposal(proposal_id: string) {
     return notFound();
   }
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
   const quorum = await fetchQuorumForProposal(proposal);
   const votableSupply = await fetchVotableSupply();
 

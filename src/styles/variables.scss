@@ -161,7 +161,7 @@ $color-pink-500: #ed64a6;
 $color-pink-600: #d53f8c;
 $color-pink-700: #b83280;
 $color-pink-800: #97266d;
-$color-pink-900: #702459;
+$color-pink-900: #ff007a;
 
 $daos-optimism: #fb001a;
 
@@ -279,6 +279,7 @@ $rotate-continuous: rotation 60s infinite linear;
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

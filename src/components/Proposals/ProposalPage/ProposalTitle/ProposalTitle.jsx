@@ -1,7 +1,6 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl } from "@/lib/utils";
-import { VStack } from "@/components/Layout/Stack";
-import { getProposalTypeText } from "@/lib/utils";
+import { getBlockScanUrl, getProposalTypeText } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalTitle({
   title,
@@ -9,13 +8,12 @@ export default function ProposalTitle({
   createdTransactionHash,
 }) {
   const proposalText = getProposalTypeText(proposalType);
+  const { ui } = Tenant.current();
+
   return (
-    <VStack className="flex-col-reverse items-start">
-      <h2 className="font-black text-2xl">{title}</h2>
+    <div className="flex-col items-start">
       <div className="text-xs font-semibold text-gray-700 flex items-center">
-        {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
-        {proposalText} by The Optimism Foundation
-        {/* <HumanAddress address={proposerAddress} /> */}
+        {proposalText} by The {ui.organization.title}
         <a
           href={getBlockScanUrl(createdTransactionHash)}
           target="_blank"
@@ -24,6 +22,7 @@ export default function ProposalTitle({
           <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
         </a>
       </div>
-    </VStack>
+      <h2 className="font-black text-2xl">{title}</h2>
+    </div>
   );
 }

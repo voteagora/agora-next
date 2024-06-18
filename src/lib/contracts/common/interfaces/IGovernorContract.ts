@@ -2,15 +2,20 @@ import type { TypedContractMethod } from "@/lib/contracts/generated/common";
 import type { AddressLike, BaseContract, BigNumberish } from "ethers";
 
 export interface IGovernorContract extends BaseContract {
-  quorum: TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
+  // BRAVO
+  quorumVotes?: TypedContractMethod<[], [bigint], "view">;
 
-  manager: TypedContractMethod<[], [string], "view">;
+  // -------
 
-  votingDelay: TypedContractMethod<[], [bigint], "view">;
+  quorum?: TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
 
-  votingPeriod: TypedContractMethod<[], [bigint], "view">;
+  manager?: TypedContractMethod<[], [string], "view">;
 
-  weightCast: TypedContractMethod<
+  votingDelay?: TypedContractMethod<[], [bigint], "view">;
+
+  votingPeriod?: TypedContractMethod<[], [bigint], "view">;
+
+  weightCast?: TypedContractMethod<
     [proposalId: BigNumberish, account: AddressLike],
     [bigint],
     "view"
