@@ -23,6 +23,15 @@ export default class TenantTokenFactory {
           symbol: "ETHFI",
           decimals: 18,
         };
+      /**
+       * TODO: replace when we have scroll token deployed
+       */
+      case TENANT_NAMESPACES.SCROLL:
+        return {
+          name: "Scroll",
+          symbol: "SCRL",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

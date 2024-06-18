@@ -59,7 +59,7 @@ async function getVotingPowerForProposalByAddress({
     AuhtorityChainsAggregate[]
   >(
     `
-    SELECT 
+    SELECT
       array_agg(proxy) as proxies,
       array_agg(balance) as balances,
       json_agg(rules) as rules,
@@ -96,7 +96,7 @@ async function getVotingPowerForProposalByAddress({
           proxy,
           block_number
         FROM ${namespace + ".advanced_voting_power_raw_snaps"}
-        WHERE chain_str=s.chain_str 
+        WHERE chain_str=s.chain_str
           AND contract = $2
           AND block_number <= $3
         ORDER BY ordinal DESC

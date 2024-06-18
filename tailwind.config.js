@@ -11,7 +11,7 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: "640px"
+      sm: "640px",
     },
     container: {
       center: true,
@@ -38,10 +38,10 @@ module.exports = {
         40: "10rem",
         48: "12rem",
         56: "14rem",
-        64: "16rem"
+        64: "16rem",
       },
       minWidth: {
-        desktop: '1280px',
+        desktop: "1280px",
       },
       gap: {
         0.5: "0.125rem", // 2px
@@ -119,6 +119,13 @@ module.exports = {
         black: "#000",
         white: "#fff",
         partner: "#FF0420",
+        "agora-stone": {
+          900: "#000000",
+          700: "#4F4F4F",
+          500: "#AFAFAF",
+          100: "#E0E0E0",
+          50: "#FAFAFA",
+        },
         gray: {
           eb: "#ebebeb",
           "4f": "#4f4f4f",

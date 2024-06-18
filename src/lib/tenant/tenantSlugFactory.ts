@@ -11,6 +11,8 @@ export default class TenantSlugFactory {
         return "ENS";
       case TENANT_NAMESPACES.ETHERFI:
         return "ETHERFI";
+      case TENANT_NAMESPACES.SCROLL:
+        return "SCROLL";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

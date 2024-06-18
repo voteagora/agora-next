@@ -19,11 +19,55 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.ENS:
         return ensUI;
+
+      case TENANT_NAMESPACES.SCROLL:
+        return scrollUI;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
   }
 }
+
+/**
+ * TODO: CHANGE!
+ * I copy pasted the etherFI config to save time
+ * since we don't have the scroll details yet.
+ */
+const scrollUI = new TenantUI({
+  title: "Scroll Agora",
+  color: "#2F38FF",
+  hero: etherfiHero,
+  logo: etherfiLogo,
+
+  pages: [
+    {
+      route: "/",
+      title: "Agora is the home of Scroll governance",
+      description:
+        "Scroll governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      meta: {
+        title: "Scroll Agora",
+        description: "Home of token governance",
+      },
+    },
+    {
+      route: "claim",
+      title: "Agora is the home of Scroll delegates",
+      description: "Scroll claim",
+      meta: {
+        title: "Scroll Agora",
+        description: "Home of token governance",
+      },
+    },
+  ],
+
+  toggles: [
+    {
+      name: "claim",
+      enabled: true,
+    },
+  ],
+});
 
 const etherfiUI = new TenantUI({
   title: "ether.fi Agora",

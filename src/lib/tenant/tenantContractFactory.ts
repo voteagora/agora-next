@@ -1,20 +1,24 @@
 import { TenantContracts, type TenantNamespace } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-
 import {
   AlligatorOPV5__factory,
   EtherfiToken__factory,
+  L2GovToken__factory,
+  ScrollGovernor__factory,
+  TokenDistributor__factory,
   OptimismGovernor__factory,
   OptimismToken__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 
-import provider, { ethProvider } from "@/app/lib/provider";
+import provider, { ethProvider, sepoliaProvider } from "@/app/lib/provider";
 
 import { BaseContract } from "ethers";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
+import { IL2GovTokenContract } from "@/lib/contracts/common/interfaces/IL2GovTokenContract";
+import { IScrollGovernorContract } from "@/lib/contracts/common/interfaces/IScrollGovernorContract";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { mainnet, optimism, sepolia } from "viem/chains";
 
@@ -30,11 +34,52 @@ export default class TenantContractFactory {
         return ensContracts(isProd);
       case TENANT_NAMESPACES.OPTIMISM:
         return opContracts(isProd);
+      case TENANT_NAMESPACES.SCROLL:
+        return scrollContracts(isProd);
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
   }
 }
+
+/**
+ * TODO: replace once we've deployed proper scroll contracts
+ */
+const scrollContracts = (isProd: boolean): TenantContracts => {
+  return {
+    // TOKEN
+    token: new TenantContract<IL2GovTokenContract>({
+      abi: L2GovToken__factory.abi,
+      address: isProd ? "0x0" : "0xca91CA159317218F67eCbDaBf4Fd778801551906",
+      chain: isProd ? mainnet : sepolia,
+      contract: L2GovToken__factory.connect(
+        isProd ? "0x0" : "0xca91CA159317218F67eCbDaBf4Fd778801551906",
+        isProd ? ethProvider : sepoliaProvider
+      ),
+    }),
+    // GOVERNOR
+    governor: new TenantContract<IScrollGovernorContract>({
+      abi: ScrollGovernor__factory.abi,
+      address: isProd ? "0x0" : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+      contract: ScrollGovernor__factory.connect(
+        isProd ? "0x0" : "0xca83e6932cf4f03cdd6238be0ffcf2fe97854f67",
+        isProd ? ethProvider : sepoliaProvider
+      ),
+      chain: isProd ? mainnet : sepolia,
+      optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
+    }),
+    // TOKEN DISTRIBUTOR (MERKLE TREE AIRDROP)
+    tokenDistributor: new TenantContract<BaseContract>({
+      abi: TokenDistributor__factory.abi,
+      address: isProd ? "0x0" : "0x4d3933fe4F1a9e8Ddb68237a7C84932Ca2E86B99",
+      chain: isProd ? mainnet : sepolia,
+      contract: TokenDistributor__factory.connect(
+        isProd ? "0x0" : "0x4d3933fe4F1a9e8Ddb68237a7C84932Ca2E86B99",
+        isProd ? ethProvider : sepoliaProvider
+      ),
+    }),
+  };
+};
 
 const ensContracts = (isProd: boolean): TenantContracts => {
   return {

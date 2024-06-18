@@ -2,6 +2,8 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
+import { IL2GovTokenContract } from "@/lib/contracts/common/interfaces/IL2GovTokenContract";
+import { IScrollGovernorContract } from "@/lib/contracts/common/interfaces/IScrollGovernorContract";
 import { BaseContract } from "ethers";
 import { TENANT_NAMESPACES } from "./constants";
 
@@ -9,8 +11,9 @@ export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
 export type TenantContracts = {
-  token: TenantContract<ITokenContract>;
-  governor: TenantContract<IGovernorContract>;
+  token: TenantContract<ITokenContract | IL2GovTokenContract>;
+  governor: TenantContract<IGovernorContract | IScrollGovernorContract>;
+  tokenDistributor?: TenantContract<BaseContract>;
   alligator?: TenantContract<IAlligatorContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
 };

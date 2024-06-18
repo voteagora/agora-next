@@ -12,6 +12,11 @@ export default function Navbar() {
   const hasProposals = ui.toggle("proposals") && ui.toggle("proposals").enabled;
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
 
+  // Hide the navbar when on the claim page
+  if (pathname === "/claim") {
+    return null;
+  }
+
   return (
     <div className={`flex flex-row ${styles.main_nav}`}>
       {hasProposals && (
