@@ -1,6 +1,5 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import ReactMarkdown from "react-markdown";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
@@ -43,7 +42,7 @@ export default function ProposalDescription({ proposal, proposalVotes }) {
   }
 
   return (
-    <VStack gap={4} className={styles.proposal_description}>
+    <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
       <ProposalTitle
         title={shortTitle}
         proposalType={proposal.proposalType}
@@ -52,7 +51,7 @@ export default function ProposalDescription({ proposal, proposalVotes }) {
       />
       <VotingTimelineChart proposal={proposal} proposalVotes={proposalVotes} />
 
-      <VStack gap={2}>
+      <div className="flex flex-col gap-2">
         <ApprovedTransactions
           proposalData={proposal.proposalData}
           proposalType={proposal.proposalType}
@@ -63,7 +62,7 @@ export default function ProposalDescription({ proposal, proposalVotes }) {
         >
           {stripTitleFromDescription(shortTitle, patchedDescription)}
         </ReactMarkdown>
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ import ProposalVotesSummary from "../ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import styles from "../OPProposalPage.module.scss";
+import styles from "../StandardProposalPage.module.scss";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 
 const ProposalVotesCard = ({
