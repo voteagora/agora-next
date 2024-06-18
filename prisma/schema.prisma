@@ -910,11 +910,11 @@ view uniswapProposalTypes {
 }
 
 view uniswapStakedDeposits {
-  deposit_id  String @unique
+  deposit_id  BigInt  @unique
   depositor   String
   beneficiary String
   delegatee   String
-  amount      String
+  amount      Decimal @db.Decimal
 
   @@map("staked_deposits")
   @@schema("uniswap")
