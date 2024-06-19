@@ -14,7 +14,7 @@ const inputVariants = cva(
       variant: {
         default: "border-input bg-gray-fa",
         none: "border-none bg-gray-fa",
-        bgGray100: "border-input bg-theme-100",
+        bgGray100: "border-input bg-line",
       },
       inputSize: {
         default: "px-3 py-2",

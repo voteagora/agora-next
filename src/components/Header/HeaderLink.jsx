@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 
 export const HeaderLink = ({ className, children, href, target, isActive }) => {
-  const activeClass = isActive ? "bg-theme-100 text-inherit" : "";
+  const activeClass = isActive ? "bg-line text-inherit" : "";
 
   return (
     <Link

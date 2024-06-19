@@ -124,7 +124,7 @@ export default function SubmitButton({
         disabled={isLoading || onPrepareError || !!inputDataError}
         className={cx([
           "w-[40%]",
-          onPrepareError && "cursor-not-allowed bg-theme-100",
+          onPrepareError && "cursor-not-allowed bg-line",
         ])}
         onClick={(e) => {
           e.preventDefault();

@@ -124,7 +124,7 @@ function SubdelegationToRow({
           : ""
       }`}
     >
-      <div className="flex flex-row justify-between items-center border-b border-dashed border-theme-100 py-4 last:border-b-0">
+      <div className="flex flex-row justify-between items-center border-b border-dashed border-line py-4 last:border-b-0">
         <HStack gap={3}>
           <ENSAvatar ensName={data} className="h-10 w-10" />
           <VStack>

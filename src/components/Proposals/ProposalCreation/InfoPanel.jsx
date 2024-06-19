@@ -2,7 +2,7 @@ import { VStack } from "@/components/Layout/Stack";
 
 export default function InfoPanel() {
   return (
-    <VStack className="bg-theme-50 rounded-xl border border-theme-100 p-6">
+    <VStack className="bg-wash rounded-xl border border-line p-6">
       <h2 className="text-2xl font-extrabold mb-4">Manager’s handbook</h2>
       <div>
         <p className="text-theme-700">

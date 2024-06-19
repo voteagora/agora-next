@@ -46,7 +46,7 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
         <VStack
           gap={4}
           key={index}
-          className="border-box w-full p-4 mb-8 border border-theme-100 rounded-lg"
+          className="border-box w-full p-4 mb-8 border border-line rounded-lg"
         >
           <div className="border-b border-dashed border-gray-300 font-semibold pb-1 flex flex-row justify-between">
             <span>Option {index + 1}</span>
@@ -73,9 +73,9 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
       ))}
       <div
         onClick={addOption}
-        className="flex items-center w-full gap-2 p-4 border border-theme-100 cursor-pointer font-semibold shadow-newDefault"
+        className="flex items-center w-full gap-2 p-4 border border-line cursor-pointer font-semibold shadow-newDefault"
       >
-        <div className="h-8 w-8 flex items-center justify-center rounded-full shadow-newDefault bg-white border border-theme-100">
+        <div className="h-8 w-8 flex items-center justify-center rounded-full shadow-newDefault bg-white border border-line">
           +
         </div>
         <div>Add option</div>

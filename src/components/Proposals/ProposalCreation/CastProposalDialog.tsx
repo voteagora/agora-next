@@ -45,7 +45,7 @@ function Message({ text, image }: { text: string; image?: JSX.Element }) {
     <HStack
       justifyContent="justify-between"
       alignItems="items-center"
-      className="w-full relative z-[1] p-4 rounded-md border border-theme-100"
+      className="w-full relative z-[1] p-4 rounded-md border border-line"
     >
       <div className="font-medium">{text}</div>
       {image}
@@ -77,7 +77,7 @@ export function SuccessMessage({
       <div>
         <div
           onClick={closeDialog}
-          className="text-center font-bold bg-white rounded-md border border-theme-100 shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-theme-100 active:shadow-none disabled:bg-gray-300 disabled:text-gray-700"
+          className="text-center font-bold bg-white rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-gray-300 disabled:text-gray-700"
         >
           Got it
         </div>

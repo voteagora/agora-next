@@ -175,7 +175,7 @@ function CastVoteWithReason({
   return (
     <VStack gap={4}>
       <textarea
-        className="p-4 resize-none rounded-lg bg-theme-100 border-theme-100 transition-all"
+        className="p-4 resize-none rounded-lg bg-line border-line transition-all"
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
@@ -239,8 +239,8 @@ function CheckCard({
       <div
         className={
           checked
-            ? "border border-theme-900 bg-theme-900 absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
-            : "absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all bg-theme-100 border-theme-100"
+            ? "border border-primary-900 bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
+            : "absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all bg-line border-line"
         }
       >
         {checked && <CheckIcon className="w-4 h-4 text-white" />}

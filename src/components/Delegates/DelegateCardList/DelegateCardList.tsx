@@ -95,16 +95,8 @@ export default function DelegateCardList({
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>
-<<<<<<< HEAD
                 <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-theme-300 shadow-newDefault">
                   <div className="flex flex-col gap-4 justify-center">
-=======
-                <VStack
-                  gap={4}
-                  className="h-full p-6 rounded-xl bg-white border border-theme-100 shadow-newDefault"
-                >
-                  <VStack gap={4} justifyContent="justify-center">
->>>>>>> ef7cdeb0 (Deleting many css module files)
                     <DelegateProfileImage
                       endorsed={delegate.statement?.endorsed}
                       address={delegate.address}

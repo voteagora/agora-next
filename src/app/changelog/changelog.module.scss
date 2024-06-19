@@ -18,7 +18,7 @@
 }
 .changelogContainer {
   ::before {
-    @apply absolute h-2 w-2 rounded-full bg-theme-300 -top-1 -left-1 text-sm z-10;
+    @apply absolute h-2 w-2 rounded-full bg-line -top-1 -left-1 text-sm z-10;
     content: "";
   }
 }

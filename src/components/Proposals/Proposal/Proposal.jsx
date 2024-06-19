@@ -25,7 +25,7 @@ export default function Proposal({ proposal, votableSupply }) {
       }
       target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
     >
-      <HStack alignItems="center" className="border-b border-theme-100">
+      <HStack alignItems="center" className="border-b border-line">
         <VStack
           className={cn(
             "whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",

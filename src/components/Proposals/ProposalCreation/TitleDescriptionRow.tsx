@@ -12,10 +12,9 @@ export const tipTextStyle = "text-sm text-theme-700";
 type DisplayMode = "write" | "preview";
 
 const displayModeSelectorStyles =
-  "cursor-pointer text-sm font-medium text-theme-500 py-1 px-3 rounded-full hover:bg-theme-100 hover:text-theme-900";
+  "cursor-pointer text-sm font-medium text-theme-500 py-1 px-3 rounded-full hover:bg-line hover:text-theme-900";
 
-const displayModeSelectorSelectedStyles =
-  "bg-theme-50 text-theme-900 rounded-full";
+const displayModeSelectorSelectedStyles = "bg-wash text-theme-900 rounded-full";
 
 export default function TitleDescriptionRow({ form }: { form: Form }) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("write");
@@ -94,7 +93,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
 
       {displayMode === "write" && (
         <textarea
-          className="text-theme-50 p-4 mt-2 rounded-md outline-none w-full min-h-[16rem] border border-theme-100"
+          className="text-theme-50 p-4 mt-2 rounded-md outline-none w-full min-h-[16rem] border border-line"
           value={form.state.description}
           onChange={(e) => form.onChange.description(e.target.value)}
           placeholder="I’m a proposal body, and I like markdown formatting..."

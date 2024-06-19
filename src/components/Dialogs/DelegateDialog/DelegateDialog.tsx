@@ -123,7 +123,7 @@ export function DelegateDialog({
             alignItems="items-center"
             className="py-3 w-full text-theme-500 text-xs"
           >
-            <VStack className="text-xs border border-theme-100 rounded-lg justify-center items-center w-full py-8 px-2">
+            <VStack className="text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
               <HStack alignItems="items-center" gap={1}>
                 Your total delegatable votes
               </HStack>

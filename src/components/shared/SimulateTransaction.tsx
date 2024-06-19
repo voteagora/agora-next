@@ -66,7 +66,7 @@ export default function SimulateTransaction({
   return (
     <HStack
       alignItems="items-center"
-      className="h-full border border-theme-100 rounded-md"
+      className="h-full border border-line rounded-md"
     >
       <p
         className={

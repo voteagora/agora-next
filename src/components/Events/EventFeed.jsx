@@ -62,7 +62,7 @@ export default function EventFeed({ initialEvents, fetchEvents }) {
               {activityItem.kind === "VOTE_CAST" ? (
                 <>
                   <div className="relative">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-theme-100 ring-8 ring-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-line ring-8 ring-white">
                       <UserCircleIcon
                         className="h-5 w-5 text-theme-500"
                         aria-hidden="true"
@@ -86,7 +86,7 @@ export default function EventFeed({ initialEvents, fetchEvents }) {
               ) : activityItem.kind === "DELEGATE_CHANGED" ? (
                 <>
                   <div className="relative">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-theme-100 ring-8 ring-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-line ring-8 ring-white">
                       <UserCircleIcon
                         className="h-5 w-5 text-theme-500"
                         aria-hidden="true"

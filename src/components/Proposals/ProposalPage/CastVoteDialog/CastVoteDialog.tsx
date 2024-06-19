@@ -164,7 +164,7 @@ function AdvancedVoteDialog({
                 {reason}
               </div>
             ) : (
-              <div className="w-full py-6 px-4 rounded-lg border border-dashed border-theme-100 text-theme-700">
+              <div className="w-full py-6 px-4 rounded-lg border border-dashed border-line text-theme-700">
                 No voting reason provided
               </div>
             )}
@@ -232,7 +232,7 @@ export function SuccessMessage({
       <div>
         <div
           onClick={closeDialog}
-          className="text-center bg-white rounded-md border border-theme-100 font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-theme-100 active:shadow-none disabled:bg-gray-300 disabled:text-gray-700"
+          className="text-center bg-white rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-gray-300 disabled:text-gray-700"
         >
           Got it
         </div>
@@ -274,7 +274,7 @@ export function LoadingVote() {
 
 export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
   return (
-    <div className="py-2 px-4 z-[1099] bg-theme-100 text-xs text-theme-700 rounded-lg">
+    <div className="py-2 px-4 z-[1099] bg-line text-xs text-theme-700 rounded-lg">
       You do not have a delegate statement.{" "}
       <Link
         href={"/delegates/create"}
