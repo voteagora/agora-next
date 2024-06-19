@@ -13,10 +13,10 @@ interface StakedDepositListProps {
 }
 
 export const DepositList = ({
-                              deposits,
-                              fetchDelegate,
-                              refreshPath,
-                            }: StakedDepositListProps) => {
+  deposits,
+  fetchDelegate,
+  refreshPath,
+}: StakedDepositListProps) => {
   return (
     <div className="flex flex-col rounded-xl border border-gray-300 w-auto h-100 bg-gray-50 shadow-newDefault">
       <div className="border-b border-gray-300 rounded-xl bg-white shadow-newDefault">
