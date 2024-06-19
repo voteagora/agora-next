@@ -25,6 +25,19 @@ const defaults = {
   markup: "#0071DA",
 };
 
+const scroll = {
+  primary: "#E8BF8B",
+  secondary: "#EDCCA2",
+  tertiary: "#F1D9B9",
+  neutral: "#FFF8F3",
+  wash: "#FAF2E8",
+  line: "#F6E5D1",
+  veil: "rgba(232, 191, 139, 0.3)",
+  positive: "#62E3D1",
+  negative: "#EB5132",
+  markup: "#62E3D1",
+};
+
 export function PageContainer({ children }: Props) {
   const { ui } = Tenant.current();
 
