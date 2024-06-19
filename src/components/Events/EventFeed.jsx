@@ -54,7 +54,7 @@ export default function EventFeed({ initialEvents, fetchEvents }) {
           <div className="relative pb-8">
             {activityItemIdx !== events.length - 1 ? (
               <span
-                className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+                className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-line"
                 aria-hidden="true"
               />
             ) : null}

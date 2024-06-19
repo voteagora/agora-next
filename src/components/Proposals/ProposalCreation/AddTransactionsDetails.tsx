@@ -191,7 +191,7 @@ export default function AddTransactionsDetails({
         )
       )}
       {form.state.options[optionIndex].transactions.length !== 0 && (
-        <VStack className="p-4 border border-line rounded-md bg-gray-100 mt-4 relative">
+        <VStack className="p-4 border border-line rounded-md bg-wash mt-4 relative">
           <p className="font-semibold pb-1 mb-0">
             Add another transaction to this option
           </p>

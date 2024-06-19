@@ -33,7 +33,7 @@ export const LogoPill = () => {
             />
           </g>
         </svg>
-        <div tw="bg-gray-300 w-px h-3/4 mx-[18px]"></div>
+        <div tw="bg-line w-px h-3/4 mx-[18px]"></div>
         {ogLogoForNamespace(namespace)}
       </div>
     </div>

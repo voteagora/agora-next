@@ -18,7 +18,7 @@ export default function LogoLink() {
             height="16"
             className="hidden sm:block"
           />
-          <div className="h-3 w-[2px] bg-stone-200 rounded-full hidden sm:block"></div>
+          <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
           <Image src={ui.logo} alt="logo" width="18" height="18" />
           <span className="hidden sm:block font-medium">{`${ui.title}`}</span>
         </HStack>

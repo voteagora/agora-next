@@ -77,7 +77,7 @@ export function SuccessMessage({
       <div>
         <div
           onClick={closeDialog}
-          className="text-center font-bold bg-white rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-gray-300 disabled:text-gray-700"
+          className="text-center font-bold bg-white rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-gray-700"
         >
           Got it
         </div>

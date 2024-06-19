@@ -171,7 +171,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -179,7 +179,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Create delegate statement
@@ -191,7 +191,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         {hasStatement && (
                           <Link
                             href={`/delegates/${ensName ?? address}`}
-                            className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
+                            className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-primary hover:text-white"
                             onClick={() => close()}
                           >
                             View my profile

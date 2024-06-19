@@ -38,7 +38,7 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-slate-700 bg-slate-100 sm:block">
+          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-slate-700 bg-wash sm:block">
             Advanced delegation beta
           </div>
         </HStack>

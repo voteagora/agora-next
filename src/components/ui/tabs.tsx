@@ -39,7 +39,7 @@ const tabsTriggerVariants = cva(
       variant: {
         default:
           "text-black font-bold opacity-30 data-[state=active]:opacity-100",
-        gray: "rounded-full py-1 px-3 text-gray-600 font-medium hover:bg-line hover:text-gray-900 data-[state=active]:text-gray-900 data-[state=active]:bg-gray-200 data-[state=active]:hover:bg-gray-200",
+        gray: "rounded-full py-1 px-3 text-gray-600 font-medium hover:bg-line hover:text-gray-900 data-[state=active]:text-gray-900 data-[state=active]:bg-line data-[state=active]:hover:bg-line",
         bool: "text-black p-3 flex-1 text-center hover:bg-white data-[state=active]:bg-white data-[state=active]:rounded-md data-[state=active]:shadow-newDefault",
       },
     },

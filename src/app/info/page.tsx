@@ -88,7 +88,7 @@ export default async function Page() {
         <Hero />
         <div>
           <div className="flex gap-6">
-            <div className="bg-gradient-to-b from-stone-300 to-white  w-[1px] relative top-2"></div>
+            <div className="bg-gradient-to-b from-stone-300 to-white w-[1px] relative top-2"></div>
             <div className="flex flex-col gap-8 max-w-2xl">
               <div>
                 <div className="text-sm text-indigo-800 font-medium">
