@@ -285,7 +285,7 @@ export function AdvancedDelegateDialog({
       </VStack>
       {overflowDelegation && (
         <p
-          className="text-xs bg-gray-fa p-6 pb-3 pt-6 mt-3 left-0 max-w-md rounded-bl-xl rounded-br-xl absolute"
+          className="text-xs bg-wash p-6 pb-3 pt-6 mt-3 left-0 max-w-md rounded-bl-xl rounded-br-xl absolute"
           style={{ transform: "translateZ(-1px)" }}
         >
           You have delegated more than the total delegatable votes you have.

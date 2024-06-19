@@ -134,7 +134,7 @@ function SubdelegationToRow({
             </div>
           </VStack>
         </HStack>
-        <div className="relative flex rounded-md border border-input bg-gray-fa">
+        <div className="relative flex rounded-md border border-input bg-wash">
           {/* TODO: improve UX of this Input, what if value is 10,000,000 */}
           <Input
             value={newAllowanceInput}

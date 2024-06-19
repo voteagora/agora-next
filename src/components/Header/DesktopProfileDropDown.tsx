@@ -26,7 +26,7 @@ const ValueWrapper = ({
   isLoading: boolean;
 }) =>
   isLoading ? (
-    <div className="animate-pulse bg-gray-af h-5 w-[90px] rounded-2xl"></div>
+    <div className="animate-pulse bg-veil h-5 w-[90px] rounded-2xl"></div>
   ) : (
     <div className="text-base">{children}</div>
   );
@@ -163,7 +163,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                       }
                     />
                     {isLoading ? (
-                      <div className="animate-pulse bg-gray-af h-[50px] mt-1 w-full rounded-2xl"></div>
+                      <div className="animate-pulse bg-veil h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
                       <>
                         {canCreateDelegateStatement && (

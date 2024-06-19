@@ -31,7 +31,7 @@ export default function ApprovedTransactions({
     proposalData.options[0].calldatas[0] === "0x";
 
   return (
-    <div className="flex flex-col gap-1 border border-[#e0e0e0] rounded-lg bg-gray-fa py-4">
+    <div className="flex flex-col gap-1 border border-[#e0e0e0] rounded-lg bg-wash py-4">
       <div className="flex items-center justify-between px-4 mb-2">
         <p className="font-mono text-xs font-medium leading-4 text-gray-af">
           {isNoProposedTransactions ? "No " : ""}

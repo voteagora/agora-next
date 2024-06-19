@@ -45,7 +45,7 @@ export default function RetroPGFApplicationBanner({
         </div>
         <div
           className={cn(
-            "relative overflow-hidden h-[300px] w-full rounded-2xl border-8 border-white bg-gray-fa bg-cover bg-center"
+            "relative overflow-hidden h-[300px] w-full rounded-2xl border-8 border-white bg-wash bg-cover bg-center"
           )}
           style={{
             backgroundImage: `url(${
@@ -74,13 +74,13 @@ export default function RetroPGFApplicationBanner({
                   {displayName}
                 </h3>
                 <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-theme-700">
-                  <p className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                  <p className="bg-wash py-0 px-3 rounded-[24px]">
                     {capitalizeFirstLetter(applicantType)}
                   </p>
-                  <div className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                  <div className="bg-wash py-0 px-3 rounded-[24px]">
                     <HumanAddress address={applicant.address.address} />
                   </div>
-                  <div className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                  <div className="bg-wash py-0 px-3 rounded-[24px]">
                     <a href={websiteUrl} rel="noreferrer" target="_blank">
                       <HStack>
                         {extractWebsiteName(websiteUrl)}

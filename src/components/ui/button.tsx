@@ -16,7 +16,7 @@ const buttonVariants = cva(
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         elevatedOutline:
-          "border rounded-lg border-gray-eb color-black shadow-newDefault transition-all duration-200 hover:bg-line active:shadow-none disabled:bg-gray-eb disabled:color-theme-700",
+          "border rounded-lg border-gray-eb color-black shadow-newDefault transition-all duration-200 hover:bg-line active:shadow-none disabled:bg-line disabled:color-theme-700",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",

@@ -261,7 +261,7 @@ export function LoadingVote() {
       </div>
       <div>
         <div
-          className={`flex flex-row justify-center w-full py-3 bg-gray-eo rounded-lg`}
+          className={`flex flex-row justify-center w-full py-3 bg-line rounded-lg`}
         >
           <div className="font-medium text-theme-700">
             Writing your vote to the chain...

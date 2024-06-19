@@ -187,7 +187,7 @@ export function ProgressBar({
       Number(barPercentage) !== 0 ? 1 : 0
     ).toFixed(2) + "%";
 
-  const progressBarColor = isApproved ? "bg-green-positive" : "bg-gray-4f";
+  const progressBarColor = isApproved ? "bg-green-positive" : "bg-secondary";
 
   return (
     <HStack>
@@ -199,7 +199,7 @@ export function ProgressBar({
         ></div>
         {!!thresholdPosition && (
           <div
-            className={`w-[2px] h-[6px] absolute top-0 rounded-[10px] bg-gray-4f`}
+            className={`w-[2px] h-[6px] absolute top-0 rounded-[10px] bg-secondary`}
             style={{ right: `${thresholdPosition}%` }}
           ></div>
         )}

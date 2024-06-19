@@ -98,7 +98,7 @@ export function Loading() {
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
-        <div className="flex flex-row justify-center w-full py-3 rounded-lg bg-gray-eo">
+        <div className="flex flex-row justify-center w-full py-3 rounded-lg bg-line">
           <div className="text-base font-semibold text-gray-4f">
             Writing your proposal to chain...
           </div>

@@ -223,7 +223,7 @@ export default function RetroPGFResults({
                     {/* We only show two categories + more */}
                     {impactCategory.slice(0, 3).map((category, index) => (
                       <span
-                        className="mx-1 py-0.5 px-1 rounded-[4px] bg-gray-fa text-xs"
+                        className="mx-1 py-0.5 px-1 rounded-[4px] bg-wash text-xs"
                         key={category}
                       >
                         {index === 2
