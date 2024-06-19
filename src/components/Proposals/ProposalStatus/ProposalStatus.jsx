@@ -39,7 +39,7 @@ export default function ProposalStatus({ proposal }) {
         "capitalize"
       )}
     >
-      {statusText}
+      {statusText.toLowerCase()}
     </div>
   );
 }
