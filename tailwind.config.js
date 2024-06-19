@@ -262,19 +262,23 @@ module.exports = {
           800: "var(--theme-800)",
           900: "var(--theme-900)",
         },
+        // custom theme colors
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        tertiary: "var(--tertiary)",
+        neutral: "var(--neutral)",
+        wash: "var(--wash)",
+        line: "var(--line)",
+        veil: "var(--veil)",
+        positive: "var(--positive)",
+        negative: "var(--negative)",
+        markup: "var(--markup)",
+        // shad?
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

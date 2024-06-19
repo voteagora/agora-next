@@ -66,16 +66,16 @@ type TenantUIParams = {
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
   customization?: {
-    theme50?: string;
-    theme100?: string;
-    theme200?: string;
-    theme300?: string;
-    theme400?: string;
-    theme500?: string;
-    theme600?: string;
-    theme700?: string;
-    theme800?: string;
-    theme900?: string;
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    neutral?: string;
+    wash?: string;
+    line?: string;
+    veil?: string;
+    positive?: string;
+    negative?: string;
+    markup?: string;
   };
 };
 

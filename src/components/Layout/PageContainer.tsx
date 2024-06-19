@@ -13,32 +13,43 @@ type Props = {
 };
 
 const defaults = {
-  theme50: "#FAFAFA",
-  theme100: "#E0E0E0",
-  theme300: "#AFAFAF",
-  theme500: "#AFAFAF",
-  theme700: "#4F4F4F",
-  theme900: "#000000",
+  primary: "#171717",
+  secondary: "#404040",
+  tertiary: "#737373",
+  neutral: "#FFFFFF",
+  wash: "#FAFAFA",
+  line: "#EAEAEA",
+  veil: "rgba(23, 23, 23, 0.3)",
+  positive: "#00992B",
+  negative: "#C52F00",
+  markup: "#0071DA",
 };
 
 export function PageContainer({ children }: Props) {
   const { ui } = Tenant.current();
-  console.log(ui);
 
-  const theme50 = ui?.customization?.theme50 || defaults.theme50;
-  const theme100 = ui?.customization?.theme100 || defaults.theme100;
-  const theme300 = ui?.customization?.theme300 || defaults.theme300;
-  const theme500 = ui?.customization?.theme500 || defaults.theme500;
-  const theme700 = ui?.customization?.theme700 || defaults.theme700;
-  const theme900 = ui?.customization?.theme900 || defaults.theme900;
+  const primary = ui?.customization?.primary || defaults.primary;
+  const secondary = ui?.customization?.secondary || defaults.secondary;
+  const tertiary = ui?.customization?.tertiary || defaults.tertiary;
+  const neutral = ui?.customization?.neutral || defaults.neutral;
+  const wash = ui?.customization?.wash || defaults.wash;
+  const line = ui?.customization?.line || defaults.line;
+  const veil = ui?.customization?.veil || defaults.veil;
+  const positive = ui?.customization?.positive || defaults.positive;
+  const negative = ui?.customization?.negative || defaults.negative;
+  const markup = ui?.customization?.markup || defaults.markup;
 
   const style = {
-    "--theme-50": theme50,
-    "--theme-100": theme100,
-    "--theme-300": theme300,
-    "--theme-500": theme500,
-    "--theme-700": theme700,
-    "--theme-900": theme900,
+    "--primary": primary,
+    "--secondary": secondary,
+    "--tertiary": tertiary,
+    "--neutral": neutral,
+    "--wash": wash,
+    "--line": line,
+    "--veil": veil,
+    "--positive": positive,
+    "--negative": negative,
+    "--markup": markup,
   } as React.CSSProperties;
 
   return (
