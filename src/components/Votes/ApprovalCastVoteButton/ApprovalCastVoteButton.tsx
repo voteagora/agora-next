@@ -152,7 +152,7 @@ function VoteButton({
 function CastButton({ onClick }: { onClick: () => void }) {
   return (
     <button
-      className={`bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+      className={`bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
       onClick={onClick}
     >
       Cast Vote
@@ -164,7 +164,7 @@ function DisabledVoteButton({ reason }: { reason: string }) {
   return (
     <button
       disabled
-      className="bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
+      className="bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
     >
       {reason}
     </button>

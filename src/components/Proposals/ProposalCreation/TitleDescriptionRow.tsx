@@ -12,7 +12,7 @@ export const tipTextStyle = "text-sm text-secondary";
 type DisplayMode = "write" | "preview";
 
 const displayModeSelectorStyles =
-  "cursor-pointer text-sm font-medium text-tertiary py-1 px-3 rounded-full hover:bg-line hover:text-primary";
+  "cursor-pointer text-sm font-medium text-tertiary py-1 px-3 rounded-full hover:bg-wash hover:text-primary";
 
 const displayModeSelectorSelectedStyles = "bg-wash text-primary rounded-full";
 

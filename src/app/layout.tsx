@@ -35,12 +35,12 @@ const standard = {
 };
 
 const scroll = {
-  primary: "#171717",
-  secondary: "#404040",
-  tertiary: "#737373",
-  neutral: "#FFF8F3",
-  wash: "#FAF2E8",
-  line: "#F6E5D1",
+  primary: "#190602",
+  secondary: "#473835",
+  tertiary: "#756A67",
+  neutral: "#FFFFFF",
+  wash: "#F6E5D1",
+  line: "#F1D9B9",
   veil: "rgba(232, 191, 139, 0.3)",
   positive: "#00992B",
   negative: "#C52F00",

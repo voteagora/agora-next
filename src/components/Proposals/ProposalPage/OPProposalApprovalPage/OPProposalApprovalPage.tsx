@@ -63,7 +63,7 @@ export default async function OPProposalApprovalPage({
           justifyContent="justify-between"
           className="sticky top-20 flex-shrink max-w-[24rem] bg-white border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto"
         >
-          <VStack gap={4} className="py-4 min-h-0 shrink">
+          <VStack gap={4}>
             {/* Show the results of the approval vote w/ a tab for votes */}
             <ApprovalVotesPanel
               proposal={proposal}

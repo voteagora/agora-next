@@ -6,7 +6,7 @@ export default function PageHeader({ headerText }) {
       justifyContent="justify-between"
       className="sm:mb-4 flex-col sm:flex-row mb-2 max-w-full"
     >
-      <h1 className="text-agoraPrimary text-2xl font-extrabold mb-0">
+      <h1 className="text-primary text-2xl font-extrabold mb-0">
         {headerText}
       </h1>
       <HStack gap={4}></HStack>

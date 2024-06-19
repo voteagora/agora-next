@@ -192,7 +192,7 @@ export function ProgressBar({
   return (
     <HStack>
       {" "}
-      <div className="w-full h-[6px] rounded-[10px] bg-wash relative mb-3">
+      <div className="w-full h-[6px] rounded-[10px] bg-line relative mb-3">
         <div
           className={`h-[6px] absolute rounded-[10px] top-0 right-0 ${progressBarColor}`}
           style={{ width: progressBarWidth }}
