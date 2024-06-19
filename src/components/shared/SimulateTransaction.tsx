@@ -74,7 +74,7 @@ export default function SimulateTransaction({
             ? "text-positive"
             : status === "Invalid"
               ? "text-negative"
-              : "text-neutral"
+              : "text-tertiary"
         }
       >
         {status}

@@ -25,7 +25,7 @@ export default function Proposal({ proposal, votableSupply }) {
       }
       target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
     >
-      <HStack alignItems="center" className="border-b border-line">
+      <div className="border-b border-line items-center flex flex-row">
         <VStack
           className={cn(
             "whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",
@@ -42,7 +42,7 @@ export default function Proposal({ proposal, votableSupply }) {
               {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
               <div>
                 {proposalText}{" "}
-                <span className="hidden sm:block">
+                <span className="hidden sm:inline">
                   {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
                     `by The ${ui.organization.title}`
                   ) : (
@@ -78,7 +78,7 @@ export default function Proposal({ proposal, votableSupply }) {
             <ProposalStatus proposal={proposal} />
           </VStack>
         </VStack>
-        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[20%] flex-start justify-center hidden sm:block">
+        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden sm:block">
           <div className="overflow-hidden overflow-ellipsis">
             {proposal.proposalType === "SNAPSHOT" && (
               <SnapshotProposalStatus proposal={proposal} />
@@ -99,7 +99,7 @@ export default function Proposal({ proposal, votableSupply }) {
             )}
           </div>
         </VStack>
-      </HStack>
+      </div>
     </Link>
   );
 }

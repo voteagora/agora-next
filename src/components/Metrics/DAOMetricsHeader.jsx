@@ -15,20 +15,6 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-const defaults = {
-  primary: "#171717",
-  secondary: "#404040",
-  tertiary: "#737373",
-  neutral: "#FFFFFF",
-  wash: "#FAFAFA",
-  line: "#EAEAEA",
-  veil: "rgba(23, 23, 23, 0.3)",
-  positive: "#00992B",
-  negative: "#C52F00",
-  accentPrimary: "#171717",
-  accentNeutral: "#FFFFFF",
-};
-
 export default function DAOMetricsHeader({ metrics }) {
   const { token, ui } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
@@ -49,44 +35,13 @@ export default function DAOMetricsHeader({ metrics }) {
     totalSupply: formatNumber(metrics.totalSupply),
   };
 
-  const primary = ui?.customization?.primary || defaults.primary;
-  const secondary = ui?.customization?.secondary || defaults.secondary;
-  const tertiary = ui?.customization?.tertiary || defaults.tertiary;
-  const neutral = ui?.customization?.neutral || defaults.neutral;
-  const wash = ui?.customization?.wash || defaults.wash;
-  const line = ui?.customization?.line || defaults.line;
-  const veil = ui?.customization?.veil || defaults.veil;
-  const positive = ui?.customization?.positive || defaults.positive;
-  const negative = ui?.customization?.negative || defaults.negative;
-  const accentPrimary =
-    ui?.customization?.accentPrimary || defaults.accentPrimary;
-  const accentNeutral =
-    ui?.customization?.accentNeutral || defaults.accentNeutral;
-
-  const style = {
-    "--primary": primary,
-    "--secondary": secondary,
-    "--tertiary": tertiary,
-    "--neutral": neutral,
-    "--wash": wash,
-    "--line": line,
-    "--veil": veil,
-    "--positive": positive,
-    "--negative": negative,
-    "--accent-primary": accentPrimary,
-    "--accent-neutral": accentNeutral,
-  };
-
   if (!isClient) {
     return null;
   } else {
     return (
       <>
         {createPortal(
-          <div
-            className="sm:min-w-desktop sticky z-50 bottom-10 sm:bottom-0 left-0 flex justify-center"
-            style={style}
-          >
+          <div className="sm:min-w-desktop sticky z-50 bottom-10 sm:bottom-0 left-0 flex justify-center">
             <div
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",

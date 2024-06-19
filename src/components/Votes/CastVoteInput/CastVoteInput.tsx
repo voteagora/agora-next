@@ -147,7 +147,7 @@ function VoteButton({
 
   return (
     <button
-      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-neutral"} bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
       onClick={onClick}
     >
       {action.toLowerCase()}
