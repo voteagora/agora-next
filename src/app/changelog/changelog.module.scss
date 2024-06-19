@@ -4,16 +4,16 @@
 
 .changelogItem {
   p {
-    @apply mt-2 text-base leading-7 text-theme-600;
+    @apply mt-2 text-base leading-7 text-secondary;
     a {
       @apply underline;
     }
   }
   p.changelogSubtitle {
-    @apply mt-2 text-base font-semibold leading-7 text-theme-600;
+    @apply mt-2 text-base font-semibold leading-7 text-secondary;
   }
   ul {
-    @apply list-disc list-outside ml-4 text-theme-600;
+    @apply list-disc list-outside ml-4 text-secondary;
   }
 }
 .changelogContainer {

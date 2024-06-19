@@ -141,7 +141,7 @@ export default function DelegateStatementForm({
               <OtherInfoFormSection form={form} />
 
               <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
-                <span className="text-sm text-gray-800">
+                <span className="text-sm text-primary">
                   Tip: you can always come back and edit your profile at any
                   time.
                 </span>

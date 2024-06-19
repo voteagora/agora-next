@@ -141,30 +141,30 @@ function AdvancedVoteDialog({
           <HStack justifyContent="justify-between">
             <VStack>
               {delegate.address ? (
-                <div className="text-xs text-theme-700 font-medium">
+                <div className="text-xs text-secondary font-medium">
                   <HumanAddress address={delegate.address} />
                 </div>
               ) : (
-                <div className="text-xs text-theme-700 font-medium">
+                <div className="text-xs text-secondary font-medium">
                   Anonymous
                 </div>
               )}
-              <div className="text-lg text-theme-900 font-extrabold">
+              <div className="text-lg text-primary font-extrabold">
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
             </VStack>
             <VStack alignItems="items-end">
-              <div className="text-xs text-theme-700 font-medium">with</div>
+              <div className="text-xs text-secondary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
             </VStack>
           </HStack>
           <div>
             {reason ? (
-              <div className="max-h-[40vh] overflow-y-scroll text-theme-700">
+              <div className="max-h-[40vh] overflow-y-scroll text-secondary">
                 {reason}
               </div>
             ) : (
-              <div className="w-full py-6 px-4 rounded-lg border border-dashed border-line text-theme-700">
+              <div className="w-full py-6 px-4 rounded-lg border border-dashed border-line text-secondary">
                 No voting reason provided
               </div>
             )}
@@ -225,14 +225,14 @@ export function SuccessMessage({
       <div className="mb-2 text-2xl font-black">
         Your vote has been submitted!
       </div>
-      <div className="mb-5 text-sm text-theme-700">
+      <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected. Thank you
         for participating in Optimism’s token house.
       </div>
       <div>
         <div
           onClick={closeDialog}
-          className="text-center bg-white rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-gray-700"
+          className="text-center bg-white rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-secondary"
         >
           Got it
         </div>
@@ -256,14 +256,14 @@ export function LoadingVote() {
         alt="Vote pending"
       />
       <div className="mb-2 text-2xl font-black">Casting your vote</div>
-      <div className="mb-5 text-sm text-theme-700">
+      <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
         <div
           className={`flex flex-row justify-center w-full py-3 bg-line rounded-lg`}
         >
-          <div className="font-medium text-theme-700">
+          <div className="font-medium text-secondary">
             Writing your vote to the chain...
           </div>
         </div>
@@ -274,7 +274,7 @@ export function LoadingVote() {
 
 export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
   return (
-    <div className="py-2 px-4 z-[1099] bg-line text-xs text-theme-700 rounded-lg">
+    <div className="py-2 px-4 z-[1099] bg-line text-xs text-secondary rounded-lg">
       You do not have a delegate statement.{" "}
       <Link
         href={"/delegates/create"}
@@ -306,7 +306,7 @@ export function DisabledVoteDialog({
       <div className="mb-2 text-2xl font-black">
         Voting will be available soon!
       </div>
-      <div className="mb-5 text-sm text-theme-700">
+      <div className="mb-5 text-sm text-secondary">
         Thanks for trying to vote early! It looks like you’ve received votes via
         advanced delegation – a new beta feature. Voting will be enabled
         shortly. Please check back in a few days.

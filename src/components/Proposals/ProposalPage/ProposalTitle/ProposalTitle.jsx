@@ -12,7 +12,7 @@ export default function ProposalTitle({
 
   return (
     <div className="flex-col items-start">
-      <div className="text-xs font-semibold text-theme-700 flex items-center">
+      <div className="text-xs font-semibold text-secondary flex items-center">
         {proposalText} by The {ui.organization.title}
         <a
           href={getBlockScanUrl(createdTransactionHash)}

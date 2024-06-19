@@ -47,7 +47,7 @@ export function ProposalSingleVote({
     <VStack
       key={vote.transactionHash}
       gap={2}
-      className="text-xs text-theme-500 px-0 py-1"
+      className="text-xs text-tertiary px-0 py-1"
     >
       <VStack>
         <HoverCard
@@ -58,7 +58,7 @@ export function ProposalSingleVote({
           <HoverCardTrigger>
             <HStack
               justifyContent="justify-between"
-              className="font-semibold text-theme-600"
+              className="font-semibold text-secondary"
             >
               <HStack gap={1} alignItems="items-center">
                 <ENSAvatar ensName={data} className="w-5 h-5" />
@@ -106,7 +106,7 @@ export function ProposalSingleVote({
           </HoverCardContent>
         </HoverCard>
       </VStack>
-      <pre className="text-xs font-medium whitespace-pre-wrap text-theme-500 w-fit break-all">
+      <pre className="text-xs font-medium whitespace-pre-wrap text-tertiary w-fit break-all">
         {vote.reason}
       </pre>
     </VStack>

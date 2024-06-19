@@ -65,7 +65,7 @@ export default function CreateProposalForm({
         <VStack className="bg-white rounded-xl border border-line shadow-newDefault">
           <div className="p-8 border-b border-line">
             <h1 className="text-2xl font-extrabold pb-1">Create proposal</h1>
-            <p className="text-theme-700">
+            <p className="text-secondary">
               Select the type of vote and proposal you want to create, and
               describe its intent to voters. Remember to proofread as proposals
               cannot be edited once published.

@@ -60,7 +60,7 @@ function ProposalTypeRow({
         gap={8}
       >
         <div className="w-1/2">
-          <h4 className="text-xs font-semibold mb-1 text-theme-700">
+          <h4 className="text-xs font-semibold mb-1 text-secondary">
             Vote type
           </h4>
           <Switch
@@ -70,7 +70,7 @@ function ProposalTypeRow({
           />
         </div>
         <div className="w-full sm:w-1/2">
-          <h4 className="text-xs font-semibold mb-1 text-theme-700">
+          <h4 className="text-xs font-semibold mb-1 text-secondary">
             Proposal type
           </h4>
           <Select
@@ -99,7 +99,7 @@ function ProposalTypeRow({
           </Select>
         </div>
       </HStack>
-      <div className="ml-0 w-full mt-2 sm:mt-1 text-theme-700">
+      <div className="ml-0 w-full mt-2 sm:mt-1 text-secondary">
         {infoText()}
       </div>
     </VStack>

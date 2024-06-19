@@ -184,7 +184,7 @@ export default function AddTransactionsDetails({
               </>
             )}
             <XCircleIcon
-              className="w-5 h-5 absolute right-0 top-[2px] cursor-pointer text-theme-300 hover:text-theme-700"
+              className="w-5 h-5 absolute right-0 top-[2px] cursor-pointer text-veil hover:text-secondary"
               onClick={() => remove(index)}
             />
           </VStack>
@@ -204,7 +204,7 @@ export default function AddTransactionsDetails({
               ["Custom transaction", () => addTransaction("Custom")],
             ]}
           />
-          <PlusIcon className="w-5 h-5 absolute top-4 right-4 text-theme-300" />
+          <PlusIcon className="w-5 h-5 absolute top-4 right-4 text-veil" />
         </VStack>
       )}
     </>

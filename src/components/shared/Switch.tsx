@@ -9,7 +9,7 @@ type Props = {
 };
 
 const optionStyle =
-  "p-[5px] flex-1 text-center cursor-pointer rounded-md text-theme-300 font-medium hover:bg-line";
+  "p-[5px] flex-1 text-center cursor-pointer rounded-md text-veil font-medium hover:bg-line";
 
 const selectedStyle = "bg-line text-black font-semibold";
 

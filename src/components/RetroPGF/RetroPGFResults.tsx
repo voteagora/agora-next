@@ -123,7 +123,7 @@ export default function RetroPGFResults({
         loader={
           <div
             key="loader"
-            className="flex justify-center py-6 text-sm text-theme-700"
+            className="flex justify-center py-6 text-sm text-secondary"
           >
             Loading...
           </div>
@@ -165,7 +165,7 @@ export default function RetroPGFResults({
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="text-gray-4f font-medium text-sm">
+          <TableBody className="text-secondary font-medium text-sm">
             {results.map((result) => {
               const {
                 applicant,

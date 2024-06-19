@@ -32,7 +32,7 @@ export default function DelegatesVotesType() {
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         selected
                           ? "text-black bg-white border-line"
-                          : "text-[#66676b] border-transparent"
+                          : "text-tertiary border-transparent"
                       }`}
                     >
                       {option.value}

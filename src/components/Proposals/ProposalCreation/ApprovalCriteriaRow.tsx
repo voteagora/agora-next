@@ -10,7 +10,7 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
   return (
     <>
       <h4 className="pb-1 font-semibold">Approval parameters</h4>
-      <p className="text-base mb-4 text-theme-700">
+      <p className="text-base mb-4 text-secondary">
         Use the following settings to set the parameters of this vote as well as
         the methodology for determining which options can be executed.
       </p>

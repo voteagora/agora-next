@@ -77,7 +77,7 @@ export default function ApprovalVotesPanel({
             <div
               key={index}
               onClick={() => handleTabsChange(index + 1)}
-              className="text-base font-semibold pr-4 cursor-pointer text-theme-700"
+              className="text-base font-semibold pr-4 cursor-pointer text-secondary"
             >
               <span className={activeTab === index + 1 ? "text-black" : ""}>
                 {tab}

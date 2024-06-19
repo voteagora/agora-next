@@ -7,20 +7,20 @@ import { useState } from "react";
 import InputBox from "@/components/shared/InputBox";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
-export const tipTextStyle = "text-sm text-theme-700";
+export const tipTextStyle = "text-sm text-secondary";
 
 type DisplayMode = "write" | "preview";
 
 const displayModeSelectorStyles =
-  "cursor-pointer text-sm font-medium text-theme-500 py-1 px-3 rounded-full hover:bg-line hover:text-theme-900";
+  "cursor-pointer text-sm font-medium text-tertiary py-1 px-3 rounded-full hover:bg-line hover:text-primary";
 
-const displayModeSelectorSelectedStyles = "bg-wash text-theme-900 rounded-full";
+const displayModeSelectorSelectedStyles = "bg-wash text-primary rounded-full";
 
 export default function TitleDescriptionRow({ form }: { form: Form }) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("write");
   return (
     <VStack className="mt-4">
-      <h4 className="text-xs font-semibold mb-1 text-theme-700">Title</h4>
+      <h4 className="text-xs font-semibold mb-1 text-secondary">Title</h4>
       <InputBox
         placeholder={"I'd like to propose..."}
         value={form.state.title}
@@ -32,7 +32,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
         justifyContent="justify-between"
         gap={4}
       >
-        <h4 className="text-xs font-semibold mb-1 text-theme-700 mt-4">
+        <h4 className="text-xs font-semibold mb-1 text-secondary mt-4">
           Proposal
         </h4>
 
@@ -93,7 +93,7 @@ export default function TitleDescriptionRow({ form }: { form: Form }) {
 
       {displayMode === "write" && (
         <textarea
-          className="text-theme-50 p-4 mt-2 rounded-md outline-none w-full min-h-[16rem] border border-line"
+          className="text-tertiary p-4 mt-2 rounded-md outline-none w-full min-h-[16rem] border border-line"
           value={form.state.description}
           onChange={(e) => form.onChange.description(e.target.value)}
           placeholder="I’m a proposal body, and I like markdown formatting..."

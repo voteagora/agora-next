@@ -44,7 +44,7 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
             </div>
             <ProposalVotesBar proposal={proposal} votes={votes} />
             <div className="flex flex-col font-medium">
-              <div className="flex flex-row text-gray-4f pb-2 justify-between">
+              <div className="flex flex-row text-secondary pb-2 justify-between">
                 <>
                   {proposal.quorum && (
                     <div>

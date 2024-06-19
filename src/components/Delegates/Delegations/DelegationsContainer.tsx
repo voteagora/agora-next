@@ -38,14 +38,14 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-slate-700 bg-wash sm:block">
+          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-secondary bg-wash sm:block">
             Advanced delegation beta
           </div>
         </HStack>
         <TabsContent value="delegatedFrom" className="max-w-full">
           <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
-              <TableHeader className="text-xs text-slate-700">
+              <TableHeader className="text-xs text-secondary">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
@@ -73,7 +73,7 @@ function DelegationsContainer({
         <TabsContent value="delegatedTo">
           <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
-              <TableHeader className="text-xs text-slate-700">
+              <TableHeader className="text-xs text-secondary">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>

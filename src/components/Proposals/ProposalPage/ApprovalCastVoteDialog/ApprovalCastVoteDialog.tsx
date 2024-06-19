@@ -98,7 +98,7 @@ export function ApprovalCastVoteDialog({
               <p className="text-xl font-extrabold">
                 Select up to {maxChecked} option{maxChecked > 1 && "s"}
               </p>
-              <p className="text-theme-700 mt-1">
+              <p className="text-secondary mt-1">
                 Your vote is final and cannot be edited once submitted.
               </p>
             </VStack>
@@ -228,13 +228,13 @@ function CheckCard({
       <p
         className={
           checked
-            ? "text-theme-900 font-medium transition-all"
-            : "text-theme-700 font-normal transition-all"
+            ? "text-primary font-medium transition-all"
+            : "text-secondary font-normal transition-all"
         }
       >
         {title}
       </p>
-      <div className="text-xs font-medium text-theme-700">{description}</div>
+      <div className="text-xs font-medium text-secondary">{description}</div>
 
       <div
         className={

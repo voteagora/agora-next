@@ -17,10 +17,8 @@ export default function Page() {
       <div className="mx-auto max-w-full py-20 sm:py-12">
         <div className="flex flex-col sm:flex-row sm:gap-32 ">
           <div className="sm:flex-1 sm:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
-            <h2 className="mt-1 font-semibold text-theme-900">
-              Agora Changelog
-            </h2>
-            <p className="mt-1 text-base leading-7 text-stone-600">
+            <h2 className="mt-1 font-semibold text-primary">Agora Changelog</h2>
+            <p className="mt-1 text-base leading-7 text-secondary">
               Stay up to date with the latest changes with Agora&apos;s
               development. Please report bugs and feedback{" "}
               <a
@@ -116,7 +114,7 @@ export default function Page() {
               <p id="changelogfeb2024" className={styles.changlogDate}>
                 {formatFullDate(new Date(2024, 4, 2))}
               </p>
-              <h3 className="text-2xl font-semibold leading-7 text-theme-900">
+              <h3 className="text-2xl font-semibold leading-7 text-primary">
                 Governance Client Changelog #5
               </h3>
               <p>Morning OP collective,</p>
@@ -233,7 +231,7 @@ export default function Page() {
               <p id="changelogfeb2024" className={styles.changlogDate}>
                 {formatFullDate(new Date(2024, 3, 15))}
               </p>
-              <h3 className="text-2xl font-semibold leading-7 text-theme-900">
+              <h3 className="text-2xl font-semibold leading-7 text-primary">
                 Governance Client Changelog #4
               </h3>
               <p>Morning OP collective,</p>
@@ -417,10 +415,10 @@ export default function Page() {
             <div className="my-8 border-t border-line"></div>
             <div>
               <div className={styles.changelogItem}>
-                <p id="changelogfeb2024" className="text-stone-600 mb-2">
+                <p id="changelogfeb2024" className="text-secondary mb-2">
                   {formatFullDate(new Date(2024, 2, 27))}
                 </p>
-                <h3 className="text-2xl font-semibold leading-7 text-theme-900">
+                <h3 className="text-2xl font-semibold leading-7 text-primary">
                   Governance Client Changelog #3
                 </h3>
                 <p>Morning OP collective,</p>
@@ -673,10 +671,10 @@ export default function Page() {
             <div className="my-8 border-t border-line"></div>
             <div>
               <div className={styles.changelogItem}>
-                <p id="changelogfeb2024" className="text-stone-600 mb-2">
+                <p id="changelogfeb2024" className="text-secondary mb-2">
                   {formatFullDate(new Date(2024, 2, 7))}
                 </p>
-                <h3 className="text-2xl font-semibold leading-7 text-theme-900">
+                <h3 className="text-2xl font-semibold leading-7 text-primary">
                   Governance Client Changelog #2
                 </h3>
                 <p>Morning OP collective,</p>
@@ -821,7 +819,7 @@ export default function Page() {
             <div className="my-8 border-t border-line"></div>
             <div>
               <div className={styles.changelogItem}>
-                <p id="changelogfeb2024" className="text-stone-600 mb-2">
+                <p id="changelogfeb2024" className="text-secondary mb-2">
                   {formatFullDate(new Date(2024, 1, 23))}
                 </p>
                 <h3 className={styles.changelogTitle}>
@@ -1237,10 +1235,10 @@ export default function Page() {
             <div className="my-8 border-t border-line"></div>
             <div className="space-y-12">
               <div className={styles.changelogItem}>
-                <p className="text-stone-600 mb-2">
+                <p className="text-secondary mb-2">
                   {formatFullDate(new Date(2023, 11, 18))}
                 </p>
-                <h3 className="text-2xl font-semibold leading-7 text-theme-900">
+                <h3 className="text-2xl font-semibold leading-7 text-primary">
                   Agora Optimism V6 Governance Beta Launch 🚀 🎉
                 </h3>
                 <p>

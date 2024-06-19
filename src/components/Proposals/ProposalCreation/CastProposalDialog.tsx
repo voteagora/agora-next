@@ -71,13 +71,13 @@ export function SuccessMessage({
       <div className="mb-2 text-2xl font-black">
         Proposal successfully created!
       </div>
-      <div className="mb-5 text-sm font-medium text-theme-700">
+      <div className="mb-5 text-sm font-medium text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
         <div
           onClick={closeDialog}
-          className="text-center font-bold bg-white rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-gray-700"
+          className="text-center font-bold bg-white rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-line active:shadow-none disabled:bg-line disabled:text-secondary"
         >
           Got it
         </div>
@@ -94,12 +94,12 @@ export function Loading() {
     <VStack className="w-full">
       <img src={ui.assets.pending} className="w-full mb-3" alt="Pending" />
       <div className="mb-2 text-2xl font-black">Creating your proposal ...</div>
-      <div className="mb-5 text-base font-medium text-gray-4f">
+      <div className="mb-5 text-base font-medium text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
         <div className="flex flex-row justify-center w-full py-3 rounded-lg bg-line">
-          <div className="text-base font-semibold text-gray-4f">
+          <div className="text-base font-semibold text-secondary">
             Writing your proposal to chain...
           </div>
         </div>

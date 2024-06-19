@@ -25,13 +25,13 @@ export default function RetroPGFApplicationContent({
           <h2 className="font-inter font-black text-2xl leading-[29px] text-black mb-[14px]">
             Contribution
           </h2>
-          <div className="font-inter font-medium text-base leading-6 text-gray-4f pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap break-normal">
+          <div className="font-inter font-medium text-base leading-6 text-secondary pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap break-normal">
             {contributionDescription}
           </div>
         </VStack>
         <VStack className="mt-0 sm:my-8 items-stretch justify-end sm:justify-between w-full sm:w-[24rem] border border-line rounded-xl shadow-newDefault p-4 flex-shrink-0">
           <div>
-            <h3 className="font-inter font-semibold text-sm leading-[16px] text-gray-4f">
+            <h3 className="font-inter font-semibold text-sm leading-[16px] text-secondary">
               Contribution links
             </h3>
             <ul className="m-0 p-0 list-none">
@@ -50,14 +50,14 @@ export default function RetroPGFApplicationContent({
           <h2 className="font-inter  font-black text-2xl leading-[29px] text-black mb-[14px]">
             Impact
           </h2>
-          <div className="font-inter  font-medium text-base leading-6 text-gray-4f pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap">
+          <div className="font-inter  font-medium text-base leading-6 text-secondary pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap">
             {impactDescription}
           </div>
         </VStack>
 
         <VStack className="mt-0 sm:my-8 justify-end sm:justify-between w-full sm:w-[24rem] border border-line rounded-xl shadow-newDefault p-4 flex-shrink-0">
           <div>
-            <h3 className="font-inter font-semibold text-sm leading-4 text-gray-4f">
+            <h3 className="font-inter font-semibold text-sm leading-4 text-secondary">
               Impact Metrics
             </h3>
             <VStack className="p-0 m-0 list-none">
@@ -111,7 +111,7 @@ const ContributionLink = ({
             {contributionLink.description}
           </p>
         </HStack>
-        <ArrowTopRightOnSquareIcon className="mt-1 w-5 h-5 text-theme-500" />
+        <ArrowTopRightOnSquareIcon className="mt-1 w-5 h-5 text-tertiary" />
       </HStack>
     </a>
   );
@@ -143,7 +143,7 @@ const ImpactMetric = ({
           target="_blank"
           className="flex items-center gap-2"
         >
-          <ArrowTopRightOnSquareIcon className="h-5 w-5 text-theme-500" />
+          <ArrowTopRightOnSquareIcon className="h-5 w-5 text-tertiary" />
         </a>
       </div>
     </li>

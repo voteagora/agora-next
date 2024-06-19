@@ -121,7 +121,7 @@ export function DelegateDialog({
           <VStack
             gap={3}
             alignItems="items-center"
-            className="py-3 w-full text-theme-500 text-xs"
+            className="py-3 w-full text-tertiary text-xs"
           >
             <VStack className="text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
               <HStack alignItems="items-center" gap={1}>
@@ -137,7 +137,7 @@ export function DelegateDialog({
               >
                 <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
                 <VStack>
-                  <p className="text-xs font-medium text-theme-700">
+                  <p className="text-xs font-medium text-secondary">
                     Currently delegated to
                   </p>
                   <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
@@ -155,7 +155,7 @@ export function DelegateDialog({
               >
                 <ENSAvatar ensName={delegateEnsName} className="h-10 w-10" />
                 <VStack>
-                  <p className="text-xs font-medium text-theme-700">
+                  <p className="text-xs font-medium text-secondary">
                     Delegating to
                   </p>
                   <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
@@ -170,7 +170,7 @@ export function DelegateDialog({
             <p className="text-xl font-bold text-left">
               Set <ENSName address={delegate.address} /> as your delegate
             </p>
-            <div className="text-theme-700">
+            <div className="text-secondary">
               <ENSName address={delegate.address} /> will be able to vote with
               any token owned by your address
             </div>
@@ -182,7 +182,7 @@ export function DelegateDialog({
               >
                 <ENSAvatar ensName={""} className="h-10 w-10" />
                 <VStack>
-                  <p className="text-xs font-medium text-theme-700">
+                  <p className="text-xs font-medium text-secondary">
                     Currently delegated to
                   </p>
                   <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
@@ -197,7 +197,7 @@ export function DelegateDialog({
                 <ENSAvatar ensName={delegateEnsName} className="w-10 h-10" />
 
                 <VStack>
-                  <p className="text-xs font-medium text-theme-700">
+                  <p className="text-xs font-medium text-secondary">
                     Delegating to
                   </p>
                   <div className="font-medium text-black max-w-[6rem] sm:max-w-full">

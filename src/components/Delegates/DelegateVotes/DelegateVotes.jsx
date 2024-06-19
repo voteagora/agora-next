@@ -83,7 +83,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         <div key={0}>
           <HStack
             key="loader"
-            className="gl_loader justify-center py-6 text-sm text-theme-700"
+            className="gl_loader justify-center py-6 text-sm text-secondary"
           >
             Loading...
           </HStack>
@@ -103,7 +103,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                 <VStack className="py-4 px-6">
                   <HStack justifyContent="justify-between" gap={2}>
                     <VStack>
-                      <span className="text-[#66676b] text-xs font-medium">
+                      <span className="text-tertiary text-xs font-medium">
                         {`${propHeader(vote)} with ${pluralizeVote(vote.weight, "optimism")}`}
                       </span>
                       <h2 className="px-0 pt-1 overflow-hidden text-base text-black text-ellipsis">

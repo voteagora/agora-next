@@ -46,7 +46,7 @@ export default function RetroPGFSort() {
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         option === orderByParam
                           ? "text-black bg-white border-line"
-                          : "text-[#66676b] border-transparent"
+                          : "text-tertiary border-transparent"
                       }`}
                     >
                       {option}

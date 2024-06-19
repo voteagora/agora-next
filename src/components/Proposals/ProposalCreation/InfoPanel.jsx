@@ -5,8 +5,8 @@ export default function InfoPanel() {
     <VStack className="bg-wash rounded-xl border border-line p-6">
       <h2 className="text-2xl font-extrabold mb-4">Manager’s handbook</h2>
       <div>
-        <p className="text-theme-700">
-          <span className="font-semibold text-theme-900 mb-4">
+        <p className="text-secondary">
+          <span className="font-semibold text-primary mb-4">
             1. Select proposal type
           </span>
           <br />
@@ -14,16 +14,16 @@ export default function InfoPanel() {
           proposal. You can view, edit, or create a new one via the{" "}
           <a href="/admin">admin panel</a>.
         </p>
-        <p className="text-theme-700">
-          <span className="font-semibold text-theme-900 mb-4">
+        <p className="text-secondary">
+          <span className="font-semibold text-primary mb-4">
             2. Choose your vote type
           </span>
           <br />
           This determines if your proposal will be a simple yes/no or a multiple
           choice.
         </p>
-        <p className="text-theme-700">
-          <span className="font-semibold text-theme-900 mb-4">
+        <p className="text-secondary">
+          <span className="font-semibold text-primary mb-4">
             3. Create your proposal
           </span>
           <br />
@@ -31,8 +31,8 @@ export default function InfoPanel() {
           create your proposal. Proposed transactions are optional, as the Token
           House governor is not executable for now.
         </p>
-        <p className="text-theme-700">
-          <span className="font-semibold text-theme-900">
+        <p className="text-secondary">
+          <span className="font-semibold text-primary">
             4. Get signatures for your SAFE
           </span>
           <br />

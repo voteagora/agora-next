@@ -66,7 +66,7 @@ export default function DelegateCardList({
         loadMore={loadMore}
         loader={
           <div
-            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-slate-300 flex items-center justify-center"
+            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-veil flex items-center justify-center"
             key="loader"
           >
             Loading...
@@ -103,7 +103,7 @@ export default function DelegateCardList({
                       votingPower={delegate.votingPower.total}
                       citizen={delegate.citizen}
                     />
-                    <p className="text-base leading-normal min-h-[48px] break-words text-gray-600 overflow-hidden line-clamp-2">
+                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
                       {truncatedStatement}
                     </p>
                   </div>

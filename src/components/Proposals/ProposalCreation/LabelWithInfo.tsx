@@ -10,7 +10,7 @@ export default function LabelWithInfo({
   children: React.ReactNode;
 }) {
   return (
-    <label className="text-theme-500 font-bold mb-1 text-xs flex items-center">
+    <label className="text-tertiary font-bold mb-1 text-xs flex items-center">
       {label} <InfoPop>{children}</InfoPop>
     </label>
   );

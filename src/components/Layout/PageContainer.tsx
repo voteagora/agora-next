@@ -22,7 +22,8 @@ const defaults = {
   veil: "rgba(23, 23, 23, 0.3)",
   positive: "#00992B",
   negative: "#C52F00",
-  markup: "#0071DA",
+  accentPrimary: "#171717",
+  accentNeutral: "#FFFFFF",
 };
 
 const scroll = {
@@ -33,9 +34,10 @@ const scroll = {
   wash: "#FAF2E8",
   line: "#F6E5D1",
   veil: "rgba(232, 191, 139, 0.3)",
-  positive: "#62E3D1",
-  negative: "#EB5132",
-  markup: "#62E3D1",
+  positive: "#00992B",
+  negative: "#C52F00",
+  accentPrimary: "#FF4C00",
+  accentNeutral: "#FAF2E8",
 };
 
 export function PageContainer({ children }: Props) {
@@ -50,7 +52,10 @@ export function PageContainer({ children }: Props) {
   const veil = ui?.customization?.veil || defaults.veil;
   const positive = ui?.customization?.positive || defaults.positive;
   const negative = ui?.customization?.negative || defaults.negative;
-  const markup = ui?.customization?.markup || defaults.markup;
+  const accentPrimary =
+    ui?.customization?.accentPrimary || defaults.accentPrimary;
+  const accentNeutral =
+    ui?.customization?.accentNeutral || defaults.accentNeutral;
 
   const style = {
     "--primary": primary,
@@ -62,7 +67,8 @@ export function PageContainer({ children }: Props) {
     "--veil": veil,
     "--positive": positive,
     "--negative": negative,
-    "--markup": markup,
+    "--accent-primary": accentPrimary,
+    "--accent-neutral": accentNeutral,
   } as React.CSSProperties;
 
   return (

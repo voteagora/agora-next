@@ -250,18 +250,6 @@ module.exports = {
           900: "#FF007A",
           positive: "#FF007A1A",
         },
-        theme: {
-          50: "var(--theme-50)",
-          100: "var(--theme-100)",
-          200: "var(--theme-200)",
-          300: "var(--theme-300)",
-          400: "var(--theme-400)",
-          500: "var(--theme-500)",
-          600: "var(--theme-600)",
-          700: "var(--theme-700)",
-          800: "var(--theme-800)",
-          900: "var(--theme-900)",
-        },
         // custom theme colors
         primary: "var(--primary)",
         secondary: "var(--secondary)",
@@ -272,7 +260,8 @@ module.exports = {
         veil: "var(--veil)",
         positive: "var(--positive)",
         negative: "var(--negative)",
-        markup: "var(--markup)",
+        accentPrimary: "var(--accent-primary)",
+        accentNeutral: "var(--accent-neutral)",
         // shad?
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

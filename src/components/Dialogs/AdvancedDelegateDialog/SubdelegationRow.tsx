@@ -128,7 +128,7 @@ function SubdelegationToRow({
         <HStack gap={3}>
           <ENSAvatar ensName={data} className="h-10 w-10" />
           <VStack>
-            <p className="text-xs font-medium text-theme-700">Delegated to</p>
+            <p className="text-xs font-medium text-secondary">Delegated to</p>
             <div className="w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
               <HumanAddress address={to} />
             </div>

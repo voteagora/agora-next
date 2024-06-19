@@ -22,7 +22,7 @@ export default function OPOptimisticProposalStatus({
   return (
     <VStack className="text-right">
       <VStack>
-        <div className="text-xs text-theme-700">
+        <div className="text-xs text-secondary">
           <p>
             {againstRelativeAmount}% / {disapprovalThreshold}% against needed to
             defeat

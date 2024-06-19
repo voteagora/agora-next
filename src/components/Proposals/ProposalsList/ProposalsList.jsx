@@ -79,7 +79,7 @@ export default function ProposalsList({
               <div key={0}>
                 <HStack
                   key="loader"
-                  className="gl_loader justify-center py-6 text-sm text-theme-700"
+                  className="gl_loader justify-center py-6 text-sm text-secondary"
                 >
                   Loading...
                 </HStack>

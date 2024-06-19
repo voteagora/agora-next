@@ -8,7 +8,7 @@ export const HeaderLink = ({ className, children, href, target, isActive }) => {
     <Link
       href={href}
       target={target}
-      className={`py-1 px-4 rounded-full text-theme-700 text-sm sm:text-base ${activeClass} ${className || ""}`}
+      className={`py-1 px-4 rounded-full text-secondary text-sm sm:text-base ${activeClass} ${className || ""}`}
     >
       {children}
     </Link>

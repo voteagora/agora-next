@@ -113,7 +113,7 @@ export function DelegateProfileImage({
             </TooltipProvider>
           )}
         </div>
-        <div className="text-theme-700 text-xs font-semibold">
+        <div className="text-secondary text-xs font-semibold">
           {formattedNumber} {token.symbol}
         </div>
       </div>

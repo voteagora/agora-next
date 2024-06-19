@@ -5,7 +5,7 @@ export default function OPApprovalProposalStatus({ proposal }) {
   const maxOptions = proposal.proposalData.proposalSettings.maxApprovals;
   return (
     <VStack alignItems="items-end">
-      <div className="text-xs text-theme-700">Select {maxOptions} of</div>
+      <div className="text-xs text-secondary">Select {maxOptions} of</div>
       <HStack gap={1}>
         {pluralize("Option", proposal.proposalData.options.length)}
       </HStack>

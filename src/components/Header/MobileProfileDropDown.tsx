@@ -96,7 +96,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                         {ensName ? (
                           <>
                             <span className="text-base">{ensName}</span>
-                            <span className="text-xs text-theme-700">
+                            <span className="text-xs text-secondary">
                               {shortAddress(address!)}
                             </span>
                           </>
@@ -171,7 +171,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border py-3 px-2 text-veil bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -179,7 +179,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border py-3 px-2 text-veil bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Create delegate statement

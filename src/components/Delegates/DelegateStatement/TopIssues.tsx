@@ -70,7 +70,7 @@ const Issue = ({ title, icon, value }: IssueProps) => {
         </div>
 
         <div className="flex flex-col">
-          <div className="text-xs font-medium text-[#66676b]">{title}</div>
+          <div className="text-xs font-medium text-secondary">{title}</div>
           <div>{value}</div>
         </div>
       </div>

@@ -74,7 +74,7 @@ const OptimisticProposalVotesCard = ({
                   This proposal is optimistically {status}
                 </p>
 
-                <p className="mt-1 font-normal text-gray-4f">
+                <p className="mt-1 font-normal text-secondary">
                   This proposal will automatically pass unless{" "}
                   {disapprovalThreshold}% of the votable supply of OP is
                   against. Currently {againstRelativeAmount}% (
@@ -104,7 +104,7 @@ const OptimisticProposalVotesCard = ({
         />
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} isOptimistic />
-        <p className="mx-4 text-xs text-gray-4f">
+        <p className="mx-4 text-xs text-secondary">
           If you agree with this proposal, you don’t need to vote. Only vote
           against if you oppose this proposal.
         </p>

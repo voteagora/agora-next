@@ -46,7 +46,7 @@ export default function DAOMetricsHeader({ metrics }) {
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
                 "border-t border-r border-l border-line rounded-tl-2xl rounded-tr-2xl",
-                "text-xs text-gray-4f font-inter font-medium",
+                "text-xs text-secondary font-inter font-medium",
                 `transition-all duration-200 ease-in-out transform ${
                   visible ? "translate-y-0" : "translate-y-10"
                 } sm:transition-none sm:translate-y-0`

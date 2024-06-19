@@ -38,7 +38,7 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
   return (
     <>
       <h4 className="font-semibold pb-1">Proposed Options</h4>
-      <p className="text-base text-theme-700 mb-4">
+      <p className="text-base text-secondary mb-4">
         Proposed transactions will execute if your proposal passes. If you skip
         this step no transactions will be added.
       </p>
@@ -52,13 +52,13 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
             <span>Option {index + 1}</span>
             {form.state.options.length > 1 && (
               <XCircleIcon
-                className="h-5 w-5 pointer text-gray-eb hover:text-gray-4f"
+                className="h-5 w-5 pointer text-line hover:text-secondary"
                 onClick={() => remove(index)}
               />
             )}
           </div>
           <VStack>
-            <label className="text-theme-700 font-semibold mb-1 text-xs">
+            <label className="text-secondary font-semibold mb-1 text-xs">
               Title (no markdown)
             </label>
             <InputBox

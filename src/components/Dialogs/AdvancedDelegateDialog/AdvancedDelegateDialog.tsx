@@ -358,7 +358,7 @@ function InfoDialog({
           ))}
         </VStack>
         {directDelegatedFromOthers > 0n && (
-          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-gray-af border-line">
+          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-veil border-line">
             You’ve been delegated an additional{" "}
             <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of
@@ -382,7 +382,7 @@ function Message({
           <div className="text-black text-xl font-bold">
             Welcome to advanced delegation
           </div>
-          <div className="text-theme-700">
+          <div className="text-secondary">
             As a large token holder, you now have access to advanced delegation,
             which lets you manage your voting power with more control and
             flexibility.

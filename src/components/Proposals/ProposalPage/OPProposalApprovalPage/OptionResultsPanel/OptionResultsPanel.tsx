@@ -154,7 +154,7 @@ function SingleOption({
         <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem]">
           {description}
         </div>
-        <div className="text-theme-700">
+        <div className="text-secondary">
           <TokenAmountDisplay amount={votes} />
           <span className="ml-1">
             {percentage === 0n

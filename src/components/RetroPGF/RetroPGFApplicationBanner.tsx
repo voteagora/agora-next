@@ -73,7 +73,7 @@ export default function RetroPGFApplicationBanner({
                 <h3 className="font-bold text-2xl text-center sm:text-left">
                   {displayName}
                 </h3>
-                <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-theme-700">
+                <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-secondary">
                   <p className="bg-wash py-0 px-3 rounded-[24px]">
                     {capitalizeFirstLetter(applicantType)}
                   </p>
@@ -84,20 +84,20 @@ export default function RetroPGFApplicationBanner({
                     <a href={websiteUrl} rel="noreferrer" target="_blank">
                       <HStack>
                         {extractWebsiteName(websiteUrl)}
-                        <ArrowTopRightOnSquareIcon className="w-6 h-6 text-theme-500 block pl-1.5" />
+                        <ArrowTopRightOnSquareIcon className="w-6 h-6 text-tertiary block pl-1.5" />
                       </HStack>
                     </a>
                   </div>
                 </HStack>
               </div>
 
-              <p className="font-inter text-center sm:text-left font-medium text-base leading-6 text-gray-4f">
+              <p className="font-inter text-center sm:text-left font-medium text-base leading-6 text-secondary">
                 {bio}
               </p>
             </VStack>
             <HStack className="gap-2">
               <VStack className="mr-4 mt-5 items-end">
-                <div className="text-sm text-theme-700 whitespace-nowrap texr-right">
+                <div className="text-sm text-secondary whitespace-nowrap texr-right">
                   Appears in
                 </div>
                 <div className="text-sm text-black whitespace-nowrap texr-right">
@@ -120,7 +120,7 @@ const CategoryListItem = ({ category }: CategoryListItemProps) => {
   return (
     <div
       key={category}
-      className="text-sm bg-white bg-opacity-90 rounded-xl text-theme-700 leading-relaxed py-0 px-3 shadow-newDefault capitalize z-10"
+      className="text-sm bg-white bg-opacity-90 rounded-xl text-secondary leading-relaxed py-0 px-3 shadow-newDefault capitalize z-10"
     >
       {formatCategory(category)}
     </div>

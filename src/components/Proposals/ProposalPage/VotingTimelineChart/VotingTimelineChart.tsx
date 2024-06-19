@@ -136,12 +136,12 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           ]}
           tickFormatter={tickFormatter}
           tick={customizedXTick}
-          className="text-xs font-inter font-semibold text-gray-af"
+          className="text-xs font-inter font-semibold text-veil"
           fill={"#AFAFAF"}
         />
 
         <YAxis
-          className="text-xs font-inter font-semibold fill:text-gray-af fill"
+          className="text-xs font-inter font-semibold fill:text-veil fill"
           tick={{
             fill: "#AFAFAF",
           }}

@@ -78,7 +78,7 @@ export default function ProposalVotesSummaryDetails({
 
       <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b -ml-4 p-4">
         <div className="flex justify-between">
-          <div className="flex items-center gap-1 text-gray-4f font-semibold text-xs">
+          <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
             Quorum
           </div>
           {proposal.quorum && (
@@ -91,7 +91,7 @@ export default function ProposalVotesSummaryDetails({
                   alt="check icon"
                 />
               )}
-              <p className="text-xs font-semibold text-gray-4f">
+              <p className="text-xs font-semibold text-secondary">
                 <TokenAmountDisplay
                   amount={totalVotes}
                   decimals={token.decimals}
@@ -110,12 +110,12 @@ export default function ProposalVotesSummaryDetails({
         </div>
         {proposal.approvalThreshold && (
           <div className="flex justify-between">
-            <div className="flex flex-row gap-1 text-gray-4f font-semibold text-xs">
+            <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
               Threshold
             </div>
             <div className="flex flex-row gap-1 ">
               {hasMetThreshold && <Image src={checkIcon} alt="check icon" />}
-              <p className=" text-xs font-semibold text-gray-4f">
+              <p className=" text-xs font-semibold text-secondary">
                 {voteThresholdPercent.toFixed(2)}% /{" "}
                 {`${apprThresholdPercent}%`} Required
               </p>
@@ -172,13 +172,13 @@ const StepperRow = ({
 
         <div className="w-full flex items-center justify-between text-xs font-semibold">
           <div
-            className={`${isCompleted ? "text-black" : isActive ? "text-blue-600" : "text-gray-4f"} flex items-center gap-x-1`}
+            className={`${isCompleted ? "text-black" : isActive ? "text-blue-600" : "text-secondary"} flex items-center gap-x-1`}
           >
             {label}
             {href && <Image src={linkIcon} alt="redirect" />}
           </div>
 
-          <p className="text-xs font-medium text-gray-4f">{value}</p>
+          <p className="text-xs font-medium text-secondary">{value}</p>
         </div>
       </Link>
     </li>

@@ -32,7 +32,7 @@ export default function ProposalStatus({ proposal }) {
       className={cn(
         approved.includes(proposal.status.toLowerCase()) && "text-positive",
         rejected.includes(proposal.status.toLowerCase()) && "text-negative",
-        pending.includes(proposal.status.toLowerCase()) && "text-theme-700",
+        pending.includes(proposal.status.toLowerCase()) && "text-secondary",
         active.includes(proposal.status.toLowerCase()) && "text-blue-500",
         test.includes(proposal.status.toLowerCase()) && "text-blue-600",
         closed.includes(proposal.status.toLowerCase()) && "text-purple-700",
