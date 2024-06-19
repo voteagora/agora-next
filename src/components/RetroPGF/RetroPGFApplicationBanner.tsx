@@ -35,7 +35,7 @@ export default function RetroPGFApplicationBanner({
 
   return (
     <div className="flex flex-col sm:flex-row items-center w-full max-w-6xl pb-8 px-4">
-      <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-white border border-gray-300 shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
+      <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-white border border-line shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
         <div className="absolute top-6 left-6">
           <HStack className="gap-2 flex-wrap">
             {impactCategory.map((category) => (

@@ -118,7 +118,7 @@ function SubdelegationToRow({
 
   return (
     <div
-      className={`flex flex-col border-b border-dashed border-gray-300 ${
+      className={`flex flex-col border-b border-dashed border-line ${
         amountToAllocateRaw < 0 && allowances.length - 1 === index
           ? "opacity-30"
           : ""

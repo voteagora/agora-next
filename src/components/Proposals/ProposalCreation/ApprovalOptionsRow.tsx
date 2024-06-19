@@ -48,7 +48,7 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
           key={index}
           className="border-box w-full p-4 mb-8 border border-line rounded-lg"
         >
-          <div className="border-b border-dashed border-gray-300 font-semibold pb-1 flex flex-row justify-between">
+          <div className="border-b border-dashed border-line font-semibold pb-1 flex flex-row justify-between">
             <span>Option {index + 1}</span>
             {form.state.options.length > 1 && (
               <XCircleIcon

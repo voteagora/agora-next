@@ -61,10 +61,10 @@ interface IssueProps {
 
 const Issue = ({ title, icon, value }: IssueProps) => {
   return (
-    <div className="rounded-xl border border-gray-eb shadow-newDefault bg-white p-3">
+    <div className="rounded-xl border border-line shadow-newDefault bg-white p-3">
       <div className="flex flex-row gap-4 items-start">
         <div className="flex flex-col justify-center shrink-0">
-          <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-gray-eb">
+          <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-line">
             <Image src={icons[icon]} alt={title} />
           </div>
         </div>

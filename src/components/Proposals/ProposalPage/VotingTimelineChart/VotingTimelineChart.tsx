@@ -136,7 +136,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           ]}
           tickFormatter={tickFormatter}
           tick={customizedXTick}
-          className="text-xs font-inter font-semibold text-gray-af "
+          className="text-xs font-inter font-semibold text-gray-af"
           fill={"#AFAFAF"}
         />
 

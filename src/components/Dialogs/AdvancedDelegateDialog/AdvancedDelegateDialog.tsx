@@ -330,7 +330,7 @@ function InfoDialog({
         </HStack>
         <AdvancedDelegationDisplayAmount amount={availableBalance} />
         <VStack
-          className="w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-gray-eo max-h-[256px] overflow-y-scroll"
+          className="w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-line max-h-[256px] overflow-y-scroll"
           alignItems="items-start"
           gap={3}
         >
@@ -358,7 +358,7 @@ function InfoDialog({
           ))}
         </VStack>
         {directDelegatedFromOthers > 0n && (
-          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-gray-af border-gray-eo">
+          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-gray-af border-line">
             You’ve been delegated an additional{" "}
             <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of

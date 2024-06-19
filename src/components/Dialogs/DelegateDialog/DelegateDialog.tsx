@@ -133,7 +133,7 @@ export function DelegateDialog({
               <HStack
                 gap={3}
                 alignItems="items-center"
-                className="p-2 pb-4 pl-0 border-b border-gray-300"
+                className="p-2 pb-4 pl-0 border-b border-line"
               >
                 <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
                 <VStack>
@@ -145,7 +145,7 @@ export function DelegateDialog({
                   </div>
                 </VStack>
               </HStack>
-              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full right-1/2 top-1/2">
+              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-line rounded-full right-1/2 top-1/2">
                 <ArrowDownIcon className="w-4 h-4 text-black" />
               </div>
               <HStack
@@ -174,11 +174,11 @@ export function DelegateDialog({
               <ENSName address={delegate.address} /> will be able to vote with
               any token owned by your address
             </div>
-            <VStack className="relative border border-gray-300 rounded-lg">
+            <VStack className="relative border border-line rounded-lg">
               <HStack
                 gap={3}
                 alignItems="items-center"
-                className="p-2 border-b border-gray-300"
+                className="p-2 border-b border-line"
               >
                 <ENSAvatar ensName={""} className="h-10 w-10" />
                 <VStack>
@@ -190,7 +190,7 @@ export function DelegateDialog({
                   </div>
                 </VStack>
               </HStack>
-              <div className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
+              <div className="w-10 h-10 flex items-center justify-center bg-white border border-line rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
                 <ArrowDownIcon className="w-4 h-4 text-black" />
               </div>
               <HStack gap={3} alignItems="items-center" className="p-2">

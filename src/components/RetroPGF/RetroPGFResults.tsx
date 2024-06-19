@@ -114,7 +114,7 @@ export default function RetroPGFResults({
   };
 
   return (
-    <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
+    <VStack className="my-8 max-w-6xl rounded-xl border border-line shadow-newDefault overflow-hidden">
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={pageInfo?.hasNextPage}

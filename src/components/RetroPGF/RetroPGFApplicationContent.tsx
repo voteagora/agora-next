@@ -29,7 +29,7 @@ export default function RetroPGFApplicationContent({
             {contributionDescription}
           </div>
         </VStack>
-        <VStack className="mt-0 sm:my-8 items-stretch justify-end sm:justify-between w-full sm:w-[24rem] border border-gray-eb rounded-xl shadow-newDefault p-4 flex-shrink-0">
+        <VStack className="mt-0 sm:my-8 items-stretch justify-end sm:justify-between w-full sm:w-[24rem] border border-line rounded-xl shadow-newDefault p-4 flex-shrink-0">
           <div>
             <h3 className="font-inter font-semibold text-sm leading-[16px] text-gray-4f">
               Contribution links
@@ -55,7 +55,7 @@ export default function RetroPGFApplicationContent({
           </div>
         </VStack>
 
-        <VStack className="mt-0 sm:my-8 justify-end sm:justify-between w-full sm:w-[24rem] border border-gray-eb rounded-xl shadow-newDefault p-4 flex-shrink-0">
+        <VStack className="mt-0 sm:my-8 justify-end sm:justify-between w-full sm:w-[24rem] border border-line rounded-xl shadow-newDefault p-4 flex-shrink-0">
           <div>
             <h3 className="font-inter font-semibold text-sm leading-4 text-gray-4f">
               Impact Metrics

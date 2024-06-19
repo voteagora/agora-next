@@ -33,14 +33,14 @@ export default function ProposalsFilter() {
             : proposalsFilterOptions.everything.value}
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
         </Listbox.Button>
-        <Listbox.Options className="mt-3 absolute bg-wash border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-10 w-max">
+        <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-10 w-max">
           {Object.values(proposalsFilterOptions).map((option) => (
             <Listbox.Option key={option.filter} value={option.filter}>
               {({ selected }) => (
                 <div
                   className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                     selected
-                      ? "text-black bg-white border-[#ebebeb]"
+                      ? "text-black bg-white border-line"
                       : "text-[#66676b] border-transparent"
                   }`}
                 >

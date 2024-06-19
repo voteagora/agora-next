@@ -43,10 +43,7 @@ function DelegationsContainer({
           </div>
         </HStack>
         <TabsContent value="delegatedFrom" className="max-w-full">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
-          >
+          <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
               <TableHeader className="text-xs text-slate-700">
                 <TableRow>
@@ -74,10 +71,7 @@ function DelegationsContainer({
           </VStack>
         </TabsContent>
         <TabsContent value="delegatedTo">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
-          >
+          <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
               <TableHeader className="text-xs text-slate-700">
                 <TableRow>

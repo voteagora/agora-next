@@ -99,14 +99,14 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
           <p
             key={index}
             className={
-              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
+              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-line text-gray-4f font-medium"
             }
           >
             {++index}. {option}
           </p>
         ))}
         {support === "ABSTAIN" && (
-          <p className="pl-3 border-l border-gray-eo text-gray-4f font-medium">
+          <p className="pl-3 border-l border-line text-gray-4f font-medium">
             {"Abstain"}
           </p>
         )}

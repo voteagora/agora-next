@@ -132,7 +132,7 @@ export default function DelegateStatementForm({
         </div>
       )}
       <div className="flex flex-col w-full">
-        <div className="flex flex-col bg-white border rounded-xl border-gray-300 shadow-newDefault">
+        <div className="flex flex-col bg-white border rounded-xl border-line shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DelegateStatementFormSection form={form} />

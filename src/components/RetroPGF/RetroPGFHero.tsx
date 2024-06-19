@@ -19,7 +19,7 @@ export default function RetroPGFHero() {
       <Image
         src="/rpgf/infographic_5.png"
         alt="RetroPGF 3 results 5"
-        className="w-full max-w-6xl rounded-xl border border-gray-300"
+        className="w-full max-w-6xl rounded-xl border border-line"
         height="1216"
         width="1216"
       />

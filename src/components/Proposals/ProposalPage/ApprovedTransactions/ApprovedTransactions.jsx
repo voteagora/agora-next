@@ -89,7 +89,7 @@ export default function ApprovedTransactions({
       )}
       {proposalData.options.length > 1 && (
         <div
-          className="cursor-pointer text-xs font-mono font-medium text-gray-af leading-4 p-4 pb-0 border-t border-gray-eo"
+          className="cursor-pointer text-xs font-mono font-medium text-gray-af leading-4 p-4 pb-0 border-t border-line"
           onClick={toggleElements}
         >
           {displayedOptions === 1

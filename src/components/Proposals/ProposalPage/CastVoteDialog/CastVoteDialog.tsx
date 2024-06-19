@@ -313,7 +313,7 @@ export function DisabledVoteDialog({
       </div>
       <div>
         <div
-          className={`flex flex-row justify-center w-full py-3 border border-gray-eo rounded-lg cursor-pointer`}
+          className={`flex flex-row justify-center w-full py-3 border border-line rounded-lg cursor-pointer`}
           onClick={closeDialog}
         >
           <div className="font-medium">Got it, I’ll come back later</div>

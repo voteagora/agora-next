@@ -15,7 +15,7 @@ export default function RetroPGFApplicationContentFundingSource({
       <h2 className="font-inter font-black text-2xl leading-[29px] text-black">
         Funding sources
       </h2>
-      <VStack className="items-stretch sm:items-normal justify-end sm:justify-start w-full h-auto sm:h-full my-8 py-2 px-4 rounded-xl border border-gray-300 shadow-newDefault min-h-[3rem]">
+      <VStack className="items-stretch sm:items-normal justify-end sm:justify-start w-full h-auto sm:h-full my-8 py-2 px-4 rounded-xl border border-line shadow-newDefault min-h-[3rem]">
         {(!fundingSources || fundingSources.length === 0) && (
           <VStack className="items-center justify-center p-8 text-theme-700">
             No funding sources provided

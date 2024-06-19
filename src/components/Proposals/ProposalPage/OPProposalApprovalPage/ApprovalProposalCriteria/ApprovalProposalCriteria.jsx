@@ -8,8 +8,8 @@ export default function ApprovalProposalCriteria({ proposal }) {
   const proposalSettings = proposalData.proposalSettings;
 
   return (
-    <VStack className="p-4 pb-2 border-t border-gray-200">
-      <div className="px-4 border border-gray-300 rounded-md">
+    <VStack className="p-4 pb-2 border-t border-line">
+      <div className="px-4 border border-line rounded-md">
         <HStack
           justifyContent="justify-between"
           className="text-xs font-semibold text-theme-700 py-2"

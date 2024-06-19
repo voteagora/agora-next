@@ -53,7 +53,7 @@ export default function Page() {
                 </p>
               </div>
             </div>
-            <div className="my-8 border-t border-gray-300"></div>
+            <div className="my-8 border-t border-line"></div>
             <div className={styles.changelogItem}>
               <p id="changelogfeb2024" className={styles.changlogDate}>
                 {formatFullDate(new Date(2024, 5, 20))}
@@ -228,7 +228,7 @@ export default function Page() {
                 </li>
               </ul>
             </div>
-            <div className="my-8 border-t border-gray-300"></div>
+            <div className="my-8 border-t border-line"></div>
             <div className={styles.changelogItem}>
               <p id="changelogfeb2024" className={styles.changlogDate}>
                 {formatFullDate(new Date(2024, 3, 15))}
@@ -414,7 +414,7 @@ export default function Page() {
                 </li>
               </ul>
             </div>
-            <div className="my-8 border-t border-gray-300"></div>
+            <div className="my-8 border-t border-line"></div>
             <div>
               <div className={styles.changelogItem}>
                 <p id="changelogfeb2024" className="text-stone-600 mb-2">
@@ -670,7 +670,7 @@ export default function Page() {
                 </ul>
               </div>
             </div>
-            <div className="my-8 border-t border-gray-300"></div>
+            <div className="my-8 border-t border-line"></div>
             <div>
               <div className={styles.changelogItem}>
                 <p id="changelogfeb2024" className="text-stone-600 mb-2">
@@ -818,7 +818,7 @@ export default function Page() {
                 </ul>
               </div>
             </div>
-            <div className="my-8 border-t border-gray-300"></div>
+            <div className="my-8 border-t border-line"></div>
             <div>
               <div className={styles.changelogItem}>
                 <p id="changelogfeb2024" className="text-stone-600 mb-2">
@@ -1234,7 +1234,7 @@ export default function Page() {
                 </ul>
               </div>
             </div>
-            <div className="my-8 border-t border-gray-300"></div>
+            <div className="my-8 border-t border-line"></div>
             <div className="space-y-12">
               <div className={styles.changelogItem}>
                 <p className="text-stone-600 mb-2">
