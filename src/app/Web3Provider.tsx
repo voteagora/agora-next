@@ -32,7 +32,7 @@ const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: [mainnet, contracts.token.chain],
+    chains: [contracts.token.chain, mainnet],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
