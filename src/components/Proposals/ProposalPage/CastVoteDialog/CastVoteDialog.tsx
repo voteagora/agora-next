@@ -11,9 +11,11 @@ import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
 import { getVpToDisplay } from "@/lib/voteUtils";
-import pendingImage from "../../../../../public/images/action-pending.svg";
-import congrats from "../../../../../public/images/congrats.svg";
+import pendingImage from "@/assets/pending.svg";
+import successImage from "@/assets/success.svg";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import useStandardVoting from "@/hooks/useStandardVoting";
+import Tenant from "@/lib/tenant/tenant";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -21,10 +23,88 @@ export type SupportTextProps = {
 
 // TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: CastVoteDialogProps) {
-  return <CastVoteDialogContents {...props} />;
+  const { contracts } = Tenant.current();
+  return contracts?.alligator ? (
+    <AdvancedVoteDialog {...props} />
+  ) : (
+    <BasicVoteDialog {...props} />
+  );
 }
 
-function CastVoteDialogContents({
+function BasicVoteDialog({
+  proposalId,
+  reason,
+  supportType,
+  closeDialog,
+  votingPower,
+  delegate,
+  missingVote,
+}: CastVoteDialogProps) {
+  const { write, isLoading, isSuccess, data } = useStandardVoting({
+    proposalId,
+    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
+    reason,
+    missingVote,
+  });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  if (!delegate) {
+    // todo: log
+    return null;
+  }
+
+  if (isLoading) {
+    return <LoadingVote />;
+  }
+
+  return (
+    <>
+      {!isSuccess && (
+        <VStack gap={4} className={styles.dialog_container}>
+          <HStack justifyContent="justify-between">
+            <VStack>
+              {delegate.address ? (
+                <div className={styles.subtitle}>
+                  <HumanAddress address={delegate.address} />
+                </div>
+              ) : (
+                <div className={styles.subtitle}>Anonymous</div>
+              )}
+              <div className={styles.title}>
+                Casting vote&nbsp;{supportType.toLowerCase()}
+              </div>
+            </VStack>
+            <VStack alignItems="items-end">
+              <div className={styles.subtitle}>with</div>
+              <TokenAmountDisplay amount={vpToDisplay} />
+            </VStack>
+          </HStack>
+          <div className={styles.reason_box}>
+            {reason ? (
+              <div className={styles.has_reason}>{reason}</div>
+            ) : (
+              <div className={styles.no_reason}>No voting reason provided</div>
+            )}
+          </div>
+          <div>
+            {delegate.statement ? (
+              <VoteButton onClick={write}>
+                Vote {supportType.toLowerCase()} with{"\u00A0"}
+                <TokenAmountDisplay amount={vpToDisplay} />
+              </VoteButton>
+            ) : (
+              <NoStatementView closeDialog={closeDialog} />
+            )}
+          </div>
+        </VStack>
+      )}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
+    </>
+  );
+}
+
+function AdvancedVoteDialog({
   proposalId,
   reason,
   supportType,
@@ -130,7 +210,7 @@ export function SuccessMessage({
       <Image
         width="457"
         height="155"
-        src={congrats}
+        src={successImage}
         className="w-full mb-3"
         alt="agora loading"
       />
@@ -187,39 +267,5 @@ export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
         Please set one up to vote.
       </Link>
     </div>
-  );
-}
-
-export function DisabledVoteDialog({
-  closeDialog,
-}: {
-  closeDialog: () => void;
-}) {
-  return (
-    <VStack className={styles.full_width}>
-      <Image
-        width="457"
-        height="155"
-        src={pendingImage}
-        className="w-full mb-3"
-        alt="agora loading"
-      />
-      <div className="mb-2 text-2xl font-black">
-        Voting will be available soon!
-      </div>
-      <div className="mb-5 text-sm text-gray-700">
-        Thanks for trying to vote early! It looks like you’ve received votes via
-        advanced delegation – a new beta feature. Voting will be enabled
-        shortly. Please check back in a few days.
-      </div>
-      <div>
-        <div
-          className={`flex flex-row justify-center w-full py-3 border border-gray-eo rounded-lg cursor-pointer`}
-          onClick={closeDialog}
-        >
-          <div className="font-medium">Got it, I’ll come back later</div>
-        </div>
-      </div>
-    </VStack>
   );
 }

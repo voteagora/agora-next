@@ -11,6 +11,9 @@ export default class TenantSlugFactory {
         return "ENS";
       case TENANT_NAMESPACES.ETHERFI:
         return "ETHERFI";
+
+      case TENANT_NAMESPACES.UNISWAP:
+        return "UNISWAP";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

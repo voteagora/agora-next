@@ -4,7 +4,7 @@ import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { fetchAllForVoting as apiFetchAllForVoting } from "@/app/api/votes/getVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import OpManagerDeleteProposal from "../OPProposalPage/OpManagerDeleteProposal";
+import StandardProposalDelete from "../OPProposalPage/StandardProposalDelete";
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal as apiFetchVotesForProposal,
@@ -28,12 +28,6 @@ async function fetchAllForVoting(
   "use server";
 
   return await apiFetchAllForVoting(address, blockNumber, proposal_id);
-}
-
-async function fetchDelegate(addressOrENSName: string | `0x${string}`) {
-  "use server";
-
-  return await apiFetchDelegate(addressOrENSName);
 }
 
 async function fetchUserVotesForProposal(
@@ -63,9 +57,9 @@ export default async function OPProposalApprovalPage({
       alignItems="items-start"
       className={styles.proposal_container}
     >
-      <ProposalDescription proposal={proposal} />
+      <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
-        <OpManagerDeleteProposal proposal={proposal} />
+        <StandardProposalDelete proposal={proposal} />
         <VStack
           gap={4}
           justifyContent="justify-between"

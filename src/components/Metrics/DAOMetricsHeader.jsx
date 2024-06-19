@@ -69,7 +69,7 @@ export default function DAOMetricsHeader({ metrics }) {
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>Total amount of OP in existence</span>
+                      <span>Total amount of {token.symbol} in existence</span>
                     </HoverCardContent>
                   </HoverCard>
                   <HoverCard openDelay={100} closeDelay={100}>
@@ -84,7 +84,7 @@ export default function DAOMetricsHeader({ metrics }) {
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>OP currently delegated to a voter</span>
+                      <span>{token.symbol} currently delegated to a voter</span>
                     </HoverCardContent>
                   </HoverCard>
                 </div>

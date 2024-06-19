@@ -4,7 +4,6 @@ import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
 import { VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -26,7 +25,7 @@ async function getVotesForDelegateForAddress({
   address: string;
   page: number;
 }) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const pageSize = 10;
 
   const { meta, data: votes } = await paginateResult(
@@ -87,7 +86,7 @@ async function getVotesForDelegateForAddress({
     };
   }
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   return {
     meta,
@@ -110,7 +109,7 @@ async function getVotesForProposal({
   page?: number;
   sort?: VotesSort;
 }) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const pageSize = 50;
 
   const { meta, data: votes } = await paginateResult(
@@ -169,7 +168,7 @@ async function getVotesForProposal({
     };
   }
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
   const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type
@@ -188,7 +187,7 @@ async function getUserVotesForProposal({
   proposal_id: string;
   address: string;
 }) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
     `
     SELECT 
@@ -210,7 +209,7 @@ async function getUserVotesForProposal({
     address.toLowerCase()
   );
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   return votes.map((vote) =>
     parseVote(
@@ -231,12 +230,12 @@ async function getVotesForProposalAndDelegate({
   proposal_id: string;
   address: string;
 }) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const votes = await prisma[`${namespace}Votes`].findMany({
     where: { proposal_id, voter: address?.toLowerCase() },
   });
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   return votes.map((vote: VotePayload) =>
     parseVote(

@@ -6,7 +6,7 @@ import Hero from "@/components/Hero/Hero";
 import { VStack } from "@/components/Layout/Stack";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
+import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
 // Revalidate cache every 60 seconds
@@ -62,70 +62,6 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Home() {
-  // NOTE: This is a temporary placeholder for Ether.fi
-  const { namespace } = Tenant.current();
-  if (namespace === TENANT_NAMESPACES.ETHERFI) {
-    return (
-      <div>
-        <Hero />
-        <div>
-          <div className="flex gap-6">
-            <div className="bg-gradient-to-b from-stone-300 to-white  w-[1px] relative top-2"></div>
-            <div className="flex flex-col gap-8 max-w-2xl">
-              <div>
-                <div className="text-sm text-indigo-800 font-medium">
-                  Live – ETHFI token launch
-                </div>
-                <div>
-                  <div className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
-                  On March 18th, we’re launching the $ETHFI token and taking the
-                  first step towards full decentralization.
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-stone-600 font-medium">
-                  Phase 1 – Governance initiation
-                </div>
-                <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
-                <div>
-                  Over the next weeks, we will be gradually bringing voters into
-                  Ether.fi’s governance by launching offchain voting on
-                  Snapshot, delegate elections, our security council, and
-                  discourse groups.
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-stone-600 font-medium">
-                  Phase 2 – Transition to onchain governance
-                </div>
-                <div>
-                  <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
-                  As the community grows over the next months, we will be fully
-                  deploying the Agora onchain governor, and granting the
-                  community access control to Ether.fi’s protocol and treasury.
-                  This is allow Ether.fi’s team and the community to fully
-                  collaborate in steering the protocol.
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-stone-600 font-medium">
-                  Phase 3 – Full Ossification
-                </div>
-                <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
-                <div>
-                  In the long run, we’ll work on fully automating and ossifying
-                  governance function so that Ether.fi can stand the test of
-                  time and last as an immutable protocol underpinning Ethereum’s
-                  staking
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter

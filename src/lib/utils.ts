@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
+
 const { token } = Tenant.current();
 
 export function cn(...inputs: ClassValue[]) {
@@ -61,6 +62,73 @@ export function pluralize(word: string, count: number) {
     pluralWord = pluralWord.charAt(0).toUpperCase() + pluralWord.slice(1);
   }
   return `${count} ${pluralWord}`;
+}
+
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLocaleLowerCase();
+}
+
+/**
+ * Check if a string is in scientific notation
+ * @param input
+ */
+export function isScientificNotation(input: string) {
+  const scientificNotationRegex = /^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/;
+  return scientificNotationRegex.test(input);
+}
+
+/**
+ * Convert a string in scientific notation to precision BigInt
+ * @param input
+ */
+export function scientificNotationToPrecision(input: string) {
+  if (isScientificNotation(input)) {
+    const parts = input.split("e");
+    const base = parts[0].replace(".", "");
+    const exponent = parseInt(parts[1], 10) - (base.length - 1);
+    return BigInt(base) * 10n ** BigInt(exponent);
+  } else {
+    return BigInt(input);
+  }
+}
+
+// TODO: Rename ot scientificNotationTo number or something better fitting
+export function formatNumberWithScientificNotation(x: number): string {
+  if (x === 0) {
+    return "0";
+  }
+
+  const scientificNotation = x.toExponential();
+  const [base, exponent] = scientificNotation.split("e");
+  const exp = parseInt(exponent, 10);
+
+  // Format small numbers (abs(x) < 1.0)
+  if (Math.abs(x) < 1.0) {
+    const leadingZeros = Math.max(0, Math.abs(exp) - 1);
+    return `0.${"0".repeat(leadingZeros)}${base.replace(".", "")}`;
+  }
+
+  // Format large numbers and numbers with exponent 0
+  if (exp >= 0) {
+    const [integerPart, fractionalPart] = base.split(".");
+    const zerosNeeded = exp - (fractionalPart ? fractionalPart.length : 0);
+    return (
+      integerPart +
+      (fractionalPart || "") +
+      "0".repeat(Math.max(zerosNeeded, 0))
+    );
+  }
+
+  return scientificNotation;
+}
+
+export function tokenToHumanNumber(amount: number, decimals: number) {
+  return Math.floor(amount / Math.pow(10, decimals));
+}
+
+export function numberToToken(number: number) {
+  const { token } = Tenant.current();
+  return BigInt(number * Math.pow(10, token.decimals));
 }
 
 export function formatNumber(
@@ -124,7 +192,7 @@ export function generateBarsForVote(
 
   // Sum of all votes using BigInt
   const totalVotes = sections.reduce(
-    (acc, section) => acc + BigInt(section.amount),
+    (acc, section) => BigInt(acc) + BigInt(section.amount),
     BigInt(0)
   );
 
@@ -204,11 +272,34 @@ export async function fetchAndSetAll<
   values.forEach((value, index) => setters[index](value));
 }
 
-// TODO: Move this into tenant.ts
+export function getBlockScanAddress(address: string) {
+  const { contracts } = Tenant.current();
+  const chainId = contracts.token.chain.id;
+  switch (chainId) {
+    case 10:
+      // Optimism
+      return `https://optimistic.etherscan.io/address/${address}`;
+
+    case 11155111:
+      // Sepolia ETH
+      return `https://sepolia.etherscan.io/address/${address}`;
+
+    default:
+      return `https://etherscan.io/tx/${address}`;
+  }
+}
+
 export function getBlockScanUrl(hash: string | `0x${string}`) {
-  switch (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME) {
-    case "optimism":
+  const { contracts } = Tenant.current();
+  const chainId = contracts.token.chain.id;
+  switch (chainId) {
+    case 10:
+      // Optimism
       return `https://optimistic.etherscan.io/tx/${hash}`;
+
+    case 11155111:
+      // Sepolia ETH
+      return `https://sepolia.etherscan.io/tx/${hash}`;
 
     default:
       return `https://etherscan.io/tx/${hash}`;

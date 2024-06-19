@@ -13,9 +13,9 @@ async function isCitizen(address: string) {
   >(
     Prisma.sql`
     SELECT address
-    FROM agora.address_metadata
-    WHERE kind = 'citizen' 
-    AND dao_slug = ${slug}::config.dao_slug
+    FROM agora.citizens
+    WHERE dao_slug = ${slug}::config.dao_slug
+    AND retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
     AND LOWER(address) = LOWER(${address});
     `
   );
