@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
 import {
   Area,
   AreaChart,
@@ -12,7 +10,6 @@ import {
   YAxis,
 } from "recharts";
 import { format } from "date-fns";
-import { icons } from "@/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
@@ -91,25 +88,7 @@ export default function VotingTimelineChart({
     votes: Vote[];
   };
 }) {
-  const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
-
-  const handleExpandChart = () => {
-    setShowChart((prevState) => !prevState);
-  };
-
-  return (
-    <div className="border border-gray-300 rounded-lg p-4 pb-2 w-full font-inter ">
-      <p
-        onClick={handleExpandChart}
-        className="flex items-center gap-x-1.5 text-xs font-semibold ml-1 mb-2 cursor-pointer"
-      >
-        Proposal Voting timeline{" "}
-        <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
-      </p>
-
-      {showChart && <Chart proposal={proposal} votes={proposalVotes.votes} />}
-    </div>
-  );
+  return <Chart proposal={proposal} votes={proposalVotes.votes} />;
 }
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
@@ -135,12 +114,10 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     ...chartData,
     {
       timestamp: proposal.end_time,
-      ...(proposal.status !== "ACTIVE" && {
-        for: chartData[chartData.length - 1]?.for,
-        abstain: chartData[chartData.length - 1]?.abstain,
-        against: chartData[chartData.length - 1]?.against,
-        total: chartData[chartData.length - 1]?.total,
-      }),
+      for: chartData[chartData.length - 1]?.for,
+      abstain: chartData[chartData.length - 1]?.abstain,
+      against: chartData[chartData.length - 1]?.against,
+      total: chartData[chartData.length - 1]?.total,
     },
   ];
 
@@ -173,7 +150,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           axisLine={false}
           tickCount={6}
           interval={0}
-          width={32}
+          width={36}
           tickMargin={0}
         />
 
@@ -181,22 +158,22 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           type="step"
           dataKey="against"
           stackId="1"
-          stroke="#C52F00"
-          fill="#eec2b5"
+          stroke="#dc2626"
+          fill="#fecaca"
         />
         <Area
           type="step"
           dataKey="abstain"
           stackId="1"
-          stroke="#5a5a5a"
-          fill="#e3e3e3"
+          stroke="#57534e"
+          fill="#e7e5e4"
         />
         <Area
           type="step"
           dataKey="for"
           stackId="1"
-          stroke="#00992B"
-          fill="#b0ebc1"
+          stroke="#16a34a"
+          fill="#bbf7d0"
         />
 
         {!!proposal.quorum && (
