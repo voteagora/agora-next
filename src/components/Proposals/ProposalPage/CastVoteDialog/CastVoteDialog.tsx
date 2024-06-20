@@ -58,30 +58,39 @@ function BasicVoteDialog({
   return (
     <>
       {!isSuccess && (
-        <VStack gap={4} className={styles.dialog_container}>
+        <div
+          className="flex flex-col gap-4 w-full relative"
+          style={{ transformStyle: "preserve-3d" }}
+        >
           <HStack justifyContent="justify-between">
             <VStack>
               {delegate.address ? (
-                <div className={styles.subtitle}>
+                <div className="text-xs text-tertiary font-medium">
                   <HumanAddress address={delegate.address} />
                 </div>
               ) : (
-                <div className={styles.subtitle}>Anonymous</div>
+                <div className="text-xs text-tertiary font-medium">
+                  Anonymous
+                </div>
               )}
-              <div className={styles.title}>
+              <div className="text-lg text-primary font-extrabold">
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
             </VStack>
             <VStack alignItems="items-end">
-              <div className={styles.subtitle}>with</div>
+              <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
             </VStack>
           </HStack>
-          <div className={styles.reason_box}>
+          <div>
             {reason ? (
-              <div className={styles.has_reason}>{reason}</div>
+              <div className="max-h-[40vh] overflow-y-scroll text-secondary">
+                {reason}
+              </div>
             ) : (
-              <div className={styles.no_reason}>No voting reason provided</div>
+              <div className="w-full py-6 px-4 rounded-lg border border-line text-center text-secondary">
+                No voting reason provided
+              </div>
             )}
           </div>
           <div>
@@ -94,7 +103,7 @@ function BasicVoteDialog({
               <NoStatementView closeDialog={closeDialog} />
             )}
           </div>
-        </VStack>
+        </div>
       )}
       {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
     </>
