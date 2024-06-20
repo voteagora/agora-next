@@ -5,7 +5,7 @@ import Markdown from "@/components/shared/Markdown/Markdown";
 export default function DelegateStatement({ statement }) {
   return (
     <VStack className="gap-4">
-      <h2 className="text-2xl font-bold">Delegate Statement</h2>
+      <h2 className="text-2xl font-bold text-primary">Delegate Statement</h2>
       <Markdown content={statement} />
     </VStack>
   );

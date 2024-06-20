@@ -1,6 +1,5 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import styles from "./OPProposalApprovalPage.module.scss";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { fetchAllForVoting as apiFetchAllForVoting } from "@/app/api/votes/getVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -9,7 +8,6 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
 
 async function fetchProposalVotes(proposal_id: string, page = 1) {
   "use server";
@@ -55,7 +53,7 @@ export default async function OPProposalApprovalPage({
       gap={16}
       justifyContent="justify-between"
       alignItems="items-start"
-      className={styles.proposal_container}
+      className="max-w-[76rem] flex-col sm:flex-row items-stretch sm:items-start justify-end sm:justify-between"
     >
       <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
@@ -63,9 +61,9 @@ export default async function OPProposalApprovalPage({
         <VStack
           gap={4}
           justifyContent="justify-between"
-          className={styles.proposal_votes_container}
+          className="sticky top-20 flex-shrink max-w-[24rem] bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto"
         >
-          <VStack gap={4} className={styles.proposal_actions_panel}>
+          <VStack gap={4}>
             {/* Show the results of the approval vote w/ a tab for votes */}
             <ApprovalVotesPanel
               proposal={proposal}

@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
               <div tw="font-bold text-5xl w-1/2">
                 {truncateString(address, 20)}
               </div>
-              <div tw="font-normal mt-[30px] text-4xl text-gray-600">
+              <div tw="font-normal mt-[30px] text-4xl text-secondary">
                 {description}
               </div>
             </div>
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
                       {truncateString(address, 30)}
                     </div>
                     {votes && (
-                      <div tw="flex text-[17px] text-slate-800">{votes}</div>
+                      <div tw="flex text-[17px] text-primary">{votes}</div>
                     )}
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
 
               <div tw="flex flex-col h-full">
                 {statement && (
-                  <div tw="flex text-2xl text-gray-800 h-60">{statement}</div>
+                  <div tw="flex text-2xl text-primary h-60">{statement}</div>
                 )}
               </div>
             </div>

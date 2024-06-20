@@ -31,7 +31,7 @@ export default function ProposalVotesBar({ proposal, votes }) {
 
       {proposal.approvalThreshold && (
         <div
-          className="bg-[#000000] h-4 w-[2px] absolute -top-[3px] z-50"
+          className="bg-black h-4 w-[2px] absolute -top-[3px] z-50"
           style={{
             left: `${Math.round(Number(proposal.approvalThreshold) / 100)}%`,
           }}

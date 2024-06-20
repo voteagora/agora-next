@@ -13,7 +13,7 @@ export const PanelClaimRewards = () => {
 
   return (
     <div className="flex flex-col rounded-xl border border-gray-300 max-w-[354px] w-full h-100 bg-gray-50 shadow-newDefault">
-      <div className="flex flex-col py-5 px-[17px] rounded-xl bg-white border-b border-b-gray-300 shadow-newDefault">
+      <div className="flex flex-col py-5 px-[17px] rounded-xl bg-neutral border-b border-b-gray-300 shadow-newDefault">
         <Image
           src="/images/uni_rewards.svg"
           alt="results 2"
@@ -28,7 +28,7 @@ export const PanelClaimRewards = () => {
             <p className="text-xs font-semibold text-gray-4f">
               Available to collect
             </p>
-            <h6 className="text-base font-medium text-black">
+            <h6 className="text-base font-medium text-primary">
               {formatNumber(0, 18)} WETH
             </h6>
           </div>

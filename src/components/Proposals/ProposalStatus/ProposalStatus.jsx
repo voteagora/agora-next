@@ -1,4 +1,3 @@
-import styles from "./proposalStatus.module.scss";
 import { cn } from "@/lib/utils";
 
 export default function ProposalStatus({ proposal }) {
@@ -21,9 +20,26 @@ export default function ProposalStatus({ proposal }) {
     statusClass = "status-succeeded";
   }
 
+  const approved = ["succeeded", "executed", "queued"];
+  const rejected = ["defeated", "expired", "cancelled", "vetoed"];
+  const pending = ["pending"];
+  const active = ["active"];
+  const test = ["test"];
+  const closed = ["closed"];
+
   return (
-    <div className={cn(styles[statusClass], styles.cell_content_status_pill)}>
-      {statusText}
+    <div
+      className={cn(
+        approved.includes(proposal.status.toLowerCase()) && "text-positive",
+        rejected.includes(proposal.status.toLowerCase()) && "text-negative",
+        pending.includes(proposal.status.toLowerCase()) && "text-secondary",
+        active.includes(proposal.status.toLowerCase()) && "text-blue-500",
+        test.includes(proposal.status.toLowerCase()) && "text-blue-600",
+        closed.includes(proposal.status.toLowerCase()) && "text-purple-700",
+        "capitalize"
+      )}
+    >
+      {statusText.toLowerCase()}
     </div>
   );
 }

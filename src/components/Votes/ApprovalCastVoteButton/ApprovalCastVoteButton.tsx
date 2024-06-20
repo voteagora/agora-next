@@ -1,7 +1,6 @@
 "use client";
 
 import { VStack, HStack } from "@/components/Layout/Stack";
-import styles from "./approvalCastVoteButton.module.scss";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -76,8 +75,8 @@ export default function ApprovalCastVoteButton({
   }, [fetchData, address, proposal.snapshotBlockNumber]);
 
   return (
-    <VStack className={styles.cast_vote_container}>
-      <VStack alignItems="items-stretch" className={styles.vote_actions}>
+    <VStack className="flex-shrink-0">
+      <VStack alignItems="items-stretch">
         <VoteButton
           onClick={(missingVote: MissingVote) =>
             openDialog({
@@ -152,7 +151,10 @@ function VoteButton({
 
 function CastButton({ onClick }: { onClick: () => void }) {
   return (
-    <button className={styles.vote_button} onClick={onClick}>
+    <button
+      className={`bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+      onClick={onClick}
+    >
       Cast Vote
     </button>
   );
@@ -160,7 +162,10 @@ function CastButton({ onClick }: { onClick: () => void }) {
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <button disabled className={styles.vote_button_disabled}>
+    <button
+      disabled
+      className="bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
+    >
       {reason}
     </button>
   );

@@ -14,7 +14,7 @@ export default function DelegateStatementFormSection({
   const delegateStatement = useWatch({ name: "delegateStatement" });
 
   return (
-    <VStack className="py-8 px-6 border-b border-gray-300">
+    <VStack className="py-8 px-6 border-b border-line">
       <Tabs defaultValue="write">
         <HStack className="gap-4 justify-between items-baseline">
           <HStack className="items-baseline gap-2">

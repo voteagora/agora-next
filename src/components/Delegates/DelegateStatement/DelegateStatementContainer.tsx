@@ -36,7 +36,7 @@ export default function DelegateStatementContainer({
         </div>
       )}
       {!delegateStatement && (
-        <div className="p-8 align-middle text-center rounded-md bg-gray-100">
+        <div className="p-8 align-middle text-center rounded-md bg-line">
           <p className="break-words">
             No delegate statement for {addressOrENSName}
           </p>

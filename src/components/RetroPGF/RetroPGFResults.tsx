@@ -114,7 +114,7 @@ export default function RetroPGFResults({
   };
 
   return (
-    <VStack className="my-8 max-w-6xl rounded-xl border border-gray-300 shadow-newDefault overflow-hidden">
+    <VStack className="my-8 max-w-6xl rounded-xl border border-line shadow-newDefault overflow-hidden">
       {/* @ts-ignore */}
       <InfiniteScroll
         hasMore={pageInfo?.hasNextPage}
@@ -123,7 +123,7 @@ export default function RetroPGFResults({
         loader={
           <div
             key="loader"
-            className="flex justify-center py-6 text-sm text-stone-500"
+            className="flex justify-center py-6 text-sm text-secondary"
           >
             Loading...
           </div>
@@ -165,7 +165,7 @@ export default function RetroPGFResults({
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="text-gray-4f font-medium text-sm">
+          <TableBody className="text-secondary font-medium text-sm">
             {results.map((result) => {
               const {
                 applicant,
@@ -207,7 +207,7 @@ export default function RetroPGFResults({
                       height="32"
                       className="inline mr-2"
                     />
-                    <span className="font-semibold text-black inline-block max-w-[calc(100%-40px)] align-middle">
+                    <span className="font-semibold text-primary inline-block max-w-[calc(100%-40px)] align-middle">
                       {displayName}
                     </span>
                   </TableCell>
@@ -223,7 +223,7 @@ export default function RetroPGFResults({
                     {/* We only show two categories + more */}
                     {impactCategory.slice(0, 3).map((category, index) => (
                       <span
-                        className="mx-1 py-0.5 px-1 rounded-[4px] bg-gray-fa text-xs"
+                        className="mx-1 py-0.5 px-1 rounded-[4px] bg-wash text-xs"
                         key={category}
                       >
                         {index === 2
@@ -239,7 +239,7 @@ export default function RetroPGFResults({
                     {includedInLists}
                   </TableCell>
                   <TableCell className="text-right px-6">
-                    <span className="font-semibold text-black whitespace-nowrap">
+                    <span className="font-semibold text-primary whitespace-nowrap">
                       {formatNumber(Number(awarded))} OP
                     </span>
                     <span className="text-xs block sm:inline sm:ml-2">

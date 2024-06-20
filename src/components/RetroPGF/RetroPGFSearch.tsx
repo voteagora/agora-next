@@ -35,7 +35,7 @@ export default function RetroPGFSearch() {
           defaultValue={searchParam}
           placeholder="Search projects"
           tooltipMessage="Searches project names and descriptions"
-          className="py-2 pr-4 pl-8 rounded-full bg-gray-fa border border-gray-eb w-full placeholder-gray-af"
+          className="py-2 pr-4 pl-8 rounded-full bg-wash border border-line w-full placeholder-gray-af"
         />
         <Image
           className="absolute top-[50%] left-3 hidden sm:inline transform -translate-y-1/2 pointer-events-none"

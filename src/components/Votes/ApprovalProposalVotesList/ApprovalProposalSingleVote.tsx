@@ -52,7 +52,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
             justifyContent="justify-between"
             className="mb-2 text-xs leading-4"
           >
-            <div className="text-black font-semibold flex items-center">
+            <div className="text-primary font-semibold flex items-center">
               <HumanAddress address={voterAddress} />
               {address?.toLowerCase() === voterAddress && (
                 <span>&nbsp;(you)</span>
@@ -79,7 +79,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                 </>
               )}
             </div>
-            <div className={"font-semibold text-gray-700"}>
+            <div className={"font-semibold text-secondary"}>
               <TokenAmountDisplay amount={weight} />
             </div>
           </HStack>
@@ -97,21 +97,21 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
           <p
             key={index}
             className={
-              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-gray-eo text-gray-4f font-medium"
+              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-line text-secondary font-medium"
             }
           >
             {++index}. {option}
           </p>
         ))}
         {support === "ABSTAIN" && (
-          <p className="pl-3 border-l border-gray-eo text-gray-4f font-medium">
+          <p className="pl-3 border-l border-line text-secondary font-medium">
             {"Abstain"}
           </p>
         )}
       </VStack>
       {reason && (
         <div>
-          <p className={"text-gray-4f font-medium text-xs leading-4"}>
+          <p className={"text-secondary font-medium text-xs leading-4"}>
             {reason}
           </p>
         </div>

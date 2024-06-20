@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
             <LogoPill />
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-full">{title}</div>
-              <div tw="font-normal mt-[30px] text-4xl text-gray-600">
+              <div tw="font-normal mt-[30px] text-4xl text-secondary">
                 {description}
               </div>
             </div>

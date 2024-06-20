@@ -20,7 +20,7 @@ function DelegationsContainer({
 }) {
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
-      <div className="p-8 text-center align-middle bg-gray-100 rounded-md">
+      <div className="p-8 text-center align-middle bg-wash rounded-md">
         No advanced delegations found
       </div>
     );
@@ -38,17 +38,14 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-slate-700 bg-slate-100 sm:block">
+          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-secondary bg-wash sm:block">
             Advanced delegation beta
           </div>
         </HStack>
         <TabsContent value="delegatedFrom" className="max-w-full">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
-          >
+          <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
-              <TableHeader className="text-xs text-slate-700">
+              <TableHeader className="text-xs text-secondary">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
@@ -74,12 +71,9 @@ function DelegationsContainer({
           </VStack>
         </TabsContent>
         <TabsContent value="delegatedTo">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
-          >
+          <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
-              <TableHeader className="text-xs text-slate-700">
+              <TableHeader className="text-xs text-secondary">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>

@@ -30,7 +30,7 @@ export const Breadcrumbs = ({
   return (
     <div className="flex flex-row gap-3 mb-5 items-center">
       <Button
-        className="w-8 h-8 border bg-white rounded-full items-center justify-center mr-2 shadow-newDefault"
+        className="w-8 h-8 border bg-neutral rounded-full items-center justify-center mr-2 shadow-newDefault"
         variant="secondary"
         onClick={onBackButton}
       >

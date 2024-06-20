@@ -1,24 +1,20 @@
 "use client";
 
-import { css, cx } from "@emotion/css";
 import { Form } from "./CreateProposalForm";
-import * as theme from "@/styles/theme";
-import styles from "./styles.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
 import { Switch } from "@/components/shared/Switch";
-import InfoPop from "@/components/shared/InfoPop";
 import LabelWithInfo from "./LabelWithInfo";
 
 export default function ApprovalCriteriaRow({ form }: { form: Form }) {
   return (
     <>
-      <h4 className={styles.create_prop_form__title}>Approval parameters</h4>
-      <p className={styles.approval__info}>
+      <h4 className="pb-1 font-semibold">Approval parameters</h4>
+      <p className="text-base mb-4 text-secondary">
         Use the following settings to set the parameters of this vote as well as
         the methodology for determining which options can be executed.
       </p>
-      <HStack className={styles.approval__section} gap={4}>
+      <HStack className="w-full mb-4" gap={4}>
         <VStack className="w-full">
           <LabelWithInfo label="Budget (OP)">
             This is the maximum number of tokens that can be transferred from
@@ -47,7 +43,7 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
           />
         </VStack>
       </HStack>
-      <HStack className={styles.approval__section} gap={4}>
+      <HStack className="w-full mb-4" gap={4}>
         <VStack className="w-full">
           <LabelWithInfo label="Criteria">
             There are two ways to determine the winners of an approval vote.

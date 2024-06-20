@@ -3,7 +3,6 @@ import { formatNumber } from "@/lib/tokenUtils";
 import Image from "next/image";
 import { useMemo } from "react";
 import tokenIcon from "@/icons/tokenIcon.svg";
-import styles from "./delegateDialog.module.scss";
 import Tenant from "@/lib/tenant/tenant";
 
 export function DelegationDisplayAmount({
@@ -19,7 +18,7 @@ export function DelegationDisplayAmount({
   return (
     <HStack
       gap={2}
-      className={styles.token_amount_container}
+      className="text-primary text-3xl sm:text-4xl"
       alignItems="items-center"
     >
       <Image src={tokenIcon} alt={token.symbol} width={32} height={32} />

@@ -2,7 +2,6 @@ import { HStack } from "@/components/Layout/Stack";
 import { formatNumberForAdvancedDelegation } from "@/lib/tokenUtils";
 import Image from "next/image";
 import { useMemo } from "react";
-import styles from "./advancedDelegateDialog.module.scss";
 import Tenant from "@/lib/tenant/tenant";
 
 export function AdvancedDelegationDisplayAmount({
@@ -19,7 +18,7 @@ export function AdvancedDelegationDisplayAmount({
   return (
     <HStack
       gap={2}
-      className={styles.token_amount_container}
+      className="text-primary text-4xl sm:text-5xl font-semibold leading-none"
       alignItems="items-center"
     >
       {formattedNumber}

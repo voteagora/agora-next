@@ -121,7 +121,7 @@ export default async function Page({
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col justify-between gap-2 sm:flex-row">
-                <h2 className="text-2xl font-bold">Past Votes</h2>
+                <h2 className="text-2xl font-bold text-primary">Past Votes</h2>
                 {/* <div className="flex flex-col justify-between gap-2 sm:flex-row">
                   <DelegatesVotesSort
                     fetchDelegateVotes={async (page, sortOrder) => {

@@ -20,7 +20,10 @@ export default function Page() {
           alignItems: "center",
         }}
       >
-        <h1 style={{ fontSize: "4rem", margin: "14px 0" }}>
+        <h1
+          className="text-primary"
+          style={{ fontSize: "4rem", margin: "14px 0" }}
+        >
           <svg
             style={{
               height: "1em",

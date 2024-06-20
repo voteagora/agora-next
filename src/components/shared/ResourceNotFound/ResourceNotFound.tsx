@@ -15,7 +15,7 @@ export default function ResourceNotFound({ message }: ResourceNotFoundProps) {
         width={40}
         height={12}
       />
-      <p className="text-md text-stone-600">{message || defaultMessage}</p>
+      <p className="text-md text-secondary">{message || defaultMessage}</p>
     </div>
   );
 }

@@ -7,7 +7,6 @@ import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
 import { useMemo } from "react";
-import styles from "./delegateCard.module.scss";
 import Image from "next/image";
 import badge from "@/icons/badge.svg";
 import { useEffect } from "react";
@@ -75,18 +74,18 @@ export function DelegateProfileImage({
             alt="badge symbol"
           />
         )}
-        <ENSAvatar className={styles.avatar} ensName={data} />
+        <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
       </div>
 
       <VStack>
-        <div className={styles.address}>
+        <div className="text-base font-semibold hover:opacity-90">
           {copyable ? (
             <CopyableHumanAddress address={address} />
           ) : (
             <HumanAddress address={address} />
           )}
         </div>
-        <div className={styles.token}>
+        <div className="text-secondary text-xs font-semibold">
           {formattedNumber} {token.symbol}
         </div>
       </VStack>

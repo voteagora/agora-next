@@ -1,13 +1,14 @@
 import { HStack } from "@/components/Layout/Stack";
-import styles from "./pageHeader.module.scss";
 
 export default function PageHeader({ headerText }) {
   return (
     <HStack
       justifyContent="justify-between"
-      className={styles.page_header_container}
+      className="sm:mb-4 flex-col sm:flex-row mb-2 max-w-full"
     >
-      <h1>{headerText}</h1>
+      <h1 className="text-primary text-2xl font-extrabold mb-0">
+        {headerText}
+      </h1>
       <HStack gap={4}></HStack>
     </HStack>
   );

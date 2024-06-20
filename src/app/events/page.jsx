@@ -2,7 +2,7 @@ export default async function Page() {
   return (
     <>
       <section>
-        <h1>Activity Feed</h1>
+        <h1 className="text-primary">Activity Feed</h1>
       </section>
     </>
   );

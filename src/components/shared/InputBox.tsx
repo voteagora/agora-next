@@ -1,5 +1,4 @@
 "use client";
-import styles from "./styles.module.scss";
 
 export default function InputBox({
   placeholder,
@@ -14,7 +13,7 @@ export default function InputBox({
 }) {
   return (
     <input
-      className={styles.input_box}
+      className="w-full py-2 px-4 rounded-md text-base bg-line border-line"
       placeholder={placeholder}
       value={value}
       onChange={(event) => onChange(event.target.value)}

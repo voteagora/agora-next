@@ -45,6 +45,20 @@ type TenantUIParams = {
   pages?: UIPage[];
   title: string;
   toggles?: UIToggle[];
+  customization?: {
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    neutral?: string;
+    wash?: string;
+    line?: string;
+    veil?: string;
+    positive?: string;
+    negative?: string;
+    accentPrimary?: string;
+    accentNeutral?: string;
+    font?: string;
+  };
 };
 
 export class TenantUI {
@@ -58,7 +72,20 @@ export class TenantUI {
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
-
+  private _customization?: {
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    neutral?: string;
+    wash?: string;
+    line?: string;
+    veil?: string;
+    positive?: string;
+    negative?: string;
+    accentPrimary?: string;
+    accentNeutral?: string;
+    font?: string;
+  };
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
@@ -74,6 +101,7 @@ export class TenantUI {
     pages,
     title,
     toggles,
+    customization,
   }: TenantUIParams) {
     this._color = color;
     this._delegates = delegates;
@@ -85,6 +113,7 @@ export class TenantUI {
     this._pages = pages;
     this._title = title;
     this._toggles = toggles;
+    this._customization = customization;
   }
 
   public get color(): string {
@@ -113,6 +142,25 @@ export class TenantUI {
 
   public get organization(): UIOrganization | undefined {
     return this._organization;
+  }
+
+  public get customization():
+    | {
+        primary?: string;
+        secondary?: string;
+        tertiary?: string;
+        neutral?: string;
+        wash?: string;
+        line?: string;
+        veil?: string;
+        positive?: string;
+        negative?: string;
+        accentPrimary?: string;
+        accentNeutral?: string;
+        font?: string;
+      }
+    | undefined {
+    return this._customization;
   }
 
   public link(name: string): UILink | undefined {

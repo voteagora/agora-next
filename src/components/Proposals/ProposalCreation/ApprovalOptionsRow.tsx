@@ -2,7 +2,6 @@
 
 import { Form } from "./CreateProposalForm";
 import { XCircleIcon } from "@heroicons/react/20/solid";
-import styles from "./styles.module.scss";
 import { VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
 import AddTransactionsDetails from "./AddTransactionsDetails";
@@ -38,24 +37,28 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
 
   return (
     <>
-      <h4 className={styles.create_prop_form__title}>Proposed Options</h4>
-      <p className={styles.approval__option_row_text}>
+      <h4 className="font-semibold pb-1">Proposed Options</h4>
+      <p className="text-base text-secondary mb-4">
         Proposed transactions will execute if your proposal passes. If you skip
         this step no transactions will be added.
       </p>
       {form.state.options.map((_option, index) => (
-        <VStack gap={4} key={index} className={styles.approval__option_row}>
-          <div className="border-b border-dashed border-gray-300 font-semibold pb-1 flex flex-row justify-between">
+        <VStack
+          gap={4}
+          key={index}
+          className="border-box w-full p-4 mb-8 border border-line rounded-lg"
+        >
+          <div className="border-b border-dashed border-line font-semibold pb-1 flex flex-row justify-between">
             <span>Option {index + 1}</span>
             {form.state.options.length > 1 && (
               <XCircleIcon
-                className="h-5 w-5 pointer text-gray-eb hover:text-gray-4f"
+                className="h-5 w-5 pointer text-line hover:text-secondary"
                 onClick={() => remove(index)}
               />
             )}
           </div>
           <VStack>
-            <label className={styles.create_prop_form__label}>
+            <label className="text-secondary font-semibold mb-1 text-xs">
               Title (no markdown)
             </label>
             <InputBox
@@ -68,9 +71,14 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
           </VStack>
         </VStack>
       ))}
-      <div onClick={addOption} className={styles.option_button}>
-        <div className={styles.option_button__add}>+</div>
-        <div className={styles.option_button__copy}>Add option</div>
+      <div
+        onClick={addOption}
+        className="flex items-center w-full gap-2 p-4 border border-line cursor-pointer font-semibold shadow-newDefault"
+      >
+        <div className="h-8 w-8 flex items-center justify-center rounded-full shadow-newDefault bg-neutral border border-line">
+          +
+        </div>
+        <div>Add option</div>
       </div>
     </>
   );

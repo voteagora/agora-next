@@ -8,7 +8,6 @@ import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFil
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Proposal from "../Proposal/Proposal";
-import styles from "./proposalLists.module.scss";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
 
@@ -46,7 +45,7 @@ export default function ProposalsList({
   const proposals = pages.flatMap((page) => page.proposals);
 
   return (
-    <VStack className={styles.proposals_list_container}>
+    <VStack className="max-w-[76rem]">
       {/* {address && <NonVotedProposalsList address={address} />} */}
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
@@ -62,8 +61,8 @@ export default function ProposalsList({
           reviewPeriod={governanceCalendar.reviewPeriod}
         />
       )}
-      <VStack className={styles.proposals_table_container}>
-        <div className={styles.proposals_table}>
+      <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        <div>
           <InfiniteScroll
             hasMore={meta.hasNextPage}
             pageStart={0}
@@ -72,7 +71,7 @@ export default function ProposalsList({
               <div key={0}>
                 <HStack
                   key="loader"
-                  className="gl_loader justify-center py-6 text-sm text-stone-500"
+                  className="gl_loader justify-center py-6 text-sm text-secondary"
                 >
                   Loading...
                 </HStack>

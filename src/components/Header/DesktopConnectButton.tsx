@@ -1,15 +1,14 @@
 import { ConnectKitButton } from "connectkit";
-import styles from "./header.module.scss";
 import { DesktopProfileDropDown } from "./DesktopProfileDropDown";
 
 export function DesktopConnectButton() {
   return (
     <ConnectKitButton.Custom>
-      {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
+      {({ isConnected, show, ensName }) => {
         return (
           <div
             onClick={!isConnected ? () => show?.() : undefined}
-            className={styles.desktop_connect_button}
+            className="border border-line font-medium bg-wash py-2 px-4 rounded-full cursor-pointer flex items-center transition-all hover:shadow-newDefault"
           >
             {isConnected ? (
               <DesktopProfileDropDown ensName={ensName} />

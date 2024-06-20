@@ -2,7 +2,6 @@
 
 import { Form } from "./CreateProposalForm";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "./styles.module.scss";
 import { Switch } from "@/components/shared/Switch";
 import {
   Select,
@@ -54,22 +53,26 @@ function ProposalTypeRow({
   ]);
 
   return (
-    <VStack className={styles.type_row}>
+    <VStack className="mt-4 pb-4">
       <HStack
-        className={styles.type_row__inner}
+        className="flex-row sm:flex-col"
         justifyContent="justify-between"
         gap={8}
       >
-        <div className={styles.type_row__left}>
-          <h4 className={styles.input_heading}>Vote type</h4>
+        <div className="w-1/2">
+          <h4 className="text-xs font-semibold mb-1 text-secondary">
+            Vote type
+          </h4>
           <Switch
             options={["Basic", "Approval", "Optimistic"]}
             selection={proposalType}
             onSelectionChanged={form.onChange.proposalType}
           />
         </div>
-        <div className={styles.type_row__right}>
-          <h4 className={styles.input_heading}>Proposal type</h4>
+        <div className="w-full sm:w-1/2">
+          <h4 className="text-xs font-semibold mb-1 text-secondary">
+            Proposal type
+          </h4>
           <Select
             value={proposalSettings}
             onValueChange={form.onChange.proposalSettings}
@@ -96,7 +99,9 @@ function ProposalTypeRow({
           </Select>
         </div>
       </HStack>
-      <div className={styles.type_row__text}>{infoText()}</div>
+      <div className="ml-0 w-full mt-2 sm:mt-1 text-secondary">
+        {infoText()}
+      </div>
     </VStack>
   );
 }

@@ -54,7 +54,7 @@ export default function EventFeed({ initialEvents, fetchEvents }) {
           <div className="relative pb-8">
             {activityItemIdx !== events.length - 1 ? (
               <span
-                className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+                className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-line"
                 aria-hidden="true"
               />
             ) : null}
@@ -62,23 +62,23 @@ export default function EventFeed({ initialEvents, fetchEvents }) {
               {activityItem.kind === "VOTE_CAST" ? (
                 <>
                   <div className="relative">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-line ring-8 ring-white">
                       <UserCircleIcon
-                        className="h-5 w-5 text-gray-500"
+                        className="h-5 w-5 text-tertiary"
                         aria-hidden="true"
                       />
                     </div>
                   </div>
                   <div className="min-w-0 flex-1 py-1.5">
-                    <div className="text-sm text-gray-500">
-                      <a href={"#"} className="font-medium text-gray-900">
+                    <div className="text-sm text-tertiary">
+                      <a href={"#"} className="font-medium text-primary">
                         <p>
                           {JSON.parse(activityItem.event_data).address} casted a
                           vote
                         </p>
                       </a>{" "}
                     </div>
-                    <div className="mt-2 text-sm text-gray-700">
+                    <div className="mt-2 text-sm text-secondary">
                       <p>{JSON.parse(activityItem.event_data).reason}</p>
                     </div>
                   </div>
@@ -86,21 +86,21 @@ export default function EventFeed({ initialEvents, fetchEvents }) {
               ) : activityItem.kind === "DELEGATE_CHANGED" ? (
                 <>
                   <div className="relative">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-line ring-8 ring-white">
                       <UserCircleIcon
-                        className="h-5 w-5 text-gray-500"
+                        className="h-5 w-5 text-tertiary"
                         aria-hidden="true"
                       />
                     </div>
                   </div>
                   <div className="min-w-0 flex-1 py-1.5">
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-tertiary">
                       Delegation changed by{" "}
-                      <a href={"#"} className="font-medium text-gray-900">
+                      <a href={"#"} className="font-medium text-primary">
                         <p>{JSON.parse(activityItem.event_data).delegator}</p>
                       </a>
                     </div>
-                    <div className="mt-2 text-sm text-gray-700">
+                    <div className="mt-2 text-sm text-secondary">
                       <p>From: {activityItem.event_data.from_delegate}</p>
                       <p>To: {activityItem.event_data.to_delegate}</p>
                     </div>

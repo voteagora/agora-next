@@ -1,5 +1,4 @@
 import { VStack } from "@/components/Layout/Stack";
-import styles from "./proposal.module.scss";
 import { formatUnits } from "ethers";
 import { disapprovalThreshold } from "@/lib/constants";
 
@@ -23,7 +22,7 @@ export default function OPOptimisticProposalStatus({
   return (
     <VStack className="text-right">
       <VStack>
-        <div className={styles.cell_content_title}>
+        <div className="text-xs text-secondary">
           <p>
             {againstRelativeAmount}% / {disapprovalThreshold}% against needed to
             defeat

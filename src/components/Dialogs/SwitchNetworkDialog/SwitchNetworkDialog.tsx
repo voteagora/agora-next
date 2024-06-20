@@ -26,7 +26,7 @@ export function SwitchNetwork({
         className="w-full"
         alt="Switch netwrok"
       />
-      <h1 className="text-2xl font-extrabold">Switch Networks</h1>
+      <h1 className="text-2xl font-extrabold text-primary">Switch Networks</h1>
       <p>Wrong network detected, switch to {chain.name} to continue.</p>
       <Button
         variant="outline"

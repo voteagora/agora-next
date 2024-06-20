@@ -19,7 +19,7 @@ export const DepositList = ({
 }: StakedDepositListProps) => {
   return (
     <div className="flex flex-col rounded-xl border border-gray-300 w-auto h-100 bg-gray-50 shadow-newDefault">
-      <div className="border-b border-gray-300 rounded-xl bg-white shadow-newDefault">
+      <div className="border-b border-gray-300 rounded-xl bg-neutral shadow-newDefault">
         {deposits.map(async (deposit) => {
           return (
             <div key={`deposit-${deposit.id}`} className="flex w-auto h-100">

@@ -2,7 +2,6 @@
 
 import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder } from "ethers";
-import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import {
   LoadingVote,
@@ -12,7 +11,6 @@ import {
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { CheckIcon } from "lucide-react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import styles from "./approvalCastVoteDialog.module.scss";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
@@ -86,7 +84,7 @@ export function ApprovalCastVoteDialog({
   }, [selectedOptions, abstain]);
 
   return (
-    <div className={styles.container}>
+    <div style={{ transformStyle: "preserve-3d" }}>
       {hasStatement && isLoading && <LoadingVote />}
       {hasStatement && isSuccess && (
         <SuccessMessage closeDialog={closeDialog} data={data} />
@@ -96,15 +94,15 @@ export function ApprovalCastVoteDialog({
       {hasStatement && !isLoading && !isSuccess && (
         <>
           <VStack gap={3}>
-            <VStack className={styles.title_box}>
-              <p className={styles.title}>
+            <VStack>
+              <p className="text-xl font-extrabold">
                 Select up to {maxChecked} option{maxChecked > 1 && "s"}
               </p>
-              <p className={styles.notes}>
+              <p className="text-secondary mt-1">
                 Your vote is final and cannot be edited once submitted.
               </p>
             </VStack>
-            <VStack className={styles.options_list}>
+            <VStack className="max-h-[46vh] overflow-y-scroll">
               {proposalData.options.map((option, index) => (
                 <CheckCard
                   key={index}
@@ -175,9 +173,9 @@ function CastVoteWithReason({
   copy?: string;
 }) {
   return (
-    <VStack className={styles.cast_vote_box} gap={4}>
+    <VStack gap={4}>
       <textarea
-        className={styles.reason_input}
+        className="p-4 resize-none rounded-lg bg-line border-line transition-all"
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
@@ -226,29 +224,26 @@ function CheckCard({
   abstain: boolean;
 }) {
   return (
-    <div className={styles.option_card} onClick={onClick}>
+    <div className="py-2 cursor-pointer relative" onClick={onClick}>
       <p
         className={
           checked
-            ? cn(styles.card_title_checked, styles.card_title)
-            : styles.card_title
+            ? "text-primary font-medium transition-all"
+            : "text-secondary font-normal transition-all"
         }
       >
         {title}
       </p>
-      <div className={styles.card_description}>{description}</div>
+      <div className="text-xs font-medium text-secondary">{description}</div>
 
       <div
         className={
           checked
-            ? cn(
-                styles.card_check_container_checked,
-                styles.card_check_container
-              )
-            : styles.card_check_container
+            ? "border border-primary-900 bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
+            : "absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all bg-line border-line"
         }
       >
-        {checked && <CheckIcon className={styles.card_check} />}
+        {checked && <CheckIcon className="w-4 h-4 text-neutral" />}
       </div>
     </div>
   );

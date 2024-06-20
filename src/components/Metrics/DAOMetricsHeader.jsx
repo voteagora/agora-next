@@ -44,9 +44,9 @@ export default function DAOMetricsHeader({ metrics }) {
           <div className="sm:min-w-desktop sticky z-50 bottom-10 sm:bottom-0 left-0 flex justify-center">
             <div
               className={cn(
-                "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-gray-fa shadow-newDefault",
-                "border-t border-r border-l border-gray-eo rounded-tl-2xl rounded-tr-2xl",
-                "text-xs text-gray-4f font-inter font-medium",
+                "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
+                "border-t border-r border-l border-line rounded-tl-2xl rounded-tr-2xl",
+                "text-xs text-secondary font-inter font-medium",
                 `transition-all duration-200 ease-in-out transform ${
                   visible ? "translate-y-0" : "translate-y-10"
                 } sm:transition-none sm:translate-y-0`
@@ -94,7 +94,7 @@ export default function DAOMetricsHeader({ metrics }) {
                   className="inline sm:hidden"
                 />
               </div>
-              <div className="block bg-gray-eo w-full sm:w-[1px] h-[1px] sm:h-10"></div>
+              <div className="block bg-line w-full sm:w-[1px] h-[1px] sm:h-10"></div>
               <div className="w-full sm:w-2/5 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
                 {governanceForumLink && (
                   <a

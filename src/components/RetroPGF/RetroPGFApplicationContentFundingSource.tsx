@@ -12,12 +12,12 @@ export default function RetroPGFApplicationContentFundingSource({
 }) {
   return (
     <VStack className="pt-4 sm:px-4">
-      <h2 className="font-inter font-black text-2xl leading-[29px] text-black">
+      <h2 className="font-inter font-black text-2xl leading-[29px] text-primary">
         Funding sources
       </h2>
-      <VStack className="items-stretch sm:items-normal justify-end sm:justify-start w-full h-auto sm:h-full my-8 py-2 px-4 rounded-xl border border-gray-300 shadow-newDefault min-h-[3rem]">
+      <VStack className="items-stretch sm:items-normal justify-end sm:justify-start w-full h-auto sm:h-full my-8 py-2 px-4 rounded-xl border border-line shadow-newDefault min-h-[3rem]">
         {(!fundingSources || fundingSources.length === 0) && (
-          <VStack className="items-center justify-center p-8 text-gray-700">
+          <VStack className="items-center justify-center p-8 text-secondary">
             No funding sources provided
           </VStack>
         )}
@@ -30,7 +30,7 @@ export default function RetroPGFApplicationContentFundingSource({
               {formatFundingSource(fundingSource.type)}
             </div>
 
-            <div className="flex-1 text-gray-700">
+            <div className="flex-1 text-secondary">
               {fundingSource.description}
             </div>
             <div className="flex-grow-0 flex-shrink-0 basis-1/5 text-right">

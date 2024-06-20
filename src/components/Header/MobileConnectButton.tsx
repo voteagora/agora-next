@@ -1,7 +1,6 @@
 "use client";
 
 import { ConnectKitButton } from "connectkit";
-import styles from "./header.module.scss";
 import Image from "next/image";
 import walletIcon from "@/icons/wallet.svg";
 import { MobileProfileDropDown } from "./MobileProfileDropDown";
@@ -11,7 +10,7 @@ export function MobileConnectButton() {
     <ConnectKitButton.Custom>
       {({ isConnected, isConnecting, show, hide, address, ensName, chain }) => {
         return (
-          <div className={styles.mobile_connect_button}>
+          <div className="sm:hidden flex items-center opacity-100 transition-all active:opacity-60 ">
             {isConnected ? (
               <MobileProfileDropDown ensName={ensName} />
             ) : (

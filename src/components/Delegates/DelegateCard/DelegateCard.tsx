@@ -1,15 +1,14 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
-import styles from "./delegateCard.module.scss";
 import DelegateCardClient from "./DelegateCardClient";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
-    <VStack className={styles.container}>
-      <VStack className={styles.card}>
-        <VStack alignItems="items-stretch" className={styles.image}>
+    <VStack className="sticky top-16 flex-shrink-0 width-[20rem]">
+      <VStack className="bg-neutral border border-line shadow-newDefault rounded-xl">
+        <VStack alignItems="items-stretch" className="p-6 border-b border-line">
           <DelegateProfileImage
             address={delegate.address}
             citizen={delegate.citizen}
@@ -18,7 +17,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
           />
         </VStack>
 
-        <div className={styles.content}>
+        <div className="flex flex-col p-6">
           <VStack gap={4}>
             <PanelRow
               title="Proposals Voted"
@@ -83,7 +82,7 @@ export const PanelRow = ({
     <HStack gap={2} className="justify-between items-center">
       <span className="whitespace-nowrap">{title}</span>
 
-      <span className={styles.row}>{detail}</span>
+      <span className="text-right text-sm text-secondary">{detail}</span>
     </HStack>
   );
 };

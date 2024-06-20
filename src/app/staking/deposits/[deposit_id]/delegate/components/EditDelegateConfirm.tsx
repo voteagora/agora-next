@@ -49,7 +49,7 @@ export const EditDelegateConfirm = ({
           Updating delegate of the existing stake
         </div>
 
-        <div className="w-full text-center bg-white font-bold text-3xl text-black">
+        <div className="w-full text-center bg-neutral font-bold text-3xl text-primary">
           <ENSName address={delegate} />
         </div>
       </div>
