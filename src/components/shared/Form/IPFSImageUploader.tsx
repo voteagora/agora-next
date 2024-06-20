@@ -68,7 +68,7 @@ const IPFSImageUploader: React.FC<IPFSImageUploaderProps> = ({
         <p>
           IPFS Hash:{" "}
           <a
-            href={`https://ipfs.io/ipfs/${localIpfsHash}`}
+            href={`https://op-atlas-test.mypinata.cloud/ipfs/${localIpfsHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >

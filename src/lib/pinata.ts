@@ -17,16 +17,8 @@ export async function testConnection() {
   console.log("Pinata test response:", res);
 }
 
-export async function uploadToPinata(
-  projectId: string,
-  json: Record<string, unknown>
-) {
-  const res = await pinata.pinJSONToIPFS(json, {
-    pinataMetadata: {
-      name: "OPRetroFunding",
-      projectID: projectId,
-    },
-  });
+export async function uploadToPinata(json: Record<string, unknown>) {
+  const res = await pinata.pinJSONToIPFS(json);
 
   console.info("Uploaded metadata to Pinata:", res);
   return res.IpfsHash;

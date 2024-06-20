@@ -46,6 +46,7 @@ export default function NewEntry() {
 
   const [title, setTitle] = useState("");
   const [markdownText, setMarkdownText] = useState("");
+  const [entryBodyIPFSHash, setEntryBodyIPFSHash] = useState("");
   const [ipfsHash, setIpfsHash] = useState("");
   const [tag, setTag] = useState("");
   const [projectURL, setProjectURL] = useState("https://vote.optimism.io");
@@ -68,7 +69,7 @@ export default function NewEntry() {
     usePrepareContractWrite({
       ...changelogContract,
       functionName: "addEntry",
-      args: [title, markdownText, ipfsHash, tag, projectURL, BigInt(createdAt)],
+      args: [title, "ssdaadasda", ipfsHash, tag, projectURL, BigInt(createdAt)],
       enabled: !!isWhitelisted,
     });
 
@@ -129,6 +130,10 @@ export default function NewEntry() {
             disabled={isDisabledCreateEntry}
           />
         </div>
+        <Separator className="my-8" />
+        {/* <Button variant="outline" size="sm" onClick={handleUploadToIPFS}>
+          Upload Markdown to IPFS
+        </Button> */}
         <div className="space-y-4">
           <Label>Header Image (Optional)</Label>
           <IPFSImageUploader setIpfsHash={setIpfsHash} />
