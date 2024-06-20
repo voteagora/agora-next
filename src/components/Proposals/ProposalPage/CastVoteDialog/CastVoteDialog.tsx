@@ -21,7 +21,7 @@ export type SupportTextProps = {
 
 // TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: CastVoteDialogProps) {
-  const { contracts, ui } = Tenant.current();
+  const { contracts } = Tenant.current();
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
   ) : (
