@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
   {
@@ -73,6 +74,7 @@ const getTextWidth = (text: string, font = "14px inter") => {
 
 const PortalTrafficVisitorsChart = () => {
   const [yAxisWidth, setYAxisWidth] = useState(0);
+  const { primary, gradient } = useTenantColorScheme();
 
   useEffect(() => {
     const maxTickWidth = Math.max(
@@ -89,8 +91,8 @@ const PortalTrafficVisitorsChart = () => {
         >
           <defs>
             <linearGradient id="colorAllDelegates" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255, 4, 32, 0.60)" />
-              <stop offset="100%" stopColor="#FFF" />
+              <stop offset="0%" stopColor={gradient.startColor} />
+              <stop offset="100%" stopColor={gradient.endcolor} />
             </linearGradient>
           </defs>
 
@@ -114,7 +116,7 @@ const PortalTrafficVisitorsChart = () => {
           <Area
             type="linear"
             dataKey="value"
-            stroke="#FF0420"
+            stroke={primary}
             fill="url(#colorAllDelegates)"
           />
         </AreaChart>

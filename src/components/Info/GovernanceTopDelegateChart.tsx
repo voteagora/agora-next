@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import useColorPicker from "./useColorPicker";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 interface DataItem {
   name: string;
@@ -27,13 +27,17 @@ const data: DataItem[] = [
 const hightestValue = Math.max(...data.map((item) => item.value));
 
 const GovernanceTopDelegateChart: React.FC = () => {
-  const { primary } = useColorPicker();
+  const { primary } = useTenantColorScheme();
 
   const getDynamicColor = (value: number, maxValue: number): string => {
     const opacity = value / maxValue;
-
-    return `rgba(255, 4, 32, ${opacity})`;
+    return `rgba(${parseInt(primary.slice(1, 3), 16)}, ${parseInt(primary.slice(3, 5), 16)}, ${parseInt(primary.slice(5, 7), 16)}, ${opacity})`;
   };
+  // const getDynamicColor = (value: number, maxValue: number): string => {
+  //   const opacity = value / maxValue;
+
+  //   return `{primary}, ${opacity})`;
+  // };
 
   return (
     <div>

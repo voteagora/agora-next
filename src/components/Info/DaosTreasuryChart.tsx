@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import ChartDataFilterTabs from "./ChartDataFilterTabs";
 import { getTextWidth } from "@/lib/utils";
-import useColorPicker from "./useColorPicker";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
   {
@@ -66,7 +66,7 @@ const data = [
 const DaosTreasuryChart = () => {
   const [yAxisWidth, setYAxisWidth] = useState(0);
 
-  const { primary, gradient } = useColorPicker();
+  const { primary, gradient } = useTenantColorScheme();
 
   useEffect(() => {
     const maxTickWidth = Math.max(
@@ -97,8 +97,8 @@ const DaosTreasuryChart = () => {
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="0%" stopColor="rgba(255, 4, 32, 0.60)" />
-                  <stop offset="100%" stopColor="#FFF" />
+                  <stop offset="0%" stopColor={gradient.startColor} />
+                  <stop offset="100%" stopColor={gradient.endcolor} />
                 </linearGradient>
               </defs>
 

@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import ChartDataFilterTabs from "./ChartDataFilterTabs";
-import useColorPicker from "./useColorPicker";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
   { name: "Prop 154...", value: 14 },
@@ -25,7 +25,7 @@ const data = [
 ];
 
 const AverageVoterProposalChart = () => {
-  const { primary } = useColorPicker();
+  const { primary } = useTenantColorScheme();
 
   return (
     <div>

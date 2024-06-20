@@ -12,7 +12,7 @@ import {
 import GovernanceChartTooltip from "./GovernanceChartTooltip";
 import ChartDataFilterTabs from "./ChartDataFilterTabs";
 import { getTextWidth } from "@/lib/utils";
-import useColorPicker from "./useColorPicker";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 interface DataPoint {
   name: string;
@@ -36,7 +36,7 @@ const data: DataPoint[] = [
 const GovernanceActiveDelegateChart: React.FC = () => {
   const [yAxisWidth, setYAxisWidth] = useState(0);
 
-  const { primary } = useColorPicker();
+  const { primary } = useTenantColorScheme();
 
   useEffect(() => {
     const maxTickWidth = Math.max(

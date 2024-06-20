@@ -5,6 +5,7 @@ import optimismHero from "@/assets/tenant/optimism_hero.svg";
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
   color: "#FF0420",
+
   logo: optimismLogo,
   hero: optimismHero,
 
@@ -88,6 +89,16 @@ export const optimismTenantUIConfig = new TenantUI({
         description: "Delegate your voting power to a trusted representative",
       },
     },
+    {
+      route: "info",
+      title: "Welcome to the Optimism Collective",
+      description:
+        "A collective of companies, communities, and citizens working together.",
+      meta: {
+        title: "Info of Agora",
+        description: "Welcome to the Optimism Collective",
+      },
+    },
   ],
 
   toggles: [
@@ -121,6 +132,10 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates/edit",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
   ],

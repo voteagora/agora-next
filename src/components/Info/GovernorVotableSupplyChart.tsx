@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import { getTextWidth } from "@/lib/utils";
 import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
   { name: "Nov '23", uv: 220, pv: 11 },
@@ -24,6 +25,7 @@ const data = [
 
 const GovernorVotableSupplyChart = () => {
   const yTicks = [0, 50, 100, 150, 200, 250, 280];
+  const { primary, gradient } = useTenantColorScheme();
   const [yAxisWidth, setYAxisWidth] = useState(0);
 
   useEffect(() => {
@@ -42,8 +44,8 @@ const GovernorVotableSupplyChart = () => {
         >
           <defs>
             <linearGradient id="colorAllDelegates" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255, 4, 32, 0.60)" />
-              <stop offset="100%" stopColor="#FFF" />
+              <stop offset="0%" stopColor={gradient.startColor} />
+              <stop offset="100%" stopColor={gradient.endcolor} />
             </linearGradient>
           </defs>
 
@@ -66,7 +68,7 @@ const GovernorVotableSupplyChart = () => {
           <Area
             type="step"
             dataKey="uv"
-            stroke="#FF0420"
+            stroke={primary}
             fill="url(#colorAllDelegates)"
           />
         </ComposedChart>

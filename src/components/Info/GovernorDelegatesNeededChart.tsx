@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { getTextWidth } from "@/lib/utils";
 import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
   { name: "Nov '23", uv: 220, pv: 250 },
@@ -27,40 +28,41 @@ const data = [
 
 const yTicks = [0, 50, 100, 150, 200, 250, 280];
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
-        <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
-        <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
-          <div className="w-4 h-[2px] bg-[#FF0420]"></div>
-          <p className="text-xs font-medium text-gray-4f ">
-            To reach quorum{" "}
-            <span className="font-bold pl-3">{payload[0].value}</span>
-          </p>
-        </div>
-        <div className="flex flex-row gap-1 justify-center items-center mt-2">
-          <div className="w-4 h-[2px] bg-[#FF0420]"></div>
-          <p className="text-xs font-medium text-gray-4f">
-            To reach 50%{" "}
-            <span className="font-bold pl-6">{payload[1].value}</span>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-};
-
 const GovernorDelegatesNeededChart = () => {
   const [yAxisWidth, setYAxisWidth] = useState(0);
+  const { primary, gradient } = useTenantColorScheme();
+  const primaryColorClass = `bg-[${primary}]`;
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
+          <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
+          <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
+            <div className={`w-4 h-[2px] ${primaryColorClass}`}></div>
+            <p className="text-xs font-medium text-gray-4f ">
+              To reach quorum{" "}
+              <span className="font-bold pl-3">{payload[0].value}</span>
+            </p>
+          </div>
+          <div className="flex flex-row gap-1 justify-center items-center mt-2">
+            <div className={`w-4 h-[2px] ${primaryColorClass}`}></div>
+            <p className="text-xs font-medium text-gray-4f">
+              To reach 50%{" "}
+              <span className="font-bold pl-6">{payload[1].value}</span>
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   useEffect(() => {
     const maxTickWidth = Math.max(
       ...data.map((d) => getTextWidth(d.pv.toString()) || 0)
     );
-    setYAxisWidth(maxTickWidth + 20); // Add some padding
+    setYAxisWidth(maxTickWidth + 20);
   }, []);
 
   return (
@@ -72,8 +74,8 @@ const GovernorDelegatesNeededChart = () => {
         >
           <defs>
             <linearGradient id="colorAllDelegates" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255, 4, 32, 0.60)" />
-              <stop offset="100%" stopColor="#FFF" />
+              <stop offset="0%" stopColor={gradient.startColor} />
+              <stop offset="100%" stopColor={gradient.endcolor} />
             </linearGradient>
           </defs>
 
@@ -92,20 +94,17 @@ const GovernorDelegatesNeededChart = () => {
             width={yAxisWidth}
             className="text-xs font-medium text-gray-4f"
           />
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ stroke: "red", strokeWidth: 2, strokeDasharray: "7 7" }}
-          />
+          <Tooltip content={<CustomTooltip />} />
           <Area
             type="step"
             dataKey="uv"
-            stroke="#FF0420"
+            stroke="primary"
             fill="url(#colorAllDelegates)"
           />
           <Line
             type="step"
             dataKey="pv"
-            stroke="#FF0420"
+            stroke={primary}
             strokeDasharray="3 3"
             dot={false}
           />
