@@ -6,7 +6,6 @@ import { XCircleIcon } from "@heroicons/react/20/solid";
 import { ethers } from "ethers";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import InputBox from "@/components/shared/InputBox";
-import styles from "./styles.module.scss";
 import { MultiButtons } from "@/components/shared/MultiButtons";
 import SimulateTransaction from "@/components/shared/SimulateTransaction";
 import { formatEther, parseUnits } from "viem";
@@ -96,7 +95,9 @@ export default function AddTransactionsDetails({
               <>
                 <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Transfer to</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Transfer to
+                    </label>
                     <InputBox
                       placeholder={"address (no ENS)"}
                       value={transaction.transferTo}
@@ -110,7 +111,7 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                   <VStack className="w-full">
-                    <label className={labelStyle}>
+                    <label className="text-xs text-tertiary font-semibold">
                       Transfer amount requested (OP)
                     </label>
                     <InputBox
@@ -135,7 +136,9 @@ export default function AddTransactionsDetails({
               <>
                 <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Target</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Target
+                    </label>
                     <InputBox
                       placeholder={"address"}
                       value={transaction.target}
@@ -147,7 +150,9 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Value</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Value
+                    </label>
                     <InputBox
                       placeholder={"uint256"}
                       value={transaction.value}
@@ -161,7 +166,9 @@ export default function AddTransactionsDetails({
                 </HStack>
                 <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Calldata</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Calldata
+                    </label>
                     <InputBox
                       placeholder={"bytes"}
                       value={transaction.calldata}
@@ -171,7 +178,9 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Transaction Validity</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Transaction Validity
+                    </label>
                     <SimulateTransaction
                       target={transaction.target}
                       value={ethers.parseEther(
@@ -210,5 +219,3 @@ export default function AddTransactionsDetails({
     </>
   );
 }
-
-export const labelStyle = styles.label;
