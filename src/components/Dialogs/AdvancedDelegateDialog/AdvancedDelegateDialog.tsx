@@ -400,7 +400,7 @@ function Message({
           </div>
         </VStack>
         <Button
-          className="bg-black text-white text-center w-full h-full"
+          className="bg-black text-neutral text-center w-full h-full"
           onClick={() => {
             setShowMessage(false);
           }}

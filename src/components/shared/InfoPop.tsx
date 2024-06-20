@@ -13,7 +13,7 @@ export default function InfoPop({ children }: { children: React.ReactNode }) {
     >
       <QuestionMarkCircleIcon className="text-tertiary cursor-pointer w-4 ml-1" />
       {isOpen && (
-        <div className="absolute top-0 left-full w-[300px] p-4 bg-black text-white rounded-lg shadow-md z-[1]">
+        <div className="absolute top-0 left-full w-[300px] p-4 bg-black text-neutral rounded-lg shadow-md z-[1]">
           {children}
         </div>
       )}

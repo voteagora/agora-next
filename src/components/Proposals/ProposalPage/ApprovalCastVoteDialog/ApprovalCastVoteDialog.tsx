@@ -243,7 +243,7 @@ function CheckCard({
             : "absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all bg-line border-line"
         }
       >
-        {checked && <CheckIcon className="w-4 h-4 text-white" />}
+        {checked && <CheckIcon className="w-4 h-4 text-neutral" />}
       </div>
     </div>
   );
