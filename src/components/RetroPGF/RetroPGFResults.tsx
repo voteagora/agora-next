@@ -207,7 +207,7 @@ export default function RetroPGFResults({
                       height="32"
                       className="inline mr-2"
                     />
-                    <span className="font-semibold text-black inline-block max-w-[calc(100%-40px)] align-middle">
+                    <span className="font-semibold text-primary inline-block max-w-[calc(100%-40px)] align-middle">
                       {displayName}
                     </span>
                   </TableCell>
@@ -239,7 +239,7 @@ export default function RetroPGFResults({
                     {includedInLists}
                   </TableCell>
                   <TableCell className="text-right px-6">
-                    <span className="font-semibold text-black whitespace-nowrap">
+                    <span className="font-semibold text-primary whitespace-nowrap">
                       {formatNumber(Number(awarded))} OP
                     </span>
                     <span className="text-xs block sm:inline sm:ml-2">

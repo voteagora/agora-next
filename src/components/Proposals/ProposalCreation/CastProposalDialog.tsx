@@ -21,7 +21,7 @@ export function CastProposalDialog({
 }: Props) {
   return (
     <VStack alignItems="items-center">
-      <VStack className="w-full bg-white rounded-xl">
+      <VStack className="w-full bg-neutral rounded-xl">
         <VStack className="text-xs">
           {!isError && !isLoading && !isSuccess && (
             <div>Waiting for transaction execution...</div>
@@ -77,7 +77,7 @@ export function SuccessMessage({
       <div>
         <div
           onClick={closeDialog}
-          className="text-center font-bold bg-white rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary"
+          className="text-center font-bold bg-neutral rounded-md border border-line shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary"
         >
           Got it
         </div>

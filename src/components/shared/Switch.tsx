@@ -11,7 +11,7 @@ type Props = {
 const optionStyle =
   "p-[5px] flex-1 text-center cursor-pointer rounded-md text-veil font-medium hover:bg-wash";
 
-const selectedStyle = "bg-line text-black font-semibold";
+const selectedStyle = "bg-line text-primary font-semibold";
 
 export function Switch({ onSelectionChanged, selection, options }: Props) {
   return (

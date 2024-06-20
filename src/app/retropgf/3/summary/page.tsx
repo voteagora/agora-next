@@ -47,7 +47,7 @@ export default function Page() {
     <VStack className="w-full items-stretch max-w-6xl pb-16 mt-12">
       <div className="mb-16 justify-between items-center flex flex-col gap-8 sm:flex-row sm:gap-0">
         <VStack>
-          <h1 className="text-2xl font-extrabold mb-2">
+          <h1 className="text-2xl font-extrabold mb-2 text-primary">
             RetroPGF 3 results in numbers
           </h1>
           <div className="max-w-lg text-secondary">
@@ -58,7 +58,7 @@ export default function Page() {
         <div className="h-auto sm:h-16 w-full sm:w-auto flex flex-col sm:flex-row items-center rounded-lg border border-line shadow-newDefault">
           {" "}
           <Link href="/retropgf/3">
-            <HStack className="items-center gap-2 p-4 sm:border-r sm:border-r-gray-300 text-secondary hover:text-black transition-colors duration-200">
+            <HStack className="items-center gap-2 p-4 sm:border-r sm:border-r-gray-300 text-secondary hover:text-primary transition-colors duration-200">
               <Image src={sunny} alt="Github" width="32" />
               <div className="max-w-[10rem]">View all recipients</div>
             </HStack>
@@ -68,7 +68,7 @@ export default function Page() {
             target="_blank"
             rel="noreferrer"
           >
-            <HStack className="items-center gap-2 p-4 sm:border-r sm:border-r-gray-300 text-secondary hover:text-black transition-colors duration-200">
+            <HStack className="items-center gap-2 p-4 sm:border-r sm:border-r-gray-300 text-secondary hover:text-primary transition-colors duration-200">
               <Image
                 src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png"
                 alt="Github"
@@ -211,7 +211,7 @@ export default function Page() {
       </VStack>
       <Link
         href="/retropgf/3"
-        className="fixed bottom-16 z-50 p-4 bg-white rounded-md shadow-md border border-line"
+        className="fixed bottom-16 z-50 p-4 bg-neutral rounded-md shadow-md border border-line"
       >
         <HStack className="gap-2">
           <Image src={badge} alt="badge symbol" />

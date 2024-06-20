@@ -49,7 +49,7 @@ export default function CitizensFilter() {
                     <li
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         selected
-                          ? "text-black bg-white border-line"
+                          ? "text-primary bg-neutral border-line"
                           : "text-tertiary border-transparent"
                       }`}
                     >

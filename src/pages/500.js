@@ -1,3 +1,3 @@
 export default function Custom500() {
-  return <h1>500 - Something went wrong</h1>;
+  return <h1 className="text-primary">500 - Something went wrong</h1>;
 }

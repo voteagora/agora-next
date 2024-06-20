@@ -69,14 +69,14 @@ export default function SnapshotVotes({
         <div key={0}>
           <HStack
             key="loader"
-            className="gl_loader justify-center py-6 text-sm text-stone-500"
+            className="gl_loader justify-center py-6 text-sm text-tertiary"
           >
             Loading...
           </HStack>
         </div>
       }
       element="main"
-      className="divide-y divide-gray-300 overflow-hidden bg-white shadow-newDefault ring-1 ring-gray-300 rounded-xl"
+      className="divide-y divide-line overflow-hidden bg-white shadow-newDefault ring-1 ring-line rounded-xl"
     >
       {snapshotVotes.map(
         (vote: any, idx: number) =>
@@ -89,13 +89,13 @@ export default function SnapshotVotes({
                       <span className="text-[#66676b] text-xs font-medium">
                         {`${propHeader(vote)}`}
                       </span>
-                      <h2 className="px-0 pt-1 overflow-hidden text-base text-black text-ellipsis">
+                      <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
                         {vote.title}
                       </h2>
                       <VoteDetails vote={vote} />
                     </div>
-                    <div className="flex-1 border-l border-stone-100 pl-4">
-                      <span className="text-xs text-stone-500 leading-5 block">
+                    <div className="flex-1 border-l border-line pl-4">
+                      <span className="text-xs text-tertiary leading-5 block">
                         {vote.reason}
                       </span>
                     </div>

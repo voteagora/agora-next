@@ -35,7 +35,7 @@ export default function RetroPGFApplicationBanner({
 
   return (
     <div className="flex flex-col sm:flex-row items-center w-full max-w-6xl pb-8 px-4">
-      <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-white border border-line shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
+      <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-neutral border border-line shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
         <div className="absolute top-6 left-6">
           <HStack className="gap-2 flex-wrap">
             {impactCategory.map((category) => (
@@ -61,7 +61,7 @@ export default function RetroPGFApplicationBanner({
           alt={`${displayName} icon`}
           className={cn(
             "absolute top-[200px] sm:top-[258px] left-[50%] sm:left-[20px] -translate-x-1/2 sm:translate-x-0",
-            "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-white shadow-newDefault"
+            "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-neutral shadow-newDefault"
           )}
           height="120"
           width="120"
@@ -100,7 +100,7 @@ export default function RetroPGFApplicationBanner({
                 <div className="text-sm text-secondary whitespace-nowrap texr-right">
                   Appears in
                 </div>
-                <div className="text-sm text-black whitespace-nowrap texr-right">
+                <div className="text-sm text-primary whitespace-nowrap texr-right">
                   {includedInBallots} ballots
                 </div>
               </VStack>
@@ -120,7 +120,7 @@ const CategoryListItem = ({ category }: CategoryListItemProps) => {
   return (
     <div
       key={category}
-      className="text-sm bg-white bg-opacity-90 rounded-xl text-secondary leading-relaxed py-0 px-3 shadow-newDefault capitalize z-10"
+      className="text-sm bg-neutral bg-opacity-90 rounded-xl text-secondary leading-relaxed py-0 px-3 shadow-newDefault capitalize z-10"
     >
       {formatCategory(category)}
     </div>

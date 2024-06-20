@@ -22,7 +22,7 @@ export default function RetroPGFApplicationContent({
     <VStack>
       <div className="flex flex-col sm:flex-row gap-0 sm:gap-16 sm:items-start justify-end sm:justify-between pb-0 sm:p-4 max-w-6xl">
         <VStack>
-          <h2 className="font-inter font-black text-2xl leading-[29px] text-black mb-[14px]">
+          <h2 className="font-inter font-black text-2xl leading-[29px] text-primary mb-[14px]">
             Contribution
           </h2>
           <div className="font-inter font-medium text-base leading-6 text-secondary pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap break-normal">
@@ -47,7 +47,7 @@ export default function RetroPGFApplicationContent({
       </div>
       <div className="flex flex-col sm:flex-row gap-0 sm:gap-16 items-stretch sm:items-start justify-end sm:justify-between sm:px-4 py-8 max-w-6xl">
         <VStack>
-          <h2 className="font-inter  font-black text-2xl leading-[29px] text-black mb-[14px]">
+          <h2 className="font-inter font-black text-2xl leading-[29px] text-primary mb-[14px]">
             Impact
           </h2>
           <div className="font-inter  font-medium text-base leading-6 text-secondary pb-[14px] max-w-[calc(100vw-48px)] sm:max-w-auto whitespace-pre-wrap">
@@ -107,7 +107,7 @@ const ContributionLink = ({
           <div className="mt-1">
             <Image src={icons[icon]} alt={icon} />
           </div>
-          <p className="max-w-[300px] text-black overflow-hidden text-ellipsis">
+          <p className="max-w-[300px] text-primary overflow-hidden text-ellipsis">
             {contributionLink.description}
           </p>
         </HStack>
@@ -129,12 +129,12 @@ const ImpactMetric = ({
   return (
     <li className="flex items-center justify-between gap-2 pt-4">
       <a href={impactMetric.url} rel="noreferrer nonopener" target="_blank">
-        <div className="max-w-[300px] text-black">
+        <div className="max-w-[300px] text-primary">
           {impactMetric.description}
         </div>
       </a>
       <div className="flex items-center gap-2">
-        <div className="text-black">
+        <div className="text-primary">
           {formatNumber(Number(impactMetric.number))}
         </div>
         <a

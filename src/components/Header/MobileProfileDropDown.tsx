@@ -73,7 +73,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
             <Popover.Panel>
               {({ close }) => (
                 <motion.div
-                  className="bg-white py-8 px-6 rounded-t-lg w-full fixed bottom-0 left-0"
+                  className="bg-neutral py-8 px-6 rounded-t-lg w-full fixed bottom-0 left-0"
                   initial="hidden"
                   animate="show"
                   exit="exit"
@@ -192,7 +192,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                           <Link
                             href={`/delegates/${ensName ?? address}`}
                             onClick={() => close()}
-                            className="rounded-lg border py-3 px-2 text-black bg-neutral mt-1 flex justify-center hover:bg-wash"
+                            className="rounded-lg border py-3 px-2 text-primary bg-neutral mt-1 flex justify-center hover:bg-wash"
                           >
                             View my profile
                           </Link>

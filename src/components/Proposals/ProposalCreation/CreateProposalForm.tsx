@@ -62,9 +62,11 @@ export default function CreateProposalForm({
   return (
     <VStack className="w-full">
       <form ref={formTarget}>
-        <VStack className="bg-white rounded-xl border border-line shadow-newDefault">
+        <VStack className="bg-neutral rounded-xl border border-line shadow-newDefault">
           <div className="p-8 border-b border-line">
-            <h1 className="text-2xl font-extrabold pb-1">Create proposal</h1>
+            <h1 className="text-2xl font-extrabold pb-1 text-primary">
+              Create proposal
+            </h1>
             <p className="text-secondary">
               Select the type of vote and proposal you want to create, and
               describe its intent to voters. Remember to proofread as proposals

@@ -28,7 +28,7 @@ export const DelegateCard = ({
     <div className="flex flex-col">
       <VStack
         gap={4}
-        className="bg-white border border-line shadow-newDefault rounded-xl"
+        className="bg-neutral border border-line shadow-newDefault rounded-xl"
       >
         <VStack gap={4} justifyContent="justify-center">
           <DelegateProfileImage address={address} votingPower={votingPower} />

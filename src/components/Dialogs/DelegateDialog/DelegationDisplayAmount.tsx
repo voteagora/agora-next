@@ -18,7 +18,7 @@ export function DelegationDisplayAmount({
   return (
     <HStack
       gap={2}
-      className="text-black text-3xl sm:text-4xl"
+      className="text-primary text-3xl sm:text-4xl"
       alignItems="items-center"
     >
       <Image src={tokenIcon} alt={token.symbol} width={32} height={32} />

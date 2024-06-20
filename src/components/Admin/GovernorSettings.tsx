@@ -128,7 +128,9 @@ export default function GovernorSettings() {
   return (
     <div className="gl_box">
       <section>
-        <h1 className="font-extrabold text-2xl">Governor settings</h1>
+        <h1 className="font-extrabold text-2xl text-primary">
+          Governor settings
+        </h1>
         <p>Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
@@ -149,7 +151,7 @@ export default function GovernorSettings() {
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute right-[6px] rounded-sm bg-white"
+                className="absolute right-[6px] rounded-sm bg-neutral"
                 loading={isDisabledSetVotingPeriod}
                 disabled={
                   /* isInitializing || */ isDisabledSetVotingPeriod ||

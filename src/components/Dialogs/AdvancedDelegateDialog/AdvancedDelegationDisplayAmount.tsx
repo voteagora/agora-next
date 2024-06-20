@@ -18,7 +18,7 @@ export function AdvancedDelegationDisplayAmount({
   return (
     <HStack
       gap={2}
-      className="text-black text-4xl sm:text-5xl font-semibold leading-none"
+      className="text-primary text-4xl sm:text-5xl font-semibold leading-none"
       alignItems="items-center"
     >
       {formattedNumber}

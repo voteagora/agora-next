@@ -311,7 +311,7 @@ function InfoDialog({
 }) {
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
   return (
-    <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
+    <div className="absolute w-full bg-neutral rounded-lg shadow-newDefault">
       <VStack
         className={
           "text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative" +
@@ -379,7 +379,7 @@ function Message({
     <div className="relative">
       <VStack gap={4}>
         <VStack gap={1}>
-          <div className="text-black text-xl font-bold">
+          <div className="text-primary text-xl font-bold">
             Welcome to advanced delegation
           </div>
           <div className="text-secondary">

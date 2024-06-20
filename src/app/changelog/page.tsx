@@ -13,7 +13,7 @@ export async function generateMetadata() {
 
 export default function Page() {
   return (
-    <div className="bg-white">
+    <div className="bg-neutral">
       <div className="mx-auto max-w-full py-20 sm:py-12">
         <div className="flex flex-col sm:flex-row sm:gap-32 ">
           <div className="sm:flex-1 sm:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">

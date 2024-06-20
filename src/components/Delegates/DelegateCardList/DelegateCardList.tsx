@@ -95,7 +95,7 @@ export default function DelegateCardList({
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>
-                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-theme-300 shadow-newDefault">
+                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
                   <div className="flex flex-col gap-4 justify-center">
                     <DelegateProfileImage
                       endorsed={delegate.statement?.endorsed}

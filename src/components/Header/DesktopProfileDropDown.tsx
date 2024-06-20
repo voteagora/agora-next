@@ -76,7 +76,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
           >
             <Popover.Panel>
               {({ close }) => (
-                <div className="bg-white py-8 px-6 mt-2 rounded-xl w-[350px]">
+                <div className="bg-neutral py-8 px-6 mt-2 rounded-xl w-[350px]">
                   <VStack gap={3} className="min-h-[250px] justify-center">
                     <HStack className="items-center mb-1">
                       <div
@@ -191,7 +191,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         {hasStatement && (
                           <Link
                             href={`/delegates/${ensName ?? address}`}
-                            className="rounded-lg border py-3 px-2 text-black bg-neutral mt-1 flex justify-center hover:bg-wash"
+                            className="rounded-lg border py-3 px-2 text-primary bg-neutral mt-1 flex justify-center hover:bg-wash"
                             onClick={() => close()}
                           >
                             View my profile

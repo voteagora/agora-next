@@ -172,7 +172,7 @@ const StepperRow = ({
 
         <div className="w-full flex items-center justify-between text-xs font-semibold">
           <div
-            className={`${isCompleted ? "text-black" : isActive ? "text-blue-600" : "text-secondary"} flex items-center gap-x-1`}
+            className={`${isCompleted ? "text-primary" : isActive ? "text-blue-600" : "text-secondary"} flex items-center gap-x-1`}
           >
             {label}
             {href && <Image src={linkIcon} alt="redirect" />}

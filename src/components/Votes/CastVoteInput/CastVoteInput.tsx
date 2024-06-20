@@ -50,7 +50,7 @@ export default function CastVoteInput({
   }
 
   return (
-    <VStack className="bg-white border border-line border-xl flex-shrink mx-4">
+    <VStack className="bg-neutral border border-line border-xl flex-shrink mx-4">
       <textarea
         placeholder="I believe..."
         value={reason}
@@ -147,7 +147,7 @@ function VoteButton({
 
   return (
     <button
-      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
       onClick={onClick}
     >
       {action.toLowerCase()}
@@ -159,7 +159,7 @@ function DisabledVoteButton({ reason }: { reason: string }) {
   return (
     <button
       disabled
-      className="bg-white rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
+      className="bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
     >
       {reason}
     </button>

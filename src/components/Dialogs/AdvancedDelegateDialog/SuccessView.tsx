@@ -35,7 +35,7 @@ export function SuccessView({
         />
       </div>
 
-      <h1 className="mt-4 mb-2 text-2xl font-extrabold">
+      <h1 className="mt-4 mb-2 text-2xl font-extrabold text-primary">
         You&apos;ve delegated your votes!
       </h1>
       <p className="text-secondary">

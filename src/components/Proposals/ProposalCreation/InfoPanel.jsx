@@ -3,7 +3,9 @@ import { VStack } from "@/components/Layout/Stack";
 export default function InfoPanel() {
   return (
     <VStack className="bg-wash rounded-xl border border-line p-6">
-      <h2 className="text-2xl font-extrabold mb-4">Manager’s handbook</h2>
+      <h2 className="text-2xl font-extrabold mb-4 text-primary">
+        Manager’s handbook
+      </h2>
       <div>
         <p className="text-secondary">
           <span className="font-semibold text-primary mb-4">

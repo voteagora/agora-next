@@ -90,7 +90,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         </div>
       }
       element="main"
-      className="divide-y divide-gray-300 overflow-hidden bg-white shadow-newDefault ring-1 ring-gray-300 rounded-xl"
+      className="divide-y divide-gray-300 overflow-hidden bg-neutral shadow-newDefault ring-1 ring-gray-300 rounded-xl"
     >
       {delegateVotes.map(
         (vote) =>
@@ -106,7 +106,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                       <span className="text-tertiary text-xs font-medium">
                         {`${propHeader(vote)} with ${pluralizeVote(vote.weight, "optimism")}`}
                       </span>
-                      <h2 className="px-0 pt-1 overflow-hidden text-base text-black text-ellipsis">
+                      <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
                         {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                       </h2>
                     </VStack>

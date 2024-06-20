@@ -69,7 +69,7 @@ export default function ProposalsList({
           reviewPeriod={governanceCalendar.reviewPeriod}
         />
       )}
-      <VStack className="bg-white border border-line rounded-lg shadow-newDefault overflow-hidden">
+      <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
           <InfiniteScroll
             hasMore={meta.hasNextPage}

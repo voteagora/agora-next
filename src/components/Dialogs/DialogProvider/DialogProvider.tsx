@@ -47,7 +47,7 @@ const Modal: FC<
             className={
               transparent
                 ? "bg-transparent p-6 rounded-xl m-0 w-full sm:w-auto"
-                : "bg-white p-6 rounded-xl m-0 z-[1100] shadow-newDefault w-full sm:w-[28rem]"
+                : "bg-neutral p-6 rounded-xl m-0 z-[1100] shadow-newDefault w-full sm:w-[28rem]"
             }
           >
             {children}

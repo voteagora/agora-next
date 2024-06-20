@@ -111,7 +111,10 @@ export function DelegateDialog({
   }
 
   return (
-    <VStack alignItems="items-center" className="w-full bg-white max-w-[28rem]">
+    <VStack
+      alignItems="items-center"
+      className="w-full bg-neutral max-w-[28rem]"
+    >
       <VStack
         gap={6}
         justifyContent="justify-center"
@@ -140,13 +143,13 @@ export function DelegateDialog({
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
                   </p>
-                  <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegatee.delegatee} />
                   </div>
                 </VStack>
               </HStack>
-              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-line rounded-full right-1/2 top-1/2">
-                <ArrowDownIcon className="w-4 h-4 text-black" />
+              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-neutral border border-line rounded-full right-1/2 top-1/2">
+                <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <HStack
                 gap={3}
@@ -158,7 +161,7 @@ export function DelegateDialog({
                   <p className="text-xs font-medium text-secondary">
                     Delegating to
                   </p>
-                  <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
                   </div>
                 </VStack>
@@ -185,13 +188,13 @@ export function DelegateDialog({
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
                   </p>
-                  <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <p>N/A</p>
                   </div>
                 </VStack>
               </HStack>
-              <div className="w-10 h-10 flex items-center justify-center bg-white border border-line rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
-                <ArrowDownIcon className="w-4 h-4 text-black" />
+              <div className="w-10 h-10 flex items-center justify-center bg-neutral border border-line rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
+                <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <HStack gap={3} alignItems="items-center" className="p-2">
                 <ENSAvatar ensName={delegateEnsName} className="w-10 h-10" />
@@ -200,7 +203,7 @@ export function DelegateDialog({
                   <p className="text-xs font-medium text-secondary">
                     Delegating to
                   </p>
-                  <div className="font-medium text-black max-w-[6rem] sm:max-w-full">
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
                   </div>
                 </VStack>

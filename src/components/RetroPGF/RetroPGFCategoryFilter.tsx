@@ -46,7 +46,7 @@ export default function RetroPGFCategoryFilter() {
                     <li
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         option.filter === categoryParam
-                          ? "text-black bg-white border-line"
+                          ? "text-primary bg-neutral border-line"
                           : "text-tertiary border-transparent"
                       }`}
                     >

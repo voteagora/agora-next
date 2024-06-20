@@ -75,7 +75,7 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
         onClick={addOption}
         className="flex items-center w-full gap-2 p-4 border border-line cursor-pointer font-semibold shadow-newDefault"
       >
-        <div className="h-8 w-8 flex items-center justify-center rounded-full shadow-newDefault bg-white border border-line">
+        <div className="h-8 w-8 flex items-center justify-center rounded-full shadow-newDefault bg-neutral border border-line">
           +
         </div>
         <div>Add option</div>

@@ -12,7 +12,7 @@ export default function RetroPGFApplicationContentFundingSource({
 }) {
   return (
     <VStack className="pt-4 sm:px-4">
-      <h2 className="font-inter font-black text-2xl leading-[29px] text-black">
+      <h2 className="font-inter font-black text-2xl leading-[29px] text-primary">
         Funding sources
       </h2>
       <VStack className="items-stretch sm:items-normal justify-end sm:justify-start w-full h-auto sm:h-full my-8 py-2 px-4 rounded-xl border border-line shadow-newDefault min-h-[3rem]">

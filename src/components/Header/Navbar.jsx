@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <div
-      className={`flex flex-row bg-white rounded-full border border-line p-1 font-medium shadow-newDefault`}
+      className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium shadow-newDefault`}
     >
       {hasProposals && (
         <HeaderLink
