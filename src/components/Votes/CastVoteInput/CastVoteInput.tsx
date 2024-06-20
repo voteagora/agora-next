@@ -50,7 +50,7 @@ export default function CastVoteInput({
   }
 
   return (
-    <VStack className="bg-neutral border border-line border-xl flex-shrink mx-4">
+    <VStack className="bg-neutral border border-line rounded-lg flex-shrink mx-4">
       <textarea
         placeholder="I believe..."
         value={reason}

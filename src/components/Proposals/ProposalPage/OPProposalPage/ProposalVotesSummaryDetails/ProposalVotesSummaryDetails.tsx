@@ -76,7 +76,7 @@ export default function ProposalVotesSummaryDetails({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b -ml-4 p-4">
+      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b border-line -ml-4 p-4">
         <div className="flex justify-between">
           <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
             Quorum
@@ -123,7 +123,7 @@ export default function ProposalVotesSummaryDetails({
           </div>
         )}
       </div>
-      <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
+      <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
         <StepperRow
           label="Proposal created"
           value={formatTime(proposal.created_time)}

@@ -77,6 +77,7 @@ type TenantUIParams = {
     negative?: string;
     accentPrimary?: string;
     accentNeutral?: string;
+    font?: string;
   };
 };
 
@@ -105,6 +106,7 @@ export class TenantUI {
     negative?: string;
     accentPrimary?: string;
     accentNeutral?: string;
+    font?: string;
   };
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
@@ -189,6 +191,7 @@ export class TenantUI {
         negative?: string;
         accentPrimary?: string;
         accentNeutral?: string;
+        font?: string;
       }
     | undefined {
     return this._customization;

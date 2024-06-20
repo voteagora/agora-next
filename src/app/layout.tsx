@@ -48,7 +48,7 @@ const scroll = {
   accentNeutral: "#FAF2E8",
 };
 
-const defaults = scroll;
+const defaults = standard;
 
 export default async function RootLayout({
   children,
@@ -71,6 +71,7 @@ export default async function RootLayout({
     ui?.customization?.accentPrimary || defaults.accentPrimary;
   const accentNeutral =
     ui?.customization?.accentNeutral || defaults.accentNeutral;
+  const font = ui?.customization?.font || "Inter";
 
   const style = {
     "--primary": primary,
@@ -84,7 +85,7 @@ export default async function RootLayout({
     "--negative": negative,
     "--accent-primary": accentPrimary,
     "--accent-neutral": accentNeutral,
-    "font-family": ui?.font || "TransSansPremium",
+    "font-family": font,
   } as React.CSSProperties;
 
   return (
