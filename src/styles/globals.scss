@@ -207,3 +207,43 @@ input[type="number"] {
     display: none;
   }
 }
+
+//////////////////////////
+// Custom tenant fonts
+//////////////////////////
+
+@font-face {
+  font-family: "TransSansPremium";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/TransSansPremium/TransSansPremium_Light.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "TransSansPremium";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/TransSansPremium/TransSansPremium_Regular.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "TransSansPremium";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/TransSansPremium/TransSansPremium_SemiBold.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "TransSansPremium";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/TransSansPremium/TransSansPremium_Bold.otf")
+    format("opentype");
+}

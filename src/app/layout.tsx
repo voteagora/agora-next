@@ -48,7 +48,7 @@ const scroll = {
   accentNeutral: "#FAF2E8",
 };
 
-const defaults = standard;
+const defaults = scroll;
 
 export default async function RootLayout({
   children,
@@ -84,6 +84,7 @@ export default async function RootLayout({
     "--negative": negative,
     "--accent-primary": accentPrimary,
     "--accent-neutral": accentNeutral,
+    "font-family": ui?.font || "TransSansPremium",
   } as React.CSSProperties;
 
   return (
