@@ -26,7 +26,7 @@ export const Receipt = ({
   return (
     <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-white">
       <Image
-        src={ui.delegate.logo}
+        src={ui.assets.delegate}
         alt="img"
         width={40}
         height={40}
