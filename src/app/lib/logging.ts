@@ -25,12 +25,13 @@ export const time_this = async <T>(
     throw error;
   } finally {
     const end = performance.now();
-    console.log(
-      util.inspect(
-        { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: !log_emission }
-      )
-    );
+    log_emission &&
+      console.log(
+        util.inspect(
+          { ...log_fields, time: end - start },
+          { showHidden: false, depth: null, colors: true }
+        )
+      );
   }
 };
 
@@ -45,12 +46,13 @@ export const time_this_sync = <T>(
     throw error;
   } finally {
     const end = performance.now();
-    console.log(
-      util.inspect(
-        { ...log_fields, time: end - start },
-        { showHidden: false, depth: null, colors: !log_emission }
-      )
-    );
+    log_emission &&
+      console.log(
+        util.inspect(
+          { ...log_fields, time: end - start },
+          { showHidden: false, depth: null, colors: true }
+        )
+      );
   }
 };
 
