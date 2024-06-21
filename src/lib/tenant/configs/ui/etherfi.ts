@@ -1,6 +1,9 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
 import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
+import delegateImage from "@/assets/tenant/etherfi_delegate.svg";
+import successImage from "@/assets/tenant/optimism_success.svg";
+import pendingImage from "@/assets/tenant/optimism_pending.svg";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ether.fi Agora",
@@ -8,8 +11,11 @@ export const etherfiTenantUIConfig = new TenantUI({
   hero: etherfiHero,
   logo: etherfiLogo,
 
-  delegate: {
-    logo: etherfiLogo,
+  assets: {
+    // TODO: Replace success and pending images
+    success: successImage,
+    pending: pendingImage,
+    delegate: delegateImage,
   },
 
   organization: {
