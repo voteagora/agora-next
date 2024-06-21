@@ -18,7 +18,7 @@ export default function ENSAvatar({ ensName, className = "" }) {
     name: ensName,
   });
 
-  const [avatar, setAvatar] = useState(ui.delegate.logo);
+  const [avatar, setAvatar] = useState(ui.assets.delegate);
 
   useEffect(() => {
     if (data) {
