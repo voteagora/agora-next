@@ -1,6 +1,7 @@
 import { formatFullDate } from "@/lib/utils";
 import styles from "./changelog.module.scss";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export async function generateMetadata() {
   return {
@@ -51,6 +52,64 @@ export default function Page() {
                   </a>
                 </p>
               </div>
+            </div>
+            <div className="my-8 border-t border-gray-300"></div>
+            <div className={styles.changelogItem}>
+              <p id="changelogfeb2024" className={styles.changlogDate}>
+                {formatFullDate(new Date(2024, 5, 20))}
+              </p>
+              <h3 className={styles.changelogTitle}>Governance Changelog #6</h3>
+              <p>Morning OP collective,</p>
+              <p>Lots of improvements big and small this month.</p>
+              <p>
+                The biggest change is the new dynamic proposal vote timeline and
+                proposal stage views. These views make it easier to see the
+                dynamics of a vote and how the vote got to success or defeat in
+                a nice visual way.
+              </p>
+
+              <div className="my-8">
+                <p>
+                  <strong>Voter Timeline Graph</strong>
+                </p>
+                <Image
+                  src="https://op-atlas-test.mypinata.cloud/ipfs/Qmakxk3UCtEmvN7kSkUNrwQWnPYqeg7W82TbLBXefh8AmY"
+                  width={800}
+                  height={400}
+                  alt="Agora Voter Timeline Graph"
+                />
+              </div>
+
+              <div>
+                <p>
+                  <strong>Proposal Stages Timeline</strong>
+                </p>
+                <Image
+                  src="https://op-atlas-test.mypinata.cloud/ipfs/Qme7A8qfmYHW76FwkwqK78WSrfU1whWk5CY26dsPEzwwst"
+                  width={800}
+                  height={400}
+                  alt="Agora Voter Timeline Graph"
+                />
+              </div>
+              <p>
+                We are also working on lots of API improvements and now have
+                over 45 OP builders in our telegram group and are looking
+                forward to getting the RetroPGF Voting API done, so that we can
+                continue to build out more governance primitives and see what
+                the community builds.
+              </p>
+              <p>
+                Finally, we are busy working on making governance compatible
+                with Interop. Interop is the protocol upgrade coming in 2024
+                that will allow for superchain tokens to work seamless across
+                chains. We are making sure that the delegation and collection of
+                voting power is a first class citizen in the new world.
+              </p>
+              <p>Have a great week!</p>
+              <p>
+                <a href="https://warpcast.com/kent">Kent</a>, Co-founder at{" "}
+                <a href="https://agora.xyz">Agora</a>
+              </p>
             </div>
             <div className="my-8 border-t border-gray-300"></div>
             <div className={styles.changelogItem}>

@@ -20,6 +20,12 @@ type UIPage = {
   };
 };
 
+type UIAssets = {
+  success: string;
+  pending: string;
+  delegate: string;
+};
+
 type UIDelegates = {
   allowed: `0x${string}`[];
   advanced: `0x${string}`[];
@@ -30,14 +36,10 @@ type UIOrganization = {
   title: string;
 };
 
-type UIDelegate = {
-  logo: string;
-};
-
 type TenantUIParams = {
+  assets: UIAssets;
   color: string;
   delegates?: UIDelegates;
-  delegate: UIDelegate;
   hero?: string;
   links?: UILink[];
   logo: string;
@@ -48,9 +50,9 @@ type TenantUIParams = {
 };
 
 export class TenantUI {
+  private _assets: UIAssets;
   private _color: string;
   private _delegates?: UIDelegates;
-  private _delegate: UIDelegate;
   private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
@@ -64,9 +66,9 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   constructor({
+    assets,
     color,
     delegates,
-    delegate,
     hero,
     links,
     logo,
@@ -75,9 +77,9 @@ export class TenantUI {
     title,
     toggles,
   }: TenantUIParams) {
+    this._assets = assets;
     this._color = color;
     this._delegates = delegates;
-    this._delegate = delegate;
     this._hero = hero;
     this._links = links;
     this._logo = logo;
@@ -87,16 +89,16 @@ export class TenantUI {
     this._toggles = toggles;
   }
 
+  public get assets(): UIAssets {
+    return this._assets;
+  }
+
   public get color(): string {
     return this._color;
   }
 
   public get delegates(): UIDelegates | undefined {
     return this._delegates;
-  }
-
-  public get delegate(): UIDelegate {
-    return this._delegate;
   }
 
   public get title(): string {

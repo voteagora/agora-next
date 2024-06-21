@@ -3,7 +3,7 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Image from "next/image";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useEffect } from "react";
-import successImage from "@/assets/success.svg";
+import Tenant from "@/lib/tenant/tenant";
 
 // TODO: Add notion link in "Learn more"
 export function SuccessView({
@@ -16,6 +16,7 @@ export function SuccessView({
     subdelegateData: { hash: string } | undefined;
   };
 }) {
+  const { ui } = Tenant.current();
   const { refetchDelegate } = useConnectButtonContext();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function SuccessView({
       <div className="w-full">
         <Image
           className="w-full"
-          src={successImage}
+          src={ui.assets.success}
           alt="Delegation successful image"
         />
       </div>
