@@ -11,8 +11,6 @@ import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
 import { getVpToDisplay } from "@/lib/voteUtils";
-import pendingImage from "@/assets/pending.svg";
-import successImage from "@/assets/success.svg";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
@@ -205,12 +203,14 @@ export function SuccessMessage({
     advancedTxHash: string | undefined;
   };
 }) {
+  const { ui } = Tenant.current();
+
   return (
     <VStack className={styles.full_width}>
       <Image
         width="457"
         height="155"
-        src={successImage}
+        src={ui.assets.success}
         className="w-full mb-3"
         alt="agora loading"
       />
@@ -235,9 +235,15 @@ export function SuccessMessage({
 }
 
 export function LoadingVote() {
+  const { ui } = Tenant.current();
+
   return (
     <VStack className={styles.full_width}>
-      <Image src={pendingImage} className="w-full mb-3" alt="Vote pending" />
+      <Image
+        src={ui.assets.pending}
+        className="w-full mb-3"
+        alt="Vote pending"
+      />
       <div className="mb-2 text-2xl font-black">Casting your vote</div>
       <div className="mb-5 text-sm text-gray-700">
         It might take up to a minute for the changes to be reflected.
