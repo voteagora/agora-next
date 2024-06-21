@@ -26,7 +26,8 @@ export default class Tenant {
     this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
     this._contracts = TenantContractFactory.create(
       this._namespace,
-      this._isProd
+      this._isProd,
+      process.env.NEXT_PUBLIC_ALCHEMY_ID as string
     );
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);

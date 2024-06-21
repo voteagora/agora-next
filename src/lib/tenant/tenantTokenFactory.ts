@@ -30,6 +30,14 @@ export default class TenantTokenFactory {
           symbol: "UNI",
           decimals: 18,
         };
+
+      case TENANT_NAMESPACES.SCROLL:
+        return {
+          name: "Scoll",
+          symbol: "SCROLL",
+          decimals: 18,
+        };
+
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

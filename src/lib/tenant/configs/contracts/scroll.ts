@@ -5,29 +5,33 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { mainnet } from "viem/chains";
+import { scroll } from "viem/chains";
+
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 interface Props {
   isProd: boolean;
   alchemyId: string;
 }
 
-export const ensTenantContractConfig = ({
+export const scrollTenantContractConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72";
+  const TOKEN = "0x5300000000000000000000000000000000000004";
   const GOVERNOR = "0x0";
 
-  const provider = new AlchemyProvider("mainnet", alchemyId);
+  const provider = new JsonRpcProvider(
+    `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
+  );
+  const chain = scroll;
 
   return {
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain: mainnet,
+      chain,
       contract: EtherfiToken__factory.connect(TOKEN, provider),
       provider,
     }),
@@ -36,7 +40,7 @@ export const ensTenantContractConfig = ({
     governor: new TenantContract<IGovernorContract>({
       abi: [],
       address: GOVERNOR,
-      chain: mainnet,
+      chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),

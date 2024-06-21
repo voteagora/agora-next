@@ -1,4 +1,4 @@
-import { BaseContract, BigNumberish } from "ethers";
+import { BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
