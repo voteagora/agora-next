@@ -12,6 +12,8 @@ const ballot = [
     os_multiplier: 3,
     metric_id: "monthly_active_addresses",
     allocation: 30,
+    updated_at: new Date("2021-10-01"),
+    created_at: new Date("2021-10-01"),
     locked: true,
     allocations:
       '[{"project_id" : "d-hedge", "name" : "Foo Link", "image" : "", "is_os" : true, "value" : 10}, {"project_id" : "hypercerts", "name" : "Bar Forge", "image" : "", "is_os" : false, "value" : 30}, {"project_id" : "synapse", "name" : "Imaginary Pulse", "image" : "", "is_os" : false, "value" : 60}]',
@@ -24,6 +26,8 @@ const ballot = [
     os_multiplier: 3,
     metric_id: "trusted_recurring_users",
     allocation: 50,
+    updated_at: new Date("2021-10-01"),
+    created_at: new Date("2021-10-01"),
     locked: true,
     allocations:
       '[{"project_id" : "d-hedge", "name" : "Foo Link", "image" : "", "is_os" : true, "value" : 10}, {"project_id" : "hypercerts", "name" : "Bar Forge", "image" : "", "is_os" : false, "value" : 30}, {"project_id" : "synapse", "name" : "Imaginary Pulse", "image" : "", "is_os" : false, "value" : 60}]',
@@ -36,6 +40,8 @@ const ballot = [
     os_multiplier: 3,
     metric_id: "gas_fees",
     allocation: 20,
+    updated_at: new Date("2021-10-01"),
+    created_at: new Date("2021-10-01"),
     locked: false,
     allocations:
       '[{"project_id" : "d-hedge", "name" : "Foo Link", "image" : "", "is_os" : true, "value" : 10}, {"project_id" : "hypercerts", "name" : "Bar Forge", "image" : "", "is_os" : false, "value" : 30}, {"project_id" : "synapse", "name" : "Imaginary Pulse", "image" : "", "is_os" : false, "value" : 60}]',
@@ -60,6 +66,10 @@ describe("ballotAllocations", () => {
       address: "0x123",
       round_id: 4,
       status: "SUBMITTED",
+      updated_at: new Date("2021-10-01"),
+      created_at: new Date("2021-10-01"),
+      os_only: false,
+      os_multiplier: 3,
       allocations: [
         {
           metric_id: "monthly_active_addresses",
