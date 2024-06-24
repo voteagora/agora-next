@@ -120,6 +120,10 @@ export function calculateAllocations(
     address: ballot[0].address,
     round_id: ballot[0].round,
     status: ballot[0].status,
+    os_multiplier: ballot[0].os_multiplier,
+    os_only: ballot[0].os_only,
+    updated_at: ballot[0].updated_at,
+    created_at: ballot[0].created_at,
     allocations: ballot.map((b) => ({
       metric_id: b.metric_id,
       allocation: Number(b.allocation),
