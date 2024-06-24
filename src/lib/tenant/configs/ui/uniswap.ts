@@ -53,6 +53,16 @@ export const uniswapTenantUIConfig = new TenantUI({
         description: "Home of token governance",
       },
     },
+    {
+      route: "info",
+      title: "Uniswap Protocol Governance",
+      description:
+        "Uniswap is a public good owned and governed by UNI token holders.",
+      meta: {
+        title: "Info of Agora",
+        description: "Welcome to the Optimism Collective",
+      },
+    },
   ],
 
   toggles: [
@@ -70,6 +80,10 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates/edit",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
   ],

@@ -44,18 +44,18 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {ui.toggle("info") && ui.toggle("info").enabled && (
-        <HeaderLink href="/info" isActive={pathname.includes("info")}>
-          Info
-        </HeaderLink>
-      )}
-
       {ui.toggle("retropgf") && ui.toggle("retropgf").enabled && (
         <HeaderLink
           href="/retropgf/3/summary"
           isActive={pathname.includes("retropgf/3/summary")}
         >
           RetroPGF
+        </HeaderLink>
+      )}
+
+      {ui.toggle("info") && ui.toggle("info").enabled && (
+        <HeaderLink href="/info" isActive={pathname.includes("info")}>
+          Info
         </HeaderLink>
       )}
     </div>

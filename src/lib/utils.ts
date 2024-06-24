@@ -305,6 +305,15 @@ export function getBlockScanUrl(hash: string | `0x${string}`) {
       return `https://etherscan.io/tx/${hash}`;
   }
 }
+export const getTextWidth = (text: string, font = "14px inter") => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.font = font;
+    return context.measureText(text).width;
+  }
+  return 0;
+};
 
 export function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
