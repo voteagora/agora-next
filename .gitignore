@@ -48,3 +48,5 @@ next-env.d.ts
 .prettierrc
 
 /src/lib/contracts/generated
+
+dist
