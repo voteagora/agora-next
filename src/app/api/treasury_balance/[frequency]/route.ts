@@ -3,7 +3,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
 import { cache } from "react";
 
-export type TokenBalance = {
+type TokenBalance = {
   day: string;
   date: string;
   ts: number;
@@ -69,8 +69,7 @@ async function getTreasuryBalanceTS(frequency : string) {
   return {result};
 }
 
-export const fetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
-
+const fetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
 
 
 export async function GET(request: NextRequest) {
