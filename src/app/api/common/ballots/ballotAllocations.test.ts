@@ -63,17 +63,17 @@ describe("ballotAllocations", () => {
       allocations: [
         {
           metric_id: "monthly_active_addresses",
-          allocation: 3000000,
+          allocation: 30,
           locked: true,
         },
         {
           metric_id: "trusted_recurring_users",
-          allocation: 5000000,
+          allocation: 50,
           locked: true,
         },
         {
           metric_id: "gas_fees",
-          allocation: 2000000,
+          allocation: 20,
           locked: false,
         },
       ],
