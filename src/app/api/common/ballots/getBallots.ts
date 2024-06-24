@@ -78,6 +78,8 @@ async function getBallotForAddress({
               ) THEN 'SUBMITTED'
               ELSE 'PENDING'
           END AS status,
+      b.created_at,
+      b.updated_at,
       os_only, 
       os_multiplier, 
       a.metric_id, 
