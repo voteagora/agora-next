@@ -5,18 +5,45 @@ export type Ballot = {
   round: Ballots["round"];
   os_only: Ballots["os_only"];
   os_multiplier: Ballots["os_multiplier"];
-  created_at: Ballots["created_at"];
   updated_at: Ballots["updated_at"];
+  created_at: Ballots["created_at"];
   allocations: Allocation[];
+  allocation: number;
   status: "SUBMITTED" | "PENDING";
+  locked: boolean;
+  metric_id: string;
 };
 
 type Allocation = {
-  address: allocations["address"];
-  round: allocations["round"];
-  metric_id: allocations["metric_id"];
-  allocation: allocations["allocation"];
-  locked: allocations["locked"];
-  created_at: allocations["created_at"];
-  updated_at: allocations["updated_at"];
+  project_id: string;
+  name: string;
+  image: string;
+  is_os: boolean;
+  value: number;
+};
+
+export type BallotResponse = {
+  address: string;
+  round_id: number;
+  status: "SUBMITTED" | "PENDING";
+  os_only: boolean;
+  os_multiplier: number;
+  updated_at: Date;
+  created_at: Date;
+  allocations: {
+    metric_id: string;
+    allocation: number;
+    locked: boolean;
+  }[];
+  project_allocations: {
+    project_id: string;
+    name: string;
+    image: string;
+    is_os: boolean;
+    allocation: number;
+    allocation_per_metric: {
+      metric_id: string;
+      allocation: number;
+    }[];
+  }[];
 };
