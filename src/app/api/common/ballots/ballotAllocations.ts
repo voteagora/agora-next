@@ -103,7 +103,7 @@ export function calculateAllocations(
     return {
       ...a,
       allocation: cappedAllocation * TOTAL_FUNDING,
-      allocation_per_metric: a.allocation_per_metric.map((apm) => {
+      allocations_per_metric: a.allocation_per_metric.map((apm) => {
         return {
           ...apm,
           allocation:
