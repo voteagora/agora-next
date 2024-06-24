@@ -122,7 +122,7 @@ export function calculateAllocations(
     status: ballot[0].status,
     allocations: ballot.map((b) => ({
       metric_id: b.metric_id,
-      allocation: (b.allocation * TOTAL_FUNDING) / 100,
+      allocation: b.allocation,
       locked: b.locked,
     })),
     project_allocations: cappedAllocations,
