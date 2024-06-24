@@ -113,7 +113,7 @@ async function getBallotForAddress({
     };
   }
 
-  return calculateAllocations(ballot);
+  return [calculateAllocations(ballot)];
 }
 
 export const fetchBallots = cache(getBallotsApi);
