@@ -83,7 +83,7 @@ const DaosTreasuryChart = () => {
           <p className="text-base font-semibold text-black">Total Value</p>
           <p className="text-xs font-medium text-gray-4f">$70,800,012.23</p>
         </div>
-        <div className="w-full p-8 pb-6">
+        <div className="p-4 sm:p-8 pb-6 !w-full">
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart
               data={data}
@@ -128,9 +128,12 @@ const DaosTreasuryChart = () => {
             </AreaChart>
           </ResponsiveContainer>
 
-          <div className="flex flex-row  justify-between mt-6 sm:pl-10">
+          <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-between pl-10 sm:pl-14 mt-6">
             <div className="flex flex-row gap-1 justify-center items-center">
-              <div className={`w-4 h-[2px] bg-[${primary}]`}></div>
+              <div
+                style={{ backgroundColor: primary }}
+                className="w-4 h-[2px] "
+              ></div>
               <p className="text-xs font-semibold text-gray-4f">Total value</p>
             </div>
             <ChartDataFilterTabs />

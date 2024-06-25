@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
+import { HStack, VStack } from "@/components/Layout/Stack";
 
 const heroCardsData = {
   optimism: [
@@ -78,14 +79,16 @@ const InfoHero = () => {
   const { title, description } = ui.page("info");
 
   return (
-    <div className="flex flex-row mt-10 gap-11 flex-wrap sm:flex-nowrap">
-      <div className="flex flex-col">
-        <h1 className="text-[56px] leading-[67px] font-black text-black">
+    <HStack className="mt-10 gap-11 flex-wrap sm:flex-nowrap">
+      <VStack>
+        <h1 className="text-4xl sm:text-[56px] sm:leading-[67px] font-black text-black">
           {title}
         </h1>
-        <p className="text-base font-medium text-gray-4f">{description}</p>
-      </div>
-      <div className="flex flex-row">
+        <p className="text-base font-medium text-gray-4f mt-2 sm:mt-0 ">
+          {description}
+        </p>
+      </VStack>
+      <HStack>
         {heroCardsData[namespace as keyof typeof heroCardsData].map(
           (card, index) => (
             <Card
@@ -105,8 +108,8 @@ const InfoHero = () => {
             />
           )
         )}
-      </div>
-    </div>
+      </HStack>
+    </HStack>
   );
 };
 

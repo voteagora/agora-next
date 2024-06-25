@@ -122,7 +122,7 @@ const PortalTrafficVisitorsChart = () => {
         </AreaChart>
       </ResponsiveContainer>
 
-      <div className="flex flex-row  justify-between mt-6">
+      <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-between pl-10 sm:pl-14 mt-6">
         <div className="flex flex-row gap-1 justify-center items-center">
           <div className="w-4 h-[2px] bg-[#FF0420]"></div>
           <p className="text-xs font-semibold text-gray-4f">All visitors</p>

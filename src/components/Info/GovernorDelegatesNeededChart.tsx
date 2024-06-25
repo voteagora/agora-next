@@ -39,14 +39,20 @@ const GovernorDelegatesNeededChart = () => {
         <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
           <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
           <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
-            <div className={`w-4 h-[2px] ${primaryColorClass}`}></div>
+            <div
+              style={{ backgroundColor: primary }}
+              className="w-4 h-[2px]"
+            ></div>
             <p className="text-xs font-medium text-gray-4f ">
               To reach quorum{" "}
               <span className="font-bold pl-3">{payload[0].value}</span>
             </p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center mt-2">
-            <div className={`w-4 h-[2px] ${primaryColorClass}`}></div>
+            <div
+              style={{ borderColor: primary }}
+              className="w-4 border border-b-1 border-dashed"
+            />
             <p className="text-xs font-medium text-gray-4f">
               To reach 50%{" "}
               <span className="font-bold pl-6">{payload[1].value}</span>
@@ -94,11 +100,14 @@ const GovernorDelegatesNeededChart = () => {
             width={yAxisWidth}
             className="text-xs font-medium text-gray-4f"
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
+          />
           <Area
             type="step"
             dataKey="uv"
-            stroke="primary"
+            stroke={primary}
             fill="url(#colorAllDelegates)"
           />
           <Line
@@ -110,12 +119,26 @@ const GovernorDelegatesNeededChart = () => {
           />
         </ComposedChart>
       </ResponsiveContainer>
-      <div className="flex flex-row justify-between pl-16 mt-6">
-        <div className="flex flex-row gap-1 justify-center items-center">
-          <div className="w-4 h-[2px] bg-[#FF0420]"></div>
-          <p className="text-xs font-semibold text-gray-4f">
-            Avg # of voters per proposal
-          </p>
+      <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-between pl-10 sm:pl-14 mt-6">
+        <div className="flex flex-row flex-wrap gap-2 sm:gap-[14px]">
+          <div className="flex flex-row gap-1 justify-center items-center">
+            <div
+              style={{ backgroundColor: primary }}
+              className="w-4 h-[2px]"
+            ></div>
+            <p className="text-xs font-semibold text-gray-4f">
+              # of delegates to reach quorum
+            </p>
+          </div>
+          <div className="flex flex-row gap-1 justify-center items-center">
+            <div
+              style={{ borderColor: primary }}
+              className="w-4 border border-b-1 border-dashed"
+            />
+            <p className="text-xs font-semibold text-gray-4f">
+              # of delegates to reach 50% of votable supply
+            </p>
+          </div>
         </div>
 
         <ChartDataFilterTabs />

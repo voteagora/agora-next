@@ -16,9 +16,9 @@ const TabTrigger: React.FC<TabProps> = ({ value, title, description }) => {
   return (
     <TabsTrigger
       value={value}
-      className="flex flex-col opacity-100 !border-gray-300 first:rounded-tl-lg last:rounded-tr-lg border-r bg-gray-fa data-[state=active]:bg-white p-8 pb-6 w-full last:border-0 "
+      className="flex flex-col last:col-span-2  last:sm:col-span-1  opacity-100 border !border-gray-300 border-t-0 border-l-0 first:rounded-tl-lg last:rounded-tr-lg  bg-gray-fa data-[state=active]:bg-white p-4 sm:p-8 w-full"
     >
-      <h3 className="text-base font-semibold text-black">{title}</h3>
+      <h3 className="text-sm sm:text-base font-semibold text-black">{title}</h3>
       <p className="text-xs font-medium text-gray-4f">{description}</p>
     </TabsTrigger>
   );
@@ -54,10 +54,10 @@ const GovernanceChartsTabs = () => {
   ];
 
   return (
-    <div className="my-10">
+    <div className="my-10 ">
       <h3 className="text-2xl font-black text-black">Governance</h3>
-      <Tabs className="mt-4" defaultValue="top-delegates">
-        <TabsList className="flex flex-row !gap-0 rounded-none rounded-t-lg border !border-gray-300 h-fit">
+      <Tabs className="mt-4 border rounded-lg" defaultValue="top-delegates">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-5 !gap-0 w-full h-fit">
           {tabs.map((tab) => (
             <TabTrigger
               key={tab.value}
@@ -68,33 +68,27 @@ const GovernanceChartsTabs = () => {
           ))}
         </TabsList>
 
-        <TabsContent
-          className="mt-0 border border-t-0 border-gray-300 rounded-b-lg p-8 pb-6  w-full"
-          value="top-delegates"
-        >
+        <TabsContent className="p-4 sm:p-8 pb-6 !w-full" value="top-delegates">
           <GovernanceTopDelegateChart />
         </TabsContent>
         <TabsContent
           value="active-delegates"
-          className="mt-0 border border-t-0 border-gray-300 rounded-b-lg p-8 pb-6  w-full"
+          className="w-full px-4 sm:px-8 py-3"
         >
           <GovernanceActiveDelegateChart />
         </TabsContent>
-        <TabsContent
-          value="avg-voters"
-          className="mt-0 border border-t-0 border-gray-300 rounded-b-lg p-8 pb-6  w-full"
-        >
+        <TabsContent value="avg-voters" className="!w-fullp-4 sm:p-8 pb-6">
           <AverageVoterProposalChart />
         </TabsContent>
         <TabsContent
           value="delegates-needed"
-          className="mt-0 border border-t-0 border-gray-300 rounded-b-lg p-8 pb-6  w-full"
+          className="!w-full px-4 sm:px-8 py-3"
         >
           <GovernorDelegatesNeededChart />
         </TabsContent>
         <TabsContent
           value="total-votable-supply"
-          className="mt-0 border border-t-0 border-gray-300 rounded-b-lg p-8 pb-6  w-full"
+          className="w-full px-4 sm:px-8 py-3"
         >
           <GovernorVotableSupplyChart />
         </TabsContent>
