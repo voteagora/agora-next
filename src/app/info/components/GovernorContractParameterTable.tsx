@@ -16,13 +16,13 @@ const SECONDS_IN_HOUR = 3600;
 
 const GovernorContractParameterTable = () => {
   const { contracts } = Tenant.current();
-  const { data: votingDelay } = useContractRead({
+  const { data: votingDelay, isFetched: isDelayFetched } = useContractRead({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingDelay",
   });
 
-  const { data: votingPeriod } = useContractRead({
+  const { data: votingPeriod, isFetched: isPeriodFetched } = useContractRead({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingPeriod",
@@ -30,7 +30,7 @@ const GovernorContractParameterTable = () => {
 
   const secondsToHuman = (seconds: number) => {
     const hrs = Math.round(Number(seconds) / SECONDS_IN_HOUR);
-    return hrs === 0 ? "Less than 1 hour" : pluralize("hour", hrs);
+    return hrs === 0 ? "No Delay" : pluralize("hour", hrs);
   };
 
   return (
@@ -51,7 +51,9 @@ const GovernorContractParameterTable = () => {
             Voting Delay
           </TableCell>
           <TableCell className="text-base font-semibold text-right text-black">
-            {votingDelay ? secondsToHuman(Number(votingDelay)) : "Loading..."}
+            {isDelayFetched && votingDelay
+              ? secondsToHuman(Number(votingDelay))
+              : "Loading..."}
           </TableCell>
         </TableRow>
         <TableRow>
@@ -59,7 +61,9 @@ const GovernorContractParameterTable = () => {
             Voting Period
           </TableCell>
           <TableCell className="text-base font-semibold text-right text-black">
-            {votingPeriod ? secondsToHuman(Number(votingPeriod)) : "Loading..."}
+            {isPeriodFetched && votingPeriod
+              ? secondsToHuman(Number(votingPeriod))
+              : "Loading..."}
           </TableCell>
         </TableRow>
       </TableBody>

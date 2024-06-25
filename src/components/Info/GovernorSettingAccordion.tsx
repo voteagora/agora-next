@@ -4,9 +4,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import GovernorContractParameterTable from "./GovernorContractParameterTable";
+import GovernorContractParameterTable from "../../app/info/components/GovernorContractParameterTable";
 import ContractsListTable from "../../app/info/components/ContractsListTable";
-import ProposalTypeTable from "./ProposalTypeTable";
+import ProposalTypeTable from "../../app/info/components/ProposalTypeTable";
 
 const GovernorSettingAccordion = () => {
   return (
