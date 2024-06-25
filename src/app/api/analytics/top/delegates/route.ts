@@ -8,9 +8,7 @@ type AddressWeight = {
   weight: string;
 };
 
-
 async function getTopDelegateWeights() {
-
   const { contracts } = Tenant.current();
 
   const QRY = `WITH 
@@ -37,11 +35,10 @@ async function getTopDelegateWeights() {
 
   const result = await prisma.$queryRawUnsafe<AddressWeight[]>(QRY);
 
-  return {result};
+  return { result };
 }
 
 const fetchDelegateWeights = cache(getTopDelegateWeights);
-
 
 export async function GET(request: NextRequest) {
   // const authResponse = await authenticateApiUser(request);
