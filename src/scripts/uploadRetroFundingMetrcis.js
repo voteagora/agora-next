@@ -4,14 +4,20 @@ const csv = require("csv-parser");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const CLEAN_OLD_DATA = true;
+
 async function main() {
   const filePath = path.join(
     __dirname,
-    "../../bquxjob_4f088de5_18f81c0ada6.csv"
+    "../../bquxjob_958899f_1904b477493.csv"
   ); // Replace 'your_file.csv' with the actual file name
 
   let totals = {};
   let rows = [];
+
+  if (CLEAN_OLD_DATA) {
+    await prisma.metrics_projects.deleteMany();
+  }
 
   // First pass: Calculate totals
   fs.createReadStream(filePath)
@@ -40,6 +46,8 @@ async function main() {
     }
   }
 
+  // TODO: Split into batches to speed up the load
+
   async function processRows() {
     for (const row of rows) {
       await processRow(row);
@@ -47,10 +55,10 @@ async function main() {
   }
 
   async function processRow(row) {
-    const projectName = row["project_name"];
-    const isOS = Math.random() < 0.5; // Randomly assign true or false
+    const projectName = row["application_id"];
+    const isOS = row["is_oss"] === "true";
     for (const [metricName, value] of Object.entries(row)) {
-      if (metricName !== "project_name") {
+      if (metricName !== "application_id" && metricName !== "is_oss") {
         const total = totals[metricName];
         const linearValue = total ? parseFloat(value) / total : 0;
 
