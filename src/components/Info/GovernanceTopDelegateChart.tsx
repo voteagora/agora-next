@@ -33,15 +33,10 @@ const GovernanceTopDelegateChart: React.FC = () => {
     const opacity = value / maxValue;
     return `rgba(${parseInt(primary.slice(1, 3), 16)}, ${parseInt(primary.slice(3, 5), 16)}, ${parseInt(primary.slice(5, 7), 16)}, ${opacity})`;
   };
-  // const getDynamicColor = (value: number, maxValue: number): string => {
-  //   const opacity = value / maxValue;
-
-  //   return `{primary}, ${opacity})`;
-  // };
 
   return (
     <div>
-      <div className="flex border border-black rounded-md overflow-hidden h-10 mt-12">
+      <div className="flex border border-black rounded-md overflow-hidden h-10 mt-4 sm:mt-12">
         {data.map((item, index) => (
           <div
             key={index}
@@ -54,11 +49,14 @@ const GovernanceTopDelegateChart: React.FC = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-5 justify-start items-start pt-2">
+      <div className="grid grid-cols-2 sm:grid-cols-5 justify-start items-start pt-2">
         {data.map((item, index) => (
           <div className="pt-4" key={index}>
             <div className="flex flex-row gap-2">
-              <div className={`w-2 h-2 bg-[${primary}] mt-1`} />
+              <div
+                className="w-2 h-2 mt-1"
+                style={{ backgroundColor: primary }}
+              />
               <div className="flex flex-col">
                 <h3 className="text-xs font-semibold text-gray-4f">
                   {item.name}

@@ -81,10 +81,12 @@ const InfoHero = () => {
   return (
     <HStack className="mt-10 gap-11 flex-wrap sm:flex-nowrap">
       <VStack>
-        <h1 className="text-[56px] leading-[67px] font-black text-black">
+        <h1 className="text-4xl sm:text-[56px] sm:leading-[67px] font-black text-black">
           {title}
         </h1>
-        <p className="text-base font-medium text-gray-4f">{description}</p>
+        <p className="text-base font-medium text-gray-4f mt-2 sm:mt-0 ">
+          {description}
+        </p>
       </VStack>
       <HStack>
         {heroCardsData[namespace as keyof typeof heroCardsData].map(

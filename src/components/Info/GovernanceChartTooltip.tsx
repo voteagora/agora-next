@@ -36,8 +36,10 @@ const GovernanceChartTooltip: React.FC<CustomTooltipProps> = ({
       <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
         <p className="text-xs font-medium text-gray-4f">{label}</p>
         <div className="flex flex-row gap-1 justify-between items-center mt-4">
-          {/* <div className={`w-4 border border-b-1 border-[${primary}]`} /> */}
-          <div className={`w-4 h-[2px] ${primaryColorClass}`}></div>
+          <div
+            style={{ backgroundColor: primary }}
+            className="w-4 h-[2px]"
+          ></div>
 
           {allDelegates && (
             <p className="text-xs font-medium text-gray-4f">
@@ -48,7 +50,8 @@ const GovernanceChartTooltip: React.FC<CustomTooltipProps> = ({
         </div>
         <div className="flex flex-row gap-1 justify-between items-center mt-2">
           <div
-            className={`w-4 border border-b-1 border-dashed border-[${primary}]`}
+            style={{ borderColor: primary }}
+            className="w-4 border border-b-1 border-dashed"
           />
           {topDelegates && (
             <p className="text-xs font-medium text-gray-4f">

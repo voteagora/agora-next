@@ -76,7 +76,7 @@ const GovernanceActiveDelegateChart: React.FC = () => {
           />
           <Tooltip
             content={<GovernanceChartTooltip />}
-            cursor={{ stroke: "red", strokeWidth: 2, strokeDasharray: "7 7" }}
+            cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
           />
 
           <Area
@@ -96,15 +96,19 @@ const GovernanceActiveDelegateChart: React.FC = () => {
           />
         </ComposedChart>
       </ResponsiveContainer>
-      <div className="flex flex-row justify-between mt-6 pl-16">
+      <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-between pl-10 sm:pl-14 mt-6">
         <div className="flex flex-row gap-[14px]">
           <div className="flex flex-row gap-1 justify-center items-center">
-            <div className={`w-4 h-[2px] bg-[${primary}]`}></div>
+            <div
+              style={{ backgroundColor: primary }}
+              className="w-4 h-[2px]"
+            ></div>
             <p className="text-xs font-semibold text-gray-4f">All delegates</p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center">
             <div
-              className={`w-4 h-[8px] border-b border-dashed border-[${primary}`}
+              style={{ borderColor: primary }}
+              className="w-4 border border-b-1 border-dashed"
             />
             <p className="text-xs font-semibold text-gray-4f">100k tokens</p>
           </div>
