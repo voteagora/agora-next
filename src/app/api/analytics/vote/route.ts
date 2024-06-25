@@ -17,7 +17,7 @@ async function getProposalVoteCounts() {
                 FROM   alltenant.dao_engagement_votes
                 WHERE  tenant = '${namespace}'
                     GROUP  BY 1
-                    ORDER  BY 1`
+                    ORDER  BY 1`;
 
   const result = await prisma.$queryRawUnsafe<ProposalCount[]>(QRY);
 
@@ -27,7 +27,7 @@ async function getProposalVoteCounts() {
 const fetchProposalVoteCounts = cache(getProposalVoteCounts);
 
 export async function GET(request: NextRequest) {
-   const authResponse = await authenticateApiUser(request);
+  const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });
