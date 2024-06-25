@@ -1,6 +1,5 @@
 import React from "react";
-import { VStack } from "@/components/Layout/Stack";
-import InfoHero from "@/components/Info/InfoHero";
+import InfoHero from "@/app/info/components/InfoHero";
 import InfoAboutSection from "@/components/Info/InfoAboutSection";
 import DaosTreasuryChart from "@/components/Info/DaosTreasuryChart";
 import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
@@ -48,14 +47,14 @@ export default async function Page() {
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     return (
-      <VStack className="font-inter">
+      <div className="flex flex-col font-inter">
         <InfoHero />
         <InfoAboutSection />
         <GovernorSettingAccordion />
         <DaosTreasuryChart />
         <GovernanceChartsTabs />
         <PortalTrafficTabs />
-      </VStack>
+      </div>
     );
   } else {
     return (

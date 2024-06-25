@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HStack, VStack } from "../Layout/Stack";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 
@@ -79,14 +78,14 @@ const InfoHero = () => {
   const { title, description } = ui.page("info");
 
   return (
-    <HStack className="mt-10 gap-11 flex-wrap sm:flex-nowrap">
-      <VStack>
+    <div className="flex flex-row mt-10 gap-11 flex-wrap sm:flex-nowrap">
+      <div className="flex flex-col">
         <h1 className="text-[56px] leading-[67px] font-black text-black">
           {title}
         </h1>
         <p className="text-base font-medium text-gray-4f">{description}</p>
-      </VStack>
-      <HStack>
+      </div>
+      <div className="flex flex-row">
         {heroCardsData[namespace as keyof typeof heroCardsData].map(
           (card, index) => (
             <Card
@@ -106,8 +105,8 @@ const InfoHero = () => {
             />
           )
         )}
-      </HStack>
-    </HStack>
+      </div>
+    </div>
   );
 };
 
