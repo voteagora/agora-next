@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
+import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { cache } from "react";
 
 type AddressWeight = {
@@ -41,11 +42,11 @@ async function getTopDelegateWeights() {
 const fetchDelegateWeights = cache(getTopDelegateWeights);
 
 export async function GET(request: NextRequest) {
-  // const authResponse = await authenticateApiUser(request);
+  const authResponse = await authenticateApiUser(request);
 
-  // if (!authResponse.authenticated) {
-  //  return new Response(authResponse.failReason, { status: 401 });
-  //}
+  if (!authResponse.authenticated) {
+    return new Response(authResponse.failReason, { status: 401 });
+  }
 
   try {
     const weights = await fetchDelegateWeights();
