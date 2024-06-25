@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
+import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { cache } from "react";
 
 type TokenBalance = {
@@ -75,11 +76,11 @@ async function getTreasuryBalanceTS(frequency: string) {
 const fetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
 
 export async function GET(request: NextRequest) {
-  // const authResponse = await authenticateApiUser(request);
+  const authResponse = await authenticateApiUser(request);
 
-  // if (!authResponse.authenticated) {
-  //  return new Response(authResponse.failReason, { status: 401 });
-  //}
+  if (!authResponse.authenticated) {
+    return new Response(authResponse.failReason, { status: 401 });
+  }
 
   const frequency = request.nextUrl.pathname.split("/")[3];
 
