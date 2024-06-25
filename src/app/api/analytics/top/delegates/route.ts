@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-   return new Response(authResponse.failReason, { status: 401 });
+    return new Response(authResponse.failReason, { status: 401 });
   }
 
   try {
