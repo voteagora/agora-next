@@ -1,16 +1,81 @@
 openapi: 3.1.0
 info:
-  title: Agora API
-  description: >
-    ## Public API for interacting with the Agora platform.
-    Note: This API is in alpha and subject to change.
-  version: 0.0.0-alpha
+  title: Agora's OP API (Beta)
+  description: |-
+    Welcome to the Collective API documentation. This API provides various endpoints to interact with the Collective platform, focusing on RetroPGF (Retroactive Public Goods Funding) for Optimism. Below is a comprehensive guide to the API endpoints, categorized by functionality.
+
+    ### Current Status
+    - **Beta**: This API is currently in beta. Endpoints marked as "Not Live" are under development and available for feedback only.
+
+    ### API Categories
+    Live and stable. 
+    - **auth**: Authenticate with the Agora API
+    - **RetroFunding**: Data related to RetroPGF Funding for Optimism Round 4 and beyond
+    - **projects**: Data related to RetroPGF Projects
+    - **RetroFundingRounds**: Data related to RetroPGF Funding Rounds
+    - **RetroFundingBallots**: Data related to RetroPGF Funding Ballots
+    - **impactMetrics**: Data related to the Impact Metrics for RetroFunding Round 4
+    - **RetroFundingImpactMetrics**: Connect RetroPGF to Impact Metrics
+    - **comments**: Data related to RetroPGF Project Comments
+    - **commentsVotes**: Data related to RetroPGF Project Comments' Votes
+    ----
+    Coming soon. 
+    - **delegates**: Not Live - Use for feedback only. Coming in OP 0.1.2
+    - **delegations**: Not Live - Use for feedback only. Coming in OP 0.1.2
+    - **proposals**: Not Live - Use for feedback only. Coming in OP 0.1.3
+    - **votes**: Not Live - Use for feedback only. Coming in OP 0.1.3
+    - **proposalTypes**: Not Live - Use for feedback only. Coming in OP 0.1.3
+    - **spec**: Not Live - Use for feedback only. Coming in OP 0.1.3
+    - **contracts**: Data for the current onchain contracts
+
+    ### Release Schedule
+
+    | Version  | Status  | Release Date  |
+    |----------|---------|---------------|
+    | OP 0.1.0 | LIVE   | June 7th|
+    | OP 0.1.1 | On Track    | June 27th |
+    | OP 0.1.2 | On Track    | July 18th |
+    | OP 0.1.3 | On Track    | July 30th |
+  version: 0.1.0
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
   - url: https://vote.optimism.io/api/v1
     description: Base URL for optimism production
+tags:
+  - name: auth
+    description: Authenticate with the Agora API
+  - name: RetroFunding
+    description: Data related to RetoPGF Funding for Optimism Round 4 and beyond
+  - name: projects
+    description: Data related to RetroPGF Projects
+  - name: RetroFundingRounds
+    description: Data related to RetoPGF Funding Rounds
+  - name: RetroFundingBallots
+    description: Data related to RetoPGF Funding Ballots
+  - name: impactMetrics
+    description: Data related to the Impact Metrics for RetroFunding Round 4
+  - name: RetroFundingImpactMetrics
+    description: Connect RetroPGF to Impact Metrics
+  - name: comments
+    description: Data related to RetroPGF Project Comments
+  - name: commentsVotes
+    description: Data related to RetroPGF Project Comments' Votes
+  - name: delegates
+    description: Not Live - Use for feedback only. Coming in OP 0.1.2 (see above)
+  - name: delegations
+    description: Not Live - Use for feedback only. Coming in OP 0.1.2 (see above)
+  - name: proposals
+    description: Not Live - Use for feedback only.  Coming in OP 0.1.3 (see above)
+  - name: votes
+    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
+  - name: proposalTypes
+    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
+  - name: spec
+    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
+  - name: contracts
+    description: Data for the current onchain contracts
 security:
   - bearerAuth: []
 components:

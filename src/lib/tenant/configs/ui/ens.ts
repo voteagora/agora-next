@@ -1,7 +1,7 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
-import successImage from "@/assets/tenant/optimism_success.svg";
-import pendingImage from "@/assets/tenant/optimism_pending.svg";
+import successImage from "@/assets/tenant/ens_success.svg";
+import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 
 export const ensTenantUIConfig = new TenantUI({
