@@ -1,8 +1,8 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import uniswapHero from "@/assets/tenant/uniswap_hero.svg";
 import uniswapLogo from "@/assets/tenant/uniswap_logo.svg";
-import successImage from "@/assets/tenant/optimism_success.svg";
-import pendingImage from "@/assets/tenant/optimism_pending.svg";
+import successImage from "@/assets/tenant/uniswap_success.svg";
+import pendingImage from "@/assets/tenant/uniswap_pending.svg";
 import delegateImage from "@/assets/tenant/uniswap_delegate.svg";
 
 export const uniswapTenantUIConfig = new TenantUI({
@@ -12,7 +12,6 @@ export const uniswapTenantUIConfig = new TenantUI({
   logo: uniswapLogo,
 
   assets: {
-    // TODO: Replace success and pending images
     success: successImage,
     pending: pendingImage,
     delegate: delegateImage,
