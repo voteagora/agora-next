@@ -76,11 +76,11 @@ async function getMetricTS(metricId: string, frequency: string) {
 const fetchMetricTS = cache(getMetricTS);
 
 export async function GET(request: NextRequest) {
-  // const authResponse = await authenticateApiUser(request);
+  const authResponse = await authenticateApiUser(request);
 
-  // if (!authResponse.authenticated) {
-  //  return new Response(authResponse.failReason, { status: 401 });
-  // }
+  if (!authResponse.authenticated) {
+   return new Response(authResponse.failReason, { status: 401 });
+  }
 
   const paramParts = request.nextUrl.pathname.split("/");
 
