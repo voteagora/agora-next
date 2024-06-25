@@ -1,9 +1,9 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HStack, VStack } from "../Layout/Stack";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
+import { HStack, VStack } from "@/components/Layout/Stack";
 
 const heroCardsData = {
   optimism: [

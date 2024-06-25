@@ -1,6 +1,9 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import optimismLogo from "@/assets/tenant/optimism_logo.svg";
 import optimismHero from "@/assets/tenant/optimism_hero.svg";
+import successImage from "@/assets/tenant/optimism_success.svg";
+import pendingImage from "@/assets/tenant/optimism_pending.svg";
+import delegateImage from "@/assets/tenant/optimism_delegate.svg";
 
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
@@ -9,8 +12,10 @@ export const optimismTenantUIConfig = new TenantUI({
   logo: optimismLogo,
   hero: optimismHero,
 
-  delegate: {
-    logo: optimismLogo,
+  assets: {
+    success: successImage,
+    pending: pendingImage,
+    delegate: delegateImage,
   },
 
   delegates: {
@@ -136,7 +141,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
-      enabled: true,
+      enabled: false,
     },
   ],
 });
