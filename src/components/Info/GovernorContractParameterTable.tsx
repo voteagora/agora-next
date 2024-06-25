@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -6,19 +8,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Tenant from "@/lib/tenant/tenant";
+import { useContractRead } from "wagmi";
+import { pluralize } from "@/lib/utils";
 
-const parameters = [
-  {
-    parameterTitle: "Voting delay",
-    parameterAddress: "0 days, 0 hours",
-  },
-  {
-    parameterTitle: "Voting period",
-    parameterAddress: "6 days, 0 hours",
-  },
-];
+const SECONDS_IN_HOUR = 3600;
 
 const GovernorContractParameterTable = () => {
+  const { contracts } = Tenant.current();
+  const { data: votingDelay } = useContractRead({
+    address: contracts.governor.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    functionName: "votingDelay",
+  });
+
+  const { data: votingPeriod } = useContractRead({
+    address: contracts.governor.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    functionName: "votingPeriod",
+  });
+
+  const secondsToHuman = (seconds: number) => {
+    const hrs = Math.round(Number(seconds) / SECONDS_IN_HOUR);
+    return hrs === 0 ? "Less than 1 hour" : pluralize("hour", hrs);
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -32,16 +46,22 @@ const GovernorContractParameterTable = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {parameters.map((parameter, index) => (
-          <TableRow key={index}>
-            <TableCell className="text-base font-semibold text-left text-gray-4f">
-              {parameter.parameterTitle}
-            </TableCell>
-            <TableCell className="text-base font-semibold text-right text-black">
-              {parameter.parameterAddress}
-            </TableCell>
-          </TableRow>
-        ))}
+        <TableRow>
+          <TableCell className="text-base font-semibold text-left text-gray-4f">
+            Voting Delay
+          </TableCell>
+          <TableCell className="text-base font-semibold text-right text-black">
+            {votingDelay ? secondsToHuman(Number(votingDelay)) : "Loading..."}
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell className="text-base font-semibold text-left text-gray-4f">
+            Voting Period
+          </TableCell>
+          <TableCell className="text-base font-semibold text-right text-black">
+            {votingPeriod ? secondsToHuman(Number(votingPeriod)) : "Loading..."}
+          </TableCell>
+        </TableRow>
       </TableBody>
     </Table>
   );
