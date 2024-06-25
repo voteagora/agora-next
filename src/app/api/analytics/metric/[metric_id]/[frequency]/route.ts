@@ -56,6 +56,26 @@ function frequencyToDates(
 async function getMetricTS(metricId: string, frequency: string) {
   const { namespace } = Tenant.current();
 
+  let availableMetrics = [
+    "total_votable_supply",
+    "majority_threshold",
+
+    "quorum_threshold",
+    "quorum_thresh_stalemate", // Out of spec, I just thought it might be a cool overlay to add if we had time.
+
+    "weight_of_fraction_of_active_delegates", // Out of spec, just might be a cool feature.
+    "fraction_of_active_delegates",
+
+    "weight_of_fraction_of_large_active_delegates", // Out of spec, just might be a cool feature.
+    "fraction_of_large_active_delegates",
+  ];
+
+  if (!availableMetrics.includes(metricId)) {
+    throw new Error(
+      `Metric '${metricId}' not valid, expected one of '${availableMetrics.join(", ")}'`
+    );
+  }
+
   const { lookback, skipCrit } = frequencyToDates(frequency, "block_date");
 
   const QRY = `SELECT block_date AS day,
@@ -67,8 +87,6 @@ async function getMetricTS(metricId: string, frequency: string) {
                    AND tenant = '${namespace}' 
                    AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
                    AND ${skipCrit}`;
-
-  console.log(QRY);
 
   const result = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
 
