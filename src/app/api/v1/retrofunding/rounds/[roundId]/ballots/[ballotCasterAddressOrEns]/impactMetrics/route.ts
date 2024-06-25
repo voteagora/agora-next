@@ -29,6 +29,10 @@ export async function POST(
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const payload = await request.json();
+
+      // log the payload
+      console.log("Payload: ", payload);
+
       const parsedPayload = ballotPayloadSchema.parse(payload);
 
       const impactMetrics = await updateBallotMetric(
