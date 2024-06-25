@@ -11,9 +11,12 @@ type MetricValue = {
   value: number;
 };
 
-// TODO - merge this with the code used in Token Balances, after that 
+// TODO - merge this with the code used in Token Balances, after that
 //        PR is merged.
-function frequencyToDates(frequency: string, timeCol: string): {
+function frequencyToDates(
+  frequency: string,
+  timeCol: string
+): {
   lookback: number;
   skipCrit: string;
 } {
@@ -37,8 +40,7 @@ function frequencyToDates(frequency: string, timeCol: string): {
       break;
     case "3mo":
       lookback = 365;
-      skipCrit =
-        `extract(DAY from ${timeCol}) = 1 AND mod(extract(MONTH from ${timeCol}), 3) = 0`;
+      skipCrit = `extract(DAY from ${timeCol}) = 1 AND mod(extract(MONTH from ${timeCol}), 3) = 0`;
       break;
     case "1y":
       lookback = 365 * 2;
@@ -54,7 +56,7 @@ function frequencyToDates(frequency: string, timeCol: string): {
 async function getMetricTS(metricId: string, frequency: string) {
   const { namespace } = Tenant.current();
 
-  const { lookback, skipCrit } = frequencyToDates(frequency, 'block_date');
+  const { lookback, skipCrit } = frequencyToDates(frequency, "block_date");
 
   const QRY = `SELECT block_date AS day,
                       TO_CHAR(block_date, 'YYYY-MM-DD') date,
@@ -65,7 +67,7 @@ async function getMetricTS(metricId: string, frequency: string) {
                    AND tenant = '${namespace}' 
                    AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
                    AND ${skipCrit}`;
-  
+
   console.log(QRY);
 
   const result = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
@@ -79,7 +81,7 @@ export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-   return new Response(authResponse.failReason, { status: 401 });
+    return new Response(authResponse.failReason, { status: 401 });
   }
 
   const paramParts = request.nextUrl.pathname.split("/");
@@ -88,9 +90,6 @@ export async function GET(request: NextRequest) {
   // I picked up this pattern from other areas of our code base.
   const frequency = paramParts[5];
   const metricId = paramParts[4];
-
-  console.log({frequency});
-  console.log({metricId});
 
   try {
     const communityInfo = await fetchMetricTS(metricId, frequency);
