@@ -24,6 +24,18 @@ export const uniswapTenantContractConfig = (
     ? "0xe3071e87a7e6dd19a911dbf1127ba9dd67aa6fc8"
     : "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5";
 
+  // Right now there are no sepolia treasury accounts for uniswap.
+  // They are set to match.
+  const TREASURY = isProd
+    ? [
+        "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
+        "0xe571dC7A558bb6D68FfE264c3d7BB98B0C6C73fC",
+      ]
+    : [
+        "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
+        "0xe571dC7A558bb6D68FfE264c3d7BB98B0C6C73fC",
+      ];
+
   const provider = isProd ? ethProvider : sepoliaProvider;
   const chain = isProd ? mainnet : sepolia;
 
@@ -51,5 +63,6 @@ export const uniswapTenantContractConfig = (
       contract: UniswapGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
+    treasury: TREASURY,
   };
 };
