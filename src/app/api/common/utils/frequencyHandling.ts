@@ -17,11 +17,11 @@ export function frequencyToDateAndSQLcrit(
       break;
     case "7d":
       lookback = 180;
-      skipCrit = `extract(DOW from (${timeCol}) = extract(DOW from current_date)`;
+      skipCrit = `extract(DOW from ${timeCol}) = extract(DOW from current_date)`;
       break;
     case "1m":
       lookback = 365;
-      skipCrit = `extract(DAY from (${timeCol}) = 1`;
+      skipCrit = `extract(DAY from ${timeCol}) = 1`;
       break;
     case "3m":
       lookback = 365;
