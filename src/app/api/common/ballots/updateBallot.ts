@@ -2,6 +2,7 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import prisma from "@/app/lib/prisma";
 import { fetchBallot } from "./getBallots";
+import { time_this } from "@/app/lib/logging";
 
 type BallotContent = {
   metric_id: string;
@@ -93,27 +94,31 @@ async function updateBallotMetricForAddress({
     [100, 0]
   );
 
-  await Promise.all(
-    allocations.map(async (allocation) => {
-      if (!allocation.locked && allocation.metric_id !== data.metric_id) {
-        await prisma.allocations.update({
-          where: {
-            address_round_metric_id: {
-              metric_id: allocation.metric_id,
-              round: roundId,
-              address,
-            },
-          },
-          data: {
-            ...allocation,
-            allocation: totalUnlocked
-              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
-                amountToBalance
-              : 0,
-          },
-        });
-      }
-    })
+  await time_this(
+    async () =>
+      await Promise.all(
+        allocations.map(async (allocation) => {
+          if (!allocation.locked && allocation.metric_id !== data.metric_id) {
+            await prisma.allocations.update({
+              where: {
+                address_round_metric_id: {
+                  metric_id: allocation.metric_id,
+                  round: roundId,
+                  address,
+                },
+              },
+              data: {
+                ...allocation,
+                allocation: totalUnlocked
+                  ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
+                    amountToBalance
+                  : 0,
+              },
+            });
+          }
+        })
+      ),
+    { Queries: "Autorebalance all other allocations" }
   );
 
   // Return full ballot
