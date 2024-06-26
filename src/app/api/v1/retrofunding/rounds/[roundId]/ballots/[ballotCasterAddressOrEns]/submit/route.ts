@@ -21,13 +21,11 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const isBadgeholderCheck = await fetchIsCitizen(
+  const isBadgeholder = await fetchIsCitizen(
     route.params.ballotCasterAddressOrEns
   );
 
-  console.log("isBadgeholderCheck", isBadgeholderCheck);
-
-  if (isBadgeholderCheck.length === 0) {
+  if (!isBadgeholder) {
     return new Response("Only badgeholder can submit a ballot", {
       status: 401,
     });
