@@ -10,7 +10,7 @@ import {
   ComposedChart,
 } from "recharts";
 import GovernanceChartTooltip from "./GovernanceChartTooltip";
-import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
+import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import { getTextWidth } from "@/lib/utils";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
@@ -114,7 +114,7 @@ const GovernanceActiveDelegateChart: React.FC = () => {
           </div>
         </div>
 
-        <ChartDataFilterTabs />
+        <ChartFrequencyTabs />
       </div>
     </div>
   );

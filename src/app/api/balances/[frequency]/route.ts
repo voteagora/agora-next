@@ -42,7 +42,6 @@ async function getTreasuryBalanceTS(frequency: string) {
 // TODO: Discuss with Jeff
 export const apiFetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
 
-
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
 

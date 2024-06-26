@@ -8,7 +8,7 @@ import {
   ComposedChart,
 } from "recharts";
 import { getTextWidth } from "@/lib/utils";
-import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
+import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
@@ -84,7 +84,7 @@ const GovernorVotableSupplyChart = () => {
           </p>
         </div>
 
-        <ChartDataFilterTabs />
+        <ChartFrequencyTabs />
       </div>
     </div>
   );

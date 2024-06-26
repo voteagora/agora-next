@@ -10,14 +10,13 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import Hero from "@/components/Hero/Hero";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/route";
 
-
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
   const page = tenant.ui.page("proposals");
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
-    title,
+    title
   )}&description=${encodeURIComponent(description)}`;
 
   return {
@@ -47,8 +46,7 @@ export default async function Page() {
     return <div>Route not supported for namespace</div>;
   }
 
-  // const data = await apiFetchTreasuryBalanceTS("7d");
-  // console.log(data.result);
+  const data = await apiFetchTreasuryBalanceTS("7d");
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     return (
@@ -56,10 +54,13 @@ export default async function Page() {
         <InfoHero />
         <InfoAboutSection />
         <GovernorSettingAccordion />
-        <TreasuryChart getData={async (frequency: string) => {
-          "use server";
-          return apiFetchTreasuryBalanceTS(frequency);
-        }} />
+        <TreasuryChart
+          initialData={data.result}
+          getData={async (frequency: string) => {
+            "use server";
+            return apiFetchTreasuryBalanceTS(frequency);
+          }}
+        />
         <GovernanceChartsTabs />
         <PortalTrafficTabs />
       </div>
@@ -77,8 +78,7 @@ export default async function Page() {
                   Live – ETHFI token launch
                 </div>
                 <div>
-                  <div
-                    className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
+                  <div className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
                   On March 18th, we’re launching the $ETHFI token and taking the
                   first step towards full decentralization.
                 </div>

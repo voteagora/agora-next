@@ -1,9 +1,17 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import ChartFrequencyTabs from "./ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
-
+import { FREQUENCY_FILTERS } from "@/lib/constants";
 
 type TokenBalance = {
   day: string;
@@ -12,17 +20,18 @@ type TokenBalance = {
   balance_usd: number;
 };
 
-
 interface TreasuryChartProps {
   getData: (frequency: string) => Promise<{ result: TokenBalance[] }>;
+  initialData: TokenBalance[];
 }
 
-export const TreasuryChart = ({ getData }: TreasuryChartProps) => {
-
-  const [filter, setFilter] = useState("7d");
+export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
+  const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
+    FREQUENCY_FILTERS.DAY
+  );
   const { primary, gradient } = useTenantColorScheme();
-  const isDataFetched = useRef(false);
-  const [data, setData] = useState<any[] | undefined>(undefined);
+  const isDataFetched = useRef(true);
+  const [data, setData] = useState<any[] | undefined>(initialData);
 
   const getChartData = async (frequency: string) => {
     if (!isDataFetched.current) {
@@ -36,8 +45,7 @@ export const TreasuryChart = ({ getData }: TreasuryChartProps) => {
     if (!isDataFetched.current) {
       getChartData(filter);
     }
-
-  }, [isDataFetched.current, data, getChartData]);
+  }, [isDataFetched.current, data, filter]);
 
   return (
     <div>
@@ -75,15 +83,15 @@ export const TreasuryChart = ({ getData }: TreasuryChartProps) => {
                 tickLine={{ stroke: "#E0E0E0" }}
                 minTickGap={12}
               />
-              {/*<YAxis*/}
-              {/*  tickLine={false}*/}
-              {/*  axisLine={false}*/}
-              {/*  tickCount={7}*/}
-              {/*  interval={0}*/}
-              {/*  width={100}*/}
-              {/*  tickFormatter={(value) => `$${value}`}*/}
-              {/*  className="text-xs font-medium text-gray-4f"*/}
-              {/*/>*/}
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickCount={7}
+                interval={0}
+                width={100}
+                tickFormatter={(value) => `$${value}`}
+                className="text-xs font-medium text-gray-4f"
+              />
               <Tooltip />
               <Area
                 type="linear"
@@ -95,20 +103,21 @@ export const TreasuryChart = ({ getData }: TreasuryChartProps) => {
           </ResponsiveContainer>
 
           <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-end pl-10 sm:pl-14 mt-6">
-
-            <ChartDataFilterTabs onChange={(value) => setFilter(prev => {
-              if (prev !== value) {
-                isDataFetched.current = false;
-                return value;
-              } else {
-                return prev;
+            <ChartFrequencyTabs
+              onChange={(value) =>
+                setFilter((prev) => {
+                  if (prev !== value) {
+                    isDataFetched.current = false;
+                    return value;
+                  } else {
+                    return prev;
+                  }
+                })
               }
-            })} />
+            />
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-

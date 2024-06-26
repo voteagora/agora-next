@@ -7,7 +7,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
+import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
@@ -64,7 +64,7 @@ const AverageVoterProposalChart = () => {
         </BarChart>
       </ResponsiveContainer>
       <div className="flex flex-row justify-end">
-        <ChartDataFilterTabs />
+        <ChartFrequencyTabs />
       </div>
     </div>
   );

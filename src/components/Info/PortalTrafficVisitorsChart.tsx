@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
+import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
@@ -128,7 +128,7 @@ const PortalTrafficVisitorsChart = () => {
           <p className="text-xs font-semibold text-gray-4f">All visitors</p>
         </div>
 
-        <ChartDataFilterTabs />
+        <ChartFrequencyTabs />
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import {
   Line,
 } from "recharts";
 import { getTextWidth } from "@/lib/utils";
-import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
+import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [
@@ -141,7 +141,7 @@ const GovernorDelegatesNeededChart = () => {
           </div>
         </div>
 
-        <ChartDataFilterTabs />
+        <ChartFrequencyTabs />
       </div>
     </div>
   );
