@@ -2,61 +2,27 @@ import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
 
 type MetricValue = {
   day: string;
   date: string;
   ts: number;
-  value: number;
+  value: any;
 };
-
-// TODO - merge this with the code used in Token Balances, after that
-//        PR is merged.
-function frequencyToDates(
-  frequency: string,
-  timeCol: string
-): {
-  lookback: number;
-  skipCrit: string;
-} {
-  const periodLowerCase = frequency.toLowerCase();
-
-  let lookback: number;
-  let skipCrit: string;
-
-  switch (periodLowerCase) {
-    case "24h":
-      lookback = 90;
-      skipCrit = "1=1";
-      break;
-    case "7d":
-      lookback = 180;
-      skipCrit = `extract(DOW from (${timeCol}) = extract(DOW from current_date)`;
-      break;
-    case "1mo":
-      lookback = 365;
-      skipCrit = `extract(DAY from (${timeCol}) = 1`;
-      break;
-    case "3mo":
-      lookback = 365;
-      skipCrit = `extract(DAY from ${timeCol}) = 1 AND mod(extract(MONTH from ${timeCol}), 3) = 0`;
-      break;
-    case "1y":
-      lookback = 365 * 2;
-      skipCrit = `extract(DAY from ${timeCol}) = 31 AND extract(MONTH from ${timeCol}) = 12`;
-      break;
-    default:
-      throw new Error("Invalid frequency value");
-  }
-
-  return { lookback, skipCrit };
-}
 
 async function getMetricTS(metricId: string, frequency: string) {
   const { namespace } = Tenant.current();
 
-  let availableMetrics = [
+  let availableGoogleMetrics = [
+    "activeUsers",
+    "averageSessionDuration",
+    "screenPageViews",
+    "bounceRate",
+  ];
+
+  let availableChainMetrics = [
     "total_votable_supply",
     "majority_threshold",
 
@@ -70,23 +36,42 @@ async function getMetricTS(metricId: string, frequency: string) {
     "fraction_of_large_active_delegates",
   ];
 
-  if (!availableMetrics.includes(metricId)) {
+  const isGoogleAnalyticMetric = availableGoogleMetrics.includes(metricId);
+  const isChainMetric = availableChainMetrics.includes(metricId);
+
+  let QRY: string;
+
+  if (isChainMetric) {
+    const { lookback, skipCrit } = frequencyToDateAndSQLcrit(
+      frequency,
+      "block_date"
+    );
+
+    QRY = `SELECT block_date AS day,
+                        TO_CHAR(block_date, 'YYYY-MM-DD') date,
+                        extract(epoch from block_date) as ts,
+                         value
+                  FROM   alltenant.dao_engagement_metrics
+                  WHERE  metric = '${metricId}'
+                     AND tenant = '${namespace}' 
+                     AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
+                     AND ${skipCrit}`;
+  } else if (isGoogleAnalyticMetric) {
+    const { lookback } = frequencyToDateAndSQLcrit(frequency, "date");
+
+    QRY = `SELECT date AS day,
+                        TO_CHAR(date, 'YYYY-MM-DD') date,
+                        extract(epoch from date) as ts,
+                         value
+                  FROM   google.analytics_${frequency}
+                  WHERE  metric_id = '${metricId}'
+                     AND tenant = '${namespace}' 
+                     AND date >= (CURRENT_DATE - INTERVAL '${lookback} day')`;
+  } else {
     throw new Error(
-      `Metric '${metricId}' not valid, expected one of '${availableMetrics.join(", ")}'`
+      `Metric '${metricId}' not valid, expected either a Google Analytics Metric ('${availableGoogleMetrics.join(", ")}) or Chain Metric ('${availableChainMetrics.join(", ")}')`
     );
   }
-
-  const { lookback, skipCrit } = frequencyToDates(frequency, "block_date");
-
-  const QRY = `SELECT block_date AS day,
-                      TO_CHAR(block_date, 'YYYY-MM-DD') date,
-                      extract(epoch from block_date) as ts,
-                       value
-                FROM   alltenant.dao_engagement_metrics
-                WHERE  metric = '${metricId}'
-                   AND tenant = '${namespace}' 
-                   AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
-                   AND ${skipCrit}`;
 
   const result = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
 
