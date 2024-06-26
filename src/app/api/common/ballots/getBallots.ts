@@ -5,6 +5,7 @@ import { Ballots } from "@prisma/client";
 import { Ballot } from "./ballot";
 import prisma from "@/app/lib/prisma";
 import { calculateAllocations } from "./ballotAllocations";
+import { time_this_sync } from "@/app/lib/logging";
 
 async function getBallotsApi({
   roundId,
@@ -125,7 +126,11 @@ async function getBallotForAddress({
     };
   }
 
-  return [calculateAllocations(ballot)];
+  return [
+    time_this_sync(() => calculateAllocations(ballot), {
+      "Algorythm: ": "calculateAllocations",
+    }),
+  ];
 }
 
 export const fetchBallots = cache(getBallotsApi);
