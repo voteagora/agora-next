@@ -2,6 +2,7 @@ import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
 
 type TokenBalance = {
@@ -11,48 +12,10 @@ type TokenBalance = {
   balance_usd: number;
 };
 
-function frequencyToDates(frequency: string): {
-  lookback: number;
-  skipCrit: string;
-} {
-  const periodLowerCase = frequency.toLowerCase();
-
-  let lookback: number;
-  let skipCrit: string;
-
-  switch (periodLowerCase) {
-    case "24h":
-      lookback = 90;
-      skipCrit = "1=1";
-      break;
-    case "7d":
-      lookback = 180;
-      skipCrit = "extract(DOW from day) = extract(DOW from current_date)";
-      break;
-    case "1mo":
-      lookback = 365;
-      skipCrit = "extract(DAY from day) = 1";
-      break;
-    case "3mo":
-      lookback = 365;
-      skipCrit =
-        "extract(DAY from day) = 1 AND mod(extract(MONTH from day), 3) = 0";
-      break;
-    case "1y":
-      lookback = 365 * 2;
-      skipCrit = "extract(DAY from day) = 31 AND extract(MONTH from day) = 12";
-      break;
-    default:
-      throw new Error("Invalid frequency value");
-  }
-
-  return { lookback, skipCrit };
-}
-
 async function getTreasuryBalanceTS(frequency: string) {
   const { contracts } = Tenant.current();
 
-  const { lookback, skipCrit } = frequencyToDates(frequency);
+  const { lookback, skipCrit } = frequencyToDateAndSQLcrit(frequency, "day");
 
   const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ")})`;
 
