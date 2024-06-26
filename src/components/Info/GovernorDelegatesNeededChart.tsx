@@ -11,7 +11,7 @@ import {
   Line,
 } from "recharts";
 import { getTextWidth } from "@/lib/utils";
-import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [

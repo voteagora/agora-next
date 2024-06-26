@@ -1,13 +1,15 @@
 import React from "react";
 import InfoHero from "@/app/info/components/InfoHero";
 import InfoAboutSection from "@/components/Info/InfoAboutSection";
-import { DaosTreasuryChart } from "@/components/Info/DaosTreasuryChart";
+import { TreasuryChart } from "@/app/info/components/TreasuryChart";
 import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
 import GovernanceChartsTabs from "@/components/Info/GovernanceChartsTabs";
 import PortalTrafficTabs from "@/components/Info/PortalTrafficTabs";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Hero from "@/components/Hero/Hero";
+import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/route";
+
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -15,7 +17,7 @@ export async function generateMetadata({}) {
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
-    title
+    title,
   )}&description=${encodeURIComponent(description)}`;
 
   return {
@@ -45,13 +47,19 @@ export default async function Page() {
     return <div>Route not supported for namespace</div>;
   }
 
+  // const data = await apiFetchTreasuryBalanceTS("7d");
+  // console.log(data.result);
+
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     return (
       <div className="flex flex-col font-inter">
         <InfoHero />
         <InfoAboutSection />
         <GovernorSettingAccordion />
-        <DaosTreasuryChart />
+        <TreasuryChart getData={async (frequency: string) => {
+          "use server";
+          return apiFetchTreasuryBalanceTS(frequency);
+        }} />
         <GovernanceChartsTabs />
         <PortalTrafficTabs />
       </div>
@@ -69,7 +77,8 @@ export default async function Page() {
                   Live – ETHFI token launch
                 </div>
                 <div>
-                  <div className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
+                  <div
+                    className="w-[13px] h-[13px] rounded-full bg-indigo-800 relative -left-[31px] border-4 -top-4"></div>
                   On March 18th, we’re launching the $ETHFI token and taking the
                   first step towards full decentralization.
                 </div>

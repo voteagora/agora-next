@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 const data = [

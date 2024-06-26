@@ -31,12 +31,17 @@ async function getTreasuryBalanceTS(frequency: string) {
               GROUP BY 1 
               ORDER BY day`;
 
-  const result = await prisma.$queryRawUnsafe<TokenBalance[]>(QRY);
+  console.log("---------------------------------");
+  console.log(QRY);
+  console.log("---------------------------------");
 
+  const result = await prisma.$queryRawUnsafe<TokenBalance[]>(QRY);
   return { result };
 }
 
-const fetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
+// TODO: Discuss with Jeff
+export const apiFetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
+
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -48,7 +53,7 @@ export async function GET(request: NextRequest) {
   const frequency = request.nextUrl.pathname.split("/")[3];
 
   try {
-    const communityInfo = await fetchTreasuryBalanceTS(frequency);
+    const communityInfo = await apiFetchTreasuryBalanceTS(frequency);
     return NextResponse.json(communityInfo);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {

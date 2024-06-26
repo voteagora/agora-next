@@ -10,7 +10,7 @@ import {
   ComposedChart,
 } from "recharts";
 import GovernanceChartTooltip from "./GovernanceChartTooltip";
-import ChartDataFilterTabs from "./ChartDataFilterTabs";
+import ChartDataFilterTabs from "../../app/info/components/ChartDataFilterTabs";
 import { getTextWidth } from "@/lib/utils";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
