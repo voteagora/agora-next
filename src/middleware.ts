@@ -21,6 +21,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(ROOT_PATH, request.url));
   }
 
+  if (request.method === "POST") {
+    // log the payload
+    console.log("Payload: ", await request.text());
+  }
+
   // TODO redundant check for API_PREFIX, consider removing, move to a sustainable pattern
   if (path.startsWith(API_PREFIX)) {
     // validate bearer token for all api routes except excluded routes
