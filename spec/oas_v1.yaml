@@ -951,6 +951,15 @@ components:
           enum:
             - PENDING
             - SUBMITTED
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
         allocations:
           type: array
           items:
