@@ -4,13 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
-
-type MetricValue = {
-  day: string;
-  date: string;
-  ts: number;
-  value: any;
-};
+import type { MetricTimeSeriesValue } from "@/lib/types";
 
 async function getMetricTS(metricId: string, frequency: string) {
   const { namespace } = Tenant.current();
@@ -73,12 +67,12 @@ async function getMetricTS(metricId: string, frequency: string) {
     );
   }
 
-  const result = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
+  const result = await prisma.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
 
   return { result };
 }
 
-const fetchMetricTS = cache(getMetricTS);
+export const apiFetchMetricTS = cache(getMetricTS);
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -95,7 +89,7 @@ export async function GET(request: NextRequest) {
   const metricId = paramParts[4];
 
   try {
-    const communityInfo = await fetchMetricTS(metricId, frequency);
+    const communityInfo = await apiFetchMetricTS(metricId, frequency);
     return NextResponse.json(communityInfo);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {

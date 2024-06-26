@@ -41,13 +41,6 @@ const ChartFrequencyTabs = ({ onChange }: ChartDataFilterTabsProps) => {
         >
           {FREQUENCY_FILTERS.QUARTER}
         </TabsTrigger>
-        <TabsTrigger
-          className="h-full"
-          variant="gray"
-          value={FREQUENCY_FILTERS.YEAR}
-        >
-          {FREQUENCY_FILTERS.YEAR}
-        </TabsTrigger>
       </TabsList>
     </Tabs>
   );

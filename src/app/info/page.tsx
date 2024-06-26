@@ -9,6 +9,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Hero from "@/components/Hero/Hero";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/route";
+import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/route";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -61,7 +62,12 @@ export default async function Page() {
             return apiFetchTreasuryBalanceTS(frequency);
           }}
         />
-        <GovernanceChartsTabs />
+        <GovernanceChartsTabs
+          getVotableSupply={async (metric: string, frequency: string) => {
+            "use server";
+            return apiFetchMetricTS(metric, frequency);
+          }}
+        />
         <PortalTrafficTabs />
       </div>
     );

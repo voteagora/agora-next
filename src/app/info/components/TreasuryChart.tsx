@@ -12,40 +12,42 @@ import {
 import ChartFrequencyTabs from "./ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
-
-type TokenBalance = {
-  day: string;
-  date: string;
-  ts: number;
-  balance_usd: number;
-};
+import type { MetricTimeSeriesValue } from "@/lib/types";
 
 interface TreasuryChartProps {
-  getData: (frequency: string) => Promise<{ result: TokenBalance[] }>;
-  initialData: TokenBalance[];
+  getData: (frequency: string) => Promise<{ result: MetricTimeSeriesValue[] }>;
+  initialData: MetricTimeSeriesValue[];
 }
 
 export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
-  const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
-    FREQUENCY_FILTERS.DAY
-  );
   const { primary, gradient } = useTenantColorScheme();
-  const isDataFetched = useRef(true);
-  const [data, setData] = useState<any[] | undefined>(initialData);
+
+  const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
+    FREQUENCY_FILTERS.WEEK
+  );
+  const shouldFetchData = useRef(false);
+  const [data, setData] = useState<MetricTimeSeriesValue[] | undefined>(
+    initialData
+  );
 
   const getChartData = async (frequency: string) => {
-    if (!isDataFetched.current) {
-      isDataFetched.current = true;
+    if (shouldFetchData.current) {
+      shouldFetchData.current = false;
       const result = await getData(frequency);
       setData(result.result);
     }
   };
 
+  const onFilterChange = (value: FREQUENCY_FILTERS) => {
+    shouldFetchData.current = true;
+    setFilter(value);
+  };
+
   useEffect(() => {
-    if (!isDataFetched.current) {
+    if (filter && shouldFetchData.current) {
       getChartData(filter);
     }
-  }, [isDataFetched.current, data, filter]);
+  }, [filter]);
 
   return (
     <div>
@@ -103,18 +105,7 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
           </ResponsiveContainer>
 
           <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-end pl-10 sm:pl-14 mt-6">
-            <ChartFrequencyTabs
-              onChange={(value) =>
-                setFilter((prev) => {
-                  if (prev !== value) {
-                    isDataFetched.current = false;
-                    return value;
-                  } else {
-                    return prev;
-                  }
-                })
-              }
-            />
+            <ChartFrequencyTabs onChange={onFilterChange} />
           </div>
         </div>
       </div>

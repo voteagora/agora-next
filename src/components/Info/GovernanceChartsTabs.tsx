@@ -24,7 +24,13 @@ const TabTrigger: React.FC<TabProps> = ({ value, title, description }) => {
   );
 };
 
-const GovernanceChartsTabs = () => {
+interface GovernanceChartsTabsProps {
+  getVotableSupply: (metric: string, frequency: string) => Promise<any>;
+}
+
+const GovernanceChartsTabs = ({
+  getVotableSupply,
+}: GovernanceChartsTabsProps) => {
   const tabs = [
     {
       value: "top-delegates",
@@ -90,7 +96,7 @@ const GovernanceChartsTabs = () => {
           value="total-votable-supply"
           className="w-full px-4 sm:px-8 py-3"
         >
-          <GovernorVotableSupplyChart />
+          <GovernorVotableSupplyChart getData={getVotableSupply} />
         </TabsContent>
       </Tabs>
     </div>

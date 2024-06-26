@@ -1,39 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Area,
+  CartesianGrid,
+  ComposedChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  ComposedChart,
 } from "recharts";
-import { getTextWidth } from "@/lib/utils";
 import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
+import type { MetricTimeSeriesValue } from "@/lib/types";
+import { FREQUENCY_FILTERS } from "@/lib/constants";
+import { formatNumber, scientificNotationToPrecision } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
-const data = [
-  { name: "Nov '23", uv: 220, pv: 11 },
-  { name: "Dec '23", uv: 80, pv: 14 },
-  { name: "Jan '24", uv: 150, pv: 9 },
-  { name: "Feb '24", uv: 60, pv: 18 },
-  { name: "Mar '24", uv: 200, pv: 15 },
-  { name: "Apr '24", uv: 170, pv: 18 },
-  { name: "May '24", uv: 130, pv: 10 },
-  { name: "Jun '24", uv: 100, pv: 7 },
-  { name: "Jul '24", uv: 60, pv: 19 },
-];
+interface GovernorVotableSupplyChartProps {
+  getData: (
+    metric: string,
+    frequency: string
+  ) => Promise<{ result: MetricTimeSeriesValue[] }>;
+}
 
-const GovernorVotableSupplyChart = () => {
-  const yTicks = [0, 50, 100, 150, 200, 250, 280];
+const GovernorVotableSupplyChart = ({
+  getData,
+}: GovernorVotableSupplyChartProps) => {
   const { primary, gradient } = useTenantColorScheme();
-  const [yAxisWidth, setYAxisWidth] = useState(0);
+  const { token } = Tenant.current();
+
+  const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
+    FREQUENCY_FILTERS.WEEK
+  );
+  const shouldFetchData = useRef(true);
+  const [data, setData] = useState<MetricTimeSeriesValue[] | undefined>();
+
+  const getChartData = async (frequency: string) => {
+    if (shouldFetchData.current) {
+      shouldFetchData.current = false;
+      const result = await getData("total_votable_supply", frequency);
+      setData(result.result);
+    }
+  };
+
+  const onFilterChange = (value: FREQUENCY_FILTERS) => {
+    shouldFetchData.current = true;
+    setFilter(value);
+  };
 
   useEffect(() => {
-    const maxTickWidth = Math.max(
-      ...data.map((d) => getTextWidth(d.pv.toString()) || 0)
-    );
-    setYAxisWidth(maxTickWidth + 20); // Add some padding
-  }, []);
+    if (filter && shouldFetchData.current) {
+      getChartData(filter);
+    }
+  }, [filter]);
 
   return (
     <div>
@@ -51,23 +69,29 @@ const GovernorVotableSupplyChart = () => {
 
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
-            dataKey="name"
-            textAnchor="left"
+            dataKey="date"
+            textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
             tickLine={{ stroke: "#E0E0E0" }}
             className="text-xs font-medium text-gray-4f"
+            minTickGap={12}
           />
           <YAxis
+            dataKey="value"
             axisLine={false}
             tickLine={false}
-            ticks={yTicks}
-            width={yAxisWidth}
+            tickCount={7}
+            width={100}
+            tickFormatter={(value) => {
+              return `${formatNumber(scientificNotationToPrecision(value.toString()), token.decimals)}`;
+            }}
             className="text-xs font-medium text-gray-4f"
           />
 
+          <Tooltip />
           <Area
             type="step"
-            dataKey="uv"
+            dataKey="value"
             stroke={primary}
             fill="url(#colorAllDelegates)"
           />
@@ -80,11 +104,11 @@ const GovernorVotableSupplyChart = () => {
             className="w-4 h-[2px]"
           ></div>
           <p className="text-xs font-semibold text-gray-4f">
-            Total votable token supply
+            Total Votable Supply
           </p>
         </div>
 
-        <ChartFrequencyTabs />
+        <ChartFrequencyTabs onChange={onFilterChange} />
       </div>
     </div>
   );

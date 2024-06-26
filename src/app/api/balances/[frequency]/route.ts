@@ -4,13 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
-
-type TokenBalance = {
-  day: string;
-  date: string;
-  ts: number;
-  balance_usd: number;
-};
+import type { MetricTimeSeriesValue } from "@/lib/types";
 
 async function getTreasuryBalanceTS(frequency: string) {
   const { contracts } = Tenant.current();
@@ -31,15 +25,10 @@ async function getTreasuryBalanceTS(frequency: string) {
               GROUP BY 1 
               ORDER BY day`;
 
-  console.log("---------------------------------");
-  console.log(QRY);
-  console.log("---------------------------------");
-
-  const result = await prisma.$queryRawUnsafe<TokenBalance[]>(QRY);
+  const result = await prisma.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
   return { result };
 }
 
-// TODO: Discuss with Jeff
 export const apiFetchTreasuryBalanceTS = cache(getTreasuryBalanceTS);
 
 export async function GET(request: NextRequest) {
