@@ -43,7 +43,7 @@ export type BallotResponse = {
     image: string;
     is_os: boolean;
     allocation: number;
-    allocation_per_metric: {
+    allocations_per_metric: {
       metric_id: string;
       allocation: number;
     }[];
