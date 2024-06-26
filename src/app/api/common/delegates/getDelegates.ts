@@ -254,7 +254,7 @@ async function getDelegates({
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
-      citizen: _delegates[index].citizen.length > 0,
+      citizen: _delegates[index].citizen,
       statement: _delegates[index].statement,
     })),
     seed,
@@ -343,7 +343,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   // Build out delegate JSON response
   return {
     address: address,
-    citizen: _isCitizen.length > 0,
+    citizen: _isCitizen,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply || 0)
