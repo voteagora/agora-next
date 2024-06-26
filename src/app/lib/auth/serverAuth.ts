@@ -126,7 +126,7 @@ export async function getRolesForUser(
 ): Promise<string[]> {
   const defaultRoles = [ROLE_PUBLIC_READER];
   if (siweData) {
-    const isBadge = (await fetchIsCitizen(siweData.address)).length > 0;
+    const isBadge = await fetchIsCitizen(siweData.address);
     return isBadge ? [ROLE_BADGEHOLDER, ...defaultRoles] : defaultRoles;
   }
 

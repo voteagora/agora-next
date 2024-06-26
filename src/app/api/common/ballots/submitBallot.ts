@@ -31,8 +31,6 @@ async function submitBallotForAddress({
     signature: data.signature as `0x${string}`,
   });
 
-  // TODO: Validate ballot content
-
   if (!isSignatureValid) {
     throw new Error("Invalid signature");
   }
