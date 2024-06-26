@@ -7,6 +7,7 @@ export type Ballot = {
   os_multiplier: Ballots["os_multiplier"];
   updated_at: Ballots["updated_at"];
   created_at: Ballots["created_at"];
+  published_at: Date;
   allocations: Allocation[];
   allocation: number;
   status: "SUBMITTED" | "PENDING";
@@ -30,6 +31,7 @@ export type BallotResponse = {
   os_multiplier: number;
   updated_at: Date;
   created_at: Date;
+  published_at: Date;
   allocations: {
     metric_id: string;
     allocation: number;
@@ -41,7 +43,7 @@ export type BallotResponse = {
     image: string;
     is_os: boolean;
     allocation: number;
-    allocation_per_metric: {
+    allocations_per_metric: {
       metric_id: string;
       allocation: number;
     }[];
