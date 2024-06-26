@@ -29,6 +29,11 @@ async function getBallotsApi({
             ) THEN 'SUBMITTED'
             ELSE 'PENDING'
           END AS status,
+          (
+            SELECT updated_at
+            FROM retro_funding.ballot_submittions bs 
+            WHERE bs.address = b.address AND bs.round = b.round
+          ) as published_at,
           COALESCE(
             (SELECT json_agg(a.* ORDER BY a.allocation DESC) 
             FROM retro_funding.allocations a 
@@ -80,6 +85,11 @@ async function getBallotForAddress({
           END AS status,
       b.created_at,
       b.updated_at,
+      (
+        SELECT updated_at
+        FROM retro_funding.ballot_submittions bs 
+        WHERE bs.address = b.address AND bs.round = b.round
+      ) as published_at,
       os_only, 
       os_multiplier, 
       a.metric_id, 
