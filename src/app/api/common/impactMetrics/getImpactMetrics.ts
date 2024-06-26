@@ -40,7 +40,7 @@ async function getImpactMetricsApi(roundId: string) {
       m.name, 
       m.description, 
       m.url,
-      (
+      COALESCE((
         SELECT json_agg(
           json_build_object(
             'project_id', p.project_id,
@@ -53,8 +53,8 @@ async function getImpactMetricsApi(roundId: string) {
         FROM retro_funding.metrics_projects mp
         JOIN retro_funding.projects_data p ON mp.project_id = p.project_id
         WHERE mp.metric_id = m.metric_id
-      ) AS allocations_per_project,
-      (
+      ), '[]'::json) AS allocations_per_project,
+      COALESCE((
         SELECT json_agg(
           json_build_object(
             'comment_id', c.comment_id,
@@ -65,7 +65,7 @@ async function getImpactMetricsApi(roundId: string) {
             'votes_count', COALESCE(
               (SELECT SUM(v.vote) FROM retro_funding.metrics_comments_votes v WHERE v.comment_id = c.comment_id), 0
             ),
-            'votes', (
+            'votes', COALESCE((
               SELECT json_agg(
                 json_build_object(
                   'comment_id', v.comment_id,
@@ -75,12 +75,12 @@ async function getImpactMetricsApi(roundId: string) {
                   'updated_at', v.updated_at
                 )
               ) FROM retro_funding.metrics_comments_votes v WHERE v.comment_id = c.comment_id
-            )
+            ), '[]'::json)
           ) ORDER BY c.updated_at DESC
         )
         FROM retro_funding.metrics_comments c
         WHERE c.metric_id = m.metric_id
-      ) AS comments,
+      ),'[]'::json) AS comments,
       (
         SELECT COUNT(*)::int
         FROM (
@@ -146,7 +146,7 @@ async function getImpactMetricApi(impactMetricId: string, roundId: string) {
       m.name, 
       m.description, 
       m.url,
-      (
+      COALESCE((
         SELECT json_agg(
           json_build_object(
             'project_id', p.project_id,
@@ -159,8 +159,8 @@ async function getImpactMetricApi(impactMetricId: string, roundId: string) {
         FROM retro_funding.metrics_projects mp
         JOIN retro_funding.projects_data p ON mp.project_id = p.project_id
         WHERE mp.metric_id = m.metric_id
-      ) AS allocations_per_project,
-      (
+      ), '[]'::json) AS allocations_per_project,
+      COALESCE((
         SELECT json_agg(
           json_build_object(
             'comment_id', c.comment_id,
@@ -171,7 +171,7 @@ async function getImpactMetricApi(impactMetricId: string, roundId: string) {
             'votes_count', COALESCE(
               (SELECT SUM(v.vote) FROM retro_funding.metrics_comments_votes v WHERE v.comment_id = c.comment_id), 0
             ),
-            'votes', (
+            'votes', COALESCE((
               SELECT json_agg(
                 json_build_object(
                   'comment_id', v.comment_id,
@@ -181,12 +181,12 @@ async function getImpactMetricApi(impactMetricId: string, roundId: string) {
                   'updated_at', v.updated_at
                 )
               ) FROM retro_funding.metrics_comments_votes v WHERE v.comment_id = c.comment_id
-            )
+            ), '[]'::json)
           ) ORDER BY c.updated_at DESC
         )
         FROM retro_funding.metrics_comments c
         WHERE c.metric_id = m.metric_id
-      ) AS comments,
+      ),'[]'::json) AS comments,
       (
         SELECT COUNT(*)::int
         FROM (
