@@ -1,7 +1,7 @@
 import React from "react";
 import InfoHero from "@/app/info/components/InfoHero";
 import InfoAboutSection from "@/components/Info/InfoAboutSection";
-import DaosTreasuryChart from "@/components/Info/DaosTreasuryChart";
+import { DaosTreasuryChart } from "@/components/Info/DaosTreasuryChart";
 import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
 import GovernanceChartsTabs from "@/components/Info/GovernanceChartsTabs";
 import PortalTrafficTabs from "@/components/Info/PortalTrafficTabs";

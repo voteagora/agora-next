@@ -63,14 +63,15 @@ const data = [
   },
 ];
 
-const DaosTreasuryChart = () => {
+
+export const DaosTreasuryChart = () => {
   const [yAxisWidth, setYAxisWidth] = useState(0);
 
   const { primary, gradient } = useTenantColorScheme();
 
   useEffect(() => {
     const maxTickWidth = Math.max(
-      ...data.map((d) => getTextWidth(d.value.toString()) || 0)
+      ...data.map((d) => getTextWidth(d.value.toString()) || 0),
     );
     setYAxisWidth(maxTickWidth + 20); // Add some padding
   }, []);
@@ -143,5 +144,3 @@ const DaosTreasuryChart = () => {
     </div>
   );
 };
-
-export default DaosTreasuryChart;
