@@ -91,7 +91,7 @@ async function getImpactMetricsApi(roundId: string) {
         ) as views WHERE views.b IS NOT NULL
       ) AS views,
       (
-        SELECT COUNT(*)::int
+        SELECT ROUND((COUNT(*)::numeric / (SELECT COUNT(*)::int FROM agora.citizens WHERE retro_funding_round = $1) * 100)::numeric, 2)::float
         FROM (
           SELECT a.address as a, b.address as b
           FROM retro_funding.allocations a
@@ -197,7 +197,7 @@ async function getImpactMetricApi(impactMetricId: string, roundId: string) {
         ) as views WHERE views.b IS NOT NULL
       ) AS views,
       (
-        SELECT COUNT(*)::int
+        SELECT ROUND((COUNT(*)::numeric / (SELECT COUNT(*)::int FROM agora.citizens WHERE retro_funding_round = $1) * 100)::numeric, 2)::float
         FROM (
           SELECT a.address as a, b.address as b
           FROM retro_funding.allocations a
