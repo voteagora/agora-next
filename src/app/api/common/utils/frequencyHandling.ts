@@ -1,39 +1,34 @@
-export function frequencyToDateAndSQLcrit(
-  frequency: string,
-  timeCol: string
-): {
+export function frequencyToLookbackDayCount(frequency: string): {
   lookback: number;
-  skipCrit: string;
 } {
   const periodLowerCase = frequency.toLowerCase();
 
   let lookback: number;
-  let skipCrit: string;
 
   switch (periodLowerCase) {
-    case "24h":
-      lookback = 90;
-      skipCrit = "1=1";
+    case "3d":
+      lookback = 3;
       break;
     case "7d":
-      lookback = 180;
-      skipCrit = `extract(DOW from ${timeCol}) = extract(DOW from current_date)`;
+      lookback = 7;
       break;
     case "1m":
-      lookback = 365;
-      skipCrit = `extract(DAY from ${timeCol}) = 1`;
+    case "30d":
+      lookback = 30;
       break;
     case "3m":
-      lookback = 365;
-      skipCrit = `extract(DAY from ${timeCol}) = 1 AND mod(extract(MONTH from ${timeCol}), 3) = 0`;
+    case "90d":
+      lookback = 90;
       break;
     case "1y":
-      lookback = 365 * 2;
-      skipCrit = `extract(DAY from ${timeCol}) = 31 AND extract(MONTH from ${timeCol}) = 12`;
+      lookback = 365;
+      break;
+    case "max":
+      lookback = 365 * 10;
       break;
     default:
       throw new Error("Invalid frequency value");
   }
 
-  return { lookback, skipCrit };
+  return { lookback };
 }
