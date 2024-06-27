@@ -39,12 +39,12 @@ const GovernanceChartsTabs = ({
   const tabs = [
     {
       value: "top-delegates",
-      title: "Top delegates",
+      title: "Top Delegates",
       description: "",
     },
     {
       value: "active-delegates",
-      title: "Active delegates",
+      title: "Active Delegates",
       description: "",
     },
     {

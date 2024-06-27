@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
+import HumanAddress from "@/components/shared/HumanAddress";
 
 type ChartData = {
   address: string;
@@ -74,7 +75,7 @@ const GovernanceTopDelegateChart = ({
               />
               <div className="flex flex-col">
                 <h3 className="text-xs font-semibold text-gray-4f">
-                  {item.address}
+                  <HumanAddress address={item.address} />
                 </h3>
                 <p className="text-xs font-medium text-gray-4f">
                   {Number(item.weight).toFixed(2)}%

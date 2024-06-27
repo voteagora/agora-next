@@ -31,6 +31,7 @@ const AverageVoterProposalChart = ({
     if (shouldFetchData.current) {
       shouldFetchData.current = false;
       const data = await getData();
+
       setData(data.result);
     }
   };
@@ -40,6 +41,13 @@ const AverageVoterProposalChart = ({
       getChartData();
     }
   }, []);
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const min = Math.min(...data.map((d) => parseInt(d.votes)));
+  const max = Math.max(...data.map((d) => parseInt(d.votes)));
 
   return (
     <div>
@@ -56,6 +64,7 @@ const AverageVoterProposalChart = ({
           />
           <Tooltip />
           <YAxis
+            domain={[min, max]}
             dataKey="votes"
             tickLine={false}
             axisLine={false}

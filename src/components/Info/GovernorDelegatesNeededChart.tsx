@@ -34,7 +34,7 @@ const GovernorDelegatesNeededChart = ({
   const { primary, gradient } = useTenantColorScheme();
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
-    FREQUENCY_FILTERS.WEEK
+    FREQUENCY_FILTERS.YEAR
   );
   const shouldFetchData = useRef(true);
   const [data, setData] = useState<ChartData[] | undefined>();
@@ -69,6 +69,13 @@ const GovernorDelegatesNeededChart = ({
     }
   }, [filter]);
 
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const min = Math.min(...data.map((d) => parseInt(d.majority)));
+  const max = Math.max(...data.map((d) => parseInt(d.majority)));
+
   return (
     <div>
       <ResponsiveContainer width="100%" height={300}>
@@ -92,6 +99,7 @@ const GovernorDelegatesNeededChart = ({
             className="text-xs font-medium text-gray-4f"
           />
           <YAxis
+            domain={[min, max]}
             dataKey="majority"
             axisLine={false}
             tickLine={false}

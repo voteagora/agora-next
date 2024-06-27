@@ -49,7 +49,7 @@ export default async function Page() {
     return <div>Route not supported for namespace</div>;
   }
 
-  const data = await apiFetchTreasuryBalanceTS("7d");
+  const data = await apiFetchTreasuryBalanceTS("1y");
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     return (

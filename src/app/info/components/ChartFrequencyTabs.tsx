@@ -9,7 +9,7 @@ interface ChartDataFilterTabsProps {
 const ChartFrequencyTabs = ({ onChange }: ChartDataFilterTabsProps) => {
   return (
     <Tabs
-      defaultValue={FREQUENCY_FILTERS.WEEK}
+      defaultValue={FREQUENCY_FILTERS.YEAR}
       onValueChange={(value) => onChange(value as FREQUENCY_FILTERS)}
     >
       <TabsList className="w-fit gap-2 px-1 rounded-full border bg-white shadow-sm text-xs p-1">

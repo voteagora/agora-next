@@ -24,7 +24,7 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
   const { primary, gradient } = useTenantColorScheme();
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
-    FREQUENCY_FILTERS.WEEK
+    FREQUENCY_FILTERS.YEAR
   );
   const shouldFetchData = useRef(false);
   const [data, setData] = useState<MetricTimeSeriesValue[] | undefined>(
@@ -49,6 +49,13 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
       getChartData(filter);
     }
   }, [filter]);
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const min = Math.min(...data.map((d) => parseInt(d.value)));
+  const max = Math.max(...data.map((d) => parseInt(d.value)));
 
   return (
     <div>
@@ -85,15 +92,18 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
                 textAnchor="middle"
                 axisLine={{ stroke: "#E0E0E0" }}
                 tickLine={{ stroke: "#E0E0E0" }}
-                minTickGap={12}
+                minTickGap={20}
               />
               <YAxis
+                domain={[min, max]}
                 tickLine={false}
                 axisLine={false}
                 tickCount={7}
                 interval={0}
                 width={100}
-                tickFormatter={(value) => `$${humanizeNumber(value)}`}
+                tickFormatter={(value) =>
+                  value > Number(0) ? `$${humanizeNumber(value)}` : ""
+                }
                 className="text-xs font-medium text-gray-4f"
               />
               <Tooltip

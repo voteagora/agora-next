@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import GovernanceChartTooltip from "./GovernanceChartTooltip";
 import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import type { MetricTimeSeriesValue } from "@/lib/types";
@@ -34,7 +33,7 @@ const GovernanceActiveDelegateChart = ({
   const { primary } = useTenantColorScheme();
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
-    FREQUENCY_FILTERS.WEEK
+    FREQUENCY_FILTERS.YEAR
   );
   const shouldFetchData = useRef(true);
   const [data, setData] = useState<ChartData[] | undefined>();
@@ -72,6 +71,13 @@ const GovernanceActiveDelegateChart = ({
     }
   }, [filter]);
 
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const min = Math.min(...data.map((d) => parseInt(d.active)));
+  const max = Math.max(...data.map((d) => parseInt(d.active)));
+
   return (
     <div>
       <ResponsiveContainer width="100%" height={300}>
@@ -91,21 +97,20 @@ const GovernanceActiveDelegateChart = ({
             textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
             tickLine={{ stroke: "#E0E0E0" }}
+            minTickGap={20}
             className="text-xs font-medium text-gray-4f"
           />
           <YAxis
+            domain={[min, max]}
             dataKey="active"
             axisLine={false}
             tickLine={false}
-            tickFormatter={(value) => `${value}%`}
+            tickFormatter={(value) => (value > 0 ? `${value.toFixed(2)}%` : "")}
             tickCount={7}
-            width={100}
+            width={40}
             className="text-xs font-medium text-gray-4f"
           />
-          <Tooltip
-            // content={<GovernanceChartTooltip />}
-            cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
-          />
+          <Tooltip content={<CustomTooltip />} />
 
           <Area
             type="linear"
@@ -131,14 +136,16 @@ const GovernanceActiveDelegateChart = ({
               style={{ backgroundColor: primary }}
               className="w-4 h-[2px]"
             ></div>
-            <p className="text-xs font-semibold text-gray-4f">All delegates</p>
+            <p className="text-xs font-semibold text-gray-4f">all delegates</p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center">
             <div
               style={{ borderColor: primary }}
               className="w-4 border border-b-1 border-dashed"
             />
-            <p className="text-xs font-semibold text-gray-4f">100k tokens</p>
+            <p className="text-xs font-semibold text-gray-4f">
+              delegates with over 100K tokens
+            </p>
           </div>
         </div>
 
@@ -163,18 +170,22 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             className="w-4 h-[2px]"
           ></div>
           <p className="text-xs font-medium text-gray-4f ">
-            To reach quorum{" "}
-            <span className="font-bold pl-3">{payload[0].value}</span>
+            All Delegates
+            <span className="font-bold pl-3">
+              {Number(payload[0].value).toFixed(4)}%
+            </span>
           </p>
         </div>
-        <div className="flex flex-row gap-1 justify-center items-center mt-2">
+        <div className="flex flex-row gap-2 justify-center items-center mt-2">
           <div
             style={{ borderColor: primary }}
             className="w-4 border border-b-1 border-dashed"
           />
           <p className="text-xs font-medium text-gray-4f">
-            To reach 50%{" "}
-            <span className="font-bold pl-6">{payload[1].value}</span>
+            Whales
+            <span className="font-bold pl-6">
+              {Number(payload[1].value).toFixed(4)}%
+            </span>
           </p>
         </div>
       </div>

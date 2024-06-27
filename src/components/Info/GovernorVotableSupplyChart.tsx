@@ -14,6 +14,7 @@ import type { MetricTimeSeriesValue } from "@/lib/types";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import { formatNumber, scientificNotationToPrecision } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
+import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
 interface GovernorVotableSupplyChartProps {
   getData: (
@@ -29,7 +30,7 @@ const GovernorVotableSupplyChart = ({
   const { token } = Tenant.current();
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
-    FREQUENCY_FILTERS.WEEK
+    FREQUENCY_FILTERS.YEAR
   );
   const shouldFetchData = useRef(true);
   const [data, setData] = useState<MetricTimeSeriesValue[] | undefined>();
@@ -52,6 +53,13 @@ const GovernorVotableSupplyChart = ({
       getChartData(filter);
     }
   }, [filter]);
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const min = Math.min(...data.map((d) => parseInt(d.value)));
+  const max = Math.max(...data.map((d) => parseInt(d.value)));
 
   return (
     <div>
@@ -77,6 +85,7 @@ const GovernorVotableSupplyChart = ({
             minTickGap={12}
           />
           <YAxis
+            domain={[min, max]}
             dataKey="value"
             axisLine={false}
             tickLine={false}
@@ -88,7 +97,7 @@ const GovernorVotableSupplyChart = ({
             className="text-xs font-medium text-gray-4f"
           />
 
-          <Tooltip />
+          <Tooltip content={<CustomTooltip />} />
           <Area
             type="step"
             dataKey="value"
@@ -115,3 +124,22 @@ const GovernorVotableSupplyChart = ({
 };
 
 export default GovernorVotableSupplyChart;
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  const { primary } = useTenantColorScheme();
+
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
+        <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
+        <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
+          <p className="text-xs font-medium text-gray-4f ">
+            <span className="pr-10">All Delegates</span>
+            <TokenAmountDisplay amount={payload[0].value} />
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
