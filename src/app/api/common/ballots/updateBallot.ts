@@ -109,7 +109,7 @@ async function deleteBallotMetricForAddress({
 async function autobalanceAllocations(
   address: string,
   roundId: number,
-  procssedMeric: string
+  metricToSkip: string
 ) {
   const allocations = await prisma.allocations.findMany({
     where: {
@@ -121,13 +121,13 @@ async function autobalanceAllocations(
   const [amountToBalance, totalUnlocked] = allocations.reduce(
     (acc, allocation) => {
       acc[0] -=
-        allocation.locked || allocation.metric_id === procssedMeric
+        allocation.locked || allocation.metric_id === metricToSkip
           ? Number(allocation.allocation.toFixed(2))
           : 0;
       return [
         acc[0] < 0 ? 0 : acc[0],
         acc[1] +
-          (allocation.locked || allocation.metric_id === procssedMeric
+          (allocation.locked || allocation.metric_id === metricToSkip
             ? 0
             : Number(allocation.allocation.toFixed(2))),
       ];
@@ -137,7 +137,7 @@ async function autobalanceAllocations(
 
   await Promise.all(
     allocations.map(async (allocation) => {
-      if (!allocation.locked && allocation.metric_id !== procssedMeric) {
+      if (!allocation.locked && allocation.metric_id !== metricToSkip) {
         await prisma.allocations.update({
           where: {
             address_round_metric_id: {
