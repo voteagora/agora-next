@@ -4,18 +4,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
-
-type MetricValue = {
-  day: string;
-  date: string;
-  ts: number;
-  value: any;
-};
+import { MetricTimeSeriesValue } from "@/lib/types";
 
 async function getMetricTS(
   metricId: string,
   frequency: string
-): Promise<{ result: MetricValue[] }> {
+): Promise<{ result: MetricTimeSeriesValue[] }> {
   const { namespace } = Tenant.current();
 
   if (frequency == "latest") {
@@ -33,16 +27,16 @@ async function getMetricTS(
 
   let availableChainMetrics = [
     "total_votable_supply",
+
     "majority_threshold",
-
     "quorum_threshold",
-    "quorum_thresh_stalemate", // Out of spec, I just thought it might be a cool overlay to add if we had time.
 
-    "weight_of_fraction_of_active_delegates", // Out of spec, just might be a cool feature.
     "fraction_of_active_delegates",
-
-    "weight_of_fraction_of_large_active_delegates", // Out of spec, just might be a cool feature.
     "fraction_of_large_active_delegates",
+
+    "quorum_thresh_stalemate", // Out of spec, I just thought it might be a cool overlay to add if we had time.
+    "weight_of_fraction_of_active_delegates", // Out of spec, just might be a cool feature.
+    "weight_of_fraction_of_large_active_delegates", // Out of spec, just might be a cool feature.
   ];
 
   const isGoogleAnalyticMetric = availableGoogleMetrics.includes(metricId);
@@ -82,12 +76,13 @@ async function getMetricTS(
     );
   }
 
-  const data: MetricValue[] = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
+  const data: MetricTimeSeriesValue[] =
+    await prisma.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
 
   return { result: data };
 }
 
-const fetchMetricTS = cache(getMetricTS);
+export const apiFetchMetricTS = cache(getMetricTS);
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -104,7 +99,7 @@ export async function GET(request: NextRequest) {
   const metricId = paramParts[4];
 
   try {
-    const communityInfo = await fetchMetricTS(metricId, frequency);
+    const communityInfo = await apiFetchMetricTS(metricId, frequency);
     return NextResponse.json(communityInfo);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {

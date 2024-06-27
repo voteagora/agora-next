@@ -1,49 +1,76 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  ResponsiveContainer,
   Area,
+  CartesianGrid,
+  ComposedChart,
   Line,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ComposedChart,
 } from "recharts";
 import GovernanceChartTooltip from "./GovernanceChartTooltip";
 import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
-import { getTextWidth } from "@/lib/utils";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
+import type { MetricTimeSeriesValue } from "@/lib/types";
+import { FREQUENCY_FILTERS } from "@/lib/constants";
 
-interface DataPoint {
-  name: string;
-  allDelegates: number;
-  topDelegates: number;
+interface GovernanceActiveDelegateChartProps {
+  getData: (
+    metric: string,
+    frequency: string
+  ) => Promise<{ result: MetricTimeSeriesValue[] }>;
 }
 
-const data: DataPoint[] = [
-  { name: "Nov '23", allDelegates: 70, topDelegates: 60 },
-  { name: "Dec '23", allDelegates: 60, topDelegates: 50 },
-  { name: "Jan '24", allDelegates: 56, topDelegates: 100 },
-  { name: "Feb '24", allDelegates: 35, topDelegates: 90 },
-  { name: "Mar '24", allDelegates: 80, topDelegates: 45 },
-  { name: "Apr '24", allDelegates: 23, topDelegates: 32 },
-  { name: "May '24", allDelegates: 80, topDelegates: 90 },
-  { name: "Jun '24", allDelegates: 120, topDelegates: 80 },
-  { name: "May '24", allDelegates: 40, topDelegates: 30 },
-  { name: "Jun '24", allDelegates: 20, topDelegates: 10 },
-];
+type ChartData = {
+  active: string;
+  large: string;
+  date: string;
+};
 
-const GovernanceActiveDelegateChart: React.FC = () => {
-  const [yAxisWidth, setYAxisWidth] = useState(0);
-
+const GovernanceActiveDelegateChart = ({
+  getData,
+}: GovernanceActiveDelegateChartProps) => {
   const { primary } = useTenantColorScheme();
 
+  const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
+    FREQUENCY_FILTERS.WEEK
+  );
+  const shouldFetchData = useRef(true);
+  const [data, setData] = useState<ChartData[] | undefined>();
+
+  const getChartData = async (frequency: string) => {
+    if (shouldFetchData.current) {
+      shouldFetchData.current = false;
+
+      const active = await getData("fraction_of_active_delegates", frequency);
+      const large = await getData(
+        "fraction_of_large_active_delegates",
+        frequency
+      );
+
+      // Combine majority and quorum data into a single index-based array
+      const combined = active.result.map((item, index) => {
+        return {
+          active: item.value,
+          large: large.result[index].value,
+          date: item.date,
+        };
+      });
+      setData(combined);
+    }
+  };
+
+  const onFilterChange = (value: FREQUENCY_FILTERS) => {
+    shouldFetchData.current = true;
+    setFilter(value);
+  };
+
   useEffect(() => {
-    const maxTickWidth = Math.max(
-      ...data.map((d) => getTextWidth(d.allDelegates.toString()) || 0)
-    );
-    setYAxisWidth(maxTickWidth + 20); // Add some padding
-  }, []);
+    if (filter && shouldFetchData.current) {
+      getChartData(filter);
+    }
+  }, [filter]);
 
   return (
     <div>
@@ -60,37 +87,38 @@ const GovernanceActiveDelegateChart: React.FC = () => {
           </defs>
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
-            dataKey="name"
-            textAnchor="left"
-            className="text-xs font-medium text-gray-4f"
+            dataKey="date"
+            textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
             tickLine={{ stroke: "#E0E0E0" }}
+            className="text-xs font-medium text-gray-4f"
           />
           <YAxis
-            className="text-xs font-medium text-gray-4f"
+            dataKey="active"
             axisLine={false}
             tickLine={false}
             tickFormatter={(value) => `${value}%`}
-            width={yAxisWidth}
             tickCount={7}
+            width={100}
+            className="text-xs font-medium text-gray-4f"
           />
           <Tooltip
-            content={<GovernanceChartTooltip />}
+            // content={<GovernanceChartTooltip />}
             cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
           />
 
           <Area
             type="linear"
-            dataKey="allDelegates"
+            dataKey="active"
             stroke={primary}
             fill="url(#colorAllDelegates)"
             name="All delegates"
           />
           <Line
             type="linear"
-            dataKey="topDelegates"
+            dataKey="large"
             stroke={primary}
-            strokeDasharray="5 5"
+            strokeDasharray="3 3"
             name=">100k tokens"
             dot={false}
           />
@@ -114,10 +142,43 @@ const GovernanceActiveDelegateChart: React.FC = () => {
           </div>
         </div>
 
-        <ChartFrequencyTabs />
+        <ChartFrequencyTabs onChange={onFilterChange} />
       </div>
     </div>
   );
 };
 
 export default GovernanceActiveDelegateChart;
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  const { primary } = useTenantColorScheme();
+
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
+        <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
+        <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
+          <div
+            style={{ backgroundColor: primary }}
+            className="w-4 h-[2px]"
+          ></div>
+          <p className="text-xs font-medium text-gray-4f ">
+            To reach quorum{" "}
+            <span className="font-bold pl-3">{payload[0].value}</span>
+          </p>
+        </div>
+        <div className="flex flex-row gap-1 justify-center items-center mt-2">
+          <div
+            style={{ borderColor: primary }}
+            className="w-4 border border-b-1 border-dashed"
+          />
+          <p className="text-xs font-medium text-gray-4f">
+            To reach 50%{" "}
+            <span className="font-bold pl-6">{payload[1].value}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};

@@ -16,13 +16,6 @@ const ChartFrequencyTabs = ({ onChange }: ChartDataFilterTabsProps) => {
         <TabsTrigger
           className="h-full"
           variant="gray"
-          value={FREQUENCY_FILTERS.DAY}
-        >
-          {FREQUENCY_FILTERS.DAY}
-        </TabsTrigger>
-        <TabsTrigger
-          className="h-full"
-          variant="gray"
           value={FREQUENCY_FILTERS.WEEK}
         >
           {FREQUENCY_FILTERS.WEEK}
@@ -40,6 +33,13 @@ const ChartFrequencyTabs = ({ onChange }: ChartDataFilterTabsProps) => {
           value={FREQUENCY_FILTERS.QUARTER}
         >
           {FREQUENCY_FILTERS.QUARTER}
+        </TabsTrigger>
+        <TabsTrigger
+          className="h-full"
+          variant="gray"
+          value={FREQUENCY_FILTERS.YEAR}
+        >
+          {FREQUENCY_FILTERS.YEAR}
         </TabsTrigger>
       </TabsList>
     </Tabs>

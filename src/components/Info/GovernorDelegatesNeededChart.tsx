@@ -1,75 +1,73 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Area,
-  XAxis,
-  YAxis,
   CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
   ComposedChart,
   Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { getTextWidth } from "@/lib/utils";
 import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
+import { FREQUENCY_FILTERS } from "@/lib/constants";
+import type { MetricTimeSeriesValue } from "@/lib/types";
 
-const data = [
-  { name: "Nov '23", uv: 220, pv: 250 },
-  { name: "Dec '23", uv: 80, pv: 220 },
-  { name: "Jan '24", uv: 150, pv: 170 },
-  { name: "Feb '24", uv: 60, pv: 200 },
-  { name: "Mar '24", uv: 200, pv: 230 },
-  { name: "Apr '24", uv: 170, pv: 200 },
-  { name: "May '24", uv: 130, pv: 190 },
-  { name: "Jun '24", uv: 100, pv: 160 },
-  { name: "Jul '24", uv: 60, pv: 90 },
-];
+interface GovernorDelegatesNeededChartProps {
+  getData: (
+    metric: string,
+    frequency: string
+  ) => Promise<{ result: MetricTimeSeriesValue[] }>;
+}
 
-const yTicks = [0, 50, 100, 150, 200, 250, 280];
+type ChartData = {
+  majority: string;
+  quorum: string;
+  date: string;
+};
 
-const GovernorDelegatesNeededChart = () => {
-  const [yAxisWidth, setYAxisWidth] = useState(0);
+const GovernorDelegatesNeededChart = ({
+  getData,
+}: GovernorDelegatesNeededChartProps) => {
   const { primary, gradient } = useTenantColorScheme();
-  const primaryColorClass = `bg-[${primary}]`;
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
-          <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
-          <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
-            <div
-              style={{ backgroundColor: primary }}
-              className="w-4 h-[2px]"
-            ></div>
-            <p className="text-xs font-medium text-gray-4f ">
-              To reach quorum{" "}
-              <span className="font-bold pl-3">{payload[0].value}</span>
-            </p>
-          </div>
-          <div className="flex flex-row gap-1 justify-center items-center mt-2">
-            <div
-              style={{ borderColor: primary }}
-              className="w-4 border border-b-1 border-dashed"
-            />
-            <p className="text-xs font-medium text-gray-4f">
-              To reach 50%{" "}
-              <span className="font-bold pl-6">{payload[1].value}</span>
-            </p>
-          </div>
-        </div>
-      );
+  const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
+    FREQUENCY_FILTERS.WEEK
+  );
+  const shouldFetchData = useRef(true);
+  const [data, setData] = useState<ChartData[] | undefined>();
+
+  const getChartData = async (frequency: string) => {
+    if (shouldFetchData.current) {
+      shouldFetchData.current = false;
+
+      const majority = await getData("majority_threshold", frequency);
+      const quorum = await getData("quorum_threshold", frequency);
+
+      // Combine majority and quorum data into a single index-based array
+      const combined = majority.result.map((item, index) => {
+        return {
+          majority: item.value,
+          quorum: quorum.result[index].value,
+          date: item.date,
+        };
+      });
+      setData(combined);
     }
-    return null;
+  };
+
+  const onFilterChange = (value: FREQUENCY_FILTERS) => {
+    shouldFetchData.current = true;
+    setFilter(value);
   };
 
   useEffect(() => {
-    const maxTickWidth = Math.max(
-      ...data.map((d) => getTextWidth(d.pv.toString()) || 0)
-    );
-    setYAxisWidth(maxTickWidth + 20);
-  }, []);
+    if (filter && shouldFetchData.current) {
+      getChartData(filter);
+    }
+  }, [filter]);
 
   return (
     <div>
@@ -87,32 +85,33 @@ const GovernorDelegatesNeededChart = () => {
 
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
-            dataKey="name"
-            textAnchor="left"
+            dataKey="date"
+            textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
             tickLine={{ stroke: "#E0E0E0" }}
             className="text-xs font-medium text-gray-4f"
           />
           <YAxis
+            dataKey="majority"
             axisLine={false}
             tickLine={false}
-            ticks={yTicks}
-            width={yAxisWidth}
+            tickCount={7}
+            width={100}
             className="text-xs font-medium text-gray-4f"
           />
           <Tooltip
-            content={<CustomTooltip />}
+            // content={<CustomTooltip />}
             cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
           />
           <Area
             type="step"
-            dataKey="uv"
+            dataKey="majority"
             stroke={primary}
             fill="url(#colorAllDelegates)"
           />
           <Line
             type="step"
-            dataKey="pv"
+            dataKey="quorum"
             stroke={primary}
             strokeDasharray="3 3"
             dot={false}
@@ -141,10 +140,43 @@ const GovernorDelegatesNeededChart = () => {
           </div>
         </div>
 
-        <ChartFrequencyTabs />
+        <ChartFrequencyTabs onChange={onFilterChange} />
       </div>
     </div>
   );
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  const { primary } = useTenantColorScheme();
+
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
+        <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
+        <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
+          <div
+            style={{ backgroundColor: primary }}
+            className="w-4 h-[2px]"
+          ></div>
+          <p className="text-xs font-medium text-gray-4f ">
+            To reach quorum{" "}
+            <span className="font-bold pl-3">{payload[0].value}</span>
+          </p>
+        </div>
+        <div className="flex flex-row gap-1 justify-center items-center mt-2">
+          <div
+            style={{ borderColor: primary }}
+            className="w-4 border border-b-1 border-dashed"
+          />
+          <p className="text-xs font-medium text-gray-4f">
+            To reach 50%{" "}
+            <span className="font-bold pl-6">{payload[1].value}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 export default GovernorDelegatesNeededChart;

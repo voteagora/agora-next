@@ -63,7 +63,7 @@ export default async function Page() {
           }}
         />
         <GovernanceChartsTabs
-          getVotableSupply={async (metric: string, frequency: string) => {
+          getData={async (metric: string, frequency: string) => {
             "use server";
             return apiFetchMetricTS(metric, frequency);
           }}

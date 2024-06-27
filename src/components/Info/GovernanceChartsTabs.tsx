@@ -25,37 +25,35 @@ const TabTrigger: React.FC<TabProps> = ({ value, title, description }) => {
 };
 
 interface GovernanceChartsTabsProps {
-  getVotableSupply: (metric: string, frequency: string) => Promise<any>;
+  getData: (metric: string, frequency: string) => Promise<any>;
 }
 
-const GovernanceChartsTabs = ({
-  getVotableSupply,
-}: GovernanceChartsTabsProps) => {
+const GovernanceChartsTabs = ({ getData }: GovernanceChartsTabsProps) => {
   const tabs = [
     {
       value: "top-delegates",
       title: "Top delegates",
-      description: "Top 10 by token holdings",
+      description: "",
     },
     {
       value: "active-delegates",
       title: "Active delegates",
-      description: "45.6%",
+      description: "",
     },
     {
       value: "avg-voters",
       title: "Avg voters / proposal",
-      description: "67.5 voters",
+      description: "",
     },
     {
       value: "delegates-needed",
       title: "Delegates needed",
-      description: "4 to reach quorum",
+      description: "",
     },
     {
       value: "total-votable-supply",
       title: "Total votable supply",
-      description: "2.24M tokens",
+      description: "",
     },
   ];
 
@@ -81,7 +79,7 @@ const GovernanceChartsTabs = ({
           value="active-delegates"
           className="w-full px-4 sm:px-8 py-3"
         >
-          <GovernanceActiveDelegateChart />
+          <GovernanceActiveDelegateChart getData={getData} />
         </TabsContent>
         <TabsContent value="avg-voters" className="!w-fullp-4 sm:p-8 pb-6">
           <AverageVoterProposalChart />
@@ -90,13 +88,13 @@ const GovernanceChartsTabs = ({
           value="delegates-needed"
           className="!w-full px-4 sm:px-8 py-3"
         >
-          <GovernorDelegatesNeededChart />
+          <GovernorDelegatesNeededChart getData={getData} />
         </TabsContent>
         <TabsContent
           value="total-votable-supply"
           className="w-full px-4 sm:px-8 py-3"
         >
-          <GovernorVotableSupplyChart getData={getVotableSupply} />
+          <GovernorVotableSupplyChart getData={getData} />
         </TabsContent>
       </Tabs>
     </div>
