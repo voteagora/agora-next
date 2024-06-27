@@ -2,7 +2,7 @@ import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
+import { frequencyToLookbackDayCount } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 
@@ -10,14 +10,14 @@ async function getTreasuryBalanceTS(
   frequency: string
 ): Promise<{ result: TokenBalance[] }> {
   if (frequency == "latest") {
-    const { result } = await getTreasuryBalanceTS("24h");
+    const { result } = await getTreasuryBalanceTS("3d");
     const lastObject = result[result.length - 1];
     return { result: [lastObject] };
   }
 
   const { contracts } = Tenant.current();
 
-  const { lookback, skipCrit } = frequencyToDateAndSQLcrit(frequency, "day");
+  const { lookback } = frequencyToLookbackDayCount(frequency);
 
   const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ")})`;
 
@@ -28,7 +28,6 @@ async function getTreasuryBalanceTS(
               FROM   dune.token_balances tb
               WHERE  chain_id = 1
                 AND day >= (CURRENT_DATE - INTERVAL '${lookback} day')
-                AND ${skipCrit}
                 AND address IN ${crit}
               GROUP BY 1 
               ORDER BY day`;
