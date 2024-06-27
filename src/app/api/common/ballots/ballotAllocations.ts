@@ -103,16 +103,18 @@ export function calculateAllocations(
     return {
       ...a,
       allocation: cappedAllocation * TOTAL_FUNDING,
-      allocations_per_metric: a.allocations_per_metric.map((apm) => {
-        return {
-          ...apm,
-          allocation:
-            Math.round(
-              (100 * (TOTAL_FUNDING * (apm.allocation * cappedAllocation))) /
-                a.allocation
-            ) / 100, // prevent floating point errors
-        };
-      }),
+      allocations_per_metric: a.allocations_per_metric
+        .map((apm) => {
+          return {
+            ...apm,
+            allocation:
+              Math.round(
+                (100 * (TOTAL_FUNDING * (apm.allocation * cappedAllocation))) /
+                  a.allocation
+              ) / 100, // prevent floating point errors
+          };
+        })
+        .sort((a, b) => b.allocation - a.allocation),
     };
   });
 
