@@ -11,6 +11,19 @@ async function updateImpactMetricCommentVoteApi({
   address: string;
   vote: number;
 }): Promise<ImpactMetricCommentVote> {
+  const existingVote = await prisma.metrics_comments_votes.findUnique({
+    where: {
+      comment_id_voter: {
+        comment_id: commentId,
+        voter: address,
+      },
+    },
+  });
+
+  const voteValue = existingVote
+    ? Math.max(-1, Math.min(1, existingVote.vote + vote))
+    : vote;
+
   const commentVote = await prisma.metrics_comments_votes.upsert({
     where: {
       comment_id_voter: {
@@ -19,7 +32,7 @@ async function updateImpactMetricCommentVoteApi({
       },
     },
     update: {
-      vote,
+      vote: voteValue,
       updated_at: new Date(),
     },
     create: {
