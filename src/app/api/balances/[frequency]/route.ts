@@ -2,7 +2,7 @@ import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
+import { frequencyToLookbackDayCount } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
 
 type TokenBalance = {
@@ -23,7 +23,7 @@ async function getTreasuryBalanceTS(
 
   const { contracts } = Tenant.current();
 
-  const { lookback } = frequencyToDateAndSQLcrit(frequency);
+  const { lookback } = frequencyToLookbackDayCount(frequency);
 
   const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ")})`;
 

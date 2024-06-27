@@ -1,4 +1,4 @@
-export function frequencyToDateAndSQLcrit(frequency: string): {
+export function frequencyToLookbackDayCount(frequency: string): {
   lookback: number;
 } {
   const periodLowerCase = frequency.toLowerCase();
