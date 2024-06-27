@@ -71,6 +71,9 @@ async function getBallotForAddress({
   roundId: number;
   address: string;
 }) {
+  console.log("roundId", roundId);
+  console.log("address", address);
+
   const ballot = await prisma.$queryRawUnsafe<Ballot[]>(
     `
     SELECT 
@@ -117,7 +120,7 @@ async function getBallotForAddress({
     address
   );
 
-  if (!ballot) {
+  if (ballot.length === 0) {
     return {
       address,
       round_id: roundId,
