@@ -35,11 +35,10 @@ async function getTopDelegateWeights() {
                 LIMIT 10; `;
 
   const result = await prisma.$queryRawUnsafe<AddressWeight[]>(QRY);
-
   return { result };
 }
 
-const fetchDelegateWeights = cache(getTopDelegateWeights);
+export const apiFetchDelegateWeights = cache(getTopDelegateWeights);
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -49,7 +48,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const weights = await fetchDelegateWeights();
+    const weights = await apiFetchDelegateWeights();
     return NextResponse.json(weights);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {

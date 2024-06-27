@@ -24,7 +24,7 @@ async function getProposalVoteCounts() {
   return { result };
 }
 
-const fetchProposalVoteCounts = cache(getProposalVoteCounts);
+export const apiFetchProposalVoteCounts = cache(getProposalVoteCounts);
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const communityInfo = await fetchProposalVoteCounts();
+    const communityInfo = await apiFetchProposalVoteCounts();
     return NextResponse.json(communityInfo);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {

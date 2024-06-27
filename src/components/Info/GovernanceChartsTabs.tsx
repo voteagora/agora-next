@@ -25,10 +25,17 @@ const TabTrigger: React.FC<TabProps> = ({ value, title, description }) => {
 };
 
 interface GovernanceChartsTabsProps {
+  // TODO: Rename to getMetrics
   getData: (metric: string, frequency: string) => Promise<any>;
+  getVotes: () => Promise<any>;
+  getDelegates: () => Promise<any>;
 }
 
-const GovernanceChartsTabs = ({ getData }: GovernanceChartsTabsProps) => {
+const GovernanceChartsTabs = ({
+  getData,
+  getVotes,
+  getDelegates,
+}: GovernanceChartsTabsProps) => {
   const tabs = [
     {
       value: "top-delegates",
@@ -42,7 +49,7 @@ const GovernanceChartsTabs = ({ getData }: GovernanceChartsTabsProps) => {
     },
     {
       value: "avg-voters",
-      title: "Avg voters / proposal",
+      title: "Proposal Voters",
       description: "",
     },
     {
@@ -73,7 +80,7 @@ const GovernanceChartsTabs = ({ getData }: GovernanceChartsTabsProps) => {
         </TabsList>
 
         <TabsContent className="p-4 sm:p-8 pb-6 !w-full" value="top-delegates">
-          <GovernanceTopDelegateChart />
+          <GovernanceTopDelegateChart getData={getDelegates} />
         </TabsContent>
         <TabsContent
           value="active-delegates"
@@ -82,7 +89,7 @@ const GovernanceChartsTabs = ({ getData }: GovernanceChartsTabsProps) => {
           <GovernanceActiveDelegateChart getData={getData} />
         </TabsContent>
         <TabsContent value="avg-voters" className="!w-fullp-4 sm:p-8 pb-6">
-          <AverageVoterProposalChart />
+          <AverageVoterProposalChart getData={getVotes} />
         </TabsContent>
         <TabsContent
           value="delegates-needed"

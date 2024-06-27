@@ -10,6 +10,8 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import Hero from "@/components/Hero/Hero";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/route";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/route";
+import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/route";
+import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/route";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -63,12 +65,19 @@ export default async function Page() {
           }}
         />
         <GovernanceChartsTabs
+          getDelegates={async () => {
+            "use server";
+            return apiFetchDelegateWeights();
+          }}
+          getVotes={async () => {
+            "use server";
+            return apiFetchProposalVoteCounts();
+          }}
           getData={async (metric: string, frequency: string) => {
             "use server";
             return apiFetchMetricTS(metric, frequency);
           }}
         />
-        <PortalTrafficTabs />
       </div>
     );
   } else {
