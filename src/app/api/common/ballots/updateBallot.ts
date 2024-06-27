@@ -68,53 +68,7 @@ async function updateBallotMetricForAddress({
     },
   });
 
-  // Autoreblance all other allocations
-  const allocations = await prisma.allocations.findMany({
-    where: {
-      address,
-      round: roundId,
-    },
-  });
-
-  const [amountToBalance, totalUnlocked] = allocations.reduce(
-    (acc, allocation) => {
-      acc[0] -=
-        allocation.locked || allocation.metric_id === data.metric_id
-          ? Number(allocation.allocation.toFixed(2))
-          : 0;
-      return [
-        acc[0] < 0 ? 0 : acc[0],
-        acc[1] +
-          (allocation.locked || allocation.metric_id === data.metric_id
-            ? 0
-            : Number(allocation.allocation.toFixed(2))),
-      ];
-    },
-    [100, 0]
-  );
-
-  await Promise.all(
-    allocations.map(async (allocation) => {
-      if (!allocation.locked && allocation.metric_id !== data.metric_id) {
-        await prisma.allocations.update({
-          where: {
-            address_round_metric_id: {
-              metric_id: allocation.metric_id,
-              round: roundId,
-              address,
-            },
-          },
-          data: {
-            ...allocation,
-            allocation: totalUnlocked
-              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
-                amountToBalance
-              : 0,
-          },
-        });
-      }
-    })
-  );
+  await autobalanceAllocations(address, roundId, data.metric_id);
 
   // Return full ballot
   return fetchBallot(roundId, address);
@@ -139,13 +93,70 @@ async function deleteBallotMetricForAddress({
   roundId: number;
   address: string;
 }) {
-  return prisma.allocations.deleteMany({
+  await prisma.allocations.deleteMany({
     where: {
       metric_id: metricId,
       address,
       round: roundId,
     },
   });
+
+  await autobalanceAllocations(address, roundId, metricId);
+
+  return fetchBallot(roundId, address);
+}
+
+async function autobalanceAllocations(
+  address: string,
+  roundId: number,
+  metricToSkip: string
+) {
+  const allocations = await prisma.allocations.findMany({
+    where: {
+      address,
+      round: roundId,
+    },
+  });
+
+  const [amountToBalance, totalUnlocked] = allocations.reduce(
+    (acc, allocation) => {
+      acc[0] -=
+        allocation.locked || allocation.metric_id === metricToSkip
+          ? Number(allocation.allocation.toFixed(2))
+          : 0;
+      return [
+        acc[0] < 0 ? 0 : acc[0],
+        acc[1] +
+          (allocation.locked || allocation.metric_id === metricToSkip
+            ? 0
+            : Number(allocation.allocation.toFixed(2))),
+      ];
+    },
+    [100, 0]
+  );
+
+  await Promise.all(
+    allocations.map(async (allocation) => {
+      if (!allocation.locked && allocation.metric_id !== metricToSkip) {
+        await prisma.allocations.update({
+          where: {
+            address_round_metric_id: {
+              metric_id: allocation.metric_id,
+              round: roundId,
+              address,
+            },
+          },
+          data: {
+            ...allocation,
+            allocation: totalUnlocked
+              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
+                amountToBalance
+              : 0,
+          },
+        });
+      }
+    })
+  );
 }
 
 const updateBallotOsMultiplierApi = async (
