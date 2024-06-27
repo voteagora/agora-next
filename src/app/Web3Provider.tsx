@@ -3,7 +3,7 @@
 import { FC, PropsWithChildren } from "react";
 import { createConfig, WagmiConfig } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet, optimism } from "wagmi/chains";
+import { mainnet } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
@@ -32,7 +32,7 @@ const config = createConfig(
   getDefaultConfig({
     alchemyId: alchemyId,
     walletConnectProjectId: projectId,
-    chains: [mainnet, contracts.token.chain],
+    chains: [contracts.token.chain, mainnet],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,

@@ -1,8 +1,12 @@
+export const INDEXER_DELAY = 3000;
+
 export const TENANT_NAMESPACES = {
-  OPTIMISM: "optimism",
-  ETHERFI: "etherfi",
   ENS: "ens",
+  ETHERFI: "etherfi",
+  OPTIMISM: "optimism",
+  UNISWAP: "uniswap",
 } as const;
+
 export const proposalsFilterOptions = {
   relevant: {
     value: "Relevant",

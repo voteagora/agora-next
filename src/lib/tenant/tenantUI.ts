@@ -20,29 +20,43 @@ type UIPage = {
   };
 };
 
+type UIAssets = {
+  success: string;
+  pending: string;
+  delegate: string;
+};
+
 type UIDelegates = {
   allowed: `0x${string}`[];
   advanced: `0x${string}`[];
   retired: `0x${string}`[];
 };
 
+type UIOrganization = {
+  title: string;
+};
+
 type TenantUIParams = {
+  assets: UIAssets;
   color: string;
   delegates?: UIDelegates;
   hero?: string;
   links?: UILink[];
   logo: string;
+  organization?: UIOrganization;
   pages?: UIPage[];
   title: string;
   toggles?: UIToggle[];
 };
 
 export class TenantUI {
+  private _assets: UIAssets;
   private _color: string;
   private _delegates?: UIDelegates;
   private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
+  private _organization?: UIOrganization;
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
@@ -52,23 +66,31 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   constructor({
+    assets,
     color,
     delegates,
     hero,
-    logo,
-    title,
     links,
+    logo,
+    organization,
     pages,
+    title,
     toggles,
   }: TenantUIParams) {
+    this._assets = assets;
     this._color = color;
     this._delegates = delegates;
     this._hero = hero;
-    this._logo = logo;
-    this._title = title;
     this._links = links;
-    this._toggles = toggles;
+    this._logo = logo;
+    this._organization = organization;
     this._pages = pages;
+    this._title = title;
+    this._toggles = toggles;
+  }
+
+  public get assets(): UIAssets {
+    return this._assets;
   }
 
   public get color(): string {
@@ -89,6 +111,10 @@ export class TenantUI {
 
   public get logo(): string {
     return this._logo;
+  }
+
+  public get organization(): UIOrganization | undefined {
+    return this._organization;
   }
 
   public link(name: string): UILink | undefined {

@@ -1,42 +1,42 @@
-import { HStack } from "@/components/Layout/Stack";
-import styles from "./proposalVotesBar.module.scss";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { TokenAmountDisplay, generateBarsForVote } from "@/lib/utils";
+export default function ProposalVotesBar({ proposal, votes }) {
+  const voteCounts = {
+    FOR: [],
+    ABSTAIN: [],
+    AGAINST: [],
+  };
 
-export default function ProposalVotesBar({ proposal }) {
+  votes.forEach((item) => {
+    voteCounts[item.support].push(item);
+  });
+
   return (
-    <div>
-      <TooltipProvider delayDuration={10}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <HStack
-              justifyContent="justify-around"
-              className={styles.vote_bar_ticks}
-            >
-              {generateBarsForVote(
-                proposal.proposalResults.for,
-                proposal.proposalResults.abstain,
-                proposal.proposalResults.against
-              ).map((value, idx) => {
-                return <div key={`${idx}`} className={styles[value]} />;
-              })}
-            </HStack>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              {TokenAmountDisplay({
-                amount: proposal.proposalResults.abstain,
-              })}{" "}
-              abstained
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <div id="chartContainer" className="relative flex items-stretch gap-x-0.5">
+      {Object.entries(voteCounts).map(([support, parsedVotes], index) => (
+        <div
+          key={support} // use support as a unique key
+          style={{
+            flex: `${proposal.proposalResults[support.toLowerCase()]} 1 0%`,
+          }}
+          className="flex items-stretch gap-x-0.5 min-h-[10px]"
+        >
+          {parsedVotes?.map((vote, idx) => (
+            <div
+              key={`${support}-${idx}`} // use a combination of support and idx as a unique key
+              style={{ flex: `${vote.weight} 1 0%` }}
+              className={`min-w-[1px] ${support === "FOR" ? "bg-[#41b579]" : support === "AGAINST" ? "bg-[#db5664]" : "bg-[#666666]"}`}
+            ></div>
+          ))}
+        </div>
+      ))}
+
+      {proposal.approvalThreshold && (
+        <div
+          className="bg-[#000000] h-4 w-[2px] absolute -top-[3px] z-50"
+          style={{
+            left: `${Math.round(Number(proposal.approvalThreshold) / 100)}%`,
+          }}
+        />
+      )}
     </div>
   );
 }

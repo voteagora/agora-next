@@ -50,10 +50,10 @@ async function getDelegatesApi(
     ON 
       avp.delegate = delegates.delegate
     LEFT JOIN 
-      agora.address_metadata am
+      agora.citizens am
     ON
       LOWER(am.address) = LOWER(delegates.delegate) AND 
-      am.kind = 'citizen' AND
+      am.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens) AND
       am.dao_slug = $3::config.dao_slug
     WHERE 
       num_of_delegators IS NOT NULL
@@ -254,7 +254,7 @@ async function getDelegates({
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
-      citizen: _delegates[index].citizen.length > 0,
+      citizen: _delegates[index].citizen,
       statement: _delegates[index].statement,
     })),
     seed,
@@ -343,7 +343,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   // Build out delegate JSON response
   return {
     address: address,
-    citizen: _isCitizen.length > 0,
+    citizen: _isCitizen,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply || 0)
@@ -361,7 +361,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators:
       // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n
+      cachedNumOfDelegators < 1000n && namespace === "optimism"
         ? BigInt(
             (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
               "0"
