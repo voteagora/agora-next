@@ -1,30 +1,6 @@
-import prisma from "@/app/lib/prisma";
-import Tenant from "@/lib/tenant/tenant";
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { cache } from "react";
-
-type ProposalCount = {
-  proposalId: number;
-  votes: number;
-};
-
-async function getProposalVoteCounts() {
-  const { namespace } = Tenant.current();
-
-  const QRY = `SELECT proposal_id,
-                    SUM(vote_count) votes
-                FROM   alltenant.dao_engagement_votes
-                WHERE  tenant = '${namespace}'
-                    GROUP  BY 1
-                    ORDER  BY 1`;
-
-  const result = await prisma.$queryRawUnsafe<ProposalCount[]>(QRY);
-
-  return { result };
-}
-
-export const apiFetchProposalVoteCounts = cache(getProposalVoteCounts);
+import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);

@@ -4,14 +4,13 @@ import InfoAboutSection from "@/components/Info/InfoAboutSection";
 import { TreasuryChart } from "@/app/info/components/TreasuryChart";
 import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
 import GovernanceChartsTabs from "@/components/Info/GovernanceChartsTabs";
-import PortalTrafficTabs from "@/components/Info/PortalTrafficTabs";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Hero from "@/components/Hero/Hero";
-import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/route";
-import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/route";
-import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/route";
-import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/route";
+import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
+import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTopDelegateWeighs";
+import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
+import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
