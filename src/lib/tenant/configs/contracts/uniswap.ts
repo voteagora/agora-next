@@ -26,15 +26,11 @@ export const uniswapTenantContractConfig = (
 
   // Right now there are no sepolia treasury accounts for uniswap.
   // They are set to match.
-  const TREASURY = isProd
-    ? [
-        "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
-        "0xe571dC7A558bb6D68FfE264c3d7BB98B0C6C73fC",
-      ]
-    : [
-        "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
-        "0xe571dC7A558bb6D68FfE264c3d7BB98B0C6C73fC",
-      ];
+  const TREASURY = [
+    "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
+    "0xe571dC7A558bb6D68FfE264c3d7BB98B0C6C73fC",
+    "0x3D30B1aB88D487B0F3061F40De76845Bec3F1e94",
+  ];
 
   const provider = isProd ? ethProvider : sepoliaProvider;
   const chain = isProd ? mainnet : sepolia;
