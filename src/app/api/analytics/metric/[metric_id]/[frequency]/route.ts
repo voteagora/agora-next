@@ -19,7 +19,7 @@ async function getMetricTS(
   const { namespace } = Tenant.current();
 
   if (frequency == "latest") {
-    const { result } = await getMetricTS(metricId, "24h");
+    const { result } = await getMetricTS(metricId, "3d");
     const lastObject = result[result.length - 1];
     return { result: [lastObject] };
   }
