@@ -31,8 +31,8 @@ async function getTopDelegateWeights() {
                 SELECT delegate AS address,
                        round(fraction_of_voting_power * 100.0,3) AS weight
                 FROM   weightings
-                WHERE  fraction_of_voting_power > 0.01
-                ORDER  BY fraction_of_voting_power DESC; `;
+                ORDER  BY fraction_of_voting_power DESC
+                LIMIT 10; `;
 
   const result = await prisma.$queryRawUnsafe<AddressWeight[]>(QRY);
 

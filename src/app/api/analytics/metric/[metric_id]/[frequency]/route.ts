@@ -12,8 +12,17 @@ type MetricValue = {
   value: any;
 };
 
-async function getMetricTS(metricId: string, frequency: string) {
+async function getMetricTS(
+  metricId: string,
+  frequency: string
+): Promise<{ result: MetricValue[] }> {
   const { namespace } = Tenant.current();
+
+  if (frequency == "latest") {
+    const { result } = await getMetricTS(metricId, "24h");
+    const lastObject = result[result.length - 1];
+    return { result: [lastObject] };
+  }
 
   let availableGoogleMetrics = [
     "activeUsers",
@@ -73,9 +82,9 @@ async function getMetricTS(metricId: string, frequency: string) {
     );
   }
 
-  const result = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
+  const data: MetricValue[] = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
 
-  return { result };
+  return { result: data };
 }
 
 const fetchMetricTS = cache(getMetricTS);
