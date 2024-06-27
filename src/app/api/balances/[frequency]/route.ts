@@ -6,7 +6,15 @@ import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandl
 import { cache } from "react";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 
-async function getTreasuryBalanceTS(frequency: string) {
+async function getTreasuryBalanceTS(
+  frequency: string
+): Promise<{ result: TokenBalance[] }> {
+  if (frequency == "latest") {
+    const { result } = await getTreasuryBalanceTS("24h");
+    const lastObject = result[result.length - 1];
+    return { result: [lastObject] };
+  }
+
   const { contracts } = Tenant.current();
 
   const { lookback, skipCrit } = frequencyToDateAndSQLcrit(frequency, "day");

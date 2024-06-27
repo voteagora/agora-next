@@ -4,10 +4,25 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
-import type { MetricTimeSeriesValue } from "@/lib/types";
 
-async function getMetricTS(metricId: string, frequency: string) {
+type MetricValue = {
+  day: string;
+  date: string;
+  ts: number;
+  value: any;
+};
+
+async function getMetricTS(
+  metricId: string,
+  frequency: string
+): Promise<{ result: MetricValue[] }> {
   const { namespace } = Tenant.current();
+
+  if (frequency == "latest") {
+    const { result } = await getMetricTS(metricId, "24h");
+    const lastObject = result[result.length - 1];
+    return { result: [lastObject] };
+  }
 
   let availableGoogleMetrics = [
     "activeUsers",
@@ -67,12 +82,12 @@ async function getMetricTS(metricId: string, frequency: string) {
     );
   }
 
-  const result = await prisma.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
+  const data: MetricValue[] = await prisma.$queryRawUnsafe<MetricValue[]>(QRY);
 
-  return { result };
+  return { result: data };
 }
 
-export const apiFetchMetricTS = cache(getMetricTS);
+const fetchMetricTS = cache(getMetricTS);
 
 export async function GET(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
@@ -89,7 +104,7 @@ export async function GET(request: NextRequest) {
   const metricId = paramParts[4];
 
   try {
-    const communityInfo = await apiFetchMetricTS(metricId, frequency);
+    const communityInfo = await fetchMetricTS(metricId, frequency);
     return NextResponse.json(communityInfo);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {
