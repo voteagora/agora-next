@@ -54,7 +54,6 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
     return <div>Loading...</div>;
   }
 
-  const min = Math.min(...data.map((d) => parseInt(d.value)));
   const max = Math.max(...data.map((d) => parseInt(d.value)));
 
   return (
@@ -95,7 +94,7 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
                 minTickGap={20}
               />
               <YAxis
-                domain={[min, max]}
+                domain={[0, max]}
                 tickLine={false}
                 axisLine={false}
                 tickCount={7}

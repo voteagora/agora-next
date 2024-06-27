@@ -58,7 +58,6 @@ const GovernorVotableSupplyChart = ({
     return <div>Loading...</div>;
   }
 
-  const min = Math.min(...data.map((d) => parseInt(d.value)));
   const max = Math.max(...data.map((d) => parseInt(d.value)));
 
   return (
@@ -85,14 +84,16 @@ const GovernorVotableSupplyChart = ({
             minTickGap={12}
           />
           <YAxis
-            domain={[min, max]}
+            domain={[0, max]}
             dataKey="value"
             axisLine={false}
             tickLine={false}
             tickCount={7}
             width={100}
             tickFormatter={(value) => {
-              return `${formatNumber(scientificNotationToPrecision(value.toString()), token.decimals)}`;
+              return value > 0
+                ? `${formatNumber(scientificNotationToPrecision(value.toString()), token.decimals)}`
+                : "";
             }}
             className="text-xs font-medium text-gray-4f"
           />

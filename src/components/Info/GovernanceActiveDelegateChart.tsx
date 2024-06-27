@@ -75,7 +75,6 @@ const GovernanceActiveDelegateChart = ({
     return <div>Loading...</div>;
   }
 
-  const min = Math.min(...data.map((d) => parseInt(d.active)));
   const max = Math.max(...data.map((d) => parseInt(d.active)));
 
   return (
@@ -101,7 +100,7 @@ const GovernanceActiveDelegateChart = ({
             className="text-xs font-medium text-gray-4f"
           />
           <YAxis
-            domain={[min, max]}
+            domain={[0, max]}
             dataKey="active"
             axisLine={false}
             tickLine={false}

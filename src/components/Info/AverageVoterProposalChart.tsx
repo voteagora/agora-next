@@ -46,7 +46,6 @@ const AverageVoterProposalChart = ({
     return <div>Loading...</div>;
   }
 
-  const min = Math.min(...data.map((d) => parseInt(d.votes)));
   const max = Math.max(...data.map((d) => parseInt(d.votes)));
 
   return (
@@ -64,7 +63,7 @@ const AverageVoterProposalChart = ({
           />
           <Tooltip />
           <YAxis
-            domain={[min, max]}
+            domain={[0, max]}
             dataKey="votes"
             tickLine={false}
             axisLine={false}
@@ -72,7 +71,7 @@ const AverageVoterProposalChart = ({
             interval={0}
             width={100}
             tickMargin={0}
-            tickFormatter={(value) => `${value}`}
+            tickFormatter={(value) => (value > 0 ? `${value}` : "")}
             className="text-xs font-medium text-gray-4f"
           />
           <CartesianGrid vertical={false} stroke="#ccc" strokeDasharray="5 5" />
