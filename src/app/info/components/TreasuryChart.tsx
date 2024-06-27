@@ -13,6 +13,7 @@ import ChartFrequencyTabs from "./ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import type { MetricTimeSeriesValue } from "@/lib/types";
+import { humanizeNumber } from "@/lib/utils";
 
 interface TreasuryChartProps {
   getData: (frequency: string) => Promise<{ result: MetricTimeSeriesValue[] }>;
@@ -53,10 +54,11 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
     <div>
       <h3 className="text-2xl font-black text-black mt-10">Treasury value</h3>
       <div className="border border-gray-300 rounded-lg w-full mt-4">
-        <div className="border-b border-gray-300 p-6">
-          <p className="text-base font-semibold text-black">Total Value</p>
-          <p className="text-xs font-medium text-gray-4f">$70,800,012.23</p>
-        </div>
+        {/*TODO: Figure out an efficient way of loading the total value in USD before enabling this*/}
+        {/*<div className="border-b border-gray-300 p-6">*/}
+        {/*  <p className="text-base font-semibold text-black">Total Value</p>*/}
+        {/*  <p className="text-xs font-medium text-gray-4f">$70,800,012.23</p>*/}
+        {/*</div>*/}
         <div className="p-4 sm:p-8 pb-6 !w-full">
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart
@@ -91,10 +93,13 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
                 tickCount={7}
                 interval={0}
                 width={100}
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `$${humanizeNumber(value)}`}
                 className="text-xs font-medium text-gray-4f"
               />
-              <Tooltip />
+              <Tooltip
+                content={<CustomTooltip />}
+                // cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
+              />
               <Area
                 type="linear"
                 dataKey="balance_usd"
@@ -111,4 +116,21 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
       </div>
     </div>
   );
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
+        <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
+        <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
+          <p className="text-xs font-medium text-gray-4f ">
+            Value
+            <span className="font-bold pl-2">{`$${humanizeNumber(payload[0].value)}`}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
