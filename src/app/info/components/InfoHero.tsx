@@ -32,22 +32,22 @@ const heroCardsData = {
     {
       image: "/images/info/uniswap_1.png",
       linkText: "Community Discord",
-      link: "",
+      link: "https://discord.com/invite/FCfyBSbCU5",
     },
     {
       image: "/images/info/uniswap_2.png",
       linkText: "Governance Forums",
-      link: "",
+      link: "https://gov.uniswap.org/",
     },
     {
       image: "/images/info/uniswap_3.png",
       linkText: "Protocol Docs",
-      link: "",
+      link: "https://docs.uniswap.org",
     },
     {
       image: "/images/info/uniswap_4.png",
       linkText: "Uniswap Labs",
-      link: "",
+      link: "https://x.com/Uniswap",
     },
   ],
   scroll: [
@@ -131,7 +131,8 @@ const Card = ({
       <Image src={image} className="w-full" width={106} height={106} alt="" />
       <Link
         className=" flex gap-1 items-center text-[9px] font-medium leading-[12px] text-gray-4f mt-3 "
-        href="#"
+        target="_blank"
+        href={link}
       >
         {linkText} <Image src={icons.northEast} width={9} height={9} alt="" />
       </Link>

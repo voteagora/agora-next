@@ -20,8 +20,8 @@ interface AverageVoterProposalChartProps {
 }
 
 const AverageVoterProposalChart = ({
-                                     getData,
-                                   }: AverageVoterProposalChartProps) => {
+  getData,
+}: AverageVoterProposalChartProps) => {
   const { primary } = useTenantColorScheme();
 
   const shouldFetchData = useRef(true);

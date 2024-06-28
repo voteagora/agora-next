@@ -40,7 +40,7 @@ const about = {
     featureList: [
       {
         icon: icons.notificationMessage,
-        title: "About Optimism",
+        title: "About Uniswap",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus dignissim, porta tortor nec.",
       },
@@ -122,7 +122,6 @@ const InfoAboutSection = () => {
                       width={24}
                       height={24}
                       alt="notification"
-                      className="cursor-pointer"
                     />
                   </div>
                   <div>
