@@ -17,6 +17,7 @@ async function getProjectsApi({
         return prisma.project_applicants.findMany({
           where: {
             round: round,
+            status: "Passed",
           },
           skip,
           take,
