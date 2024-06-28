@@ -248,6 +248,8 @@ view project_applicants {
   grants_and_funding_venture_funding Json?   @db.Json
   grants_and_funding_grants          Json?   @db.Json
   grants_and_funding_revenue         Json?   @db.Json
+  status                             String?
+  reason                             String?
 
   @@schema("retro_funding")
 }
