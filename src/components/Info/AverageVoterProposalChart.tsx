@@ -12,7 +12,7 @@ import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 
 type ChartData = {
   proposalId: string;
-  votes: string;
+  voter_count: string;
 };
 
 interface AverageVoterProposalChartProps {
@@ -20,8 +20,8 @@ interface AverageVoterProposalChartProps {
 }
 
 const AverageVoterProposalChart = ({
-  getData,
-}: AverageVoterProposalChartProps) => {
+                                     getData,
+                                   }: AverageVoterProposalChartProps) => {
   const { primary } = useTenantColorScheme();
 
   const shouldFetchData = useRef(true);
@@ -46,7 +46,7 @@ const AverageVoterProposalChart = ({
     return <div>Loading...</div>;
   }
 
-  const max = Math.max(...data.map((d) => parseInt(d.votes)));
+  const max = Math.max(...data.map((d) => parseInt(d.voter_count)));
 
   return (
     <div>
@@ -64,7 +64,7 @@ const AverageVoterProposalChart = ({
           <Tooltip />
           <YAxis
             domain={[0, max]}
-            dataKey="votes"
+            dataKey="voter_count"
             tickLine={false}
             axisLine={false}
             tickCount={7}
