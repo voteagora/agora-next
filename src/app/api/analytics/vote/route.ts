@@ -6,14 +6,14 @@ import { cache } from "react";
 
 type ProposalCount = {
   proposalId: number;
-  votes: number;
+  voter_count: number;
 };
 
 async function getProposalVoteCounts() {
   const { namespace } = Tenant.current();
 
   const QRY = `SELECT proposal_id,
-                    SUM(vote_count) votes
+                    SUM(voter_count) voter_count
                 FROM   alltenant.dao_engagement_votes
                 WHERE  tenant = '${namespace}'
                     GROUP  BY 1
