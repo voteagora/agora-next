@@ -13,7 +13,7 @@ import ChartFrequencyTabs from "./ChartFrequencyTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import type { MetricTimeSeriesValue } from "@/lib/types";
-import { humanizeNumber } from "@/lib/utils";
+import { humanizeNumber, humanizeNumberContact } from "@/lib/utils";
 
 interface TreasuryChartProps {
   getData: (frequency: string) => Promise<{ result: MetricTimeSeriesValue[] }>;
@@ -98,17 +98,12 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
                 tickLine={false}
                 axisLine={false}
                 tickCount={7}
-                interval={0}
-                width={100}
-                tickFormatter={(value) =>
-                  value > Number(0) ? `$${humanizeNumber(value)}` : ""
-                }
+                width={60}
+                interval={"preserveStartEnd"}
+                tickFormatter={(value) => `$${humanizeNumberContact(value, 3)}`}
                 className="text-xs font-medium text-gray-4f"
               />
-              <Tooltip
-                content={<CustomTooltip />}
-                // cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Area
                 type="linear"
                 dataKey="balance_usd"
@@ -134,7 +129,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
         <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
           <p className="text-xs font-medium text-gray-4f ">
-            Value
+            Treasury value
             <span className="font-bold pl-2">{`$${humanizeNumber(payload[0].value)}`}</span>
           </p>
         </div>

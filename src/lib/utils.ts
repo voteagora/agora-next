@@ -134,6 +134,13 @@ export function humanizeNumber(
   return result.join(s);
 }
 
+export function humanizeNumberContact(n: number, digits: number): string {
+  return new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: digits,
+  }).format(n);
+}
+
 export function tokenToHumanNumber(amount: number, decimals: number) {
   return Math.floor(amount / Math.pow(10, decimals));
 }
