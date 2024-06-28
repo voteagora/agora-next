@@ -91,26 +91,24 @@ const GovernorDelegatesNeededChart = ({
 
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
-            dataKey="date"
-            textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
-            tickLine={{ stroke: "#E0E0E0" }}
             className="text-xs font-medium text-gray-4f"
+            dataKey="date"
+            minTickGap={30}
+            textAnchor="middle"
+            tickLine={{ stroke: "#E0E0E0" }}
           />
           <YAxis
-            domain={[0, max]}
-            dataKey="majority"
             axisLine={false}
-            tickLine={false}
-            tickCount={7}
-            width={100}
-            tickFormatter={(value) => (value > 0 ? value : "")}
             className="text-xs font-medium text-gray-4f"
+            dataKey="majority"
+            domain={[0, max]}
+            interval={"preserveStartEnd"}
+            tickFormatter={(value) => (value > 0 ? value : "")}
+            tickLine={false}
+            width={60}
           />
-          <Tooltip
-            // content={<CustomTooltip />}
-            cursor={{ stroke: primary, strokeWidth: 2, strokeDasharray: "7 7" }}
-          />
+          <Tooltip content={<CustomTooltip />} />
           <Area
             type="step"
             dataKey="majority"

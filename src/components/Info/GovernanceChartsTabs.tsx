@@ -65,7 +65,7 @@ const GovernanceChartsTabs = ({
   ];
 
   return (
-    <div className="my-10 ">
+    <div className="my-10">
       <h3 className="text-2xl font-black text-black">Governance</h3>
       <Tabs className="mt-4 border rounded-lg" defaultValue="top-delegates">
         <TabsList className="grid grid-cols-2 sm:grid-cols-5 !gap-0 w-full h-fit">

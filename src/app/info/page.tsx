@@ -77,6 +77,8 @@ export default async function Page() {
             return apiFetchMetricTS(metric, frequency);
           }}
         />
+
+        <div className="h-[250px]"></div>
       </div>
     );
   } else {

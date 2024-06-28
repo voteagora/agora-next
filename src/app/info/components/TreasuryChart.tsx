@@ -86,22 +86,24 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
 
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
+                axisLine={{ stroke: "#E0E0E0" }}
                 className="text-xs font-medium text-gray-4f"
                 dataKey="date"
+                minTickGap={30}
                 textAnchor="middle"
-                axisLine={{ stroke: "#E0E0E0" }}
                 tickLine={{ stroke: "#E0E0E0" }}
-                minTickGap={20}
               />
               <YAxis
-                domain={[0, max]}
-                tickLine={false}
                 axisLine={false}
-                tickCount={7}
-                width={60}
-                interval={"preserveStartEnd"}
-                tickFormatter={(value) => `$${humanizeNumberContact(value, 3)}`}
                 className="text-xs font-medium text-gray-4f"
+                dataKey="balance_usd"
+                domain={[0, max]}
+                interval={"preserveStartEnd"}
+                tickFormatter={(value) =>
+                  value > 0 ? `$${humanizeNumberContact(value, 3)}` : ""
+                }
+                tickLine={false}
+                width={60}
               />
               <Tooltip content={<CustomTooltip />} />
               <Area

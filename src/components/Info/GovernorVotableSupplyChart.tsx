@@ -76,26 +76,25 @@ const GovernorVotableSupplyChart = ({
 
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
-            dataKey="date"
-            textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
-            tickLine={{ stroke: "#E0E0E0" }}
             className="text-xs font-medium text-gray-4f"
-            minTickGap={12}
+            dataKey="date"
+            minTickGap={30}
+            textAnchor="middle"
+            tickLine={{ stroke: "#E0E0E0" }}
           />
           <YAxis
-            domain={[0, max]}
-            dataKey="value"
             axisLine={false}
-            tickLine={false}
-            tickCount={7}
-            width={100}
-            tickFormatter={(value) => {
-              return value > 0
-                ? `${formatNumber(scientificNotationToPrecision(value.toString()), token.decimals)}`
-                : "";
-            }}
             className="text-xs font-medium text-gray-4f"
+            dataKey="value"
+            domain={[0, max]}
+            tickFormatter={(value) =>
+              value > 0
+                ? `${formatNumber(scientificNotationToPrecision(value.toString()), token.decimals, 2)}`
+                : ""
+            }
+            tickLine={false}
+            width={60}
           />
 
           <Tooltip content={<CustomTooltip />} />
@@ -127,8 +126,6 @@ const GovernorVotableSupplyChart = ({
 export default GovernorVotableSupplyChart;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
-  const { primary } = useTenantColorScheme();
-
   if (active && payload && payload.length) {
     return (
       <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">

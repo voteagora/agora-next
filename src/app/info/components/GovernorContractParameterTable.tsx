@@ -30,7 +30,7 @@ const GovernorContractParameterTable = () => {
 
   const secondsToHuman = (seconds: number) => {
     const hrs = Math.round(Number(seconds) / SECONDS_IN_HOUR);
-    return hrs === 0 ? "No Delay" : pluralize("hour", hrs);
+    return hrs === 0 ? "Less than 1 hour" : pluralize("hour", hrs);
   };
 
   return (

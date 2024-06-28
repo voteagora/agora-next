@@ -92,22 +92,22 @@ const GovernanceActiveDelegateChart = ({
           </defs>
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
-            dataKey="date"
-            textAnchor="middle"
             axisLine={{ stroke: "#E0E0E0" }}
-            tickLine={{ stroke: "#E0E0E0" }}
-            minTickGap={20}
             className="text-xs font-medium text-gray-4f"
+            dataKey="date"
+            minTickGap={30}
+            textAnchor="middle"
+            tickLine={{ stroke: "#E0E0E0" }}
           />
           <YAxis
-            domain={[0, max]}
-            dataKey="active"
             axisLine={false}
-            tickLine={false}
-            tickFormatter={(value) => (value > 0 ? `${value.toFixed(2)}%` : "")}
-            tickCount={7}
-            width={40}
             className="text-xs font-medium text-gray-4f"
+            dataKey="active"
+            domain={[0, max]}
+            interval={"preserveStartEnd"}
+            tickFormatter={(value) => (value > 0 ? `${value.toFixed(2)}%` : "")}
+            tickLine={false}
+            width={40}
           />
           <Tooltip content={<CustomTooltip />} />
 
