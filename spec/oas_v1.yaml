@@ -786,34 +786,33 @@ components:
         Information about a project submitted for Retroactive Public Goods Funding on Agora.
       type: object
       properties:
-        avatarUrl:
-          type: string
-        coverImageUrl:
-          type: string
-        attestationUid:
-          type: string
-        approvalAttestationUid:
+        id:
           type: string
         name:
           type: string
+        category:
+          type: string
         description:
           type: string
-        externalLink:
+        profileAvatarUrl:
+          type: string
+        proejctCoverImageUrl:
           type: string
         socialLinks:
           $ref: "#/components/schemas/SocialLinks"
         team:
           type: array
           items:
-            $ref: "#/components/schemas/ProjectMember"
-        repositories:
-          summary: Repository URLs for the project
-          description: >
-            URLs for the project's repositories, such as GitHub, GitLab, NPM and other platforms.
+            type: string
+        github:
           type: array
           items:
             type: string
-        deployedContracts:
+        packages:
+          type: array
+          items:
+            type: string
+        contracts:
           summary: Deployed contracts for the project
           description: >
             Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
@@ -823,41 +822,60 @@ components:
               - $ref: "#/components/schemas/Contract"
               - type: object
                 properties:
-                  verificationProof:
-                    summary: Proof of contract verification
-                    description: Verification of ownership of contract on chain.
+                  address:
+                    summary: Address of the deployed contract
+                    description: The address of the deployed contract.
                     type: string
-                  openSourceObserverSlug:
-                    summary: Open source observer verification slug
-                    description: >
-                      Slug for the open source observer external verification.
+                  deploymentTxHash:
+                    summary: Transaction hash of the deployment
+                    description: The transaction hash of the deployment transaction.
                     type: string
-        categories:
-          type: array
-          items:
-            $ref: "#/components/schemas/RetroFundingCategory"
-        funding:
+                  deployerAddress:
+                    summary: Address of the deployer
+                    description: The address of the entity which deployed the contract.
+                    type: string
+                  chainId:
+                    summary: Chain ID of the contract
+                    description: The chain ID on which the contract was deployed.
+                    type: string
+        grantsAndFunding:
           type: object
           properties:
-            ventureCapital:
+            ventureFunding:
               type: array
               items:
-                $ref: "#/components/schemas/FundingInfo"
+                type: object
+                properties:
+                  amount:
+                    type: string
+                  year:
+                    type: string
+                  details:
+                    type: string
             grants:
               type: array
               items:
-                $ref: "#/components/schemas/FundingInfo"
-            optimismGrants:
+                type: object
+                properties:
+                  grant:
+                    type: string
+                  link:
+                    type: string
+                  amount:
+                    type: string
+                  date:
+                    type: string
+                  details:
+                    type: string
+            revenue:
               type: array
               items:
-                allOf:
-                  - $ref: "#/components/schemas/FundingInfo"
-                  - type: object
-                    properties:
-                      link:
-                        type: string
-                      type:
-                        $ref: "#/components/schemas/OptimismGrantType"
+                type: object
+                properties:
+                  amount:
+                    type: string
+                  details:
+                    type: string
     SocialLinks:
       summary: Social media links for a project
       description: >
@@ -871,31 +889,6 @@ components:
         mirror:
           type: string
         website:
-          type: string
-    OptimismGrantType:
-      summary: Type of Optimism grant
-      description: Enum description of the type of Optimism grant.
-      type: string
-      enum:
-        - DEVELOPMENT
-        - RESEARCH
-        - COMMUNITY
-        - ECOSYSTEM
-        - OTHER
-    FundingInfo:
-      summary: Information about funding for a project
-      description: >
-        Information about funding for a project, including the amount and source.
-      type: object
-      properties:
-        amount:
-          type: string
-        source:
-          type: string
-        date:
-          type: string
-          format: date-time
-        details:
           type: string
     RetroFundingBallotMetricsAllocation:
       summary: A vote for an RetroFunding ballot
