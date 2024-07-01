@@ -31,6 +31,17 @@ export type DelegatesGetPayload = {
   advanced_vp: Decimal;
   voting_power: Decimal;
   citizen: boolean;
+  statement: DelegateStatement;
+};
+
+type DelegateStatement = {
+  signature: string;
+  payload: { delegateStatement: string };
+  twitter: string | null;
+  discord: string | null;
+  warpcast: string | null;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type DelegateStats = {

@@ -153,7 +153,22 @@ async function getDelegates({
                   WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
                 ) THEN TRUE 
                 ELSE FALSE 
-              END AS citizen
+              END AS citizen,
+              (SELECT row_to_json(sub)
+                FROM ( 
+                  SELECT 
+                    signature, 
+                    payload,
+                    twitter,
+                    discord,
+                    created_at,
+                    updated_at,
+                    warpcast
+                  FROM agora.delegate_statements s 
+                  WHERE s.address = d.delegate 
+                  LIMIT 1
+                ) sub
+              ) AS statement
             FROM ${namespace + ".delegates"} d
             WHERE num_of_delegators IS NOT NULL AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             ORDER BY num_of_delegators DESC
@@ -178,7 +193,22 @@ async function getDelegates({
                   WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
                 ) THEN TRUE 
                 ELSE FALSE 
-              END AS citizen
+              END AS citizen,
+              (SELECT row_to_json(sub)
+                FROM ( 
+                  SELECT 
+                    signature, 
+                    payload,
+                    twitter,
+                    discord,
+                    created_at,
+                    updated_at,
+                    warpcast
+                  FROM agora.delegate_statements s 
+                  WHERE s.address = d.delegate 
+                  LIMIT 1
+                ) sub
+              ) AS statement
             FROM ${namespace + ".delegates"} d
             WHERE voting_power > 0 AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
             ORDER BY -log(random()) / voting_power
@@ -203,7 +233,22 @@ async function getDelegates({
                   WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
                 ) THEN TRUE 
                 ELSE FALSE 
-              END AS citizen
+              END AS citizen,
+              (SELECT row_to_json(sub)
+                FROM ( 
+                  SELECT 
+                    signature, 
+                    payload,
+                    twitter,
+                    discord,
+                    created_at,
+                    updated_at,
+                    warpcast
+                  FROM agora.delegate_statements s 
+                  WHERE s.address = d.delegate 
+                  LIMIT 1
+                ) sub
+              ) AS statement
             FROM ${namespace + ".delegates"} d
             WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             ORDER BY voting_power DESC
@@ -223,13 +268,6 @@ async function getDelegates({
     page,
     pageSize
   );
-  const _delegates = await Promise.all(
-    delegates.map(async (delegate) => {
-      return {
-        statement: await fetchDelegateStatement(delegate.delegate),
-      };
-    })
-  );
 
   // Voting power detail added for use with API, so as to not break existing
   // components
@@ -239,7 +277,7 @@ async function getDelegates({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
       citizen: delegate.citizen,
-      statement: _delegates[index].statement,
+      statement: delegate.statement,
     })),
     seed,
   };
