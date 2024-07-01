@@ -20,11 +20,13 @@ if (isProd) {
   provider = MulticallWrapper.wrap(
     getDefaultProvider("optimism", {
       alchemy: alchemyId,
+      exclusive: "alchemy",
     })
   );
   ethProvider = MulticallWrapper.wrap(
     getDefaultProvider("mainnet", {
       alchemy: alchemyId,
+      exclusive: "alchemy",
     })
   );
 } else {
@@ -32,6 +34,7 @@ if (isProd) {
     global.provider = MulticallWrapper.wrap(
       getDefaultProvider("optimism", {
         alchemy: alchemyId,
+        exclusive: "alchemy",
       })
     );
   }
@@ -41,6 +44,7 @@ if (isProd) {
     global.ethProvider = MulticallWrapper.wrap(
       getDefaultProvider("mainnet", {
         alchemy: alchemyId,
+        exclusive: "alchemy",
       })
     );
   }
