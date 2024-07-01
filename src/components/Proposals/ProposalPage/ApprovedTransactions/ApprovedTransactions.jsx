@@ -45,7 +45,6 @@ export default function ApprovedTransactions({
         )}
       </div>
       {!isNoProposedTransactions && (
-
         <div className="flex flex-col px-4">
           {proposalData.options
             .slice(0, displayedOptions)
