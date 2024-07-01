@@ -15,7 +15,7 @@ export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
     : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67";
 
   const GOVERNOR = isProd
-    ? "0x0"
+    ? "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
     : "0x630a6a268191c654ce084aad2d7910ff651e0797";
 
   const provider = isProd ? ethProvider : sepoliaProvider;
