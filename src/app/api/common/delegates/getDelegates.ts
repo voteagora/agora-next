@@ -165,7 +165,7 @@ async function getDelegates({
                     updated_at,
                     warpcast
                   FROM agora.delegate_statements s 
-                  WHERE s.address = d.delegate 
+                  WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
                   LIMIT 1
                 ) sub
               ) AS statement
@@ -205,7 +205,7 @@ async function getDelegates({
                     updated_at,
                     warpcast
                   FROM agora.delegate_statements s 
-                  WHERE s.address = d.delegate 
+                  WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
                   LIMIT 1
                 ) sub
               ) AS statement
@@ -245,7 +245,7 @@ async function getDelegates({
                     updated_at,
                     warpcast
                   FROM agora.delegate_statements s 
-                  WHERE s.address = d.delegate 
+                  WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
                   LIMIT 1
                 ) sub
               ) AS statement
@@ -284,7 +284,7 @@ async function getDelegates({
 }
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, slug } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
@@ -302,7 +302,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       voting_power,
       advanced_vp,
       num_of_delegators,
-      proposals_proposed
+      proposals_proposed,
+      citizen.citizen,
+      statement.statement
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
@@ -310,7 +312,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     LEFT JOIN 
       ${
         namespace + ".advanced_voting_power"
-      } av ON av.delegate = $1 AND contract = $2
+      } av ON av.delegate = $1 AND av.contract = $2
     LEFT JOIN 
         (SELECT num_of_delegators FROM ${
           namespace + ".delegates"
@@ -319,19 +321,40 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         (SELECT * FROM ${
           namespace + ".voting_power"
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
+    LEFT JOIN
+        (SELECT
+          CASE 
+          WHEN EXISTS (SELECT 1 FROM agora.citizens ac WHERE LOWER(ac.address) = LOWER($1) AND ac.dao_slug = $3::config.dao_slug) THEN TRUE 
+          ELSE FALSE 
+          END as citizen
+        ) citizen ON TRUE
+    LEFT JOIN
+        (SELECT row_to_json(sub) as statement
+        FROM ( 
+          SELECT 
+            signature, 
+            payload,
+            twitter,
+            discord,
+            created_at,
+            updated_at,
+            warpcast
+          FROM agora.delegate_statements s 
+          WHERE LOWER(s.address) = LOWER($1) AND s.dao_slug = $3::config.dao_slug
+          LIMIT 1
+        ) sub
+      ) AS statement ON TRUE;
     `,
     address,
-    contracts.alligator?.address
+    contracts.alligator?.address || "",
+    slug
   );
 
-  const [delegate, votableSupply, delegateStatement, quorum, _isCitizen] =
-    await Promise.all([
-      delegateQuery.then((result) => result?.[0] || undefined),
-      fetchVotableSupply(),
-      fetchDelegateStatement(addressOrENSName),
-      fetchCurrentQuorum(),
-      fetchIsCitizen(address),
-    ]);
+  const [delegate, votableSupply, quorum] = await Promise.all([
+    delegateQuery.then((result) => result?.[0] || undefined),
+    fetchVotableSupply(),
+    fetchCurrentQuorum(),
+  ]);
 
   const numOfDelegatesQuery = prisma.$queryRawUnsafe<
     { num_of_delegators: BigInt }[]
@@ -365,7 +388,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   // Build out delegate JSON response
   return {
     address: address,
-    citizen: _isCitizen,
+    citizen: delegate?.citizen || false,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply || 0)
@@ -389,7 +412,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
               "0"
           )
         : cachedNumOfDelegators,
-    statement: delegateStatement,
+    statement: delegate?.statement || null,
   };
 }
 
