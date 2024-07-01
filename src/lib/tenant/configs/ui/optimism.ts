@@ -101,7 +101,8 @@ export const optimismTenantUIConfig = new TenantUI({
     {
       route: "info",
       title: "Welcome to the Optimism Collective",
-      description: "A collective of companies, communities, and citizens working together.",
+      description:
+        "A collective of companies, communities, and citizens working together.",
       meta: {
         title: "Info of Agora",
         description: "Welcome to the Optimism Collective",

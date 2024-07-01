@@ -3,7 +3,6 @@ import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 
-
 import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
 import uniswapInfoAbout from "@/assets/tenant/uniswap_info_about.png";
 
@@ -92,8 +91,7 @@ const InfoAboutSection = () => {
                   key={index}
                   className="flex flex-row gap-3 justify-center items-center mt-3"
                 >
-                  <div
-                    className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border bg-gray-eb">
+                  <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border bg-gray-eb">
                     <Image
                       src={item.icon}
                       width={24}
@@ -108,7 +106,7 @@ const InfoAboutSection = () => {
                     <p className="text-sm font-normal">{item.description}</p>
                   </div>
                 </div>
-              ),
+              )
             )}
           </div>
         </div>

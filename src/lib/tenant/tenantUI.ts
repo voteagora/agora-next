@@ -70,17 +70,17 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   constructor({
-                assets,
-                color,
-                delegates,
-                hero,
-                links,
-                logo,
-                organization,
-                pages,
-                title,
-                toggles,
-              }: TenantUIParams) {
+    assets,
+    color,
+    delegates,
+    hero,
+    links,
+    logo,
+    organization,
+    pages,
+    title,
+    toggles,
+  }: TenantUIParams) {
     this._assets = assets;
     this._color = color;
     this._delegates = delegates;

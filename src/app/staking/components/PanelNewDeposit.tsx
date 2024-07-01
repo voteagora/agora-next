@@ -15,14 +15,8 @@ export const PanelNewDeposit = () => {
   const router = useRouter();
 
   return (
-    <div
-      className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
-      <Image
-        src={depositImage}
-        alt="results 2"
-        height="164"
-        width="320"
-      />
+    <div className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
+      <Image src={depositImage} alt="results 2" height="164" width="320" />
       <div className="text-md">
         {`Stake your ${token.symbol} to start earning rewards from ${namespace} liquidity pools.`}
       </div>

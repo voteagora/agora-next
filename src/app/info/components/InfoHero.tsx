@@ -5,7 +5,6 @@ import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 
 const InfoHero = () => {
-
   const { ui } = Tenant.current();
   const { title, description, links } = ui.page("info");
 
@@ -22,25 +21,26 @@ const InfoHero = () => {
         </p>
       </div>
       <div className="flex flex-row">
-        {links.map((link, idx) => <Card
+        {links.map((link, idx) => (
+          <Card
             className={rotationClasses[idx % rotationClasses.length]}
             image={link.image}
             key={`card-${idx}`}
             link={link.url}
             linkText={link.title}
-          />,
-        )}
+          />
+        ))}
       </div>
     </div>
   );
 };
 
 const Card = ({
-                className,
-                link,
-                linkText,
-                image,
-              }: {
+  className,
+  link,
+  linkText,
+  image,
+}: {
   className?: string;
   link: string;
   linkText: string;

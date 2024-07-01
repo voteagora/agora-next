@@ -14,15 +14,9 @@ export const PanelClaimRewards = () => {
   const hasRewards = false;
 
   return (
-    <div
-      className="flex flex-col rounded-xl border border-gray-300 max-w-[354px] w-full h-100 bg-gray-50 shadow-newDefault">
+    <div className="flex flex-col rounded-xl border border-gray-300 max-w-[354px] w-full h-100 bg-gray-50 shadow-newDefault">
       <div className="flex flex-col py-5 px-[17px] rounded-xl bg-white border-b border-b-gray-300 shadow-newDefault">
-        <Image
-          src={rewardsImage}
-          alt="results 2"
-          height="164"
-          width="320"
-        />
+        <Image src={rewardsImage} alt="results 2" height="164" width="320" />
         <div className="flex flex-row gap-4 my-4">
           <div className="min-w-[48px] h-12 p-3 rounded-lg  border border-gray-300 shadow-newDefault ">
             <Image height={24} width={24} src={icons.currency} alt="" />

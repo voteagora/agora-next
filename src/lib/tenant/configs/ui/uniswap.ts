@@ -59,7 +59,8 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       route: "info",
       title: "Uniswap Protocol Governance",
-      description: "Uniswap is a public good owned and governed by UNI token holders.",
+      description:
+        "Uniswap is a public good owned and governed by UNI token holders.",
       meta: {
         title: "Info of Agora",
         description: "Welcome to the Optimism Collective",
