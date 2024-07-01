@@ -78,7 +78,7 @@ export default async function Page() {
           }}
         />
 
-        <div className="h-[250px]"></div>
+        <div className="h-[350px]"></div>
       </div>
     );
   } else {
