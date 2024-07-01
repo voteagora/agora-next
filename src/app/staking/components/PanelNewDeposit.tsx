@@ -7,15 +7,18 @@ import Tenant from "@/lib/tenant/tenant";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 
+import depositImage from "@/assets/tenant/uniswap_staking_deposit.svg";
+
 export const PanelNewDeposit = () => {
   const { isConnected } = useAccount();
   const { token, namespace } = Tenant.current();
   const router = useRouter();
 
   return (
-    <div className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
+    <div
+      className="flex flex-col gap-3 max-w-[354px] w-full py-5 px-[17px] rounded-xl border border-gray-300 shadow-newDefault">
       <Image
-        src="/images/uni_deposit.svg"
+        src={depositImage}
         alt="results 2"
         height="164"
         width="320"
