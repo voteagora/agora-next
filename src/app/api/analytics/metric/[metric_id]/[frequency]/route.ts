@@ -2,7 +2,7 @@ import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { frequencyToDateAndSQLcrit } from "@/app/api/common/utils/frequencyHandling";
+import { frequencyToLookbackDayCount } from "@/app/api/common/utils/frequencyHandling";
 import { cache } from "react";
 
 type MetricValue = {
@@ -19,7 +19,7 @@ async function getMetricTS(
   const { namespace } = Tenant.current();
 
   if (frequency == "latest") {
-    const { result } = await getMetricTS(metricId, "24h");
+    const { result } = await getMetricTS(metricId, "3d");
     const lastObject = result[result.length - 1];
     return { result: [lastObject] };
   }
@@ -51,10 +51,7 @@ async function getMetricTS(
   let QRY: string;
 
   if (isChainMetric) {
-    const { lookback, skipCrit } = frequencyToDateAndSQLcrit(
-      frequency,
-      "block_date"
-    );
+    const { lookback } = frequencyToLookbackDayCount(frequency);
 
     QRY = `SELECT block_date AS day,
                         TO_CHAR(block_date, 'YYYY-MM-DD') date,
@@ -63,16 +60,15 @@ async function getMetricTS(
                   FROM   alltenant.dao_engagement_metrics
                   WHERE  metric = '${metricId}'
                      AND tenant = '${namespace}' 
-                     AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
-                     AND ${skipCrit}`;
+                     AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')`;
   } else if (isGoogleAnalyticMetric) {
-    const { lookback } = frequencyToDateAndSQLcrit(frequency, "date");
+    const { lookback } = frequencyToLookbackDayCount(frequency);
 
     QRY = `SELECT date AS day,
                         TO_CHAR(date, 'YYYY-MM-DD') date,
                         extract(epoch from date) as ts,
                          value
-                  FROM   google.analytics_${frequency}
+                  FROM   google.analytics_24h
                   WHERE  metric_id = '${metricId}'
                      AND tenant = '${namespace}' 
                      AND date >= (CURRENT_DATE - INTERVAL '${lookback} day')`;

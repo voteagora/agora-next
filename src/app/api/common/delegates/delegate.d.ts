@@ -1,5 +1,6 @@
 import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime";
 
 export type Delegate = {
   address: string;
@@ -23,7 +24,25 @@ export type DelegatePayload = Delegate & {
   voting_power: number;
 };
 
-export type DelegatesGetPayload = Prisma.OptimismDelegatesGetPayload<true>;
+export type DelegatesGetPayload = {
+  delegate: string;
+  num_of_delegators: number;
+  direct_vp: Decimal;
+  advanced_vp: Decimal;
+  voting_power: Decimal;
+  citizen: boolean;
+  statement: DelegateStatement;
+};
+
+type DelegateStatement = {
+  signature: string;
+  payload: { delegateStatement: string };
+  twitter: string | null;
+  discord: string | null;
+  warpcast: string | null;
+  created_at: Date;
+  updated_at: Date;
+};
 
 export type DelegateStats = {
   voter: OptimismVoterStats["voter"];
@@ -37,4 +56,6 @@ export type DelegateStats = {
   advanced_vp: OptimismAdvancedVotingPower["advanced_vp"];
   num_of_delegators: OptimismDelegates["num_of_delegators"];
   proposals_proposed: OptimismDelegates["proposals_proposed"];
+  statement: DelegateStatement;
+  citizen: boolean;
 };

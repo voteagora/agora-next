@@ -80,6 +80,12 @@ export async function PUT(
     });
   }
 
+  if (!authResponse.scope?.includes("badgeholder")) {
+    return new Response("Only badgeholder can vote on a comment", {
+      status: 401,
+    });
+  }
+
   return await traceWithUserId(authResponse.userId, async () => {
     const { roundId, impactMetricId } = route.params;
 
