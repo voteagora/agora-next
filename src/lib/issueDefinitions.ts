@@ -22,4 +22,14 @@ export const issueDefinitions: IssueTypeDefinition[] = [
     key: "publicGoods",
     icon: "ballot",
   },
+  {
+    title: "Fee switch",
+    key: "feeSwitch",
+    icon: "piggyBank",
+  },
+  {
+    title: "Meta governance",
+    key: "metaGovernance",
+    icon: "ballot",
+  },
 ];

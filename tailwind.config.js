@@ -85,6 +85,11 @@ module.exports = {
         extrabold: "800",
         black: "900",
       },
+      rotate: {
+        2: "2deg",
+        4: "4deg",
+        5: "5deg",
+      },
       fontFamily: {
         sans: [
           "system-ui",
