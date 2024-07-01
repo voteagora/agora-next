@@ -4,23 +4,15 @@ import {
   type PaginatedResultEx,
   type PaginationParamsEx,
 } from "@/app/lib/pagination";
-import {
-  OptimismAdvancedVotingPower,
-  OptimismDelegates,
-  OptimismVoterStats,
-  OptimismVotingPower,
-} from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
   type Delegate,
-  type DelegatePayload,
   type DelegatesGetPayload,
   type DelegateStats,
 } from "./delegate";
-import { fetchIsCitizen } from "../citizens/isCitizen";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
