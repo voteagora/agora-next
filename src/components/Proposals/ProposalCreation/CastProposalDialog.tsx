@@ -3,6 +3,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   isError: boolean;
@@ -13,12 +14,12 @@ type Props = {
 };
 
 export function CastProposalDialog({
-  isError,
-  isLoading,
-  isSuccess,
-  txHash,
-  closeDialog,
-}: Props) {
+                                     isError,
+                                     isLoading,
+                                     isSuccess,
+                                     txHash,
+                                     closeDialog,
+                                   }: Props) {
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-white rounded-xl">
@@ -54,16 +55,18 @@ function Message({ text, image }: { text: string; image?: JSX.Element }) {
 }
 
 export function SuccessMessage({
-  closeDialog,
-  txHash,
-}: {
+                                 closeDialog,
+                                 txHash,
+                               }: {
   closeDialog: () => void;
   txHash: string;
 }) {
+  const { ui } = Tenant.current();
   return (
+
     <VStack className={styles.full_width}>
       <img
-        src={`/images/congrats.svg`}
+        src={ui.assets.success}
         className="w-full mb-3"
         alt="Proposal successfully created!"
       />
@@ -84,10 +87,13 @@ export function SuccessMessage({
 }
 
 export function Loading() {
+
+  const { ui } = Tenant.current();
+
   return (
     <VStack className={styles.full_width}>
       <img
-        src={`/images/action-pending.svg`}
+        src={ui.assets.pending}
         className="w-full mb-3"
         alt="Pending"
       />

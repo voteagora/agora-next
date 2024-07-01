@@ -2,15 +2,16 @@ import React from "react";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
-import optimismSectionImg from "@/assets/optimism/info_about.png";
-import uniswapSectionImg from "@/assets/uniswap/info_about.png";
-import scrollSectionImg from "@/assets/scroll/info_about.png";
+
+
+import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
+import uniswapInfoAbout from "@/assets/tenant/uniswap_info_about.png";
 
 const about = {
   optimism: {
     description:
       "Both Houses make decisions through governance proposals. Proposals are accepted or rejected using a voting process. Anyone can submit a proposal to governance. The proposal must be one of the valid proposal types listed below, and it must follow the voting process described here.",
-    sectionImage: optimismSectionImg,
+    sectionImage: optimismInfoAbout,
     featureList: [
       {
         icon: icons.notificationMessage,
@@ -35,7 +36,7 @@ const about = {
   uniswap: {
     description:
       "The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
-    sectionImage: uniswapSectionImg,
+    sectionImage: uniswapInfoAbout,
 
     featureList: [
       {
@@ -62,6 +63,7 @@ const about = {
 
 const InfoAboutSection = () => {
   const { namespace, ui } = Tenant.current();
+
   return (
     <>
       <h3 className="text-2xl font-black text-black mt-10">Getting started</h3>
@@ -90,7 +92,8 @@ const InfoAboutSection = () => {
                   key={index}
                   className="flex flex-row gap-3 justify-center items-center mt-3"
                 >
-                  <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border bg-gray-eb">
+                  <div
+                    className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border bg-gray-eb">
                     <Image
                       src={item.icon}
                       width={24}
@@ -105,7 +108,7 @@ const InfoAboutSection = () => {
                     <p className="text-sm font-normal">{item.description}</p>
                   </div>
                 </div>
-              )
+              ),
             )}
           </div>
         </div>

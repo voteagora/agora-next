@@ -4,6 +4,10 @@ import optimismHero from "@/assets/tenant/optimism_hero.svg";
 import successImage from "@/assets/tenant/optimism_success.svg";
 import pendingImage from "@/assets/tenant/optimism_pending.svg";
 import delegateImage from "@/assets/tenant/optimism_delegate.svg";
+import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
+import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
+import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
+import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
@@ -97,12 +101,37 @@ export const optimismTenantUIConfig = new TenantUI({
     {
       route: "info",
       title: "Welcome to the Optimism Collective",
-      description:
-        "A collective of companies, communities, and citizens working together.",
+      description: "A collective of companies, communities, and citizens working together.",
       meta: {
         title: "Info of Agora",
         description: "Welcome to the Optimism Collective",
       },
+      links: [
+        {
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "",
+          image: infoPageCard01,
+        },
+        {
+          name: "Governance Forums",
+          title: "Governance Forums",
+          url: "",
+          image: infoPageCard02,
+        },
+        {
+          name: "Protocol Docs",
+          title: "Protocol Docs",
+          url: "",
+          image: infoPageCard03,
+        },
+        {
+          name: "Optimistic Vision",
+          title: "Optimistic Vision",
+          url: "",
+          image: infoPageCard04,
+        },
+      ],
     },
   ],
 

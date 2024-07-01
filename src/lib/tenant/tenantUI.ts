@@ -1,3 +1,5 @@
+import { StaticImageData } from "next/image";
+
 type UIToggle = {
   name: string;
   enabled: boolean;
@@ -7,6 +9,7 @@ type UILink = {
   name: string;
   title: string;
   url: string;
+  image?: string | StaticImageData;
 };
 
 type UIPage = {
@@ -14,6 +17,7 @@ type UIPage = {
   route: string;
   title: string;
   href?: string;
+  links?: UILink[];
   meta: {
     title: string;
     description: string;
@@ -66,17 +70,17 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   constructor({
-    assets,
-    color,
-    delegates,
-    hero,
-    links,
-    logo,
-    organization,
-    pages,
-    title,
-    toggles,
-  }: TenantUIParams) {
+                assets,
+                color,
+                delegates,
+                hero,
+                links,
+                logo,
+                organization,
+                pages,
+                title,
+                toggles,
+              }: TenantUIParams) {
     this._assets = assets;
     this._color = color;
     this._delegates = delegates;
