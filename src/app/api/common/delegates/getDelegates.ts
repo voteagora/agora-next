@@ -135,10 +135,9 @@ async function getDelegates({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace, ui } = Tenant.current();
+  const { namespace, ui, slug } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
-  const hasAllowList = allowList.length > 0;
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
@@ -146,14 +145,23 @@ async function getDelegates({
       case "most_delegators":
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
-            SELECT *
-            FROM ${namespace + ".delegates"}
+            SELECT *,
+              CASE 
+                WHEN EXISTS (
+                  SELECT 1
+                  FROM agora.citizens
+                  WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
+                ) THEN TRUE 
+                ELSE FALSE 
+              END AS citizen
+            FROM ${namespace + ".delegates"} d
             WHERE num_of_delegators IS NOT NULL AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             ORDER BY num_of_delegators DESC
-            OFFSET $2
-            LIMIT $3;
+            OFFSET $3
+            LIMIT $4;
             `,
           allowList,
+          slug,
           skip,
           take
         );
@@ -162,15 +170,24 @@ async function getDelegates({
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
-            SELECT *
-            FROM ${namespace + ".delegates"}
+            SELECT *,
+              CASE 
+                WHEN EXISTS (
+                  SELECT 1
+                  FROM agora.citizens
+                  WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
+                ) THEN TRUE 
+                ELSE FALSE 
+              END AS citizen
+            FROM ${namespace + ".delegates"} d
             WHERE voting_power > 0 AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
             ORDER BY -log(random()) / voting_power
-            OFFSET $3
-            LIMIT $4;
+            OFFSET $4
+            LIMIT $5;
             `,
           seed,
           allowList,
+          slug,
           skip,
           take
         );
@@ -178,14 +195,23 @@ async function getDelegates({
       default:
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
-            SELECT *
-            FROM ${namespace + ".delegates"}
+            SELECT *,
+              CASE 
+                WHEN EXISTS (
+                  SELECT 1
+                  FROM agora.citizens
+                  WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
+                ) THEN TRUE 
+                ELSE FALSE 
+              END AS citizen
+            FROM ${namespace + ".delegates"} d
             WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             ORDER BY voting_power DESC
-            OFFSET $2
-            LIMIT $3;
+            OFFSET $3
+            LIMIT $4;
             `,
           allowList,
+          slug,
           skip,
           take
         );
@@ -200,7 +226,6 @@ async function getDelegates({
   const _delegates = await Promise.all(
     delegates.map(async (delegate) => {
       return {
-        citizen: await fetchIsCitizen(delegate.delegate),
         statement: await fetchDelegateStatement(delegate.delegate),
       };
     })
@@ -213,7 +238,7 @@ async function getDelegates({
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
-      citizen: _delegates[index].citizen,
+      citizen: delegate.citizen,
       statement: _delegates[index].statement,
     })),
     seed,
