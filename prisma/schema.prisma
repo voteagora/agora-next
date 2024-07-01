@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap", "test2", "retro_funding"]
 }
 
 model DelegateStatements {
@@ -975,6 +975,82 @@ view uniswapStakedDeposits {
   @@schema("uniswap")
 }
 
+model Daos {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  dao_slug          DaoSlug             @unique
+  Proposals         ProposalDraft[]
+  @@map("daos")
+  @@schema("test2")
+}
+
+model ProposalDraft {
+  id                          Int                        @id @default(autoincrement())
+  temp_check_link             String
+  proposal_type               String?
+  proposal_social_type        String?
+  title                       String
+  abstract                    String
+  audit_url                   String?
+  dao_slug                    DaoSlug
+  author_address              String
+  sponsor_address             String?
+  created_at                  DateTime                   @default(now())
+  updated_at                  DateTime                   @updatedAt
+  onchain_transaction_hash    String?
+  snapshot_link               String?
+  start_date_social           DateTime?
+  end_date_social             DateTime?
+  stage                       ProposalStage
+  transactions                ProposalDraftTransaction[]
+  social_options              ProposalSocialOption[]
+  dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
+  checklist_items             ProposalChecklist[]
+  @@map("proposals")
+  @@schema("test2")
+}
+
+model ProposalDraftTransaction {
+  id               Int           @id @default(autoincrement())
+  proposal_id      Int
+  order            Int
+  target           String        @db.VarChar(255)
+  value            String        @db.VarChar(255)
+  calldata         String
+  description      String
+  simulation_state String        @default("UNCONFIRMED") // UNCONFIRMED, VALID, INVALID
+  simulation_id    String?
+  created_at       DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@map("proposal_transactions")
+  @@schema("test2")
+}
+
+model ProposalSocialOption {
+  id          Int      @id @default(autoincrement())
+  proposal_id Int
+  text        String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  @@map("proposal_options")
+  @@schema("test2")
+}
+
+model ProposalChecklist {
+  id           Int           @id @default(autoincrement())
+  title        String
+  completed_at DateTime      @default(now())
+  completed_by String
+  link         String?
+  proposal_id  Int
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  @@map("proposal_checklist_items")
+  @@schema("test2")
+}
+
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_voting_power_raw_snaps {
   chain_str           String?
@@ -1544,4 +1620,23 @@ enum ProposalType {
 
   @@map("proposal_type")
   @@schema("config")
+}
+
+
+enum ProposalStage {
+  ADDING_TEMP_CHECK
+  DRAFTING
+  ADDING_GITHUB_PR
+  AWAITING_SUBMISSION
+  PENDING
+  ACTIVE
+  EXECUTED
+  QUEUED
+  CANCELED
+  DEFEATED
+  EXPIRED
+  SUCCEEDED
+
+  @@map("proposal_stage")
+  @@schema("test2")
 }

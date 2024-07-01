@@ -1,5 +1,4 @@
 import { TenantNamespace } from "@/lib/types";
-
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { uniswapTenantUIConfig } from "@/lib/tenant/configs/ui/uniswap";
 import { etherfiTenantUIConfig } from "@/lib/tenant/configs/ui/etherfi";

@@ -1,3 +1,5 @@
+"use client";
+
 import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
