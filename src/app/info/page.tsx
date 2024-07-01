@@ -1,12 +1,11 @@
 import React from "react";
-import InfoHero from "@/app/info/components/InfoHero";
 import InfoAboutSection from "@/components/Info/InfoAboutSection";
+import { Hero } from "@/app/info/components/Hero";
 import { TreasuryChart } from "@/app/info/components/TreasuryChart";
 import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
 import GovernanceChartsTabs from "@/components/Info/GovernanceChartsTabs";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import Hero from "@/components/Hero/Hero";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
 import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTopDelegateWeighs";
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
@@ -53,7 +52,7 @@ export default async function Page() {
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     return (
       <div className="flex flex-col font-inter">
-        <InfoHero />
+        <Hero />
         <InfoAboutSection />
         <GovernorSettingAccordion />
         <TreasuryChart

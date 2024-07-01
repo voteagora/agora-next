@@ -5,7 +5,7 @@ type UIToggle = {
   enabled: boolean;
 };
 
-type UILink = {
+export type UILink = {
   name: string;
   title: string;
   url: string;

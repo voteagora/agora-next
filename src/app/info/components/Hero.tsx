@@ -1,10 +1,11 @@
 import React from "react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
+import { type UILink } from "@/lib/tenant/tenantUI";
 
-const InfoHero = () => {
+export const Hero = () => {
   const { ui } = Tenant.current();
   const { title, description, links } = ui.page("info");
 
@@ -21,10 +22,10 @@ const InfoHero = () => {
         </p>
       </div>
       <div className="flex flex-row">
-        {links.map((link, idx) => (
+        {(links as UILink[]).map((link, idx) => (
           <Card
             className={rotationClasses[idx % rotationClasses.length]}
-            image={link.image}
+            image={link.image || ""}
             key={`card-${idx}`}
             link={link.url}
             linkText={link.title}
@@ -44,7 +45,7 @@ const Card = ({
   className?: string;
   link: string;
   linkText: string;
-  image: string;
+  image: StaticImageData | string;
 }) => {
   return (
     <div
@@ -61,5 +62,3 @@ const Card = ({
     </div>
   );
 };
-
-export default InfoHero;
