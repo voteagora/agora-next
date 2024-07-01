@@ -5,8 +5,8 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { ethProvider } from "@/app/lib/provider";
-import { mainnet } from "viem/chains";
+import { ethProvider, sepoliaProvider } from "@/app/lib/provider";
+import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 
 export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
@@ -18,13 +18,15 @@ export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
     ? "0x0"
     : "0x630a6a268191c654ce084aad2d7910ff651e0797";
 
-  const provider = ethProvider;
+  const provider = isProd ? ethProvider : sepoliaProvider;
+
+  const chain = isProd ? mainnet : sepolia;
 
   return {
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain: mainnet,
+      chain: chain,
       contract: EtherfiToken__factory.connect(TOKEN, provider),
       provider,
     }),
@@ -33,7 +35,7 @@ export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
     governor: new TenantContract<IGovernorContract>({
       abi: [],
       address: GOVERNOR,
-      chain: mainnet,
+      chain: chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
