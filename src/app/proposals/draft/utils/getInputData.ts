@@ -12,7 +12,7 @@ export function getInputData(
     "# " +
     proposal.title +
     "\n\n" +
-    proposal.description +
+    proposal.abstract +
     "\n" +
     // `${
     //   form.state.draftLink &&

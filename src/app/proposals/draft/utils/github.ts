@@ -90,7 +90,7 @@ function formatGithubProposal(
 ) {
   const descriptionTable = markdownTable([
     ["description"],
-    [proposal.description],
+    [proposal.abstract],
   ]);
 
   const title = `# ${proposal.title}`;
@@ -241,7 +241,7 @@ export async function createGithubProposal(
       title: proposal.title,
       head: `${AGORA_PROXY_ACCOUNT}:${branch.data.ref}`,
       base: BASE_BRANCH,
-      body: proposal.description,
+      body: proposal.abstract,
     });
 
     return pullRequest.data.html_url;

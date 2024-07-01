@@ -72,7 +72,7 @@ export async function createSnapshot({
   }
 
   const description =
-    proposal.description +
+    proposal.abstract +
     "\n" +
     // `${
     //   form.state.draftLink &&
