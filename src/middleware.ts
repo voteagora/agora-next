@@ -1,12 +1,14 @@
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 
 const API_PREFIX = "/api/v1";
 const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify"];
+const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
+
 /*
   Middleware function to run on matching routes for config.matcher.
 
-  Currently only validating presence and formatting of API Key for /api
+  Currently only validating presence and formatting of API Key for /apiB
   routes.
 
   Consider fully validating user api key against postgres pending prisma
@@ -14,6 +16,11 @@ const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify"];
 */
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+
+  if (path === "/" && ROOT_PATH !== "/") {
+    return NextResponse.redirect(new URL(ROOT_PATH, request.url));
+  }
+
   // TODO redundant check for API_PREFIX, consider removing, move to a sustainable pattern
   if (path.startsWith(API_PREFIX)) {
     // validate bearer token for all api routes except excluded routes
@@ -34,5 +41,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/v1/:path*",
+  matcher: ["/", "/api/v1/:path*"],
 };

@@ -18,26 +18,26 @@ export class TenantContract<ContractType> {
   public abi: any;
   public chain: ChainConstants;
   public contract: ContractType;
-  public v6UpgradeBlock?: number;
-  public provider: MulticallProvider | AlchemyProvider;
   public optionBudgetChangeDate?: Date;
+  public provider: MulticallProvider | AlchemyProvider;
+  public v6UpgradeBlock?: number;
 
   constructor({
     abi,
+    address,
     chain,
     contract,
-    address,
+    optionBudgetChangeDate,
     provider,
     v6UpgradeBlock,
-    optionBudgetChangeDate,
   }: TenantContractParams<ContractType>) {
     this._address = address;
     this.abi = abi;
     this.chain = chain;
     this.contract = contract;
+    this.optionBudgetChangeDate = optionBudgetChangeDate;
     this.provider = provider;
     this.v6UpgradeBlock = v6UpgradeBlock;
-    this.optionBudgetChangeDate = optionBudgetChangeDate;
   }
 
   get address(): string {

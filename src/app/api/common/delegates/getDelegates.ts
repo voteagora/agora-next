@@ -50,10 +50,10 @@ async function getDelegatesApi(
     ON 
       avp.delegate = delegates.delegate
     LEFT JOIN 
-      agora.address_metadata am
+      agora.citizens am
     ON
       LOWER(am.address) = LOWER(delegates.delegate) AND 
-      am.kind = 'citizen' AND
+      am.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens) AND
       am.dao_slug = $3::config.dao_slug
     WHERE 
       num_of_delegators IS NOT NULL
@@ -135,7 +135,62 @@ async function getDelegates({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace } = Tenant.current();
+  const { namespace, ui } = Tenant.current();
+
+  const allowList = ui.delegates?.allowed || [];
+  const hasAllowList = allowList.length > 0;
+
+  // Applies allow-list filtering to the delegate list
+  const paginatedAllowlistQuery = async (skip: number, take: number) => {
+    switch (sort) {
+      case "most_delegators":
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
+            SELECT *
+            FROM ${namespace + ".delegates"}
+            WHERE num_of_delegators IS NOT NULL AND delegate = ANY($1)
+            ORDER BY num_of_delegators DESC
+            OFFSET $2
+            LIMIT $3;
+            `,
+          allowList,
+          skip,
+          take
+        );
+
+      case "weighted_random":
+        await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
+            SELECT *
+            FROM ${namespace + ".delegates"}
+            WHERE voting_power > 0 AND delegate = ANY($2)
+            ORDER BY -log(random()) / voting_power
+            OFFSET $3
+            LIMIT $4;
+            `,
+          seed,
+          allowList,
+          skip,
+          take
+        );
+
+      default:
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+          `
+            SELECT *
+            FROM ${namespace + ".delegates"}
+            WHERE delegate = ANY($1)
+            ORDER BY voting_power DESC
+            OFFSET $2
+            LIMIT $3;
+            `,
+          allowList,
+          skip,
+          take
+        );
+    }
+  };
 
   const paginatedQuery = async (skip: number, take: number) => {
     switch (sort) {
@@ -167,7 +222,7 @@ async function getDelegates({
           skip,
           take
         );
-      // TODO unclear if this schema is actually the same as the others
+
       default:
         return (prisma as any)[`${namespace}Delegates`].findMany({
           skip,
@@ -179,7 +234,7 @@ async function getDelegates({
     }
   };
   const { meta, data: delegates } = await paginateResult<DelegatesGetPayload[]>(
-    paginatedQuery,
+    hasAllowList ? paginatedAllowlistQuery : paginatedQuery,
     page,
     pageSize
   );
@@ -199,7 +254,7 @@ async function getDelegates({
     delegates: delegates.map((delegate, index) => ({
       address: delegate.delegate,
       votingPower: delegate.voting_power?.toFixed(0),
-      citizen: _delegates[index].citizen.length > 0,
+      citizen: _delegates[index].citizen,
       statement: _delegates[index].statement,
     })),
     seed,
@@ -224,7 +279,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       last_10_props,
       voting_power,
       advanced_vp,
-      num_of_delegators
+      num_of_delegators,
+      proposals_proposed
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
@@ -287,7 +343,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   // Build out delegate JSON response
   return {
     address: address,
-    citizen: _isCitizen.length > 0,
+    citizen: _isCitizen,
     votingPower: totalVotingPower.toString(),
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply || 0)
@@ -296,7 +352,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
         : 0,
-    proposalsCreated: 0n,
+    proposalsCreated: delegate?.proposals_proposed || 0n,
     proposalsVotedOn: delegate?.proposals_voted || 0n,
     votedFor: delegate?.for?.toString() || "0",
     votedAgainst: delegate?.against?.toString() || "0",
@@ -305,7 +361,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators:
       // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n
+      cachedNumOfDelegators < 1000n && namespace === "optimism"
         ? BigInt(
             (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
               "0"

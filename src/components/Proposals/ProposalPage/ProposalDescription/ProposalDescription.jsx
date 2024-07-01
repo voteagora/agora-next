@@ -1,13 +1,13 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import ReactMarkdown from "react-markdown";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
+import ProposalChart from "../ProposalChart/ProposalChart";
 
-export default function ProposalDescription({ proposal }) {
+export default function ProposalDescription({ proposal, proposalVotes }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
     "64930538748268257621925093712454552173772860987977453334165023026835711650357",
@@ -42,14 +42,16 @@ export default function ProposalDescription({ proposal }) {
   }
 
   return (
-    <VStack gap={4} className={styles.proposal_description}>
+    <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
       <ProposalTitle
         title={shortTitle}
         proposalType={proposal.proposalType}
         proposerAddress={proposal.proposer}
         createdTransactionHash={proposal.created_transaction_hash}
       />
-      <VStack gap={2}>
+      <ProposalChart proposal={proposal} proposalVotes={proposalVotes} />
+
+      <div className="flex flex-col gap-2">
         <ApprovedTransactions
           proposalData={proposal.proposalData}
           proposalType={proposal.proposalType}
@@ -60,7 +62,7 @@ export default function ProposalDescription({ proposal }) {
         >
           {stripTitleFromDescription(shortTitle, patchedDescription)}
         </ReactMarkdown>
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }

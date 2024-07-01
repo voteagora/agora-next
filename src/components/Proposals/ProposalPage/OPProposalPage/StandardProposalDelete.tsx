@@ -12,13 +12,12 @@ import { useContractWrite } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
-export default function OpManagerDeleteProposal({
+export default function StandardProposalDelete({
   proposal,
 }: {
   proposal: Proposal;
 }) {
   const { isOpManager } = useIsOpManager();
-
   const { contracts } = Tenant.current();
   const proposalType = proposal.proposalType;
 
@@ -54,6 +53,11 @@ export default function OpManagerDeleteProposal({
   });
 
   if (!isOpManager) {
+    return null;
+  }
+
+  // If proposal is cancelled, it means it has been deleted and we don't need to show the button
+  if (!!proposal.cancelled_transaction_hash) {
     return null;
   }
 

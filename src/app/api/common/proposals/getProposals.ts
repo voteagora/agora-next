@@ -3,7 +3,6 @@ import { cache } from "react";
 import { paginateResult } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
@@ -111,6 +110,9 @@ async function getProposalTypes() {
   return prisma[`${namespace}ProposalTypes`].findMany({
     where: {
       contract: contracts.proposalTypesConfigurator!.address,
+      name: {
+        not: "",
+      },
     },
   });
 }

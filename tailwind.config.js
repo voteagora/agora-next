@@ -111,6 +111,7 @@ module.exports = {
           "monospace",
         ],
         inter: "var(--font-inter), sans-serif",
+        code: ["IBM Plex Mono", "monospace"],
         // Add any other custom font families you need
       },
       colors: {
@@ -241,7 +242,8 @@ module.exports = {
           600: "#d53f8c",
           700: "#b83280",
           800: "#97266d",
-          900: "#702459",
+          900: "#FF007A",
+          positive: "#FF007A1A",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

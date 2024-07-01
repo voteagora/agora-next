@@ -24,6 +24,7 @@ import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
+import { StakedDeposit } from "@/lib/types";
 
 export type DialogType =
   | DelegateDialogType
@@ -89,6 +90,20 @@ export type SwithcNetworkDialogType = {
   type: "SWITCH_NETWORK";
   params: {
     chain: ChainConstants;
+  };
+};
+
+export type StaleDepositAddDialogType = {
+  type: "STAKE_DEPOSIT_ADD";
+  params: {
+    deposit: StakedDeposit;
+  };
+};
+
+export type StakeDepositWithdrawDialogType = {
+  type: "STAKE_DEPOSIT_WITHDRAW";
+  params: {
+    deposit: StakedDeposit;
   };
 };
 

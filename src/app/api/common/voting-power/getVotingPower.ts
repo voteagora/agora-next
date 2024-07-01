@@ -5,7 +5,7 @@ import {
   getTotalVotableAllowance,
 } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { VotingPowerData } from "./votingPower";
+import { VotingPowerData, VotingPowerSnapsPayload } from "./votingPower";
 import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -39,18 +39,19 @@ async function getVotingPowerForProposalByAddress({
   proposalId: string;
 }): Promise<VotingPowerData> {
   const { namespace, contracts } = Tenant.current();
-
-  const votingPowerQuery = prisma[`${namespace}VotingPowerSnaps`].findFirst({
-    where: {
-      delegate: address,
-      block_number: {
-        lte: blockNumber,
-      },
-    },
-    orderBy: {
-      ordinal: "desc",
-    },
-  });
+  const votingPowerQuery = prisma.$queryRawUnsafe<VotingPowerSnapsPayload[]>(
+    `
+    SELECT
+      *
+    FROM ${namespace + ".voting_power_snaps"}
+    WHERE delegate = $1
+      AND block_number <= $2
+    ORDER BY block_number DESC, transaction_index DESC, log_index DESC
+    LIMIT 1;
+    `,
+    address,
+    blockNumber
+  );
 
   // This query pulls only partially delegated voting power
   const advancedVotingPowerQuery = prisma.$queryRawUnsafe<
@@ -104,7 +105,7 @@ async function getVotingPowerForProposalByAddress({
     WHERE allowance > 0;
     `,
     address,
-    contracts.alligator!.address,
+    contracts.alligator?.address,
     blockNumber
   );
 
@@ -119,9 +120,9 @@ async function getVotingPowerForProposalByAddress({
   });
 
   return {
-    directVP: votingPower?.balance ?? "0",
+    directVP: votingPower[0]?.balance ?? "0",
     advancedVP: advancedVP.toString(),
-    totalVP: (BigInt(votingPower?.balance ?? "0") + advancedVP).toString(),
+    totalVP: (BigInt(votingPower[0]?.balance ?? "0") + advancedVP).toString(),
   };
 }
 

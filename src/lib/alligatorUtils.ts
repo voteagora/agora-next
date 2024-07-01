@@ -1,4 +1,3 @@
-import provider from "@/app/lib/provider";
 import {
   AuhtorityChainsAggregate,
   AuthorityChainRules,
@@ -55,7 +54,7 @@ export async function getTotalVotableAllowance({
   const latestBlockNumber = await contracts.token.provider.getBlockNumber();
   const weightsCastByProxies = await Promise.all(
     (proxies ?? []).map((proxy) =>
-      contracts.governor.contract.weightCast(proposalId, proxy.toString())
+      contracts.governor.contract.weightCast!(proposalId, proxy.toString())
     )
   );
 

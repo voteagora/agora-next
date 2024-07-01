@@ -1,20 +1,17 @@
-"use server";
-
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
-import { HStack, VStack } from "../Layout/Stack";
 import styles from "./hero.module.scss";
 
-export default async function Hero() {
+export default function Hero() {
   const { namespace, ui } = Tenant.current();
   const { title, description } = ui.page("/");
 
   return (
-    <HStack justifyContent="justify-between" className={styles.hero_container}>
-      <VStack className={styles.content_container}>
+    <div className={`flex flex-row justify-between ${styles.hero_container}`}>
+      <div className={`flex flex-col ${styles.content_container}`}>
         <h1>{title}</h1>
         <p> {description}</p>
-      </VStack>
+      </div>
       {ui.hero && (
         <Image
           className="h-[110px] w-auto"
@@ -22,6 +19,6 @@ export default async function Hero() {
           src={ui.hero}
         />
       )}
-    </HStack>
+    </div>
   );
 }

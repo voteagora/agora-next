@@ -1,6 +1,5 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
@@ -28,10 +27,7 @@ export default function ApprovedTransactions({
     proposalData.options[0].calldatas[0] === "0x";
 
   return (
-    <VStack
-      gap="1"
-      className="border border-[#e0e0e0] rounded-lg bg-gray-fa py-4"
-    >
+    <div className="flex flex-col gap-1 border border-[#e0e0e0] rounded-lg bg-gray-fa py-4">
       <div className="flex items-center justify-between px-4 mb-2">
         <p className="font-mono text-xs font-medium leading-4 text-gray-af">
           {isNoProposedTransactions ? "No " : ""}
@@ -49,17 +45,15 @@ export default function ApprovedTransactions({
         )}
       </div>
       {!isNoProposedTransactions && (
-        <VStack className="px-4">
+
+        <div className="flex flex-col px-4">
           {proposalData.options
             .slice(0, displayedOptions)
-            .map((option, index) => {
+            .map((option, idx) => {
               return (
-                <>
+                <div key={idx}>
                   {proposalType === "APPROVAL" && (
-                    <p
-                      className="font-mono text-xs font-medium leading-4 text-gray-af"
-                      key={`description-${index}`}
-                    >
+                    <p className="font-mono text-xs font-medium leading-4 text-gray-af">
                       {"//"} {option.description}
                     </p>
                   )}
@@ -84,10 +78,10 @@ export default function ApprovedTransactions({
                         </div>
                       );
                     })}
-                </>
+                </div>
               );
             })}
-        </VStack>
+        </div>
       )}
       {proposalData.options.length > 1 && (
         <div
@@ -99,6 +93,6 @@ export default function ApprovedTransactions({
             : "Hide options"}
         </div>
       )}
-    </VStack>
+    </div>
   );
 }

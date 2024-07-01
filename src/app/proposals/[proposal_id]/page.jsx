@@ -1,20 +1,12 @@
-import { fetchProposal as apiFetchProposal } from "@/app/api/common/proposals/getProposals";
+import { fetchProposal } from "@/app/api/common/proposals/getProposals";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
-import OPProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalPage";
+import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
 import React from "react";
 
-async function fetchProposal(proposal_id) {
-  "use server";
-  return {
-    proposal: await apiFetchProposal(proposal_id),
-  };
-}
-
 export async function generateMetadata({ params }, parent) {
-  const { proposal } = await fetchProposal(params.proposal_id);
+  const proposal = await fetchProposal(params.proposal_id);
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
   const description = truncateString(cleanString(proposal.description), 80);
 
@@ -43,13 +35,14 @@ export async function generateMetadata({ params }, parent) {
 }
 
 export default async function Page({ params: { proposal_id } }) {
-  const { proposal } = await fetchProposal(proposal_id);
+  const proposal = await fetchProposal(proposal_id);
 
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
-      RenderComponent = OPProposalPage;
+      RenderComponent = StandardProposalPage;
       break;
+
     case "OPTIMISTIC":
       RenderComponent = OPProposalOptimisticPage;
       break;
@@ -57,14 +50,13 @@ export default async function Page({ params: { proposal_id } }) {
       RenderComponent = OPProposalApprovalPage;
       break;
     default:
-      // TODO: Fix this but We shouldn't get here
-      RenderComponent = null;
+      // Default to standard proposal page
+      RenderComponent = StandardProposalPage;
   }
 
   return (
-    <HStack justifyContent="justify-between" className="mt-12">
+    <div className="flex justify-between mt-12">
       <div>{RenderComponent && <RenderComponent proposal={proposal} />}</div>
-      <VStack gap={6}></VStack>
-    </HStack>
+    </div>
   );
 }

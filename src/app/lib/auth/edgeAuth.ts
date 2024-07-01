@@ -18,21 +18,20 @@ import { AuthInfo } from "@/app/lib/auth/types";
 // algorithm classes
 export function extractBearerTokenFromHeader(
   authorizationHeader?: string | null
-) {
+): string | null {
   if (authorizationHeader && authorizationHeader.split(" ")[0] === "Bearer") {
     return authorizationHeader.split(" ")[1];
   }
   return null;
 }
 
-// TODO: add zod validations here
 export async function validateBearerToken(
   request: NextRequest
 ): Promise<AuthInfo> {
   const token = extractBearerTokenFromHeader(
     request.headers.get("Authorization")
   );
-  let authResponse: AuthInfo = { authenticated: true, failReason: "" };
+  let authResponse: AuthInfo = { authenticated: false, failReason: "" };
 
   if (!token) {
     authResponse = {
@@ -121,7 +120,12 @@ export async function validateScopeAgainstRoute(
   const roles = scope.split(";");
   const isBadge = roles.includes("badgeholder");
   const isPublic = roles.includes("reader:public");
-  if (request.nextUrl.pathname.includes("/api/v1/retrofunding/ballots")) {
+  if (
+    request.nextUrl.pathname.includes("/api/v1/retrofunding/ballots") ||
+    request.method === "POST" ||
+    request.method === "PUT" ||
+    request.method === "DELETE"
+  ) {
     return isBadge;
   } else {
     return isPublic;

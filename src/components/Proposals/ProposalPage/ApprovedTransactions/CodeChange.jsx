@@ -1,14 +1,11 @@
 import { isAddress } from "viem";
+import { getBlockScanAddress } from "@/lib/utils";
 
 function linkIfAddress(content) {
   // TODO: This doesn't handle ENS addresses
   if (isAddress(content)) {
     return (
-      <a
-        href={`https://optimistic.etherscan.io/address/${content}`}
-        target="_blank"
-        rel="noreferrer"
-      >
+      <a href={getBlockScanAddress(content)} target="_blank" rel="noreferrer">
         {content}
       </a>
     );
