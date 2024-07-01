@@ -148,7 +148,7 @@ async function getDelegates({
           `
             SELECT *
             FROM ${namespace + ".delegates"}
-            WHERE num_of_delegators IS NOT NULL AND delegate = ANY($1)
+            WHERE num_of_delegators IS NOT NULL AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             ORDER BY num_of_delegators DESC
             OFFSET $2
             LIMIT $3;
@@ -164,7 +164,7 @@ async function getDelegates({
           `
             SELECT *
             FROM ${namespace + ".delegates"}
-            WHERE voting_power > 0 AND delegate = ANY($2)
+            WHERE voting_power > 0 AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
             ORDER BY -log(random()) / voting_power
             OFFSET $3
             LIMIT $4;
@@ -180,7 +180,7 @@ async function getDelegates({
           `
             SELECT *
             FROM ${namespace + ".delegates"}
-            WHERE delegate = ANY($1)
+            WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             ORDER BY voting_power DESC
             OFFSET $2
             LIMIT $3;
@@ -192,49 +192,8 @@ async function getDelegates({
     }
   };
 
-  const paginatedQuery = async (skip: number, take: number) => {
-    switch (sort) {
-      case "most_delegators":
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          `
-            SELECT *
-            FROM ${namespace + ".delegates"}
-            WHERE num_of_delegators IS NOT NULl
-            ORDER BY num_of_delegators DESC
-            OFFSET $1
-            LIMIT $2;
-            `,
-          skip,
-          take
-        );
-      case "weighted_random":
-        await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          `
-            SELECT *
-            FROM ${namespace + ".delegates"}
-            WHERE voting_power > 0
-            ORDER BY -log(random()) / voting_power
-            OFFSET $2
-            LIMIT $3;
-            `,
-          seed,
-          skip,
-          take
-        );
-
-      default:
-        return (prisma as any)[`${namespace}Delegates`].findMany({
-          skip,
-          take,
-          orderBy: {
-            voting_power: "desc",
-          },
-        });
-    }
-  };
   const { meta, data: delegates } = await paginateResult<DelegatesGetPayload[]>(
-    hasAllowList ? paginatedAllowlistQuery : paginatedQuery,
+    paginatedAllowlistQuery,
     page,
     pageSize
   );
