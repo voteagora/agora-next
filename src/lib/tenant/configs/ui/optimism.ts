@@ -171,7 +171,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
-      enabled: true,
+      enabled: false,
     },
   ],
 });
