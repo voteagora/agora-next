@@ -2,11 +2,11 @@ import React from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 
-interface ChartDataFilterTabsProps {
+interface Props {
   onChange: (frequency: FREQUENCY_FILTERS) => void;
 }
 
-const ChartFrequencyTabs = ({ onChange }: ChartDataFilterTabsProps) => {
+const ChartTabs = ({ onChange }: Props) => {
   return (
     <Tabs
       defaultValue={FREQUENCY_FILTERS.YEAR}
@@ -46,4 +46,4 @@ const ChartFrequencyTabs = ({ onChange }: ChartDataFilterTabsProps) => {
   );
 };
 
-export default ChartFrequencyTabs;
+export default ChartTabs;

@@ -6,6 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
 import uniswapInfoAbout from "@/assets/tenant/uniswap_info_about.png";
 
+// TODO: This needs to be refactored to use the Tenant UI object
 const about = {
   optimism: {
     description:
@@ -60,8 +61,8 @@ const about = {
   },
 };
 
-const InfoAboutSection = () => {
-  const { namespace, ui } = Tenant.current();
+const About = () => {
+  const { namespace } = Tenant.current();
 
   return (
     <>
@@ -115,4 +116,4 @@ const InfoAboutSection = () => {
   );
 };
 
-export default InfoAboutSection;
+export default About;

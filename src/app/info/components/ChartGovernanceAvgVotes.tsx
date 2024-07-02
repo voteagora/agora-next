@@ -16,13 +16,11 @@ type ChartData = {
   voter_count: string;
 };
 
-interface AverageVoterProposalChartProps {
+interface Props {
   getData: () => Promise<{ result: ChartData[] }>;
 }
 
-const AverageVoterProposalChart = ({
-  getData,
-}: AverageVoterProposalChartProps) => {
+const ChartGovernanceAvgVotes = ({ getData }: Props) => {
   const { primary } = useTenantColorScheme();
 
   const shouldFetchData = useRef(true);
@@ -83,7 +81,7 @@ const AverageVoterProposalChart = ({
   );
 };
 
-export default AverageVoterProposalChart;
+export default ChartGovernanceAvgVotes;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {

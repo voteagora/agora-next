@@ -1,15 +1,16 @@
 import React from "react";
-import InfoAboutSection from "@/components/Info/InfoAboutSection";
+import About from "@/app/info/components/About";
 import { Hero } from "@/app/info/components/Hero";
-import { TreasuryChart } from "@/app/info/components/TreasuryChart";
-import GovernorSettingAccordion from "@/components/Info/GovernorSettingAccordion";
-import GovernanceChartsTabs from "@/components/Info/GovernanceChartsTabs";
+import { ChartTreasury } from "@/app/info/components/ChartTreasury";
+import GovernorSettings from "@/app/info/components/GovernorSettings";
+import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
 import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTopDelegateWeighs";
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
+import { FREQUENCY_FILTERS } from "@/lib/constants";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -47,22 +48,23 @@ export default async function Page() {
     return <div>Route not supported for namespace</div>;
   }
 
-  const data = await apiFetchTreasuryBalanceTS("1y");
+  // Default treasury data
+  const data = await apiFetchTreasuryBalanceTS(FREQUENCY_FILTERS.YEAR);
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     return (
       <div className="flex flex-col font-inter">
         <Hero />
-        <InfoAboutSection />
-        <GovernorSettingAccordion />
-        <TreasuryChart
+        <About />
+        <GovernorSettings />
+        <ChartTreasury
           initialData={data.result}
           getData={async (frequency: string) => {
             "use server";
             return apiFetchTreasuryBalanceTS(frequency);
           }}
         />
-        <GovernanceChartsTabs
+        <GovernanceCharts
           getDelegates={async () => {
             "use server";
             return apiFetchDelegateWeights();
@@ -71,7 +73,7 @@ export default async function Page() {
             "use server";
             return apiFetchProposalVoteCounts();
           }}
-          getData={async (metric: string, frequency: string) => {
+          getMetrics={async (metric: string, frequency: string) => {
             "use server";
             return apiFetchMetricTS(metric, frequency);
           }}

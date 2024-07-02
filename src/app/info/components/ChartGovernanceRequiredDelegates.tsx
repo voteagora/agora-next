@@ -10,12 +10,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
+import ChartTabs from "./ChartTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 
-interface GovernorDelegatesNeededChartProps {
+interface Props {
   getData: (
     metric: string,
     frequency: string
@@ -28,9 +28,7 @@ type ChartData = {
   date: string;
 };
 
-const GovernorDelegatesNeededChart = ({
-  getData,
-}: GovernorDelegatesNeededChartProps) => {
+const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
   const { primary, gradient } = useTenantColorScheme();
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
@@ -146,7 +144,7 @@ const GovernorDelegatesNeededChart = ({
           </div>
         </div>
 
-        <ChartFrequencyTabs onChange={onFilterChange} />
+        <ChartTabs onChange={onFilterChange} />
       </div>
     </div>
   );
@@ -185,4 +183,4 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default GovernorDelegatesNeededChart;
+export default ChartGovernanceRequiredDelegates;

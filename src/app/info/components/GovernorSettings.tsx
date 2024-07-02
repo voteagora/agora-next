@@ -4,11 +4,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import GovernorContractParameterTable from "../../app/info/components/GovernorContractParameterTable";
-import ContractsListTable from "../../app/info/components/ContractsListTable";
-import ProposalTypeTable from "../../app/info/components/ProposalTypeTable";
+import GovernorSettingsParams from "@/app/info/components/GovernorSettingsParams";
+import ContractList from "@/app/info/components/ContractList";
+import GovernorSettingsProposalTypes from "@/app/info/components/GovernorSettingsProposalTypes";
 
-const GovernorSettingAccordion = () => {
+const GovernorSettings = () => {
   return (
     <Accordion
       type="single"
@@ -22,14 +22,14 @@ const GovernorSettingAccordion = () => {
         <AccordionContent className="mt-6 border-t pt-6">
           <div className="flex gap-2 flex-wrap sm:flex-nowrap">
             <div className="w-full sm:w-[65%] border border-gray-300 rounded-lg">
-              <ContractsListTable />
+              <ContractList />
             </div>
             <div className="w-full sm:w-[35%] border border-gray-300 h-fit rounded-lg">
-              <GovernorContractParameterTable />
+              <GovernorSettingsParams />
             </div>
           </div>
           <div className="w-full border border-gray-300 rounded-lg mt-6">
-            <ProposalTypeTable />
+            <GovernorSettingsProposalTypes />
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -37,4 +37,4 @@ const GovernorSettingAccordion = () => {
   );
 };
 
-export default GovernorSettingAccordion;
+export default GovernorSettings;

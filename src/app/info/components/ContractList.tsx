@@ -12,7 +12,7 @@ import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
 import { getBlockScanAddress } from "@/lib/utils";
 
-const ContractsListTable = () => {
+const ContractList = () => {
   const { contracts } = Tenant.current();
 
   const list = [
@@ -67,4 +67,4 @@ const ContractsListTable = () => {
   );
 };
 
-export default ContractsListTable;
+export default ContractList;

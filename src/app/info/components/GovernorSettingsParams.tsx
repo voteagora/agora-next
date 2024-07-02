@@ -11,10 +11,9 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { useContractRead } from "wagmi";
 import { pluralize } from "@/lib/utils";
+import { SECONDS_IN_HOUR } from "@/lib/constants";
 
-const SECONDS_IN_HOUR = 3600;
-
-const GovernorContractParameterTable = () => {
+const GovernorSettingsParams = () => {
   const { contracts } = Tenant.current();
   const { data: votingDelay, isFetched: isDelayFetched } = useContractRead({
     address: contracts.governor.address as `0x${string}`,
@@ -71,4 +70,4 @@ const GovernorContractParameterTable = () => {
   );
 };
 
-export default GovernorContractParameterTable;
+export default GovernorSettingsParams;

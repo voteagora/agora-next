@@ -9,18 +9,18 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import ChartFrequencyTabs from "./ChartFrequencyTabs";
+import ChartTabs from "./ChartTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 import { humanizeNumber, humanizeNumberContact } from "@/lib/utils";
 
-interface TreasuryChartProps {
+interface Props {
   getData: (frequency: string) => Promise<{ result: MetricTimeSeriesValue[] }>;
   initialData: MetricTimeSeriesValue[];
 }
 
-export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
+export const ChartTreasury = ({ getData, initialData }: Props) => {
   const { primary, gradient } = useTenantColorScheme();
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
@@ -60,11 +60,6 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
     <div>
       <h3 className="text-2xl font-black text-black mt-10">Treasury value</h3>
       <div className="border border-gray-300 rounded-lg w-full mt-4">
-        {/*TODO: Figure out an efficient way of loading the total value in USD before enabling this*/}
-        {/*<div className="border-b border-gray-300 p-6">*/}
-        {/*  <p className="text-base font-semibold text-black">Total Value</p>*/}
-        {/*  <p className="text-xs font-medium text-gray-4f">$70,800,012.23</p>*/}
-        {/*</div>*/}
         <div className="p-4 sm:p-8 pb-6 !w-full">
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart
@@ -116,7 +111,7 @@ export const TreasuryChart = ({ getData, initialData }: TreasuryChartProps) => {
           </ResponsiveContainer>
 
           <div className="flex flex-row flex-wrap  sm:gap-0 gap-2 justify-end pl-10 sm:pl-14 mt-6">
-            <ChartFrequencyTabs onChange={onFilterChange} />
+            <ChartTabs onChange={onFilterChange} />
           </div>
         </div>
       </div>

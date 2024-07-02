@@ -1,10 +1,10 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AverageVoterProposalChart from "./AverageVoterProposalChart";
-import GovernorDelegatesNeededChart from "./GovernorDelegatesNeededChart";
-import GovernorVotableSupplyChart from "./GovernorVotableSupplyChart";
-import GovernanceTopDelegateChart from "./GovernanceTopDelegateChart";
-import GovernanceActiveDelegateChart from "./GovernanceActiveDelegateChart";
+import ChartGovernanceAvgVotes from "@/app/info/components/ChartGovernanceAvgVotes";
+import ChartGovernanceRequiredDelegates from "@/app/info/components/ChartGovernanceRequiredDelegates";
+import ChartGovernanceVotableSupply from "@/app/info/components/ChartGovernanceVotableSupply";
+import ChartGovernanceTopDelegates from "@/app/info/components/ChartGovernanceTopDelegates";
+import ChartGovernanceActiveDelegates from "@/app/info/components/ChartGovernanceActiveDelegates";
 
 interface TabProps {
   value: string;
@@ -24,18 +24,17 @@ const TabTrigger: React.FC<TabProps> = ({ value, title, description }) => {
   );
 };
 
-interface GovernanceChartsTabsProps {
-  // TODO: Rename to getMetrics
-  getData: (metric: string, frequency: string) => Promise<any>;
+interface GovernanceChartsProps {
+  getMetrics: (metric: string, frequency: string) => Promise<any>;
   getVotes: () => Promise<any>;
   getDelegates: () => Promise<any>;
 }
 
-const GovernanceChartsTabs = ({
-  getData,
+const GovernanceCharts = ({
+  getMetrics,
   getVotes,
   getDelegates,
-}: GovernanceChartsTabsProps) => {
+}: GovernanceChartsProps) => {
   const tabs = [
     {
       value: "top-delegates",
@@ -80,32 +79,32 @@ const GovernanceChartsTabs = ({
         </TabsList>
 
         <TabsContent className="p-4 sm:p-8 pb-6 !w-full" value="top-delegates">
-          <GovernanceTopDelegateChart getData={getDelegates} />
+          <ChartGovernanceTopDelegates getData={getDelegates} />
         </TabsContent>
         <TabsContent
           value="active-delegates"
           className="w-full px-4 sm:px-8 py-3"
         >
-          <GovernanceActiveDelegateChart getData={getData} />
+          <ChartGovernanceActiveDelegates getData={getMetrics} />
         </TabsContent>
         <TabsContent value="avg-voters" className="!w-fullp-4 sm:p-8 pb-6">
-          <AverageVoterProposalChart getData={getVotes} />
+          <ChartGovernanceAvgVotes getData={getVotes} />
         </TabsContent>
         <TabsContent
           value="delegates-needed"
           className="!w-full px-4 sm:px-8 py-3"
         >
-          <GovernorDelegatesNeededChart getData={getData} />
+          <ChartGovernanceRequiredDelegates getData={getMetrics} />
         </TabsContent>
         <TabsContent
           value="total-votable-supply"
           className="w-full px-4 sm:px-8 py-3"
         >
-          <GovernorVotableSupplyChart getData={getData} />
+          <ChartGovernanceVotableSupply getData={getMetrics} />
         </TabsContent>
       </Tabs>
     </div>
   );
 };
 
-export default GovernanceChartsTabs;
+export default GovernanceCharts;

@@ -14,7 +14,7 @@ import { useContractRead } from "wagmi";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
-const ProposalTypeTable = () => {
+const GovernorSettingsProposalTypes = () => {
   const { contracts, namespace, token } = Tenant.current();
 
   const { data: quorum, isFetched: isQuorumFetched } = useContractRead({
@@ -66,4 +66,4 @@ const ProposalTypeTable = () => {
   );
 };
 
-export default ProposalTypeTable;
+export default GovernorSettingsProposalTypes;

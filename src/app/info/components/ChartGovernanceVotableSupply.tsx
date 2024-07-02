@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import ChartFrequencyTabs from "../../app/info/components/ChartFrequencyTabs";
+import ChartTabs from "./ChartTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
@@ -16,16 +16,14 @@ import { formatNumber, scientificNotationToPrecision } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
-interface GovernorVotableSupplyChartProps {
+interface Props {
   getData: (
     metric: string,
     frequency: string
   ) => Promise<{ result: MetricTimeSeriesValue[] }>;
 }
 
-const GovernorVotableSupplyChart = ({
-  getData,
-}: GovernorVotableSupplyChartProps) => {
+const ChartGovernanceVotableSupply = ({ getData }: Props) => {
   const { primary, gradient } = useTenantColorScheme();
   const { token } = Tenant.current();
 
@@ -117,13 +115,13 @@ const GovernorVotableSupplyChart = ({
           </p>
         </div>
 
-        <ChartFrequencyTabs onChange={onFilterChange} />
+        <ChartTabs onChange={onFilterChange} />
       </div>
     </div>
   );
 };
 
-export default GovernorVotableSupplyChart;
+export default ChartGovernanceVotableSupply;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {

@@ -8,16 +8,13 @@ type ChartData = {
   weight: string;
 };
 
-interface GovernanceTopDelegateChartProps {
+interface Props {
   getData: () => Promise<{ result: ChartData[] }>;
 }
 
-const GovernanceTopDelegateChart = ({
-  getData,
-}: GovernanceTopDelegateChartProps) => {
+const ChartGovernanceTopDelegates = ({ getData }: Props) => {
   const { primary } = useTenantColorScheme();
 
-  const [hightestValue, setHightestValue] = useState(0);
   const getDynamicColor = (value: number, maxValue: number): string => {
     const opacity = value / maxValue;
     return `rgba(${parseInt(primary.slice(1, 3), 16)}, ${parseInt(primary.slice(3, 5), 16)}, ${parseInt(primary.slice(5, 7), 16)}, ${opacity})`;
@@ -30,9 +27,6 @@ const GovernanceTopDelegateChart = ({
     if (shouldFetchData.current) {
       shouldFetchData.current = false;
       const data = await getData();
-      setHightestValue(
-        Math.max(...data.result.map((item) => Number(item.weight)))
-      );
       setData(data.result);
     }
   };
@@ -47,6 +41,8 @@ const GovernanceTopDelegateChart = ({
     return <div>Loading...</div>;
   }
 
+  const max = Math.max(...data.map((item) => Number(item.weight)));
+
   return (
     <div>
       <div className="flex border border-black rounded-md overflow-hidden h-10 mt-4 sm:mt-12">
@@ -56,10 +52,7 @@ const GovernanceTopDelegateChart = ({
             className={`h-full ${index < data.length - 1 ? "border-r" : ""} border-black`}
             style={{
               flex: item.weight,
-              backgroundColor: getDynamicColor(
-                Number(item.weight),
-                hightestValue
-              ),
+              backgroundColor: getDynamicColor(Number(item.weight), max),
             }}
           ></div>
         ))}
@@ -89,4 +82,4 @@ const GovernanceTopDelegateChart = ({
   );
 };
 
-export default GovernanceTopDelegateChart;
+export default ChartGovernanceTopDelegates;
