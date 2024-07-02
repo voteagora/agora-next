@@ -68,11 +68,11 @@ const About = () => {
     <>
       <h3 className="text-2xl font-black text-black mt-10">Getting started</h3>
       <div className="mt-4 rounded-xl border bg-white shadow-sm ">
-        <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6 mt-4">
+        <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
           <Image
             src={about[namespace as keyof typeof about].sectionImage}
-            alt="RetroPGF 3 results 4"
-            className="w-full"
+            alt={`About ${namespace}`}
+            className="w-full rounded-lg"
             height="366"
             width="172"
           />
