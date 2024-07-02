@@ -5,7 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import { type UILink } from "@/lib/tenant/tenantUI";
 
-export const Hero = () => {
+export const InfoHero = () => {
   const { ui } = Tenant.current();
   const { title, description, links } = ui.page("info");
 

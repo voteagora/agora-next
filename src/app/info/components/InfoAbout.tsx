@@ -7,7 +7,7 @@ import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
 import uniswapInfoAbout from "@/assets/tenant/uniswap_info_about.png";
 
 // TODO: This needs to be refactored to use the Tenant UI object
-const about = {
+const infoAbout = {
   optimism: {
     description:
       "Both Houses make decisions through governance proposals. Proposals are accepted or rejected using a voting process. Anyone can submit a proposal to governance. The proposal must be one of the valid proposal types listed below, and it must follow the voting process described here.",
@@ -70,7 +70,7 @@ const About = () => {
       <div className="mt-4 rounded-xl border bg-white shadow-sm ">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
           <Image
-            src={about[namespace as keyof typeof about].sectionImage}
+            src={infoAbout[namespace as keyof typeof infoAbout].sectionImage}
             alt={`About ${namespace}`}
             className="w-full rounded-lg"
             height="366"
@@ -79,14 +79,14 @@ const About = () => {
           <div>
             <h3 className="text-lg font-bold text-black">About {namespace}</h3>
             <p className="text-base font-medium text-gray-4f mt-3">
-              {about[namespace as keyof typeof about].description}
+              {infoAbout[namespace as keyof typeof infoAbout].description}
             </p>
           </div>
         </div>
 
         <div className="p-6  rounded-b-xl border-t bg-white">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
-            {about[namespace as keyof typeof about].featureList.map(
+            {infoAbout[namespace as keyof typeof infoAbout].featureList.map(
               (item, index) => (
                 <div
                   key={index}
