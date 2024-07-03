@@ -1,12 +1,15 @@
+import { StaticImageData } from "next/image";
+
 type UIToggle = {
   name: string;
   enabled: boolean;
 };
 
-type UILink = {
+export type UILink = {
   name: string;
   title: string;
   url: string;
+  image?: string | StaticImageData;
 };
 
 type UIPage = {
@@ -14,6 +17,7 @@ type UIPage = {
   route: string;
   title: string;
   href?: string;
+  links?: UILink[];
   meta: {
     title: string;
     description: string;

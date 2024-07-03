@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { HStack } from "./Stack";
 
 export default function Loader() {
@@ -7,12 +6,6 @@ export default function Loader() {
       key="loader"
       className="gl_loader justify-center py-6 text-sm text-stone-500"
     >
-      {/* <Image
-        src="/images/blink.gif"
-        alt="Blinking Agora Logo"
-        width={32}
-        height={8}
-      /> */}
       Loading...
     </HStack>
   );
