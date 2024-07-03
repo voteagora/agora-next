@@ -7,6 +7,7 @@ import {
   ProposalSocialOption,
 } from "@prisma/client";
 import { markdownTable } from "markdown-table";
+import { formatTransactions } from "./formatTransactions";
 
 const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
 const AGORA_ENS_FORK = "docs";
@@ -19,66 +20,24 @@ function getFormattedTransactionTable(
   proposal: ProposalDraft & { transactions: ProposalDraftTransaction[] }
 ) {
   const markDownArray = [["Address", "Value", "Function", "Argument", "Value"]];
+  const parsedTransactions = formatTransactions(proposal.transactions);
+  const options =
+    parsedTransactions.key !== "SNAPSHOT"
+      ? parsedTransactions.kind?.options
+      : [];
 
-  proposal.transactions.forEach((transaction) => {
-    const { target, value, calldata, description } = transaction;
-
-    // TODO: decode calldata?
-    // if (type === "transfer") {
-    if (true) {
-      if (target === "0x") {
-        markDownArray.push([description, value + " ETH", "", "", ""]);
-      } else {
-        markDownArray.push([target, "", "transfer", "to", description]);
-        markDownArray.push([
-          "",
-          "",
-          "",
-          "amount",
-          // ethers.utils
-          //   .parseUnits(transferAmount.toString() || "0", token.decimals)
-          //   .toString(),
-          value.toString(),
-        ]);
-      }
-    } else {
-      // Decode custom transaction
-      // const args = signature.split("(")[1].split(")")[0].split(",");
-      // const functionName = signature.split("(")[0];
-      // const functionArgs = args.map((arg) => arg.trim().split(" ")[1]);
-      // const functionTypes = args.map((arg) => arg.trim().split(" ")[0]);
-      // const callDataToDecode = "0x" + calldata.slice(10);
-
-      // const decodedValues = ethers.utils.defaultAbiCoder.decode(
-      //   functionTypes,
-      //   callDataToDecode
-      // );
-
-      // functionArgs.forEach((arg, index) => {
-      //   if (index === 0) {
-      //     markDownArray.push([
-      //       target,
-      //       value + " ETH",
-      //       functionName,
-      //       arg,
-      //       decodedValues[index].toString(),
-      //     ]);
-      //   } else {
-      //     markDownArray.push([
-      //       "",
-      //       "",
-      //       "",
-      //       arg,
-      //       decodedValues[index].toString(),
-      //     ]);
-      //   }
-      // });
-      markDownArray.push(["failed to decode transaction", "", "", "", ""]);
-    }
-  });
+  const transactionObject = options[0];
+  for (let i = 0; i < transactionObject.targets.length; i++) {
+    markDownArray.push([
+      transactionObject.targets[i], // target
+      transactionObject.values[i], // value
+      transactionObject.functionArgsName[i].functionName, // fn
+      transactionObject.functionArgsName[i].functionArgs.join(", "), // args
+      "", // value?
+    ]);
+  }
 
   const table = markdownTable(markDownArray);
-
   return table;
 }
 

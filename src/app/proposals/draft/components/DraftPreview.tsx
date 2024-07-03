@@ -18,7 +18,7 @@ import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
-import { parseProposalData } from "@/lib/proposalUtils";
+import { formatTransactions } from "../utils/formatTransactions";
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -53,34 +53,7 @@ const DraftPreview = ({
     ? accountVotesData >= THRESHOLD
     : false;
 
-  const aggregatedTransactions = proposalDraft.transactions.reduce(
-    (acc, transaction) => {
-      acc["targets"] = [...acc["targets"], transaction.target];
-      acc["values"] = [...acc["values"], transaction.value];
-      acc["calldatas"] = [...acc["calldatas"], transaction.calldata];
-      acc["signatures"] = [...acc["signatures"], ""];
-
-      return acc;
-    },
-    { targets: [], calldatas: [], values: [], signatures: [] } as {
-      targets: string[];
-      calldatas: string[];
-      values: string[];
-      signatures: string[];
-    }
-  );
-
-  const stringifiedTransactions = JSON.stringify({
-    targets: JSON.stringify(aggregatedTransactions.targets),
-    calldatas: JSON.stringify(aggregatedTransactions.calldatas),
-    values: JSON.stringify(aggregatedTransactions.values),
-    signatures: JSON.stringify(aggregatedTransactions.signatures),
-  });
-
-  const parsedTransactions = parseProposalData(
-    stringifiedTransactions,
-    "STANDARD"
-  );
+  const parsedTransactions = formatTransactions(proposalDraft.transactions);
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
