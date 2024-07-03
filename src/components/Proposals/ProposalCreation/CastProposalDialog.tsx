@@ -3,6 +3,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import styles from "./styles.module.scss";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   isError: boolean;
@@ -60,10 +61,11 @@ export function SuccessMessage({
   closeDialog: () => void;
   txHash: string;
 }) {
+  const { ui } = Tenant.current();
   return (
     <VStack className={styles.full_width}>
       <img
-        src={`/images/congrats.svg`}
+        src={ui.assets.success}
         className="w-full mb-3"
         alt="Proposal successfully created!"
       />
@@ -84,13 +86,11 @@ export function SuccessMessage({
 }
 
 export function Loading() {
+  const { ui } = Tenant.current();
+
   return (
     <VStack className={styles.full_width}>
-      <img
-        src={`/images/action-pending.svg`}
-        className="w-full mb-3"
-        alt="Pending"
-      />
+      <img src={ui.assets.pending} className="w-full mb-3" alt="Pending" />
       <div className="mb-2 text-2xl font-black">Creating your proposal ...</div>
       <div className="mb-5 text-base font-medium text-gray-4f">
         It might take up to a minute for the changes to be reflected.
