@@ -15,7 +15,7 @@ async function getTopDelegateWeights() {
                 total_voting_power
                 AS (SELECT Sum(voting_power) tot
                     FROM   uniswap.delegates
-                    WHERE  contract = '${contracts.token.address}'),
+                    WHERE  contract = '${contracts.token.address.toLowerCase()}'),
                 
                 weightings
                 AS (SELECT delegate,
