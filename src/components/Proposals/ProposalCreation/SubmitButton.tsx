@@ -101,7 +101,7 @@ export default function SubmitButton({
     <>
       {manager && String(manager) !== address ? (
         <p className="text-gray-700 text-sm max-w-[420px] break-words">
-          Only the {ui.organization.title} manager address can create proposals
+          Only the {ui.organization!.title} manager address can create proposals
           for the time being.
         </p>
       ) : (
@@ -160,7 +160,7 @@ function getInputData(form: Form): {
   let targets: string[] = [];
   let values: bigint[] = [];
   let calldatas: string[] = [];
-  // TODO
+
   let proposalSettings = Number(form.state.proposalSettings); // index as uint8 as last argument on propose and proposeWithModule
   let inputData: InputData = [
     targets,

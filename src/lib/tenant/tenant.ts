@@ -53,7 +53,7 @@ export default class Tenant {
     return this._token;
   }
 
-  public get ui(): any {
+  public get ui(): TenantUI {
     return this._ui;
   }
 
