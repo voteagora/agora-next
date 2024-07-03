@@ -1,5 +1,15 @@
 export const INDEXER_DELAY = 3000;
 
+export const SECONDS_IN_HOUR = 3600;
+
+export enum FREQUENCY_FILTERS {
+  DAY = "24h",
+  WEEK = "7d",
+  MONTH = "1m",
+  QUARTER = "3m",
+  YEAR = "1y",
+}
+
 export const TENANT_NAMESPACES = {
   ENS: "ens",
   ETHERFI: "etherfi",
