@@ -16,7 +16,7 @@ import Hero from "@/components/Hero/Hero";
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
   const page = tenant.ui.page("proposals");
-  const { title, description } = page.meta;
+  const { title, description } = page!.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
     title

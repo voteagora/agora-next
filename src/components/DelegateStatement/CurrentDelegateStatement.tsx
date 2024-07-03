@@ -10,7 +10,6 @@ import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateSt
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { initialTopIssues } from "@/components/DelegateStatement/TopIssuesFormSection";
 import Tenant from "@/lib/tenant/tenant";
 
 const { slug: daoSlug } = Tenant.current();
@@ -55,12 +54,23 @@ const formSchema = z.object({
 });
 
 export default function CurrentDelegateStatement() {
+  const { ui } = Tenant.current();
   const { address, isConnected } = useAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
 
-  const { ui } = Tenant.current();
+  // Display the first two delegate issues as default values
+  const topIssues = ui.topGovernanceIssues;
+  const defaultIssues = !topIssues
+    ? []
+    : topIssues.slice(0, 2).map((issue) => {
+        return {
+          type: issue.key,
+          value: "",
+        };
+      });
+
   const requireCodeOfConduct = !!ui.toggle("delegates/code-of-conduct")
     ?.enabled;
 
@@ -92,7 +102,7 @@ export default function CurrentDelegateStatement() {
                 }[];
               }
             )?.topIssues
-          : initialTopIssues(),
+          : defaultIssues,
       openToSponsoringProposals:
         (
           delegateStatement?.payload as {
@@ -123,6 +133,7 @@ export default function CurrentDelegateStatement() {
       reset(setDefaultValues(_delegateStatement as DelegateStatement));
       setLoading(false);
     }
+
     if (address) {
       setLoading(true);
       _getDelegateStatement();
