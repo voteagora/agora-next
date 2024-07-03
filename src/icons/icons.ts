@@ -29,6 +29,7 @@ import github from "./github.svg";
 import world from "./world.svg";
 import clipboard from "./clipboard.svg";
 import sponsor from "./sponsor.svg";
+import copy from "./copy.svg";
 import chevronSelectorVertical from "./chevronSelectorVertical.svg";
 import check from "./check.svg";
 import link from "./link.svg";
@@ -65,6 +66,7 @@ export const icons = {
   world,
   clipboard,
   sponsor,
+  copy,
   chevronSelectorVertical,
   check,
   link,

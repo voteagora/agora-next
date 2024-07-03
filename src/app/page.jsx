@@ -14,6 +14,7 @@ import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
+import Image from "next/image";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -68,6 +69,7 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Home() {
+  const tenant = Tenant.current();
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter
@@ -80,6 +82,21 @@ export default async function Home() {
 
   return (
     <VStack>
+      {tenant.namespace === "optimism" && (
+        <a
+          href="https://round4.optimism.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="h-[100px] w-full relative mt-12 block"
+        >
+          <Image
+            src="/images/RetroPGF_Banner.png"
+            alt="Retro banner"
+            fill={true}
+            className=" object-cover rounded-lg"
+          />
+        </a>
+      )}
       <Hero />
       <MyDraftProposals
         fetchDraftProposals={async (address) => {

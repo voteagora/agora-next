@@ -122,6 +122,25 @@ export function formatNumberWithScientificNotation(x: number): string {
   return scientificNotation;
 }
 
+export function humanizeNumber(
+  n: number,
+  options: { delimiter?: string; separator?: string } = {}
+): string {
+  options = options || {};
+  const d = options.delimiter || ",";
+  const s = options.separator || ".";
+  let result = n.toString().split(".");
+  result[0] = result[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1" + d);
+  return result.join(s);
+}
+
+export function humanizeNumberContact(n: number, digits: number): string {
+  return new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: digits,
+  }).format(n);
+}
+
 export function tokenToHumanNumber(amount: number, decimals: number) {
   return Math.floor(amount / Math.pow(10, decimals));
 }
@@ -305,6 +324,16 @@ export function getBlockScanUrl(hash: string | `0x${string}`) {
       return `https://etherscan.io/tx/${hash}`;
   }
 }
+
+export const getTextWidth = (text: string, font = "14px inter") => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.font = font;
+    return context.measureText(text).width;
+  }
+  return 0;
+};
 
 export function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
