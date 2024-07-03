@@ -33,7 +33,7 @@ export function DelegateActions({
   const hasAlligator = contracts?.alligator;
 
   const isRetired = ui.delegates?.retired.includes(
-    delegate.address.toLowerCase()
+    delegate.address.toLowerCase() as `0x${string}`
   );
 
   if (isRetired) {
