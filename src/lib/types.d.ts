@@ -1,4 +1,4 @@
-import { BaseContract, BigNumberish } from "ethers";
+import { BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
@@ -6,6 +6,13 @@ import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
+
+export type MetricTimeSeriesValue = {
+  day: string;
+  date: string;
+  ts: number;
+  value: any;
+};
 
 export type StakedDeposit = {
   amount: string;
