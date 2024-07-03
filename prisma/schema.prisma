@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap", "test2", "retro_funding"]
+  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap", "alltenant", "retro_funding"]
 }
 
 model DelegateStatements {
@@ -981,7 +981,7 @@ model Daos {
   dao_slug          DaoSlug             @unique
   Proposals         ProposalDraft[]
   @@map("daos")
-  @@schema("test2")
+  @@schema("alltenant")
 }
 
 model ProposalDraft {
@@ -1001,13 +1001,15 @@ model ProposalDraft {
   snapshot_link               String?
   start_date_social           DateTime?
   end_date_social             DateTime?
+  contract                    String?
+  chain_id                    Int
   stage                       ProposalStage
   transactions                ProposalDraftTransaction[]
   social_options              ProposalSocialOption[]
   dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
   checklist_items             ProposalChecklist[]
   @@map("proposals")
-  @@schema("test2")
+  @@schema("alltenant")
 }
 
 model ProposalDraftTransaction {
@@ -1024,7 +1026,7 @@ model ProposalDraftTransaction {
   updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   @@map("proposal_transactions")
-  @@schema("test2")
+  @@schema("alltenant")
 }
 
 model ProposalSocialOption {
@@ -1035,7 +1037,7 @@ model ProposalSocialOption {
   updated_at  DateTime @default(now())
   proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
   @@map("proposal_options")
-  @@schema("test2")
+  @@schema("alltenant")
 }
 
 model ProposalChecklist {
@@ -1047,7 +1049,7 @@ model ProposalChecklist {
   proposal_id  Int
   proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
   @@map("proposal_checklist_items")
-  @@schema("test2")
+  @@schema("alltenant")
 }
 
 
@@ -1638,5 +1640,5 @@ enum ProposalStage {
   SUCCEEDED
 
   @@map("proposal_stage")
-  @@schema("test2")
+  @@schema("alltenant")
 }

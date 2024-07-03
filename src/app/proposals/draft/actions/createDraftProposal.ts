@@ -4,6 +4,7 @@ import { z } from "zod";
 import { schema as DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import prisma from "@/app/lib/prisma";
 import { ProposalDraftTransaction, ProposalStage } from "@prisma/client";
+import Tenant from "@/lib/tenant/tenant";
 
 export type FormState = {
   ok: boolean;
@@ -16,6 +17,7 @@ export async function onSubmitAction(
     creatorAddress: string;
   }
 ): Promise<FormState> {
+  const { contracts } = Tenant.current();
   const parsed = DraftProposalSchema.safeParse(data);
 
   if (!parsed.success) {

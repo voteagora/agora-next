@@ -119,9 +119,12 @@ async function getProposalTypes() {
 }
 
 async function getDraftProposals(address: `0x${string}`) {
+  const { contracts } = Tenant.current();
   return await prisma.proposalDraft.findMany({
     where: {
       author_address: address,
+      chain_id: contracts.governor.chain.id,
+      contract: contracts.governor.address,
       stage: {
         in: [
           PrismaProposalStage.ADDING_TEMP_CHECK,
@@ -138,9 +141,12 @@ async function getDraftProposals(address: `0x${string}`) {
 }
 
 async function getDraftProposalForSponsor(address: `0x${string}`) {
+  const { contracts } = Tenant.current();
   return await prisma.proposalDraft.findMany({
     where: {
       sponsor_address: address,
+      chain_id: contracts.governor.chain.id,
+      contract: contracts.governor.address,
       stage: {
         in: [
           PrismaProposalStage.ADDING_TEMP_CHECK,

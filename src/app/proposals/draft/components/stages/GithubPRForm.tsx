@@ -92,7 +92,7 @@ const GithubPRForm = ({
       <FormCard.Section>
         <div className="w-full rounded-md h-[350px] block relative">
           <Image
-            src="/images/temp_check.png"
+            src="/images/ens_temp_check.png"
             alt="Temp Check"
             fill={true}
             className="object-cover rounded-md"
