@@ -118,7 +118,6 @@ function formatGithubProposal(
   `;
 
   const abstract = `# Abstract \n ${proposal.abstract}`;
-  // const specification = `# Specification \n ${proposal.specification}`;
   const transactions =
     proposal.proposal_type === "executable"
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
@@ -294,7 +293,6 @@ async function getFolderContents(
     }.md`;
 
     return {
-      //   path: `${basePath}/${termDirectory}/${fileName}`,
       path: `${basePath}/${fileName}`,
       fileName,
     };

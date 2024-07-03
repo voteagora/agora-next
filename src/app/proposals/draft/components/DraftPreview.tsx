@@ -55,7 +55,6 @@ const DraftPreview = ({
 
   const aggregatedTransactions = proposalDraft.transactions.reduce(
     (acc, transaction) => {
-      // @ts-ignore
       acc["targets"] = [...acc["targets"], transaction.target];
       acc["values"] = [...acc["values"], transaction.value];
       acc["calldatas"] = [...acc["calldatas"], transaction.calldata];
@@ -100,7 +99,6 @@ const DraftPreview = ({
       return item.title.toLowerCase() !== self[index + 1].title.toLowerCase();
     });
 
-  console.log(filteredAndSortedChecklistItems);
   return (
     <FormCard>
       {!isArchived && (
@@ -123,7 +121,7 @@ const DraftPreview = ({
               options: parsedTransactions.kind.options,
             }}
             proposalType={parsedTransactions.key}
-            executedTransactionHash={"https://etherscan.io/tx/0x123"}
+            executedTransactionHash={undefined}
           />
         </div>
         {proposalDraft.proposal_type === "social" && (

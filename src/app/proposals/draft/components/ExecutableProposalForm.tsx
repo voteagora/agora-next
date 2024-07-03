@@ -7,7 +7,6 @@ import FormItem from "./form/FormItem";
 import { TransactionType } from "./../types";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
 import { UpdatedButton } from "@/components/Button";
-import { Button as MovingButton } from "@/components/MovingButton";
 import {
   useFormContext,
   useFieldArray,
@@ -198,18 +197,20 @@ const ExecutableProposalForm = () => {
           return (
             <>
               {field.type === TransactionType.TRANSFER ? (
-                <TransactionForm index={index} remove={remove}>
-                  <TransferTransactionForm
-                    index={index}
-                    key={`transfer-${index}`}
-                  />
+                <TransactionForm
+                  index={index}
+                  remove={remove}
+                  key={`transfer-${index}`}
+                >
+                  <TransferTransactionForm index={index} />
                 </TransactionForm>
               ) : (
-                <TransactionForm index={index} remove={remove}>
-                  <CustomTransactionForm
-                    index={index}
-                    key={`custom-${index}`}
-                  />
+                <TransactionForm
+                  index={index}
+                  remove={remove}
+                  key={`custom-${index}`}
+                >
+                  <CustomTransactionForm index={index} />
                 </TransactionForm>
               )}
             </>
@@ -239,16 +240,6 @@ const ExecutableProposalForm = () => {
             >
               Simulate transactions
             </UpdatedButton>
-            // <MovingButton
-            //   borderRadius="0.75rem"
-            //   className="bg-white text-black border-neutral-200 w-full"
-            //   type="button"
-            //   onClick={() => {
-            //     simulateTransactions();
-            //   }}
-            // >
-            //   Simulate transactions
-            // </MovingButton>
           )}
         </div>
       )}

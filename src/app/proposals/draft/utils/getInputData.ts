@@ -12,12 +12,6 @@ export function getInputData(
     "# " +
     proposal.title +
     "\n\n" +
-    proposal.abstract +
-    "\n" +
-    // `${
-    //   form.state.draftLink &&
-    //   "[Draft Discourse link](" + form.state.draftLink + ")\n"
-    // }` +
     `${
       proposal.temp_check_link &&
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
@@ -44,9 +38,7 @@ export function getInputData(
         calldatas.push(t.calldata as `0x${string}`);
       });
     }
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
   return { inputData };
 }

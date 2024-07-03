@@ -28,12 +28,10 @@ const SponsorOnchainProposalDialog = ({
           <VStack className="w-full">
             <img
               src={
-                isLoading
-                  ? `/images/action-pending.svg`
-                  : `/images/ens_success.svg`
+                isLoading ? tenant.ui.assets.pending : tenant.ui.assets.success
               }
               className="w-full mb-3"
-              alt="Pending"
+              alt={isLoading ? "Pending" : "Success"}
             />
             <div className="mb-2 text-2xl font-black">
               {isLoading ? "Creating your proposal ..." : "Proposal complete!"}

@@ -1,10 +1,11 @@
 "use server";
 
 import prisma from "@/app/lib/prisma";
-import { DaoSlug } from "@prisma/client";
 import { DRAFT_STAGES_FOR_TENANT } from "@/app/proposals/draft/utils/stages";
+import Tenant from "@/lib/tenant/tenant";
 
 async function createProposalDraft(address: `0x${string}`) {
+  const tenant = Tenant.current();
   // TODO: need to generalize this as well -- this is the high level idea though...
   const firstStage = DRAFT_STAGES_FOR_TENANT[0];
 
@@ -17,15 +18,14 @@ async function createProposalDraft(address: `0x${string}`) {
       author_address: address,
       sponsor_address: "",
       stage: firstStage.stage,
-      // TODO: need a way to generalize this to the current tenant
       dao: {
         connectOrCreate: {
           where: {
-            dao_slug: DaoSlug.ENS,
+            dao_slug: tenant.slug,
           },
           create: {
-            dao_slug: DaoSlug.ENS,
-            name: "ENS",
+            dao_slug: tenant.slug,
+            name: tenant.slug,
           },
         },
       },

@@ -1,6 +1,7 @@
 import { getWalletClient, getPublicClient } from "@/lib/viem";
 import { ProposalDraft } from "@prisma/client";
 import crossFetch from "cross-fetch";
+import Tenant from "@/lib/tenant/tenant";
 
 export const proposalTypes = {
   Proposal: [
@@ -63,21 +64,15 @@ export async function createSnapshot({
   address: string | null;
   proposal: ProposalDraft;
 }) {
-  // TODO: replace with tenent to get proper chainId
-  const walletClient = getWalletClient(11155111);
-  const publicClient = getPublicClient(1);
+  const tenant = Tenant.current();
+  const walletClient = getWalletClient(tenant.contracts.token.chain.id);
+  const publicClient = getPublicClient(tenant.contracts.token.chain.id);
 
   if (!address) {
     throw new Error("address not available");
   }
 
   const description =
-    proposal.abstract +
-    "\n" +
-    // `${
-    //   form.state.draftLink &&
-    //   "[Draft Discourse link](" + form.state.draftLink + ")\n"
-    // }` +
     `${
       proposal.temp_check_link &&
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
@@ -98,7 +93,6 @@ export async function createSnapshot({
     title: proposal.title,
     body: description,
     discussion: "",
-    // TODO: add choices based on proposal type
     choices: ["For", "Against", "Abstain"],
     start: Math.floor(
       new Date(proposal.start_date_social ?? new Date()).getTime() / 1000

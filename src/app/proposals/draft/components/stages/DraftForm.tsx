@@ -24,7 +24,6 @@ import {
 } from "@prisma/client";
 import ExecutableProposalForm from "../ExecutableProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
-// import FileInput from "../form/FileInput";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -150,17 +149,6 @@ const DraftForm = ({
               <SocialProposalForm />
             )}
           </FormCard.Section>
-          {/* <FormCard.Section>
-            <h3 className="text-stone-900 font-semibold">
-              Transaction payload audit
-            </h3>
-            <p className="mt-2 stone-700 mb-6">
-              Use this field to upload an optional audit report for your
-              transaction payload. This can help voters verify that your
-              proposal does what it intends to.
-            </p>
-            <FileInput />
-          </FormCard.Section> */}
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">
               <UpdatedButton

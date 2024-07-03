@@ -7,6 +7,7 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 async function getProposals({
   filter,
@@ -24,7 +25,7 @@ async function getProposals({
 
   // TODO: not the nicest way to handle this, but it works for now
   // and should allow us to test ENS in the short term
-  const isENSTestEnv = namespace === "ens" && !isProd;
+  const isENSTestEnv = namespace === TENANT_NAMESPACES.ENS && !isProd;
   const ensTestData = isENSTestEnv && {
     contract: contracts.governor.address,
   };

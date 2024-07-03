@@ -1,10 +1,5 @@
 import { z } from "zod";
-
-const isURL = (value: string) => {
-  // Regular expression for URL validation
-  const urlRegExp = /^(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+$/i;
-  return value === "" || urlRegExp.test(value);
-};
+import { isURL } from "@/lib/utils";
 
 export const schema = z.object({
   temp_check_link: z

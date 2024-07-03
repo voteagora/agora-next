@@ -2,8 +2,6 @@
 
 import { useAccount } from "wagmi";
 import { useState } from "react";
-import { z } from "zod";
-// import Tenant from "@/lib/tenant/tenant";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
 import {
@@ -53,7 +51,6 @@ const GithubPRForm = ({
       setIsSkipPending(false);
       router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
     } catch (e) {
-      console.error(e);
       setIsSkipPending(false);
     }
   };

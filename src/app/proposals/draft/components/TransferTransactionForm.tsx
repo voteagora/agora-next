@@ -8,6 +8,8 @@ import NumberInput from "./form/NumberInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
+import Tenant from "@/lib/tenant/tenant";
+import { useTokenDecimals } from "@/hooks/useTokenDecimals";
 
 const transferABI = [
   {
@@ -38,6 +40,7 @@ const transferABI = [
 type FormType = z.output<typeof draftProposalSchema>;
 
 const TransferTransactionForm = ({ index }: { index: number }) => {
+  const tenant = Tenant.current();
   const {
     register,
     watch,
@@ -47,6 +50,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
 
   const recipient = watch(`transactions.${index}.recipient`);
   const amount = watch(`transactions.${index}.amount`);
+  const { data: decimals } = useTokenDecimals();
 
   useEffect(() => {
     if (recipient && amount && isAddress(recipient)) {
@@ -54,15 +58,16 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       const calldata = encodeFunctionData({
         abi: transferABI,
         functionName: "transfer",
-        args: [recipient as `0x${string}`, BigInt(parseUnits(amount, 18))],
+        args: [
+          recipient as `0x${string}`,
+          BigInt(parseUnits(amount, Number(decimals))),
+        ],
       });
 
       setValue(`transactions.${index}.calldata`, calldata);
-      // TODO: replace with tenant governor address
-      // right now it's ENS test address
       setValue(
         `transactions.${index}.target`,
-        "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67"
+        tenant.contracts.governor.address
       );
       setValue(`transactions.${index}.value`, "0");
     }

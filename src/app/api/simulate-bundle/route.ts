@@ -3,8 +3,6 @@ export async function POST(request: Request) {
   const user = process.env.TENDERLY_USER;
   const project = process.env.TENDERLY_PROJECT;
 
-  // https://api.tenderly.co/api/v1/account/:accountID/project/:projectSlug/simulations/:simulationID/share
-
   const transactions = body?.transactions.map((transaction: any) => {
     return {
       to: transaction.target,

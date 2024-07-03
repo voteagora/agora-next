@@ -92,10 +92,7 @@ const SponsorActions = ({
                 },
               });
             }
-          } catch (error) {
-            console.error(error);
-            // toast?
-          }
+          } catch (error) {}
         }}
       >
         Submit proposal

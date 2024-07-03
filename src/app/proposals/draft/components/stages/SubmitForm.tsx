@@ -11,9 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
-
-// TODO: either read from contract or add to tenant
-const THRESHOLD = 100000000000000000000000;
+import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 
 const Actions = ({
   proposalDraft,
@@ -37,9 +35,10 @@ const Actions = ({
     ],
   });
 
-  const hasEnoughVotes = accountVotesData
-    ? accountVotesData >= THRESHOLD
-    : false;
+  const { data: threshold } = useProposalThreshold();
+
+  const hasEnoughVotes =
+    accountVotesData && threshold ? accountVotesData >= threshold : false;
 
   return (
     <div className="mt-6">

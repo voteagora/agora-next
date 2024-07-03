@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { z } from "zod";
-// import Tenant from "@/lib/tenant/tenant";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,18 +59,12 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   };
 
   return (
-    <form
-    //   action={async (formData: FormData) => {
-    //     await tempCheckAction(formData);
-    //     // this should probably be order in the tenent list + 1
-    //     redirect(`/proposals/draft?stage=1`);
-    //   }}
-    >
+    <form>
       <FormCard>
         <FormCard.Section>
           <div className="w-full rounded-md h-[350px] block relative">
             <Image
-              src="/images/temp_check.png"
+              src="/images/ens_temp_check.png"
               alt="Temp Check"
               fill={true}
               className="object-cover rounded-md"

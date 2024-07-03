@@ -13,14 +13,15 @@ import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSp
 import { ProposalDraft } from "@prisma/client";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
-
-const THRESHOLD = 100000000000000000000000;
+import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 
 const RequestSponsorshipForm = ({
   draftProposal,
 }: {
   draftProposal: ProposalDraft;
 }) => {
+  const tenant = Tenant.current();
+  const { data: threshold } = useProposalThreshold();
   const [isPending, setIsPending] = useState(false);
   const { watch } = useFormContext();
 
@@ -29,9 +30,9 @@ const RequestSponsorshipForm = ({
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useContractRead({
     abi: ENSGovernorABI,
-    address: Tenant.current().contracts.governor.address as `0x${string}`,
+    address: tenant.contracts.governor.address as `0x${string}`,
     functionName: "getVotes",
-    chainId: Tenant.current().contracts.governor.chain.id,
+    chainId: tenant.contracts.governor.chain.id,
     args: [
       address as `0x${string}`,
       blockNumber ? blockNumber - BigInt(1) : BigInt(0),
@@ -39,7 +40,7 @@ const RequestSponsorshipForm = ({
   });
 
   const hasEnoughVotes = accountVotesData
-    ? accountVotesData >= THRESHOLD
+    ? accountVotesData >= threshold!
     : false;
 
   return (
@@ -71,13 +72,7 @@ const RequestSponsorshipForm = ({
             sponsor_address: address,
           });
           setIsPending(false);
-          if (!res.ok) {
-            // toast?
-          } else {
-            // pretty funky way to revalidate path?
-            // I'm curious what this is actually doing internally
-            // better than a full page refresh though...
-            // wonder if there is a way to optimistically update data
+          if (res.ok) {
             invalidatePath(draftProposal.id);
           }
         }}

@@ -1,5 +1,4 @@
 import * as otel from "@opentelemetry/api";
-import { type NextRequest } from "next/server";
 import { performance } from "perf_hooks";
 import * as util from "util";
 
@@ -25,12 +24,12 @@ export const time_this = async <T>(
     throw error;
   } finally {
     const end = performance.now();
-    // console.log(
-    //   util.inspect(
-    //     { ...log_fields, time: end - start },
-    //     { showHidden: false, depth: null, colors: !log_emission }
-    //   )
-    // );
+    console.log(
+      util.inspect(
+        { ...log_fields, time: end - start },
+        { showHidden: false, depth: null, colors: !log_emission }
+      )
+    );
   }
 };
 
@@ -45,12 +44,12 @@ export const time_this_sync = <T>(
     throw error;
   } finally {
     const end = performance.now();
-    // console.log(
-    //   util.inspect(
-    //     { ...log_fields, time: end - start },
-    //     { showHidden: false, depth: null, colors: !log_emission }
-    //   )
-    // );
+    console.log(
+      util.inspect(
+        { ...log_fields, time: end - start },
+        { showHidden: false, depth: null, colors: !log_emission }
+      )
+    );
   }
 };
 
