@@ -50,6 +50,7 @@ export default function DelegateStatementForm({
       const _delegate = await fetchDelegate(address as string);
       setDelegate(_delegate);
     }
+
     if (address) {
       _getDelegate();
     }
