@@ -11,7 +11,8 @@ async function createProposalDraft(address: `0x${string}`) {
 
   const proposal = await prisma.proposalDraft.create({
     data: {
-      contract: tenant.contracts.governor.address as `0x${string}`,
+      contract:
+        tenant.contracts.governor.address.toLowerCase() as `0x${string}`,
       chain_id: tenant.contracts.governor.chain.id,
       temp_check_link: "",
       title: "",

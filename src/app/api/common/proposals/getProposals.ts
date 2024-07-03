@@ -124,7 +124,7 @@ async function getDraftProposals(address: `0x${string}`) {
     where: {
       author_address: address,
       chain_id: contracts.governor.chain.id,
-      contract: contracts.governor.address,
+      contract: contracts.governor.address.toLowerCase(),
       stage: {
         in: [
           PrismaProposalStage.ADDING_TEMP_CHECK,
@@ -146,7 +146,7 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
     where: {
       sponsor_address: address,
       chain_id: contracts.governor.chain.id,
-      contract: contracts.governor.address,
+      contract: contracts.governor.address.toLowerCase(),
       stage: {
         in: [
           PrismaProposalStage.ADDING_TEMP_CHECK,

@@ -17,7 +17,6 @@ export async function onSubmitAction(
     creatorAddress: string;
   }
 ): Promise<FormState> {
-  const { contracts } = Tenant.current();
   const parsed = DraftProposalSchema.safeParse(data);
 
   if (!parsed.success) {
