@@ -25,6 +25,39 @@ export const uniswapTenantUIConfig = new TenantUI({
     title: "Uniswap Foundation",
   },
 
+  topGovernanceIssues: [
+    {
+      icon: "wallet",
+      title: "Cross Chain deployments",
+      key: "cross-chain-deployments",
+    },
+    {
+      icon: "community",
+      title: "DAO working groups",
+      key: "dao-working-groups",
+    },
+    {
+      icon: "piggyBank",
+      title: "Fee tiers",
+      key: "fee-tiers",
+    },
+    {
+      icon: "measure",
+      title: "Mechanism design",
+      key: "mechanism-design",
+    },
+    {
+      icon: "users",
+      title: "Public goods",
+      key: "public-goods",
+    },
+    {
+      icon: "ballot",
+      key: "other",
+      title: "Other",
+    },
+  ],
+
   pages: [
     {
       route: "/",
@@ -100,16 +133,20 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegates/code-of-conduct",
+      enabled: true,
+    },
+    {
+      name: "delegates/edit",
+      enabled: true,
+    },
+    {
       name: "proposals",
       enabled: true,
     },
     {
       name: "staking",
       enabled: false,
-    },
-    {
-      name: "delegates/edit",
-      enabled: true,
     },
     {
       name: "info",
