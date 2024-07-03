@@ -9,7 +9,6 @@ import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
 import Tenant from "@/lib/tenant/tenant";
-import { useTokenDecimals } from "@/hooks/useTokenDecimals";
 
 const transferABI = [
   {
@@ -50,7 +49,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
 
   const recipient = watch(`transactions.${index}.recipient`);
   const amount = watch(`transactions.${index}.amount`);
-  const { data: decimals } = useTokenDecimals();
+  const decimals = tenant.token.decimals;
 
   useEffect(() => {
     if (recipient && amount && isAddress(recipient)) {
