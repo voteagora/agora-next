@@ -3,11 +3,10 @@ import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
-import { type UILink } from "@/lib/tenant/tenantUI";
 
 export const InfoHero = () => {
   const { ui } = Tenant.current();
-  const { title, description, links } = ui.page("info");
+  const page = ui!.page("info");
 
   const rotationClasses = ["-rotate-2", "rotate-4", "-rotate-5", "rotate-1"];
 
@@ -15,14 +14,14 @@ export const InfoHero = () => {
     <div className="flex flex-row mt-10 gap-11 flex-wrap sm:flex-nowrap">
       <div className="flex flex-col">
         <h1 className="text-4xl sm:text-[56px] sm:leading-[67px] font-black text-black">
-          {title}
+          {page!.title}
         </h1>
         <p className="text-base font-medium text-gray-4f mt-2 sm:mt-0 ">
-          {description}
+          {page!.description}
         </p>
       </div>
       <div className="flex flex-row">
-        {(links as UILink[]).map((link, idx) => (
+        {page!.links!.map((link, idx) => (
           <Card
             className={rotationClasses[idx % rotationClasses.length]}
             image={link.image || ""}
