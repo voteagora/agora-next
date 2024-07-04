@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "snapshot", "uniswap", "alltenant", "retro_funding"]
+  schemas  = ["agora", "alltenant", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
 }
 
 model DelegateStatements {
@@ -147,7 +147,7 @@ model BallotSubmittions {
   address    String   @db.VarChar(255)
   round      Int
   signature  String   @db.VarChar(255)
-  payload    String   @db.VarChar(255)
+  payload    String
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 
@@ -975,39 +975,30 @@ view uniswapStakedDeposits {
   @@schema("uniswap")
 }
 
-model Daos {
-  id                Int                 @id @default(autoincrement())
-  name              String              @unique
-  dao_slug          DaoSlug             @unique
-  Proposals         ProposalDraft[]
-  @@map("daos")
-  @@schema("alltenant")
-}
-
 model ProposalDraft {
-  id                          Int                        @id @default(autoincrement())
-  temp_check_link             String
-  proposal_type               String?
-  proposal_social_type        String?
-  title                       String
-  abstract                    String
-  audit_url                   String?
-  dao_slug                    DaoSlug
-  author_address              String
-  sponsor_address             String?
-  created_at                  DateTime                   @default(now())
-  updated_at                  DateTime                   @updatedAt
-  onchain_transaction_hash    String?
-  snapshot_link               String?
-  start_date_social           DateTime?
-  end_date_social             DateTime?
-  contract                    String?
-  chain_id                    Int
-  stage                       ProposalStage
-  transactions                ProposalDraftTransaction[]
-  social_options              ProposalSocialOption[]
-  dao                         Daos                       @relation(fields: [dao_slug], references: [dao_slug], onDelete: Restrict)
-  checklist_items             ProposalChecklist[]
+  id                       Int                        @id @default(autoincrement())
+  temp_check_link          String
+  proposal_type            String?                    @db.VarChar(50)
+  proposal_social_type     String?                    @db.VarChar(50)
+  title                    String                     @db.VarChar(255)
+  abstract                 String
+  audit_url                String?
+  dao_slug                 DaoSlug
+  author_address           String
+  sponsor_address          String
+  stage                    ProposalStage
+  start_date_social        DateTime?                  @db.Timestamp(6)
+  end_date_social          DateTime?                  @db.Timestamp(6)
+  created_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
+  onchain_transaction_hash String?                    @db.VarChar(255)
+  snapshot_link            String?
+  contract                 String
+  chain_id                 Int
+  checklist_items          ProposalChecklist[]
+  social_options           ProposalSocialOption[]
+  transactions             ProposalDraftTransaction[]
+
   @@map("proposals")
   @@schema("alltenant")
 }
@@ -1020,34 +1011,37 @@ model ProposalDraftTransaction {
   value            String        @db.VarChar(255)
   calldata         String
   description      String
-  simulation_state String        @default("UNCONFIRMED") // UNCONFIRMED, VALID, INVALID
-  simulation_id    String?
+  simulation_state String        @default("UNCONFIRMED") @db.VarChar(255)
+  simulation_id    String?       @db.VarChar(255)
   created_at       DateTime      @default(now()) @db.Timestamptz(6)
   updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@map("proposal_transactions")
   @@schema("alltenant")
 }
 
 model ProposalSocialOption {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   proposal_id Int
-  text        String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
-  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  text        String        @db.VarChar(255)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@map("proposal_options")
   @@schema("alltenant")
 }
 
 model ProposalChecklist {
   id           Int           @id @default(autoincrement())
-  title        String
-  completed_at DateTime      @default(now())
-  completed_by String
+  title        String        @db.VarChar(255)
+  completed_at DateTime      @default(now()) @db.Timestamptz(6)
+  completed_by String        @db.VarChar(255)
   link         String?
   proposal_id  Int
-  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade)
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@map("proposal_checklist_items")
   @@schema("alltenant")
 }
@@ -1623,7 +1617,6 @@ enum ProposalType {
   @@map("proposal_type")
   @@schema("config")
 }
-
 
 enum ProposalStage {
   ADDING_TEMP_CHECK

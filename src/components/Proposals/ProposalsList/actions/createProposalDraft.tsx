@@ -21,17 +21,7 @@ async function createProposalDraft(address: `0x${string}`) {
       author_address: address,
       sponsor_address: "",
       stage: firstStage.stage,
-      dao: {
-        connectOrCreate: {
-          where: {
-            dao_slug: tenant.slug,
-          },
-          create: {
-            dao_slug: tenant.slug,
-            name: tenant.slug,
-          },
-        },
-      },
+      dao_slug: tenant.slug,
     },
   });
 
