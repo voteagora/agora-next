@@ -42,13 +42,26 @@ async function getMetricTS(
 
   let QRY: string;
 
+  let scaler: number;
+
+  switch (metricId) {
+    case "fraction_of_active_delegates":
+      scaler = 100;
+      break;
+    case "fraction_of_large_active_delegates":
+      scaler = 100;
+      break;
+    default:
+      scaler = 1;
+      break;
+  }
+
   if (isChainMetric) {
     const { lookback } = frequencyToLookbackDayCount(frequency);
 
     QRY = `SELECT block_date AS day,
                         TO_CHAR(block_date, 'YYYY-MM-DD') date,
-                        extract(epoch from block_date) as ts,
-                         value
+                        (value::numeric * ${scaler})::text as value
                   FROM   alltenant.dao_engagement_metrics
                   WHERE  metric = '${metricId}'
                      AND tenant = '${namespace}' 
@@ -58,7 +71,6 @@ async function getMetricTS(
 
     QRY = `SELECT date AS day,
                         TO_CHAR(date, 'YYYY-MM-DD') date,
-                        extract(epoch from date) as ts,
                          value
                   FROM   google.analytics_24h
                   WHERE  metric_id = '${metricId}'
