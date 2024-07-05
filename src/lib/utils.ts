@@ -338,3 +338,9 @@ export const getTextWidth = (text: string, font = "14px inter") => {
 export function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const isURL = (value: string) => {
+  // Regular expression for URL validation
+  const urlRegExp = /^(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+$/i;
+  return value === "" || urlRegExp.test(value);
+};
