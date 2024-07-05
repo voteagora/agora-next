@@ -23,11 +23,9 @@ export default function ProposalsList({
 }) {
   const { address } = useAccount();
   const {
-    ui: { _toggles },
+    ui: { toggle },
   } = Tenant.current();
-  const tenantSupportsProposalLifecycle = _toggles?.some(
-    (toggle) => toggle.name === "proposal-lifecycle" && toggle.enabled
-  );
+  const tenantSupportsProposalLifecycle = toggle("proposal-lifecycle");
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
