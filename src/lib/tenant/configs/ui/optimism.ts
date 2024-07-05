@@ -30,14 +30,14 @@ export const optimismTenantUIConfig = new TenantUI({
     ],
   },
 
-  topGovernanceIssues: [
+  governanceIssues: [
     {
       icon: "measure",
       title: "Treasury management",
       key: "treasury",
     },
     {
-      icon: "ballot",
+      icon: "piggyBank",
       title: "Grant funding",
       key: "funding",
     },

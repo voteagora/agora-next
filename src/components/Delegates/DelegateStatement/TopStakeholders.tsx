@@ -2,49 +2,46 @@ import { DelegateStatement as DelegateStatementType } from "@/app/api/common/del
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 interface Props {
   statement: DelegateStatementType;
 }
 
-export default function TopIssues({ statement }: Props) {
+export default function TopStakeholders({ statement }: Props) {
   const { ui } = Tenant.current();
-  const topIssues = (
+
+  const stakeholders = (
     statement.payload as {
-      topIssues: {
+      topStakeholders: {
         value: string;
         type: string;
       }[];
     }
-  ).topIssues;
+  ).topStakeholders;
 
-  if (topIssues.length === 0 || !ui.governanceIssues) {
+  if (
+    !stakeholders ||
+    stakeholders.length === 0 ||
+    !ui.governanceStakeholders
+  ) {
     return null;
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold">Top Issues</h2>
+      <h2 className="text-2xl font-bold">Represented Stakeholders</h2>
 
       <div className="flex flex-col gap-4">
-        {topIssues.map((issue, idx) => {
-          const issueDefinition = ui.governanceIssues!.find(
-            (def) => issue.type === def.key
+        {stakeholders.map((stakeholder, idx) => {
+          const definition = ui.governanceStakeholders!.find(
+            (def) => stakeholder.type === def.key
           );
 
-          return issueDefinition ? (
-            <Issue
+          return (
+            <Stakeholder
               key={idx}
-              value={issue.value}
-              title={issueDefinition.title}
-              icon={issueDefinition.icon}
-            />
-          ) : (
-            <Issue
-              key={idx}
-              value={issue.value}
-              title={issue.type}
-              icon={"ballot"}
+              title={definition ? definition.title : stakeholder.type}
             />
           );
         })}
@@ -53,25 +50,23 @@ export default function TopIssues({ statement }: Props) {
   );
 }
 
-interface IssueProps {
+interface StakeholderProps {
   title: string;
-  icon: keyof typeof icons;
-  value: string;
 }
 
-const Issue = ({ title, icon, value }: IssueProps) => {
+const Stakeholder = ({ title }: StakeholderProps) => {
   return (
     <div className="rounded-xl border border-gray-eb shadow-newDefault bg-white p-3">
       <div className="flex flex-row gap-4 items-start">
         <div className="flex flex-col justify-center shrink-0">
           <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-gray-eb">
-            <Image src={icons[icon]} alt={title} />
+            <Image src={icons.community} alt={title} />
           </div>
         </div>
 
         <div className="flex flex-col">
-          <div className="text-xs font-medium text-[#66676b]">{title}</div>
-          <div>{value}</div>
+          <div className="text-xs font-medium text-[#66676b]">I represent</div>
+          <div>{capitalizeFirstLetter(title)}s</div>
         </div>
       </div>
     </div>

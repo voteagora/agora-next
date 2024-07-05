@@ -17,15 +17,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
-
-const cleanTopIssues = (
-  issues: {
-    value: string;
-    type: string;
-  }[]
-) => {
-  return issues.filter((issue) => issue.value !== "");
-};
+import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 
 export default function DelegateStatementForm({
   form,
@@ -39,7 +31,13 @@ export default function DelegateStatementForm({
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
-  const hasTopIssues = !!ui.topGovernanceIssues;
+
+  const hasTopIssues = Boolean(
+    ui.governanceIssues && ui.governanceIssues.length > 0
+  );
+  const hasStakeholders = Boolean(
+    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
+  );
 
   const agreeCodeConduct = useWatch({
     control: form.control,
@@ -64,7 +62,9 @@ export default function DelegateStatementForm({
     if (!walletClient) {
       throw new Error("signer not available");
     }
-    values.topIssues = cleanTopIssues(values.topIssues);
+
+    values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
+
     const {
       daoSlug,
       discord,
@@ -73,6 +73,7 @@ export default function DelegateStatementForm({
       twitter,
       warpcast,
       topIssues,
+      topStakeholders,
     } = values;
 
     // User will only sign what they are seeing on the frontend
@@ -85,6 +86,7 @@ export default function DelegateStatementForm({
       twitter,
       warpcast,
       topIssues,
+      topStakeholders,
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
@@ -135,6 +137,7 @@ export default function DelegateStatementForm({
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DelegateStatementFormSection form={form} />
               {hasTopIssues && <TopIssuesFormSection form={form} />}
+              {hasStakeholders && <TopStakeholdersFormSection form={form} />}
               <OtherInfoFormSection form={form} />
 
               <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
