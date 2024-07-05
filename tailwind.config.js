@@ -125,6 +125,13 @@ module.exports = {
         black: "#000",
         white: "#fff",
         partner: "#FF0420",
+        "agora-stone": {
+          900: "#000000",
+          700: "#4F4F4F",
+          500: "#AFAFAF",
+          100: "#E0E0E0",
+          50: "#FAFAFA",
+        },
         gray: {
           eb: "#ebebeb",
           "4f": "#4f4f4f",
