@@ -37,7 +37,7 @@ export const optimismTenantUIConfig = new TenantUI({
       key: "treasury",
     },
     {
-      icon: "ballot",
+      icon: "piggyBank",
       title: "Grant funding",
       key: "funding",
     },
