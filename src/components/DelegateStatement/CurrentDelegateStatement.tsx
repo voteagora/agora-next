@@ -4,14 +4,14 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import DelegateStatementForm from "./DelegateStatementForm";
-import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Tenant from "@/lib/tenant/tenant";
 import { useRouter } from "next/navigation";
+import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
+import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -171,7 +171,7 @@ export default function CurrentDelegateStatement() {
   }, [address, reset]);
 
   if (!isConnected && !isConnecting) {
-    router.push("/");
+    return <ResourceNotFound message="Oops! Nothing's here" />;
   }
 
   return loading ? <AgoraLoader /> : <DelegateStatementForm form={form} />;

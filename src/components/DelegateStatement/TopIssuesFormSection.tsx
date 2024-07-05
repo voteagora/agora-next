@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import Tenant from "@/lib/tenant/tenant";
 
-const FORM_KEY = "topIssues";
+const TOP_ISSUES_FORM_FIELD = "topIssues";
 
 type Issue = {
   type: string;
@@ -28,18 +28,18 @@ export default function TopIssuesFormSection({
   form,
 }: TopIssuesFormSectionProps) {
   const { ui } = Tenant.current();
-  const topIssues = useWatch({ name: FORM_KEY });
+  const topIssues = useWatch({ name: TOP_ISSUES_FORM_FIELD });
 
   const addIssue = (key: string) => {
     const newTopIssues = [...topIssues, { type: key, value: "" }];
-    form.setValue(FORM_KEY, newTopIssues);
+    form.setValue(TOP_ISSUES_FORM_FIELD, newTopIssues);
   };
 
   const removeIssue = (index: number) => {
     const newTopIssues = topIssues.filter(
       (issue: Issue, _index: number) => _index !== index
     );
-    form.setValue(FORM_KEY, newTopIssues);
+    form.setValue(TOP_ISSUES_FORM_FIELD, newTopIssues);
   };
 
   const updateIssue = (index: number, value: string) => {
@@ -52,7 +52,7 @@ export default function TopIssuesFormSection({
       }
       return issue;
     });
-    form.setValue(FORM_KEY, newTopIssues);
+    form.setValue(TOP_ISSUES_FORM_FIELD, newTopIssues);
   };
 
   return (

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import Tenant from "@/lib/tenant/tenant";
 
-const FORM_KEY = "topStakeholders";
+const TOP_STAKEHOLDERS_FORM_FIELD = "topStakeholders";
 
 type Stakeholder = {
   type: string;
@@ -28,7 +28,7 @@ export default function TopStakeholdersFormSection({
   form,
 }: TopStakeholdersFormSectionProps) {
   const { ui } = Tenant.current();
-  const topStakeholders = useWatch({ name: FORM_KEY });
+  const topStakeholders = useWatch({ name: TOP_STAKEHOLDERS_FORM_FIELD });
   const canAddMoreStakeholders = topStakeholders.length === 0;
 
   const addIssue = (key: string) => {
@@ -39,14 +39,14 @@ export default function TopStakeholdersFormSection({
         value: `I represent ${key.toLowerCase()}s`,
       },
     ];
-    form.setValue(FORM_KEY, newStakeholder);
+    form.setValue(TOP_STAKEHOLDERS_FORM_FIELD, newStakeholder);
   };
 
   const removeIssue = (index: number) => {
     const newTopIssues = topStakeholders.filter(
       (issue: Stakeholder, idx: number) => idx !== index
     );
-    form.setValue(FORM_KEY, newTopIssues);
+    form.setValue(TOP_STAKEHOLDERS_FORM_FIELD, newTopIssues);
   };
 
   return (

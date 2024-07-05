@@ -62,7 +62,9 @@ export default function DelegateStatementForm({
     if (!walletClient) {
       throw new Error("signer not available");
     }
+
     values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
+
     const {
       daoSlug,
       discord,
@@ -71,6 +73,7 @@ export default function DelegateStatementForm({
       twitter,
       warpcast,
       topIssues,
+      topStakeholders,
     } = values;
 
     // User will only sign what they are seeing on the frontend
@@ -83,6 +86,7 @@ export default function DelegateStatementForm({
       twitter,
       warpcast,
       topIssues,
+      topStakeholders,
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
