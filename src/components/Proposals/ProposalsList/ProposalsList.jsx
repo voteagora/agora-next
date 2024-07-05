@@ -22,10 +22,8 @@ export default function ProposalsList({
   governanceCalendar,
 }) {
   const { address } = useAccount();
-  const {
-    ui: { toggle },
-  } = Tenant.current();
-  const tenantSupportsProposalLifecycle = toggle("proposal-lifecycle");
+  const { ui } = Tenant.current();
+  const tenantSupportsProposalLifecycle = ui.toggle("proposal-lifecycle");
   const filter = useSearchParams().get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);

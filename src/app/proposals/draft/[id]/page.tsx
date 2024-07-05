@@ -43,10 +43,8 @@ export default async function DraftProposalPage({
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const {
-    ui: { toggle },
-  } = Tenant.current();
-  const tenantSupportsProposalLifecycle = toggle("proposal-lifecycle");
+  const { ui } = Tenant.current();
+  const tenantSupportsProposalLifecycle = ui.toggle("proposal-lifecycle");
 
   if (!tenantSupportsProposalLifecycle) {
     return <div>This feature is not supported by this tenant.</div>;
