@@ -65,7 +65,7 @@ async function getVotesForDelegateForAddress({
             FROM
               ${namespace + ".proposals"} proposals
             WHERE
-              proposals.proposal_id = av.proposal_id) p ON TRUE
+              proposals.proposal_id = av.proposal_id AND proposals.contract = '${contracts.governor.address}') p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET $2
@@ -147,7 +147,7 @@ async function getVotesForProposal({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM ${namespace + ".proposals"} proposals
-            WHERE proposals.proposal_id = $1) p ON TRUE
+            WHERE proposals.proposal_id = $1 AND proposals.contract = '${contracts.governor.address}') p ON TRUE
         ) q
         ORDER BY ${sort} DESC
         OFFSET $2
