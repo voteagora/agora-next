@@ -66,5 +66,9 @@ export const ensTenantUIConfig = new TenantUI({
       name: "delegates/edit",
       enabled: true,
     },
+    {
+      name: "proposal-lifecycle",
+      enabled: true,
+    },
   ],
 });
