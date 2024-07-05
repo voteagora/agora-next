@@ -25,31 +25,47 @@ export const uniswapTenantUIConfig = new TenantUI({
     title: "Uniswap Foundation",
   },
 
-  topGovernanceIssues: [
+  governanceStakeholders: [
+    { title: "Builder", key: "builder" },
+    { title: "Trader", key: "trader" },
+    { title: "Gamer", key: "gamer" },
+  ],
+
+  governanceIssues: [
     {
       icon: "wallet",
-      title: "Cross Chain deployments",
-      key: "cross-chain-deployments",
+      title: "Cross chain deployments",
+      key: "crossChain",
     },
     {
       icon: "community",
       title: "DAO working groups",
-      key: "dao-working-groups",
+      key: "daoWorkingGroups",
     },
     {
       icon: "piggyBank",
       title: "Fee tiers",
-      key: "fee-tiers",
+      key: "feeTiers",
+    },
+    {
+      icon: "piggyBank",
+      title: "Fee switch",
+      key: "feeSwitch",
     },
     {
       icon: "measure",
       title: "Mechanism design",
-      key: "mechanism-design",
+      key: "mechanismDesign",
     },
     {
       icon: "users",
       title: "Public goods",
-      key: "public-goods",
+      key: "publicGoods",
+    },
+    {
+      icon: "ballot",
+      title: "Meta governance",
+      key: "metaGovernance",
     },
     {
       icon: "ballot",

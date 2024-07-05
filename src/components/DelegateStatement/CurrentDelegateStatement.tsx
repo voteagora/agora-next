@@ -11,6 +11,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Tenant from "@/lib/tenant/tenant";
+import { useRouter } from "next/navigation";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -25,6 +26,14 @@ const formSchema = z.object({
   twitter: z.string(),
   warpcast: z.string(),
   topIssues: z.array(
+    z
+      .object({
+        type: z.string(),
+        value: z.string(),
+      })
+      .strict()
+  ),
+  stakeholders: z.array(
     z
       .object({
         type: z.string(),
@@ -54,14 +63,15 @@ const formSchema = z.object({
 });
 
 export default function CurrentDelegateStatement() {
+  const router = useRouter();
   const { ui } = Tenant.current();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isConnecting } = useAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
 
   // Display the first two delegate issues as default values
-  const topIssues = ui.topGovernanceIssues;
+  const topIssues = ui.governanceIssues;
   const defaultIssues = !topIssues
     ? []
     : topIssues.slice(0, 2).map((issue) => {
@@ -103,6 +113,26 @@ export default function CurrentDelegateStatement() {
               }
             )?.topIssues
           : defaultIssues,
+
+      stakeholders:
+        (
+          delegateStatement?.payload as {
+            stakeholders: {
+              value: string;
+              type: string;
+            }[];
+          }
+        )?.stakeholders?.length > 0
+          ? (
+              delegateStatement?.payload as {
+                stakeholders: {
+                  value: string;
+                  type: string;
+                }[];
+              }
+            )?.stakeholders
+          : [],
+
       openToSponsoringProposals:
         (
           delegateStatement?.payload as {
@@ -140,8 +170,8 @@ export default function CurrentDelegateStatement() {
     }
   }, [address, reset]);
 
-  if (!isConnected) {
-    return <ResourceNotFound message="Oops! Nothing's here" />;
+  if (!isConnected && !isConnecting) {
+    router.push("/");
   }
 
   return loading ? <AgoraLoader /> : <DelegateStatementForm form={form} />;

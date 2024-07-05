@@ -13,58 +13,55 @@ import { Button } from "@/components/ui/button";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import Tenant from "@/lib/tenant/tenant";
 
-const FORM_KEY = "topIssues";
+const FORM_KEY = "stakeholders";
 
-type Issue = {
+type Stakeholder = {
   type: string;
   value: string;
 };
 
-interface TopIssuesFormSectionProps {
+interface StakeholdersFormSection {
   form: UseFormReturn<DelegateStatementFormValues>;
 }
 
-export default function TopIssuesFormSection({
+export default function StakeholdersFormSection({
   form,
-}: TopIssuesFormSectionProps) {
+}: StakeholdersFormSection) {
   const { ui } = Tenant.current();
-  const topIssues = useWatch({ name: FORM_KEY });
+  const topStakeholders = useWatch({ name: FORM_KEY });
+  const canAddMoreStakeholders = topStakeholders.length === 0;
 
   const addIssue = (key: string) => {
-    const newTopIssues = [...topIssues, { type: key, value: "" }];
-    form.setValue(FORM_KEY, newTopIssues);
+    const newStakeholder = [
+      ...topStakeholders,
+      {
+        type: key,
+        value: `I represent ${key.toLowerCase()}s`,
+      },
+    ];
+    form.setValue(FORM_KEY, newStakeholder);
   };
 
   const removeIssue = (index: number) => {
-    const newTopIssues = topIssues.filter(
-      (issue: Issue, _index: number) => _index !== index
+    const newTopIssues = topStakeholders.filter(
+      (issue: Stakeholder, idx: number) => idx !== index
     );
-    form.setValue(FORM_KEY, newTopIssues);
-  };
-
-  const updateIssue = (index: number, value: string) => {
-    const newTopIssues = topIssues.map((issue: Issue, _index: number) => {
-      if (_index === index) {
-        return {
-          ...issue,
-          value,
-        };
-      }
-      return issue;
-    });
     form.setValue(FORM_KEY, newTopIssues);
   };
 
   return (
     <div className="py-8 px-6 border-b border-gray-300">
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-baseline">
-        <h3 className="font-bold">Views on top issues</h3>
+        <h3 className="font-bold">Stakeholders I represent</h3>
         <DropdownMenu>
-          <DropdownMenuTrigger className="text-[#66676b] outline-none">
-            + Add a new issue
+          <DropdownMenuTrigger
+            className={`${canAddMoreStakeholders ? "text-[#66676b]" : "text-gray-500"} outline-none`}
+            disabled={!canAddMoreStakeholders}
+          >
+            + Add a stakeholder
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {ui.governanceIssues!.map((issue) => (
+            {ui.governanceStakeholders!.map((issue) => (
               <DropdownMenuItem
                 key={issue.title}
                 onClick={() => addIssue(issue.key)}
@@ -76,31 +73,20 @@ export default function TopIssuesFormSection({
         </DropdownMenu>
       </div>
 
-      <div className="flex flex-col gap-4 mt-6">
-        {topIssues.map((issue: Issue, idx: number) => {
-          const issueDefinition = ui.governanceIssues!.find(
-            (def) => issue.type === def.key
-          );
+      <div className="text-sm">
+        Use this tag to identify what stakeholder group you are, or look to
+        represent in your votes.
+      </div>
 
-          return issueDefinition ? (
-            <IssueInput
-              key={idx}
-              title={issueDefinition.title}
-              icon={issueDefinition.icon}
-              value={issue.value}
-              index={idx}
-              removeIssue={removeIssue}
-              updateIssue={updateIssue}
-            />
-          ) : (
-            <IssueInput
+      <div className="flex flex-col gap-4 mt-6">
+        {topStakeholders.map((issue: Stakeholder, idx: number) => {
+          return (
+            <StakeholderInput
               key={idx}
               title={issue.value}
-              icon={"ballot"}
               value={issue.value}
               index={idx}
-              removeIssue={removeIssue}
-              updateIssue={updateIssue}
+              remove={removeIssue}
             />
           );
         })}
@@ -109,27 +95,18 @@ export default function TopIssuesFormSection({
   );
 }
 
-interface IssueInputProps {
+interface StakeholderInputProps {
   title: string;
-  icon: keyof typeof icons;
   value: string;
   index: number;
-  removeIssue: (index: number) => void;
-  updateIssue: (index: number, value: string) => void;
+  remove: (index: number) => void;
 }
 
-const IssueInput = ({
-  icon,
-  title,
-  value,
-  index,
-  removeIssue,
-  updateIssue,
-}: IssueInputProps) => {
+const StakeholderInput = ({ title, index, remove }: StakeholderInputProps) => {
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-gray-300 shadow-newDefault p-2">
-        <Image src={icons[icon]} alt={title} />
+        <Image src={icons.community} alt="Stakeholders" />
       </div>
 
       <div className="flex flex-col flex-1 relative">
@@ -137,7 +114,7 @@ const IssueInput = ({
           <Button
             variant="ghost"
             className="mt-[2px] mr-[3px]"
-            onClick={() => removeIssue(index)}
+            onClick={() => remove(index)}
           >
             <CloseIcon className="w-4 h-4 mx-1 my-[1px] text-muted-foreground" />
           </Button>
@@ -147,9 +124,8 @@ const IssueInput = ({
           variant="bgGray100"
           inputSize="md"
           type="text"
-          placeholder={`On ${title.toLowerCase()}, I believe...`}
-          value={value}
-          onChange={(e) => updateIssue(index, e.target.value)}
+          placeholder={`I represent ${title}`}
+          value={`I represent ${title}`}
         />
       </div>
     </div>
