@@ -23,7 +23,7 @@ import {
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
-import Stakeholders from "@/components/Delegates/DelegateStatement/Stakeholders";
+import TopStakeholders from "@/components/Delegates/DelegateStatement/TopStakeholders";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -117,7 +117,7 @@ export default async function Page({
         {statement && (
           <>
             <TopIssues statement={statement} />
-            <Stakeholders statement={statement} />
+            <TopStakeholders statement={statement} />
           </>
         )}
 

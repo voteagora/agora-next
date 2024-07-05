@@ -8,17 +8,17 @@ interface Props {
   statement: DelegateStatementType;
 }
 
-export default function Stakeholders({ statement }: Props) {
+export default function TopStakeholders({ statement }: Props) {
   const { ui } = Tenant.current();
 
   const stakeholders = (
     statement.payload as {
-      stakeholders: {
+      topStakeholders: {
         value: string;
         type: string;
       }[];
     }
-  ).stakeholders;
+  ).topStakeholders;
 
   if (
     !stakeholders ||
@@ -34,7 +34,16 @@ export default function Stakeholders({ statement }: Props) {
 
       <div className="flex flex-col gap-4">
         {stakeholders.map((stakeholder, idx) => {
-          return <Stakeholder key={idx} title={stakeholder.type} />;
+          const definition = ui.governanceStakeholders!.find(
+            (def) => stakeholder.type === def.key
+          );
+
+          return (
+            <Stakeholder
+              key={idx}
+              title={definition ? definition.title : stakeholder.type}
+            />
+          );
         })}
       </div>
     </div>

@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
-import StakeholdersFormSection from "@/components/DelegateStatement/StakeholdersFormSection";
+import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 
 export default function DelegateStatementForm({
   form,
@@ -32,8 +32,12 @@ export default function DelegateStatementForm({
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
 
-  const hasTopIssues = !!ui.governanceIssues;
-  const hasStakeholders = !!ui.governanceStakeholders;
+  const hasTopIssues = Boolean(
+    ui.governanceIssues && ui.governanceIssues.length > 0
+  );
+  const hasStakeholders = Boolean(
+    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
+  );
 
   const agreeCodeConduct = useWatch({
     control: form.control,
@@ -129,7 +133,7 @@ export default function DelegateStatementForm({
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DelegateStatementFormSection form={form} />
               {hasTopIssues && <TopIssuesFormSection form={form} />}
-              {hasStakeholders && <StakeholdersFormSection form={form} />}
+              {hasStakeholders && <TopStakeholdersFormSection form={form} />}
               <OtherInfoFormSection form={form} />
 
               <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">

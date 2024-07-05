@@ -33,7 +33,7 @@ const formSchema = z.object({
       })
       .strict()
   ),
-  stakeholders: z.array(
+  topStakeholders: z.array(
     z
       .object({
         type: z.string(),
@@ -114,23 +114,23 @@ export default function CurrentDelegateStatement() {
             )?.topIssues
           : defaultIssues,
 
-      stakeholders:
+      topStakeholders:
         (
           delegateStatement?.payload as {
-            stakeholders: {
+            topStakeholders: {
               value: string;
               type: string;
             }[];
           }
-        )?.stakeholders?.length > 0
+        )?.topStakeholders?.length > 0
           ? (
               delegateStatement?.payload as {
-                stakeholders: {
+                topStakeholders: {
                   value: string;
                   type: string;
                 }[];
               }
-            )?.stakeholders
+            )?.topStakeholders
           : [],
 
       openToSponsoringProposals:

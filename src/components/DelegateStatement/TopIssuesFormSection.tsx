@@ -78,15 +78,15 @@ export default function TopIssuesFormSection({
 
       <div className="flex flex-col gap-4 mt-6">
         {topIssues.map((issue: Issue, idx: number) => {
-          const issueDefinition = ui.governanceIssues!.find(
+          const definition = ui.governanceIssues!.find(
             (def) => issue.type === def.key
           );
 
-          return issueDefinition ? (
+          return definition ? (
             <IssueInput
               key={idx}
-              title={issueDefinition.title}
-              icon={issueDefinition.icon}
+              title={definition.title}
+              icon={definition.icon}
               value={issue.value}
               index={idx}
               removeIssue={removeIssue}

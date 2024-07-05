@@ -13,20 +13,20 @@ import { Button } from "@/components/ui/button";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import Tenant from "@/lib/tenant/tenant";
 
-const FORM_KEY = "stakeholders";
+const FORM_KEY = "topStakeholders";
 
 type Stakeholder = {
   type: string;
   value: string;
 };
 
-interface StakeholdersFormSection {
+interface TopStakeholdersFormSectionProps {
   form: UseFormReturn<DelegateStatementFormValues>;
 }
 
-export default function StakeholdersFormSection({
+export default function TopStakeholdersFormSection({
   form,
-}: StakeholdersFormSection) {
+}: TopStakeholdersFormSectionProps) {
   const { ui } = Tenant.current();
   const topStakeholders = useWatch({ name: FORM_KEY });
   const canAddMoreStakeholders = topStakeholders.length === 0;
@@ -80,10 +80,22 @@ export default function StakeholdersFormSection({
 
       <div className="flex flex-col gap-4 mt-6">
         {topStakeholders.map((issue: Stakeholder, idx: number) => {
-          return (
+          const definition = ui.governanceStakeholders!.find(
+            (def) => issue.type === def.key
+          );
+
+          return definition ? (
             <StakeholderInput
               key={idx}
-              title={issue.value}
+              title={`${definition.title.toLowerCase()}s`}
+              value={`${definition.title.toLowerCase()}s`}
+              index={idx}
+              remove={removeIssue}
+            />
+          ) : (
+            <StakeholderInput
+              key={idx}
+              title={issue.type}
               value={issue.value}
               index={idx}
               remove={removeIssue}
@@ -102,7 +114,12 @@ interface StakeholderInputProps {
   remove: (index: number) => void;
 }
 
-const StakeholderInput = ({ title, index, remove }: StakeholderInputProps) => {
+const StakeholderInput = ({
+  title,
+  value,
+  index,
+  remove,
+}: StakeholderInputProps) => {
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-gray-300 shadow-newDefault p-2">
@@ -124,8 +141,8 @@ const StakeholderInput = ({ title, index, remove }: StakeholderInputProps) => {
           variant="bgGray100"
           inputSize="md"
           type="text"
-          placeholder={`I represent ${title}`}
-          value={`I represent ${title}`}
+          placeholder={`I represent ${value}`}
+          value={`I represent ${value}`}
         />
       </div>
     </div>
