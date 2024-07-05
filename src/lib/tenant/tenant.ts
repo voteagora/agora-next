@@ -60,7 +60,7 @@ export default class Tenant {
     );
   }
 
-  public get ui(): any {
+  public get ui(): TenantUI {
     return this._ui;
   }
 

@@ -21,7 +21,6 @@ async function getTreasuryBalanceTS(
 
   const QRY = `SELECT day,
                 TO_CHAR(day, 'YYYY-MM-DD') date,
-                extract(epoch from day) as ts,
                 ROUND(SUM(balance_usd)::numeric,0) balance_usd
               FROM   dune.token_balances tb
               WHERE  chain_id = 1
