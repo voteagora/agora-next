@@ -31,6 +31,8 @@ async function getCurrentDelegateesForAddress({
     },
   });
 
+  console.log("advancedDelegatees", advancedDelegatees);
+
   // const directDelegatee = await (async () => {
   //   const [proxyAddress, delegatee] = await Promise.all([
   //     getProxyAddress(address),
@@ -108,13 +110,14 @@ async function getCurrentDelegateesForAddress({
       timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
-      type: "ADVANCED",
+      type: "ADVANCED" as const,
       amount:
         Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
-          ? "FULL"
-          : "PARTIAL",
+          ? ("FULL" as const)
+          : ("PARTIAL" as const),
+      transaction_hash: advancedDelegatee.transaction_hash || "",
     })),
-  ] as Delegation[];
+  ];
 }
 
 /**
@@ -204,13 +207,14 @@ async function getCurrentDelegatorsForAddress({
       timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
         : null,
-      type: "ADVANCED",
+      type: "ADVANCED" as const,
       amount:
         Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-          ? "FULL"
-          : "PARTIAL",
+          ? ("FULL" as const)
+          : ("PARTIAL" as const),
+      transaction_hash: advancedDelegator.transaction_hash || "",
     })),
-  ] as Delegation[];
+  ];
 }
 
 /**
