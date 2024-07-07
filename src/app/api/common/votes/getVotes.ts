@@ -32,7 +32,20 @@ async function getVotesForDelegateForAddress({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT * FROM (
+        SELECT 
+          transaction_hash,
+          proposal_id,
+          voter,
+          support,
+          weight,
+          reason,
+          block_number,
+          params,
+          start_block,
+          description,
+          proposal_data,
+          proposal_type
+        FROM (
           SELECT * FROM (
           SELECT 
             STRING_AGG(transaction_hash,'|') as transaction_hash,
@@ -42,7 +55,8 @@ async function getVotesForDelegateForAddress({
             SUM(weight::numeric) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
-            params 
+            params,
+            contract
           FROM (
             SELECT
               *
@@ -54,7 +68,7 @@ async function getVotesForDelegateForAddress({
               FROM ${namespace + ".vote_cast_with_params_events"}
               WHERE voter = $1 AND contract = $2
           ) t
-          GROUP BY 2,3,4,8
+          GROUP BY 2,3,4,8,9
           ) av
           LEFT JOIN LATERAL (
             SELECT
@@ -65,7 +79,7 @@ async function getVotesForDelegateForAddress({
             FROM
               ${namespace + ".proposals"} proposals
             WHERE
-              proposals.proposal_id = av.proposal_id AND proposals.contract = $2) p ON TRUE
+              proposals.proposal_id = av.proposal_id AND proposals.contract = av.contract) p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET $3
@@ -117,7 +131,20 @@ async function getVotesForProposal({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT * FROM (
+        SELECT 
+          transaction_hash,
+          proposal_id,
+          voter,
+          support,
+          weight,
+          reason,
+          block_number,
+          params,
+          start_block,
+          description,
+          proposal_data,
+          proposal_type
+        FROM (
           SELECT * FROM (
           SELECT 
             STRING_AGG(transaction_hash,'|') as transaction_hash,
@@ -127,19 +154,20 @@ async function getVotesForProposal({
             SUM(weight::numeric) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
-            params
+            params,
+            contract
           FROM (
             SELECT
               *
             FROM ${namespace + ".vote_cast_events"}
-            WHERE proposal_id = $1 AND contract = $2
+            WHERE proposal_id = $1
             UNION ALL
             SELECT
               *
             FROM ${namespace + ".vote_cast_with_params_events"}
-            WHERE proposal_id = $1 AND contract = $2
+            WHERE proposal_id = $1
           ) t
-          GROUP BY 2,3,4,8
+          GROUP BY 2,3,4,8,9
           ) av
           LEFT JOIN LATERAL (
             SELECT
@@ -148,14 +176,13 @@ async function getVotesForProposal({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM ${namespace + ".proposals"} proposals
-            WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
+            WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
         ) q
         ORDER BY ${sort} DESC
-        OFFSET $3
-        LIMIT $4;
+        OFFSET $2
+        LIMIT $3;
       `,
         proposal_id,
-        contracts.governor.address.toLowerCase(),
         skip,
         take
       ),
