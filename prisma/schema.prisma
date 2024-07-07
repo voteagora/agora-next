@@ -812,7 +812,6 @@ view uniswapDelegatees {
   delegatee    String
   block_number BigInt
   balance      Decimal @db.Decimal
-  contract     String? @db.VarChar(42)
 
   @@map("delegatees")
   @@schema("uniswap")
