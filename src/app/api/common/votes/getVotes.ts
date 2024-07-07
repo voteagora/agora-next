@@ -47,12 +47,12 @@ async function getVotesForDelegateForAddress({
             SELECT
               *
               FROM ${namespace + ".vote_cast_events"}
-              WHERE voter = $1
+              WHERE voter = $1 AND contract = $2
             UNION ALL
               SELECT
                 *
               FROM ${namespace + ".vote_cast_with_params_events"}
-              WHERE voter = $1
+              WHERE voter = $1 AND contract = $2
           ) t
           GROUP BY 2,3,4,8
           ) av
@@ -65,13 +65,14 @@ async function getVotesForDelegateForAddress({
             FROM
               ${namespace + ".proposals"} proposals
             WHERE
-              proposals.proposal_id = av.proposal_id AND proposals.contract = '${contracts.governor.address}') p ON TRUE
+              proposals.proposal_id = av.proposal_id AND proposals.contract = $2) p ON TRUE
         ) q
         ORDER BY block_number DESC
-        OFFSET $2
-        LIMIT $3;
+        OFFSET $3
+        LIMIT $4;
       `,
         address.toLocaleLowerCase(),
+        contracts.governor.address.toLowerCase(),
         skip,
         take
       ),
@@ -131,12 +132,12 @@ async function getVotesForProposal({
             SELECT
               *
             FROM ${namespace + ".vote_cast_events"}
-            WHERE proposal_id = $1
+            WHERE proposal_id = $1 AND contract = $2
             UNION ALL
             SELECT
               *
             FROM ${namespace + ".vote_cast_with_params_events"}
-            WHERE proposal_id = $1
+            WHERE proposal_id = $1 AND contract = $2
           ) t
           GROUP BY 2,3,4,8
           ) av
@@ -147,13 +148,14 @@ async function getVotesForProposal({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM ${namespace + ".proposals"} proposals
-            WHERE proposals.proposal_id = $1 AND proposals.contract = '${contracts.governor.address}') p ON TRUE
+            WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
         ) q
         ORDER BY ${sort} DESC
-        OFFSET $2
-        LIMIT $3;
+        OFFSET $3
+        LIMIT $4;
       `,
         proposal_id,
+        contracts.governor.address.toLowerCase(),
         skip,
         take
       ),
