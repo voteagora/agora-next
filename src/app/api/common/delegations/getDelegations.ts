@@ -31,8 +31,6 @@ async function getCurrentDelegateesForAddress({
     },
   });
 
-  console.log("advancedDelegatees", advancedDelegatees);
-
   // const directDelegatee = await (async () => {
   //   const [proxyAddress, delegatee] = await Promise.all([
   //     getProxyAddress(address),
