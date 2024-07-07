@@ -819,7 +819,6 @@ view uniswapDelegatees {
 
 view uniswapDelegates {
   delegate          String   @unique
-  contract          String?  @db.VarChar(42)
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
@@ -839,7 +838,6 @@ view uniswapVotableSupply {
 view uniswapVotingPower {
   delegate     String  @unique
   voting_power String?
-  contract     String? @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("uniswap")
@@ -853,7 +851,6 @@ view uniswapVotingPowerSnaps {
   ordinal           Decimal? @db.Decimal
   transaction_index Int?
   log_index         Int?
-  contract          String?  @db.VarChar(42)
 
   @@map("voting_power_snaps")
   @@schema("uniswap")
@@ -892,7 +889,6 @@ view uniswapVoterStats {
   abstain            BigInt?
   against            BigInt?
   proposals_proposed BigInt?
-  contract           String?  @db.VarChar(42)
 
   @@map("voter_stats")
   @@schema("uniswap")
