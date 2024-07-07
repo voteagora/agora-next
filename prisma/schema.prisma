@@ -294,6 +294,8 @@ view OptimismVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?      @db.VarChar(42)
+  chain_id         Int?
 
   @@map("votes")
   @@schema("optimism")
@@ -533,6 +535,8 @@ view ensVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?
+  chain_id         Int?
 
   @@map("votes")
   @@schema("ens")
@@ -728,6 +732,8 @@ view etherfiVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?
+  chain_id         Int?
 
   @@map("votes")
   @@schema("etherfi")
@@ -902,6 +908,8 @@ view uniswapVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?      @db.VarChar(42)
+  chain_id         Int?
 
   @@map("votes")
   @@schema("uniswap")
@@ -1162,6 +1170,8 @@ view vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
 
   @@ignore
   @@schema("optimism")
@@ -1177,6 +1187,8 @@ view vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
 
   @@ignore
   @@schema("optimism")
@@ -1386,6 +1398,8 @@ view ens_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_events")
   @@ignore
@@ -1402,6 +1416,8 @@ view ens_vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_with_params_events")
   @@ignore
@@ -1418,6 +1434,8 @@ view etherfi_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_events")
   @@ignore
@@ -1434,6 +1452,8 @@ view etherfi_vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_with_params_events")
   @@ignore
@@ -1482,6 +1502,7 @@ view uniswap_delegates_wrapper {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates_wrapper")
   @@ignore
@@ -1529,6 +1550,8 @@ view uniswap_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
 
   @@map("vote_cast_events")
   @@ignore
@@ -1545,6 +1568,8 @@ view uniswap_vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_with_params_events")
   @@ignore
