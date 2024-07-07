@@ -86,7 +86,7 @@ async function getProposals({
 async function getProposal(proposal_id: string) {
   const { namespace, contracts } = Tenant.current();
   const proposal = await prisma[`${namespace}Proposals`].findFirst({
-    where: { proposal_id },
+    where: { proposal_id, contract: contracts.governor.address },
   });
 
   if (!proposal) {
