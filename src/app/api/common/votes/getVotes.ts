@@ -160,12 +160,12 @@ async function getVotesForProposal({
             SELECT
               *
             FROM ${namespace + ".vote_cast_events"}
-            WHERE proposal_id = $1
+            WHERE proposal_id = $1 AND contract = $2
             UNION ALL
             SELECT
               *
             FROM ${namespace + ".vote_cast_with_params_events"}
-            WHERE proposal_id = $1
+            WHERE proposal_id = $1 AND contract = $2
           ) t
           GROUP BY 2,3,4,8,9
           ) av
@@ -179,10 +179,11 @@ async function getVotesForProposal({
             WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
         ) q
         ORDER BY ${sort} DESC
-        OFFSET $2
-        LIMIT $3;
+        OFFSET $3
+        LIMIT $4;
       `,
         proposal_id,
+        contracts.governor.address.toLowerCase(),
         skip,
         take
       ),
