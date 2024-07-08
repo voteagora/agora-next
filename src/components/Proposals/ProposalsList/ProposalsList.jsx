@@ -49,7 +49,6 @@ export default function ProposalsList({
   };
 
   const proposals = pages.flatMap((page) => page.proposals);
-  console.log("proposals", proposals);
 
   return (
     <VStack className={styles.proposals_list_container}>
