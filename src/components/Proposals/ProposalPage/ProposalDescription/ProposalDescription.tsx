@@ -7,13 +7,21 @@ import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Vote } from "@/app/api/common/votes/vote";
 
 export default function ProposalDescription({
   proposal,
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: any;
+  proposalVotes: {
+    meta: {
+      currentPage: number;
+      pageSize: number;
+      hasNextPage: boolean;
+    };
+    votes: Vote[];
+  };
 }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
