@@ -5,6 +5,8 @@ import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovedTransactions({
   proposalData,
@@ -22,6 +24,8 @@ export default function ApprovedTransactions({
     return null;
   }
 
+  const { namespace } = Tenant.current();
+
   const isNoProposedTransactions =
     proposalType === "STANDARD" &&
     proposalData.options[0].calldatas[0] === "0x";
@@ -31,8 +35,9 @@ export default function ApprovedTransactions({
       <div className="flex items-center justify-between px-4 mb-2">
         <p className="font-mono text-xs font-medium leading-4 text-gray-af">
           {isNoProposedTransactions ? "No " : ""}
-          Proposed Transactions (signal only – transactions are manually
-          executed by the Foundation)
+          Proposed Transactions{" "}
+          {namespace === TENANT_NAMESPACES.OPTIMISM &&
+            "(signal only – transactions are manually executed by the Foundation)"}
         </p>
         {executedTransactionHash && (
           <a
