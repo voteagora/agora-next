@@ -1,8 +1,8 @@
-import { paginateResult } from "@/app/lib/pagination";
+import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { VotePayload, VotesSort } from "./vote";
+import { Vote, VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
