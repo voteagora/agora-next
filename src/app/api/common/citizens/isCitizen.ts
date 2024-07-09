@@ -10,6 +10,10 @@ const isCitizen = async (addressOrEnsName: string) =>
 async function isCitizenForAddress({ address }: { address: string }) {
   const { slug } = Tenant.current();
 
+  if (allowList.includes(address)) {
+    return true;
+  }
+
   const citizen = await prisma.$queryRaw<
     {
       address: string;
@@ -28,3 +32,7 @@ async function isCitizenForAddress({ address }: { address: string }) {
 }
 
 export const fetchIsCitizen = cache(isCitizen);
+
+const allowList = [
+  "0x849151d7D0bF1F34b70d5caD5149D28CC2308bf1", // Jesse
+];
