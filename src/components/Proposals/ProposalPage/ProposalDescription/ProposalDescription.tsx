@@ -5,8 +5,10 @@ import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
+import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+
 import { Vote } from "@/app/api/common/votes/vote";
 
 export default function ProposalDescription({
@@ -55,6 +57,11 @@ export default function ProposalDescription({
     return description;
   }
 
+  console.log("proposal data", proposal.proposalData);
+  // @ts-ignore
+  const options = proposal.proposalData?.options;
+  const option = options?.[0];
+
   return (
     <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
       <ProposalTitle title={shortTitle} proposal={proposal} />
@@ -65,6 +72,12 @@ export default function ProposalDescription({
           proposalData={proposal.proposalData}
           proposalType={proposal.proposalType}
           executedTransactionHash={proposal.executed_transaction_hash}
+        />
+        <ProposalTransactionDisplay
+          target={option.targets[0]}
+          calldata={option.calldatas[0]}
+          value={option.values[0]}
+          collapsed={false}
         />
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}

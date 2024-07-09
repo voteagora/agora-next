@@ -127,24 +127,6 @@ const decodeCalldata = (calldatas: `0x${string}`[]) => {
   });
 };
 
-const generateDecodingMetadata = async (calldatas: `0x${string}`[]) => {
-  const metadatas = await Promise.all(
-    calldatas.map(async (calldata) => {
-      const signatureFromLookup = await lookupFunction(
-        calldatas[0].slice(0, 10)
-      );
-      const args = decodeArgsWithSignature(
-        signatureFromLookup as string,
-        trimFunctionSelector(ethers.getBytes(calldatas[0]))
-      );
-
-      return args;
-    })
-  );
-
-  return metadatas;
-};
-
 /**
  * Proposal title extraction
  */
@@ -317,7 +299,6 @@ export type ParsedProposalData = {
           functionName: string;
           functionArgs: string[];
         }[];
-        decodingMetadata: any;
       }[];
     };
   };
@@ -376,7 +357,6 @@ export async function parseProposalData(
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
       const functionArgsName = decodeCalldata(calldatas);
-      const decodingMetadata = generateDecodingMetadata(calldatas);
 
       return {
         key: "STANDARD",
@@ -388,7 +368,6 @@ export async function parseProposalData(
               signatures: JSON.parse(parsedProposalData.signatures),
               calldatas: calldatas,
               functionArgsName,
-              decodingMetadata,
             },
           ],
         },
@@ -723,64 +702,3 @@ type ProposalTypeData = {
   quorum: bigint;
   approval_threshold: bigint;
 };
-
-const BASE_URL = "https://api.openchain.xyz/signature-database/v1/";
-
-type FunctionLookupResult = {
-  result: {
-    function: {
-      [fn: string]: [
-        {
-          name: string;
-        },
-      ];
-    };
-  };
-};
-
-export async function lookupFunction(fn: string) {
-  const url = `${BASE_URL}lookup?function=${fn}`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const payload = (await response.json()) as FunctionLookupResult;
-
-    if (payload.result.function[fn]) {
-      return payload.result.function[fn][0].name;
-    }
-
-    return null;
-  } catch (e) {
-    console.error(e);
-
-    return null;
-  }
-}
-
-export function decodeArgsWithSignature(
-  signature: string,
-  calldata: Uint8Array
-) {
-  const functionFragment = ethers.FunctionFragment.from(signature);
-
-  const decoder = new ethers.AbiCoder();
-  const decoded = decoder.decode(functionFragment.inputs, calldata);
-
-  return {
-    functionFragment,
-    values: functionFragment.inputs.map((type, index) => ({
-      type,
-      value: decoded[index],
-    })),
-  };
-}
-
-export function trimFunctionSelector(bytes: Uint8Array) {
-  return bytes.slice(4);
-}
