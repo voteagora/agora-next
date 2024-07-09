@@ -4,7 +4,7 @@ import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { Block } from "ethers";
+import { Block, ethers } from "ethers";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -126,6 +126,22 @@ const decodeCalldata = (calldatas: `0x${string}`[]) => {
     };
   });
 };
+
+// function decodeCalldatas(signature: any, calldata: any) {
+//   console.log(signature);
+//   const functionFragment = ethers.FunctionFragment.from(signature);
+
+//   const decoder = new ethers.AbiCoder.defaultAbiCoder();
+//   const decoded = decoder.decode(functionFragment.inputs, calldata);
+
+//   return {
+//     functionFragment,
+//     values: functionFragment.inputs.map((type, index) => ({
+//       type,
+//       value: decoded[index],
+//     })),
+//   };
+// }
 
 /**
  * Proposal title extraction
@@ -355,8 +371,12 @@ export function parseProposalData(
     }
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
+      console.log(parsedProposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
+      const signatures = JSON.parse(parsedProposalData.signatures);
       const functionArgsName = decodeCalldata(calldatas);
+      //   const args = decodeCalldatas(signatures[0], calldatas[0]);
+      //   console.log(args);
       return {
         key: "STANDARD",
         kind: {
