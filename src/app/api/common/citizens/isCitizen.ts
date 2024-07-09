@@ -34,5 +34,5 @@ async function isCitizenForAddress({ address }: { address: string }) {
 export const fetchIsCitizen = cache(isCitizen);
 
 const allowList = [
-  "0x849151d7D0bF1F34b70d5caD5149D28CC2308bf1", // Jesse
+  "0x849151d7d0bf1f34b70d5cad5149d28cc2308bf1", // Jesse
 ];
