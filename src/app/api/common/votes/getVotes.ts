@@ -1,8 +1,8 @@
-import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { Vote, VotePayload, VotesSort } from "./vote";
+import { VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -32,7 +32,7 @@ async function getVotesForDelegateForAddress({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT 
+        SELECT
           transaction_hash,
           proposal_id,
           voter,
@@ -47,7 +47,7 @@ async function getVotesForDelegateForAddress({
           proposal_type
         FROM (
           SELECT * FROM (
-          SELECT 
+          SELECT
             STRING_AGG(transaction_hash,'|') as transaction_hash,
             proposal_id,
             voter,
@@ -103,15 +103,19 @@ async function getVotesForDelegateForAddress({
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  return {
-    meta,
-    votes: votes.map((vote) => {
-      const proposalData = parseProposalData(
+  const parsedVotes = await Promise.all(
+    votes.map(async (vote) => {
+      const proposalData = await parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
       );
       return parseVote(vote, proposalData, latestBlock);
-    }),
+    })
+  );
+
+  return {
+    meta,
+    votes: parsedVotes,
   };
 }
 
@@ -131,7 +135,7 @@ async function getVotesForProposal({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT 
+        SELECT
           transaction_hash,
           proposal_id,
           voter,
@@ -146,7 +150,7 @@ async function getVotesForProposal({
           proposal_type
         FROM (
           SELECT * FROM (
-          SELECT 
+          SELECT
             STRING_AGG(transaction_hash,'|') as transaction_hash,
             proposal_id,
             voter,
@@ -199,7 +203,7 @@ async function getVotesForProposal({
   }
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
-  const proposalData = parseProposalData(
+  const proposalData = await parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type
   );
@@ -220,7 +224,7 @@ async function getUserVotesForProposal({
   const { namespace, contracts } = Tenant.current();
   const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
     `
-    SELECT 
+    SELECT
       STRING_AGG(transaction_hash,'|') as transaction_hash,
       proposal_id,
       proposal_type,
@@ -241,16 +245,20 @@ async function getUserVotesForProposal({
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  return votes.map((vote) =>
-    parseVote(
-      vote,
-      parseProposalData(
-        JSON.stringify(vote.proposal_data || {}),
-        vote.proposal_type
-      ),
-      latestBlock
+  const userVotes = await Promise.all(
+    votes.map(async (vote) =>
+      parseVote(
+        vote,
+        await parseProposalData(
+          JSON.stringify(vote.proposal_data || {}),
+          vote.proposal_type
+        ),
+        latestBlock
+      )
     )
   );
+
+  return userVotes;
 }
 
 async function getVotesForProposalAndDelegate({
@@ -266,17 +274,17 @@ async function getVotesForProposalAndDelegate({
   });
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
-
-  return votes.map((vote: VotePayload) =>
-    parseVote(
-      vote,
-      parseProposalData(
+  const parsedVotes = await Promise.all(
+    votes.map(async (vote) => {
+      const proposalData = await parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
-      ),
-      latestBlock
-    )
+      );
+      return parseVote(vote, proposalData, latestBlock);
+    })
   );
+
+  return parsedVotes;
 }
 
 export const fetchVotesForDelegate = cache(getVotesForDelegate);

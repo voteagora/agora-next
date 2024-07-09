@@ -1,7 +1,7 @@
 import { parseProposalData } from "@/lib/proposalUtils";
 import { ProposalDraftTransaction } from "@prisma/client";
 
-export const formatTransactions = (
+export const formatTransactions = async (
   transactions: ProposalDraftTransaction[]
 ) => {
   const aggregatedTransactions = transactions.reduce(
@@ -28,7 +28,7 @@ export const formatTransactions = (
     signatures: JSON.stringify(aggregatedTransactions.signatures),
   });
 
-  const parsedTransactions = parseProposalData(
+  const parsedTransactions = await parseProposalData(
     stringifiedTransactions,
     "STANDARD"
   );

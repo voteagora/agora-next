@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import FormCard from "./form/FormCard";
 import {
   ProposalDraft,
@@ -36,6 +37,7 @@ const DraftPreview = ({
   actions?: React.ReactNode;
   isArchived?: boolean;
 }) => {
+  const [parsedTransactions, setParsedTransactions] = useState<any>(null);
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useContractRead({
@@ -53,7 +55,13 @@ const DraftPreview = ({
     ? accountVotesData >= THRESHOLD
     : false;
 
-  const parsedTransactions = formatTransactions(proposalDraft.transactions);
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const parsed = await formatTransactions(proposalDraft.transactions);
+      setParsedTransactions(parsed);
+    };
+    fetchTransactions();
+  }, [proposalDraft.transactions]);
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
@@ -86,13 +94,9 @@ const DraftPreview = ({
         <h2 className="font-black text-agora-stone-900 text-2xl">
           {proposalDraft.title}
         </h2>
-        {/* found in parseProposalData */}
         <div className="mt-6">
           <ApprovedTransactions
-            proposalData={{
-              // @ts-ignore
-              options: parsedTransactions.kind.options,
-            }}
+            proposalData={{ options: parsedTransactions.kind.options }}
             proposalType={parsedTransactions.key}
             executedTransactionHash={undefined}
           />

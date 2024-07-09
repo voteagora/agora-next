@@ -16,11 +16,11 @@ const ENS_REPO_NAME = "docs";
 const BASE_BRANCH = "master"; // Base branch to create the new branch from
 const BASE_PATH = "docs/dao/proposals";
 
-function getFormattedTransactionTable(
+async function getFormattedTransactionTable(
   proposal: ProposalDraft & { transactions: ProposalDraftTransaction[] }
 ) {
   const markDownArray = [["Address", "Value", "Function", "Argument", "Value"]];
-  const parsedTransactions = formatTransactions(proposal.transactions);
+  const parsedTransactions = await formatTransactions(proposal.transactions);
   const options =
     parsedTransactions.key !== "SNAPSHOT"
       ? parsedTransactions.kind?.options
@@ -41,7 +41,7 @@ function getFormattedTransactionTable(
   return table;
 }
 
-function formatGithubProposal(
+async function formatGithubProposal(
   proposal: ProposalDraft & {
     transactions: ProposalDraftTransaction[];
     social_options: ProposalSocialOption[];
@@ -79,7 +79,7 @@ function formatGithubProposal(
   const abstract = `# Abstract \n ${proposal.abstract}`;
   const transactions =
     proposal.proposal_type === "executable"
-      ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
+      ? `# Transactions \n ${await getFormattedTransactionTable(proposal)}`
       : "";
 
   const votingStrategy =
@@ -149,7 +149,7 @@ export async function createGithubProposal(
       ENS_REPO_NAME
     );
 
-    const content = Buffer.from(formatGithubProposal(proposal)).toString(
+    const content = Buffer.from(await formatGithubProposal(proposal)).toString(
       "base64"
     );
 
