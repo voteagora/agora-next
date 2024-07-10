@@ -300,7 +300,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     FROM 
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN 
-        (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $2) a ON TRUE
+        (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $4) a ON TRUE
     LEFT JOIN 
       ${
         namespace + ".advanced_voting_power"
