@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import FormCard from "./form/FormCard";
 import {
   ProposalDraft,
@@ -8,7 +7,7 @@ import {
   ProposalSocialOption,
   ProposalChecklist,
 } from "@prisma/client";
-import ApprovedTransactions from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
+import ProposalTransactionDisplay from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { useContractRead, useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
@@ -19,7 +18,6 @@ import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
-import { formatTransactions } from "../utils/formatTransactions";
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -37,7 +35,6 @@ const DraftPreview = ({
   actions?: React.ReactNode;
   isArchived?: boolean;
 }) => {
-  const [parsedTransactions, setParsedTransactions] = useState<any>(null);
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useContractRead({
@@ -54,14 +51,6 @@ const DraftPreview = ({
   const hasEnoughVotes = accountVotesData
     ? accountVotesData >= THRESHOLD
     : false;
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      const parsed = await formatTransactions(proposalDraft.transactions);
-      setParsedTransactions(parsed);
-    };
-    fetchTransactions();
-  }, [proposalDraft.transactions]);
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
@@ -95,10 +84,15 @@ const DraftPreview = ({
           {proposalDraft.title}
         </h2>
         <div className="mt-6">
-          <ApprovedTransactions
-            proposalData={{ options: parsedTransactions.kind.options }}
-            proposalType={parsedTransactions.key}
-            executedTransactionHash={undefined}
+          <ProposalTransactionDisplay
+            targets={proposalDraft.transactions.map((t) => t.target)}
+            calldatas={
+              proposalDraft.transactions.map(
+                (t) => t.calldata
+              ) as `0x${string}`[]
+            }
+            values={proposalDraft.transactions.map((t) => t.value)}
+            collapsed={false}
           />
         </div>
         {proposalDraft.proposal_type === "social" && (

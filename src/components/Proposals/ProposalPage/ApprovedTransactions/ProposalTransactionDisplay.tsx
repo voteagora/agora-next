@@ -14,6 +14,32 @@ const generateDecodingMetadata = async (calldata: `0x${string}`) => {
 };
 
 const ProposalTransactionDisplay = ({
+  targets,
+  calldatas,
+  values,
+  collapsed,
+}: {
+  targets: string[];
+  calldatas: `0x${string}`[];
+  values: string[];
+  collapsed: boolean;
+}) => {
+  return (
+    <div className="flex flex-col border border-[#e0e0e0] rounded-lg bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden">
+      {targets.map((target, idx) => (
+        <ProposalTransactionItem
+          key={idx}
+          target={target}
+          calldata={calldatas[idx]}
+          value={values[idx]}
+          collapsed
+        />
+      ))}
+    </div>
+  );
+};
+
+const ProposalTransactionItem = ({
   target,
   calldata,
   value,
@@ -37,7 +63,7 @@ const ProposalTransactionDisplay = ({
   }, [calldata]);
 
   return (
-    <div className="flex flex-col gap-1 border border-[#e0e0e0] rounded-lg bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden">
+    <>
       <a className="underline" href={target}>
         {target}
       </a>
@@ -94,7 +120,7 @@ const ProposalTransactionDisplay = ({
           );
         })()}
       </div>
-    </div>
+    </>
   );
 };
 
