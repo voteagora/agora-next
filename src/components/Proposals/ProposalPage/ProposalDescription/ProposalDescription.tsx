@@ -67,17 +67,23 @@ export default function ProposalDescription({
       <ProposalChart proposal={proposal} proposalVotes={proposalVotes} />
 
       <div className="flex flex-col gap-2">
-        <ApprovedTransactions
-          proposalData={proposal.proposalData}
-          proposalType={proposal.proposalType}
-          executedTransactionHash={proposal.executed_transaction_hash}
-        />
-        <ProposalTransactionDisplay
-          target={option.targets[0]}
-          calldata={option.calldatas[0]}
-          value={option.values[0]}
-          collapsed={false}
-        />
+        {/* Right now I'm only sure this better decoded component works for standard proposals */}
+        {/* This is a feature for ENS, they use standard only, so we should be good for now */}
+        {/* TODO: abstract this into better decoding for all proposal types */}
+        {proposal.proposalType === "STANDARD" ? (
+          <ProposalTransactionDisplay
+            targets={option.targets}
+            calldatas={option.calldatas}
+            values={option.values}
+            executedTransactionHash={proposal.executed_transaction_hash}
+          />
+        ) : (
+          <ApprovedTransactions
+            proposalData={proposal.proposalData}
+            proposalType={proposal.proposalType}
+            executedTransactionHash={proposal.executed_transaction_hash}
+          />
+        )}
         <ReactMarkdown
           className={cn(styles.proposal_description_md, "max-w-none", "prose")}
         >

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { ethers } from "ethers";
+import { getBlockScanUrl, getBlockScanAddress } from "@/lib/utils";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 const generateDecodingMetadata = async (calldata: `0x${string}`) => {
   const signatureFromLookup = await lookupFunction(calldata.slice(0, 10));
@@ -17,24 +19,52 @@ const ProposalTransactionDisplay = ({
   targets,
   calldatas,
   values,
-  collapsed,
+  executedTransactionHash,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
   values: string[];
-  collapsed: boolean;
+  executedTransactionHash?: string | null;
 }) => {
+  const [collapsed, setCollapsed] = useState(true);
   return (
-    <div className="flex flex-col border border-[#e0e0e0] rounded-lg bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden">
-      {targets.map((target, idx) => (
-        <ProposalTransactionItem
-          key={idx}
-          target={target}
-          calldata={calldatas[idx]}
-          value={values[idx]}
-          collapsed
-        />
-      ))}
+    <div>
+      <div className="flex flex-col border border-b-0 border-[#e0e0e0] rounded-t-lg bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden">
+        <div className="w-full flex items-center justify-between">
+          <span className="text-xs text-stone-400">Proposed transactions</span>
+          {executedTransactionHash && (
+            <a
+              href={getBlockScanUrl(executedTransactionHash)}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+            </a>
+          )}
+        </div>
+
+        {(collapsed ? [targets[0]] : targets).map((target, idx) => (
+          <ProposalTransactionItem
+            key={idx}
+            target={target}
+            calldata={calldatas[idx]}
+            value={values[idx]}
+            collapsed={collapsed}
+          />
+        ))}
+      </div>
+      {targets.length > 1 && (
+        <div
+          className="border border-[#e0e0e0] rounded-b-lg bg-gray-fa p-4 cursor-pointer text-xs text-stone-400 font-mono"
+          onClick={() => {
+            setCollapsed(!collapsed);
+          }}
+        >
+          {collapsed
+            ? `Reveal remaining transactions (${targets.length} total)`
+            : "Hide transactions"}
+        </div>
+      )}
     </div>
   );
 };
@@ -63,8 +93,13 @@ const ProposalTransactionItem = ({
   }, [calldata]);
 
   return (
-    <>
-      <a className="underline" href={target}>
+    <div className="mt-4">
+      <a
+        className="underline"
+        href={getBlockScanAddress(target)}
+        target="_blank"
+        rel="noreferrer noopener"
+      >
         {target}
       </a>
       {(() => {
@@ -120,7 +155,7 @@ const ProposalTransactionItem = ({
           );
         })()}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -131,12 +166,17 @@ function EncodedValueDisplay({
 }: {
   type: ethers.ParamType;
   value: any;
-  collapsed?: boolean;
+  collapsed: boolean;
 }) {
   switch (type.type) {
     case "address":
       return (
-        <a className="underline mr-4" href={value}>
+        <a
+          className="underline mr-4"
+          href={getBlockScanAddress(value)}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
           {value},
         </a>
       );
@@ -149,13 +189,14 @@ function EncodedValueDisplay({
               key={idx}
               type={compoment}
               value={value[idx]}
+              collapsed={collapsed}
             />
           ))}
         </div>
       );
 
     case "bytes":
-      return <NestedFunctionDisplay calldata={value} collapsed={!!collapsed} />;
+      return <NestedFunctionDisplay calldata={value} collapsed={collapsed} />;
 
     default:
     case "string":

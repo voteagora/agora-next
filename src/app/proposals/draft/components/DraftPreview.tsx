@@ -92,7 +92,6 @@ const DraftPreview = ({
               ) as `0x${string}`[]
             }
             values={proposalDraft.transactions.map((t) => t.value)}
-            collapsed={false}
           />
         </div>
         {proposalDraft.proposal_type === "social" && (
