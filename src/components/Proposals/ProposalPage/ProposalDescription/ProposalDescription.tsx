@@ -57,7 +57,6 @@ export default function ProposalDescription({
     return description;
   }
 
-  console.log("proposal data", proposal.proposalData);
   // @ts-ignore
   const options = proposal.proposalData?.options;
   const option = options?.[0];

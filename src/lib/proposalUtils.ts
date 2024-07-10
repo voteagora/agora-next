@@ -178,7 +178,7 @@ export async function parseProposal(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
-  const proposalData = await parseProposalData(
+  const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposal.proposal_type as ProposalType
   );
@@ -331,10 +331,10 @@ export type ParsedProposalData = {
   };
 };
 
-export async function parseProposalData(
+export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType
-): Promise<ParsedProposalData[ProposalType]> {
+): ParsedProposalData[ProposalType] {
   switch (proposalType) {
     case "SNAPSHOT": {
       const parsedProposalData = JSON.parse(proposalData);

@@ -1,8 +1,8 @@
-import { paginateResult } from "@/app/lib/pagination";
+import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { VotePayload, VotesSort } from "./vote";
+import { Vote, VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -103,19 +103,15 @@ async function getVotesForDelegateForAddress({
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  const parsedVotes = await Promise.all(
-    votes.map(async (vote) => {
-      const proposalData = await parseProposalData(
+  return {
+    meta,
+    votes: votes.map((vote) => {
+      const proposalData = parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
       );
       return parseVote(vote, proposalData, latestBlock);
-    })
-  );
-
-  return {
-    meta,
-    votes: parsedVotes,
+    }),
   };
 }
 
@@ -203,7 +199,7 @@ async function getVotesForProposal({
   }
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
-  const proposalData = await parseProposalData(
+  const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type
   );
@@ -245,20 +241,16 @@ async function getUserVotesForProposal({
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  const userVotes = await Promise.all(
-    votes.map(async (vote) =>
-      parseVote(
-        vote,
-        await parseProposalData(
-          JSON.stringify(vote.proposal_data || {}),
-          vote.proposal_type
-        ),
-        latestBlock
-      )
+  return votes.map((vote) =>
+    parseVote(
+      vote,
+      parseProposalData(
+        JSON.stringify(vote.proposal_data || {}),
+        vote.proposal_type
+      ),
+      latestBlock
     )
   );
-
-  return userVotes;
 }
 
 async function getVotesForProposalAndDelegate({
@@ -274,17 +266,17 @@ async function getVotesForProposalAndDelegate({
   });
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
-  const parsedVotes = await Promise.all(
-    votes.map(async (vote) => {
-      const proposalData = await parseProposalData(
+
+  return votes.map((vote: VotePayload) =>
+    parseVote(
+      vote,
+      parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
-      );
-      return parseVote(vote, proposalData, latestBlock);
-    })
+      ),
+      latestBlock
+    )
   );
-
-  return parsedVotes;
 }
 
 export const fetchVotesForDelegate = cache(getVotesForDelegate);
