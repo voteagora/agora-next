@@ -32,7 +32,7 @@ async function getVotesForDelegateForAddress({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT 
+        SELECT
           transaction_hash,
           proposal_id,
           voter,
@@ -47,7 +47,7 @@ async function getVotesForDelegateForAddress({
           proposal_type
         FROM (
           SELECT * FROM (
-          SELECT 
+          SELECT
             STRING_AGG(transaction_hash,'|') as transaction_hash,
             proposal_id,
             voter,
@@ -131,7 +131,7 @@ async function getVotesForProposal({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT 
+        SELECT
           transaction_hash,
           proposal_id,
           voter,
@@ -146,7 +146,7 @@ async function getVotesForProposal({
           proposal_type
         FROM (
           SELECT * FROM (
-          SELECT 
+          SELECT
             STRING_AGG(transaction_hash,'|') as transaction_hash,
             proposal_id,
             voter,
@@ -220,7 +220,7 @@ async function getUserVotesForProposal({
   const { namespace, contracts } = Tenant.current();
   const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
     `
-    SELECT 
+    SELECT
       STRING_AGG(transaction_hash,'|') as transaction_hash,
       proposal_id,
       proposal_type,

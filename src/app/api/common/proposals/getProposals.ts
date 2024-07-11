@@ -17,18 +17,7 @@ async function getProposals({
   page: number;
 }) {
   const pageSize = 10;
-
-  const { namespace, contracts, isProd } = Tenant.current();
-  const prodDataOnly = isProd && {
-    contract: contracts.governor.address,
-  };
-
-  // TODO: not the nicest way to handle this, but it works for now
-  // and should allow us to test ENS in the short term
-  const isENSTestEnv = namespace === TENANT_NAMESPACES.ENS && !isProd;
-  const ensTestData = isENSTestEnv && {
-    contract: contracts.governor.address,
-  };
+  const { namespace, contracts } = Tenant.current();
 
   const { meta, data: proposals } = await paginateResult(
     (skip: number, take: number) => {
@@ -40,8 +29,7 @@ async function getProposals({
             ordinal: "desc",
           },
           where: {
-            ...(prodDataOnly || {}),
-            ...(ensTestData || {}),
+            contract: contracts.governor.address.toLowerCase(),
             cancelled_block: null,
           },
         });
@@ -53,7 +41,7 @@ async function getProposals({
             ordinal: "desc",
           },
           where: {
-            ...(prodDataOnly || {}),
+            contract: contracts.governor.address.toLowerCase(),
           },
         });
       }
