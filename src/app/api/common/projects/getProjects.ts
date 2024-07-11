@@ -22,12 +22,15 @@ async function getProjectsApi({
           skip,
           take,
         });
+      } else {
+        return prisma.project_applicants.findMany({
+          where: {
+            status: "Passed",
+          },
+          skip,
+          take,
+        });
       }
-
-      return prisma.projects.findMany({
-        skip,
-        take,
-      });
     },
     {
       limit,
