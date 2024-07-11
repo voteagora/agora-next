@@ -14,6 +14,8 @@ import styles from "./proposalVotesList.module.scss";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl, timeout } from "@/lib/utils";
 import { useState } from "react";
+import ENSAvatar from "@/components/shared/ENSAvatar";
+import { useEnsName } from "wagmi";
 
 export function ProposalSingleVote({
   vote,
@@ -37,6 +39,11 @@ export function ProposalSingleVote({
     }
   };
 
+  const { data } = useEnsName({
+    chainId: 1,
+    address: vote.address as `0x${string}`,
+  });
+
   return (
     <VStack key={vote.transactionHash} gap={2} className={styles.vote_row}>
       <VStack>
@@ -48,6 +55,7 @@ export function ProposalSingleVote({
           <HoverCardTrigger>
             <HStack justifyContent="justify-between" className={styles.voter}>
               <HStack gap={1} alignItems="items-center">
+                <ENSAvatar ensName={data} className="w-5 h-5" />
                 <HumanAddress address={vote.address} />
                 {vote.address === connectedAddress?.toLowerCase() && (
                   <p>(you)</p>

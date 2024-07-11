@@ -4,7 +4,7 @@ import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData } from "viem";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { Block } from "ethers";
+import { Block, ethers } from "ethers";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -357,6 +357,7 @@ export function parseProposalData(
       const parsedProposalData = JSON.parse(proposalData);
       const calldatas = JSON.parse(parsedProposalData.calldatas);
       const functionArgsName = decodeCalldata(calldatas);
+
       return {
         key: "STANDARD",
         kind: {
