@@ -27,7 +27,7 @@ async function getDelegatesApi(
   const { namespace, slug } = Tenant.current();
   const apiDelegatesQuery = (sort: string) =>
     `
-    SELECT 
+    SELECT
       delegates.delegate,
       num_of_delegators,
       direct_vp,
@@ -35,21 +35,21 @@ async function getDelegatesApi(
       voting_power,
       contract,
       am.address IS NOT NULL as citizen
-    FROM 
+    FROM
       ${namespace + ".delegates"}
     LEFT JOIN
       ${namespace + ".advanced_voting_power"} avp
-    ON 
+    ON
       avp.delegate = delegates.delegate
-    LEFT JOIN 
+    LEFT JOIN
       agora.citizens am
     ON
-      LOWER(am.address) = LOWER(delegates.delegate) AND 
+      LOWER(am.address) = LOWER(delegates.delegate) AND
       am.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens) AND
       am.dao_slug = $3::config.dao_slug
-    WHERE 
+    WHERE
       num_of_delegators IS NOT NULL
-    ORDER BY 
+    ORDER BY
       ${sort}
     OFFSET $1
     LIMIT $2;
@@ -138,25 +138,25 @@ async function getDelegates({
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
             SELECT *,
-              CASE 
+              CASE
                 WHEN EXISTS (
                   SELECT 1
                   FROM agora.citizens
                   WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
-                ) THEN TRUE 
-                ELSE FALSE 
+                ) THEN TRUE
+                ELSE FALSE
               END AS citizen,
               (SELECT row_to_json(sub)
-                FROM ( 
-                  SELECT 
-                    signature, 
+                FROM (
+                  SELECT
+                    signature,
                     payload,
                     twitter,
                     discord,
                     created_at,
                     updated_at,
                     warpcast
-                  FROM agora.delegate_statements s 
+                  FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
                   LIMIT 1
                 ) sub
@@ -178,25 +178,25 @@ async function getDelegates({
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
             SELECT *,
-              CASE 
+              CASE
                 WHEN EXISTS (
                   SELECT 1
                   FROM agora.citizens
                   WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
-                ) THEN TRUE 
-                ELSE FALSE 
+                ) THEN TRUE
+                ELSE FALSE
               END AS citizen,
               (SELECT row_to_json(sub)
-                FROM ( 
-                  SELECT 
-                    signature, 
+                FROM (
+                  SELECT
+                    signature,
                     payload,
                     twitter,
                     discord,
                     created_at,
                     updated_at,
                     warpcast
-                  FROM agora.delegate_statements s 
+                  FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
                   LIMIT 1
                 ) sub
@@ -218,25 +218,25 @@ async function getDelegates({
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
             SELECT *,
-              CASE 
+              CASE
                 WHEN EXISTS (
                   SELECT 1
                   FROM agora.citizens
                   WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
-                ) THEN TRUE 
-                ELSE FALSE 
+                ) THEN TRUE
+                ELSE FALSE
               END AS citizen,
               (SELECT row_to_json(sub)
-                FROM ( 
-                  SELECT 
-                    signature, 
+                FROM (
+                  SELECT
+                    signature,
                     payload,
                     twitter,
                     discord,
                     created_at,
                     updated_at,
                     warpcast
-                  FROM agora.delegate_statements s 
+                  FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
                   LIMIT 1
                 ) sub
@@ -283,7 +283,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
 
   const delegateQuery = prisma.$queryRawUnsafe<DelegateStats[]>(
     `
-    SELECT 
+    SELECT
       voter,
       proposals_voted,
       "for",
@@ -297,34 +297,34 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       proposals_proposed,
       citizen.citizen,
       statement.statement
-    FROM 
+    FROM
         (SELECT 1 as dummy) dummy_table
-    LEFT JOIN 
-        (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1) a ON TRUE
-    LEFT JOIN 
+    LEFT JOIN
+        (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $4) a ON TRUE
+    LEFT JOIN
       ${
         namespace + ".advanced_voting_power"
       } av ON av.delegate = $1 AND av.contract = $2
-    LEFT JOIN 
+    LEFT JOIN
         (SELECT num_of_delegators FROM ${
           namespace + ".delegates"
         } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
-    LEFT JOIN 
+    LEFT JOIN
         (SELECT * FROM ${
           namespace + ".voting_power"
         } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
     LEFT JOIN
         (SELECT
-          CASE 
-          WHEN EXISTS (SELECT 1 FROM agora.citizens ac WHERE LOWER(ac.address) = LOWER($1) AND ac.dao_slug = $3::config.dao_slug) THEN TRUE 
-          ELSE FALSE 
+          CASE
+          WHEN EXISTS (SELECT 1 FROM agora.citizens ac WHERE LOWER(ac.address) = LOWER($1) AND ac.dao_slug = $3::config.dao_slug) THEN TRUE
+          ELSE FALSE
           END as citizen
         ) citizen ON TRUE
     LEFT JOIN
         (SELECT row_to_json(sub) as statement
-        FROM ( 
-          SELECT 
-            signature, 
+        FROM (
+          SELECT
+            signature,
             payload,
             twitter,
             discord,
@@ -339,7 +339,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     `,
     address,
     contracts.alligator?.address || "",
-    slug
+    slug,
+    contracts.governor.address.toLowerCase()
   );
 
   const [delegate, votableSupply, quorum] = await Promise.all([
@@ -352,7 +353,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     { num_of_delegators: BigInt }[]
   >(
     `
-    SELECT 
+    SELECT
       SUM(count) as num_of_delegators
     FROM (
       SELECT count(*)
