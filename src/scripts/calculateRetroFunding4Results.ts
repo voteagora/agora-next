@@ -5,7 +5,7 @@ const iconv = require("iconv-lite");
 
 const TOTAL_FUNDING = 10_000_000;
 const MAX_CAP = 500_000;
-const MIN_CAP = 100;
+const MIN_CAP = 1000;
 
 const METRICS_CSV_PATH = path.join(
   __dirname,
