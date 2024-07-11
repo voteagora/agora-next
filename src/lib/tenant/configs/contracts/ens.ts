@@ -16,7 +16,7 @@ export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
 
   const GOVERNOR = isProd
     ? "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
-    : "0x630a6a268191c654ce084aad2d7910ff651e0797";
+    : "0xb65c031ac61128ae791d42ae43780f012e2f7f89";
 
   const provider = isProd ? ethProvider : sepoliaProvider;
 
@@ -33,7 +33,7 @@ export const ensTenantContractConfig = (isProd: boolean): TenantContracts => {
 
     // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: OptimismGovernor__factory.abi,
       address: GOVERNOR,
       chain: chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),

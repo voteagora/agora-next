@@ -331,8 +331,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             created_at,
             updated_at,
             warpcast
-          FROM agora.delegate_statements s
-          WHERE LOWER(s.address) = LOWER($1) AND s.dao_slug = $3::config.dao_slug
+          FROM agora.delegate_statements s 
+          WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
           LIMIT 1
         ) sub
       ) AS statement ON TRUE;
