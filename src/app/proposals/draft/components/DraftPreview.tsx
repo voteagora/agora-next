@@ -7,7 +7,7 @@ import {
   ProposalSocialOption,
   ProposalChecklist,
 } from "@prisma/client";
-import ApprovedTransactions from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
+import ProposalTransactionDisplay from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { useContractRead, useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
@@ -18,7 +18,6 @@ import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
-import { formatTransactions } from "../utils/formatTransactions";
 
 // TODO: either read from contract or add to tenant
 const THRESHOLD = 100000000000000000000000;
@@ -53,8 +52,6 @@ const DraftPreview = ({
     ? accountVotesData >= THRESHOLD
     : false;
 
-  const parsedTransactions = formatTransactions(proposalDraft.transactions);
-
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
   // sort by completed_at
@@ -86,15 +83,15 @@ const DraftPreview = ({
         <h2 className="font-black text-agora-stone-900 text-2xl">
           {proposalDraft.title}
         </h2>
-        {/* found in parseProposalData */}
         <div className="mt-6">
-          <ApprovedTransactions
-            proposalData={{
-              // @ts-ignore
-              options: parsedTransactions.kind.options,
-            }}
-            proposalType={parsedTransactions.key}
-            executedTransactionHash={undefined}
+          <ProposalTransactionDisplay
+            targets={proposalDraft.transactions.map((t) => t.target)}
+            calldatas={
+              proposalDraft.transactions.map(
+                (t) => t.calldata
+              ) as `0x${string}`[]
+            }
+            values={proposalDraft.transactions.map((t) => t.value)}
           />
         </div>
         {proposalDraft.proposal_type === "social" && (

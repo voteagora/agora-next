@@ -3,6 +3,7 @@ import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Tenant from "@/lib/tenant/tenant";
 
 const SponsorSnapshotProposalDialog = ({
   redirectUrl,
@@ -13,14 +14,15 @@ const SponsorSnapshotProposalDialog = ({
   snapshotLink: string;
   closeDialog: () => void;
 }) => {
+  const tenant = Tenant.current();
   const router = useRouter();
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-white rounded-xl">
         <VStack>
           <VStack className="w-full">
-            <img
-              src={`/images/ens_success.svg`}
+            <Image
+              src={tenant.ui.assets.success}
               className="w-full mb-3"
               alt="Cheerful scene with ENS + agora logo and thumbs up emojis."
             />

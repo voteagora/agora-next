@@ -26,7 +26,7 @@ const SponsorOnchainProposalDialog = ({
       <VStack className="w-full bg-white rounded-xl">
         <VStack>
           <VStack className="w-full">
-            <img
+            <Image
               src={
                 isLoading ? tenant.ui.assets.pending : tenant.ui.assets.success
               }
