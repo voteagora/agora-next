@@ -1,5 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
+import ensHero from "@/assets/tenant/ens_hero.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
@@ -8,6 +9,7 @@ export const ensTenantUIConfig = new TenantUI({
   title: "ENS Agora",
   color: "#5BAAF4",
   logo: ensLogo,
+  hero: ensHero,
 
   assets: {
     // TODO: Replace success and pending images
