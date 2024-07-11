@@ -23,7 +23,6 @@ interface Ballot {
   address: string;
   metric_id: string;
   os_multiplier: number;
-  os_only: boolean;
   allocation: number;
   allocations: Allocation[];
 }
@@ -138,11 +137,7 @@ function calculateAllocations(ballot: Ballot[]): BallotResponse {
   ballot.map((b) => {
     const metricId = b.metric_id;
     const adjustedValues = b.allocations.map((a) => {
-      const value = a.is_os
-        ? a.value * b.os_multiplier
-        : b.os_only
-          ? 0
-          : a.value;
+      const value = a.is_os ? a.value * b.os_multiplier : a.value;
       return {
         ...a,
         value,
@@ -185,8 +180,6 @@ function calculateAllocations(ballot: Ballot[]): BallotResponse {
   const allocations = Array.from(projectData.entries())
     .map(([projectId, data]) => ({
       project_id: projectId,
-      name: data.name,
-      image: data.image,
       is_os: data.is_os,
       allocations_per_metric: data.allocations_per_metric,
       allocation: data.allocations_per_metric.reduce(
