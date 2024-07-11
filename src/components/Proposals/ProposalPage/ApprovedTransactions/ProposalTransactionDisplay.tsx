@@ -29,9 +29,7 @@ const ProposalTransactionDisplay = ({
   const [collapsed, setCollapsed] = useState(true);
   return (
     <div>
-      <div
-        className={`flex flex-col border ${targets.length > 1 ? "border-b-0 rounded-t-lg" : "rounded-lg"} border-[#e0e0e0] bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden`}
-      >
+      <div className="flex flex-col border border-b-0 rounded-t-lg border-[#e0e0e0] bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden">
         <div className="w-full flex items-center justify-between">
           <span className="text-xs text-stone-400">Proposed transactions</span>
           {executedTransactionHash && (
@@ -55,18 +53,14 @@ const ProposalTransactionDisplay = ({
           />
         ))}
       </div>
-      {targets.length > 1 && (
-        <div
-          className="border border-[#e0e0e0] rounded-b-lg bg-gray-fa p-4 cursor-pointer text-xs text-stone-400 font-mono"
-          onClick={() => {
-            setCollapsed(!collapsed);
-          }}
-        >
-          {collapsed
-            ? `Reveal remaining transactions (${targets.length} total)`
-            : "Hide transactions"}
-        </div>
-      )}
+      <div
+        className="border border-[#e0e0e0] rounded-b-lg bg-gray-fa p-4 cursor-pointer text-xs text-stone-400 font-mono"
+        onClick={() => {
+          setCollapsed(!collapsed);
+        }}
+      >
+        {collapsed ? "Expand transactions" : "Collapse transactions"}
+      </div>
     </div>
   );
 };
@@ -128,7 +122,7 @@ const ProposalTransactionItem = ({
             return (
               <>
                 calldata:
-                <div>{calldata}</div>
+                <div className="line-clamp-2">{calldata}</div>
               </>
             );
           }
@@ -227,13 +221,13 @@ function MultiSendDisplay({
   }, [calldata]);
 
   if (!transactions) {
-    return <div>{calldata}</div>;
+    return <div className="line-clamp-2">{calldata}</div>;
   }
 
   return (
     <div className="flex flex-col">
       {collapsed ? (
-        <div>{calldata}</div>
+        <div className="line-clamp-2">{calldata}</div>
       ) : (
         transactions.map((tx, idx) => (
           <EncodedValueDisplay
