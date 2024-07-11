@@ -254,33 +254,6 @@ view project_applicants {
   @@schema("retro_funding")
 }
 
-view projects {
-  project_id                         String  @unique
-  attestation_id                     String?
-  farcaster_id                       String?
-  name                               String?
-  category                           String?
-  parent_project_id                  String?
-  metadata_url                       String?
-  description                        String?
-  project_avatar_url                 String?
-  project_cover_image_url            String?
-  oso_slug                           String?
-  team                               Json?   @db.Json
-  github                             Json?   @db.Json
-  packages                           Json?   @db.Json
-  contracts                          Json?   @db.Json
-  social_links_website               Json?   @db.Json
-  social_links_farcaster             Json?   @db.Json
-  social_links_twitter               String?
-  social_links_mirror                String?
-  grants_and_funding_venture_funding Json?   @db.Json
-  grants_and_funding_grants          Json?   @db.Json
-  grants_and_funding_revenue         Json?   @db.Json
-
-  @@schema("retro_funding")
-}
-
 view OptimismVotes {
   transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
