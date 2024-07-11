@@ -30,7 +30,7 @@ const ProposalTransactionDisplay = ({
   return (
     <div>
       <div
-        className={`flex flex-col border border-b-0 rounded-t-lg border-[#e0e0e0] bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden`}
+        className="flex flex-col border border-b-0 rounded-t-lg border-[#e0e0e0] bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden"
       >
         <div className="w-full flex items-center justify-between">
           <span className="text-xs text-stone-400">Proposed transactions</span>
