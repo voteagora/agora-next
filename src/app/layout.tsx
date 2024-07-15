@@ -28,7 +28,6 @@ const standard = {
   neutral: "#FFFFFF",
   wash: "#FAFAFA",
   line: "#EAEAEA",
-  veil: "rgba(23, 23, 23, 0.3)",
   positive: "#00992B",
   negative: "#C52F00",
   brandPrimary: "#171717",
@@ -51,7 +50,6 @@ export default async function RootLayout({
   const neutral = ui?.customization?.neutral || defaults.neutral;
   const wash = ui?.customization?.wash || defaults.wash;
   const line = ui?.customization?.line || defaults.line;
-  const veil = ui?.customization?.veil || defaults.veil;
   const positive = ui?.customization?.positive || defaults.positive;
   const negative = ui?.customization?.negative || defaults.negative;
   const brandPrimary = ui?.customization?.brandPrimary || defaults.brandPrimary;
@@ -66,7 +64,6 @@ export default async function RootLayout({
     "--neutral": neutral,
     "--wash": wash,
     "--line": line,
-    "--veil": veil,
     "--positive": positive,
     "--negative": negative,
     "--brand-primary": brandPrimary,
