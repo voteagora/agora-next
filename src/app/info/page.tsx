@@ -101,7 +101,7 @@ export default async function Page() {
                 </div>
               </div>
               <div>
-                <div className="text-sm text-stone-600 font-medium">
+                <div className="text-sm text-secondary font-medium">
                   Phase 1 – Governance initiation
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
@@ -113,7 +113,7 @@ export default async function Page() {
                 </div>
               </div>
               <div>
-                <div className="text-sm text-stone-600 font-medium">
+                <div className="text-sm text-secondary font-medium">
                   Phase 2 – Transition to onchain governance
                 </div>
                 <div>
@@ -126,7 +126,7 @@ export default async function Page() {
                 </div>
               </div>
               <div>
-                <div className="text-sm text-stone-600 font-medium">
+                <div className="text-sm text-secondary font-medium">
                   Phase 3 – Full Ossification
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>

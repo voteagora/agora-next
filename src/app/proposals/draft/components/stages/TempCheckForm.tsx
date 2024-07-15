@@ -70,7 +70,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
               className="object-cover rounded-md"
             />
           </div>
-          <p className="mt-4 text-stone-700">
+          <p className="mt-4 text-secondary">
             We encourage you to go to Discourse to post a temp check that helps
             gauge the community&apos;s interest. It&apos;s not mandatory, but
             helps create alignment with the voter base.

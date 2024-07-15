@@ -65,7 +65,7 @@ const Stakeholder = ({ title }: StakeholderProps) => {
         </div>
 
         <div className="flex flex-col">
-          <div className="text-xs font-medium text-[#66676b]">I represent</div>
+          <div className="text-xs font-medium text-tertiary">I represent</div>
           <div>{capitalizeFirstLetter(title)}s</div>
         </div>
       </div>
