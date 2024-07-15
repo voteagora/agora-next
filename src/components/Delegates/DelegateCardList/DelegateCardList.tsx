@@ -66,7 +66,7 @@ export default function DelegateCardList({
         loadMore={loadMore}
         loader={
           <div
-            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-veil flex items-center justify-center"
+            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-tertiary flex items-center justify-center"
             key="loader"
           >
             Loading...

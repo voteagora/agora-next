@@ -4,6 +4,7 @@ import Header from "@/components/Header/Header";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
+import { inter } from "@/styles/fonts";
 
 declare global {
   interface BigInt {
@@ -34,20 +35,6 @@ const standard = {
   accentNeutral: "#FFFFFF",
 };
 
-const scroll = {
-  primary: "#190602",
-  secondary: "#473835",
-  tertiary: "#756A67",
-  neutral: "#FFFFFF",
-  wash: "#F6E5D1",
-  line: "#F1D9B9",
-  veil: "rgba(232, 191, 139, 0.3)",
-  positive: "#00992B",
-  negative: "#C52F00",
-  accentPrimary: "#FF4C00",
-  accentNeutral: "#FAF2E8",
-};
-
 const defaults = standard;
 
 export default async function RootLayout({
@@ -71,7 +58,7 @@ export default async function RootLayout({
     ui?.customization?.accentPrimary || defaults.accentPrimary;
   const accentNeutral =
     ui?.customization?.accentNeutral || defaults.accentNeutral;
-  const font = ui?.customization?.font || "Inter";
+  const font = ui?.customization?.font || inter.style.fontFamily;
 
   const style = {
     "--primary": primary,

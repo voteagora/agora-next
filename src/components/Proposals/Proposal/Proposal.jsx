@@ -25,7 +25,7 @@ export default function Proposal({ proposal, votableSupply }) {
       }
       target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
     >
-      <div className="border-b border-line items-center flex flex-row">
+      <div className="border-b border-line items-center flex flex-row bg-neutral">
         <VStack
           className={cn(
             "whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",

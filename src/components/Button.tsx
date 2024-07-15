@@ -7,13 +7,13 @@ export function Button({ href = "", className = "", ...props }) {
     <>
       {href ? (
         <div
-          className={`"rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover" ${className}`}
+          className={`rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover ${className}`}
         >
           <Link href={href} {...props} />{" "}
         </div>
       ) : (
         <button
-          className={`"bg-primary text-white rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover" ${className}`}
+          className={`bg-neutral text-primary rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover ${className}`}
           {...props}
         />
       )}

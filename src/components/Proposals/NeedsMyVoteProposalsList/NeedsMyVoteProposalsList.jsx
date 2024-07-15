@@ -34,7 +34,7 @@ export default function NeedsMyVoteProposalsList({
         <VStack className="max-w-[76rem]">
           <PageHeader headerText="Needs my vote" />
 
-          <VStack className="border border-line rounded-xl shadow-newDefault overflow-hidden mb-3">
+          <VStack className="border border-line rounded-xl shadow-newDefault overflow-hidden mb-6">
             <div>
               {proposals.map((proposal) => (
                 <Proposal
