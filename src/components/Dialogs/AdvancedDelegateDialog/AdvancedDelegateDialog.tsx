@@ -358,7 +358,7 @@ function InfoDialog({
           ))}
         </VStack>
         {directDelegatedFromOthers > 0n && (
-          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-veil border-line">
+          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
             You’ve been delegated an additional{" "}
             <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of

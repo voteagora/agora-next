@@ -257,11 +257,10 @@ module.exports = {
         neutral: "var(--neutral)",
         wash: "var(--wash)",
         line: "var(--line)",
-        veil: "var(--veil)",
         positive: "var(--positive)",
         negative: "var(--negative)",
-        accentPrimary: "var(--accent-primary)",
-        accentNeutral: "var(--accent-neutral)",
+        brandPrimary: "var(--brand-primary)",
+        brandSecondary: "var(--brand-secondary)",
         // shad?
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

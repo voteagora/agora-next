@@ -200,7 +200,7 @@ export default function GovernorSettings() {
         <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
           <div className="flex items-center gap-2">
             <p className="text-secondary">Manager Address</p>
-            <Lock className="w-4 h-4 text-veil" />
+            <Lock className="w-4 h-4 text-primary/30" />
           </div>
           <p className="text-secondary truncate">{manager}</p>
         </div>

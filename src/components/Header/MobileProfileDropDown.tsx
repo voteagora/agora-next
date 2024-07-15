@@ -34,7 +34,7 @@ const MobileValueWrapper = ({
   isLoading: boolean;
 }) =>
   isLoading ? (
-    <div className="animate-pulse bg-veil h-5 w-[90px] rounded-2xl"></div>
+    <div className="animate-pulse bg-primary/30 h-5 w-[90px] rounded-2xl"></div>
   ) : (
     <div className="text-base">{children}</div>
   );
@@ -163,7 +163,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     />
 
                     {isLoading ? (
-                      <div className="animate-pulse bg-veil h-[50px] mt-1 w-full rounded-2xl"></div>
+                      <div className="animate-pulse bg-primary/30 h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
                       <>
                         {canCreateDelegateStatement && (
@@ -171,7 +171,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 text-veil bg-black flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border py-3 px-2 text-primary/30 bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -179,7 +179,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 text-veil bg-black flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border py-3 px-2 text-primary/30 bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Create delegate statement

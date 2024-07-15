@@ -167,7 +167,7 @@ const StepperRow = ({
     >
       <Link href={href ?? "#"} className="flex items-center gap-x-3">
         <div
-          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : isActive ? "bg-blue-600" : "bg-veil"}`}
+          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : isActive ? "bg-blue-600" : "bg-primary/30"}`}
         />
 
         <div className="w-full flex items-center justify-between text-xs font-semibold">

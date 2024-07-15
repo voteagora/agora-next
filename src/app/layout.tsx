@@ -31,8 +31,8 @@ const standard = {
   veil: "rgba(23, 23, 23, 0.3)",
   positive: "#00992B",
   negative: "#C52F00",
-  accentPrimary: "#171717",
-  accentNeutral: "#FFFFFF",
+  brandPrimary: "#171717",
+  brandSecondary: "#FFFFFF",
 };
 
 const defaults = standard;
@@ -54,10 +54,9 @@ export default async function RootLayout({
   const veil = ui?.customization?.veil || defaults.veil;
   const positive = ui?.customization?.positive || defaults.positive;
   const negative = ui?.customization?.negative || defaults.negative;
-  const accentPrimary =
-    ui?.customization?.accentPrimary || defaults.accentPrimary;
-  const accentNeutral =
-    ui?.customization?.accentNeutral || defaults.accentNeutral;
+  const brandPrimary = ui?.customization?.brandPrimary || defaults.brandPrimary;
+  const brandSecondary =
+    ui?.customization?.brandSecondary || defaults.brandSecondary;
   const font = ui?.customization?.font || inter.style.fontFamily;
 
   const style = {
@@ -70,8 +69,8 @@ export default async function RootLayout({
     "--veil": veil,
     "--positive": positive,
     "--negative": negative,
-    "--accent-primary": accentPrimary,
-    "--accent-neutral": accentNeutral,
+    "--brand-primary": brandPrimary,
+    "--brand-secondary": brandSecondary,
     "font-family": font,
   } as React.CSSProperties;
 

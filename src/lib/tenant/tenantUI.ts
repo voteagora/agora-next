@@ -72,11 +72,10 @@ type TenantUIParams = {
     neutral?: string;
     wash?: string;
     line?: string;
-    veil?: string;
     positive?: string;
     negative?: string;
-    accentPrimary?: string;
-    accentNeutral?: string;
+    brandPrimary?: string;
+    brandSecondary?: string;
     font?: string;
   };
 };
@@ -101,11 +100,10 @@ export class TenantUI {
     neutral?: string;
     wash?: string;
     line?: string;
-    veil?: string;
     positive?: string;
     negative?: string;
-    accentPrimary?: string;
-    accentNeutral?: string;
+    brandPrimary?: string;
+    brandSecondary?: string;
     font?: string;
   };
   private _linksCache: { [key: string]: UILink | undefined } = {};
@@ -186,11 +184,10 @@ export class TenantUI {
         neutral?: string;
         wash?: string;
         line?: string;
-        veil?: string;
         positive?: string;
         negative?: string;
-        accentPrimary?: string;
-        accentNeutral?: string;
+        brandPrimary?: string;
+        brandSecondary?: string;
         font?: string;
       }
     | undefined {
