@@ -192,17 +192,4 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: false,
     },
   ],
-  customization: {
-    primary: "#190602",
-    secondary: "#756A67",
-    tertiary: "#D1CDCC",
-    neutral: "#FFFFFF",
-    wash: "#FAF2E8",
-    line: "rgba(241, 217, 185, 0.0)",
-    positive: "#00992B",
-    negative: "#C52F00",
-    brandPrimary: "#FF4C00",
-    brandSecondary: "#FAF2E8",
-    font: "TransSansPremium",
-  },
 });
