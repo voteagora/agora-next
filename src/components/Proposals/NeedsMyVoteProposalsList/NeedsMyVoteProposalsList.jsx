@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 import styles from "./needsMyVoteProposalLists.module.scss";
-import { HStack, VStack } from "@/components/Layout/Stack";
+import { VStack } from "@/components/Layout/Stack";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import Proposal from "../Proposal/Proposal";
 

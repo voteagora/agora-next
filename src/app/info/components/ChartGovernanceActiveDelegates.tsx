@@ -73,7 +73,7 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
     return <div>Loading...</div>;
   }
 
-  const max = Math.max(...data.map((d) => parseInt(d.active)));
+  const max = Math.max(...data.map((d) => parseInt(d.large)));
 
   return (
     <div>
@@ -100,10 +100,10 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
           <YAxis
             axisLine={false}
             className="text-xs font-medium text-gray-4f"
-            dataKey="active"
+            dataKey="large"
             domain={[0, max]}
             interval={"preserveStartEnd"}
-            tickFormatter={(value) => (value > 0 ? `${value.toFixed(2)}%` : "")}
+            tickFormatter={(value) => (value > 0 ? `${value.toFixed(0)}%` : "")}
             tickLine={false}
             width={40}
           />
@@ -133,7 +133,7 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
               style={{ backgroundColor: primary }}
               className="w-4 h-[2px]"
             ></div>
-            <p className="text-xs font-semibold text-gray-4f">all delegates</p>
+            <p className="text-xs font-semibold text-gray-4f">All Delegates</p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center">
             <div
@@ -141,7 +141,7 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
               className="w-4 border border-b-1 border-dashed"
             />
             <p className="text-xs font-semibold text-gray-4f">
-              delegates with over 100K tokens
+              Delegates with over 100K tokens
             </p>
           </div>
         </div>
@@ -169,7 +169,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p className="text-xs font-medium text-gray-4f ">
             All Delegates
             <span className="font-bold pl-3">
-              {Number(payload[0].value).toFixed(4)}%
+              {Number(payload[0].value).toFixed(2)}%
             </span>
           </p>
         </div>
@@ -181,7 +181,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p className="text-xs font-medium text-gray-4f">
             Whales
             <span className="font-bold pl-6">
-              {Number(payload[1].value).toFixed(4)}%
+              {Number(payload[1].value).toFixed(2)}%
             </span>
           </p>
         </div>

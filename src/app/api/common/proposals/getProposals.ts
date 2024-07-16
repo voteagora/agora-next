@@ -6,6 +6,8 @@ import prisma from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 async function getProposals({
   filter,
@@ -15,11 +17,7 @@ async function getProposals({
   page: number;
 }) {
   const pageSize = 10;
-
-  const { namespace, contracts, isProd } = Tenant.current();
-  const prodDataOnly = isProd && {
-    contract: contracts.governor.address,
-  };
+  const { namespace, contracts } = Tenant.current();
 
   const { meta, data: proposals } = await paginateResult(
     (skip: number, take: number) => {
@@ -31,7 +29,7 @@ async function getProposals({
             ordinal: "desc",
           },
           where: {
-            ...(prodDataOnly || {}),
+            contract: contracts.governor.address.toLowerCase(),
             cancelled_block: null,
           },
         });
@@ -43,7 +41,7 @@ async function getProposals({
             ordinal: "desc",
           },
           where: {
-            ...(prodDataOnly || {}),
+            contract: contracts.governor.address.toLowerCase(),
           },
         });
       }
@@ -76,7 +74,7 @@ async function getProposals({
 async function getProposal(proposal_id: string) {
   const { namespace, contracts } = Tenant.current();
   const proposal = await prisma[`${namespace}Proposals`].findFirst({
-    where: { proposal_id },
+    where: { proposal_id, contract: contracts.governor.address },
   });
 
   if (!proposal) {
@@ -108,6 +106,52 @@ async function getProposalTypes() {
   });
 }
 
+async function getDraftProposals(address: `0x${string}`) {
+  const { contracts } = Tenant.current();
+  return await prisma.proposalDraft.findMany({
+    where: {
+      author_address: address,
+      chain_id: contracts.governor.chain.id,
+      contract: contracts.governor.address.toLowerCase(),
+      stage: {
+        in: [
+          PrismaProposalStage.ADDING_TEMP_CHECK,
+          PrismaProposalStage.DRAFTING,
+          PrismaProposalStage.ADDING_GITHUB_PR,
+          PrismaProposalStage.AWAITING_SUBMISSION,
+        ],
+      },
+    },
+    include: {
+      transactions: true,
+    },
+  });
+}
+
+async function getDraftProposalForSponsor(address: `0x${string}`) {
+  const { contracts } = Tenant.current();
+  return await prisma.proposalDraft.findMany({
+    where: {
+      sponsor_address: address,
+      chain_id: contracts.governor.chain.id,
+      contract: contracts.governor.address.toLowerCase(),
+      stage: {
+        in: [
+          PrismaProposalStage.ADDING_TEMP_CHECK,
+          PrismaProposalStage.DRAFTING,
+          PrismaProposalStage.ADDING_GITHUB_PR,
+          PrismaProposalStage.AWAITING_SUBMISSION,
+        ],
+      },
+    },
+    include: {
+      transactions: true,
+    },
+  });
+}
+
+export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
+export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);

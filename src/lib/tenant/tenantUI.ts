@@ -37,8 +37,13 @@ type UIDelegates = {
   retired: `0x${string}`[];
 };
 
-type UITopGovernanceIssue = {
+type UIGovernanceIssue = {
   icon: keyof typeof icons;
+  key: string;
+  title: string;
+};
+
+type UIGovernanceStakeholder = {
   key: string;
   title: string;
 };
@@ -58,14 +63,16 @@ type TenantUIParams = {
   pages?: UIPage[];
   title: string;
   toggles?: UIToggle[];
-  topGovernanceIssues?: UITopGovernanceIssue[];
+  governanceIssues?: UIGovernanceIssue[];
+  governanceStakeholders?: UIGovernanceStakeholder[];
 };
 
 export class TenantUI {
   private _assets: UIAssets;
   private _color: string;
   private _delegates?: UIDelegates;
-  private _topGovernanceIssues?: UITopGovernanceIssue[];
+  private _governanceIssues?: UIGovernanceIssue[];
+  private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
@@ -89,7 +96,8 @@ export class TenantUI {
     pages,
     title,
     toggles,
-    topGovernanceIssues,
+    governanceIssues,
+    governanceStakeholders,
   }: TenantUIParams) {
     this._assets = assets;
     this._color = color;
@@ -101,7 +109,8 @@ export class TenantUI {
     this._pages = pages;
     this._title = title;
     this._toggles = toggles;
-    this._topGovernanceIssues = topGovernanceIssues;
+    this._governanceIssues = governanceIssues;
+    this._governanceStakeholders = governanceStakeholders;
   }
 
   public get assets(): UIAssets {
@@ -116,8 +125,12 @@ export class TenantUI {
     return this._delegates;
   }
 
-  public get topGovernanceIssues(): UITopGovernanceIssue[] | undefined {
-    return this._topGovernanceIssues;
+  public get governanceIssues(): UIGovernanceIssue[] | undefined {
+    return this._governanceIssues;
+  }
+
+  public get governanceStakeholders(): UIGovernanceStakeholder[] | undefined {
+    return this._governanceStakeholders;
   }
 
   public get title(): string {

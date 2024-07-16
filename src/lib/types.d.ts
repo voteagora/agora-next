@@ -10,7 +10,6 @@ import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardLi
 export type MetricTimeSeriesValue = {
   day: string;
   date: string;
-  ts: number;
   value: any;
 };
 
