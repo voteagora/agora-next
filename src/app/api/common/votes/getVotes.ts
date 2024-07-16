@@ -1,8 +1,8 @@
-import { paginateResult } from "@/app/lib/pagination";
+import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { VotePayload, VotesSort } from "./vote";
+import { Vote, VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -32,9 +32,22 @@ async function getVotesForDelegateForAddress({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT * FROM (
+        SELECT
+          transaction_hash,
+          proposal_id,
+          voter,
+          support,
+          weight,
+          reason,
+          block_number,
+          params,
+          start_block,
+          description,
+          proposal_data,
+          proposal_type
+        FROM (
           SELECT * FROM (
-          SELECT 
+          SELECT
             STRING_AGG(transaction_hash,'|') as transaction_hash,
             proposal_id,
             voter,
@@ -42,19 +55,20 @@ async function getVotesForDelegateForAddress({
             SUM(weight::numeric) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
-            params 
+            params,
+            contract
           FROM (
             SELECT
               *
               FROM ${namespace + ".vote_cast_events"}
-              WHERE voter = $1
+              WHERE voter = $1 AND contract = $2
             UNION ALL
               SELECT
                 *
               FROM ${namespace + ".vote_cast_with_params_events"}
-              WHERE voter = $1
+              WHERE voter = $1 AND contract = $2
           ) t
-          GROUP BY 2,3,4,8
+          GROUP BY 2,3,4,8,9
           ) av
           LEFT JOIN LATERAL (
             SELECT
@@ -65,13 +79,14 @@ async function getVotesForDelegateForAddress({
             FROM
               ${namespace + ".proposals"} proposals
             WHERE
-              proposals.proposal_id = av.proposal_id) p ON TRUE
+              proposals.proposal_id = av.proposal_id AND proposals.contract = av.contract) p ON TRUE
         ) q
         ORDER BY block_number DESC
-        OFFSET $2
-        LIMIT $3;
+        OFFSET $3
+        LIMIT $4;
       `,
         address.toLocaleLowerCase(),
+        contracts.governor.address.toLowerCase(),
         skip,
         take
       ),
@@ -116,9 +131,22 @@ async function getVotesForProposal({
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
-        SELECT * FROM (
+        SELECT
+          transaction_hash,
+          proposal_id,
+          voter,
+          support,
+          weight,
+          reason,
+          block_number,
+          params,
+          start_block,
+          description,
+          proposal_data,
+          proposal_type
+        FROM (
           SELECT * FROM (
-          SELECT 
+          SELECT
             STRING_AGG(transaction_hash,'|') as transaction_hash,
             proposal_id,
             voter,
@@ -126,19 +154,20 @@ async function getVotesForProposal({
             SUM(weight::numeric) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
-            params
+            params,
+            contract
           FROM (
             SELECT
               *
             FROM ${namespace + ".vote_cast_events"}
-            WHERE proposal_id = $1
+            WHERE proposal_id = $1 AND contract = $2
             UNION ALL
             SELECT
               *
             FROM ${namespace + ".vote_cast_with_params_events"}
-            WHERE proposal_id = $1
+            WHERE proposal_id = $1 AND contract = $2
           ) t
-          GROUP BY 2,3,4,8
+          GROUP BY 2,3,4,8,9
           ) av
           LEFT JOIN LATERAL (
             SELECT
@@ -147,13 +176,14 @@ async function getVotesForProposal({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM ${namespace + ".proposals"} proposals
-            WHERE proposals.proposal_id = $1) p ON TRUE
+            WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
         ) q
         ORDER BY ${sort} DESC
-        OFFSET $2
-        LIMIT $3;
+        OFFSET $3
+        LIMIT $4;
       `,
         proposal_id,
+        contracts.governor.address.toLowerCase(),
         skip,
         take
       ),
@@ -190,7 +220,7 @@ async function getUserVotesForProposal({
   const { namespace, contracts } = Tenant.current();
   const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
     `
-    SELECT 
+    SELECT
       STRING_AGG(transaction_hash,'|') as transaction_hash,
       proposal_id,
       proposal_type,

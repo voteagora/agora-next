@@ -11,6 +11,8 @@ export interface IGovernorContract extends BaseContract {
 
   manager?: TypedContractMethod<[], [string], "view">;
 
+  proposalThreshold?: TypedContractMethod<[], [bigint], "view">;
+
   votingDelay?: TypedContractMethod<[], [bigint], "view">;
 
   votingPeriod?: TypedContractMethod<[], [bigint], "view">;

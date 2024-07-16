@@ -13,17 +13,12 @@ import { Button } from "@/components/ui/button";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import Tenant from "@/lib/tenant/tenant";
 
-type IssueState = {
+const TOP_ISSUES_FORM_FIELD = "topIssues";
+
+type Issue = {
   type: string;
   value: string;
 };
-
-function initialIssueState(type: string): IssueState {
-  return {
-    type,
-    value: "",
-  };
-}
 
 interface TopIssuesFormSectionProps {
   form: UseFormReturn<DelegateStatementFormValues>;
@@ -33,22 +28,22 @@ export default function TopIssuesFormSection({
   form,
 }: TopIssuesFormSectionProps) {
   const { ui } = Tenant.current();
-  const topIssues = useWatch({ name: "topIssues" });
+  const topIssues = useWatch({ name: TOP_ISSUES_FORM_FIELD });
 
   const addIssue = (key: string) => {
-    const newTopIssues = [...topIssues, initialIssueState(key)];
-    form.setValue("topIssues", newTopIssues);
+    const newTopIssues = [...topIssues, { type: key, value: "" }];
+    form.setValue(TOP_ISSUES_FORM_FIELD, newTopIssues);
   };
 
   const removeIssue = (index: number) => {
     const newTopIssues = topIssues.filter(
-      (issue: IssueState, _index: number) => _index !== index
+      (issue: Issue, _index: number) => _index !== index
     );
-    form.setValue("topIssues", newTopIssues);
+    form.setValue(TOP_ISSUES_FORM_FIELD, newTopIssues);
   };
 
   const updateIssue = (index: number, value: string) => {
-    const newTopIssues = topIssues.map((issue: IssueState, _index: number) => {
+    const newTopIssues = topIssues.map((issue: Issue, _index: number) => {
       if (_index === index) {
         return {
           ...issue,
@@ -57,7 +52,7 @@ export default function TopIssuesFormSection({
       }
       return issue;
     });
-    form.setValue("topIssues", newTopIssues);
+    form.setValue(TOP_ISSUES_FORM_FIELD, newTopIssues);
   };
 
   return (
@@ -69,7 +64,7 @@ export default function TopIssuesFormSection({
             + Add a new issue
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {ui.topGovernanceIssues!.map((issue) => (
+            {ui.governanceIssues!.map((issue) => (
               <DropdownMenuItem
                 key={issue.title}
                 onClick={() => addIssue(issue.key)}
@@ -82,23 +77,23 @@ export default function TopIssuesFormSection({
       </div>
 
       <div className="flex flex-col gap-4 mt-6">
-        {topIssues.map((issue: IssueState, idx: number) => {
-          const issueDefinition = ui.topGovernanceIssues!.find(
+        {topIssues.map((issue: Issue, idx: number) => {
+          const definition = ui.governanceIssues!.find(
             (def) => issue.type === def.key
           );
 
-          return issueDefinition ? (
-            <Issue
+          return definition ? (
+            <IssueInput
               key={idx}
-              title={issueDefinition.title}
-              icon={issueDefinition.icon}
+              title={definition.title}
+              icon={definition.icon}
               value={issue.value}
               index={idx}
               removeIssue={removeIssue}
               updateIssue={updateIssue}
             />
           ) : (
-            <Issue
+            <IssueInput
               key={idx}
               title={issue.value}
               icon={"ballot"}
@@ -114,7 +109,7 @@ export default function TopIssuesFormSection({
   );
 }
 
-interface IssueProps {
+interface IssueInputProps {
   title: string;
   icon: keyof typeof icons;
   value: string;
@@ -123,14 +118,14 @@ interface IssueProps {
   updateIssue: (index: number, value: string) => void;
 }
 
-const Issue = ({
+const IssueInput = ({
   icon,
   title,
   value,
   index,
   removeIssue,
   updateIssue,
-}: IssueProps) => {
+}: IssueInputProps) => {
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-gray-300 shadow-newDefault p-2">
@@ -139,8 +134,12 @@ const Issue = ({
 
       <div className="flex flex-col flex-1 relative">
         <div className="flex flex-col absolute right-0 top-0 bottom-0">
-          <Button variant="ghost" onClick={() => removeIssue(index)}>
-            <CloseIcon className="w-4 h-4 my-[0.8rem] text-muted-foreground" />
+          <Button
+            variant="ghost"
+            className="mt-[2px] mr-[3px]"
+            onClick={() => removeIssue(index)}
+          >
+            <CloseIcon className="w-4 h-4 mx-1 my-[1px] text-muted-foreground" />
           </Button>
         </div>
         <Input

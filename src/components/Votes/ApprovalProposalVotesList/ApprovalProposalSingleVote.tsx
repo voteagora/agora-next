@@ -14,6 +14,7 @@ import { getBlockScanUrl, timeout } from "@/lib/utils";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import ENSAvatar from "@/components/shared/ENSAvatar";
 
 export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { isAdvancedUser } = useIsAdvancedUser();
@@ -53,6 +54,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
             className="mb-2 text-xs leading-4"
           >
             <div className="text-black font-semibold flex items-center">
+              <ENSAvatar ensName={voterAddress} className="w-5 h-5" />
               <HumanAddress address={voterAddress} />
               {address?.toLowerCase() === voterAddress && (
                 <span>&nbsp;(you)</span>
