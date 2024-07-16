@@ -1,10 +1,21 @@
 import { StaticImageData } from "next/image";
+<<<<<<< HEAD
 import { icons } from "@/icons/icons";
+=======
+import { icons } from "@/assets/icons/icons";
+import { PLMConfig } from "@/app/proposals/draft/types";
+>>>>>>> 3f861290 (Spiking ENS with generalized PLM)
 
 type UIToggle = {
   name: string;
   enabled: boolean;
+  config?: UIConfig;
 };
+
+// UI config exists to give tenant specifc config options to a UI toggle
+// the canonical example is wanting to allow tenants to customize
+// their proposal lifecycle feature
+type UIConfig = PLMConfig;
 
 export type UILink = {
   name: string;

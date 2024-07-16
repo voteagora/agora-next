@@ -1,13 +1,21 @@
 "use server";
 
 import prisma from "@/app/lib/prisma";
-import { DRAFT_STAGES_FOR_TENANT } from "@/app/proposals/draft/utils/stages";
 import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 async function createProposalDraft(address: `0x${string}`) {
   const tenant = Tenant.current();
-  // TODO: need to generalize this as well -- this is the high level idea though...
-  const firstStage = DRAFT_STAGES_FOR_TENANT[0];
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  const config = plmToggle.config as PLMConfig;
+  const firstStage = config.stages[0];
 
   const proposal = await prisma.proposalDraft.create({
     data: {
