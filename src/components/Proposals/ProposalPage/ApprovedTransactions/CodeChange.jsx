@@ -27,7 +27,7 @@ export default function CodeChange({
       <span className="ml-2">
         {functionArgs.map((arg, index) => (
           <span key={arg}>
-            {arg}
+            {arg?.toString()}
             {index !== functionArgs.length - 1 && ", "}
           </span>
         ))}

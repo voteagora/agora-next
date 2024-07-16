@@ -4,13 +4,14 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import DelegateStatementForm from "./DelegateStatementForm";
-import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Tenant from "@/lib/tenant/tenant";
+import { useRouter } from "next/navigation";
+import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
+import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -25,6 +26,14 @@ const formSchema = z.object({
   twitter: z.string(),
   warpcast: z.string(),
   topIssues: z.array(
+    z
+      .object({
+        type: z.string(),
+        value: z.string(),
+      })
+      .strict()
+  ),
+  topStakeholders: z.array(
     z
       .object({
         type: z.string(),
@@ -54,14 +63,15 @@ const formSchema = z.object({
 });
 
 export default function CurrentDelegateStatement() {
+  const router = useRouter();
   const { ui } = Tenant.current();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isConnecting } = useAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
 
   // Display the first two delegate issues as default values
-  const topIssues = ui.topGovernanceIssues;
+  const topIssues = ui.governanceIssues;
   const defaultIssues = !topIssues
     ? []
     : topIssues.slice(0, 2).map((issue) => {
@@ -103,6 +113,26 @@ export default function CurrentDelegateStatement() {
               }
             )?.topIssues
           : defaultIssues,
+
+      topStakeholders:
+        (
+          delegateStatement?.payload as {
+            topStakeholders: {
+              value: string;
+              type: string;
+            }[];
+          }
+        )?.topStakeholders?.length > 0
+          ? (
+              delegateStatement?.payload as {
+                topStakeholders: {
+                  value: string;
+                  type: string;
+                }[];
+              }
+            )?.topStakeholders
+          : [],
+
       openToSponsoringProposals:
         (
           delegateStatement?.payload as {
@@ -140,7 +170,7 @@ export default function CurrentDelegateStatement() {
     }
   }, [address, reset]);
 
-  if (!isConnected) {
+  if (!isConnected && !isConnecting) {
     return <ResourceNotFound message="Oops! Nothing's here" />;
   }
 

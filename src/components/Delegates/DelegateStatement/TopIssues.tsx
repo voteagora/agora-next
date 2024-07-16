@@ -3,13 +3,12 @@ import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 
-export default function TopIssues({
-  statement,
-}: {
+interface Props {
   statement: DelegateStatementType;
-}) {
-  const { ui } = Tenant.current();
+}
 
+export default function TopIssues({ statement }: Props) {
+  const { ui } = Tenant.current();
   const topIssues = (
     statement.payload as {
       topIssues: {
@@ -19,7 +18,7 @@ export default function TopIssues({
     }
   ).topIssues;
 
-  if (topIssues.length === 0 || !ui.topGovernanceIssues) {
+  if (topIssues.length === 0 || !ui.governanceIssues) {
     return null;
   }
 
@@ -29,8 +28,8 @@ export default function TopIssues({
 
       <div className="flex flex-col gap-4">
         {topIssues.map((issue, idx) => {
-          const issueDefinition = ui.topGovernanceIssues!.find(
-            (needle) => issue.type === needle.key
+          const issueDefinition = ui.governanceIssues!.find(
+            (def) => issue.type === def.key
           );
 
           return issueDefinition ? (
@@ -44,7 +43,7 @@ export default function TopIssues({
             <Issue
               key={idx}
               value={issue.value}
-              title={issue.value}
+              title={issue.type}
               icon={"ballot"}
             />
           );
