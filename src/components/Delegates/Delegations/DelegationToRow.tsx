@@ -35,9 +35,7 @@ export default function DelegationToRow({
       </TableCell>
       <TableCell>
         <a
-          href={getBlockScanUrl(
-            "0x373685deb4e6cca8fb915eca177a4f741fc282fe4337797cfe52e9725afe63bf"
-          )}
+          href={getBlockScanUrl(delegation.transaction_hash)}
           target="_blank"
           rel="noreferrer noopener"
         >

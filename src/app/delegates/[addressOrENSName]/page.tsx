@@ -5,7 +5,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import { VStack } from "@/components/Layout/Stack";
 import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
@@ -24,6 +23,7 @@ import {
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
+import TopStakeholders from "@/components/Delegates/DelegateStatement/TopStakeholders";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -104,43 +104,33 @@ export default async function Page({
 
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
-      <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
+      <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
         <DelegateCard delegate={delegate} />
-      </VStack>
+      </div>
 
-      <VStack className="sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
+      <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <DelegateStatementContainer
           addressOrENSName={addressOrENSName}
           statement={statement}
         />
-        {statement && <TopIssues statement={statement} />}
-        <DelegationsContainer delegatees={delegates} delegators={delegators} />
 
-        {/* TODO: -> this could be refactor with revalidatePath */}
+        {statement && (
+          <>
+            <TopIssues statement={statement} />
+            <TopStakeholders statement={statement} />
+          </>
+        )}
+
+        <DelegationsContainer delegatees={delegates} delegators={delegators} />
         <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col justify-between gap-2 sm:flex-row">
                 <h2 className="text-2xl font-bold">Past Votes</h2>
-                {/* <div className="flex flex-col justify-between gap-2 sm:flex-row">
-                  <DelegatesVotesSort
-                    fetchDelegateVotes={async (page, sortOrder) => {
-                      "use server";
-
-                      return getDelegateVotes(
-                        addressOrENSName,
-                        page,
-                        sortOrder
-                      );
-                    }}
-                  />
-                  <DelegatesVotesType />
-                </div> */}
               </div>
               <DelegateVotes
                 fetchDelegateVotes={async (page: number) => {
                   "use server";
-
                   return fetchVotesForDelegate(addressOrENSName, page);
                 }}
               />
@@ -151,7 +141,7 @@ export default async function Page({
             </div>
           )}
         </DelegateVotesProvider>
-      </VStack>
+      </div>
     </div>
   );
 }

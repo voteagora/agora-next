@@ -30,14 +30,14 @@ export const optimismTenantUIConfig = new TenantUI({
     ],
   },
 
-  topGovernanceIssues: [
+  governanceIssues: [
     {
       icon: "measure",
       title: "Treasury management",
       key: "treasury",
     },
     {
-      icon: "ballot",
+      icon: "piggyBank",
       title: "Grant funding",
       key: "funding",
     },
@@ -61,7 +61,7 @@ export const optimismTenantUIConfig = new TenantUI({
     {
       name: "faq",
       title: "FAQ",
-      url: "https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
+      url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
     },
     {
       name: "changelog",
@@ -164,7 +164,7 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/new",
+      name: "proposals/create",
       enabled: true,
     },
     {
