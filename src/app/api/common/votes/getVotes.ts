@@ -2,7 +2,7 @@ import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { Vote, VotePayload, VotesSort } from "./vote";
+import { SnapshotVote, Vote, VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -17,6 +17,55 @@ const getVotesForDelegate = ({
   addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
     page,
   });
+
+async function getSnapshotVotesForDelegate({
+  address,
+  page = 1,
+}: {
+  address: string;
+  page: number;
+}) {
+  const { slug } = Tenant.current();
+  const pageSize = 10;
+
+  const { meta, data: votes } = await paginateResult(
+    (skip: number, take: number) =>
+      prisma.$queryRawUnsafe<SnapshotVote[]>(
+        `
+        SELECT id, 
+               voter, 
+               created, 
+               choice, 
+               metadata, 
+               reason, 
+               app, 
+               vp, 
+               vp_by_strategy, 
+               vp_state, 
+               proposal_id, 
+               choice_labels
+              FROM "snapshot".votes 
+              WHERE dao_slug = ${slug}
+                AND voter = ${address}
+              OFFSET ${skip}
+              LIMIT ${take};
+       `,
+        skip,
+        take
+      ),
+    page,
+    pageSize
+  );
+
+  if (!votes || votes.length === 0) {
+    return {
+      meta,
+      votes: [],
+    };
+  }
+
+  return { meta, data: votes };
+}
 
 async function getVotesForDelegateForAddress({
   address,
