@@ -9,14 +9,24 @@ import { type ReactNode } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useRouter } from "next/navigation";
+import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
+import IssuesFilter from "@/app/delegates/components/IssuesFilter";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
+  const { ui } = Tenant.current();
+
+  const hasTopIssues = Boolean(
+    ui.governanceIssues && ui.governanceIssues.length > 0
+  );
+  const hasStakeholders = Boolean(
+    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
+  );
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const tabParam = searchParams?.get("tab");
-  const { ui } = Tenant.current();
 
   const hasCitizens = ui.toggle("citizens")?.enabled;
 
@@ -48,6 +58,8 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
         </TabsList>
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />
+          {hasStakeholders && <StakeholdersFilter />}
+          {hasTopIssues && <IssuesFilter />}
           {tabParam === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
         </div>
       </div>

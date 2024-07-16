@@ -60,9 +60,13 @@ export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort ||
     delegatesFilterOptions.weightedRandom.sort;
+
   const citizensSort =
     citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
     citizensFilterOptions.shuffle.sort;
+
+  // const issuesSort = ui.governanceStakeholders
+
   const tab = searchParams.tab;
   const seed = Math.random();
   const delegates =
