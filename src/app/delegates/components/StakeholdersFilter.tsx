@@ -8,7 +8,7 @@ import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import Tenant from "@/lib/tenant/tenant";
 
-const FILTER_PARAM = "issuesFilter";
+const FILTER_PARAM = "stakeholderFilter";
 const DEFAULT_FILTER = "all";
 
 export default function StakeholdersFilter() {
@@ -22,19 +22,20 @@ export default function StakeholdersFilter() {
   const { setIsDelegatesFiltering } = useAgoraContext();
 
   const hasStakeholders = Boolean(
-    ui.governanceIssues && ui.governanceIssues.length > 0
+    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
   );
+
   if (!hasStakeholders) return null;
 
   let issuesFilterOptions: any = {
     [DEFAULT_FILTER]: {
-      value: "All Issues",
+      value: "All Stakeholders",
       sort: DEFAULT_FILTER,
     },
   };
 
   // Map values to sort options
-  ui.governanceIssues!.forEach((item) => {
+  ui.governanceStakeholders!.forEach((item) => {
     issuesFilterOptions[item.key] = {
       value: item.title,
       sort: item.key,

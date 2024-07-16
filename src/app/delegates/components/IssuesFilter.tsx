@@ -8,7 +8,7 @@ import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import Tenant from "@/lib/tenant/tenant";
 
-const FILTER_PARAM = "stakeholderFilter";
+const FILTER_PARAM = "issueFilter";
 const DEFAULT_FILTER = "all";
 
 export default function IssuesFilter() {
@@ -21,21 +21,21 @@ export default function IssuesFilter() {
   const filterParam = searchParams?.get(FILTER_PARAM) || "all";
   const { setIsDelegatesFiltering } = useAgoraContext();
 
-  const hasStakeholders = Boolean(
-    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
+  const hasIssues = Boolean(
+    ui.governanceIssues && ui.governanceIssues.length > 0
   );
-  if (!hasStakeholders) return null;
+  if (!hasIssues) return null;
 
-  let stakeholdersFilterOptions: any = {
+  let issuesFilterOptions: any = {
     [DEFAULT_FILTER]: {
-      value: "All Representatives",
+      value: "All Issues",
       sort: DEFAULT_FILTER,
     },
   };
 
   // Map values to sort options
-  ui.governanceStakeholders!.forEach((item) => {
-    stakeholdersFilterOptions[item.key] = {
+  ui.governanceIssues!.forEach((item) => {
+    issuesFilterOptions[item.key] = {
       value: item.title,
       sort: item.key,
     };
@@ -54,18 +54,18 @@ export default function IssuesFilter() {
   return (
     <Listbox
       as="div"
-      value={filterParam || stakeholdersFilterOptions.all.value}
+      value={filterParam || issuesFilterOptions.all.value}
       onChange={(value) => handleChange(value)}
     >
       {() => (
         <>
           <Listbox.Button className="w-full sm:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
-            {stakeholdersFilterOptions[filterParam]?.value ||
-              stakeholdersFilterOptions.all.value}
+            {issuesFilterOptions[filterParam]?.value ||
+              issuesFilterOptions.all.value}
             <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
           </Listbox.Button>
           <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
-            {Object.keys(stakeholdersFilterOptions).map((key) => (
+            {Object.keys(issuesFilterOptions).map((key) => (
               <Listbox.Option key={key} value={key} as={Fragment}>
                 {({ selected }) => {
                   return (
@@ -76,7 +76,7 @@ export default function IssuesFilter() {
                           : "text-[#66676b] border-transparent"
                       }`}
                     >
-                      {stakeholdersFilterOptions[key].value}
+                      {issuesFilterOptions[key].value}
                     </li>
                   );
                 }}

@@ -121,15 +121,40 @@ async function getDelegates({
   page = 1,
   sort = "weighted_random",
   seed,
+  filters,
 }: {
   page: number;
   sort: string;
   seed?: number;
+  filters?: {
+    issues?: string;
+    stakeholders?: string;
+  };
 }) {
   const pageSize = 20;
   const { namespace, ui, slug } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
+
+  const topIssuesCondition = filters?.issues
+    ? `
+      AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(s.payload -> 'topIssues') elem
+        WHERE elem ->> 'type' = $5
+      )
+    `
+    : "";
+
+  const topStakeholdersCondition = filters?.stakeholders
+    ? `
+      AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(s.payload -> 'topStakeholders') elem
+        WHERE elem ->> 'type' = $6
+      )
+    `
+    : "";
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
@@ -158,11 +183,21 @@ async function getDelegates({
                     warpcast
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                  ${topIssuesCondition}
+                  ${topStakeholdersCondition}
                   LIMIT 1
                 ) sub
               ) AS statement
             FROM ${namespace + ".delegates"} d
-            WHERE num_of_delegators IS NOT NULL AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            WHERE num_of_delegators IS NOT NULL
+            AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            AND EXISTS (
+                SELECT 1
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate
+                ${topIssuesCondition}
+                ${topStakeholdersCondition}
+            )
             ORDER BY num_of_delegators DESC
             OFFSET $3
             LIMIT $4;
@@ -170,7 +205,9 @@ async function getDelegates({
           allowList,
           slug,
           skip,
-          take
+          take,
+          filters?.issues,
+          filters?.stakeholders
         );
 
       case "weighted_random":

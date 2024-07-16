@@ -1,14 +1,13 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
 import CitizensFilter from "@/components/Delegates/DelegatesFilter/CitizensFilter";
 import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
 import { type ReactNode } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
-import { useRouter } from "next/navigation";
 import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
 import IssuesFilter from "@/app/delegates/components/IssuesFilter";
 

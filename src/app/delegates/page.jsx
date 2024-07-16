@@ -15,10 +15,10 @@ async function fetchCitizens(sort, seed, page = 1) {
   return apiFetchCitizens({ page, seed, sort });
 }
 
-async function fetchDelegates(sort, seed, page = 1) {
+async function fetchDelegates(sort, seed, filters, page = 1) {
   "use server";
 
-  return apiFetchDelegates({ page, seed, sort });
+  return apiFetchDelegates({ page, seed, sort, filters });
 }
 
 async function fetchDelegators(address) {
@@ -60,19 +60,21 @@ export default async function Page({ searchParams }) {
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort ||
     delegatesFilterOptions.weightedRandom.sort;
-
   const citizensSort =
     citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
     citizensFilterOptions.shuffle.sort;
 
-  // const issuesSort = ui.governanceStakeholders
+  const filters = {
+    issues: searchParams.issueFilter,
+    stakeholders: searchParams.stakeholderFilter,
+  };
 
   const tab = searchParams.tab;
   const seed = Math.random();
   const delegates =
     tab === "citizens"
       ? await fetchCitizens(citizensSort, seed)
-      : await fetchDelegates(sort, seed);
+      : await fetchDelegates(sort, seed, filters);
 
   return (
     <section>
