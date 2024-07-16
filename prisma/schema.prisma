@@ -86,6 +86,28 @@ model SnapshotProposal {
   @@schema("snapshot")
 }
 
+model SnapshotVotes {
+  id             String   @id @unique
+  voter          String?  // enforced lower case at ingestion
+  created        Int? 
+  choice         String? 
+  metadata       Json? 
+  reason         String? 
+  app            String? 
+  vp             Float? 
+  vp_by_strategy Json? 
+  vp_state       String? 
+  proposal_id    String? 
+  choice_labels  Json? 
+  dao_slug       String?
+
+  @@index([id], name: "ix_snapshot_votes_id")
+  @@schema("snapshot")
+  @@map("votes")
+}
+
+
+
 model api_user {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   api_key     String?   @unique @default(dbgenerated("gen_random_uuid()"))
