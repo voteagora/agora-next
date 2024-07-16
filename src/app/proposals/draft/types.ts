@@ -1,63 +1,11 @@
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
-/**
- * This is my attempt at "generalizing" the lifecycle stages of a proposal before actually generalizing it
- * I think to properly generalize it, we need to have a way to define the stages in the db so we aren't
- * hardcoding them here.
- *
- * The idea is that we have a list of stages that are shared across all tenants. These stages have metadata
- * so we can pull things like description and title from them.
- *
- * Then, each tenant defines the order of these stages and which ones are pre-submission.
- * This way all tenants are sharing the same core stages and we can build UI components that are shared
- * but each tenant is able to customize the order and existence of certain stages.
- */
 type TenantProposalLifecycleStage = {
   stage: PrismaProposalStage;
   order: number;
   isPreSubmission: boolean;
+  config?: any;
 };
-
-export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
-  {
-    stage: PrismaProposalStage.ADDING_TEMP_CHECK,
-    order: 0,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.DRAFTING,
-    order: 1,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.ADDING_GITHUB_PR,
-    order: 2,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.AWAITING_SUBMISSION,
-    order: 3,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.PENDING,
-    order: 4,
-    isPreSubmission: false,
-  },
-  // order kinda falls apart since we could get into failed, approved, etc
-  // I think we might need a proper state machine for that
-  // athough the pre-submission stages seem like they are linear
-  {
-    stage: PrismaProposalStage.QUEUED,
-    order: 5,
-    isPreSubmission: false,
-  },
-  {
-    stage: PrismaProposalStage.EXECUTED,
-    order: 6,
-    isPreSubmission: false,
-  },
-];
 
 export const ProposalLifecycleStageMetadata = {
   [PrismaProposalStage.ADDING_TEMP_CHECK]: {
@@ -179,3 +127,18 @@ export enum TransactionType {
   TRANSFER = "transfer",
   CUSTOM = "custom",
 }
+
+export enum AdditionalProposalTypes {
+  SNAPSHOT = "snapshot",
+}
+
+export type PLMConfig = {
+  // the stages of the proposal lifecycle that
+  // this tenant wants to use
+  stages: TenantProposalLifecycleStage[];
+  // We can read proposal type from the governor
+  // but others might be desired, like snapshot
+  additionalProposalTypes: any[];
+  // custom copy for the proposal lifecycle feature
+  copy: any;
+};

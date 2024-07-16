@@ -3,6 +3,8 @@ import ensLogo from "@/assets/tenant/ens_logo.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
+import { AdditionalProposalTypes } from "@/app/proposals/draft/types";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const ensTenantUIConfig = new TenantUI({
   title: "ENS Agora",
@@ -79,6 +81,47 @@ export const ensTenantUIConfig = new TenantUI({
     {
       name: "proposal-lifecycle",
       enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.ADDING_TEMP_CHECK,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.ADDING_GITHUB_PR,
+            order: 2,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 3,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 4,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 5,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 6,
+            isPreSubmission: false,
+          },
+        ],
+        additionalProposalTypes: [AdditionalProposalTypes.SNAPSHOT],
+        copy: {},
+      },
     },
   ],
 });

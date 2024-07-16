@@ -12,7 +12,7 @@ import {
 import {
   getStageMetadata,
   isPostSubmission,
-  DRAFT_STAGES_FOR_TENANT,
+  GET_DRAFT_STAGES,
 } from "../utils/stages";
 import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
@@ -57,6 +57,8 @@ export default async function DraftProposalPage({
     return <ArchivedDraftProposal draftProposal={draftProposal} />;
   }
 
+  const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
+  console.log(DRAFT_STAGES_FOR_TENANT);
   const stageParam = (searchParams?.stage || "0") as string;
   const stageIndex = parseInt(stageParam, 10);
   const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];

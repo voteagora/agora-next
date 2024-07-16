@@ -99,6 +99,7 @@ const ProposalTransactionItem = ({
         {target}
       </a>
       {(() => {
+        if (!value) return;
         const bigValue = BigInt(value);
         if (bigValue === 0n && !calldata) {
           return;
@@ -132,6 +133,7 @@ const ProposalTransactionItem = ({
               .{decodingMetadata.functionFragment.name}(
               <div className="flex flex-col ml-4">
                 {(() => {
+                  if (!value) return;
                   const bigValue = BigInt(value);
                   if (bigValue !== 0n) {
                     return <div>{ethers.formatEther(value)} ETH</div>;

@@ -1,18 +1,20 @@
 import { ProposalDraft } from "@prisma/client";
 import { ProposalLifecycleStageMetadata } from "@/app/proposals/draft/types";
-import {
-  DRAFT_STAGES_FOR_TENANT,
-  POST_DRAFT_STAGES_FOR_TENANT,
-  getStageMetadata,
-} from "@/app/proposals/draft/utils/stages";
+import { getStageMetadata } from "@/app/proposals/draft/utils/stages";
+import Tenant from "@/lib/tenant/tenant";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
-  const ALL_STAGES_FOR_TENANT = [
-    ...DRAFT_STAGES_FOR_TENANT,
-    ...POST_DRAFT_STAGES_FOR_TENANT,
-  ];
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-  const currentStageObject = ALL_STAGES_FOR_TENANT.find(
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  const ALL_STAGES_FOR_TENANT = plmToggle.config?.stages || [];
+  const currentStageObject = plmToggle.config?.stages.find(
     (stage) => stage.stage === proposal.stage
   )!;
 

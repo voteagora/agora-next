@@ -1,7 +1,7 @@
 import {
   getStageMetadata,
-  DRAFT_STAGES_FOR_TENANT,
-  POST_DRAFT_STAGES_FOR_TENANT,
+  GET_DRAFT_STAGES,
+  GET_POST_DRAFT_STAGES,
 } from "../utils/stages";
 import DeleteDraftButton from "./DeleteDraftButton";
 import { ProposalStage, ProposalDraft } from "@prisma/client";
@@ -30,6 +30,8 @@ export default function DraftProposalChecklist({
   stage: ProposalStage;
   draftProposal: ProposalDraft;
 }) {
+  const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
+  const POST_DRAFT_STAGES_FOR_TENANT = GET_POST_DRAFT_STAGES()!;
   const currentStageObject = DRAFT_STAGES_FOR_TENANT.find(
     (stageObject) => stageObject.stage === stage
   )!;
