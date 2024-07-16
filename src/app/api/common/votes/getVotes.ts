@@ -28,31 +28,32 @@ async function getSnapshotVotesForDelegate({
   const { slug } = Tenant.current();
   const pageSize = 10;
 
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT id, 
+             voter, 
+             created, 
+             choice, 
+             metadata, 
+             reason, 
+             app, 
+             vp, 
+             vp_by_strategy, 
+             vp_state, 
+             proposal_id, 
+             choice_labels
+      FROM "snapshot".votes 
+      WHERE dao_slug = '${slug}'
+        AND voter = '${address}'
+      OFFSET ${skip}
+      LIMIT ${take};
+    `;
+    // console.log("Executing query:", query);
+    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
+  };
+
   const { meta, data: votes } = await paginateResult(
-    (skip: number, take: number) =>
-      prisma.$queryRawUnsafe<SnapshotVote[]>(
-        `
-        SELECT id, 
-               voter, 
-               created, 
-               choice, 
-               metadata, 
-               reason, 
-               app, 
-               vp, 
-               vp_by_strategy, 
-               vp_state, 
-               proposal_id, 
-               choice_labels
-              FROM "snapshot".votes 
-              WHERE dao_slug = ${slug}
-                AND voter = ${address}
-              OFFSET ${skip}
-              LIMIT ${take};
-       `,
-        skip,
-        take
-      ),
+    queryFunction,
     page,
     pageSize
   );
@@ -63,8 +64,6 @@ async function getSnapshotVotesForDelegate({
       votes: [],
     };
   }
-
-  return { meta, data: votes };
 }
 
 async function getVotesForDelegateForAddress({
