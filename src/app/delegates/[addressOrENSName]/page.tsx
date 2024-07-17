@@ -113,7 +113,14 @@ export default async function Page({
           addressOrENSName={addressOrENSName}
           statement={statement}
         />
-        {statement && <TopIssues statement={statement} />}
+
+        {statement && (
+          <>
+            <TopIssues statement={statement} />
+            <TopStakeholders statement={statement} />
+          </>
+        )}
+
         <DelegationsContainer
           delegatees={delegates}
           initialDelegators={delegators}
@@ -123,15 +130,6 @@ export default async function Page({
             return fetchCurrentDelegators(addressOrENSName, page);
           }}
         />
-
-        {statement && (
-          <>
-            <TopIssues statement={statement} />
-            <TopStakeholders statement={statement} />
-          </>
-        )}
-
-        <DelegationsContainer delegatees={delegates} delegators={delegators} />
         <DelegateVotesProvider initialVotes={delegateVotes}>
           {delegateVotes && delegateVotes.votes.length > 0 ? (
             <div className="flex flex-col gap-4">

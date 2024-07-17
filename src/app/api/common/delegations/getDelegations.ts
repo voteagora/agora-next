@@ -5,7 +5,7 @@ import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
-import { paginateResult } from "@/app/lib/pagination";
+import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
@@ -100,7 +100,7 @@ async function getCurrentDelegatorsForAddress({
 }: {
   address: string;
   page?: number;
-}) {
+}): Promise<PaginatedResult<Delegation[]>> {
   const { namespace, contracts } = Tenant.current();
   const pageSize = 20;
 
@@ -174,29 +174,33 @@ async function getCurrentDelegatorsForAddress({
         timestamp: latestBlock
           ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
           : null,
-        type: "ADVANCED",
+        type: "ADVANCED" as const,
         amount:
           Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-            ? "FULL"
-            : "PARTIAL",
+            ? ("FULL" as const)
+            : ("PARTIAL" as const),
+        transaction_hash: advancedDelegator.transaction_hash || "",
       })),
       ...(
         await Promise.all(
           directDelegators.data.map(async (directDelegator) => ({
             from: directDelegator.delegator,
             to: directDelegator.delegatee,
-            allowance: await contracts.token.contract.balanceOf(
-              directDelegator.delegator
-            ),
+            allowance: (
+              await contracts.token.contract.balanceOf(
+                directDelegator.delegator
+              )
+            ).toString(),
             timestamp: latestBlock
               ? getHumanBlockTime(directDelegator.block_number, latestBlock)
               : null,
-            type: "DIRECT",
-            amount: "FULL",
+            type: "DIRECT" as const,
+            amount: "FULL" as const,
+            transaction_hash: "",
           }))
         )
-      ).filter((delegator) => delegator.allowance > BigInt(1e15)), // filter out delegators with 0 (or close to 0) balance
-    ] as Delegation[],
+      ).filter((delegator) => BigInt(delegator.allowance) > BigInt(1e15)), // filter out delegators with 0 (or close to 0) balance
+    ],
   };
 }
 
