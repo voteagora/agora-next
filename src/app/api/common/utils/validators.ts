@@ -44,3 +44,25 @@ export const createOptionalNumberValidator = (
     ])
     .transform((x) => (x !== null ? x : defaultValue));
 };
+
+/*
+  Creates a zod schema for validating input against min and max number values for float types.
+  If input is null, returns the supplied default value.
+*/
+export const createOptionalFloatNumberValidator = (
+  min: number,
+  max: number,
+  defaultValue: number
+) => {
+  return z
+    .union([
+      z.literal(null),
+      z
+        .string()
+        .transform((x) => parseFloat(x))
+        .refine((x) => x >= min)
+        .refine((x) => x <= max),
+      z.number().min(min).max(max).default(defaultValue),
+    ])
+    .transform((x) => (x !== null ? x : defaultValue));
+};

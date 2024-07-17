@@ -13,6 +13,7 @@ import styles from "./header.module.scss";
 import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   ensName: string | undefined;
@@ -32,10 +33,13 @@ const ValueWrapper = ({
   );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
+  const { ui } = Tenant.current();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const { isLoading, delegate, balance } = useConnectedDelegate();
+
   const hasStatement = !!delegate?.statement;
+  const canCreateDelegateStatement = ui.toggle("delegates/edit")?.enabled;
 
   return (
     <Popover className="relative cursor-auto">
@@ -63,7 +67,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
           )}
 
           <Transition
-            className="absolute right-0 z-10"
+            className="absolute right-0 z-[100]"
             enter="transition duration-00 ease-out"
             enterFrom="transform scale-95 opacity-0"
             enterTo="transform scale-100 opacity-100"
@@ -165,23 +169,28 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                       <div className="animate-pulse bg-gray-af h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
                       <>
-                        {hasStatement ? (
-                          <Link
-                            href={`/delegates/edit`}
-                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                            onClick={() => close()}
-                          >
-                            Edit delegate statement
-                          </Link>
-                        ) : (
-                          <Link
-                            href={`/delegates/create`}
-                            className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
-                            onClick={() => close()}
-                          >
-                            Create delegate statement
-                          </Link>
+                        {canCreateDelegateStatement && (
+                          <>
+                            {hasStatement ? (
+                              <Link
+                                href={`/delegates/edit`}
+                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                                onClick={() => close()}
+                              >
+                                Edit delegate statement
+                              </Link>
+                            ) : (
+                              <Link
+                                href={`/delegates/create`}
+                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                                onClick={() => close()}
+                              >
+                                Create delegate statement
+                              </Link>
+                            )}
+                          </>
                         )}
+
                         {hasStatement && (
                           <Link
                             href={`/delegates/${ensName ?? address}`}

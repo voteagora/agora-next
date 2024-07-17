@@ -17,7 +17,7 @@ export const SocialLinks = () => {
     {
       icon: icons.twitter,
       alt: "twitter",
-      url: "https://twitter.com/nounsagora", // Replace with your Twitter URL
+      url: "https://twitter.com/AgoraGovernance", // Replace with your Twitter URL
     },
   ];
 

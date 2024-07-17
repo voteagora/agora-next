@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  validateAddressScope,
+} from "@/app/lib/auth/serverAuth";
 import { fetchBallot } from "@/app/api/common/ballots/getBallots";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
@@ -13,8 +16,10 @@ export async function GET(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
+  const { roundId, ballotCasterAddressOrEns } = route.params;
+  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
+
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId, ballotCasterAddressOrEns } = route.params;
     try {
       const ballots = await fetchBallot(
         Number(roundId),

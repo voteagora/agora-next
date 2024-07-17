@@ -1,7 +1,13 @@
 import { updateBallotOsMultiplier } from "@/app/api/common/ballots/updateBallot";
+import { createOptionalFloatNumberValidator } from "@/app/api/common/utils/validators";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  validateAddressScope,
+} from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
+
+const multiplierValidator = createOptionalFloatNumberValidator(1, 5, 1);
 
 export async function POST(
   request: NextRequest,
@@ -19,11 +25,15 @@ export async function POST(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
+  const { roundId, ballotCasterAddressOrEns, multiplier } = route.params;
+  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
+
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId, ballotCasterAddressOrEns, multiplier } = route.params;
+      const multiplierPayload = multiplierValidator.parse(Number(multiplier));
+
       const ballot = await updateBallotOsMultiplier(
-        Number(multiplier),
+        multiplierPayload,
         Number(roundId),
         ballotCasterAddressOrEns
       );

@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
+  schemas  = ["agora", "alltenant", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
 }
 
 model DelegateStatements {
@@ -47,6 +47,17 @@ model AddressMetadata {
 
   @@id([address, kind, dao_slug])
   @@map("address_metadata")
+  @@schema("agora")
+}
+
+view Citizens {
+  address             String
+  dao_slug            DaoSlug
+  retro_funding_round String
+  time_created        BigInt?
+
+  @@id([address, dao_slug, retro_funding_round])
+  @@map("citizens")
   @@schema("agora")
 }
 
@@ -107,7 +118,7 @@ model Ballots {
   address       String        @db.VarChar(255)
   round         Int
   os_only       Boolean       @default(false)
-  os_multiplier Int           @default(1)
+  os_multiplier Float         @default(1)
   created_at    DateTime      @default(now()) @db.Timestamptz(6)
   updated_at    DateTime      @default(now()) @db.Timestamptz(6)
   allocations   allocations[]
@@ -136,7 +147,7 @@ model BallotSubmittions {
   address    String   @db.VarChar(255)
   round      Int
   signature  String   @db.VarChar(255)
-  payload    String   @db.VarChar(255)
+  payload    String
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 
@@ -146,39 +157,39 @@ model BallotSubmittions {
 }
 
 model metrics_comments {
+  comment_id             Int                      @id @default(autoincrement())
   metric_id              String                   @db.VarChar
   address                String                   @db.VarChar
   comment                String                   @db.VarChar
-  ts                     DateTime                 @default(now()) @db.Timestamptz(6)
+  created_at             DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime                 @default(now()) @db.Timestamptz(6)
   metrics_data           metrics_data             @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
   metrics_comments_votes metrics_comments_votes[]
 
-  @@id([metric_id, address])
   @@schema("retro_funding")
 }
 
 model metrics_comments_votes {
-  metric_id        String           @db.VarChar
-  commenter        String           @db.VarChar
+  comment_id       Int
   voter            String           @db.VarChar
   vote             Int
-  ts               DateTime         @default(now()) @db.Timestamptz(6)
-  metrics_comments metrics_comments @relation(fields: [metric_id, commenter], references: [metric_id, address], onDelete: NoAction, onUpdate: NoAction)
-  metrics_data     metrics_data     @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime         @default(now()) @db.Timestamptz(6)
+  metrics_comments metrics_comments @relation(fields: [comment_id], references: [comment_id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([metric_id, commenter, voter])
+  @@id([comment_id, voter])
   @@schema("retro_funding")
 }
 
 model metrics_data {
-  metric_id              String                   @id @db.VarChar
-  name                   String                   @db.VarChar
-  description            String                   @db.VarChar
-  allocations            allocations[]
-  metrics_comments       metrics_comments[]
-  metrics_comments_votes metrics_comments_votes[]
-  metrics_projects       metrics_projects[]
-  metrics_views          metrics_views[]
+  metric_id        String             @id @db.VarChar
+  name             String             @db.VarChar
+  description      String             @db.VarChar
+  url              String?            @db.VarChar
+  allocations      allocations[]
+  metrics_comments metrics_comments[]
+  metrics_projects metrics_projects[]
+  metrics_views    metrics_views[]
 
   @@schema("retro_funding")
 }
@@ -215,6 +226,61 @@ model projects_data {
   @@schema("retro_funding")
 }
 
+view project_applicants {
+  project_id                         String  @unique
+  application_id                     String?
+  round                              String?
+  farcaster_id                       String?
+  name                               String?
+  category                           String?
+  description                        String?
+  project_avatar_url                 String?
+  project_cover_image_url            String?
+  oso_slug                           String?
+  team                               Json?   @db.Json
+  github                             Json?   @db.Json
+  packages                           Json?   @db.Json
+  contracts                          Json?   @db.Json
+  social_links_website               Json?   @db.Json
+  social_links_farcaster             Json?   @db.Json
+  social_links_twitter               String?
+  social_links_mirror                String?
+  grants_and_funding_venture_funding Json?   @db.Json
+  grants_and_funding_grants          Json?   @db.Json
+  grants_and_funding_revenue         Json?   @db.Json
+  status                             String?
+  reason                             String?
+
+  @@schema("retro_funding")
+}
+
+view projects {
+  project_id                         String  @unique
+  attestation_id                     String?
+  farcaster_id                       String?
+  name                               String?
+  category                           String?
+  parent_project_id                  String?
+  metadata_url                       String?
+  description                        String?
+  project_avatar_url                 String?
+  project_cover_image_url            String?
+  oso_slug                           String?
+  team                               Json?   @db.Json
+  github                             Json?   @db.Json
+  packages                           Json?   @db.Json
+  contracts                          Json?   @db.Json
+  social_links_website               Json?   @db.Json
+  social_links_farcaster             Json?   @db.Json
+  social_links_twitter               String?
+  social_links_mirror                String?
+  grants_and_funding_venture_funding Json?   @db.Json
+  grants_and_funding_grants          Json?   @db.Json
+  grants_and_funding_revenue         Json?   @db.Json
+
+  @@schema("retro_funding")
+}
+
 view OptimismVotes {
   transaction_hash String       @unique @db.VarChar(66)
   proposal_id      String
@@ -228,6 +294,8 @@ view OptimismVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?      @db.VarChar(42)
+  chain_id         Int?
 
   @@map("votes")
   @@schema("optimism")
@@ -341,11 +409,13 @@ view OptimismProposalTypes {
 }
 
 view OptimismVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("optimism")
@@ -359,6 +429,7 @@ view OptimismVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
 
   @@map("voter_stats")
   @@schema("optimism")
@@ -464,6 +535,8 @@ view ensVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?
+  chain_id         Int?
 
   @@map("votes")
   @@schema("ens")
@@ -478,11 +551,13 @@ view ensVotingPower {
 }
 
 view ensVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("ens")
@@ -593,11 +668,13 @@ view etherfiVotingPower {
 }
 
 view etherfiVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("etherfi")
@@ -635,6 +712,7 @@ view etherfiVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
 
   @@map("voter_stats")
   @@schema("etherfi")
@@ -654,6 +732,8 @@ view etherfiVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?
+  chain_id         Int?
 
   @@map("votes")
   @@schema("etherfi")
@@ -764,11 +844,13 @@ view uniswapVotingPower {
 }
 
 view uniswapVotingPowerSnaps {
-  id           String   @id
-  delegate     String?
-  balance      String?
-  block_number BigInt?
-  ordinal      Decimal? @db.Decimal
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
 
   @@map("voting_power_snaps")
   @@schema("uniswap")
@@ -790,9 +872,9 @@ view uniswapProposals {
   proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?
-  cancelled_transaction_hash String?
-  executed_transaction_hash  String?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
   @@schema("uniswap")
@@ -806,6 +888,7 @@ view uniswapVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
 
   @@map("voter_stats")
   @@schema("uniswap")
@@ -825,6 +908,8 @@ view uniswapVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
+  contract         String?      @db.VarChar(42)
+  chain_id         Int?
 
   @@map("votes")
   @@schema("uniswap")
@@ -897,6 +982,78 @@ view uniswapStakedDeposits {
   @@map("staked_deposits")
   @@schema("uniswap")
 }
+
+model ProposalDraft {
+  id                       Int                        @id @default(autoincrement())
+  temp_check_link          String
+  proposal_type            String?                    @db.VarChar(50)
+  proposal_social_type     String?                    @db.VarChar(50)
+  title                    String                     @db.VarChar(255)
+  abstract                 String
+  audit_url                String?
+  dao_slug                 DaoSlug
+  author_address           String
+  sponsor_address          String
+  stage                    ProposalStage
+  start_date_social        DateTime?                  @db.Timestamp(6)
+  end_date_social          DateTime?                  @db.Timestamp(6)
+  created_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
+  onchain_transaction_hash String?                    @db.VarChar(255)
+  snapshot_link            String?
+  contract                 String
+  chain_id                 Int
+  checklist_items          ProposalChecklist[]
+  social_options           ProposalSocialOption[]
+  transactions             ProposalDraftTransaction[]
+
+  @@map("proposals")
+  @@schema("alltenant")
+}
+
+model ProposalDraftTransaction {
+  id               Int           @id @default(autoincrement())
+  proposal_id      Int
+  order            Int
+  target           String        @db.VarChar(255)
+  value            String        @db.VarChar(255)
+  calldata         String
+  description      String
+  simulation_state String        @default("UNCONFIRMED") @db.VarChar(255)
+  simulation_id    String?       @db.VarChar(255)
+  created_at       DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_transactions")
+  @@schema("alltenant")
+}
+
+model ProposalSocialOption {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  text        String        @db.VarChar(255)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_options")
+  @@schema("alltenant")
+}
+
+model ProposalChecklist {
+  id           Int           @id @default(autoincrement())
+  title        String        @db.VarChar(255)
+  completed_at DateTime      @default(now()) @db.Timestamptz(6)
+  completed_by String        @db.VarChar(255)
+  link         String?
+  proposal_id  Int
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_checklist_items")
+  @@schema("alltenant")
+}
+
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_voting_power_raw_snaps {
@@ -1013,6 +1170,8 @@ view vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
 
   @@ignore
   @@schema("optimism")
@@ -1028,6 +1187,8 @@ view vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
 
   @@ignore
   @@schema("optimism")
@@ -1237,6 +1398,8 @@ view ens_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_events")
   @@ignore
@@ -1253,6 +1416,8 @@ view ens_vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_with_params_events")
   @@ignore
@@ -1269,6 +1434,8 @@ view etherfi_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_events")
   @@ignore
@@ -1285,6 +1452,8 @@ view etherfi_vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_with_params_events")
   @@ignore
@@ -1333,6 +1502,7 @@ view uniswap_delegates_wrapper {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates_wrapper")
   @@ignore
@@ -1372,7 +1542,7 @@ view uniswap_direct_chains_snaps {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view uniswap_vote_cast_events {
-  transaction_hash String?
+  transaction_hash String?  @db.VarChar(66)
   proposal_id      String?
   voter            String?
   support          String?
@@ -1380,6 +1550,8 @@ view uniswap_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
 
   @@map("vote_cast_events")
   @@ignore
@@ -1396,6 +1568,8 @@ view uniswap_vote_cast_with_params_events {
   reason           String?
   block_number     BigInt?
   params           String?
+  contract         String?
+  chain_id         Int?
 
   @@map("vote_cast_with_params_events")
   @@ignore
@@ -1467,4 +1641,22 @@ enum ProposalType {
 
   @@map("proposal_type")
   @@schema("config")
+}
+
+enum ProposalStage {
+  ADDING_TEMP_CHECK
+  DRAFTING
+  ADDING_GITHUB_PR
+  AWAITING_SUBMISSION
+  PENDING
+  ACTIVE
+  EXECUTED
+  QUEUED
+  CANCELED
+  DEFEATED
+  EXPIRED
+  SUCCEEDED
+
+  @@map("proposal_stage")
+  @@schema("alltenant")
 }

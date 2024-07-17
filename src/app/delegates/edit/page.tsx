@@ -2,9 +2,9 @@ import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDele
 import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata({}) {
-  const tenant = Tenant.current();
-  const page = tenant.ui.page("delegates");
-  const { title, description } = page.meta;
+  const { ui } = Tenant.current();
+  const page = ui.page("delegates");
+  const { title, description } = page!.meta;
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
     title
@@ -29,6 +29,7 @@ export async function generateMetadata({}) {
     },
   };
 }
+
 export default async function Page() {
   return <CurrentDelegateStatement />;
 }

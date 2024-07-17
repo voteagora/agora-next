@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   const filePath = path.join(
     __dirname,
-    "../../bquxjob_4f088de5_18f81c0ada6.csv"
+    "../../op_rf4_impact_metrics_by_project.csv"
   ); // Replace 'your_file.csv' with the actual file name
 
   let totals = {};
@@ -40,6 +40,8 @@ async function main() {
     }
   }
 
+  // TODO: Split into batches to speed up the load
+
   async function processRows() {
     for (const row of rows) {
       await processRow(row);
@@ -47,21 +49,33 @@ async function main() {
   }
 
   async function processRow(row) {
-    const projectName = row["project_name"];
-    const isOS = Math.random() < 0.5; // Randomly assign true or false
+    const projectName = row["application_id"];
+    const isOS = row["is_oss"] === "true";
     for (const [metricName, value] of Object.entries(row)) {
-      if (metricName !== "project_name") {
+      if (
+        metricName !== "application_id" &&
+        metricName !== "is_oss" &&
+        metricName !== "project_name"
+      ) {
         const total = totals[metricName];
         const linearValue = total ? parseFloat(value) / total : 0;
 
+        console.log(
+          `Updating data for project ${projectName}, metric ${metricName}, value ${value}, linearValue ${linearValue}, isOS ${isOS}`
+        );
+
         // Insert the data into the database using Prisma
-        await prisma.metrics_projects.create({
+        await prisma.metrics_projects.update({
           data: {
-            metric_id: metricName,
-            project_id: projectName,
             is_os: isOS,
             allocation: linearValue,
             values: Number(value),
+          },
+          where: {
+            metric_id_project_id: {
+              project_id: projectName,
+              metric_id: metricName,
+            },
           },
         });
       }

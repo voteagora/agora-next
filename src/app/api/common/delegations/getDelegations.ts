@@ -2,11 +2,11 @@ import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
-import provider from "@/app/lib/provider";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { paginateResult } from "@/app/lib/pagination";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -50,7 +50,7 @@ async function getCurrentDelegateesForAddress({
     })(),
   ]);
 
-  const latestBlock = await provider.getBlockNumber();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   return [
     ...(directDelegatee
@@ -62,8 +62,9 @@ async function getCurrentDelegateesForAddress({
             timestamp: latestBlock
               ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
               : null,
-            type: "DIRECT",
-            amount: "FULL",
+            type: "DIRECT" as const,
+            amount: "FULL" as const,
+            transaction_hash: "",
           },
         ]
       : []),
@@ -71,16 +72,17 @@ async function getCurrentDelegateesForAddress({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      timestamp: latestBlock
+      timestamp: latestBlock?.number
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
-      type: "ADVANCED",
+      type: "ADVANCED" as const,
       amount:
         Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
-          ? "FULL"
-          : "PARTIAL",
+          ? ("FULL" as const)
+          : ("PARTIAL" as const),
+      transaction_hash: advancedDelegatee.transaction_hash || "",
     })),
-  ] as Delegation[];
+  ];
 }
 
 /**
@@ -158,7 +160,7 @@ async function getCurrentDelegatorsForAddress({
           pageSize
         );
       })(),
-      provider.getBlockNumber(),
+      contracts.token.provider.getBlock("latest"),
     ]
   );
 
@@ -222,7 +224,7 @@ async function getCurrentAdvancedDelegatorsForAddress(
         contract: contracts.alligator!.address,
       },
     }),
-    provider.getBlockNumber(),
+    contracts.token.provider.getBlock("latest"),
   ]);
 
   return advancedDelegators.map((advancedDelegator) => ({
@@ -254,17 +256,17 @@ const getDirectDelegateeForAddress = async ({
   address: string;
 }) => {
   const { namespace } = Tenant.current();
-  const [proxyAddress, delegatee] = await Promise.all([
-    getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
-      where: { delegator: address.toLowerCase() },
-    }),
-  ]);
 
-  if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
-    return null;
+  const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
+    where: { delegator: address.toLowerCase() },
+  });
+
+  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+    const proxyAddress = await getProxyAddress(address);
+    if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
+      return null;
+    }
   }
-
   return delegatee;
 };
 

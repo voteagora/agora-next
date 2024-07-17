@@ -53,7 +53,14 @@ export default class Tenant {
     return this._token;
   }
 
-  public get ui(): any {
+  public get blockExplorer(): string {
+    return (
+      this._contracts.token.chain.blockExplorers?.default.url ||
+      "http://etherscan.io"
+    );
+  }
+
+  public get ui(): TenantUI {
     return this._ui;
   }
 
