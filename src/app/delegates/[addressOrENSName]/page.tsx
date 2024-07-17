@@ -89,6 +89,10 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
+  const { ui } = Tenant.current();
+  const tenantSupportsSnapshotVote = ui.toggle("snapshotVotes") || false;
+  console.log("tenantSupportsSnapshotVote", tenantSupportsSnapshotVote);
+
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
   const [delegate, delegateVotes, delegates, delegators, snapshotVotes] =
     await Promise.all([
@@ -96,7 +100,9 @@ export default async function Page({
       fetchVotesForDelegate(address),
       fetchCurrentDelegatees(address),
       fetchCurrentDelegators(address),
-      getSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 }),
+      tenantSupportsSnapshotVote
+        ? getSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 })
+        : Promise.resolve({ meta: { total: 0 }, votes: [] }),
     ]);
 
   const statement = delegate.statement;
@@ -127,39 +133,58 @@ export default async function Page({
         )}
 
         <DelegationsContainer delegatees={delegates} delegators={delegators} />
-        <VotesContainer
-          onchainVotes={
-            <DelegateVotesProvider initialVotes={delegateVotes}>
-              {delegateVotes && delegateVotes.votes.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  <DelegateVotes
-                    fetchDelegateVotes={async (page: number) => {
-                      "use server";
-                      return fetchVotesForDelegate(addressOrENSName, page);
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="default-message-class">
-                  <p>No past votes available.</p>
-                </div>
-              )}
-            </DelegateVotesProvider>
-          }
-          snapshotVotes={
-            <SnapshotVotes
-              meta={snapshotVotes.meta}
-              initialVotes={snapshotVotes.votes}
-              fetchSnapshotVotes={async (page: number) => {
-                "use server";
-                return await getSnapshotVotesForDelegate({
-                  addressOrENSName: addressOrENSName,
-                  page: page,
-                });
-              }}
-            />
-          }
-        />
+        {tenantSupportsSnapshotVote ? (
+          <VotesContainer
+            onchainVotes={
+              <DelegateVotesProvider initialVotes={delegateVotes}>
+                {delegateVotes && delegateVotes.votes.length > 0 ? (
+                  <div className="flex flex-col gap-4">
+                    <DelegateVotes
+                      fetchDelegateVotes={async (page: number) => {
+                        "use server";
+                        return fetchVotesForDelegate(addressOrENSName, page);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="default-message-class">
+                    <p>No past votes available.</p>
+                  </div>
+                )}
+              </DelegateVotesProvider>
+            }
+            snapshotVotes={
+              <SnapshotVotes
+                meta={snapshotVotes.meta}
+                initialVotes={snapshotVotes.votes}
+                fetchSnapshotVotes={async (page: number) => {
+                  "use server";
+                  return await getSnapshotVotesForDelegate({
+                    addressOrENSName: addressOrENSName,
+                    page: page,
+                  });
+                }}
+              />
+            }
+          />
+        ) : (
+          <DelegateVotesProvider initialVotes={delegateVotes}>
+            {delegateVotes && delegateVotes.votes.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                <DelegateVotes
+                  fetchDelegateVotes={async (page: number) => {
+                    "use server";
+                    return fetchVotesForDelegate(addressOrENSName, page);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="default-message-class">
+                <p>No past votes available.</p>
+              </div>
+            )}
+          </DelegateVotesProvider>
+        )}
       </div>
     </div>
   );
