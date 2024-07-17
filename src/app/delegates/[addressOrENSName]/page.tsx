@@ -101,8 +101,6 @@ export default async function Page({
 
   const statement = delegate.statement;
 
-  console.log("delegateVotes", delegateVotes);
-
   if (!delegate) {
     return (
       <ResourceNotFound message="Hmm... can't find that address or ENS, please check again." />
