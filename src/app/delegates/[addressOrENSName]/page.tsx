@@ -91,7 +91,6 @@ export default async function Page({
 }) {
   const { ui } = Tenant.current();
   const tenantSupportsSnapshotVote = ui.toggle("snapshotVotes") || false;
-  console.log("tenantSupportsSnapshotVote", tenantSupportsSnapshotVote);
 
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
   const [delegate, delegateVotes, delegates, delegators, snapshotVotes] =
@@ -154,17 +153,25 @@ export default async function Page({
               </DelegateVotesProvider>
             }
             snapshotVotes={
-              <SnapshotVotes
-                meta={snapshotVotes.meta}
-                initialVotes={snapshotVotes.votes}
-                fetchSnapshotVotes={async (page: number) => {
-                  "use server";
-                  return await getSnapshotVotesForDelegate({
-                    addressOrENSName: addressOrENSName,
-                    page: page,
-                  });
-                }}
-              />
+              <>
+                {snapshotVotes && snapshotVotes.votes.length > 0 ? (
+                  <SnapshotVotes
+                    meta={snapshotVotes.meta}
+                    initialVotes={snapshotVotes.votes}
+                    fetchSnapshotVotes={async (page: number) => {
+                      "use server";
+                      return await getSnapshotVotesForDelegate({
+                        addressOrENSName: addressOrENSName,
+                        page: page,
+                      });
+                    }}
+                  />
+                ) : (
+                  <div className="default-message-class">
+                    <p>No past votes available.</p>
+                  </div>
+                )}
+              </>
             }
           />
         ) : (
