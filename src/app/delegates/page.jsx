@@ -65,8 +65,10 @@ export default async function Page({ searchParams }) {
     citizensFilterOptions.shuffle.sort;
 
   const filters = {
-    issues: searchParams.issueFilter,
-    stakeholders: searchParams.stakeholderFilter,
+    ...(searchParams.issueFilter && { issues: searchParams.issueFilter }),
+    ...(searchParams.stakeholderFilter && {
+      stakeholders: searchParams.stakeholderFilter,
+    }),
   };
 
   const tab = searchParams.tab;
@@ -86,8 +88,7 @@ export default async function Page({ searchParams }) {
             initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
               "use server";
-
-              return apiFetchDelegates({ page, seed, sort });
+              return apiFetchDelegates({ page, seed, sort, filters });
             }}
             fetchDelegators={fetchDelegators}
           />

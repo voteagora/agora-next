@@ -57,8 +57,8 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
         </TabsList>
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />
-          {hasStakeholders && <StakeholdersFilter />}
-          {hasTopIssues && <IssuesFilter />}
+          {hasStakeholders && tabParam !== "citizens" && <StakeholdersFilter />}
+          {hasTopIssues && tabParam !== "citizens" && <IssuesFilter />}
           {tabParam === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
         </div>
       </div>
