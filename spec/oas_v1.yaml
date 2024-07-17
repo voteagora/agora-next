@@ -197,8 +197,7 @@ components:
           description: Address of the delegate.
           type: string
           examples:
-            - summary: Address of the delegate.
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+            - "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
         votingPower:
           summary: Delegate's available voting power
           description: An object providing a breakdown of a delegate's overall voting power between direct, advanced, and total.
@@ -208,36 +207,45 @@ components:
               description: Advanced voting power.
               type: string
               examples:
-                - summary: Advanced voting power.
-                  value: "10000"
+                - "10000"
             direct:
               description: Direct voting power.
               type: string
               examples:
-                - summary: Direct voting power
-                  value: "20000"
+                - "20000"
             total:
               description: Total voting power.
               type: string
               examples:
-                - summary: Total voting power
-                  value: "30000"
+                - "30000"
         isCitizen:
           description: A boolean flag indicating whether or not this delegate is an Agora citizen.
           type: boolean
-        twitter:
-          description: Optional twitter handle for a particular delegate.
-          type: string
-          examples:
-            - summary: Twitter handle
-              value: "@flip_liquide"
         statement:
+          $ref: "#/components/schemas/DelegateStatement"
+    DelegateStatement:
+      summmary: A delegate's statement
+      description: A delegate's statement, including the social links and topIssues.
+      type: object
+      properties:
+        statement:
+          summary: Delegate's statement
           description: A statement from the delegate describing their voting positions.
           type: string
-          examples:
-            - summary: Delegate statement
-              value: "hello! I am a great delegate for reasons xyz"
+        twitter:
+          summary: Twitter handle
+          description: Twitter handle for the delegate.
+          type: string
+        discord:
+          summary: Discord handle
+          description: Discord handle for the delegate.
+          type: string
+        warpcast:
+          summary: Warpcast handle
+          description: Warpcast handle for the delegate.
+          type: string
         topIssues:
+          summary: Top issues for a delegate
           description: The most important issues for a given delegate.
           type: array
           items:
@@ -1166,7 +1174,7 @@ paths:
                 properties:
                   metadata:
                     $ref: "#/components/schemas/PageMetadata"
-                  delegates:
+                  data:
                     type: array
                     items:
                       $ref: "#/components/schemas/BaseDelegate"
