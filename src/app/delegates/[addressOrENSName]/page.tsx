@@ -16,6 +16,7 @@ import {
   fetchDelegate,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
+import { getSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
@@ -24,6 +25,8 @@ import {
 } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholders from "@/components/Delegates/DelegateStatement/TopStakeholders";
+import SnapshotVotes from "@/components/Delegates/DelegateVotes/SnapshotVotes";
+import VotesContainer from "@/components/Delegates/DelegateVotes/VotesContainer";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -87,14 +90,18 @@ export default async function Page({
   params: { addressOrENSName: string };
 }) {
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const [delegate, delegateVotes, delegates, delegators] = await Promise.all([
-    fetchDelegate(address),
-    fetchVotesForDelegate(address),
-    fetchCurrentDelegatees(address),
-    fetchCurrentDelegators(address),
-  ]);
+  const [delegate, delegateVotes, delegates, delegators, snapshotVotes] =
+    await Promise.all([
+      fetchDelegate(address),
+      fetchVotesForDelegate(address),
+      fetchCurrentDelegatees(address),
+      fetchCurrentDelegators(address),
+      getSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 }),
+    ]);
 
   const statement = delegate.statement;
+
+  console.log("delegateVotes", delegateVotes);
 
   if (!delegate) {
     return (
@@ -122,25 +129,39 @@ export default async function Page({
         )}
 
         <DelegationsContainer delegatees={delegates} delegators={delegators} />
-        <DelegateVotesProvider initialVotes={delegateVotes}>
-          {delegateVotes && delegateVotes.votes.length > 0 ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col justify-between gap-2 sm:flex-row">
-                <h2 className="text-2xl font-bold">Past Votes</h2>
-              </div>
-              <DelegateVotes
-                fetchDelegateVotes={async (page: number) => {
-                  "use server";
-                  return fetchVotesForDelegate(addressOrENSName, page);
-                }}
-              />
-            </div>
-          ) : (
-            <div className="default-message-class">
-              <p>No past votes available.</p>
-            </div>
-          )}
-        </DelegateVotesProvider>
+        <VotesContainer
+          onchainVotes={
+            <DelegateVotesProvider initialVotes={delegateVotes}>
+              {delegateVotes && delegateVotes.votes.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  <DelegateVotes
+                    fetchDelegateVotes={async (page: number) => {
+                      "use server";
+                      return fetchVotesForDelegate(addressOrENSName, page);
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="default-message-class">
+                  <p>No past votes available.</p>
+                </div>
+              )}
+            </DelegateVotesProvider>
+          }
+          snapshotVotes={
+            <SnapshotVotes
+              meta={snapshotVotes.meta}
+              initialVotes={snapshotVotes.votes}
+              fetchSnapshotVotes={async (page: number) => {
+                "use server";
+                return await getSnapshotVotesForDelegate({
+                  addressOrENSName: addressOrENSName,
+                  page: page,
+                });
+              }}
+            />
+          }
+        />
       </div>
     </div>
   );

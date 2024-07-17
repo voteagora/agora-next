@@ -18,33 +18,52 @@ const getVotesForDelegate = ({
     page,
   });
 
-async function getSnapshotVotesForDelegate({
+export const getSnapshotVotesForDelegate = async ({
+  addressOrENSName,
+  page,
+}: {
+  addressOrENSName: string;
+  page: number;
+}) => {
+  return await addressOrEnsNameWrap(
+    getSnapshotVotesForDelegateForAddress,
+    addressOrENSName,
+    {
+      page,
+    }
+  );
+};
+
+async function getSnapshotVotesForDelegateForAddress({
   address,
   page = 1,
 }: {
   address: string;
-  page: number;
+  page?: number;
 }) {
   const { slug } = Tenant.current();
   const pageSize = 10;
 
   const queryFunction = (skip: number, take: number) => {
     const query = `
-      SELECT id, 
-             voter, 
-             created, 
-             choice, 
-             metadata, 
-             reason, 
-             app, 
-             vp, 
-             vp_by_strategy, 
-             vp_state, 
-             proposal_id, 
-             choice_labels
-      FROM "snapshot".votes 
-      WHERE dao_slug = '${slug}'
-        AND voter = '${address}'
+      SELECT "vote".id,
+             "vote".voter,
+             "vote".created,
+             "vote".choice,
+             "vote".metadata,
+             "vote".reason,
+             "vote".app,
+             "vote".vp,
+             "vote".vp_by_strategy,
+             "vote".vp_state,
+             "vote".proposal_id,
+             "vote".choice_labels,
+             "proposal".title
+      FROM "snapshot".votes as "vote"
+      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
+      WHERE "vote".dao_slug = '${slug}'
+      AND "vote".voter = '${address}'
+      ORDER BY "vote".created DESC
       OFFSET ${skip}
       LIMIT ${take};
     `;
@@ -62,6 +81,11 @@ async function getSnapshotVotesForDelegate({
     return {
       meta,
       votes: [],
+    };
+  } else {
+    return {
+      meta,
+      votes,
     };
   }
 }
