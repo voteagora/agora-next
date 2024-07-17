@@ -122,8 +122,6 @@ async function getCitizens({
     };
   });
 
-  console.log("citizens", citizens);
-
   return {
     meta,
     delegates: citizens,
