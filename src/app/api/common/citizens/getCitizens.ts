@@ -26,7 +26,7 @@ async function getCitizens({
   seed?: number;
 }) {
   const pageSize = 20;
-  const { namespace } = Tenant.current();
+  const { namespace, slug } = Tenant.current();
 
   const { meta, data: _citizens } = await paginateResult(
     (skip: number, take: number) => {
@@ -38,12 +38,13 @@ async function getCitizens({
           LEFT JOIN ${
             namespace + ".delegates"
           } delegate ON LOWER(citizens.address) = LOWER(delegate.delegate)
-          AND citizens.dao_slug = 'OP'
+          AND citizens.dao_slug = $1::config.dao_slug
           WHERE citizens.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
-          ORDER BY md5(CAST(citizens.address AS TEXT) || CAST($1 AS TEXT))
-          OFFSET $2
-          LIMIT $3;        
+          ORDER BY md5(CAST(citizens.address AS TEXT) || CAST($2 AS TEXT))
+          OFFSET $3
+          LIMIT $4;        
             `,
+          slug,
           seed,
           skip,
           take
@@ -56,13 +57,14 @@ async function getCitizens({
             LEFT JOIN ${
               namespace + ".delegates"
             } delegate ON LOWER(citizens.address) = LOWER(delegate.delegate)
-            AND citizens.dao_slug = 'OP'
+            AND citizens.dao_slug = $1::config.dao_slug
             WHERE citizens.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
             ORDER BY COALESCE(delegate.voting_power, 0) DESC,
             citizens.address ASC 
-            OFFSET $1
-            LIMIT $2;
+            OFFSET $2
+            LIMIT $3;
           `,
+          slug,
           skip,
           take
         );
