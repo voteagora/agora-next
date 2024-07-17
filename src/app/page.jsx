@@ -82,6 +82,21 @@ export default async function Home() {
 
   return (
     <VStack>
+      {tenant.namespace === "optimism" && (
+        <a
+          href="https://retrofunding.optimism.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="h-[100px] w-full relative mt-12 block"
+        >
+          <Image
+            src="/images/results_banner.png"
+            alt="Retro banner"
+            fill={true}
+            className=" object-cover rounded-lg"
+          />
+        </a>
+      )}
       <Hero />
       <MyDraftProposals
         fetchDraftProposals={async (address) => {
