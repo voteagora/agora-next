@@ -4,16 +4,20 @@ import { cache } from "react";
 import { paginateResult } from "@/app/lib/pagination";
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
-import { getDelegateStatement } from "../delegateStatement/getDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 
 type citizen = {
   address: string;
-  kind: string;
-  dao_slug: string;
-  metadata: object | null;
-  created_at: Date;
   voting_power?: Prisma.Decimal;
+  statement?: {
+    signature: string;
+    payload: string;
+    twitter: string;
+    discord: string;
+    created_at: Date;
+    updated_at: Date;
+    warpcast: string;
+  };
 };
 
 async function getCitizens({
@@ -33,7 +37,24 @@ async function getCitizens({
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
-          SELECT citizens.address, delegate.voting_power
+          SELECT 
+            citizens.address, 
+            delegate.voting_power,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast
+                FROM agora.delegate_statements s
+                WHERE s.address = LOWER(citizens.address) AND s.dao_slug = $1::config.dao_slug
+                LIMIT 1
+              ) sub
+            ) AS statement
           FROM agora.citizens citizens
           LEFT JOIN ${
             namespace + ".delegates"
@@ -52,7 +73,24 @@ async function getCitizens({
       } else {
         return prisma.$queryRawUnsafe<citizen[]>(
           `
-            SELECT citizens.address, delegate.voting_power
+            SELECT 
+              citizens.address, 
+              delegate.voting_power,
+              (SELECT row_to_json(sub)
+                FROM (
+                  SELECT
+                    signature,
+                    payload,
+                    twitter,
+                    discord,
+                    created_at,
+                    updated_at,
+                    warpcast
+                  FROM agora.delegate_statements s
+                  WHERE s.address = LOWER(citizens.address) AND s.dao_slug = $1::config.dao_slug
+                  LIMIT 1
+                ) sub
+              ) AS statement
             FROM agora.citizens citizens
             LEFT JOIN ${
               namespace + ".delegates"
@@ -74,20 +112,17 @@ async function getCitizens({
     pageSize
   );
 
-  const citizens = await Promise.all(
-    _citizens.map(async (citizen) => {
-      const statement = await getDelegateStatement(citizen.address);
-      const { address, metadata } = citizen;
-      return {
-        address,
-        metadata,
-        votingPower: citizen.voting_power?.toFixed(0) || "0",
-        // Mark as citizen to display badge
-        citizen: true,
-        statement,
-      };
-    })
-  );
+  const citizens = _citizens.map((citizen) => {
+    const { address } = citizen;
+    return {
+      address,
+      votingPower: citizen.voting_power?.toFixed(0) || "0",
+      citizen: true,
+      statement: citizen.statement,
+    };
+  });
+
+  console.log("citizens", citizens);
 
   return {
     meta,
