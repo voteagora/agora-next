@@ -27,7 +27,7 @@ export default function StakeholdersFilter() {
 
   if (!hasStakeholders) return null;
 
-  let issuesFilterOptions: any = {
+  let stakeholderFilterOptions: any = {
     [DEFAULT_FILTER]: {
       value: "All Stakeholders",
       sort: DEFAULT_FILTER,
@@ -36,7 +36,7 @@ export default function StakeholdersFilter() {
 
   // Map values to sort options
   ui.governanceStakeholders!.forEach((item) => {
-    issuesFilterOptions[item.key] = {
+    stakeholderFilterOptions[item.key] = {
       value: item.title,
       sort: item.key,
     };
@@ -55,18 +55,18 @@ export default function StakeholdersFilter() {
   return (
     <Listbox
       as="div"
-      value={filterParam || issuesFilterOptions.all.value}
+      value={filterParam || stakeholderFilterOptions.all.value}
       onChange={(value) => handleChange(value)}
     >
       {() => (
         <>
           <Listbox.Button className="w-full sm:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
-            {issuesFilterOptions[filterParam]?.value ||
-              issuesFilterOptions.all.value}
+            {stakeholderFilterOptions[filterParam]?.value ||
+              stakeholderFilterOptions.all.value}
             <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
           </Listbox.Button>
           <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
-            {Object.keys(issuesFilterOptions).map((key) => (
+            {Object.keys(stakeholderFilterOptions).map((key) => (
               <Listbox.Option key={key} value={key} as={Fragment}>
                 {({ selected }) => {
                   return (
@@ -77,7 +77,7 @@ export default function StakeholdersFilter() {
                           : "text-[#66676b] border-transparent"
                       }`}
                     >
-                      {issuesFilterOptions[key].value}
+                      {stakeholderFilterOptions[key].value}
                     </li>
                   );
                 }}

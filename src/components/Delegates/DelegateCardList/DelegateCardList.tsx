@@ -51,8 +51,6 @@ export default function DelegateCardList({
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    console.log(initialDelegates);
-
     if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchDelegates(
