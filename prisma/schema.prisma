@@ -1692,6 +1692,32 @@ view projects_backup_20240715 {
   @@schema("retro_funding")
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+view uniswap_proposals_wrapper {
+  proposal_id                String?
+  contract                   String?       @db.VarChar
+  proposer                   String?
+  description                String?
+  ordinal                    Decimal?      @db.Decimal
+  created_block              BigInt?
+  start_block                String?
+  end_block                  String?
+  cancelled_block            BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType?
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?       @db.VarChar(66)
+  cancelled_transaction_hash String?       @db.VarChar
+  executed_transaction_hash  String?       @db.VarChar
+
+  @@map("proposals_wrapper")
+  @@ignore
+  @@schema("uniswap")
+}
 
 enum DaoSlug {
   OP
