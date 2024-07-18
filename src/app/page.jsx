@@ -84,13 +84,13 @@ export default async function Home() {
     <VStack>
       {tenant.namespace === "optimism" && (
         <a
-          href="https://round4.optimism.io/"
+          href=" https://retrofunding.optimism.io/round/results"
           target="_blank"
           rel="noopener noreferrer"
           className="h-[100px] w-full relative mt-12 block"
         >
           <Image
-            src="/images/RetroPGF_Banner.png"
+            src="/images/results_banner.png"
             alt="Retro banner"
             fill={true}
             className=" object-cover rounded-lg"
