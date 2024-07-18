@@ -631,7 +631,7 @@ view ensProposals {
   proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?      @db.VarChar
+  created_transaction_hash   String?      @db.VarChar(66)
   cancelled_transaction_hash String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
@@ -662,7 +662,7 @@ view ensVoterStats {
 }
 
 view ensVotes {
-  transaction_hash String       @unique @db.VarChar(66)
+  transaction_hash String       @unique @db.VarChar
   proposal_id      String
   voter            String
   support          String
@@ -1445,7 +1445,7 @@ view ens_proposals_wrapper {
   proposal_type              ProposalType?
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?       @db.VarChar
+  created_transaction_hash   String?       @db.VarChar(66)
   cancelled_transaction_hash String?       @db.VarChar
   executed_transaction_hash  String?       @db.VarChar
 
@@ -1538,7 +1538,7 @@ view etherfi_authority_chains {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ens_vote_cast_events {
-  transaction_hash String?  @db.VarChar
+  transaction_hash String?  @db.VarChar(66)
   proposal_id      String?
   voter            String?
   support          String?
@@ -1556,7 +1556,7 @@ view ens_vote_cast_events {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ens_vote_cast_with_params_events {
-  transaction_hash String?  @db.VarChar
+  transaction_hash String?
   proposal_id      String?
   voter            String?
   support          String?
