@@ -1735,6 +1735,7 @@ view cyberAdvancedDelegatees {
 
   @@ignore
   @@schema("cyber")
+  @@map("advanced_delegatees")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1749,10 +1750,11 @@ view cyberAdvancedVotingPower {
 
   @@ignore
   @@schema("cyber")
+  @@map("advanced_voting_power")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view cyberCdvancedVotingPowerRawSnaps {
+view cyberAdvancedVotingPowerRawSnaps {
   chain_str           String?
   delegate            String?
   chain               String[]
@@ -2009,7 +2011,7 @@ view cyber_vote_cast_with_params_events {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view voter_stats {
+view cyberVoterStats {
   voter              String?
   proposals_voted    BigInt?
   participation_rate Float?
@@ -2022,10 +2024,11 @@ view voter_stats {
 
   @@ignore
   @@schema("cyber")
+  @@map("voter_stats")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view cyber_votes {
+view cyberVotes {
   transaction_hash String?       @db.VarChar
   proposal_id      String?
   voter            String?
@@ -2047,17 +2050,18 @@ view cyber_votes {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view voting_power {
+view cyberVotingPower {
   delegate     String?
   voting_power String?
   contract     String? @db.VarChar(42)
 
   @@ignore
   @@schema("cyber")
+  @@map("voting_power")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view voting_power_snaps {
+view cyberVotingPowerSnaps {
   id                String?
   delegate          String?
   balance           String?
@@ -2069,6 +2073,7 @@ view voting_power_snaps {
 
   @@ignore
   @@schema("cyber")
+  @@map("voting_power_snaps")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2088,7 +2093,7 @@ view scrollAdvancedDelegatees {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_advanced_voting_power {
+view scrollAdvancedVotingPower {
   delegate                 String?
   vp_allowance             Decimal? @db.Decimal
   vp_delegatable_allowance Decimal? @db.Decimal
@@ -2123,7 +2128,7 @@ view scroll_advanced_voting_power_raw_snaps {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_authority_chains {
+view scrollAuthorityChains {
   delegate  String?
   rules     Json?
   chain     String[]
@@ -2137,7 +2142,7 @@ view scroll_authority_chains {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_authority_chains_snaps {
+view scrollAuthorityChainsSnaps {
   id                   String?
   delegate             String?
   rules                Json?
@@ -2360,7 +2365,7 @@ view scroll_vote_cast_with_params_events {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_voter_stats {
+view scrollVoterStats {
   voter              String?
   proposals_voted    BigInt?
   participation_rate Float?
@@ -2377,7 +2382,7 @@ view scroll_voter_stats {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_votes {
+view scrollVotes {
   transaction_hash String?       @db.VarChar
   proposal_id      String?
   voter            String?
@@ -2399,7 +2404,7 @@ view scroll_votes {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_voting_power {
+view scrollVotingPower {
   delegate     String?
   voting_power String?
   contract     String? @db.VarChar(42)
@@ -2410,7 +2415,7 @@ view scroll_voting_power {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_voting_power_snaps {
+view scrollVotingPowerSnaps {
   id                String?
   delegate          String?
   balance           String?
