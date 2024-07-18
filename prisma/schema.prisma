@@ -50,17 +50,6 @@ model AddressMetadata {
   @@schema("agora")
 }
 
-view Citizens {
-  address             String
-  dao_slug            DaoSlug
-  retro_funding_round String
-  time_created        BigInt?
-
-  @@id([address, dao_slug, retro_funding_round])
-  @@map("citizens")
-  @@schema("agora")
-}
-
 model SnapshotProposal {
   id             String    @id
   dao_slug       DaoSlug
@@ -224,6 +213,137 @@ model projects_data {
   metrics_projects metrics_projects[]
 
   @@schema("retro_funding")
+}
+
+model ProposalDraft {
+  id                       Int                        @id @default(autoincrement())
+  temp_check_link          String
+  proposal_type            String?                    @db.VarChar(50)
+  proposal_social_type     String?                    @db.VarChar(50)
+  title                    String                     @db.VarChar(255)
+  abstract                 String
+  audit_url                String?
+  dao_slug                 DaoSlug
+  author_address           String
+  sponsor_address          String
+  stage                    ProposalStage
+  start_date_social        DateTime?                  @db.Timestamp(6)
+  end_date_social          DateTime?                  @db.Timestamp(6)
+  created_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
+  onchain_transaction_hash String?                    @db.VarChar(255)
+  snapshot_link            String?
+  contract                 String
+  chain_id                 Int
+  checklist_items          ProposalChecklist[]
+  social_options           ProposalSocialOption[]
+  transactions             ProposalDraftTransaction[]
+
+  @@map("proposals")
+  @@schema("alltenant")
+}
+
+model ProposalDraftTransaction {
+  id               Int           @id @default(autoincrement())
+  proposal_id      Int
+  order            Int
+  target           String        @db.VarChar(255)
+  value            String        @db.VarChar(255)
+  calldata         String
+  description      String
+  simulation_state String        @default("UNCONFIRMED") @db.VarChar(255)
+  simulation_id    String?       @db.VarChar(255)
+  created_at       DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_transactions")
+  @@schema("alltenant")
+}
+
+model ProposalSocialOption {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  text        String        @db.VarChar(255)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_options")
+  @@schema("alltenant")
+}
+
+model ProposalChecklist {
+  id           Int           @id @default(autoincrement())
+  title        String        @db.VarChar(255)
+  completed_at DateTime      @default(now()) @db.Timestamptz(6)
+  completed_by String        @db.VarChar(255)
+  link         String?
+  proposal_id  Int
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_checklist_items")
+  @@schema("alltenant")
+}
+
+model dao_engagement_metrics {
+  chain_id   BigInt
+  block_date DateTime @db.Date
+  metric     String
+  tenant     String
+  value      String?
+
+  @@id([chain_id, block_date, metric, tenant], map: "dao_engagement_metrics_pk")
+  @@index([block_date], map: "ix_alltenant_dao_engagement_metrics_block_date")
+  @@index([chain_id], map: "ix_alltenant_dao_engagement_metrics_chain_id")
+  @@index([metric], map: "ix_alltenant_dao_engagement_metrics_metric")
+  @@index([tenant], map: "ix_alltenant_dao_engagement_metrics_tenant")
+  @@schema("alltenant")
+}
+
+model dao_engagement_votes {
+  chain_id    BigInt
+  block_date  DateTime @db.Date
+  tenant      String
+  proposal_id BigInt
+  voter_count BigInt?
+
+  @@id([chain_id, block_date, tenant, proposal_id], map: "dao_engagement_votes_pk")
+  @@index([block_date], map: "ix_alltenant_dao_engagement_votes_block_date")
+  @@index([chain_id], map: "ix_alltenant_dao_engagement_votes_chain_id")
+  @@index([proposal_id], map: "ix_alltenant_dao_engagement_votes_proposal_id")
+  @@index([tenant], map: "ix_alltenant_dao_engagement_votes_tenant")
+  @@schema("alltenant")
+}
+
+model votes {
+  id             String  @id(map: "votes_pk")
+  voter          String?
+  created        BigInt?
+  choice         String?
+  metadata       Json?   @db.Json
+  reason         String?
+  app            String?
+  vp             Float?
+  vp_by_strategy Json?   @db.Json
+  vp_state       String?
+  proposal_id    String?
+  choice_labels  Json?   @db.Json
+  dao_slug       String?
+
+  @@index([id], map: "ix_snapshot_votes_id")
+  @@schema("snapshot")
+}
+
+view Citizens {
+  address             String
+  dao_slug            DaoSlug
+  retro_funding_round String
+  time_created        BigInt?
+
+  @@id([address, dao_slug, retro_funding_round])
+  @@map("citizens")
+  @@schema("agora")
 }
 
 view project_applicants {
