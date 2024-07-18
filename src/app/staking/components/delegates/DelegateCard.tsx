@@ -9,7 +9,6 @@ interface DelegateCardProps {
   action: string;
   address: string;
   discord?: string;
-  endorsed: boolean;
   onSelect: (address: string) => void;
   statement: string;
   twitter?: string;
