@@ -93,6 +93,8 @@ export default function DelegateCardList({
             truncatedStatement = delegateStatement.slice(0, 120);
           }
 
+          console.log(delegate.statement?.endorsed);
+
           return (
             <div
               key={delegate.address}
@@ -107,6 +109,7 @@ export default function DelegateCardList({
                 <VStack gap={4} className={styles.link_container}>
                   <VStack gap={4} justifyContent="justify-center">
                     <DelegateProfileImage
+                      endorsed={delegate.statement?.endorsed}
                       address={delegate.address}
                       votingPower={delegate.votingPower}
                       citizen={delegate.citizen}

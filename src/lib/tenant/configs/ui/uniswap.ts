@@ -157,6 +157,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegates/endorsed-filter",
+      enabled: true,
+    },
+    {
       name: "delegates/edit",
       enabled: true,
     },

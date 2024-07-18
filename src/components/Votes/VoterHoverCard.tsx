@@ -67,6 +67,7 @@ export default function VoterHoverCard({
             <VStack gap={4} justifyContent="justify-center">
               <DelegateProfileImage
                 address={address}
+                endorsed={!!delegate ? delegate.statement.endorsed : false}
                 votingPower={!!delegate ? delegate.votingPower : "0"}
               />
               <p

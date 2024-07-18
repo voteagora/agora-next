@@ -129,6 +129,7 @@ async function getDelegates({
   filters?: {
     issues?: string;
     stakeholders?: string;
+    endorsed?: boolean;
   };
 }) {
   const pageSize = 20;
@@ -136,8 +137,10 @@ async function getDelegates({
 
   const allowList = ui.delegates?.allowed || [];
 
+  const endorsedFilterQuery = filters?.endorsed ? `AND endorsed = true` : "";
+
   const topIssuesParam = filters?.issues || "";
-  const topIssuesQuery =
+  const topIssuesFilterQuery =
     topIssuesParam && topIssuesParam !== ""
       ? `
       AND jsonb_array_length(s.payload -> 'topIssues') > 0
@@ -152,10 +155,10 @@ async function getDelegates({
     `
       : "";
 
-  // TODO 1/2: There is an inconsistency between top stakeholders and top issues. Top issues are filtered by a value
-  // TODO 2/2 : where the top stakeholders are filtered on type. We need to make this consistent and clean up the data and UI.
+  // Note: There is an inconsistency between top stakeholders and top issues. Top issues are filtered by a value
+  // where the top stakeholders are filtered on type. We need to make this consistent and clean up the data and UI.
   const topStakeholdersParam = filters?.stakeholders || "";
-  const topStakeholdersQuery =
+  const topStakeholdersFilterQuery =
     topStakeholdersParam && topStakeholdersParam !== ""
       ? `
       AND jsonb_array_length(s.payload -> 'topStakeholders') > 0
@@ -192,11 +195,13 @@ async function getDelegates({
                     discord,
                     created_at,
                     updated_at,
-                    warpcast
+                    warpcast, 
+                    endorsed
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
-                  ${topIssuesQuery}
-                  ${topStakeholdersQuery}
+                  ${endorsedFilterQuery}
+                  ${topIssuesFilterQuery}
+                  ${topStakeholdersFilterQuery}
                   LIMIT 1
                 ) sub
               ) AS statement
@@ -207,8 +212,9 @@ async function getDelegates({
                 SELECT 1
                 FROM agora.delegate_statements s
                 WHERE s.address = d.delegate
-                ${topIssuesQuery}
-                ${topStakeholdersQuery}
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
             )
             ORDER BY num_of_delegators DESC
             OFFSET $3
@@ -242,25 +248,27 @@ async function getDelegates({
                     discord,
                     created_at,
                     updated_at,
-                    warpcast
+                    warpcast,
+                    endorsed
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
-                  ${topIssuesQuery}
-                  ${topStakeholdersQuery}
+                  ${endorsedFilterQuery}
+                  ${topIssuesFilterQuery}
+                  ${topStakeholdersFilterQuery}
                   LIMIT 1
                 ) sub
               ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE voting_power > 0 
-            AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
+            FROM ${namespace + ".delegates"} d 
+            WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
             AND EXISTS (
                 SELECT 1
                 FROM agora.delegate_statements s
                 WHERE s.address = d.delegate
-                ${topIssuesQuery}
-                ${topStakeholdersQuery}
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
             )
-            ORDER BY -log(random()) / voting_power
+             ORDER BY -log(random()) / NULLIF(voting_power, 0)
             OFFSET $4
             LIMIT $5;
             `,
@@ -292,11 +300,13 @@ async function getDelegates({
                     discord,
                     created_at,
                     updated_at,
-                    warpcast
+                    warpcast,
+                    endorsed
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
-                  ${topIssuesQuery}
-                  ${topStakeholdersQuery}
+                  ${endorsedFilterQuery}
+                  ${topIssuesFilterQuery}
+                  ${topStakeholdersFilterQuery}
                   LIMIT 1
                 ) sub
               ) AS statement
@@ -306,8 +316,9 @@ async function getDelegates({
                 SELECT 1
                 FROM agora.delegate_statements s
                 WHERE s.address = d.delegate
-                ${topIssuesQuery}
-                ${topStakeholdersQuery}
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
             )
             ORDER BY voting_power DESC
             OFFSET $3
@@ -396,7 +407,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             discord,
             created_at,
             updated_at,
-            warpcast
+            warpcast,
+            endorsed
           FROM agora.delegate_statements s 
           WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
           LIMIT 1

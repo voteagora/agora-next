@@ -76,6 +76,7 @@ export default function DelegateCardList({
       >
         <DelegateCard
           key={address}
+          endorsed={false}
           address={address}
           onSelect={onSelect}
           statement={`Delegate your votes to yourself to engage directly in ${capitalizeFirstLetter(namespace)} governance.`}
@@ -89,6 +90,7 @@ export default function DelegateCardList({
             const twitter = delegate?.statement?.twitter;
             const discord = delegate?.statement?.discord;
             const warpcast = delegate?.statement?.warpcast;
+            const endorsed = delegate?.statement?.endorsed;
 
             if (delegate?.statement?.payload) {
               const delegateStatement = (
@@ -101,6 +103,7 @@ export default function DelegateCardList({
             return (
               <DelegateCard
                 action={"Select as delegate"}
+                endorsed={endorsed}
                 address={delegate.address}
                 discord={discord}
                 key={delegate.address}
