@@ -127,7 +127,7 @@ async function getDelegates({
   page: number;
   sort: string;
   seed?: number;
-}): Promise<PaginatedResult<DelegateChunk[]> & { seed?: number }> {
+}): Promise<PaginatedResult<DelegateChunk[]>> {
   const pageSize = 20;
   const { namespace, ui, slug } = Tenant.current();
 
