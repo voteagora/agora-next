@@ -565,6 +565,7 @@ view OptimismVoterStats {
   abstain            BigInt?
   against            BigInt?
   proposals_proposed BigInt?
+  contract           String?
 
   @@map("voter_stats")
   @@schema("optimism")
@@ -585,6 +586,7 @@ view ensDelegatees {
   delegatee    String
   block_number BigInt
   balance      Decimal @db.Decimal
+  contract     String? @db.VarChar(42)
 
   @@map("delegatees")
   @@schema("ens")
@@ -603,6 +605,7 @@ view OptimismStakedDeposits {
 
 view ensDelegates {
   delegate          String   @unique
+  contract          String?  @db.VarChar(42)
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
@@ -652,6 +655,7 @@ view ensVoterStats {
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  contract           String?  @db.VarChar(42)
 
   @@map("voter_stats")
   @@schema("ens")
@@ -670,7 +674,7 @@ view ensVotes {
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
-  contract         String?
+  contract         String?      @db.VarChar(42)
   chain_id         Int?
 
   @@map("votes")
@@ -680,6 +684,7 @@ view ensVotes {
 view ensVotingPower {
   delegate     String  @unique
   voting_power String?
+  contract     String? @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("ens")
@@ -693,6 +698,7 @@ view ensVotingPowerSnaps {
   ordinal           Decimal? @db.Decimal
   transaction_index Int?
   log_index         Int?
+  contract          String?  @db.VarChar(42)
 
   @@map("voting_power_snaps")
   @@schema("ens")
@@ -848,6 +854,7 @@ view etherfiVoterStats {
   abstain            BigInt?
   against            BigInt?
   proposals_proposed BigInt?
+  contract           String?
 
   @@map("voter_stats")
   @@schema("etherfi")
@@ -947,6 +954,7 @@ view uniswapDelegatees {
   delegatee    String
   block_number BigInt
   balance      Decimal @db.Decimal
+  contract     String? @db.VarChar(42)
 
   @@map("delegatees")
   @@schema("uniswap")
@@ -954,6 +962,7 @@ view uniswapDelegatees {
 
 view uniswapDelegates {
   delegate          String   @unique
+  contract          String?  @db.VarChar(42)
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
@@ -973,6 +982,7 @@ view uniswapVotableSupply {
 view uniswapVotingPower {
   delegate     String  @unique
   voting_power String?
+  contract     String? @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("uniswap")
@@ -986,6 +996,7 @@ view uniswapVotingPowerSnaps {
   ordinal           Decimal? @db.Decimal
   transaction_index Int?
   log_index         Int?
+  contract          String?  @db.VarChar(42)
 
   @@map("voting_power_snaps")
   @@schema("uniswap")
@@ -1024,6 +1035,7 @@ view uniswapVoterStats {
   abstain            BigInt?
   against            BigInt?
   proposals_proposed BigInt?
+  contract           String?  @db.VarChar(42)
 
   @@map("voter_stats")
   @@schema("uniswap")
@@ -1408,6 +1420,7 @@ view ens_delegates_wrapper {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates_wrapper")
   @@ignore
@@ -1533,7 +1546,7 @@ view ens_vote_cast_events {
   reason           String?
   block_number     BigInt?
   params           String?
-  contract         String?
+  contract         String?  @db.VarChar(42)
   chain_id         Int?
 
   @@map("vote_cast_events")
