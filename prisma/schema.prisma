@@ -1723,7 +1723,7 @@ view ens_direct_chains_snaps {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view advanced_delegatees {
+view cyberAdvancedDelegatees {
   pair             String?
   from             String?
   to               String?
@@ -1804,7 +1804,7 @@ view authority_chains_snaps {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view delegatees {
+view cyberDelegatees {
   delegator    String?
   delegatee    String?
   block_number BigInt?
@@ -2065,7 +2065,7 @@ view voting_power_snaps {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view scroll_advanced_delegatees {
+view scrollAdvancedDelegatees {
   pair             String?
   from             String?
   to               String?
@@ -2149,7 +2149,7 @@ view scroll_authority_chains_snaps {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view scroll_delegatees {
+view scrollDelegatees {
   delegator    String?
   delegatee    String?
   block_number BigInt?
