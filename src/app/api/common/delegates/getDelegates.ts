@@ -473,7 +473,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators:
       // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n && namespace === "optimism"
+      cachedNumOfDelegators < 1000n
         ? BigInt(
             (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
               "0"
