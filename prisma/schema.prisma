@@ -322,6 +322,7 @@ view OptimismDelegates {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates")
   @@schema("optimism")
@@ -472,6 +473,7 @@ view ensDelegates {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates")
   @@schema("ens")
@@ -647,6 +649,7 @@ view etherfiDelegates {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates")
   @@schema("etherfi")
@@ -823,6 +826,7 @@ view uniswapDelegates {
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
 
   @@map("delegates")
   @@schema("uniswap")
