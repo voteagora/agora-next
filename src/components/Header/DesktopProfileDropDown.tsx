@@ -67,7 +67,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
           )}
 
           <Transition
-            className="absolute right-0 z-10"
+            className="absolute right-0 z-[100]"
             enter="transition duration-00 ease-out"
             enterFrom="transform scale-95 opacity-0"
             enterTo="transform scale-100 opacity-100"

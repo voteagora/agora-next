@@ -18,6 +18,13 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { ChainConstants } from "viem/types/chain";
+import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
+import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
+import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
+import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
+import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
+import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
+import { StakedDeposit } from "@/lib/types";
 
 export type DialogType =
   | DelegateDialogType
@@ -26,7 +33,13 @@ export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
-  | SwithcNetworkDialogType;
+  | SwithcNetworkDialogType
+  | DeleteDraftProposalDialog
+  | CreateDraftProposalDialog
+  | UpdateDraftProposalDialog
+  | SponsorSnapshotDraftProposalDialog
+  | SponsorOnchainDraftProposalDialog
+  | OpenGithubPRDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -80,6 +93,20 @@ export type SwithcNetworkDialogType = {
   };
 };
 
+export type StaleDepositAddDialogType = {
+  type: "STAKE_DEPOSIT_ADD";
+  params: {
+    deposit: StakedDeposit;
+  };
+};
+
+export type StakeDepositWithdrawDialogType = {
+  type: "STAKE_DEPOSIT_WITHDRAW";
+  params: {
+    deposit: StakedDeposit;
+  };
+};
+
 // export type FaqDialogType = {
 //   type: "FAQ";
 //   params: {};
@@ -113,6 +140,36 @@ export type ApprovalCastVoteDialogProps = {
 export type ApprovalCastVoteDialogType = {
   type: "APPROVAL_CAST_VOTE";
   params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
+};
+
+export type DeleteDraftProposalDialog = {
+  type: "DELETE_DRAFT_PROPOSAL";
+  params: { proposalId: number };
+};
+
+export type CreateDraftProposalDialog = {
+  type: "CREATE_DRAFT_PROPOSAL";
+  params: { redirectUrl: string; githubUrl: string };
+};
+
+export type UpdateDraftProposalDialog = {
+  type: "UPDATE_DRAFT_PROPOSAL";
+  params: { redirectUrl: string };
+};
+
+export type SponsorSnapshotDraftProposalDialog = {
+  type: "SPONSOR_SNAPSHOT_DRAFT_PROPOSAL";
+  params: { redirectUrl: string; snapshotLink: string };
+};
+
+export type SponsorOnchainDraftProposalDialog = {
+  type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL";
+  params: { redirectUrl: string; txHash: `0x${string}` };
+};
+
+export type OpenGithubPRDialog = {
+  type: "OPEN_GITHUB_PR";
+  params: { redirectUrl: string; githubUrl: string };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -217,6 +274,45 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   SWITCH_NETWORK: ({ chain }: { chain: ChainConstants }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
+  ),
+  DELETE_DRAFT_PROPOSAL: ({ proposalId }, closeDialog) => (
+    <DeleteDraftProposalDialog
+      closeDialog={closeDialog}
+      proposalId={proposalId}
+    />
+  ),
+  CREATE_DRAFT_PROPOSAL: ({ redirectUrl, githubUrl }) => (
+    <CreateDraftProposalDialog
+      redirectUrl={redirectUrl}
+      githubUrl={githubUrl}
+    />
+  ),
+  UPDATE_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
+    <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
+  ),
+  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+    <SponsorOnchainProposalDialog
+      redirectUrl={redirectUrl}
+      txHash={txHash}
+      closeDialog={closeDialog}
+    />
+  ),
+  SPONSOR_SNAPSHOT_DRAFT_PROPOSAL: (
+    { redirectUrl, snapshotLink },
+    closeDialog
+  ) => (
+    <SponsorSnapshotProposalDialog
+      redirectUrl={redirectUrl}
+      snapshotLink={snapshotLink}
+      closeDialog={closeDialog}
+    />
+  ),
+  OPEN_GITHUB_PR: ({ redirectUrl, githubUrl }, closeDialog) => (
+    <AddGithubPRDialog
+      redirectUrl={redirectUrl}
+      githubUrl={githubUrl}
+      closeDialog={closeDialog}
+    />
   ),
   // FAQ: () => {
   //   return <FaqDialog />;

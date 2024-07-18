@@ -1,12 +1,16 @@
+import { StaticImageData } from "next/image";
+import { icons } from "@/assets/icons/icons";
+
 type UIToggle = {
   name: string;
   enabled: boolean;
 };
 
-type UILink = {
+export type UILink = {
   name: string;
   title: string;
   url: string;
+  image?: string | StaticImageData;
 };
 
 type UIPage = {
@@ -14,10 +18,17 @@ type UIPage = {
   route: string;
   title: string;
   href?: string;
+  links?: UILink[];
   meta: {
     title: string;
     description: string;
   };
+};
+
+type UIAssets = {
+  success: string;
+  pending: string;
+  delegate: string;
 };
 
 type UIDelegates = {
@@ -26,23 +37,46 @@ type UIDelegates = {
   retired: `0x${string}`[];
 };
 
+type UIGovernanceIssue = {
+  icon: keyof typeof icons;
+  key: string;
+  title: string;
+};
+
+type UIGovernanceStakeholder = {
+  key: string;
+  title: string;
+};
+
+type UIOrganization = {
+  title: string;
+};
+
 type TenantUIParams = {
+  assets: UIAssets;
   color: string;
   delegates?: UIDelegates;
   hero?: string;
   links?: UILink[];
   logo: string;
+  organization?: UIOrganization;
   pages?: UIPage[];
   title: string;
   toggles?: UIToggle[];
+  governanceIssues?: UIGovernanceIssue[];
+  governanceStakeholders?: UIGovernanceStakeholder[];
 };
 
 export class TenantUI {
+  private _assets: UIAssets;
   private _color: string;
   private _delegates?: UIDelegates;
+  private _governanceIssues?: UIGovernanceIssue[];
+  private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
+  private _organization?: UIOrganization;
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
@@ -52,23 +86,35 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   constructor({
+    assets,
     color,
     delegates,
     hero,
-    logo,
-    title,
     links,
+    logo,
+    organization,
     pages,
+    title,
     toggles,
+    governanceIssues,
+    governanceStakeholders,
   }: TenantUIParams) {
+    this._assets = assets;
     this._color = color;
     this._delegates = delegates;
     this._hero = hero;
-    this._logo = logo;
-    this._title = title;
     this._links = links;
-    this._toggles = toggles;
+    this._logo = logo;
+    this._organization = organization;
     this._pages = pages;
+    this._title = title;
+    this._toggles = toggles;
+    this._governanceIssues = governanceIssues;
+    this._governanceStakeholders = governanceStakeholders;
+  }
+
+  public get assets(): UIAssets {
+    return this._assets;
   }
 
   public get color(): string {
@@ -77,6 +123,14 @@ export class TenantUI {
 
   public get delegates(): UIDelegates | undefined {
     return this._delegates;
+  }
+
+  public get governanceIssues(): UIGovernanceIssue[] | undefined {
+    return this._governanceIssues;
+  }
+
+  public get governanceStakeholders(): UIGovernanceStakeholder[] | undefined {
+    return this._governanceStakeholders;
   }
 
   public get title(): string {
@@ -89,6 +143,10 @@ export class TenantUI {
 
   public get logo(): string {
     return this._logo;
+  }
+
+  public get organization(): UIOrganization | undefined {
+    return this._organization;
   }
 
   public link(name: string): UILink | undefined {

@@ -1,14 +1,13 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateStatementFormSection from "./DelegateStatementFormSection";
 import TopIssuesFormSection from "./TopIssuesFormSection";
 import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
-import { useWatch } from "react-hook-form";
+import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { useAccount, useWalletClient, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useWalletClient } from "wagmi";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import {
   fetchDelegate,
@@ -16,17 +15,9 @@ import {
 } from "@/app/delegates/actions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
-
-const cleanTopIssues = (
-  issues: {
-    value: string;
-    type: string;
-  }[]
-) => {
-  return issues.filter((issue) => issue.value !== "");
-};
+import Tenant from "@/lib/tenant/tenant";
+import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 
 export default function DelegateStatementForm({
   form,
@@ -35,10 +26,18 @@ export default function DelegateStatementForm({
 }) {
   const router = useRouter();
   const { address } = useAccount();
+  const { ui } = Tenant.current();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
+
+  const hasTopIssues = Boolean(
+    ui.governanceIssues && ui.governanceIssues.length > 0
+  );
+  const hasStakeholders = Boolean(
+    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
+  );
 
   const agreeCodeConduct = useWatch({
     control: form.control,
@@ -50,6 +49,7 @@ export default function DelegateStatementForm({
       const _delegate = await fetchDelegate(address as string);
       setDelegate(_delegate);
     }
+
     if (address) {
       _getDelegate();
     }
@@ -62,7 +62,9 @@ export default function DelegateStatementForm({
     if (!walletClient) {
       throw new Error("signer not available");
     }
-    values.topIssues = cleanTopIssues(values.topIssues);
+
+    values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
+
     const {
       daoSlug,
       discord,
@@ -71,6 +73,7 @@ export default function DelegateStatementForm({
       twitter,
       warpcast,
       topIssues,
+      topStakeholders,
     } = values;
 
     // User will only sign what they are seeing on the frontend
@@ -83,6 +86,7 @@ export default function DelegateStatementForm({
       twitter,
       warpcast,
       topIssues,
+      topStakeholders,
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
@@ -123,16 +127,17 @@ export default function DelegateStatementForm({
   return (
     <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
-        <VStack className="static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
+        <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
           <DelegateCard delegate={delegate} />
-        </VStack>
+        </div>
       )}
-      <VStack className="w-full">
-        <VStack className="bg-white border rounded-xl border-gray-300 shadow-newDefault">
+      <div className="flex flex-col w-full">
+        <div className="flex flex-col bg-white border rounded-xl border-gray-300 shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DelegateStatementFormSection form={form} />
-              <TopIssuesFormSection form={form} />
+              {hasTopIssues && <TopIssuesFormSection form={form} />}
+              {hasStakeholders && <TopStakeholdersFormSection form={form} />}
               <OtherInfoFormSection form={form} />
 
               <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
@@ -162,8 +167,8 @@ export default function DelegateStatementForm({
               </div>
             </form>
           </Form>
-        </VStack>
-      </VStack>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,7 @@
-import { getDefaultProvider } from "ethers";
+import { getDefaultProvider, AlchemyProvider } from "ethers";
 import { MulticallProvider, MulticallWrapper } from "ethers-multicall-provider";
+
+// TODO: Andrei - this needs to be refactored into a factory
 
 declare global {
   var provider: MulticallProvider;
@@ -12,15 +14,19 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
 let provider: MulticallProvider;
 let ethProvider: MulticallProvider;
 
+const sepoliaProvider = new AlchemyProvider("sepolia", alchemyId);
+
 if (isProd) {
   provider = MulticallWrapper.wrap(
     getDefaultProvider("optimism", {
       alchemy: alchemyId,
+      exclusive: "alchemy",
     })
   );
   ethProvider = MulticallWrapper.wrap(
     getDefaultProvider("mainnet", {
       alchemy: alchemyId,
+      exclusive: "alchemy",
     })
   );
 } else {
@@ -28,6 +34,7 @@ if (isProd) {
     global.provider = MulticallWrapper.wrap(
       getDefaultProvider("optimism", {
         alchemy: alchemyId,
+        exclusive: "alchemy",
       })
     );
   }
@@ -37,6 +44,7 @@ if (isProd) {
     global.ethProvider = MulticallWrapper.wrap(
       getDefaultProvider("mainnet", {
         alchemy: alchemyId,
+        exclusive: "alchemy",
       })
     );
   }
@@ -44,4 +52,4 @@ if (isProd) {
 }
 
 export default provider;
-export { ethProvider };
+export { ethProvider, sepoliaProvider };

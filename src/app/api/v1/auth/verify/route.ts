@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   // create JWT
-  const scope = await getRolesForUser(siweObject.address);
+  const scope = await getRolesForUser(siweObject.address, siweObject);
   const ttl = await getExpiry();
   const jwt = await generateJwt(siweObject.address, scope, ttl, {
     address: siweObject.address,
