@@ -1719,6 +1719,20 @@ view uniswap_proposals_wrapper {
   @@schema("uniswap")
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_direct_chains {
+  delegate  String?
+  rules     Json?
+  chain     String?
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("direct_chains")
+  @@ignore
+  @@schema("ens")
+}
+
 enum DaoSlug {
   OP
   ENS
