@@ -30,7 +30,7 @@ async function getDelegates({
     limit: 20,
     offset: 0,
   },
-  sort = "weighted_random",
+  sort,
   seed,
 }: {
   pagination: PaginationParamsEx;
