@@ -1733,6 +1733,23 @@ view ens_direct_chains {
   @@schema("ens")
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ens_direct_chains_snaps {
+  delegate             String?
+  rules                Json?
+  chain                String?
+  proxy                String?
+  balance              Decimal? @db.Decimal
+  balance_block_number BigInt?
+  allowance            Decimal? @db.Decimal
+  contract             String?  @db.VarChar
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("direct_chains_snaps")
+  @@ignore
+  @@schema("ens")
+}
+
 enum DaoSlug {
   OP
   ENS
