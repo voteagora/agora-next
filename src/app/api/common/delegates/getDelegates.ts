@@ -185,7 +185,6 @@ async function getDelegates({
         direct: delegate.direct_vp?.toFixed(0) || "0",
         advanced: delegate.advanced_vp?.toFixed(0) || "0",
       },
-      numOfDelegators: delegate.num_of_delegators,
       citizen: delegate.citizen,
       statement: delegate.statement,
     })),
