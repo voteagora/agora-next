@@ -38,7 +38,7 @@ export const uniswapTenantUIConfig = new TenantUI({
   governanceIssues: [
     {
       icon: "users",
-      title: "Cross Chain deployments",
+      title: "Cross chain deployments",
       key: "crossChain",
     },
     {
@@ -65,6 +65,11 @@ export const uniswapTenantUIConfig = new TenantUI({
       icon: "users",
       title: "Public goods",
       key: "publicGoods",
+    },
+    {
+      icon: "ballot",
+      key: "daoWorkingGroups",
+      title: "DAO working groups",
     },
     {
       icon: "ballot",
