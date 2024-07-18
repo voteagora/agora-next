@@ -446,6 +446,22 @@ view OptimismDelegatees {
   @@schema("optimism")
 }
 
+view OptimismDelegateChangedEvents {
+  chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
+  @@schema("optimism")
+}
+
 view ensDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -633,6 +649,22 @@ view ensStakedDeposits {
   @@schema("ens")
 }
 
+view ensDelegateChangedEvents {
+chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
+  @@schema("ens")
+}
+
 view etherfiDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -810,6 +842,22 @@ view etherfiStakedDeposits {
   @@schema("etherfi")
 }
 
+view etherfiDelegateChangedEvents {
+  chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
+  @@schema("etherfi")
+}
+
 view uniswapDelegatees {
   delegator    String  @unique
   delegatee    String
@@ -984,6 +1032,23 @@ view uniswapStakedDeposits {
   amount      Decimal @db.Decimal
 
   @@map("staked_deposits")
+  @@schema("uniswap")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view uniswapDelegateChangedEvents {
+  chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
   @@schema("uniswap")
 }
 
