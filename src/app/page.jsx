@@ -84,7 +84,7 @@ export default async function Home() {
     <VStack>
       {tenant.namespace === "optimism" && (
         <a
-          href="https://retrofunding.optimism.io/"
+          href=" https://retrofunding.optimism.io/round/results"
           target="_blank"
           rel="noopener noreferrer"
           className="h-[100px] w-full relative mt-12 block"
