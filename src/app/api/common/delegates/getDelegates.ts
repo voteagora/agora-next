@@ -121,15 +121,52 @@ async function getDelegates({
   page = 1,
   sort = "weighted_random",
   seed,
+  filters,
 }: {
   page: number;
   sort: string;
   seed?: number;
+  filters?: {
+    issues?: string;
+    stakeholders?: string;
+  };
 }) {
   const pageSize = 20;
-  const { namespace, ui, slug } = Tenant.current();
+  const { namespace, ui, slug, contracts } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
+
+  const topIssuesParam = filters?.issues || "";
+  const topIssuesQuery =
+    topIssuesParam && topIssuesParam !== ""
+      ? `
+      AND jsonb_array_length(s.payload -> 'topIssues') > 0
+      AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(s.payload -> 'topIssues') elem
+        WHERE elem ->> 'type' = '${topIssuesParam}'
+        AND elem ->> 'value' IS NOT NULL
+        AND elem ->> 'value' <> ''
+      )
+      AND s.dao_slug = '${slug}'
+    `
+      : "";
+
+  // TODO 1/2: There is an inconsistency between top stakeholders and top issues. Top issues are filtered by a value
+  // TODO 2/2 : where the top stakeholders are filtered on type. We need to make this consistent and clean up the data and UI.
+  const topStakeholdersParam = filters?.stakeholders || "";
+  const topStakeholdersQuery =
+    topStakeholdersParam && topStakeholdersParam !== ""
+      ? `
+      AND jsonb_array_length(s.payload -> 'topStakeholders') > 0
+      AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(s.payload -> 'topStakeholders') elem
+        WHERE elem ->> 'type' = '${topStakeholdersParam}'
+      )
+      AND s.dao_slug = '${slug}'
+    `
+      : "";
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
@@ -158,17 +195,29 @@ async function getDelegates({
                     warpcast
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                  ${topIssuesQuery}
+                  ${topStakeholdersQuery}
                   LIMIT 1
                 ) sub
               ) AS statement
             FROM ${namespace + ".delegates"} d
-            WHERE num_of_delegators IS NOT NULL AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            WHERE num_of_delegators IS NOT NULL
+            AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            AND d.contract = $3
+            AND EXISTS (
+                SELECT 1
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate
+                ${topIssuesQuery}
+                ${topStakeholdersQuery}
+            )
             ORDER BY num_of_delegators DESC
-            OFFSET $3
-            LIMIT $4;
+            OFFSET $4
+            LIMIT $5;
             `,
           allowList,
           slug,
+          contracts.token.address.toLowerCase(),
           skip,
           take
         );
@@ -198,18 +247,30 @@ async function getDelegates({
                     warpcast
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
+                  ${topIssuesQuery}
+                  ${topStakeholdersQuery}
                   LIMIT 1
                 ) sub
               ) AS statement
             FROM ${namespace + ".delegates"} d
-            WHERE voting_power > 0 AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
+            WHERE voting_power > 0 
+            AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
+            AND d.contract = $4
+            AND EXISTS (
+                SELECT 1
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate
+                ${topIssuesQuery}
+                ${topStakeholdersQuery}
+            )
             ORDER BY -log(random()) / voting_power
-            OFFSET $4
-            LIMIT $5;
+            OFFSET $5
+            LIMIT $6;
             `,
           seed,
           allowList,
           slug,
+          contracts.token.address.toLowerCase(),
           skip,
           take
         );
@@ -238,17 +299,28 @@ async function getDelegates({
                     warpcast
                   FROM agora.delegate_statements s
                   WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                  ${topIssuesQuery}
+                  ${topStakeholdersQuery}
                   LIMIT 1
                 ) sub
               ) AS statement
             FROM ${namespace + ".delegates"} d
             WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            AND d.contract = $3
+            AND EXISTS (
+                SELECT 1
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate
+                ${topIssuesQuery}
+                ${topStakeholdersQuery}
+            )
             ORDER BY voting_power DESC
-            OFFSET $3
-            LIMIT $4;
+            OFFSET $4
+            LIMIT $5;
             `,
           allowList,
           slug,
+          contracts.token.address.toLowerCase(),
           skip,
           take
         );
@@ -312,7 +384,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     LEFT JOIN
         (SELECT * FROM ${
           namespace + ".voting_power"
-        } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
+        } vp WHERE vp.delegate = $1 AND vp.contract = $5  LIMIT 1) c ON TRUE
     LEFT JOIN
         (SELECT
           CASE
@@ -340,7 +412,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     address,
     contracts.alligator?.address || "",
     slug,
-    contracts.governor.address.toLowerCase()
+    contracts.governor.address.toLowerCase(),
+    contracts.token.address.toLowerCase()
   );
 
   const [delegate, votableSupply, quorum] = await Promise.all([
@@ -349,26 +422,34 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     fetchCurrentQuorum(),
   ]);
 
-  const numOfDelegatesQuery = prisma.$queryRawUnsafe<
-    { num_of_delegators: BigInt }[]
-  >(
-    `
-    SELECT
-      SUM(count) as num_of_delegators
-    FROM (
-      SELECT count(*)
-      FROM optimism.advanced_delegatees
-      WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
-      UNION ALL
-      SELECT
-        SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-      FROM center.optimism_delegate_changed_events
-      WHERE to_delegate=$1 OR from_delegate=$1
-    ) t;
-    `,
-    address,
-    contracts.alligator?.address
-  );
+  const numOfDelegatesQuery = contracts.alligator
+    ? prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
+        `
+        SELECT 
+          SUM(count) as num_of_delegators
+        FROM (
+          SELECT count(*)
+          FROM ${namespace + ".advanced_delegatees"}
+          WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
+          UNION ALL
+          SELECT
+            SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+          FROM ${namespace + ".delegate_changed_events"}
+          WHERE to_delegate=$1 OR from_delegate=$1
+        ) t;
+        `,
+        address,
+        contracts.alligator?.address
+      )
+    : prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
+        `
+        SELECT
+          SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+        FROM ${namespace + ".delegate_changed_events"}
+        WHERE to_delegate=$1 OR from_delegate=$1;
+        `,
+        address
+      );
 
   const totalVotingPower =
     BigInt(delegate?.voting_power || 0) +
@@ -399,7 +480,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators:
       // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n && namespace === "optimism"
+      cachedNumOfDelegators < 1000n
         ? BigInt(
             (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
               "0"
