@@ -14,15 +14,15 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
-  initialDelegates: PaginatedResult<DelegateChunk[]>;
+  initialDelegates: PaginatedResultEx<DelegateChunk[]>;
   fetchDelegates: (
-    page: number,
-    seed: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+    pagination: PaginationParamsEx,
+    seed?: number
+  ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
@@ -44,10 +44,10 @@ export default function DelegateCardList({
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
       const data = await fetchDelegates(
-        meta.currentPage + 1,
+        { offset: meta.next_offset, limit: meta.total_returned },
         initialDelegates.seed || Math.random()
       );
       setDelegates(delegates.concat(data.data));
@@ -63,7 +63,7 @@ export default function DelegateCardList({
       {/* @ts-ignore */}
       <InfiniteScroll
         className={styles.infinite_scroll}
-        hasMore={meta.hasNextPage}
+        hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}
         loader={
