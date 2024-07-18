@@ -76,7 +76,6 @@ export default function DelegateCardList({
       >
         <DelegateCard
           key={address}
-          endorsed={false}
           address={address}
           onSelect={onSelect}
           statement={`Delegate your votes to yourself to engage directly in ${capitalizeFirstLetter(namespace)} governance.`}
@@ -103,7 +102,6 @@ export default function DelegateCardList({
             return (
               <DelegateCard
                 action={"Select as delegate"}
-                endorsed={endorsed}
                 address={delegate.address}
                 discord={discord}
                 key={delegate.address}
