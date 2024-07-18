@@ -648,13 +648,13 @@ view ensVotableSupply {
 
 view ensVoterStats {
   voter              String   @unique
-  proposals_proposed BigInt?
   proposals_voted    BigInt?
   participation_rate Float?
   last_10_props      Decimal? @db.Decimal
   for                BigInt?
   abstain            BigInt?
   against            BigInt?
+  proposals_proposed BigInt?
   contract           String?  @db.VarChar(42)
 
   @@map("voter_stats")
