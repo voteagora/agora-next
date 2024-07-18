@@ -7,29 +7,22 @@ import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-
-export type DelegateChunk = Pick<
-  Delegate,
-  "address" | "votingPower" | "statement" | "citizen"
->;
-
-interface DelegatePaginated {
-  seed: number;
-  meta: any;
-  delegates: DelegateChunk[];
-}
+import { PaginatedResult } from "@/app/lib/pagination";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
-  initialDelegates: DelegatePaginated;
-  fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
+  initialDelegates: PaginatedResult<DelegateChunk[]>;
+  fetchDelegates: (
+    page: number,
+    seed: number
+  ) => Promise<PaginatedResult<DelegateChunk[]>>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
@@ -40,13 +33,13 @@ export default function DelegateCardList({
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.delegates);
+  const [delegates, setDelegates] = useState(initialDelegates.data);
   const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.delegates);
+    setDelegates(initialDelegates.data);
     setMeta(initialDelegates.meta);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
@@ -55,9 +48,9 @@ export default function DelegateCardList({
       fetching.current = true;
       const data = await fetchDelegates(
         meta.currentPage + 1,
-        initialDelegates.seed
+        initialDelegates.seed || Math.random()
       );
-      setDelegates(delegates.concat(data.delegates));
+      setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
       fetching.current = false;
     }
@@ -108,7 +101,7 @@ export default function DelegateCardList({
                   <VStack gap={4} justifyContent="justify-center">
                     <DelegateProfileImage
                       address={delegate.address}
-                      votingPower={delegate.votingPower}
+                      votingPower={delegate.votingPower.total}
                       citizen={delegate.citizen}
                     />
                     <p className={styles.summary}>{truncatedStatement}</p>

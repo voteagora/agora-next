@@ -6,7 +6,7 @@ import { DelegateSocialLinks } from "./DelegateSocialLinks";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";

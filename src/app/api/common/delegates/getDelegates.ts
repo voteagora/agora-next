@@ -1,4 +1,5 @@
 import {
+  PaginatedResult,
   paginateResult,
   paginateResultEx,
   type PaginatedResultEx,
@@ -9,6 +10,7 @@ import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
+  DelegateChunk,
   type Delegate,
   type DelegatesGetPayload,
   type DelegateStats,
@@ -125,7 +127,7 @@ async function getDelegates({
   page: number;
   sort: string;
   seed?: number;
-}) {
+}): Promise<PaginatedResult<DelegateChunk[]> & { seed?: number }> {
   const pageSize = 20;
   const { namespace, ui, slug } = Tenant.current();
 
@@ -265,9 +267,14 @@ async function getDelegates({
   // components
   return {
     meta,
-    delegates: delegates.map((delegate, index) => ({
+    data: delegates.map((delegate) => ({
       address: delegate.delegate,
-      votingPower: delegate.voting_power?.toFixed(0),
+      votingPower: {
+        total: delegate.voting_power?.toFixed(0) || "0",
+        direct: delegate.direct_vp?.toFixed(0) || "0",
+        advanced: delegate.advanced_vp?.toFixed(0) || "0",
+      },
+      numOfDelegators: delegate.num_of_delegators,
       citizen: delegate.citizen,
       statement: delegate.statement,
     })),
@@ -382,7 +389,11 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   return {
     address: address,
     citizen: delegate?.citizen || false,
-    votingPower: totalVotingPower.toString(),
+    votingPower: {
+      total: totalVotingPower.toString(),
+      direct: delegate?.voting_power.toString() || "0",
+      advanced: delegate?.advanced_vp?.toFixed(0) || "0",
+    },
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply || 0)
     ),

@@ -4,15 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateCard } from "@/app/staking/components/delegates/DelegateCard";
-
-export type DelegateChunk = Pick<
-  Delegate,
-  "address" | "votingPower" | "statement" | "citizen"
->;
 
 interface DelegatePaginated {
   seed: number;
@@ -107,7 +102,7 @@ export default function DelegateCardList({
                 onSelect={onSelect}
                 statement={truncatedStatement}
                 twitter={twitter}
-                votingPower={delegate.votingPower}
+                votingPower={delegate.votingPower.total}
                 warpcast={warpcast}
               />
             );
