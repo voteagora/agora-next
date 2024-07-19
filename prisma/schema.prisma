@@ -1805,13 +1805,11 @@ view cyberAuthorityChainsSnaps {
   @@schema("cyber")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view cyberDelegatees {
-  delegator    String?
-  delegatee    String?
-  block_number BigInt?
-  balance      Decimal? @db.Decimal
+  delegator    String   @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal  @db.Decimal
   contract     String?  @db.VarChar(42)
 
   @@schema("cyber")
@@ -2161,10 +2159,10 @@ view scrollAuthorityChainsSnaps {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view scrollDelegatees {
-  delegator    String?
-  delegatee    String?
-  block_number BigInt?
-  balance      Decimal? @db.Decimal
+  delegator    String   @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal @db.Decimal
   contract     String?  @db.VarChar(42)
 
   @@map("delegatees")
