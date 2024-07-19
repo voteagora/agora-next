@@ -65,7 +65,8 @@ async function getMetricTS(
                   FROM   alltenant.dao_engagement_metrics
                   WHERE  metric = '${metricId}'
                      AND tenant = '${namespace}' 
-                     AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')`;
+                     AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
+                     ORDER BY date;`;
   } else if (isGoogleAnalyticMetric) {
     const { lookback } = frequencyToLookbackDayCount(frequency);
 
@@ -75,7 +76,8 @@ async function getMetricTS(
                   FROM   google.analytics_24h
                   WHERE  metric_id = '${metricId}'
                      AND tenant = '${namespace}' 
-                     AND date >= (CURRENT_DATE - INTERVAL '${lookback} day')`;
+                     AND date >= (CURRENT_DATE - INTERVAL '${lookback} day')
+                     ORDER BY date;`;
   } else {
     throw new Error(
       `Metric '${metricId}' not valid, expected either a Google Analytics Metric ('${availableGoogleMetrics.join(", ")}) or Chain Metric ('${availableChainMetrics.join(", ")}')`
