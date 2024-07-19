@@ -5,7 +5,11 @@ import { Decimal } from "@prisma/client/runtime";
 export type Delegate = {
   address: string;
   citizen: boolean;
-  votingPower: string;
+  votingPower: {
+    total: string;
+    direct: string;
+    advanced: string;
+  };
   votingPowerRelativeToVotableSupply: number;
   votingPowerRelativeToQuorum: number;
   proposalsCreated: bigint;
@@ -18,6 +22,11 @@ export type Delegate = {
   numOfDelegators: bigint;
   statement: DelegateStatement | null;
 };
+
+export type DelegateChunk = Pick<
+  Delegate,
+  "address" | "votingPower" | "statement" | "citizen"
+>;
 
 export type DelegatePayload = Delegate & {
   delegate: string;
