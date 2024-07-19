@@ -36,7 +36,6 @@ export async function onSubmitAction(
       message: "Success!",
     };
   } catch (error) {
-    console.log(error);
     return {
       ok: false,
       message: "Error adding sponsor to proposal.",

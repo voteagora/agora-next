@@ -121,7 +121,7 @@ export const ensTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        additionalProposalTypes: [ProposalType.SOCIAL],
+        additionalProposalTypes: [ProposalType.BASIC, ProposalType.SOCIAL],
         copy: {},
       },
     },

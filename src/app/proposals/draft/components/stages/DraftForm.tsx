@@ -22,7 +22,7 @@ import {
   ProposalSocialOption,
   ProposalDraftTransaction,
 } from "@prisma/client";
-import ExecutableProposalForm from "../ExecutableProposalForm";
+import BasicProposalForm from "../BasicProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
@@ -46,8 +46,7 @@ const DraftForm = ({
   const methods = useForm<z.output<typeof draftProposalSchema>>({
     resolver: zodResolver(draftProposalSchema),
     defaultValues: {
-      type: (draftProposal.proposal_type ||
-        ProposalType.EXECUTABLE) as ProposalType,
+      type: (draftProposal.proposal_type || ProposalType.BASIC) as ProposalType,
       title: draftProposal.title,
       abstract: draftProposal.abstract,
       // @ts-ignore (prisma is saying target is string, needs to be `0x${string}` though, don't feel like fighting this)
@@ -110,18 +109,6 @@ const DraftForm = ({
                 <FormItem label="Proposal type" required={true} htmlFor="type">
                   <SwitchInput
                     options={Object.values([
-                      // TODO: my thinking here is that proposal types likely expand based on governor
-                      // and that "executable" is no longer accurate since we have different types
-                      // in OP.
-                      // OP ---
-                      // - BASIC
-                      // - APPROVAL
-                      // - OPTIMISTIC
-                      //
-                      // Is this something we can infer based on the governor?
-                      // Are all governors of one type the same, or do we have to read state on-chain?
-                      // (Could this mapping be done in some consts...)
-                      ProposalType.EXECUTABLE,
                       ...(plmToggle?.config?.additionalProposalTypes || []),
                     ])}
                     name="type"
@@ -149,11 +136,8 @@ const DraftForm = ({
             </div>
           </FormCard.Section>
           <FormCard.Section>
-            {proposalType === ProposalType.EXECUTABLE ? (
-              <ExecutableProposalForm />
-            ) : (
-              <SocialProposalForm />
-            )}
+            {proposalType === ProposalType.BASIC && <BasicProposalForm />}
+            {proposalType === ProposalType.SOCIAL && <SocialProposalForm />}
           </FormCard.Section>
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">

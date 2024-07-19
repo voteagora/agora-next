@@ -108,19 +108,36 @@ export enum SocialProposalType {
 }
 
 export enum ProposalType {
-  EXECUTABLE = "executable",
+  // might make sense to move snapshot to something else since snapshot isn't really a "proposal"
+  // It doesn't go through the governor
   SOCIAL = "social",
+  BASIC = "basic",
+  APPROVAL = "approval",
+  OPTIMISIC = "optimistic",
 }
 
 export const ProposalTypeMetadata = {
-  [ProposalType.EXECUTABLE]: {
-    title: "Executable Proposal",
-    description: "A proposal that executes on-chain and accepts transactions.",
-  },
   [ProposalType.SOCIAL]: {
     title: "Social Proposal",
     description: "A proposal that resolves via a snapshot vote.",
   },
+  [ProposalType.BASIC]: {
+    title: "Basic Proposal",
+    description: "A basic proposal.",
+  },
+  [ProposalType.APPROVAL]: {
+    title: "Approval Proposal",
+    description: "An approval proposal.",
+  },
+  [ProposalType.OPTIMISIC]: {
+    title: "Optimistic Proposal",
+    description: "An optimistic proposal.",
+  },
+} as {
+  [key in ProposalType]: {
+    title: string;
+    description: string;
+  };
 };
 
 export enum TransactionType {
