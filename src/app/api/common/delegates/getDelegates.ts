@@ -42,7 +42,7 @@ async function getDelegates({
     stakeholders?: string;
   };
 }): Promise<PaginatedResultEx<DelegateChunk[]>> {
-  const { namespace, ui, slug } = Tenant.current();
+  const { namespace, ui, slug, contracts } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
 
@@ -113,6 +113,7 @@ async function getDelegates({
             FROM ${namespace + ".delegates"} d
             WHERE num_of_delegators IS NOT NULL
             AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            AND d.contract = $3
             AND EXISTS (
                 SELECT 1
                 FROM agora.delegate_statements s
@@ -121,11 +122,12 @@ async function getDelegates({
                 ${topStakeholdersQuery}
             )
             ORDER BY num_of_delegators DESC
-            OFFSET $3
-            LIMIT $4;
+            OFFSET $4
+            LIMIT $5;
             `,
           allowList,
           slug,
+          contracts.token.address.toLowerCase(),
           skip,
           take
         );
@@ -163,6 +165,7 @@ async function getDelegates({
             FROM ${namespace + ".delegates"} d
             WHERE voting_power > 0 
             AND (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
+            AND d.contract = $4
             AND EXISTS (
                 SELECT 1
                 FROM agora.delegate_statements s
@@ -171,12 +174,13 @@ async function getDelegates({
                 ${topStakeholdersQuery}
             )
             ORDER BY -log(random()) / voting_power
-            OFFSET $4
-            LIMIT $5;
+            OFFSET $5
+            LIMIT $6;
             `,
           seed,
           allowList,
           slug,
+          contracts.token.address.toLowerCase(),
           skip,
           take
         );
@@ -212,6 +216,7 @@ async function getDelegates({
               ) AS statement
             FROM ${namespace + ".delegates"} d
             WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+            AND d.contract = $3
             AND EXISTS (
                 SELECT 1
                 FROM agora.delegate_statements s
@@ -220,11 +225,12 @@ async function getDelegates({
                 ${topStakeholdersQuery}
             )
             ORDER BY voting_power DESC
-            OFFSET $3
-            LIMIT $4;
+            OFFSET $4
+            LIMIT $5;
             `,
           allowList,
           slug,
+          contracts.token.address.toLowerCase(),
           skip,
           take
         );
@@ -295,7 +301,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     LEFT JOIN
         (SELECT * FROM ${
           namespace + ".voting_power"
-        } vp WHERE vp.delegate = $1 LIMIT 1) c ON TRUE
+        } vp WHERE vp.delegate = $1 AND vp.contract = $5  LIMIT 1) c ON TRUE
     LEFT JOIN
         (SELECT
           CASE
@@ -323,7 +329,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     address,
     contracts.alligator?.address || "",
     slug,
-    contracts.governor.address.toLowerCase()
+    contracts.governor.address.toLowerCase(),
+    contracts.token.address.toLowerCase()
   );
 
   const [delegate, votableSupply, quorum] = await Promise.all([
@@ -332,26 +339,34 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     fetchCurrentQuorum(),
   ]);
 
-  const numOfDelegatesQuery = prisma.$queryRawUnsafe<
-    { num_of_delegators: BigInt }[]
-  >(
-    `
-    SELECT
-      SUM(count) as num_of_delegators
-    FROM (
-      SELECT count(*)
-      FROM optimism.advanced_delegatees
-      WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
-      UNION ALL
-      SELECT
-        SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-      FROM center.optimism_delegate_changed_events
-      WHERE to_delegate=$1 OR from_delegate=$1
-    ) t;
-    `,
-    address,
-    contracts.alligator?.address
-  );
+  const numOfDelegatesQuery = contracts.alligator
+    ? prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
+        `
+        SELECT 
+          SUM(count) as num_of_delegators
+        FROM (
+          SELECT count(*)
+          FROM ${namespace + ".advanced_delegatees"}
+          WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
+          UNION ALL
+          SELECT
+            SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+          FROM ${namespace + ".delegate_changed_events"}
+          WHERE to_delegate=$1 OR from_delegate=$1
+        ) t;
+        `,
+        address,
+        contracts.alligator?.address
+      )
+    : prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
+        `
+        SELECT
+          SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+        FROM ${namespace + ".delegate_changed_events"}
+        WHERE to_delegate=$1 OR from_delegate=$1;
+        `,
+        address
+      );
 
   const totalVotingPower =
     BigInt(delegate?.voting_power || 0) +
@@ -386,7 +401,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators:
       // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n && namespace === "optimism"
+      cachedNumOfDelegators < 1000n
         ? BigInt(
             (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
               "0"
