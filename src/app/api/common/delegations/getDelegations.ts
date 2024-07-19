@@ -27,7 +27,7 @@ async function getCurrentDelegateesForAddress({
       where: {
         from: address.toLowerCase(),
         delegated_amount: { gt: 0 },
-        contract: contracts.alligator!.address,
+        contract: contracts.alligator?.address,
       },
     }),
     (async () => {
@@ -112,7 +112,7 @@ async function getCurrentDelegatorsForAddress({
               where: {
                 to: address.toLowerCase(),
                 delegated_amount: { gt: 0 },
-                contract: contracts.alligator!.address,
+                contract: contracts.alligator?.address,
               },
             })
           : [])(),
@@ -132,14 +132,14 @@ async function getCurrentDelegatorsForAddress({
               t1.to_delegate AS delegatee,
               t1.block_number
             FROM
-              center.optimism_delegate_changed_events t1
+              ${namespace}.delegate_changed_events t1
             WHERE
               t1.to_delegate = $1
               AND NOT EXISTS (
                 SELECT
                   1
                 FROM
-                  center.optimism_delegate_changed_events t2
+                  ${namespace}.delegate_changed_events t2
                 WHERE
                   t2.delegator = t1.delegator
                   AND t2.block_number > t1.block_number
@@ -225,7 +225,7 @@ async function getCurrentAdvancedDelegatorsForAddress(
       where: {
         to: address.toLowerCase(),
         delegated_amount: { gt: 0 },
-        contract: contracts.alligator!.address,
+        contract: contracts.alligator?.address,
       },
     }),
     contracts.token.provider.getBlock("latest"),
