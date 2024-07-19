@@ -14,6 +14,7 @@ import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck
 import { ProposalDraft } from "@prisma/client";
 import { useAccount } from "wagmi";
 import Image from "next/image";
+import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const router = useRouter();
@@ -31,6 +32,8 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
     },
   });
 
+  const stageIndex = getStageIndexForTenant("ADDING_TEMP_CHECK") as number;
+
   const onSubmitSkip = async (data: z.output<typeof tempCheckSchema>) => {
     setIsSkipPending(true);
     await sharedOnSubmit(data);
@@ -46,13 +49,14 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
       if (!address) {
         throw new Error("No address connected");
       }
-
       const res = await tempCheckAction({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
       });
-      router.push(`/proposals/draft/${draftProposal.id}?stage=1`);
+      router.push(
+        `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
+      );
     } catch (e) {
       console.error(e);
     }
@@ -64,12 +68,18 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
         <FormCard.Section>
           <div className="w-full rounded-md h-[350px] block relative">
             <Image
+              // TODO: do we want to make this something that is configurable by tenant?
+              // Or should we have a default for all tenants?
               src="/images/ens_temp_check.png"
-              alt="Temp Check"
+              alt="Digital collage of sparkles and thumbs ups promoting caputuring a temp check."
               fill={true}
               className="object-cover rounded-md"
             />
           </div>
+          {/*
+            TODO: is this copy the same for everyone who wants to do a temp check?
+            Should this be something you configure at the tenant level?
+           */}
           <p className="mt-4 text-secondary">
             We encourage you to go to Discourse to post a temp check that helps
             gauge the community&apos;s interest. It&apos;s not mandatory, but
@@ -83,6 +93,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
                 <TextInput
                   name="temp_check_link"
                   register={register}
+                  //   TODO: still ENS branded -- make generalizable
                   placeholder="https://discuss.ens.domains/"
                   errorMessage={errors.temp_check_link?.message}
                 />

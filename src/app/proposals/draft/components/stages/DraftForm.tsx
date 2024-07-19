@@ -27,6 +27,8 @@ import SocialProposalForm from "../SocialProposalForm";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
+import Tenant from "@/lib/tenant/tenant";
 
 const DraftForm = ({
   draftProposal,
@@ -36,6 +38,8 @@ const DraftForm = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const router = useRouter();
   const { address } = useAccount();
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -46,7 +50,10 @@ const DraftForm = ({
         ProposalType.EXECUTABLE) as ProposalType,
       title: draftProposal.title,
       abstract: draftProposal.abstract,
+      // @ts-ignore (prisma is saying target is string, needs to be `0x${string}` though, don't feel like fighting this)
       transactions: draftProposal.transactions || [],
+      // TODO: make sure that if a tenant does not have social proposal enabled
+      // it won't be an issue to have this default polluting their data
       socialProposal: {
         type: (draftProposal.proposal_social_type ||
           SocialProposalType.BASIC) as SocialProposalType,
@@ -64,9 +71,8 @@ const DraftForm = ({
     formState: { errors },
   } = methods;
 
-  console.log(errors);
-
   const proposalType = watch("type");
+  const stageIndex = getStageIndexForTenant("DRAFTING") as number;
 
   const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
     setIsPending(true);
@@ -81,12 +87,12 @@ const DraftForm = ({
         creatorAddress: address,
       });
       if (!res.ok) {
-        console.log(res.message);
-        // TODO: make error toast + improve messaging
         setIsPending(false);
         toast("Something went wrong...");
       } else {
-        router.push(`/proposals/draft/${draftProposal.id}?stage=2`);
+        router.push(
+          `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
+        );
       }
     } catch (error) {
       setIsPending(false);
@@ -96,29 +102,28 @@ const DraftForm = ({
 
   return (
     <FormProvider {...methods}>
-      <form
-        action={async (formData: FormData) => {
-          /**
-           * @TODO
-           * Need to figure out how to get react-hook-form to actually create form elements
-           * so it can be used without javascript... the problem is that checkbox + editor
-           * do not work since they rely on react-hook-form "controller" so its not sending
-           * The full form data to the server.
-           */
-          // const data = Object.fromEntries(formData);
-          // await formAction(formData);
-        }}
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form onSubmit={handleSubmit(onSubmit)}>
         <FormCard>
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <FormItem label="Proposal type" required={true} htmlFor="type">
                   <SwitchInput
-                    options={Object.values(
-                      draftProposalSchema.shape.type._def.values
-                    )}
+                    options={Object.values([
+                      // TODO: my thinking here is that proposal types likely expand based on governor
+                      // and that "executable" is no longer accurate since we have different types
+                      // in OP.
+                      // OP ---
+                      // - BASIC
+                      // - APPROVAL
+                      // - OPTIMISTIC
+                      //
+                      // Is this something we can infer based on the governor?
+                      // Are all governors of one type the same, or do we have to read state on-chain?
+                      // (Could this mapping be done in some consts...)
+                      ProposalType.EXECUTABLE,
+                      ...(plmToggle?.config?.additionalProposalTypes || []),
+                    ])}
                     name="type"
                   />
                 </FormItem>
@@ -130,6 +135,7 @@ const DraftForm = ({
                 <TextInput
                   name="title"
                   register={register}
+                  // TODO: maybe make this customizable per tenant? EP [1.1] feels ENS specific
                   placeholder="EP [1.1] [Executable] title"
                   options={{
                     required: "Title is required.",
