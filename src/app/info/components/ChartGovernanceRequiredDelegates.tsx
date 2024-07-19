@@ -130,7 +130,7 @@ const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
               className="w-4 h-[2px]"
             ></div>
             <p className="text-xs font-semibold text-gray-4f">
-              # of delegates to reach quorum
+              # of delegates to reach 50% of votable supply
             </p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center">
@@ -139,7 +139,7 @@ const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
               className="w-4 border border-b-1 border-dashed"
             />
             <p className="text-xs font-semibold text-gray-4f">
-              # of delegates to reach 50% of votable supply
+              # of delegates to reach quorum
             </p>
           </div>
         </div>
