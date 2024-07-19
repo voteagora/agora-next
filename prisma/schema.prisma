@@ -1734,20 +1734,18 @@ view cyberAuthorityChainsSnaps {
   @@map("authority_chains_snaps")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberDelegateChangedEvents {
-  chain_id          Int?
-  address           String? @db.VarChar(42)
-  block_number      BigInt?
-  block_hash        String? @db.VarChar(66)
+  chain_id          Int
+  address           String  @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String  @db.VarChar(66)
   log_index         Int?
   transaction_index Int?
-  transaction_hash  String? @db.VarChar(66)
-  delegator         String?
-  from_delegate     String?
-  to_delegate       String?
+  transaction_hash  String  @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
 
-  @@ignore
   @@schema("cyber")
   @@map("delegate_changed_events")
 }
