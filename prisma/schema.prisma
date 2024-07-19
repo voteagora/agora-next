@@ -1823,7 +1823,7 @@ view uniswap_proposals_wrapper {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view advanced_delegatees {
+view cyberAdvancedDelegatees {
   pair             String?
   from             String?
   to               String?
@@ -1835,10 +1835,11 @@ view advanced_delegatees {
 
   @@ignore
   @@schema("cyber")
+  @@map("advanced_delegatees")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view advanced_voting_power {
+view cyberAdvancedVotingPower {
   delegate                 String?
   vp_allowance             Decimal? @db.Decimal
   vp_delegatable_allowance Decimal? @db.Decimal
@@ -1849,6 +1850,7 @@ view advanced_voting_power {
 
   @@ignore
   @@schema("cyber")
+  @@map("advanced_voting_power")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1886,7 +1888,7 @@ view cyber_authority_chains {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view authority_chains_snaps {
+view cyberAuthorityChainsSnaps {
   id                   String?
   delegate             String?
   rules                Json?
@@ -1900,10 +1902,11 @@ view authority_chains_snaps {
 
   @@ignore
   @@schema("cyber")
+  @@map("authority_chains_snaps")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view delegate_changed_events {
+view cyberDelegateChangedEvents {
   chain_id          Int?
   address           String? @db.VarChar(42)
   block_number      BigInt?
@@ -1917,11 +1920,12 @@ view delegate_changed_events {
 
   @@ignore
   @@schema("cyber")
+  @@map("delegate_changed_events")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view delegatees {
+view cyberDelegatees {
   delegator    String?
   delegatee    String?
   block_number BigInt?
@@ -1930,11 +1934,12 @@ view delegatees {
 
   @@ignore
   @@schema("cyber")
+  @@map("delegatees")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view delegates {
+view cyberDelegates {
   delegate          String?
   contract          String?  @db.VarChar(42)
   num_of_delegators Decimal? @db.Decimal
@@ -1944,7 +1949,9 @@ view delegates {
 
   @@ignore
   @@schema("cyber")
+  @@map("delegates")
 }
+
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -1993,7 +2000,7 @@ view cyber_direct_chains_snaps {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view proposal_types {
+view cyberProposalTypes {
   id                 String?
   contract           String? @db.VarChar
   block_number       BigInt?
@@ -2005,11 +2012,12 @@ view proposal_types {
 
   @@ignore
   @@schema("cyber")
+  @@map("proposal_types")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view proposals {
+view cyberProposals {
   proposal_id                String?
   contract                   String?       @db.VarChar
   proposer                   String?
@@ -2031,6 +2039,7 @@ view proposals {
 
   @@ignore
   @@schema("cyber")
+  @@map("proposals")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2062,7 +2071,7 @@ view cyber_proposals_wrapper {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view staked_deposits {
+view cyberStakedDeposits {
   deposit_id  BigInt?
   depositor   String?
   beneficiary String?
@@ -2071,15 +2080,17 @@ view staked_deposits {
 
   @@ignore
   @@schema("cyber")
+  @@map("staked_deposits")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view votable_supply {
+view cyberVotableSupply {
   votable_supply String?
 
   @@ignore
   @@schema("cyber")
+  @@map("votable_supply")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2119,7 +2130,7 @@ view cyber_vote_cast_with_params_events {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view voter_stats {
+view cyberVoterStats {
   voter              String?
   proposals_voted    BigInt?
   participation_rate Float?
@@ -2132,10 +2143,11 @@ view voter_stats {
 
   @@ignore
   @@schema("cyber")
+  @@map("voter_stats")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view cyber_votes {
+view cyberVotes {
   transaction_hash String?       @db.VarChar
   proposal_id      String?
   voter            String?
@@ -2157,17 +2169,18 @@ view cyber_votes {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view voting_power {
+view cyberVotingPower {
   delegate     String?
   voting_power String?
   contract     String? @db.VarChar(42)
 
   @@ignore
   @@schema("cyber")
+  @@map("voting_power")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view voting_power_snaps {
+view votingPowerSnaps {
   id                String?
   delegate          String?
   balance           String?
@@ -2179,6 +2192,7 @@ view voting_power_snaps {
 
   @@ignore
   @@schema("cyber")
+  @@map("voting_power_snaps")
 }
 
 enum DaoSlug {
@@ -2189,6 +2203,7 @@ enum DaoSlug {
   LYRA
   ETHERFI
   UNISWAP
+  CYBER
 
   @@map("dao_slug")
   @@schema("config")
