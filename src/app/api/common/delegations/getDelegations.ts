@@ -229,16 +229,16 @@ const getDirectDelegateeForAddress = async ({
 }) => {
   const { namespace } = Tenant.current();
 
-  const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
-    where: { delegator: address.toLowerCase() },
-  });
+  const delegatee = null; //= await prisma[`${namespace}Delegatees`].findFirst({
+  //  where: { delegator: address.toLowerCase() },
+  //});
 
-  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
-    const proxyAddress = await getProxyAddress(address);
-    if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
-      return null;
-    }
-  }
+  // if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+  //  const proxyAddress = await getProxyAddress(address);
+  //  if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
+  //    return null;
+  //  }
+
   return delegatee;
 };
 
