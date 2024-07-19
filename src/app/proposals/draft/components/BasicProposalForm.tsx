@@ -4,8 +4,8 @@ import { z } from "zod";
 import Tenant from "@/lib/tenant/tenant";
 import { useState, useEffect, useRef } from "react";
 import FormItem from "./form/FormItem";
-import { TransactionType } from "./../types";
-import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
+import { TransactionType } from "../types";
+import { schema as draftProposalSchema } from "../schemas/DraftProposalSchema";
 import { UpdatedButton } from "@/components/Button";
 import {
   useFormContext,
@@ -85,7 +85,7 @@ const TransactionForm = ({
   );
 };
 
-const ExecutableProposalForm = () => {
+const BasicProposalForm = () => {
   const { contracts } = Tenant.current();
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
@@ -285,4 +285,4 @@ const ExecutableProposalForm = () => {
   );
 };
 
-export default ExecutableProposalForm;
+export default BasicProposalForm;

@@ -3,8 +3,11 @@
 import { z } from "zod";
 import { schema as DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import prisma from "@/app/lib/prisma";
-import { ProposalDraftTransaction, ProposalStage } from "@prisma/client";
-import Tenant from "@/lib/tenant/tenant";
+import { ProposalDraftTransaction } from "@prisma/client";
+import {
+  getStageByIndex,
+  getStageIndexForTenant,
+} from "@/app/proposals/draft/utils/stages";
 
 export type FormState = {
   ok: boolean;
@@ -26,13 +29,16 @@ export async function onSubmitAction(
     };
   }
 
+  const currentIndex = getStageIndexForTenant("DRAFTING") as number;
+
   try {
+    const nextStage = getStageByIndex(currentIndex + 1);
     const updateDraft = prisma.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
       data: {
-        stage: ProposalStage.ADDING_GITHUB_PR,
+        stage: nextStage?.stage,
         title: parsed.data.title,
         abstract: parsed.data.abstract,
         proposal_type: parsed.data.type,
