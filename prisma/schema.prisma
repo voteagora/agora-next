@@ -1757,11 +1757,11 @@ view cyberDelegateChangedEvents {
 }
 
 view cyberDelegatees {
-  delegator    String   @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal  @db.Decimal
-  contract     String   @db.VarChar(42)
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  transaction_hash String? @db.VarChar(66)
 
   @@schema("cyber")
   @@map("delegatees")

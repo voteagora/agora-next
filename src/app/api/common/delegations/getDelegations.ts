@@ -124,13 +124,15 @@ async function getCurrentDelegatorsForAddress({
                 delegator: string;
                 delegatee: string;
                 block_number: bigint;
+                transaction_hash: string;
               }[]
             >(
               `
             SELECT
               t1.delegator,
               t1.to_delegate AS delegatee,
-              t1.block_number
+              t1.block_number,
+              t1.transaction_hash
             FROM
               ${namespace}.delegate_changed_events t1
             WHERE
@@ -196,7 +198,7 @@ async function getCurrentDelegatorsForAddress({
               : null,
             type: "DIRECT" as const,
             amount: "FULL" as const,
-            transaction_hash: "",
+            transaction_hash: directDelegator.transaction_hash,
           }))
         )
       ).filter((delegator) => BigInt(delegator.allowance) > BigInt(1e15)), // filter out delegators with 0 (or close to 0) balance
