@@ -86,7 +86,6 @@ function DelegationsContainer({
                   <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
-              {/* @ts-ignore */}
               <InfiniteScroll
                 hasMore={meta.hasNextPage}
                 pageStart={1}
@@ -104,6 +103,7 @@ function DelegationsContainer({
                 // References styles of TableBody
                 className="[&_tr:last-child]:border-0"
                 element="tbody"
+                useWindow={false}
               >
                 {delegators.length === 0 ? (
                   <TableRow>
