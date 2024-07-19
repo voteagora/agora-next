@@ -148,7 +148,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       detail={
                         <MobileValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
-                            amount={delegate?.votingPower || BigInt(0)}
+                            amount={delegate?.votingPower.total || BigInt(0)}
                           />
                         </MobileValueWrapper>
                       }
