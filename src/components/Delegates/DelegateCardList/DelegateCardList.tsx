@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { VStack } from "../../Layout/Stack";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import styles from "./DelegateCardList.module.scss";
@@ -97,15 +96,16 @@ export default function DelegateCardList({
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>
-                <VStack gap={4} className={styles.link_container}>
-                  <VStack gap={4} justifyContent="justify-center">
+                <div className={`flex flex-col gap-4 ${styles.link_container}`}>
+                  <div className="flex flex-col gap-4 justify-center">
                     <DelegateProfileImage
+                      endorsed={delegate.statement?.endorsed}
                       address={delegate.address}
                       votingPower={delegate.votingPower.total}
                       citizen={delegate.citizen}
                     />
                     <p className={styles.summary}>{truncatedStatement}</p>
-                  </VStack>
+                  </div>
                   <div className="min-h-[24px]">
                     <DelegateActions
                       delegate={delegate}
@@ -113,7 +113,7 @@ export default function DelegateCardList({
                       delegators={advancedDelegators}
                     />
                   </div>
-                </VStack>
+                </div>
               </Link>
             </div>
           );
