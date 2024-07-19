@@ -67,7 +67,7 @@ export default function VoterHoverCard({
             <VStack gap={4} justifyContent="justify-center">
               <DelegateProfileImage
                 address={address}
-                votingPower={!!delegate ? delegate.votingPower : "0"}
+                votingPower={!!delegate ? delegate.votingPower.total : "0"}
               />
               <p
                 className={`break-words text-gray-600 overflow-hidden line-clamp-2 text-ellipsis`}

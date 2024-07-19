@@ -32,7 +32,7 @@ const useConnectedDelegate = () => {
       if (refetchDelegate) {
         revalidateDelegateAddressPage(refetchDelegate.address);
       }
-      setLastVotingPower(delegate.votingPower);
+      setLastVotingPower(delegate.votingPower.total);
 
       // If refetchDelegate?.votingPower we are looking for a revalidation on the page of the delegatee
       if (refetchDelegate?.prevVotingPowerDelegatee) {
@@ -42,7 +42,8 @@ const useConnectedDelegate = () => {
          * Refetch delegate will be set to null by the delegateProfileImage
          */
         if (
-          delegatee.votingPower === refetchDelegate.prevVotingPowerDelegatee
+          delegatee.votingPower.total ===
+          refetchDelegate.prevVotingPowerDelegatee
         ) {
           // Check if maximum retries has been reached
           if (retries < MAX_RETRIES) {
@@ -59,7 +60,7 @@ const useConnectedDelegate = () => {
       } else if (refetchDelegate) {
         // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the
         // create voting power
-        if (delegate.votingPower === lastVotingPower) {
+        if (delegate.votingPower.total === lastVotingPower) {
           // Check if maximum retries has been reached
           if (retries < MAX_RETRIES) {
             // Implement exponential backoff
