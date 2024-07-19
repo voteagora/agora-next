@@ -1814,7 +1814,6 @@ view cyberDelegatees {
   balance      Decimal? @db.Decimal
   contract     String?  @db.VarChar(42)
 
-  @@ignore
   @@schema("cyber")
   @@map("delegatees")
 }
@@ -2169,7 +2168,6 @@ view scrollDelegatees {
   contract     String?  @db.VarChar(42)
 
   @@map("delegatees")
-  @@ignore
   @@schema("scroll")
 }
 
