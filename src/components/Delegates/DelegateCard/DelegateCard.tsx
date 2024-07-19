@@ -1,4 +1,3 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import styles from "./delegateCard.module.scss";
@@ -7,19 +6,20 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
-    <VStack className={styles.container}>
-      <VStack className={styles.card}>
-        <VStack alignItems="items-stretch" className={styles.image}>
+    <div className={`flex flex-col ${styles.container}`}>
+      <div className={`flex flex-col ${styles.card}`}>
+        <div className={`flex flex-col items-stretch ${styles.image}`}>
           <DelegateProfileImage
+            endorsed={delegate.statement?.endorsed}
             address={delegate.address}
             citizen={delegate.citizen}
             votingPower={delegate.votingPower.total}
             copyable={true}
           />
-        </VStack>
+        </div>
 
         <div className={styles.content}>
-          <VStack gap={4}>
+          <div className="flex flex-col gap-4">
             <PanelRow
               title="Proposals Voted"
               detail={
@@ -34,20 +34,6 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
               title="For / Against / Abstain"
               detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
             />
-            {/* <PanelRow
-              title="Vote Power"
-              detail={
-                <>
-                  {bpsToString(
-                    delegate.votingPowerRelativeToVotableSupply * 100
-                  )}{" "}
-                  votable supply
-                  <br />
-                  {bpsToString(delegate.votingPowerRelativeToQuorum * 100)}{" "}
-                  quorum
-                </>
-              }
-            /> */}
             <PanelRow
               title="Recent activity"
               detail={
@@ -65,10 +51,10 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
               detail={pluralizeAddresses(Number(delegate.numOfDelegators))}
             />
             <DelegateCardClient delegate={delegate} />
-          </VStack>
+          </div>
         </div>
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }
 
@@ -80,10 +66,10 @@ export const PanelRow = ({
   detail: string | JSX.Element;
 }) => {
   return (
-    <HStack gap={2} className="justify-between items-center">
+    <div className="flex flex-row gap-2 justify-between items-center">
       <span className="whitespace-nowrap">{title}</span>
 
       <span className={styles.row}>{detail}</span>
-    </HStack>
+    </div>
   );
 };
