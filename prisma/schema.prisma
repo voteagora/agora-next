@@ -1671,17 +1671,15 @@ view cyberAdvancedDelegatees {
   @@map("advanced_delegatees")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberAdvancedVotingPower {
-  delegate                 String?
-  vp_allowance             Decimal? @db.Decimal
-  vp_delegatable_allowance Decimal? @db.Decimal
-  delegated_vp             Decimal? @db.Decimal
-  advanced_vp              Decimal? @db.Decimal
-  subdelegated_share       Decimal? @db.Decimal
-  contract                 String?  @db.VarChar
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal  @db.Decimal
+  contract                 String   @db.VarChar
 
-  @@ignore
   @@schema("cyber")
   @@map("advanced_voting_power")
 }
