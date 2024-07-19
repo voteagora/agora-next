@@ -18,6 +18,8 @@ import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDe
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
+import { addressOrEnsNameWrap } from "../utils/ensName";
+import { fetchAllDelegatorsInChains } from "../delegations/getDelegations";
 
 async function getDelegatesApi(
   sort: string,
@@ -490,6 +492,20 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
+const getAllForDelegate = async (addressOrENSName: string) =>
+  addressOrEnsNameWrap(getAllForDelegateForAddress, addressOrENSName);
+
+async function getAllForDelegateForAddress({ address }: { address: string }) {
+  const { contracts } = Tenant.current();
+
+  return Promise.all([
+    fetchDelegate(address),
+    fetchAllDelegatorsInChains(address),
+    contracts.token.contract.balanceOf(address),
+  ]);
+}
+
 export const fetchDelegatesApi = cache(getDelegatesApi);
 export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
+export const fetchAllForDelegate = cache(getAllForDelegate);
