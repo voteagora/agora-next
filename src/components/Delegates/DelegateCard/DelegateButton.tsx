@@ -1,6 +1,6 @@
 import { Button } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import {
   fetchDirectDelegatee,
   fetchBalanceForDirectDelegation,

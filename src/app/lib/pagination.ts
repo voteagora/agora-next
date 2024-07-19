@@ -5,6 +5,7 @@ export type PaginatedResult<T> = {
     hasNextPage: boolean;
   };
   data: T;
+  seed?: number;
 };
 
 export type PaginatedResultEx<T> = {
@@ -14,6 +15,7 @@ export type PaginatedResultEx<T> = {
     next_offset: number;
   };
   data: T;
+  seed?: number;
 };
 
 export type PaginationParams = {
