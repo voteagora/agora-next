@@ -10,15 +10,19 @@ import Tenant from "@/lib/tenant/tenant";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
 import IssuesFilter from "@/app/delegates/components/IssuesFilter";
+import EndorsedFilter from "@/app/delegates/components/EndorsedFilter";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
   const { ui } = Tenant.current();
 
-  const hasTopIssues = Boolean(
+  const hasIssuesFilter = Boolean(
     ui.governanceIssues && ui.governanceIssues.length > 0
   );
-  const hasStakeholders = Boolean(
+  const hasStakeholdersFilter = Boolean(
     ui.governanceStakeholders && ui.governanceStakeholders.length > 0
+  );
+  const hasEndorsedFilter = Boolean(
+    ui.toggle("delegates/endorsed-filter")?.enabled
   );
 
   const router = useRouter();
@@ -57,8 +61,11 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
         </TabsList>
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />
-          {hasStakeholders && tabParam !== "citizens" && <StakeholdersFilter />}
-          {hasTopIssues && tabParam !== "citizens" && <IssuesFilter />}
+          {hasStakeholdersFilter && tabParam !== "citizens" && (
+            <StakeholdersFilter />
+          )}
+          {hasIssuesFilter && tabParam !== "citizens" && <IssuesFilter />}
+          {hasEndorsedFilter && tabParam !== "citizens" && <EndorsedFilter />}
           {tabParam === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
         </div>
       </div>
