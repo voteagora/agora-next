@@ -187,8 +187,8 @@ components:
           enum:
             - full
             - partial
-    BaseDelegate:
-      summary: A voting delegate
+    DelegateChunk:
+      summary: A chunk of delegate data
       description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded.
       type: object
       properties:
@@ -197,8 +197,7 @@ components:
           description: Address of the delegate.
           type: string
           examples:
-            - summary: Address of the delegate.
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+            - "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
         votingPower:
           summary: Delegate's available voting power
           description: An object providing a breakdown of a delegate's overall voting power between direct, advanced, and total.
@@ -208,36 +207,121 @@ components:
               description: Advanced voting power.
               type: string
               examples:
-                - summary: Advanced voting power.
-                  value: "10000"
+                - "10000"
             direct:
               description: Direct voting power.
               type: string
               examples:
-                - summary: Direct voting power
-                  value: "20000"
+                - "20000"
             total:
               description: Total voting power.
               type: string
               examples:
-                - summary: Total voting power
-                  value: "30000"
+                - "30000"
         isCitizen:
           description: A boolean flag indicating whether or not this delegate is an Agora citizen.
           type: boolean
-        twitter:
-          description: Optional twitter handle for a particular delegate.
+        statement:
+          $ref: "#/components/schemas/DelegateStatement"
+    Delegate:
+      summary: A voting delegate
+      description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded.
+      type: object
+      properties:
+        address:
+          summary: Delegate address
+          description: Address of the delegate.
           type: string
           examples:
-            - summary: Twitter handle
-              value: "@flip_liquide"
+            - "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        votingPower:
+          summary: Delegate's available voting power
+          description: An object providing a breakdown of a delegate's overall voting power between direct, advanced, and total.
+          type: object
+          properties:
+            advanced:
+              description: Advanced voting power.
+              type: string
+              examples:
+                - "10000"
+            direct:
+              description: Direct voting power.
+              type: string
+              examples:
+                - "20000"
+            total:
+              description: Total voting power.
+              type: string
+              examples:
+                - "30000"
+        isCitizen:
+          description: A boolean flag indicating whether or not this delegate is an Agora citizen.
+          type: boolean
         statement:
+          $ref: "#/components/schemas/DelegateStatement"
+        votingPowerRelativeToVotableSupply:
+          summary: Delegate's voting power relative to votable supply
+          description: The delegate's voting power relative to the votable supply.
+          type: number
+        votingPowerRelativeToQuorum:
+          summary: Delegate's voting power relative to quorum
+          description: The delegate's voting power relative to the quorum.
+          type: number
+        proposalsCreated:
+          summary: Number of proposals created
+          description: The number of proposals created by the delegate.
+          type: number
+        proposalsVotedOn:
+          summary: Number of proposals voted on
+          description: The number of proposals voted on by the delegate.
+          type: number
+        votedFor:
+          summary: Number of proposals voted for
+          description: The number of proposals voted for by the delegate.
+          type: string
+        votedAgainst:
+          summary: Number of proposals voted against
+          description: The number of proposals voted against by the delegate.
+          type: string
+        votedAbstain:
+          summary: Number of proposals abstained from
+          description: The number of proposals abstained from by the delegate.
+          type: string
+        votingParticipation:
+          summary: Voting participation
+          description: The delegate's voting participation.
+          type: string
+        lastTenProps:
+          summary: number of proposals voted on out of the last ten
+          description: The number of proposals voted on out of the last ten.
+          type: string
+        numOfDelegators:
+          summary: Number of delegators
+          description: The number of delegators.
+          type: string
+    DelegateStatement:
+      summmary: A delegate's statement
+      description: A delegate's statement, including the social links and topIssues.
+      type: object
+      properties:
+        statement:
+          summary: Delegate's statement
           description: A statement from the delegate describing their voting positions.
           type: string
-          examples:
-            - summary: Delegate statement
-              value: "hello! I am a great delegate for reasons xyz"
+        twitter:
+          summary: Twitter handle
+          description: Twitter handle for the delegate.
+          type: string
+        discord:
+          summary: Discord handle
+          description: Discord handle for the delegate.
+          type: string
+        warpcast:
+          summary: Warpcast handle
+          description: Warpcast handle for the delegate.
+          type: string
         topIssues:
+          summary: Top issues for a delegate
           description: The most important issues for a given delegate.
           type: array
           items:
@@ -1149,7 +1233,7 @@ paths:
           in: query
           description: >
             The desired method by which returned delegates will be sorted.
-            Supported values are: 'most_delegators', 'weighted_random'
+            Supported values are: 'voting_power', 'most_delegators', 'weighted_random'
           required: false
           schema:
             type: string
@@ -1166,10 +1250,10 @@ paths:
                 properties:
                   metadata:
                     $ref: "#/components/schemas/PageMetadata"
-                  delegates:
+                  data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/BaseDelegate"
+                      $ref: "#/components/schemas/DelegateChunk"
         "400":
           description: Bad Request
         "401":
@@ -1204,7 +1288,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BaseDelegate"
+                $ref: "#/components/schemas/Delegate"
         "400":
           description: Bad Request
         "401":

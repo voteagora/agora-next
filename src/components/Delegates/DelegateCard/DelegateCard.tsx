@@ -13,7 +13,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
           <DelegateProfileImage
             address={delegate.address}
             citizen={delegate.citizen}
-            votingPower={delegate.votingPower}
+            votingPower={delegate.votingPower.total}
             copyable={true}
           />
         </VStack>

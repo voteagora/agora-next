@@ -175,7 +175,7 @@ export function AdvancedDelegateDialog({
       const delegatee = await fetchDelegate(pageDelegateeAddress);
       setRefetchDelegate({
         address: pageDelegateeAddress,
-        prevVotingPowerDelegatee: delegatee.votingPower,
+        prevVotingPowerDelegatee: delegatee.votingPower.total,
       });
     } else {
       /**

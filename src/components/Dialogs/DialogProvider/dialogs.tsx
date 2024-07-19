@@ -10,7 +10,7 @@ import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelega
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
-import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
 import {

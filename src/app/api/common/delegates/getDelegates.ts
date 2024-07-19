@@ -1,5 +1,4 @@
 import {
-  paginateResult,
   paginateResultEx,
   type PaginatedResultEx,
   type PaginationParamsEx,
@@ -9,106 +8,15 @@ import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
+  DelegateChunk,
   type Delegate,
   type DelegatesGetPayload,
   type DelegateStats,
 } from "./delegate";
 import Tenant from "@/lib/tenant/tenant";
-import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
-
-async function getDelegatesApi(
-  sort: string,
-  pagination: PaginationParamsEx,
-  seed?: number
-): Promise<PaginatedResultEx<any>> {
-  const { namespace, slug } = Tenant.current();
-  const apiDelegatesQuery = (sort: string) =>
-    `
-    SELECT
-      delegates.delegate,
-      num_of_delegators,
-      direct_vp,
-      avp.advanced_vp,
-      voting_power,
-      contract,
-      am.address IS NOT NULL as citizen
-    FROM
-      ${namespace + ".delegates"}
-    LEFT JOIN
-      ${namespace + ".advanced_voting_power"} avp
-    ON
-      avp.delegate = delegates.delegate
-    LEFT JOIN
-      agora.citizens am
-    ON
-      LOWER(am.address) = LOWER(delegates.delegate) AND
-      am.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens) AND
-      am.dao_slug = $3::config.dao_slug
-    WHERE
-      num_of_delegators IS NOT NULL
-    ORDER BY
-      ${sort}
-    OFFSET $1
-    LIMIT $2;
-  `;
-  // TODO: voting power sort, others
-  const paginatedQuery = async (skip: number, take: number) => {
-    switch (sort) {
-      case "most_delegators":
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          apiDelegatesQuery("num_of_delegators DESC"),
-          skip,
-          take,
-          slug
-        );
-      case "weighted_random":
-        await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          apiDelegatesQuery("-log(random()) / voting_power"),
-          skip,
-          take,
-          slug
-        );
-      default:
-        throw new Error("Invalid sort order");
-    }
-  };
-
-  const result = (await doInSpan(
-    { name: "getDelegatesApi" },
-    async () => await paginateResultEx(paginatedQuery, pagination)
-  )) as PaginatedResultEx<DelegatesGetPayload[]>;
-
-  const delegates = result.data;
-  const meta = result.meta;
-
-  const _delegates = await Promise.all(
-    delegates.map(async (delegate: DelegatesGetPayload) => {
-      return {
-        statement: await fetchDelegateStatement(delegate.delegate),
-      };
-    })
-  );
-
-  // Voting power detail added for use with API, so as to not break existing
-  // components
-  return {
-    meta,
-    data: delegates.map((delegate: any, index: number) => ({
-      address: delegate.delegate,
-      votingPower: {
-        total: delegate.voting_power?.toFixed(0),
-        direct: delegate.direct_vp?.toFixed(0),
-        advanced: delegate.advanced_vp?.toFixed(0) || "0",
-      },
-      citizen: delegate.citizen,
-      statement: _delegates[index].statement,
-    })),
-  };
-}
 
 /*
  * Fetches a list of delegates
@@ -118,20 +26,22 @@ async function getDelegatesApi(
  * @returns - a list of delegates
  */
 async function getDelegates({
-  page = 1,
-  sort = "weighted_random",
+  pagination = {
+    limit: 20,
+    offset: 0,
+  },
+  sort,
   seed,
   filters,
 }: {
-  page: number;
+  pagination: PaginationParamsEx;
   sort: string;
   seed?: number;
   filters?: {
     issues?: string;
     stakeholders?: string;
   };
-}) {
-  const pageSize = 20;
+}): Promise<PaginatedResultEx<DelegateChunk[]>> {
   const { namespace, ui, slug, contracts } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
@@ -327,19 +237,26 @@ async function getDelegates({
     }
   };
 
-  const { meta, data: delegates } = await paginateResult<DelegatesGetPayload[]>(
-    paginatedAllowlistQuery,
-    page,
-    pageSize
+  const { meta, data: delegates } = await doInSpan(
+    { name: "getDelegates" },
+    async () =>
+      await paginateResultEx<DelegatesGetPayload[]>(
+        paginatedAllowlistQuery,
+        pagination
+      )
   );
 
   // Voting power detail added for use with API, so as to not break existing
   // components
   return {
     meta,
-    delegates: delegates.map((delegate, index) => ({
+    data: delegates.map((delegate) => ({
       address: delegate.delegate,
-      votingPower: delegate.voting_power?.toFixed(0),
+      votingPower: {
+        total: delegate.voting_power?.toFixed(0) || "0",
+        direct: delegate.direct_vp?.toFixed(0) || "0",
+        advanced: delegate.advanced_vp?.toFixed(0) || "0",
+      },
       citizen: delegate.citizen,
       statement: delegate.statement,
     })),
@@ -463,7 +380,11 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   return {
     address: address,
     citizen: delegate?.citizen || false,
-    votingPower: totalVotingPower.toString(),
+    votingPower: {
+      total: totalVotingPower.toString(),
+      direct: delegate?.voting_power.toString() || "0",
+      advanced: delegate?.advanced_vp?.toFixed(0) || "0",
+    },
     votingPowerRelativeToVotableSupply: Number(
       totalVotingPower / BigInt(votableSupply || 0)
     ),
@@ -490,6 +411,5 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
-export const fetchDelegatesApi = cache(getDelegatesApi);
 export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
