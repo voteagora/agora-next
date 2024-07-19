@@ -482,7 +482,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       // Use cached amount when recalculation is expensive
       cachedNumOfDelegators < 1000n
         ? BigInt(
-            (await numOfDelegatesQuery)?.[0]?.num_of_delegators.toString() ||
+            (await numOfDelegatesQuery)?.[0]?.num_of_delegators?.toString() ||
               "0"
           )
         : cachedNumOfDelegators,
