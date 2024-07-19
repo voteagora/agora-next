@@ -1718,20 +1718,18 @@ view cyber_authority_chains {
   @@schema("cyber")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberAuthorityChainsSnaps {
-  id                   String?
-  delegate             String?
+  id                   String   @unique
+  delegate             String 
   rules                Json?
   chain                String[]
-  proxy                String?
-  balance              Decimal? @db.Decimal
-  allowance            Decimal? @db.Decimal
-  contract             String?  @db.VarChar
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String   @db.VarChar
   balance_block_number BigInt?
   balance_ordinal      Decimal? @db.Decimal
 
-  @@ignore
   @@schema("cyber")
   @@map("authority_chains_snaps")
 }
