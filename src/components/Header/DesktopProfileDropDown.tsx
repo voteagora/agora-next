@@ -149,7 +149,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                       detail={
                         <ValueWrapper isLoading={isLoading}>
                           <TokenAmountDisplay
-                            amount={delegate?.votingPower || BigInt(0)}
+                            amount={delegate?.votingPower.total || BigInt(0)}
                           />
                         </ValueWrapper>
                       }

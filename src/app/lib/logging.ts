@@ -102,7 +102,7 @@ export const doInSpan = <T>(
     additionalBaggage?: Record<string, string>;
   },
   fn: () => T
-): T | Promise<T> | undefined => {
+): T | Promise<T> => {
   const { tracer, name } = metadata;
   let selectedTracer: otel.Tracer;
   if (!tracer) {
@@ -145,6 +145,7 @@ export const doInSpan = <T>(
         return handleSuccess(response);
       } catch (error) {
         catchError(error as otel.Exception);
+        throw error;
       }
     });
 

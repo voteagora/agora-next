@@ -49,7 +49,7 @@ export async function generateMetadata(
   const imgParams = [
     delegate.votingPower &&
       `votes=${encodeURIComponent(
-        `${formatNumber(delegate.votingPower || "0")} ${token.symbol}`
+        `${formatNumber(delegate.votingPower.total || "0")} ${token.symbol}`
       )}`,
     avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,

@@ -5,7 +5,7 @@ import { Button } from "@/components/Button";
 import styles from "./delegateDialog.module.scss";
 import { useModal } from "connectkit";
 import { Button as ShadcnButton } from "@/components/ui/button";
-import { DelegateChunk } from "@/components/Delegates/DelegateCardList/DelegateCardList";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useCallback, useEffect, useState } from "react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
@@ -59,7 +59,7 @@ export function DelegateDialog({
     if (Number(votingPower) > 0) {
       setRefetchDelegate({
         address: trackingData.delegateAddress,
-        prevVotingPowerDelegatee: delegate.votingPower,
+        prevVotingPowerDelegatee: delegate.votingPower.total,
       });
     }
     setIsLoading(false);
