@@ -128,10 +128,6 @@ export enum TransactionType {
   CUSTOM = "custom",
 }
 
-export enum AdditionalProposalTypes {
-  SNAPSHOT = "snapshot",
-}
-
 export type PLMConfig = {
   // the stages of the proposal lifecycle that
   // this tenant wants to use

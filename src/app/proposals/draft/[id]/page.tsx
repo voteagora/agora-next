@@ -58,7 +58,6 @@ export default async function DraftProposalPage({
   }
 
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
-  console.log(DRAFT_STAGES_FOR_TENANT);
   const stageParam = (searchParams?.stage || "0") as string;
   const stageIndex = parseInt(stageParam, 10);
   const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
