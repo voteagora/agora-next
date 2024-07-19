@@ -32,7 +32,7 @@ export function ApprovalCastVoteDialog({
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState<string>("");
-  const [abstain, setAbstain] = useState<boolean>(true);
+  const [abstain, setAbstain] = useState<boolean>(false);
   const [encodedParams, setEncodedParams] = useState<`0x${string}`>("0x");
   const maxChecked = proposalData.proposalSettings.maxApprovals;
   const abstainOptionId = proposalData.options.length; // Abstain option is always last
