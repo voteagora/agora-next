@@ -1750,31 +1750,25 @@ view cyberDelegateChangedEvents {
   @@map("delegate_changed_events")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view cyberDelegatees {
-  delegator    String?
-  delegatee    String?
-  block_number BigInt?
-  balance      Decimal? @db.Decimal
-  contract     String?  @db.VarChar(42)
+  delegator    String   @unique
+  delegatee    String
+  block_number BigInt
+  balance      Decimal  @db.Decimal
+  contract     String   @db.VarChar(42)
 
-  @@ignore
   @@schema("cyber")
   @@map("delegatees")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view cyberDelegates {
-  delegate          String?
+  delegate          String   @unique
   contract          String?  @db.VarChar(42)
-  num_of_delegators Decimal? @db.Decimal
-  direct_vp         Decimal? @db.Decimal
-  advanced_vp       Decimal? @db.Decimal
-  voting_power      Decimal? @db.Decimal
+  num_of_delegators Decimal  @db.Decimal
+  direct_vp         Decimal  @db.Decimal
+  advanced_vp       Decimal  @db.Decimal
+  voting_power      Decimal  @db.Decimal
 
-  @@ignore
   @@schema("cyber")
   @@map("delegates")
 }
