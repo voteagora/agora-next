@@ -52,11 +52,6 @@ export async function fetchDirectDelegatee(addressOrENSName: string) {
   return apiFetchDirectDelegatee(addressOrENSName);
 }
 
-// Pass address of the connected wallet
-export async function getProxyAddress(addressOrENSName: string) {
-  return fetchProxy(addressOrENSName);
-}
-
 export async function submitDelegateStatement({
   address,
   delegateStatement,

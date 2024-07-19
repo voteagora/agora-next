@@ -266,7 +266,7 @@ async function getProxyAddressForAddress({
   address,
 }: {
   address: string;
-}): Promise<string> {
+}): Promise<string | null> {
   return getProxyAddress(address);
 }
 
