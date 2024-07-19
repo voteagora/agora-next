@@ -1792,7 +1792,7 @@ view cyber_delegates_wrapper {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyber_direct_chains {
   delegate  String?
-  rules     Json?
+  rules     Json? // Uh oh, this is a Json[] for optimism, [] for uniswap
   chain     String?
   balance   Decimal? @db.Decimal
   allowance Decimal? @db.Decimal
@@ -1836,29 +1836,26 @@ view cyberProposalTypes {
   @@map("proposal_types")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view cyberProposals {
-  proposal_id                String?
-  contract                   String?       @db.VarChar
-  proposer                   String?
-  description                String?
-  ordinal                    Decimal?      @db.Decimal
-  created_block              BigInt?
-  start_block                String?
+  proposal_id                String        @unique
+  contract                   String        @db.VarChar
+  proposer                   String 
+  description                String? 
+  ordinal                    Decimal       @db.Decimal
+  created_block              BigInt? 
+  start_block                String
   end_block                  String?
   cancelled_block            BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType?
+  proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?       @db.VarChar(66)
   cancelled_transaction_hash String?       @db.VarChar
   executed_transaction_hash  String?       @db.VarChar
 
-  @@ignore
   @@schema("cyber")
   @@map("proposals")
 }
@@ -1890,26 +1887,20 @@ view cyber_proposals_wrapper {
   @@schema("cyber")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view cyberStakedDeposits {
-  deposit_id  BigInt?
-  depositor   String?
-  beneficiary String?
-  delegatee   String?
-  amount      Decimal? @db.Decimal
+  deposit_id  BigInt   @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal  @db.Decimal
 
-  @@ignore
   @@schema("cyber")
   @@map("staked_deposits")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 view cyberVotableSupply {
-  votable_supply String?
+  votable_supply String @unique
 
-  @@ignore
   @@schema("cyber")
   @@map("votable_supply")
 }
@@ -1950,9 +1941,8 @@ view cyber_vote_cast_with_params_events {
   @@schema("cyber")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberVoterStats {
-  voter              String?
+  voter              String  @unique
   proposals_voted    BigInt?
   participation_rate Float?
   last_10_props      Decimal? @db.Decimal
@@ -1962,47 +1952,41 @@ view cyberVoterStats {
   proposals_proposed BigInt?
   contract           String?  @db.VarChar(42)
 
-  @@ignore
   @@schema("cyber")
   @@map("voter_stats")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberVotes {
-  transaction_hash String?       @db.VarChar
-  proposal_id      String?
-  voter            String?
-  support          String?
-  weight           Decimal?      @db.Decimal
+  transaction_hash String       @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal      @db.Decimal
   reason           String?
-  block_number     BigInt?
+  block_number     BigInt
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json?
-  proposal_type    ProposalType?
+  proposal_data    Json
+  proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
   @@map("votes")
-  @@ignore
   @@schema("cyber")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberVotingPower {
-  delegate     String?
+  delegate     String  @unique
   voting_power String?
-  contract     String? @db.VarChar(42)
+  contract     String  @db.VarChar(42)
 
-  @@ignore
   @@schema("cyber")
   @@map("voting_power")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view votingPowerSnaps {
-  id                String?
+  id                String   @id
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -2011,7 +1995,6 @@ view votingPowerSnaps {
   log_index         Int?
   contract          String?  @db.VarChar(42)
 
-  @@ignore
   @@schema("cyber")
   @@map("voting_power_snaps")
 }
