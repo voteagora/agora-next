@@ -2,7 +2,7 @@
 
 import { DelegateActions } from "./DelegateActions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-import { DelegateChunk } from "../DelegateCardList/DelegateCardList";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 export default function DelegateCardClient({

@@ -68,7 +68,7 @@ export default function VoterHoverCard({
               <DelegateProfileImage
                 address={address}
                 endorsed={!!delegate ? delegate.statement.endorsed : false}
-                votingPower={!!delegate ? delegate.votingPower : "0"}
+                votingPower={!!delegate ? delegate.votingPower.total : "0"}
               />
               <p
                 className={`break-words text-gray-600 overflow-hidden line-clamp-2 text-ellipsis`}

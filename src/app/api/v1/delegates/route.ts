@@ -1,13 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { ZodError, z } from "zod";
-
+import { ZodError } from "zod";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { fetchDelegatesApi } from "@/app/api/common/delegates/getDelegates";
-import {
-  type Delegate,
-  type DelegatePayload,
-  type DelegatesGetPayload,
-} from "@/app/api/common/delegates/delegate";
+import { fetchDelegates } from "@/app/api/common/delegates/getDelegates";
 
 import {
   createOptionalNumberValidator,
@@ -48,9 +42,12 @@ export async function GET(request: NextRequest) {
       const sort = sortValidator.parse(params.get("sort"));
       const limit = limitValidator.parse(params.get("limit"));
       const offest = offsetValidator.parse(params.get("offset"));
-      const delegatesResult = await fetchDelegatesApi(sort, {
-        limit: limit,
-        offset: offest,
+      const delegatesResult = await fetchDelegates({
+        pagination: {
+          limit: limit,
+          offset: offest,
+        },
+        sort,
       });
       return NextResponse.json(delegatesResult);
     } catch (e: any) {
