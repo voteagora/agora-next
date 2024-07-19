@@ -437,10 +437,11 @@ view OptimismVoterStats {
 }
 
 view OptimismDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
   @@schema("optimism")
@@ -463,10 +464,12 @@ view OptimismDelegateChangedEvents {
 }
 
 view ensDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
   @@schema("ens")
@@ -666,10 +669,11 @@ chain_id          Int
 }
 
 view etherfiDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
   @@schema("etherfi")
@@ -859,10 +863,12 @@ view etherfiDelegateChangedEvents {
 }
 
 view uniswapDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
   @@schema("uniswap")
