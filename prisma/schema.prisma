@@ -1657,18 +1657,16 @@ view delgatees {
 }
 
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberAdvancedDelegatees {
-  pair             String?
-  from             String?
-  to               String?
-  delegated_amount Decimal? @db.Decimal
-  delegated_share  Decimal? @db.Decimal
-  block_number     BigInt?
+  pair             String   @unique
+  from             String
+  to               String
+  delegated_amount Decimal  @db.Decimal
+  delegated_share  Decimal  @db.Decimal
+  block_number     BigInt
   contract         String?  @db.VarChar
   transaction_hash String?
 
-  @@ignore
   @@schema("cyber")
   @@map("advanced_delegatees")
 }
