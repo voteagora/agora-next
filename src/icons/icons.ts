@@ -33,10 +33,12 @@ import copy from "./copy.svg";
 import chevronSelectorVertical from "./chevronSelectorVertical.svg";
 import check from "./check.svg";
 import link from "./link.svg";
+import endorsed from "./endorsed.svg";
 
 export const icons = {
   badge,
   contractVoter,
+  endorsed,
   expand,
   anonNoun,
   speakerCone,

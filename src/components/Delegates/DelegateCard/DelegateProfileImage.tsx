@@ -1,31 +1,40 @@
 "use client";
 
 import ENSAvatar from "../../shared/ENSAvatar";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import HumanAddress from "@/components/shared/HumanAddress";
 import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
-import { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import styles from "./delegateCard.module.scss";
 import Image from "next/image";
-import badge from "@/icons/badge.svg";
-import { useEffect } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
+import { icons } from "@/icons/icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+interface Props {
+  address: string;
+  citizen?: boolean;
+  copyable?: boolean;
+  endorsed: boolean;
+  votingPower: string;
+}
 
 export function DelegateProfileImage({
   address,
-  votingPower,
   citizen,
   copyable = false,
-}: {
-  address: string;
-  votingPower: string;
-  citizen?: boolean;
-  copyable?: boolean;
-}) {
+  endorsed,
+  votingPower,
+}: Props) {
+  const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const { token } = Tenant.current();
   const formattedNumber = useMemo(() => {
@@ -66,30 +75,49 @@ export function DelegateProfileImage({
   }, [address, formattedNumber, refetchDelegate, setRefetchDelegate]);
 
   return (
-    <HStack className="gap-4">
+    <div className="flex flex-row gap-4">
       <div className="relative aspect-square">
         {citizen && (
           <Image
             className="absolute bottom-[-5px] right-[-7px] z-10"
-            src={badge}
+            src={icons.badge}
             alt="badge symbol"
           />
         )}
         <ENSAvatar className={styles.avatar} ensName={data} />
       </div>
 
-      <VStack>
-        <div className={styles.address}>
+      <div className="flex flex-col">
+        <div className={`${styles.address} flex flex-row gap-1 items-center`}>
           {copyable ? (
             <CopyableHumanAddress address={address} />
           ) : (
             <HumanAddress address={address} />
           )}
+          {endorsed && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Image
+                    src={icons.endorsed}
+                    alt={`Endorsed by ${ui.organization?.title}`}
+                    className="w-4 h-4"
+                  />
+                </TooltipTrigger>
+
+                <TooltipContent>
+                  <div className="text-xs">
+                    Endorsed by {ui.organization?.title}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
         <div className={styles.token}>
           {formattedNumber} {token.symbol}
         </div>
-      </VStack>
-    </HStack>
+      </div>
+    </div>
   );
 }

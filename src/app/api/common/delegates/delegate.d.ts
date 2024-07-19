@@ -44,13 +44,14 @@ export type DelegatesGetPayload = {
 };
 
 type DelegateStatement = {
-  signature: string;
-  payload: { delegateStatement: string };
-  twitter: string | null;
-  discord: string | null;
-  warpcast: string | null;
   created_at: Date;
+  discord: string | null;
+  endorsed: boolean;
+  payload: { delegateStatement: string };
+  signature: string;
+  twitter: string | null;
   updated_at: Date;
+  warpcast: string | null;
 };
 
 export type DelegateStats = {
