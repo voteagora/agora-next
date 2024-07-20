@@ -441,6 +441,7 @@ view OptimismDelegatees {
   delegatee        String
   block_number     BigInt
   balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
   transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
@@ -673,6 +674,7 @@ view etherfiDelegatees {
   delegatee        String
   block_number     BigInt
   balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
   transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
@@ -1761,6 +1763,7 @@ view cyberDelegatees {
   delegatee        String
   block_number     BigInt
   balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
   transaction_hash String? @db.VarChar(66)
 
   @@schema("cyber")
