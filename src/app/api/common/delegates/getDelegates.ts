@@ -382,7 +382,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     citizen: delegate?.citizen || false,
     votingPower: {
       total: totalVotingPower.toString(),
-      direct: delegate?.voting_power.toString() || "0",
+      direct: delegate?.voting_power?.toString() || "0",
       advanced: delegate?.advanced_vp?.toFixed(0) || "0",
     },
     votingPowerRelativeToVotableSupply: Number(
