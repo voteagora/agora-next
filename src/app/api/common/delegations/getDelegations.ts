@@ -34,7 +34,10 @@ async function getCurrentDelegateesForAddress({
       const [proxyAddress, delegatee] = await Promise.all([
         getProxyAddress(address),
         prisma[`${namespace}Delegatees`].findFirst({
-          where: { delegator: address.toLowerCase() },
+          where: {
+            delegator: address.toLowerCase(),
+            contract: contracts.token.address.toLowerCase(),
+          },
         }),
       ]);
 
@@ -136,7 +139,7 @@ async function getCurrentDelegatorsForAddress({
             FROM
               ${namespace}.delegate_changed_events t1
             WHERE
-              t1.to_delegate = $1
+              t1.to_delegate = $1 AND t1.address = $2
               AND NOT EXISTS (
                 SELECT
                   1
@@ -150,10 +153,11 @@ async function getCurrentDelegatorsForAddress({
               t1.block_number DESC,
               t1.log_index DESC,
               t1.transaction_index DESC
-            OFFSET $2
-            LIMIT $3;
+            OFFSET $3
+            LIMIT $4;
             `,
               address,
+              contracts.token.address.toLowerCase(),
               skip,
               take
             );
