@@ -131,16 +131,25 @@ async function getCurrentDelegatorsForAddress({
               }[]
             >(
               `
-            SELECT
-              t1.delegator,
-              t1.to_delegate AS delegatee,
-              t1.block_number,
-              t1.transaction_hash
-            FROM
-              ${namespace}.delegate_changed_events t1
-            WHERE
-              t1.to_delegate = $1 AND t1.address = $2
-              AND NOT EXISTS (
+            SELECT *
+            FROM (
+              SELECT
+                delegator,
+                to_delegate AS delegatee,
+                block_number,
+                transaction_hash,
+                log_index,
+                transaction_index
+              FROM
+                ${namespace}.delegate_changed_events
+              WHERE
+                to_delegate = $1 AND address = $2
+              ORDER BY
+                block_number DESC,
+                log_index DESC,
+                transaction_index DESC
+            ) t1
+            WHERE NOT EXISTS (
                 SELECT
                   1
                 FROM
@@ -150,9 +159,9 @@ async function getCurrentDelegatorsForAddress({
                   AND t2.block_number > t1.block_number
                   OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index))
             ORDER BY
-              t1.block_number DESC,
-              t1.log_index DESC,
-              t1.transaction_index DESC
+              block_number DESC,
+              log_index DESC,
+              transaction_index DESC
             OFFSET $3
             LIMIT $4;
             `,
