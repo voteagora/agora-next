@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
 function DelegationsContainer({
@@ -29,7 +29,6 @@ function DelegationsContainer({
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegates] = useState(initialDelegators.data);
-  // const { advancedDelegators } = useConnectedDelegate();
 
   useEffect(() => {
     setDelegates(initialDelegators.data);
