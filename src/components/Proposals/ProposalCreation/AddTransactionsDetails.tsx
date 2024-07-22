@@ -1,13 +1,11 @@
 "use client";
 
-import { cx } from "@emotion/css";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Form, Transaction } from "./CreateProposalForm";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { ethers } from "ethers";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import InputBox from "@/components/shared/InputBox";
-import styles from "./styles.module.scss";
 import { MultiButtons } from "@/components/shared/MultiButtons";
 import SimulateTransaction from "@/components/shared/SimulateTransaction";
 import { formatEther, parseUnits } from "viem";
@@ -91,16 +89,15 @@ export default function AddTransactionsDetails({
       )}
       {form.state.options[optionIndex].transactions.map(
         (transaction, index) => (
-          <VStack key={index} className={styles.transaction_details_option}>
-            <p>Transaction {index + 1}</p>
+          <VStack key={index} className="mt-4 w-full relative">
+            <p className="font-bold mt-2 mb-4">Transaction {index + 1}</p>
             {transaction.type === "Transfer" && (
               <>
-                <HStack
-                  className={styles.transaction_details_option__transfer}
-                  gap={4}
-                >
+                <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Transfer to</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Transfer to
+                    </label>
                     <InputBox
                       placeholder={"address (no ENS)"}
                       value={transaction.transferTo}
@@ -114,7 +111,7 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                   <VStack className="w-full">
-                    <label className={labelStyle}>
+                    <label className="text-xs text-tertiary font-semibold">
                       Transfer amount requested (OP)
                     </label>
                     <InputBox
@@ -137,12 +134,11 @@ export default function AddTransactionsDetails({
             )}
             {transaction.type === "Custom" && (
               <>
-                <HStack
-                  className={styles.transaction_details_option__transfer}
-                  gap={4}
-                >
+                <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Target</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Target
+                    </label>
                     <InputBox
                       placeholder={"address"}
                       value={transaction.target}
@@ -154,7 +150,9 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Value</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Value
+                    </label>
                     <InputBox
                       placeholder={"uint256"}
                       value={transaction.value}
@@ -166,12 +164,11 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                 </HStack>
-                <HStack
-                  className={styles.transaction_details_option__transfer}
-                  gap={4}
-                >
+                <HStack className="w-full mb-4" gap={4}>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Calldata</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Calldata
+                    </label>
                     <InputBox
                       placeholder={"bytes"}
                       value={transaction.calldata}
@@ -181,7 +178,9 @@ export default function AddTransactionsDetails({
                     />
                   </VStack>
                   <VStack className="w-full">
-                    <label className={labelStyle}>Transaction Validity</label>
+                    <label className="text-xs text-tertiary font-semibold">
+                      Transaction Validity
+                    </label>
                     <SimulateTransaction
                       target={transaction.target}
                       value={ethers.parseEther(
@@ -194,15 +193,15 @@ export default function AddTransactionsDetails({
               </>
             )}
             <XCircleIcon
-              className={styles.transaction_details_option__remove}
+              className="w-5 h-5 absolute right-0 top-[2px] cursor-pointer text-primary/30 hover:text-secondary"
               onClick={() => remove(index)}
             />
           </VStack>
         )
       )}
       {form.state.options[optionIndex].transactions.length !== 0 && (
-        <VStack className={styles.transaction_details_option__add}>
-          <p className={cx(styles.create_prop_form__title, "mb-0")}>
+        <VStack className="p-4 border border-line rounded-md bg-wash mt-4 relative">
+          <p className="font-semibold pb-1 mb-0">
             Add another transaction to this option
           </p>
           <MultiButtons
@@ -214,11 +213,9 @@ export default function AddTransactionsDetails({
               ["Custom transaction", () => addTransaction("Custom")],
             ]}
           />
-          <PlusIcon className={styles.transaction_details_option__plus} />
+          <PlusIcon className="w-5 h-5 absolute top-4 right-4 text-primary/30" />
         </VStack>
       )}
     </>
   );
 }
-
-export const labelStyle = styles.label;

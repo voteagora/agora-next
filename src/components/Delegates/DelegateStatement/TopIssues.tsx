@@ -24,7 +24,7 @@ export default function TopIssues({ statement }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold">Top Issues</h2>
+      <h2 className="text-2xl font-bold text-primary">Top Issues</h2>
 
       <div className="flex flex-col gap-4">
         {topIssues.map((issue, idx) => {
@@ -61,16 +61,16 @@ interface IssueProps {
 
 const Issue = ({ title, icon, value }: IssueProps) => {
   return (
-    <div className="rounded-xl border border-gray-eb shadow-newDefault bg-white p-3">
+    <div className="rounded-xl border border-line shadow-newDefault bg-white p-3">
       <div className="flex flex-row gap-4 items-start">
         <div className="flex flex-col justify-center shrink-0">
-          <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-gray-eb">
+          <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-line">
             <Image src={icons[icon]} alt={title} />
           </div>
         </div>
 
         <div className="flex flex-col">
-          <div className="text-xs font-medium text-[#66676b]">{title}</div>
+          <div className="text-xs font-medium text-secondary">{title}</div>
           <div>{value}</div>
         </div>
       </div>

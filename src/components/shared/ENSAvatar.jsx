@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "./styles.module.scss";
 import Image from "next/image";
 import { useEnsAvatar } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
@@ -27,11 +26,13 @@ export default function ENSAvatar({ ensName, className = "" }) {
   }, [data, ensName]);
 
   return (
-    <div className={`${styles.ens_avatar} ${className}`}>
+    <div
+      className={`overflow-hidden rounded-full flex justify-center items-center ${className}`}
+    >
       <Image
         loader={imageLoader}
         alt="ENS Avatar"
-        className={styles.image}
+        className="animate-in"
         src={avatar}
         width={44}
         height={44}

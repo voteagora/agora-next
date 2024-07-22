@@ -12,7 +12,7 @@ const labelVariants = cva(
     variants: {
       variant: {
         default: "text-foreground",
-        black: "text-black",
+        black: "text-primary",
       },
     },
     defaultVariants: {

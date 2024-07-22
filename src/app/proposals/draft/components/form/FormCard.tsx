@@ -31,6 +31,7 @@ const FormCardFooter = ({ children }: { children: React.ReactNode }) => {
 
 const FormCardHeader = ({ children }: { children: React.ReactNode }) => {
   return (
+    // yellow color for draft proposal -- not themeable right now
     <header className="px-6 pt-2 bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] border rounded-t-2xl z-10 pb-[32px] mb-[-24px]">
       {children}
     </header>
