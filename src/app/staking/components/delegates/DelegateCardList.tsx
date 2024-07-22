@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { capitalizeFirstLetter } from "@/lib/utils";
@@ -55,7 +54,7 @@ export default function DelegateCardList({
     <DialogProvider>
       {/* @ts-ignore */}
       <InfiniteScroll
-        className={styles.infinite_scroll}
+        className="grid grid-flow-row grid-cols-[repeat(auto-fit,_23rem)] sm:grid-cols-[repeat(3,_23rem)] justify-around sm:justify-between py-4 gap-4 sm:gap-8"
         hasMore={meta.hasNextPage}
         pageStart={1}
         loadMore={loadMore}

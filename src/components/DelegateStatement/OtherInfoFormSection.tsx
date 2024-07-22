@@ -13,7 +13,7 @@ export default function OtherInfoFormSection({
   const requireCodeOfConduct = ui.toggle("delegates/code-of-conduct")?.enabled;
 
   return (
-    <div className="py-8 px-6 border-b border-gray-300">
+    <div className="py-8 px-6 border-b border-line">
       <h3 className="font-bold">Other info</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
