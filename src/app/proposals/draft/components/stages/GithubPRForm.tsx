@@ -98,7 +98,7 @@ const GithubPRForm = ({
             className="object-cover rounded-md"
           />
         </div>
-        <p className="mt-4 text-stone-700">
+        <p className="mt-4 text-secondary">
           {!!github_pr_checklist_item ? (
             <span>
               You have already started creating docs for this draft proposal. If

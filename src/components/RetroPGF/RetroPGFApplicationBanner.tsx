@@ -35,7 +35,7 @@ export default function RetroPGFApplicationBanner({
 
   return (
     <div className="flex flex-col sm:flex-row items-center w-full max-w-6xl pb-8 px-4">
-      <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-white border border-gray-300 shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
+      <div className="h-[640px] sm:h-[400px] box-border rounded-lg bg-neutral border border-line shadow-newDefault relative overlofw-hidden w-full my-0 mx-auto pb-[80px]">
         <div className="absolute top-6 left-6">
           <HStack className="gap-2 flex-wrap">
             {impactCategory.map((category) => (
@@ -45,7 +45,7 @@ export default function RetroPGFApplicationBanner({
         </div>
         <div
           className={cn(
-            "relative overflow-hidden h-[300px] w-full rounded-2xl border-8 border-white bg-gray-fa bg-cover bg-center"
+            "relative overflow-hidden h-[300px] w-full rounded-2xl border-8 border-white bg-wash bg-cover bg-center"
           )}
           style={{
             backgroundImage: `url(${
@@ -61,7 +61,7 @@ export default function RetroPGFApplicationBanner({
           alt={`${displayName} icon`}
           className={cn(
             "absolute top-[200px] sm:top-[258px] left-[50%] sm:left-[20px] -translate-x-1/2 sm:translate-x-0",
-            "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-white shadow-newDefault"
+            "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-neutral shadow-newDefault"
           )}
           height="120"
           width="120"
@@ -73,34 +73,34 @@ export default function RetroPGFApplicationBanner({
                 <h3 className="font-bold text-2xl text-center sm:text-left">
                   {displayName}
                 </h3>
-                <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-gray-700">
-                  <p className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                <HStack className="gap-2 justify-center sm:justify-start mb-4 sm:mb-auto flex-wrap text-sm text-secondary">
+                  <p className="bg-wash py-0 px-3 rounded-[24px]">
                     {capitalizeFirstLetter(applicantType)}
                   </p>
-                  <div className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                  <div className="bg-wash py-0 px-3 rounded-[24px]">
                     <HumanAddress address={applicant.address.address} />
                   </div>
-                  <div className="bg-gray-fa py-0 px-3 rounded-[24px]">
+                  <div className="bg-wash py-0 px-3 rounded-[24px]">
                     <a href={websiteUrl} rel="noreferrer" target="_blank">
                       <HStack>
                         {extractWebsiteName(websiteUrl)}
-                        <ArrowTopRightOnSquareIcon className="w-6 h-6 text-gray-500 block pl-1.5" />
+                        <ArrowTopRightOnSquareIcon className="w-6 h-6 text-tertiary block pl-1.5" />
                       </HStack>
                     </a>
                   </div>
                 </HStack>
               </div>
 
-              <p className="font-inter text-center sm:text-left font-medium text-base leading-6 text-gray-4f">
+              <p className="font-inter text-center sm:text-left font-medium text-base leading-6 text-secondary">
                 {bio}
               </p>
             </VStack>
             <HStack className="gap-2">
               <VStack className="mr-4 mt-5 items-end">
-                <div className="text-sm text-gray-700 whitespace-nowrap texr-right">
+                <div className="text-sm text-secondary whitespace-nowrap texr-right">
                   Appears in
                 </div>
-                <div className="text-sm text-black whitespace-nowrap texr-right">
+                <div className="text-sm text-primary whitespace-nowrap texr-right">
                   {includedInBallots} ballots
                 </div>
               </VStack>
@@ -120,7 +120,7 @@ const CategoryListItem = ({ category }: CategoryListItemProps) => {
   return (
     <div
       key={category}
-      className="text-sm bg-white bg-opacity-90 rounded-xl text-gray-700 leading-relaxed py-0 px-3 shadow-newDefault capitalize z-10"
+      className="text-sm bg-neutral bg-opacity-90 rounded-xl text-secondary leading-relaxed py-0 px-3 shadow-newDefault capitalize z-10"
     >
       {formatCategory(category)}
     </div>

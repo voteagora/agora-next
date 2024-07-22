@@ -17,7 +17,6 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 import { useModal } from "connectkit";
-import styles from "./styles.module.scss";
 import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -100,20 +99,20 @@ export default function SubmitButton({
   return (
     <>
       {manager && String(manager) !== address ? (
-        <p className="text-gray-700 text-sm max-w-[420px] break-words">
+        <p className="text-secondary text-sm max-w-[420px] break-words">
           Only the {ui.organization!.title} manager address can create proposals
           for the time being.
         </p>
       ) : (
         <div className="flex flex-col gap-2">
           {!!inputDataError && (
-            <p className="text-gray-700 text-sm max-w-[420px] break-words">
+            <p className="text-secondary text-sm max-w-[420px] break-words">
               {(inputDataError as { message?: string })?.message ||
                 JSON.stringify(inputDataError)}
             </p>
           )}
           {onPrepareError && (
-            <p className="text-gray-700 text-sm max-w-[420px] break-words">
+            <p className="text-secondary text-sm max-w-[420px] break-words">
               {error?.message || JSON.stringify(error)}
             </p>
           )}
@@ -123,7 +122,10 @@ export default function SubmitButton({
         type="submit"
         variant={"outline"}
         disabled={isLoading || onPrepareError || !!inputDataError}
-        className={cx(["w-[40%]", onPrepareError && styles.submit_button])}
+        className={cx([
+          "w-[40%]",
+          onPrepareError && "cursor-not-allowed bg-line",
+        ])}
         onClick={(e) => {
           e.preventDefault();
           if (!isConnected) {

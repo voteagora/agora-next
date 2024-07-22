@@ -1,5 +1,4 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "./advancedDelegateDialog.module.scss";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import useAdvancedDelegation from "./useAdvancedDelegation";
@@ -193,7 +192,7 @@ export function AdvancedDelegateDialog({
       <VStack
         justifyContent="justify-center"
         alignItems="items-center"
-        className={styles.box}
+        className="w-full"
       >
         {showMessage ? (
           <div>
@@ -207,8 +206,8 @@ export function AdvancedDelegateDialog({
               availableBalance !== "" &&
               !!delegatees &&
               proxyAddress !== "" ? (
-              <VStack className={styles.dialog_container} gap={1}>
-                <VStack className={styles.amount_container}>
+              <VStack className="relative" gap={1}>
+                <VStack className="text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative">
                   <HStack alignItems="items-center" gap={1}>
                     Your total delegatable votes{" "}
                     <InfoIcon
@@ -286,7 +285,7 @@ export function AdvancedDelegateDialog({
       </VStack>
       {overflowDelegation && (
         <p
-          className="text-xs bg-gray-fa p-6 pb-3 pt-6 mt-3 left-0 max-w-md rounded-bl-xl rounded-br-xl absolute"
+          className="text-xs bg-wash p-6 pb-3 pt-6 mt-3 left-0 max-w-md rounded-bl-xl rounded-br-xl absolute"
           style={{ transform: "translateZ(-1px)" }}
         >
           You have delegated more than the total delegatable votes you have.
@@ -312,8 +311,13 @@ function InfoDialog({
 }) {
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
   return (
-    <div className="absolute w-full bg-white rounded-lg shadow-newDefault">
-      <VStack className={styles.amount_container + " !pb-0 !px-0"}>
+    <div className="absolute w-full bg-neutral rounded-lg shadow-newDefault">
+      <VStack
+        className={
+          "text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative" +
+          " !pb-0 !px-0"
+        }
+      >
         <div
           className="absolute cursor-pointer top-2 right-2 opacity-80"
           onClick={() => setShowInfo(false)}
@@ -326,7 +330,7 @@ function InfoDialog({
         </HStack>
         <AdvancedDelegationDisplayAmount amount={availableBalance} />
         <VStack
-          className="w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-gray-eo max-h-[256px] overflow-y-scroll"
+          className="w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-line max-h-[256px] overflow-y-scroll"
           alignItems="items-start"
           gap={3}
         >
@@ -354,7 +358,7 @@ function InfoDialog({
           ))}
         </VStack>
         {directDelegatedFromOthers > 0n && (
-          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-gray-af border-gray-eo">
+          <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
             You’ve been delegated an additional{" "}
             <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of
@@ -372,29 +376,31 @@ function Message({
   setShowMessage: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
-    <div className={styles.dialog_container}>
+    <div className="relative">
       <VStack gap={4}>
         <VStack gap={1}>
-          <div className={styles.title}>Welcome to advanced delegation</div>
-          <div className={styles.gray}>
+          <div className="text-primary text-xl font-bold">
+            Welcome to advanced delegation
+          </div>
+          <div className="text-secondary">
             As a large token holder, you now have access to advanced delegation,
             which lets you manage your voting power with more control and
             flexibility.
           </div>
         </VStack>
 
-        <VStack gap={3} className={styles.info_container}>
-          <div className={styles.icon_text}>
-            <DivideIcon size={20} />
+        <VStack gap={3} className="border border-line rounded-lg p-4">
+          <div className="flex items-center">
+            <DivideIcon size={20} className="mr-2 text-red-500" />
             <p>Split your delegation to multiple people</p>
           </div>
-          <div className={styles.icon_text}>
-            <Repeat2 size={20} />
+          <div className="flex items-center">
+            <Repeat2 size={20} className="mr-2 text-red-500" />
             <p>Let your delegates re-delegate</p>
           </div>
         </VStack>
         <Button
-          className={styles.continue_button}
+          className="bg-black text-neutral text-center w-full h-full"
           onClick={() => {
             setShowMessage(false);
           }}

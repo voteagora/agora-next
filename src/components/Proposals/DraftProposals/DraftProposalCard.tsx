@@ -22,22 +22,22 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
     <div className="bg-stone-100 border border-stone-200 rounded-2xl p-2 shadow-sm">
       <div className="flex flex-row justify-between bg-white border border-stone-200 rounded-2xl px-6 py-5 shadow-sm">
         <div>
-          <p className="font-semibold text-stone-500 text-xs">{`By ${proposal.author_address}`}</p>
+          <p className="font-semibold text-secondary text-xs">{`By ${proposal.author_address}`}</p>
           <p className="font-medium">{proposal.title || "[Title pending]"}</p>
         </div>
         <div className="flex flex-row gap-x-16">
           <div className="w-[140px]">
-            <p className="font-semibold text-stone-500 text-xs">{`Status`}</p>
+            <p className="font-semibold text-secondary text-xs">{`Status`}</p>
             <p className="font-medium">{currentStageMetadata.shortTitle}</p>
           </div>
           <div className="w-[140px]">
-            <p className="font-semibold text-stone-500 text-xs">{`Type`}</p>
+            <p className="font-semibold text-secondary text-xs">{`Type`}</p>
             <p className="font-medium">
               {proposal.proposal_type || "[Type pending]"}
             </p>
           </div>
           <div className="w-[140px]">
-            <p className="font-semibold text-stone-500 text-xs">{`Waiting for`}</p>
+            <p className="font-semibold text-secondary text-xs">{`Waiting for`}</p>
             <p className="font-medium">{currentStageMetadata.waitingFor}</p>
           </div>
         </div>

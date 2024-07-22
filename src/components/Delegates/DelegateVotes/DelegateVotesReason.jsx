@@ -1,10 +1,11 @@
 import React from "react";
 import { VStack } from "@/components/Layout/Stack";
-import styles from "./delegateVotes.module.scss";
 
 function VoteReason({ reason }) {
   return (
-    <VStack className={styles.vote_reason_container}>Reason: {reason}</VStack>
+    <VStack className="overflow-x-hidden text-xs font-medium whitespace-pre-wrap text-secondary break-words scrollbar-hide sm:pt-0 sm:h-fit">
+      Reason: {reason}
+    </VStack>
   );
 }
 

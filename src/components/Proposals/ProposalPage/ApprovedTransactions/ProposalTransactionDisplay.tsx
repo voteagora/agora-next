@@ -29,9 +29,9 @@ const ProposalTransactionDisplay = ({
   const [collapsed, setCollapsed] = useState(true);
   return (
     <div>
-      <div className="flex flex-col border border-b-0 rounded-t-lg border-[#e0e0e0] bg-gray-fa p-4 text-xs text-stone-700 font-mono break-words overflow-hidden">
+      <div className="flex flex-col border border-b-0 rounded-t-lg border-[#e0e0e0] bg-gray-fa p-4 text-xs text-secondary font-mono break-words overflow-hidden">
         <div className="w-full flex items-center justify-between">
-          <span className="text-xs text-stone-400">Proposed transactions</span>
+          <span className="text-xs text-tertiary">Proposed transactions</span>
           {executedTransactionHash && (
             <a
               href={getBlockScanUrl(executedTransactionHash)}
@@ -54,7 +54,7 @@ const ProposalTransactionDisplay = ({
         ))}
       </div>
       <div
-        className="border border-[#e0e0e0] rounded-b-lg bg-gray-fa p-4 cursor-pointer text-xs text-stone-400 font-mono"
+        className="border border-[#e0e0e0] rounded-b-lg bg-gray-fa p-4 cursor-pointer text-xs text-tertiary font-mono"
         onClick={() => {
           setCollapsed(!collapsed);
         }}
