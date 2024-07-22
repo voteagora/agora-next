@@ -72,7 +72,7 @@ export default async function DraftProposalPage({
               index={stageIndex}
             />
           )}
-          <h1 className="font-black text-stone-900 text-2xl m-0">
+          <h1 className="font-black text-primary text-2xl m-0">
             {stageMetadata?.title}
           </h1>
           <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">

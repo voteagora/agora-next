@@ -8,13 +8,13 @@ export interface InputProps
     VariantProps<typeof inputVariants> {}
 
 const inputVariants = cva(
-  "flex h-11 w-full rounded-md border focus:ring-transparent focus:border-input focus:outline-none ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  "flex h-11 w-full rounded-md border focus:ring-transparent focus:border-line focus:outline-none ring-offset-line file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "border-input bg-gray-fa",
-        none: "border-none bg-gray-fa",
-        bgGray100: "border-input bg-gray-100",
+        default: "border-line bg-wash",
+        none: "border-none bg-wash",
+        bgGray100: "border-line bg-wash",
       },
       inputSize: {
         default: "px-3 py-2",

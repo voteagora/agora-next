@@ -47,7 +47,7 @@ const SocialProposalForm = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-stone-900 font-semibold">
+        <h3 className="text-primary font-semibold">
           Voting strategy and choices
         </h3>
         <p className="mt-2 stone-700">

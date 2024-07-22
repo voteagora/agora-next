@@ -1,14 +1,13 @@
 import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
-import styles from "./delegateCard.module.scss";
 import DelegateCardClient from "./DelegateCardClient";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
-    <div className={`flex flex-col ${styles.container}`}>
-      <div className={`flex flex-col ${styles.card}`}>
-        <div className={`flex flex-col items-stretch ${styles.image}`}>
+    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
+      <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">
+        <div className="flex flex-col items-stretch p-6 border-b border-line">
           <DelegateProfileImage
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
@@ -18,7 +17,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
           />
         </div>
 
-        <div className={styles.content}>
+        <div className="flex flex-col p-6">
           <div className="flex flex-col gap-4">
             <PanelRow
               title="Proposals Voted"
@@ -68,8 +67,7 @@ export const PanelRow = ({
   return (
     <div className="flex flex-row gap-2 justify-between items-center">
       <span className="whitespace-nowrap">{title}</span>
-
-      <span className={styles.row}>{detail}</span>
+      <span className="text-right text-sm text-theme-700">{detail}</span>
     </div>
   );
 };

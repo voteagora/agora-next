@@ -52,13 +52,13 @@ export default function VoterHoverCard({
         <VStack gap={4} className="h-full w-[300px] p-2">
           <VStack gap={4} justifyContent="justify-center">
             <HStack gap={4} justifyContent="justify-start">
-              <div className="w-14 h-14 rounded-full bg-gray-300 animate-pulse" />
+              <div className="w-14 h-14 rounded-full bg-line animate-pulse" />
               <VStack gap={2} justifyContent="justify-center">
-                <div className="w-24 h-4 rounded-md bg-gray-300 animate-pulse" />
-                <div className="w-12 h-4 rounded-md bg-gray-300 animate-pulse" />
+                <div className="w-24 h-4 rounded-md bg-line animate-pulse" />
+                <div className="w-12 h-4 rounded-md bg-line animate-pulse" />
               </VStack>
             </HStack>
-            <div className="w-full h-12 rounded-md bg-gray-300 animate-pulse" />
+            <div className="w-full h-12 rounded-md bg-line animate-pulse" />
           </VStack>
         </VStack>
       ) : (
@@ -71,7 +71,7 @@ export default function VoterHoverCard({
                 votingPower={!!delegate ? delegate.votingPower.total : "0"}
               />
               <p
-                className={`break-words text-gray-600 overflow-hidden line-clamp-2 text-ellipsis`}
+                className={`break-words text-secondary overflow-hidden line-clamp-2 text-ellipsis`}
               >
                 {truncatedStatement}
               </p>

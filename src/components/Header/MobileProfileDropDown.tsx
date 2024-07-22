@@ -11,7 +11,6 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
-import styles from "./header.module.scss";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
@@ -35,7 +34,7 @@ const MobileValueWrapper = ({
   isLoading: boolean;
 }) =>
   isLoading ? (
-    <div className="animate-pulse bg-gray-af h-5 w-[90px] rounded-2xl"></div>
+    <div className="animate-pulse bg-primary/30 h-5 w-[90px] rounded-2xl"></div>
   ) : (
     <div className="text-base">{children}</div>
   );
@@ -74,7 +73,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
             <Popover.Panel>
               {({ close }) => (
                 <motion.div
-                  className={styles.mobile__container}
+                  className="bg-neutral py-8 px-6 rounded-t-lg w-full fixed bottom-0 left-0"
                   initial="hidden"
                   animate="show"
                   exit="exit"
@@ -96,16 +95,14 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       <VStack className={"flex-1"}>
                         {ensName ? (
                           <>
-                            <span className={styles.mobile__ens}>
-                              {ensName}
-                            </span>
-                            <span className={styles.mobile__address}>
+                            <span className="text-base">{ensName}</span>
+                            <span className="text-xs text-secondary">
                               {shortAddress(address!)}
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className={styles.mobile__ens}>
+                            <span className="text-base">
                               {shortAddress(address!)}
                             </span>
                           </>
@@ -166,7 +163,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     />
 
                     {isLoading ? (
-                      <div className="animate-pulse bg-gray-af h-[50px] mt-1 w-full rounded-2xl"></div>
+                      <div className="animate-pulse bg-primary/30 h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
                       <>
                         {canCreateDelegateStatement && (
@@ -174,7 +171,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                                className="rounded-lg border py-3 px-2 text-primary/30 bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -182,7 +179,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 text-gray-200 bg-black flex justify-center mt-1 hover:bg-gray-800"
+                                className="rounded-lg border py-3 px-2 text-primary/30 bg-black flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Create delegate statement
@@ -195,7 +192,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                           <Link
                             href={`/delegates/${ensName ?? address}`}
                             onClick={() => close()}
-                            className="rounded-lg border py-3 px-2 text-black bg-white mt-1 flex justify-center hover:bg-gray-800 hover:text-white"
+                            className="rounded-lg border py-3 px-2 text-primary bg-neutral mt-1 flex justify-center hover:bg-wash"
                           >
                             View my profile
                           </Link>

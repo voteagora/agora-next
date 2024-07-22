@@ -187,7 +187,7 @@ const ExecutableProposalForm = () => {
 
   return (
     <div>
-      <h3 className="text-stone-900 font-semibold">Proposed transactions</h3>
+      <h3 className="text-primary font-semibold">Proposed transactions</h3>
       <p className="mt-2 stone-700">
         Proposed transactions will execute after a proposal passes and then gets
         executed.
