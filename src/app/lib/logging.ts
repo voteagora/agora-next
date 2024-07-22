@@ -24,12 +24,14 @@ export const time_this = async <T>(
     throw error;
   } finally {
     const end = performance.now();
-    // console.log(
-    //   util.inspect(
-    //     { ...log_fields, time: end - start },
-    //     { showHidden: false, depth: null, colors: !log_emission }
-    //   )
-    // );
+    if (!process.env.NEXT_PUBLIC_MUTE_QUERY_LOGGING) {
+      console.log(
+        util.inspect(
+          { ...log_fields, time: end - start },
+          { showHidden: false, depth: null, colors: !log_emission }
+        )
+      );
+    }
   }
 };
 
@@ -44,12 +46,14 @@ export const time_this_sync = <T>(
     throw error;
   } finally {
     const end = performance.now();
-    // console.log(
-    //   util.inspect(
-    //     { ...log_fields, time: end - start },
-    //     { showHidden: false, depth: null, colors: !log_emission }
-    //   )
-    // );
+    if (!process.env.NEXT_PUBLIC_MUTE_QUERY_LOGGING) {
+      console.log(
+        util.inspect(
+          { ...log_fields, time: end - start },
+          { showHidden: false, depth: null, colors: !log_emission }
+        )
+      );
+    }
   }
 };
 
