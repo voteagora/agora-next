@@ -52,11 +52,6 @@ export async function fetchDirectDelegatee(addressOrENSName: string) {
   return apiFetchDirectDelegatee(addressOrENSName);
 }
 
-// Pass address of the connected wallet
-export async function getProxyAddress(addressOrENSName: string) {
-  return fetchProxy(addressOrENSName);
-}
-
 export async function submitDelegateStatement({
   address,
   delegateStatement,
@@ -93,8 +88,11 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
   return apiFetchCurrentDelegatees(addressOrENSName);
 }
 
-export async function fetchCurrentDelegators(addressOrENSName: string) {
-  return apiFetchCurrentDelegators(addressOrENSName);
+export async function fetchCurrentDelegators(
+  addressOrENSName: string,
+  page = 1
+) {
+  return apiFetchCurrentDelegators(addressOrENSName, page);
 }
 
 // TODO temporary fetch all query - optimization via API needed

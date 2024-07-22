@@ -5,6 +5,7 @@ import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /**
@@ -21,188 +22,165 @@ async function getCurrentDelegateesForAddress({
 }): Promise<Delegation[]> {
   const { namespace, contracts } = Tenant.current();
 
-  const advancedDelegatees = await prisma[
-    `${namespace}AdvancedDelegatees`
-  ].findMany({
-    where: {
-      from: address.toLowerCase(),
-      delegated_amount: { gt: 0 },
-      contract: contracts.alligator?.address,
-    },
-  });
+  const getDirectDelegatee = async () => {
+    const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
+      where: { delegator: address.toLowerCase() },
+    });
 
-  // const directDelegatee = await (async () => {
-  //   const [proxyAddress, delegatee] = await Promise.all([
-  //     getProxyAddress(address),
-  //     prisma.delegatees.findFirst({
-  //       where: { delegator: address.toLowerCase() },
-  //     }),
-  //   ]);
+    if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+      const proxyAddress = await getProxyAddress(address);
+      if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
+        return null;
+      }
+    }
+    return delegatee;
+  };
 
-  //   if (
-  //     proxyAddress &&
-  //     delegatee &&
-  //     delegatee.delegatee === proxyAddress.toLowerCase()
-  //   ) {
-  //     return null;
-  //   }
-
-  //   return delegatee;
-  // })();
+  const [advancedDelegatees, directDelegatee] = await Promise.all([
+    prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        from: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator?.address,
+      },
+    }),
+    getDirectDelegatee(),
+  ]);
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  // const advancedVotingPower = await prisma.advancedVotingPower.findFirst({
-  //   where: {
-  //     delegate: address.toLowerCase(),
-  //   },
-  // });
-
-  // // TODO: These needs to be ordered by timestamp
-
-  // console.log(address);
-  // console.log({
-  //   advancedVotingPower,
-  //   advancedDelegatees,
-  //   directDelegatee,
-  // });
-
-  return [
-    // ...(advancedVotingPower
-    //   ? [
-    //       {
-    //         from: address,
-    //         to: address,
-    //         allowance: advancedVotingPower.advanced_vp.toFixed(0),
-    //         timestamp: null,
-    //         type: "ADVANCED",
-    //         amount:
-    //           BigInt(advancedVotingPower.delegated_vp.toFixed(0)) > 0n
-    //             ? "PARTIAL"
-    //             : "FULL",
-    //       },
-    //     ]
-    //   : []),
-    // ...(directDelegatee
-    //   ? [
-    //       {
-    //         from: directDelegatee.delegator,
-    //         to: directDelegatee.delegatee,
-    //         allowance: directDelegatee.balance.toFixed(),
-    //         timestamp: latestBlock
-    //           ? getHumanBlockTime(
-    //               directDelegatee.block_number,
-    //               latestBlock.number,
-    //               latestBlock.timestamp
-    //             )
-    //           : null,
-    //         type: "DIRECT",
-    //         amount: "FULL",
-    //       },
-    //     ]
-    //   : []),
-    ...advancedDelegatees.map((advancedDelegatee) => ({
+  const advancedDelegateesData = advancedDelegatees.map(
+    (advancedDelegatee) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      timestamp: latestBlock?.number
+      timestamp: latestBlock
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
       type: "ADVANCED" as const,
       amount:
-        Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
+        Number(advancedDelegatee.delegated_share.toFixed(3)) === 1
           ? ("FULL" as const)
           : ("PARTIAL" as const),
       transaction_hash: advancedDelegatee.transaction_hash || "",
-    })),
-  ];
+    })
+  );
+
+  const directDelegateeData = directDelegatee && {
+    from: directDelegatee.delegator,
+    to: directDelegatee.delegatee,
+    allowance: directDelegatee.balance.toFixed(),
+    timestamp: latestBlock
+      ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
+      : null,
+    type: "DIRECT" as const,
+    amount: "FULL" as const,
+    transaction_hash: "",
+  };
+
+  return directDelegateeData
+    ? [directDelegateeData, ...advancedDelegateesData]
+    : advancedDelegateesData;
 }
 
 /**
  * Delegators for a given address (addresses delegating to the given address)
  * @param addressOrENSName
  */
-const getCurrentDelegators = (addressOrENSName: string) =>
-  addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName);
+const getCurrentDelegators = (addressOrENSName: string, page?: number) =>
+  addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName, {
+    page,
+  });
 
 async function getCurrentDelegatorsForAddress({
   address,
+  page = 1,
 }: {
   address: string;
-}) {
+  page?: number;
+}): Promise<PaginatedResult<Delegation[]>> {
   const { namespace, contracts } = Tenant.current();
+  const pageSize = 20;
 
-  const advancedDelegators = prisma[`${namespace}AdvancedDelegatees`].findMany({
-    where: {
-      to: address.toLowerCase(),
-      delegated_amount: { gt: 0 },
-      contract: contracts.alligator?.address,
-    },
-  });
+  const [advancedDelegators, directDelegators, latestBlock] = await Promise.all(
+    [
+      (() =>
+        page == 1
+          ? prisma[`${namespace}AdvancedDelegatees`].findMany({
+              where: {
+                to: address.toLowerCase(),
+                delegated_amount: { gt: 0 },
+                contract: contracts.alligator?.address,
+              },
+            })
+          : [])(),
+      (async () => {
+        return paginateResult(
+          async (skip: number, take: number) => {
+            return prisma.$queryRawUnsafe<
+              {
+                delegator: string;
+                delegatee: string;
+                block_number: bigint;
+                transaction_hash: string;
+              }[]
+            >(
+              `
+            SELECT *
+            FROM (
+              SELECT
+                delegator,
+                to_delegate AS delegatee,
+                block_number,
+                transaction_hash,
+                log_index,
+                transaction_index,
+                address
+              FROM
+                ${namespace}.delegate_changed_events
+              WHERE
+                to_delegate = $1 AND address = $2
+              ORDER BY
+                block_number DESC,
+                log_index DESC,
+                transaction_index DESC
+            ) t1
+            WHERE NOT EXISTS (
+                SELECT
+                  1
+                FROM
+                  ${namespace}.delegate_changed_events t2
+                WHERE
+                  t2.delegator = t1.delegator AND t2.address = t1.address
+                  AND (t2.block_number > t1.block_number
+                  OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index)))
+            ORDER BY
+              block_number DESC,
+              log_index DESC,
+              transaction_index DESC
+            OFFSET $3
+            LIMIT $4;
+            `,
+              address,
+              contracts.token.address.toLowerCase(),
+              skip,
+              take
+            );
+          },
+          page,
+          pageSize
+        );
+      })(),
+      contracts.token.provider.getBlock("latest"),
+    ]
+  );
 
-  // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
-  // const directDelegators = (async () => {
-  //   const proxyAddress = await getProxyAddress(address);
-  //   if (!proxyAddress) {
-  //     return [];
-  //   }
-  //   return prisma.$queryRaw<Prisma.DelegateesGetPayload<true>[]>(
-  //     Prisma.sql`
-  //     SELECT *
-  //     FROM (
-  //     SELECT
-  //       delegator,
-  //       delegatee,
-  //       block_number
-  //     FROM (
-  //       SELECT
-  //           delegator,
-  //           to_delegate as delegatee,
-  //           block_number,
-  //           ROW_NUMBER() OVER (PARTITION BY delegator ORDER BY block_number DESC, log_index DESC, transaction_index DESC) as rn
-  //       FROM optimism.delegate_changed_events
-  //       WHERE to_delegate=${address.toLowerCase()}
-  //     ) t1
-  //     WHERE rn=1
-  //     ) t2
-  //     LEFT JOIN LATERAL (
-  //       SELECT
-  //         COALESCE(SUM(
-  //           CASE WHEN "from"=delegator THEN -"value"::NUMERIC ELSE "value"::NUMERIC END
-  //         ), 0) AS balance
-  //       FROM optimism.transfer_events
-  //       WHERE "from"=delegator OR "to"=delegator
-  //     ) t3 ON TRUE
-  //     `
-  //   );
-  // })();
-
-  const latestBlock = await contracts.token.provider.getBlock("latest");
-
-  // TODO: These needs to be ordered by timestamp
-
-  return [
-    // KENT: Commented out Direct delegations, needs to be paginated and optimized for prod
-    // ...(await directDelegators).map((directDelegator) => ({
-    //   from: directDelegator.delegator,
-    //   to: directDelegator.delegatee,
-    //   allowance: directDelegator.balance.toFixed(0),
-    //   timestamp: latestBlock
-    //     ? getHumanBlockTime(
-    //         directDelegator.block_number,
-    //         latestBlock.number,
-    //         latestBlock.timestamp
-    //       )
-    //     : null,
-    //   type: "DIRECT",
-    //   amount: "FULL",
-    // })),
-
-    ...(await advancedDelegators).map((advancedDelegator) => ({
+  const advancedDelegatorsData = advancedDelegators.map(
+    (advancedDelegator) => ({
       from: advancedDelegator.from,
       to: advancedDelegator.to,
       allowance: advancedDelegator.delegated_amount.toFixed(0),
-      timestamp: latestBlock?.number
+      timestamp: latestBlock
         ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
         : null,
       type: "ADVANCED" as const,
@@ -211,8 +189,76 @@ async function getCurrentDelegatorsForAddress({
           ? ("FULL" as const)
           : ("PARTIAL" as const),
       transaction_hash: advancedDelegator.transaction_hash || "",
-    })),
-  ];
+    })
+  );
+
+  const directDelegatorsData = await Promise.all(
+    directDelegators.data.map(async (directDelegator) => ({
+      from: directDelegator.delegator,
+      to: directDelegator.delegatee,
+      allowance: (
+        await contracts.token.contract.balanceOf(directDelegator.delegator)
+      ).toString(),
+      timestamp: latestBlock
+        ? getHumanBlockTime(directDelegator.block_number, latestBlock)
+        : null,
+      type: "DIRECT" as const,
+      amount: "FULL" as const,
+      transaction_hash: directDelegator.transaction_hash,
+    }))
+  );
+
+  const filteredDirectDelegatorsData = directDelegatorsData.filter(
+    (delegator) => BigInt(delegator.allowance) > BigInt(1e15) // filter out delegators with 0 (or close to 0) balance
+  );
+
+  return {
+    meta: directDelegators.meta,
+    data: [...advancedDelegatorsData, ...filteredDirectDelegatorsData],
+  };
+}
+
+/**
+ * Advanced delegators for a given address (addresses delegating to the given address)
+ * @param addressOrENSName
+ */
+
+const getCurrentAdvancedDelegators = (addressOrENSName: string) =>
+  addressOrEnsNameWrap(
+    getCurrentAdvancedDelegatorsForAddress,
+    addressOrENSName
+  );
+
+async function getCurrentAdvancedDelegatorsForAddress(
+  address: string
+): Promise<Delegation[]> {
+  const { namespace, contracts } = Tenant.current();
+
+  const [advancedDelegators, latestBlock] = await Promise.all([
+    prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        to: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator?.address,
+      },
+    }),
+    contracts.token.provider.getBlock("latest"),
+  ]);
+
+  return advancedDelegators.map((advancedDelegator) => ({
+    from: advancedDelegator.from,
+    to: advancedDelegator.to,
+    allowance: advancedDelegator.delegated_amount.toFixed(0),
+    timestamp: latestBlock
+      ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+      : null,
+    type: "ADVANCED",
+    amount:
+      Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+        ? "FULL"
+        : "PARTIAL",
+    transaction_hash: advancedDelegator.transaction_hash || "",
+  }));
 }
 
 /**
@@ -272,3 +318,6 @@ export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
 export const fetchCurrentDelegators = cache(getCurrentDelegators);
 export const fetchDirectDelegatee = cache(getDirectDelegatee);
 export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains);
+export const fetchCurrentAdvancedDelegators = cache(
+  getCurrentAdvancedDelegators
+);

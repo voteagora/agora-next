@@ -131,7 +131,15 @@ export default async function Page({
           </>
         )}
 
-        <DelegationsContainer delegatees={delegates} delegators={delegators} />
+        <DelegationsContainer
+          delegatees={delegates}
+          initialDelegators={delegators}
+          fetchDelegators={async (page: number) => {
+            "use server";
+
+            return fetchCurrentDelegators(addressOrENSName, page);
+          }}
+        />
         {tenantSupportsSnapshotVote ? (
           <VotesContainer
             onchainVotes={

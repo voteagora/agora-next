@@ -11,7 +11,7 @@ export async function getProxyAddress(address: string) {
   if (contracts.alligator) {
     return contracts.alligator.contract.proxyAddress(address);
   } else {
-    throw new Error("Can't find Agora Instance token");
+    return null;
   }
 }
 
