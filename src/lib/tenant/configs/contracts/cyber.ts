@@ -9,11 +9,42 @@ import { scroll } from "viem/chains";
 
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { JsonRpcProvider } from "ethers";
+import { defineChain } from "viem";
 
 interface Props {
   isProd: boolean;
   alchemyId: string;
 }
+
+export const cyber = defineChain({
+  id: 7560,
+  name: "Cyber",
+  network: "cyber",
+  nativeCurrency: { name: "Cyber", symbol: "CYBER", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.cyber.co"],
+      webSocket: ["wss://rpc.cyber.co"],
+    },
+    public: {
+      http: ["https://cyber.alt.technology"],
+      webSocket: ["wss://cyber-ws.alt.technology"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Cyberscan",
+      url: "https://cyberscan.co",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xca11bde05977b3631167028862be2a173976ca11",
+      blockCreated: 14,
+    },
+  },
+  testnet: false,
+});
 
 export const cyberTenantConfig = ({
   isProd,
@@ -29,7 +60,7 @@ export const cyberTenantConfig = ({
       ? "https://cyber.alt.technology"
       : "https://cyber-testnet.alt.technology/"
   );
-  const chain = scroll;
+  const chain = cyber;
 
   return {
     token: new TenantContract<ITokenContract>({
