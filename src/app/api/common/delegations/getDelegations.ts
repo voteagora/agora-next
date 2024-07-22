@@ -139,7 +139,8 @@ async function getCurrentDelegatorsForAddress({
                 block_number,
                 transaction_hash,
                 log_index,
-                transaction_index
+                transaction_index,
+                address
               FROM
                 ${namespace}.delegate_changed_events
               WHERE
@@ -155,9 +156,9 @@ async function getCurrentDelegatorsForAddress({
                 FROM
                   ${namespace}.delegate_changed_events t2
                 WHERE
-                  t2.delegator = t1.delegator
-                  AND t2.block_number > t1.block_number
-                  OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index))
+                  t2.delegator = t1.delegator AND t2.address = t1.address
+                  AND (t2.block_number > t1.block_number
+                  OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index)))
             ORDER BY
               block_number DESC,
               log_index DESC,
@@ -178,6 +179,8 @@ async function getCurrentDelegatorsForAddress({
       contracts.token.provider.getBlock("latest"),
     ]
   );
+
+  console.log("directDelegators", directDelegators);
 
   return {
     meta: directDelegators.meta,
