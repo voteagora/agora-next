@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-
-import styles from "./needsMyVoteProposalLists.module.scss";
 import { VStack } from "@/components/Layout/Stack";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import Proposal from "../Proposal/Proposal";
-
 import { useAccount } from "wagmi";
 
 export default function NeedsMyVoteProposalsList({
@@ -34,11 +31,11 @@ export default function NeedsMyVoteProposalsList({
   return (
     <>
       {isConnected && proposals.length > 0 && (
-        <VStack className={styles.proposals_list_container}>
+        <VStack className="max-w-[76rem]">
           <PageHeader headerText="Needs my vote" />
 
-          <VStack className={styles.proposals_table_container}>
-            <div className={styles.proposals_table}>
+          <VStack className="border border-line rounded-xl shadow-newDefault overflow-hidden mb-6">
+            <div>
               {proposals.map((proposal) => (
                 <Proposal
                   key={`${proposal.id}_${proposal.status}`}

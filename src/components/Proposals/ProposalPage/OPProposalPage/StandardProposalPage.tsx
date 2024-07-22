@@ -1,5 +1,4 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import styles from "./StandardProposalPage.module.scss";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import StandardProposalDelete from "./StandardProposalDelete";
 import { fetchProposalVotes } from "@/app/proposals/actions";
@@ -18,9 +17,7 @@ export default async function StandardProposalPage({
   const proposalVotes = await fetchProposalVotes(proposal.id);
 
   return (
-    <div
-      className={`flex gap-16 justify-between items-start ${styles.proposal_container}`}
-    >
+    <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
       <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
       <div>
         {isAlligator && <StandardProposalDelete proposal={proposal} />}

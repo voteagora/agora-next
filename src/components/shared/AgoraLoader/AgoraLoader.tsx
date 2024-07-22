@@ -1,23 +1,27 @@
 import logo from "@/assets/agora_logo.svg";
 import Image from "next/image";
-import styles from "./agoraLoader.module.scss";
+import { VStack } from "@/components/Layout/Stack";
 
 export default function AgoraLoader() {
   return (
-    <div
-      className={`flex flex-col justify-center items-center ${styles.loading_container}`}
+    <VStack
+      justifyContent="justify-center"
+      alignItems="items-center"
+      className="min-h-screen animate-pulse"
     >
       <Image alt="loading" width={24} height={24} src={logo} />
-    </div>
+    </VStack>
   );
 }
 
 export function AgoraLoaderSmall() {
   return (
-    <div
-      className={`flex flex-col justify-center items-center ${styles.loading_container__small}`}
+    <VStack
+      justifyContent="justify-center"
+      alignItems="items-center"
+      className="w-full h-full animate-pulse"
     >
       <Image alt="loading" width={24} height={24} src={logo} />
-    </div>
+    </VStack>
   );
 }

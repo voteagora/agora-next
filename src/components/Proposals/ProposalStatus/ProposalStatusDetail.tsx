@@ -21,7 +21,7 @@ export default function ProposalStatusDetail({
     <HStack
       justifyContent="justify-between"
       alignItems="items-center"
-      className="bg-gray-fa border-t -mx-4 px-4 py-2 text-gray-4f rounded-b-md text-xs"
+      className="bg-wash border-t -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs"
     >
       <div>
         {proposalStatus === "ACTIVE" && (

@@ -69,6 +69,9 @@ export default async function Page({ searchParams }) {
     ...(searchParams.stakeholderFilter && {
       stakeholders: searchParams.stakeholderFilter,
     }),
+    ...(searchParams.endorsedFilter && {
+      endorsed: searchParams.endorsedFilter,
+    }),
   };
 
   const tab = searchParams.tab;

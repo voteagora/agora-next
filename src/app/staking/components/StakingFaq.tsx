@@ -1,7 +1,7 @@
 export default function StakingFaq() {
   return (
     <div className="mt-10 font-inter">
-      <h1 className="font-black text-2xl text-black">FAQ</h1>
+      <h1 className="font-black text-2xl text-primary">FAQ</h1>
       <div className="mt-[18px]">
         <h2 className="font-semibold mt-4 ">What is Uniswap staking?</h2>
         <p className="mt-2">
@@ -14,7 +14,7 @@ export default function StakingFaq() {
           governance participants.
         </p>
 
-        <h2 className="font-semibold mt-8">
+        <h2 className="font-semibold mt-8 text-primary">
           How do I find out more about delegates and the governance process in
           general?
         </h2>
@@ -47,7 +47,9 @@ export default function StakingFaq() {
           documentation.
         </p>
 
-        <h2 className="font-semibold mt-8">Which pools earn fees?</h2>
+        <h2 className="font-semibold mt-8 text-primary">
+          Which pools earn fees?
+        </h2>
         <p className="mt-2">
           Currently, fees have not yet been turned on, so no rewards will accrue
           to stakers just yet. The roll-out of protocol fees will be incremental

@@ -35,10 +35,10 @@ export function SuccessView({
         />
       </div>
 
-      <h1 className="mt-4 mb-2 text-2xl font-extrabold">
+      <h1 className="mt-4 mb-2 text-2xl font-extrabold text-primary">
         You&apos;ve delegated your votes!
       </h1>
-      <p className="text-gray-700">
+      <p className="text-secondary">
         Your delegation has been submitted successfully and now being indexed...
         (this can take up to 2 minutes). Actual amount of tokens delegated can
         be slightly different due to{" "}
