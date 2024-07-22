@@ -16,6 +16,12 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+/**
+ * TODO:
+ * It seems unlikely any other tenants are going to be using github PR as a step in their proposal process
+ * So I don't feel like it's worth the effort to make this a generic component.
+ * So, keep in mind that currently this component (and the github actions) are tightly coupled to the ENS tenant.
+ */
 const GithubPRForm = ({
   draftProposal,
 }: {

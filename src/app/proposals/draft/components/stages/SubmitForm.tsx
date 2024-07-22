@@ -5,13 +5,12 @@ import {
   ProposalSocialOption,
   ProposalChecklist,
 } from "@prisma/client";
-import { useContractRead, useAccount, useBlockNumber } from "wagmi";
-import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
-import Tenant from "@/lib/tenant/tenant";
+import { useAccount, useBlockNumber } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
+import { useGetVotes } from "@/hooks/useGetVotes";
 
 const Actions = ({
   proposalDraft,
@@ -24,17 +23,10 @@ const Actions = ({
 }) => {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useContractRead({
-    abi: ENSGovernorABI,
-    address: Tenant.current().contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    chainId: Tenant.current().contracts.governor.chain.id,
-    args: [
-      address as `0x${string}`,
-      blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    ],
+  const { data: accountVotesData } = useGetVotes({
+    address: address as `0x${string}`,
+    blockNumber: blockNumber || BigInt(0),
   });
-
   const { data: threshold } = useProposalThreshold();
 
   const hasEnoughVotes =

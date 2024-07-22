@@ -7,7 +7,6 @@ import Tenant from "@/lib/tenant/tenant";
 import { createSnapshot } from "../../draft/utils/createSnapshot";
 import { ProposalType } from "../../../proposals/draft/types";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import { useAccount } from "wagmi";
 import {
   ProposalDraft,
@@ -25,24 +24,24 @@ const SponsorActions = ({
     social_options: ProposalSocialOption[];
   };
 }) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const { contracts, isProd } = Tenant.current();
   const [isSnapshotPending, setIsSnapshotPending] = useState<boolean>(false);
   const openDialog = useOpenDialog();
   const { address } = useAccount();
   const { inputData } = getInputData(draftProposal);
+
+  // TODO: needs to be configured to use the correct governor
   const { config } = usePrepareContractWrite({
     address: contracts.governor.address as `0x${string}`,
     chainId: contracts.governor.chain.id,
-    abi: ENSGovernorABI,
+    abi: contracts.governor.abi,
     functionName: "propose",
     args: inputData,
   });
 
-  const {
-    data,
-    writeAsync,
-    isLoading: isWriteLoading,
-  } = useContractWrite(config);
+  const { writeAsync, isLoading: isWriteLoading } = useContractWrite(config);
 
   return (
     <div className="mt-6">
@@ -59,8 +58,9 @@ const SponsorActions = ({
                 proposal: draftProposal,
               });
 
+              // TODO: make snapshot pull from config
               const snapshotLink = isProd
-                ? `https://snapshot.org/#/ens.eth/proposal/${proposalId}`
+                ? `https://snapshot.org/#/${plmToggle?.config?.snapshotConfig?.domain}/proposal/${proposalId}`
                 : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
 
               await sponsorDraftProposal({
