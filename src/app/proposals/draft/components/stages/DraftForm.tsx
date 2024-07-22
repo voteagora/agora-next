@@ -24,6 +24,8 @@ import {
 } from "@prisma/client";
 import BasicProposalForm from "../BasicProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
+import ApprovalProposalForm from "../ApprovalProposalForm";
+import OptimisticProposalForm from "../OptimisticProposalForm";
 import SwitchInput from "../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -138,6 +140,10 @@ const DraftForm = ({
           <FormCard.Section>
             {proposalType === ProposalType.BASIC && <BasicProposalForm />}
             {proposalType === ProposalType.SOCIAL && <SocialProposalForm />}
+            {proposalType === ProposalType.APPROVAL && <ApprovalProposalForm />}
+            {proposalType === ProposalType.OPTIMISIC && (
+              <OptimisticProposalForm />
+            )}
           </FormCard.Section>
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">
