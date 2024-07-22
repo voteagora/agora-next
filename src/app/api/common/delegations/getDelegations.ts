@@ -180,8 +180,6 @@ async function getCurrentDelegatorsForAddress({
     ]
   );
 
-  console.log("directDelegators", directDelegators);
-
   return {
     meta: directDelegators.meta,
     data: [
