@@ -75,7 +75,7 @@ async function getCurrentDelegateesForAddress({
       : null,
     type: "DIRECT" as const,
     amount: "FULL" as const,
-    transaction_hash: "",
+    transaction_hash: directDelegatee.transaction_hash || "",
   };
 
   return directDelegateeData
