@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./delegateVotes.module.scss";
 import { pluralizeSnapshotVote } from "@/lib/tokenUtils";
 
 const propHeader = (vote: any) => {
@@ -82,8 +81,8 @@ export default function SnapshotVotes({
         (vote: any, idx: number) =>
           vote && (
             <div key={`vote-${idx}`}>
-              <div className={styles.details_container}>
-                <VStack className={styles.details_sub}>
+              <div>
+                <VStack className="py-4 px-6">
                   <div className="flex flex-row justify-between">
                     <div className="flex flex-col flex-1 pr-4">
                       <span className="text-[#66676b] text-xs font-medium">
