@@ -4,12 +4,17 @@ import { cache } from "react";
 
 async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
-  const totalSupply = await contracts.token.contract.totalSupply();
-  const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
+  // const totalSupply = await contracts.token.contract.totalSupply();
+  // const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
+  //
+  // return {
+  //   votableSupply: votableSupply?.votable_supply || "0",
+  //   totalSupply: totalSupply.toString(),
+  // };
 
   return {
-    votableSupply: votableSupply?.votable_supply || "0",
-    totalSupply: totalSupply.toString(),
+    votableSupply: "0",
+    totalSupply: "0",
   };
 }
 
