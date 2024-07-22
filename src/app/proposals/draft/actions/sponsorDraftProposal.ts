@@ -37,7 +37,7 @@ export async function onSubmitAction(
         id: data.draftProposalId,
       },
       data: {
-        stage: ProposalStage.PENDING,
+        stage: nextStage?.stage,
         ...(parsed.data.snapshot_link && {
           snapshot_link: parsed.data.snapshot_link,
         }),
