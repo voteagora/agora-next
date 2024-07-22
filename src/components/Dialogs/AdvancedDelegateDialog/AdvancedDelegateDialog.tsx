@@ -110,7 +110,7 @@ export function AdvancedDelegateDialog({
 
       setAllowance(initAllowance);
       setDelegatees(delegatees);
-      setProxyAddress(proxyAddress);
+      setProxyAddress(proxyAddress || "");
 
       setIsReady(true);
     } catch (error) {

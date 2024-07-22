@@ -25,6 +25,7 @@ import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialo
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { StakedDeposit } from "@/lib/types";
+import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 
 export type DialogType =
   | DelegateDialogType
@@ -59,9 +60,7 @@ export type AdvancedDelegateDialogType = {
   type: "ADVANCED_DELEGATE";
   params: {
     target: string;
-    fetchAllForAdvancedDelegation: (
-      address: string
-    ) => Promise<[string, boolean, Delegation[], string, Delegation[], bigint]>;
+    fetchAllForAdvancedDelegation: typeof fetchAllForAdvancedDelegation;
   };
 };
 
