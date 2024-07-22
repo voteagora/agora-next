@@ -5,47 +5,45 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { mainnet, sepolia } from "viem/chains";
+import { scroll } from "viem/chains";
+
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 interface Props {
   isProd: boolean;
   alchemyId: string;
 }
 
-export const ensTenantContractConfig = ({
+export const cyberTenantConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
-    ? "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72"
-    : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67";
-
+  const TOKEN = isProd ? " " : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
   const GOVERNOR = isProd
-    ? "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
-    : "0xb65c031ac61128ae791d42ae43780f012e2f7f89";
+    ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"
+    : "0x741005a136766e6e03ed8a7cc32d6a91241e5bf5";
 
-  const provider = isProd
-    ? new AlchemyProvider("mainnet", alchemyId)
-    : new AlchemyProvider("sepolia", alchemyId);
-
-  const chain = isProd ? mainnet : sepolia;
+  const provider = new JsonRpcProvider(
+    isProd
+      ? "https://cyber.alt.technology"
+      : "https://cyber-testnet.alt.technology/"
+  );
+  const chain = scroll;
 
   return {
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain: mainnet,
+      chain,
       contract: EtherfiToken__factory.connect(TOKEN, provider),
       provider,
     }),
 
-    // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
       abi: [],
       address: GOVERNOR,
-      chain: mainnet,
+      chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
