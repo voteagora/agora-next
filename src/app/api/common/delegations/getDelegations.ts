@@ -174,43 +174,46 @@ async function getCurrentDelegatorsForAddress({
     ]
   );
 
+  const advancedDelegatorsData = advancedDelegators.map(
+    (advancedDelegator) => ({
+      from: advancedDelegator.from,
+      to: advancedDelegator.to,
+      allowance: advancedDelegator.delegated_amount.toFixed(0),
+      timestamp: latestBlock
+        ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+        : null,
+      type: "ADVANCED" as const,
+      amount:
+        Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+          ? ("FULL" as const)
+          : ("PARTIAL" as const),
+      transaction_hash: advancedDelegator.transaction_hash || "",
+    })
+  );
+
+  const directDelegatorsData = await Promise.all(
+    directDelegators.data.map(async (directDelegator) => ({
+      from: directDelegator.delegator,
+      to: directDelegator.delegatee,
+      allowance: (
+        await contracts.token.contract.balanceOf(directDelegator.delegator)
+      ).toString(),
+      timestamp: latestBlock
+        ? getHumanBlockTime(directDelegator.block_number, latestBlock)
+        : null,
+      type: "DIRECT" as const,
+      amount: "FULL" as const,
+      transaction_hash: directDelegator.transaction_hash,
+    }))
+  );
+
+  const filteredDirectDelegatorsData = directDelegatorsData.filter(
+    (delegator) => BigInt(delegator.allowance) > BigInt(1e15) // filter out delegators with 0 (or close to 0) balance
+  );
+
   return {
     meta: directDelegators.meta,
-    data: [
-      ...advancedDelegators.map((advancedDelegator) => ({
-        from: advancedDelegator.from,
-        to: advancedDelegator.to,
-        allowance: advancedDelegator.delegated_amount.toFixed(0),
-        timestamp: latestBlock
-          ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
-          : null,
-        type: "ADVANCED" as const,
-        amount:
-          Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-            ? ("FULL" as const)
-            : ("PARTIAL" as const),
-        transaction_hash: advancedDelegator.transaction_hash || "",
-      })),
-      ...(
-        await Promise.all(
-          directDelegators.data.map(async (directDelegator) => ({
-            from: directDelegator.delegator,
-            to: directDelegator.delegatee,
-            allowance: (
-              await contracts.token.contract.balanceOf(
-                directDelegator.delegator
-              )
-            ).toString(),
-            timestamp: latestBlock
-              ? getHumanBlockTime(directDelegator.block_number, latestBlock)
-              : null,
-            type: "DIRECT" as const,
-            amount: "FULL" as const,
-            transaction_hash: directDelegator.transaction_hash,
-          }))
-        )
-      ).filter((delegator) => BigInt(delegator.allowance) > BigInt(1e15)), // filter out delegators with 0 (or close to 0) balance
-    ],
+    data: [...advancedDelegatorsData, ...filteredDirectDelegatorsData],
   };
 }
 
