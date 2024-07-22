@@ -49,37 +49,38 @@ async function getCurrentDelegateesForAddress({
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  return [
-    ...(directDelegatee
-      ? [
-          {
-            from: directDelegatee.delegator,
-            to: directDelegatee.delegatee,
-            allowance: directDelegatee.balance.toFixed(),
-            timestamp: latestBlock
-              ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
-              : null,
-            type: "DIRECT" as const,
-            amount: "FULL" as const,
-            transaction_hash: "",
-          },
-        ]
-      : []),
-    ...advancedDelegatees.map((advancedDelegatee) => ({
+  const advancedDelegateesData = advancedDelegatees.map(
+    (advancedDelegatee) => ({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      timestamp: latestBlock?.number
+      timestamp: latestBlock
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
       type: "ADVANCED" as const,
       amount:
-        Number(advancedDelegatee.delegated_share.toFixed(3)) >= 1
+        Number(advancedDelegatee.delegated_share.toFixed(3)) === 1
           ? ("FULL" as const)
           : ("PARTIAL" as const),
       transaction_hash: advancedDelegatee.transaction_hash || "",
-    })),
-  ];
+    })
+  );
+
+  const directDelegateeData = directDelegatee && {
+    from: directDelegatee.delegator,
+    to: directDelegatee.delegatee,
+    allowance: directDelegatee.balance.toFixed(),
+    timestamp: latestBlock
+      ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
+      : null,
+    type: "DIRECT" as const,
+    amount: "FULL" as const,
+    transaction_hash: "",
+  };
+
+  return directDelegateeData
+    ? [directDelegateeData, ...advancedDelegateesData]
+    : advancedDelegateesData;
 }
 
 /**
