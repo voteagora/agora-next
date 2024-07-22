@@ -109,7 +109,7 @@ const DraftForm = ({
                 <FormItem label="Proposal type" required={true} htmlFor="type">
                   <SwitchInput
                     options={Object.values([
-                      ...(plmToggle?.config?.additionalProposalTypes || []),
+                      ...(plmToggle?.config?.proposalTypes || []),
                     ])}
                     name="type"
                   />

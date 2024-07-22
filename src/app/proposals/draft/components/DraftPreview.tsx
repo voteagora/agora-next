@@ -8,19 +8,16 @@ import {
   ProposalChecklist,
 } from "@prisma/client";
 import ProposalTransactionDisplay from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useContractRead, useAccount, useBlockNumber } from "wagmi";
+import { useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
-import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
-import Tenant from "@/lib/tenant/tenant";
 import AvatarAddress from "./AvatarAdress";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
-
-// TODO: either read from contract or add to tenant
-const THRESHOLD = 100000000000000000000000;
+import { useGetVotes } from "@/hooks/useGetVotes";
+import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 
 const DraftPreview = ({
   proposalDraft,
@@ -36,21 +33,15 @@ const DraftPreview = ({
   isArchived?: boolean;
 }) => {
   const { address } = useAccount();
+  const { data: threshold } = useProposalThreshold();
   const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useContractRead({
-    abi: ENSGovernorABI,
-    address: Tenant.current().contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    chainId: Tenant.current().contracts.governor.chain.id,
-    args: [
-      address as `0x${string}`,
-      blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    ],
+  const { data: accountVotesData } = useGetVotes({
+    address: address as `0x${string}`,
+    blockNumber: blockNumber || BigInt(0),
   });
 
-  const hasEnoughVotes = accountVotesData
-    ? accountVotesData >= THRESHOLD
-    : false;
+  const hasEnoughVotes =
+    accountVotesData && threshold ? accountVotesData >= threshold : false;
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
@@ -212,7 +203,9 @@ const DraftPreview = ({
               <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
                 <p className="flex-grow">Proposal threshold</p>
                 <span className="text-secondary font-mono text-xs">
-                  {Math.round(parseFloat(formatUnits(BigInt(THRESHOLD), 18)))}{" "}
+                  {threshold
+                    ? Math.round(parseFloat(formatUnits(BigInt(threshold), 18)))
+                    : "0"}{" "}
                   required
                 </span>
                 <input

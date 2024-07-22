@@ -251,7 +251,7 @@ const BasicProposalForm = () => {
           onClick={() => {
             append({
               type: TransactionType.TRANSFER,
-              target: "",
+              target: "" as `0x${string}`,
               value: "",
               calldata: "",
               description: "",
@@ -269,7 +269,7 @@ const BasicProposalForm = () => {
           onClick={() => {
             append({
               type: TransactionType.CUSTOM,
-              target: "",
+              target: "" as `0x${string}`,
               value: "",
               calldata: "",
               description: "",

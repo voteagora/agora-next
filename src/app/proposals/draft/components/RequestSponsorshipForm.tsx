@@ -5,38 +5,30 @@ import { useState } from "react";
 import FormItem from "./form/FormItem";
 import { useFormContext } from "react-hook-form";
 import AddressInput from "./form/AddressInput";
-import { useContractRead, useBlockNumber } from "wagmi";
-import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
-import Tenant from "@/lib/tenant/tenant";
+import { useBlockNumber } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import { ProposalDraft } from "@prisma/client";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
+import { useGetVotes } from "@/hooks/useGetVotes";
 
 const RequestSponsorshipForm = ({
   draftProposal,
 }: {
   draftProposal: ProposalDraft;
 }) => {
-  const tenant = Tenant.current();
-  const { data: threshold } = useProposalThreshold();
   const [isPending, setIsPending] = useState(false);
   const { watch } = useFormContext();
 
   const address = watch("sponsorAddress");
 
+  const { data: threshold } = useProposalThreshold();
   const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useContractRead({
-    abi: ENSGovernorABI,
-    address: tenant.contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    chainId: tenant.contracts.governor.chain.id,
-    args: [
-      address as `0x${string}`,
-      blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    ],
+  const { data: accountVotesData } = useGetVotes({
+    address: address as `0x${string}`,
+    blockNumber: blockNumber || BigInt(0),
   });
 
   const hasEnoughVotes = accountVotesData

@@ -151,7 +151,11 @@ export type PLMConfig = {
   stages: TenantProposalLifecycleStage[];
   // We can read proposal type from the governor
   // but others might be desired, like snapshot
-  additionalProposalTypes: any[];
+  proposalTypes: any[];
   // custom copy for the proposal lifecycle feature
   copy: any;
+  // optional config for including snapshot as a proposal type
+  snapshotConfig?: {
+    domain: string;
+  };
 };
