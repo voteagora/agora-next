@@ -81,7 +81,7 @@ export default async function Page({ params: { addressOrENSName } }) {
       <div className="sm:col-start-5">
         {hasDeposits ? (
           <div>
-            <h2 className="font-black text-2xl text-black mb-5">
+            <h2 className="font-black text-2xl text-primary mb-5">
               Your rewards
             </h2>
             <PanelClaimRewards />

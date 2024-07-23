@@ -6,7 +6,6 @@ import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
 import React, { useEffect, useMemo } from "react";
-import styles from "./delegateCard.module.scss";
 import Image from "next/image";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
@@ -84,11 +83,11 @@ export function DelegateProfileImage({
             alt="badge symbol"
           />
         )}
-        <ENSAvatar className={styles.avatar} ensName={data} />
+        <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
       </div>
 
       <div className="flex flex-col">
-        <div className={`${styles.address} flex flex-row gap-1 items-center`}>
+        <div className="text-base font-semibold hover:opacity-90">
           {copyable ? (
             <CopyableHumanAddress address={address} />
           ) : (
@@ -114,7 +113,7 @@ export function DelegateProfileImage({
             </TooltipProvider>
           )}
         </div>
-        <div className={styles.token}>
+        <div className="text-secondary text-xs font-semibold">
           {formattedNumber} {token.symbol}
         </div>
       </div>

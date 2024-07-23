@@ -149,7 +149,7 @@ export const Deposit = ({
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
                   <DropdownMenu.Content
-                    className="DropdownMenuContent bg-white rounded-lg border border-gray-300 shadow-newDefault w-[250px]"
+                    className="DropdownMenuContent bg-neutral rounded-lg border border-gray-300 shadow-newDefault w-[250px]"
                     sideOffset={10}
                     alignOffset={0}
                     align="end"

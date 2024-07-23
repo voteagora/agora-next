@@ -10,7 +10,6 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
-import styles from "./proposalVotesList.module.scss";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl, timeout } from "@/lib/utils";
 import { useState } from "react";
@@ -45,7 +44,11 @@ export function ProposalSingleVote({
   });
 
   return (
-    <VStack key={vote.transactionHash} gap={2} className={styles.vote_row}>
+    <VStack
+      key={vote.transactionHash}
+      gap={2}
+      className="text-xs text-tertiary px-0 py-1"
+    >
       <VStack>
         <HoverCard
           openDelay={100}
@@ -53,7 +56,10 @@ export function ProposalSingleVote({
           onOpenChange={(open) => _onOpenChange(open)}
         >
           <HoverCardTrigger>
-            <HStack justifyContent="justify-between" className={styles.voter}>
+            <HStack
+              justifyContent="justify-between"
+              className="font-semibold text-secondary"
+            >
               <HStack gap={1} alignItems="items-center">
                 <ENSAvatar ensName={data} className="w-5 h-5" />
                 <HumanAddress address={vote.address} />
@@ -82,7 +88,7 @@ export function ProposalSingleVote({
                   </>
                 )}
               </HStack>
-              <HStack alignItems="items-center" className={styles.vote_weight}>
+              <HStack alignItems="items-center">
                 <TokenAmountDisplay amount={vote.weight} />
               </HStack>
             </HStack>
@@ -100,7 +106,9 @@ export function ProposalSingleVote({
           </HoverCardContent>
         </HoverCard>
       </VStack>
-      <pre className={styles.vote_reason}>{vote.reason}</pre>
+      <pre className="text-xs font-medium whitespace-pre-wrap text-tertiary w-fit break-all font-sans">
+        {vote.reason}
+      </pre>
     </VStack>
   );
 }

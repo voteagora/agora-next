@@ -69,6 +69,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "snapshotVotes",
+      enabled: true,
+    },
+    {
       name: "proposal-lifecycle",
       enabled: true,
     },

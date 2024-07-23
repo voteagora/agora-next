@@ -1,3 +1,5 @@
+"use client";
+
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import DelegationToRow from "./DelegationToRow";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -6,22 +8,53 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PaginatedResultEx } from "@/app/lib/pagination";
+import { useEffect, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroller";
 
 function DelegationsContainer({
   delegatees,
-  delegators,
+  initialDelegators,
+  fetchDelegators,
 }: {
   delegatees: Delegation[];
-  delegators: Delegation[];
+  initialDelegators: PaginatedResultEx<Delegation[]>;
+  fetchDelegators: (params: {
+    offset: number;
+    limit: number;
+  }) => Promise<PaginatedResultEx<Delegation[]>>;
 }) {
+  const fetching = useRef(false);
+  const [meta, setMeta] = useState(initialDelegators.meta);
+  const [delegators, setDelegators] = useState(initialDelegators.data);
+
+  useEffect(() => {
+    setDelegators(initialDelegators.data);
+    setMeta(initialDelegators.meta);
+  }, [initialDelegators]);
+
+  const loadMore = async () => {
+    if (!fetching.current && meta.has_next) {
+      fetching.current = true;
+      const data = await fetchDelegators({
+        offset: meta.next_offset,
+        limit: meta.total_returned,
+      });
+      setDelegators(delegators.concat(data.data));
+      setMeta(data.meta);
+      fetching.current = false;
+    }
+  };
+
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
       <div className="p-8 text-center align-middle bg-gray-100 rounded-md">
-        No advanced delegations found
+        No delegations found
       </div>
     );
   }
@@ -38,17 +71,17 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-slate-700 bg-slate-100 sm:block">
+          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-secondary bg-wash sm:block">
             Advanced delegation beta
           </div>
         </HStack>
         <TabsContent value="delegatedFrom" className="max-w-full">
           <VStack
             gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
+            className="border shadow-sm rounded-xl border-gray-eb overflow-auto max-h-[500px]"
           >
-            <Table>
-              <TableHeader className="text-xs text-slate-700">
+            <Table className="min-w-full">
+              <TableHeader className="text-xs text-slate-700 sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
@@ -58,9 +91,29 @@ function DelegationsContainer({
                   <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <InfiniteScroll
+                hasMore={meta.has_next}
+                pageStart={1}
+                loadMore={loadMore}
+                loader={
+                  <TableRow key={0}>
+                    <TableCell
+                      key="loader"
+                      className="gl_loader justify-center py-6 text-sm text-stone-500"
+                    >
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                }
+                // References styles of TableBody
+                className="[&_tr:last-child]:border-0"
+                element="tbody"
+                useWindow={false}
+              >
                 {delegators.length === 0 ? (
-                  <div className="w-full p-4">None found</div>
+                  <TableRow>
+                    <TableCell>None found</TableCell>
+                  </TableRow>
                 ) : (
                   delegators.map((delegation) => (
                     <DelegationFromRow
@@ -69,17 +122,14 @@ function DelegationsContainer({
                     />
                   ))
                 )}
-              </TableBody>
+              </InfiniteScroll>
             </Table>
           </VStack>
         </TabsContent>
         <TabsContent value="delegatedTo">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb"
-          >
+          <VStack gap={3} className="border shadow-sm rounded-xl border-line">
             <Table>
-              <TableHeader className="text-xs text-slate-700">
+              <TableHeader className="text-xs text-secondary">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>

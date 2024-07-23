@@ -34,6 +34,17 @@ export function pluralizeVote(count: BigInt) {
     .join("")} votes`;
 }
 
+export function pluralizeSnapshotVote(count: bigint) {
+  if (count == 1n) {
+    return `1 vote`;
+  } else {
+    return `${format
+      .formatToParts(count)
+      .map((it) => it.value)
+      .join("")} votes`;
+  }
+}
+
 export function formatNumber(
   amount: string | BigInt,
   maximumSignificantDigits = 4

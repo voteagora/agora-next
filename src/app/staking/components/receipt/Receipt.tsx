@@ -24,7 +24,7 @@ export const Receipt = ({
   const { token, ui } = Tenant.current();
 
   return (
-    <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-white">
+    <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-neutral">
       <Image
         src={ui.assets.delegate}
         alt="img"
@@ -32,9 +32,9 @@ export const Receipt = ({
         height={40}
         className="rounded-full filter grayscale bg-gray-400"
       />
-      <h1 className="text-2xl text-black leading-[30px] mt-5">{title}</h1>
+      <h1 className="text-2xl text-primary leading-[30px] mt-5">{title}</h1>
       <VStack className="w-full gap-[15px] mt-7">
-        <HStack className="w-full justify-between items-center text-black">
+        <HStack className="w-full justify-between items-center text-primary">
           <p className="text-base leading-4">Your address</p>
           <p className="text-base leading-4">
             {depositor && <ENSName address={depositor} />}
@@ -42,7 +42,7 @@ export const Receipt = ({
         </HStack>
 
         {delegatee && (
-          <HStack className="w-full justify-between items-center text-black">
+          <HStack className="w-full justify-between items-center text-primary">
             <p className="text-base leading-4">Delegating to</p>
             <p className="text-base leading-4">
               <ENSName address={delegatee} />
@@ -51,7 +51,7 @@ export const Receipt = ({
         )}
 
         {amount !== undefined && (
-          <HStack className="w-full justify-between items-center text-black">
+          <HStack className="w-full justify-between items-center text-primary">
             <p className="text-base leading-4">Depositing</p>
             <p className="text-base leading-4">
               {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
@@ -64,14 +64,14 @@ export const Receipt = ({
           <>
             <div className="h-0.5 w-full border-t border-dashed border-gray-300 my-5"></div>
             {deposit.delegatee !== delegatee && (
-              <HStack className="w-full justify-between items-center text-black">
+              <HStack className="w-full justify-between items-center text-primary">
                 <p className="text-base leading-4">Existing delegate</p>
                 <p className="text-base leading-4">
                   <ENSName address={deposit.delegatee} />
                 </p>
               </HStack>
             )}
-            <HStack className="w-full justify-between items-center text-black">
+            <HStack className="w-full justify-between items-center text-primary">
               <p className="text-base leading-4">Existing stake amount</p>
               <p className="text-base leading-4">
                 {formatNumber(deposit.amount, token.decimals)} {token.symbol}

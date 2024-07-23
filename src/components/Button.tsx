@@ -1,5 +1,4 @@
 import Link from "next/link";
-import styles from "./styles.module.scss";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
 
@@ -7,11 +6,16 @@ export function Button({ href = "", className = "", ...props }) {
   return (
     <>
       {href ? (
-        <div className={`${styles.button} ${className}`}>
+        <div
+          className={`rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover ${className}`}
+        >
           <Link href={href} {...props} />{" "}
         </div>
       ) : (
-        <button className={`${styles.button} ${className}`} {...props} />
+        <button
+          className={`bg-neutral text-primary rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover ${className}`}
+          {...props}
+        />
       )}
     </>
   );
