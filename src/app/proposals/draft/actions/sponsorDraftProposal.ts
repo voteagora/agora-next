@@ -3,7 +3,6 @@
 import { z } from "zod";
 import { schema as SponsorProposalSchema } from "../schemas/sponsorProposalSchema";
 import prisma from "@/app/lib/prisma";
-import { ProposalStage } from "@prisma/client";
 import {
   getStageByIndex,
   getStageIndexForTenant,

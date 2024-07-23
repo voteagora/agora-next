@@ -1,21 +1,8 @@
-import {
-  ProposalChecklist,
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-} from "@prisma/client";
 import DraftPreview from "../../draft/components/DraftPreview";
 import SponsorActions from "./SponsorActions";
+import { DraftProposal } from "../../../proposals/draft/types";
 
-const SponsorForm = ({
-  draftProposal,
-}: {
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
-}) => {
+const SponsorForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   return (
     <DraftPreview
       proposalDraft={draftProposal}

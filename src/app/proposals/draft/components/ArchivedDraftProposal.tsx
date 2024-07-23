@@ -1,21 +1,12 @@
-import {
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-  ProposalChecklist,
-} from "@prisma/client";
 import DraftPreview from "./DraftPreview";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
+import { DraftProposal } from "../../../proposals/draft/types";
 
 const ArchivedDraftProposal = ({
   draftProposal,
 }: {
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
+  draftProposal: DraftProposal;
 }) => {
   return (
     <main className="max-w-screen-xl mx-auto mt-10">

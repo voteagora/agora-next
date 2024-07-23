@@ -25,7 +25,7 @@ const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
           create: data.transactions.map((transaction, idx) => {
             const asTransaction = {
               order: idx,
-              target: transaction.target,
+              target: transaction.target as string,
               value: transaction.value,
               calldata: transaction.calldata,
               description: transaction.description,

@@ -1,10 +1,4 @@
 import prisma from "@/app/lib/prisma";
-import {
-  ProposalChecklist,
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-} from "@prisma/client";
 import SponsorForm from "../components/SponsorForm";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
@@ -12,6 +6,7 @@ import SponsorAuthCheck from "../components/SponsorAuthCheck";
 import ENSName from "@/components/shared/ENSName";
 import { isPostSubmission } from "../../draft/utils/stages";
 import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
+import { DraftProposal } from "../../../proposals/draft/types";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -25,11 +20,7 @@ const getDraftProposal = async (id: number) => {
     },
   });
 
-  return draftProposal as ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
+  return draftProposal as DraftProposal;
 };
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
