@@ -1,15 +1,18 @@
-type TextInputProps = React.ComponentPropsWithoutRef<"input"> & {
-  name: string;
-  //   register: ReturnType<typeof useForm>["register"];
-  register: any; // todo -- type properly
-  placeholder?: string;
-  required?: boolean;
-  options?: any;
-  units?: string;
-  errorMessage?: string;
-};
+import { FieldPath, FieldValues } from "react-hook-form";
 
-const TextInput = ({
+type TextInputProps<TFieldValues extends FieldValues> =
+  React.ComponentPropsWithoutRef<"input"> & {
+    name: FieldPath<TFieldValues>;
+    //   register: ReturnType<typeof useForm>["register"];
+    register: any; // todo -- type properly
+    placeholder?: string;
+    required?: boolean;
+    options?: any;
+    units?: string;
+    errorMessage?: string;
+  };
+
+function TextInput<TFieldValues extends FieldValues = FieldValues>({
   register,
   name,
   placeholder,
@@ -18,7 +21,7 @@ const TextInput = ({
   units,
   errorMessage,
   ...props
-}: TextInputProps) => {
+}: TextInputProps<TFieldValues>) {
   return (
     <div className="relative">
       <input
@@ -39,6 +42,6 @@ const TextInput = ({
       )}
     </div>
   );
-};
+}
 
 export default TextInput;

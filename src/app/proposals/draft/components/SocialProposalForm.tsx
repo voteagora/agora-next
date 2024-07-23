@@ -3,14 +3,14 @@ import { z } from "zod";
 import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import { SocialProposalType } from "./../types";
-import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
+import { SocialProposalSchema } from "./../schemas/DraftProposalSchema";
 import { UpdatedButton } from "@/components/Button";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import RadioGroupInput from "./form/RadioGroupInput";
 import DateInput from "./form/DateInput";
 
 const SocialProposalForm = () => {
-  type FormType = z.output<typeof draftProposalSchema>;
+  type FormType = z.output<typeof SocialProposalSchema>;
   const {
     register,
     control,

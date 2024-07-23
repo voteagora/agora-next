@@ -5,9 +5,9 @@ import {
   TransactionType,
   SocialProposalType,
   ApprovalProposalType,
+  EthereumAddress,
 } from "../types";
 
-type EthereumAddress = string & { __brand: "EthereumAddress" };
 const ethereumAddressSchema = z
   .string()
   .refine((value): value is EthereumAddress => isAddress(value), {
@@ -100,12 +100,3 @@ export const DraftProposalSchema = z.discriminatedUnion("type", [
   ApprovalProposalSchema,
   OptimisticProposalSchema,
 ]);
-
-export const schema = z.object({
-  type: z.nativeEnum(ProposalType),
-  title: z.string().min(1, { message: "Title cannot be empty" }),
-  abstract: z.string().min(1, { message: "Abstract cannot be empty" }),
-  transactions: z.array(transaction),
-  socialProposal: socialProposal.optional(),
-  approvalProposal: approvalProposal.optional(),
-});

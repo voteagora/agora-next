@@ -15,6 +15,15 @@ const BasicProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
 
+  /**
+   * Notes on proposal methods per governor:
+   * ENS (OZ gov): propose(address[] targets, uint256[] values, string[] calldatas, string description)
+   * OP (Agora gov): tbd
+   * Cyber: tbd
+   * Scroll: tbd
+   * Linea: tbd
+   * Uni: tbd
+   */
   const { config } = usePrepareContractWrite({
     address: contracts.governor.address as `0x${string}`,
     chainId: contracts.governor.chain.id,

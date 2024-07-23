@@ -1,15 +1,14 @@
 import React from "react";
 import { z } from "zod";
 import FormItem from "./form/FormItem";
-import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
+import { ApprovalProposalSchema } from "./../schemas/DraftProposalSchema";
 import { useFormContext } from "react-hook-form";
 import NumberInput from "./form/NumberInput";
 import SwitchInput from "./form/SwitchInput";
-import ProposedTransactionsForm from "./ProposedTransactionsForm";
 import { ApprovalProposalType } from "@/app/proposals/draft/types";
 
 const ApprovalProposalForm = () => {
-  type FormType = z.output<typeof draftProposalSchema>;
+  type FormType = z.output<typeof ApprovalProposalSchema>;
   const { register, watch } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
@@ -79,7 +78,7 @@ const ApprovalProposalForm = () => {
           skip this step no transactions will be added.
         </p>
       </div>
-      <ProposedTransactionsForm />;
+      {/* <ProposedTransactionsForm />; */}
     </div>
   );
 };

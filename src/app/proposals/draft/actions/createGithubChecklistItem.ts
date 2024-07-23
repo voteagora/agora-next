@@ -1,7 +1,6 @@
 "use server";
 
 import prisma from "@/app/lib/prisma";
-import { ProposalStage } from "@prisma/client";
 import {
   getStageByIndex,
   getStageIndexForTenant,

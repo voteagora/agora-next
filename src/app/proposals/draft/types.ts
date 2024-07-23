@@ -3,7 +3,11 @@ import {
   ProposalDraft,
   ProposalDraftTransaction,
   ProposalSocialOption,
+  ProposalChecklist,
 } from "@prisma/client";
+
+// prisma schema spits out strings so I can't match against `0x{string}`
+export type EthereumAddress = string & { __brand: "EthereumAddress" };
 
 type TenantProposalLifecycleStage = {
   stage: PrismaProposalStage;
@@ -170,12 +174,16 @@ export type PLMConfig = {
   };
 };
 
-export type BasicProposal = ProposalDraft & {
+export type BaseProposal = ProposalDraft & {
+  checklist_items: ProposalChecklist[];
+};
+
+export type BasicProposal = BaseProposal & {
   proposal_type: ProposalType.BASIC;
   transactions: ProposalDraftTransaction[];
 };
 
-export type SocialProposal = ProposalDraft & {
+export type SocialProposal = BaseProposal & {
   proposal_type: ProposalType.SOCIAL;
   end_date_social: Date;
   start_date_social: Date;
@@ -183,7 +191,7 @@ export type SocialProposal = ProposalDraft & {
   social_options: ProposalSocialOption[];
 };
 
-export type ApprovalProposal = ProposalDraft & {
+export type ApprovalProposal = BaseProposal & {
   proposal_type: ProposalType.APPROVAL;
   budget: string;
   criteria: ApprovalProposalType;
@@ -193,7 +201,7 @@ export type ApprovalProposal = ProposalDraft & {
   options: ProposalDraftTransaction[];
 };
 
-export type OptimisticProposal = ProposalDraft & {
+export type OptimisticProposal = BaseProposal & {
   proposal_type: ProposalType.OPTIMISTIC;
 };
 
