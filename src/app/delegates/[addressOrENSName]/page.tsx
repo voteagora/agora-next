@@ -134,10 +134,13 @@ export default async function Page({
         <DelegationsContainer
           delegatees={delegates}
           initialDelegators={delegators}
-          fetchDelegators={async (page: number) => {
+          fetchDelegators={async (pagination: {
+            offset: number;
+            limit: number;
+          }) => {
             "use server";
 
-            return fetchCurrentDelegators(addressOrENSName, page);
+            return fetchCurrentDelegators(addressOrENSName, pagination);
           }}
         />
         {tenantSupportsSnapshotVote ? (
