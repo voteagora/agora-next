@@ -4,16 +4,16 @@ import { cache } from "react";
 import { AlchemyProvider } from "ethers";
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
-const mainnetProvider = new AlchemyProvider("mainnet", alchemyId)
+const mainnetProvider = new AlchemyProvider("mainnet", alchemyId);
 
 export async function resolveENSName(nameOrAddress: string) {
   if (isAddress(nameOrAddress)) {
     return nameOrAddress;
   }
 
-  const address = await cache((name: string) => mainnetProvider.resolveName(name))(
-    nameOrAddress
-  );
+  const address = await cache((name: string) =>
+    mainnetProvider.resolveName(name)
+  )(nameOrAddress);
 
   if (!address) {
     throw new Error("No address found for ENS name");
