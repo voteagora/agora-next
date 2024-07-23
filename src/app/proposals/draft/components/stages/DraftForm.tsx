@@ -53,12 +53,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = methods;
+  const { watch, handleSubmit } = methods;
 
   const proposalType = watch("type");
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
@@ -108,18 +103,15 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
               </div>
-              <FormItem label="Title" required={true} htmlFor="title">
-                <TextInput
-                  name="title"
-                  register={register}
-                  // TODO: maybe make this customizable per tenant? EP [1.1] feels ENS specific
-                  placeholder="EP [1.1] [Executable] title"
-                  options={{
-                    required: "Title is required.",
-                  }}
-                  errorMessage={errors.title?.message}
-                />
-              </FormItem>
+
+              <TextInput
+                label="Title"
+                name="title"
+                control={methods.control}
+                // TODO: maybe make this customizable per tenant? EP [1.1] feels ENS specific
+                placeholder="EP [1.1] [Executable] title"
+              />
+
               <FormItem label="Abstract" required={true} htmlFor="abstract">
                 <MarkdownTextareaInput name="abstract" />
               </FormItem>
