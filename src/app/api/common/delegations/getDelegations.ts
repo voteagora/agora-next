@@ -222,7 +222,7 @@ async function getCurrentDelegatorsForAddress({
   );
 
   return {
-    meta: delegators.meta,
+    meta: { ...delegators.meta, total_returned: filteredDelegatorsData.length },
     data: filteredDelegatorsData,
   };
 }
