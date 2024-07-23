@@ -3,7 +3,6 @@
 // find their styles in the global.scss file
 
 import React, { ReactNode } from "react";
-
 import { Analytics } from "@vercel/analytics/react";
 import { DialogProvider } from "../Dialogs/DialogProvider/DialogProvider";
 

@@ -7,7 +7,6 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
 import { opAdminAddress } from "@/lib/contracts/contracts";
-import styles from "./styles.module.scss";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";
 
@@ -65,32 +64,31 @@ export default function SimulateTransaction({
   }
 
   return (
-    <HStack alignItems="items-center" className={styles.simulate}>
+    <HStack
+      alignItems="items-center"
+      className="h-full border border-line rounded-md"
+    >
       <p
         className={
           status === "Valid"
-            ? styles.valid
+            ? "text-positive"
             : status === "Invalid"
-              ? styles.invalid
-              : styles.else_color
+              ? "text-negative"
+              : "text-tertiary"
         }
       >
         {status}
       </p>
       <Button
         variant="outline"
-        className={styles.simulate__button}
+        className="w-[30%] p-1 mr-2"
         onClick={() => {
           !isLoading && simulate();
         }}
         type="button"
       >
         {isLoading ? (
-          <Image
-            src={icons.spinner}
-            alt={icons.spinner}
-            className={styles.simulate__image}
-          />
+          <Image src={icons.spinner} alt={icons.spinner} className="mx-auto" />
         ) : (
           "Simulate"
         )}

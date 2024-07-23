@@ -8,7 +8,6 @@ import InfiniteScroll from "react-infinite-scroller";
 import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
 import ApprovalVoteReason from "./ApprovalVoteReason";
-import styles from "./delegateVotes.module.scss";
 import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
 import { delegatesVotesSortOptions } from "@/lib/constants";
 import { pluralizeVote } from "@/lib/tokenUtils";
@@ -84,14 +83,14 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
         <div key={0}>
           <HStack
             key="loader"
-            className="gl_loader justify-center py-6 text-sm text-stone-500"
+            className="gl_loader justify-center py-6 text-sm text-secondary"
           >
             Loading...
           </HStack>
         </div>
       }
       element="main"
-      className="divide-y divide-gray-300 overflow-hidden bg-white shadow-newDefault ring-1 ring-gray-300 rounded-xl"
+      className="divide-y divide-gray-300 overflow-hidden bg-neutral shadow-newDefault ring-1 ring-gray-300 rounded-xl"
     >
       {delegateVotes.map(
         (vote) =>
@@ -100,14 +99,14 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
               key={vote.transactionHash}
               proposalId={vote.proposal_id}
             >
-              <div className={styles.details_container}>
-                <VStack className={styles.details_sub}>
+              <div>
+                <VStack className="py-4 px-6">
                   <HStack justifyContent="justify-between" gap={2}>
                     <VStack>
-                      <span className="text-[#66676b] text-xs font-medium">
+                      <span className="text-tertiary text-xs font-medium">
                         {`${propHeader(vote)} with ${pluralizeVote(vote.weight, "optimism")}`}
                       </span>
-                      <h2 className="px-0 pt-1 overflow-hidden text-base text-black text-ellipsis">
+                      <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
                         {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
                       </h2>
                     </VStack>

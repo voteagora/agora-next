@@ -2,7 +2,6 @@ import { useAccount, useContractWrite, useEnsName } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Button } from "@/components/Button";
-import styles from "./delegateDialog.module.scss";
 import { useModal } from "connectkit";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -112,7 +111,10 @@ export function DelegateDialog({
   }
 
   return (
-    <VStack alignItems="items-center" className={styles.dialog_container}>
+    <VStack
+      alignItems="items-center"
+      className="w-full bg-neutral max-w-[28rem]"
+    >
       <VStack
         gap={6}
         justifyContent="justify-center"
@@ -122,9 +124,9 @@ export function DelegateDialog({
           <VStack
             gap={3}
             alignItems="items-center"
-            className={styles.details_container}
+            className="py-3 w-full text-tertiary text-xs"
           >
-            <VStack className={styles.amount_container}>
+            <VStack className="text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
               <HStack alignItems="items-center" gap={1}>
                 Your total delegatable votes
               </HStack>
@@ -134,32 +136,32 @@ export function DelegateDialog({
               <HStack
                 gap={3}
                 alignItems="items-center"
-                className="p-2 pb-4 pl-0 border-b border-gray-300"
+                className="p-2 pb-4 pl-0 border-b border-line"
               >
-                <div className={styles.avatar}>
-                  <ENSAvatar ensName={delegateeEnsName} />
-                </div>
+                <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
                 <VStack>
-                  <p className={styles.subtitle}>Currently delegated to</p>
-                  <div className={styles.address_to}>
+                  <p className="text-xs font-medium text-secondary">
+                    Currently delegated to
+                  </p>
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegatee.delegatee} />
                   </div>
                 </VStack>
               </HStack>
-              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full right-1/2 top-1/2">
-                <ArrowDownIcon className="w-4 h-4 text-black" />
+              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-neutral border border-line rounded-full right-1/2 top-1/2">
+                <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <HStack
                 gap={3}
                 alignItems="items-center"
                 className="p-2 pt-4 pl-0"
               >
-                <div className={styles.avatar}>
-                  <ENSAvatar ensName={delegateEnsName} />
-                </div>
+                <ENSAvatar ensName={delegateEnsName} className="h-10 w-10" />
                 <VStack>
-                  <p className={styles.subtitle}>Delegating to</p>
-                  <div className={styles.address_to}>
+                  <p className="text-xs font-medium text-secondary">
+                    Delegating to
+                  </p>
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
                   </div>
                 </VStack>
@@ -171,36 +173,37 @@ export function DelegateDialog({
             <p className="text-xl font-bold text-left">
               Set <ENSName address={delegate.address} /> as your delegate
             </p>
-            <div className="text-gray-700">
+            <div className="text-secondary">
               <ENSName address={delegate.address} /> will be able to vote with
               any token owned by your address
             </div>
-            <VStack className="relative border border-gray-300 rounded-lg">
+            <VStack className="relative border border-line rounded-lg">
               <HStack
                 gap={3}
                 alignItems="items-center"
-                className="p-2 border-b border-gray-300"
+                className="p-2 border-b border-line"
               >
-                <div className={styles.avatar}>
-                  <ENSAvatar ensName={""} />
-                </div>
+                <ENSAvatar ensName={""} className="h-10 w-10" />
                 <VStack>
-                  <p className={styles.subtitle}>Currently delegated to</p>
-                  <div className={styles.address_to}>
+                  <p className="text-xs font-medium text-secondary">
+                    Currently delegated to
+                  </p>
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <p>N/A</p>
                   </div>
                 </VStack>
               </HStack>
-              <div className="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
-                <ArrowDownIcon className="w-4 h-4 text-black" />
+              <div className="w-10 h-10 flex items-center justify-center bg-neutral border border-line rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
+                <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <HStack gap={3} alignItems="items-center" className="p-2">
-                <div className={styles.avatar}>
-                  <ENSAvatar ensName={delegateEnsName} />
-                </div>
+                <ENSAvatar ensName={delegateEnsName} className="w-10 h-10" />
+
                 <VStack>
-                  <p className={styles.subtitle}>Delegating to</p>
-                  <div className={styles.address_to}>
+                  <p className="text-xs font-medium text-secondary">
+                    Delegating to
+                  </p>
+                  <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
                   </div>
                 </VStack>

@@ -183,10 +183,10 @@ const DraftPreview = ({
                     key={`checklist-${index}`}
                   >
                     <p className="flex-grow">{item.title}</p>
-                    <span className="text-stone-500 font-mono text-xs">
+                    <span className="text-secondary font-mono text-xs">
                       on {formatFullDate(item.completed_at)}
                     </span>
-                    <span className="text-stone-500 font-mono text-xs">
+                    <span className="text-secondary font-mono text-xs">
                       {item.link
                         ? `(by ${truncateAddress(item.completed_by)})`
                         : "(skipped)"}
@@ -211,7 +211,7 @@ const DraftPreview = ({
               })}
               <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
                 <p className="flex-grow">Proposal threshold</p>
-                <span className="text-stone-500 font-mono text-xs">
+                <span className="text-secondary font-mono text-xs">
                   {Math.round(parseFloat(formatUnits(BigInt(THRESHOLD), 18)))}{" "}
                   required
                 </span>

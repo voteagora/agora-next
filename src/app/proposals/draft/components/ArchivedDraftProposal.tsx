@@ -28,6 +28,7 @@ const ArchivedDraftProposal = ({
           />
         </div>
         <div className="self-start">
+          {/* yellow color for draft proposal -- not themeable right now */}
           <div className="border bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] p-6 rounded-lg">
             <div className="flex flex-row items-center space-x-4">
               <Image
@@ -37,11 +38,11 @@ const ArchivedDraftProposal = ({
                 width={42}
                 height={42}
               />
-
               <p className="font-semibold">
                 This draft proposal has been archived
               </p>
             </div>
+            {/* yellow color for draft proposal -- not themeable right now */}
             <p className="text-[#B16B19]/70 mt-2">
               This draft has already been submitted and is no longer editable.
               You can still view the details of this proposal.
