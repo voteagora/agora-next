@@ -43,6 +43,7 @@ export default async function RootLayout({
 }) {
   const metrics = await fetchDaoMetrics();
   const { ui } = Tenant.current();
+  console.log(ui);
 
   const primary = ui?.customization?.primary || defaults.primary;
   const secondary = ui?.customization?.secondary || defaults.secondary;

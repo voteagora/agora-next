@@ -2,6 +2,7 @@ import { TenantUI } from "@/lib/tenant/tenantUI";
 import cyberHero from "@/assets/tenant/cyber_hero.svg";
 import cyberLogo from "@/assets/tenant/cyber_logo.svg";
 import delegateImage from "@/assets/tenant/cyber_delegate.svg";
+import delegateImageTwo from "@/assets/tenant/cyber_delegate_placeholder.svg";
 import successImage from "@/assets/tenant/cyber_success.svg";
 import pendingImage from "@/assets/tenant/cyber_pending.svg";
 
@@ -14,7 +15,8 @@ export const cyberTenantUIConfig = new TenantUI({
   assets: {
     success: successImage,
     pending: pendingImage,
-    delegate: delegateImage,
+    // delegate: delegateImage,
+    delegate: delegateImageTwo,
   },
 
   organization: {
@@ -34,6 +36,19 @@ export const cyberTenantUIConfig = new TenantUI({
       url: "https://discord.com/invite/buildoncyber",
     },
   ],
+
+  //   customization: {
+  //     primary: "#171717",
+  //     secondary: "#404040",
+  //     tertiary: "#737373",
+  //     neutral: "#FFFFFF",
+  //     wash: "#FAFAFA",
+  //     line: "#E5E5E5",
+  //     positive: "#00992B",
+  //     negative: "#C52F00",
+  //     brandPrimary: "#171717",
+  //     brandSecondary: "#F2F2F2",
+  //   },
 
   governanceIssues: [
     {
