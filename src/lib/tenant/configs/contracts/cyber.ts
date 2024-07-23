@@ -19,7 +19,7 @@ export const cyber = /*#__PURE__*/ defineChain({
   id: 7560,
   name: "Cyber",
   network: "cyber",
-  nativeCurrency: { name: "Cyber", symbol: "CYBER", decimals: 18 },
+  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
   rpcUrls: {
     default: {
       http: ["https://rpc.cyber.co"],
@@ -50,9 +50,7 @@ export const cyberTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd ? " " : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
-  const GOVERNOR = isProd
-    ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"
-    : "0x741005a136766e6e03ed8a7cc32d6a91241e5bf5";
+  const GOVERNOR = isProd    ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"    : "0x741005a136766e6e03ed8a7cc32d6a91241e5bf5";
 
   // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
   const provider = new JsonRpcProvider("https://cyber.alt.technology");
