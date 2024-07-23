@@ -1514,7 +1514,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /delegators/{addressOrEnsName}:
+  /delegates/{addressOrEnsName}/delegators:
     get:
       summary: Gets delegator (delegating to) information for an address
       description: >
