@@ -90,9 +90,15 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
 
 export async function fetchCurrentDelegators(
   addressOrENSName: string,
-  page = 1
+  pagination: {
+    offset: number;
+    limit: number;
+  } = {
+    offset: 0,
+    limit: 20,
+  }
 ) {
-  return apiFetchCurrentDelegators(addressOrENSName, page);
+  return apiFetchCurrentDelegators(addressOrENSName, pagination);
 }
 
 // TODO temporary fetch all query - optimization via API needed
