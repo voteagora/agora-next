@@ -5,8 +5,9 @@ import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
-import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
+import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Decimal } from "@prisma/client/runtime";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -86,135 +87,143 @@ async function getCurrentDelegateesForAddress({
 /**
  * Delegators for a given address (addresses delegating to the given address)
  * @param addressOrENSName
+ * @param pagination
  */
-const getCurrentDelegators = (addressOrENSName: string, page?: number) =>
+const getCurrentDelegators = (
+  addressOrENSName: string,
+  pagination?: { offset: number; limit: number }
+) =>
   addressOrEnsNameWrap(getCurrentDelegatorsForAddress, addressOrENSName, {
-    page,
+    pagination,
   });
 
 async function getCurrentDelegatorsForAddress({
   address,
-  page = 1,
+  pagination = {
+    offset: 0,
+    limit: 20,
+  },
 }: {
   address: string;
-  page?: number;
-}): Promise<PaginatedResult<Delegation[]>> {
+  pagination?: {
+    offset: number;
+    limit: number;
+  };
+}): Promise<PaginatedResultEx<Delegation[]>> {
   const { namespace, contracts } = Tenant.current();
-  const pageSize = 20;
 
-  const [advancedDelegators, directDelegators, latestBlock] = await Promise.all(
-    [
-      (() =>
-        page == 1
-          ? prisma[`${namespace}AdvancedDelegatees`].findMany({
-              where: {
-                to: address.toLowerCase(),
-                delegated_amount: { gt: 0 },
-                contract: contracts.alligator?.address,
-              },
-            })
-          : [])(),
-      (async () => {
-        return paginateResult(
-          async (skip: number, take: number) => {
-            return prisma.$queryRawUnsafe<
-              {
-                delegator: string;
-                delegatee: string;
-                block_number: bigint;
-                transaction_hash: string;
-              }[]
-            >(
-              `
-            SELECT *
-            FROM (
-              SELECT
-                delegator,
-                to_delegate AS delegatee,
-                block_number,
-                transaction_hash,
-                log_index,
-                transaction_index,
-                address
-              FROM
-                ${namespace}.delegate_changed_events
-              WHERE
-                to_delegate = $1 AND address = $2
-              ORDER BY
-                block_number DESC,
-                log_index DESC,
-                transaction_index DESC
-            ) t1
-            WHERE NOT EXISTS (
-                SELECT
-                  1
-                FROM
-                  ${namespace}.delegate_changed_events t2
-                WHERE
-                  t2.delegator = t1.delegator AND t2.address = t1.address
-                  AND (t2.block_number > t1.block_number
-                  OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index)))
+  const [delegators, latestBlock] = await Promise.all([
+    paginateResultEx(async (skip: number, take: number) => {
+      return prisma.$queryRawUnsafe<
+        {
+          from: string;
+          to: string;
+          allowance: Decimal;
+          type: "DIRECT" | "ADVANCED";
+          block_number: bigint;
+          amount: "FULL" | "PARTIAL";
+          transaction_hash: string;
+        }[]
+      >(
+        `
+        WITH advanced_delegatees AS (
+          SELECT 
+              "from",
+              "to",
+              delegated_amount as allowance,
+              'ADVANCED' AS type, 
+              block_number,
+              CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
+              transaction_hash
+            FROM 
+              optimism.advanced_delegatees ad
+            WHERE 
+              ad."to" = $1
+              AND delegated_amount > 0 
+              AND contract = $2
+        ), direct_delegatees AS (
+          SELECT 
+            "from",
+            "to",
+            null::numeric as allowance,
+            'DIRECT' as type,
+            block_number,
+            'FULL' as amount,
+            transaction_hash
+          FROM (
+            SELECT
+              delegator AS "from",
+              to_delegate AS "to",
+              block_number,
+              transaction_hash,
+              log_index,
+              transaction_index,
+              address
+            FROM
+              ${namespace}.delegate_changed_events
+            WHERE
+              to_delegate = $1 AND address = $3
             ORDER BY
               block_number DESC,
               log_index DESC,
               transaction_index DESC
-            OFFSET $3
-            LIMIT $4;
-            `,
-              address,
-              contracts.token.address.toLowerCase(),
-              skip,
-              take
-            );
-          },
-          page,
-          pageSize
-        );
-      })(),
-      contracts.token.provider.getBlock("latest"),
-    ]
-  );
+          ) t1
+          WHERE NOT EXISTS (
+              SELECT
+                1
+              FROM
+                ${namespace}.delegate_changed_events t2
+              WHERE
+                t2."delegator" = t1."from" AND t2.address = t1.address
+                AND (t2.block_number > t1.block_number
+                OR (t2.block_number = t1.block_number AND t2.log_index > t1.log_index) OR (t2.block_number = t1.block_number AND t2.log_index = t1.log_index AND t2.transaction_index > t1.transaction_index)))
+          ORDER BY
+            block_number DESC,
+            log_index DESC,
+            transaction_index DESC
+        )
+        SELECT * FROM advanced_delegatees
+        UNION ALL
+        SELECT * FROM direct_delegatees
+        OFFSET $4
+        LIMIT $5;
+      `,
+        address,
+        contracts.alligator?.address.toLowerCase(),
+        contracts.token.address.toLowerCase(),
+        skip,
+        take
+      );
+    }, pagination),
+    contracts.token.provider.getBlock("latest"),
+  ]);
 
-  const advancedDelegatorsData = advancedDelegators.map(
-    (advancedDelegator) => ({
-      from: advancedDelegator.from,
-      to: advancedDelegator.to,
-      allowance: advancedDelegator.delegated_amount.toFixed(0),
+  const delagtorsData = await Promise.all(
+    delegators.data.map(async (delegator) => ({
+      from: delegator.from,
+      to: delegator.to,
+      allowance:
+        delegator.type === "ADVANCED"
+          ? delegator.allowance.toFixed(0)
+          : (
+              await contracts.token.contract.balanceOf(delegator.from)
+            ).toString(),
       timestamp: latestBlock
-        ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
+        ? getHumanBlockTime(delegator.block_number, latestBlock)
         : null,
-      type: "ADVANCED" as const,
-      amount:
-        Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-          ? ("FULL" as const)
-          : ("PARTIAL" as const),
-      transaction_hash: advancedDelegator.transaction_hash || "",
-    })
-  );
-
-  const directDelegatorsData = await Promise.all(
-    directDelegators.data.map(async (directDelegator) => ({
-      from: directDelegator.delegator,
-      to: directDelegator.delegatee,
-      allowance: (
-        await contracts.token.contract.balanceOf(directDelegator.delegator)
-      ).toString(),
-      timestamp: latestBlock
-        ? getHumanBlockTime(directDelegator.block_number, latestBlock)
-        : null,
-      type: "DIRECT" as const,
-      amount: "FULL" as const,
-      transaction_hash: directDelegator.transaction_hash,
+      type: delegator.type,
+      amount: delegator.amount,
+      transaction_hash: delegator.transaction_hash,
     }))
   );
 
-  const filteredDirectDelegatorsData = directDelegatorsData.filter(
+  const filteredDelegatorsData = delagtorsData.filter(
     (delegator) => BigInt(delegator.allowance) > BigInt(1e15) // filter out delegators with 0 (or close to 0) balance
   );
 
   return {
-    meta: directDelegators.meta,
-    data: [...advancedDelegatorsData, ...filteredDirectDelegatorsData],
+    meta: { ...delegators.meta, total_returned: filteredDelegatorsData.length },
+    data: filteredDelegatorsData,
   };
 }
 

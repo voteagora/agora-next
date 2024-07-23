@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginatedResultEx } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -23,23 +23,29 @@ function DelegationsContainer({
   fetchDelegators,
 }: {
   delegatees: Delegation[];
-  initialDelegators: PaginatedResult<Delegation[]>;
-  fetchDelegators: (page: number) => Promise<PaginatedResult<Delegation[]>>;
+  initialDelegators: PaginatedResultEx<Delegation[]>;
+  fetchDelegators: (params: {
+    offset: number;
+    limit: number;
+  }) => Promise<PaginatedResultEx<Delegation[]>>;
 }) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegators.meta);
-  const [delegators, setDelegates] = useState(initialDelegators.data);
+  const [delegators, setDelegators] = useState(initialDelegators.data);
 
   useEffect(() => {
-    setDelegates(initialDelegators.data);
+    setDelegators(initialDelegators.data);
     setMeta(initialDelegators.meta);
   }, [initialDelegators]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchDelegators(meta.currentPage + 1);
-      setDelegates(delegators.concat(data.data));
+      const data = await fetchDelegators({
+        offset: meta.next_offset,
+        limit: meta.total_returned,
+      });
+      setDelegators(delegators.concat(data.data));
       setMeta(data.meta);
       fetching.current = false;
     }
@@ -86,7 +92,7 @@ function DelegationsContainer({
                 </TableRow>
               </TableHeader>
               <InfiniteScroll
-                hasMore={meta.hasNextPage}
+                hasMore={meta.has_next}
                 pageStart={1}
                 loadMore={loadMore}
                 loader={
