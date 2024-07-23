@@ -431,16 +431,19 @@ view OptimismVoterStats {
   abstain            BigInt?
   against            BigInt?
   proposals_proposed BigInt?
+  contract           String?
 
   @@map("voter_stats")
   @@schema("optimism")
 }
 
 view OptimismDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  transaction_hash String? @db.VarChar(66)
+  contract         String? @db.VarChar(42)
 
   @@map("delegatees")
   @@schema("optimism")
@@ -666,10 +669,12 @@ chain_id          Int
 }
 
 view etherfiDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  transaction_hash String? @db.VarChar(66)
+  contract         String? @db.VarChar(42)
 
   @@map("delegatees")
   @@schema("etherfi")
@@ -859,10 +864,12 @@ view etherfiDelegateChangedEvents {
 }
 
 view uniswapDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
   @@schema("uniswap")
@@ -870,11 +877,11 @@ view uniswapDelegatees {
 
 view uniswapDelegates {
   delegate          String   @unique
+  contract          String?  @db.VarChar(42)
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
-  contract          String?  @db.VarChar(42)
 
   @@map("delegates")
   @@schema("uniswap")
