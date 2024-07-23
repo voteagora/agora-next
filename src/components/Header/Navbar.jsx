@@ -3,7 +3,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import { usePathname } from "next/navigation";
 import { HeaderLink } from "./HeaderLink";
-import styles from "./header.module.scss";
 import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 
@@ -18,7 +17,9 @@ export default function Navbar() {
   const { isConnected } = useAgoraContext();
 
   return (
-    <div className={`flex flex-row ${styles.main_nav}`}>
+    <div
+      className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium shadow-newDefault`}
+    >
       {hasProposals && (
         <HeaderLink
           href={hasProposalsHref ? ui.page("proposals")?.href : "/"}

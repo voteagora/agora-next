@@ -10,7 +10,7 @@ export default function RetroPGFHero() {
           Total OP allocated to each category
         </div>
         <Link
-          className="text-gray-700 hover:text-black transition-colors ease-in-out delay-200"
+          className="text-secondary hover:text-primary transition-colors ease-in-out delay-200"
           href="/retropgf/3/summary"
         >
           View more stats →
@@ -19,7 +19,7 @@ export default function RetroPGFHero() {
       <Image
         src="/rpgf/infographic_5.png"
         alt="RetroPGF 3 results 5"
-        className="w-full max-w-6xl rounded-xl border border-gray-300"
+        className="w-full max-w-6xl rounded-xl border border-line"
         height="1216"
         width="1216"
       />

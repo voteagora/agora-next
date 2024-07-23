@@ -88,7 +88,7 @@ export default async function Page() {
         <Hero />
         <div>
           <div className="flex gap-6">
-            <div className="bg-gradient-to-b from-stone-300 to-white  w-[1px] relative top-2"></div>
+            <div className="bg-gradient-to-b from-stone-300 to-white w-[1px] relative top-2"></div>
             <div className="flex flex-col gap-8 max-w-2xl">
               <div>
                 <div className="text-sm text-indigo-800 font-medium">
@@ -101,7 +101,7 @@ export default async function Page() {
                 </div>
               </div>
               <div>
-                <div className="text-sm text-stone-600 font-medium">
+                <div className="text-sm text-secondary font-medium">
                   Phase 1 – Governance initiation
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>
@@ -113,7 +113,7 @@ export default async function Page() {
                 </div>
               </div>
               <div>
-                <div className="text-sm text-stone-600 font-medium">
+                <div className="text-sm text-secondary font-medium">
                   Phase 2 – Transition to onchain governance
                 </div>
                 <div>
@@ -126,7 +126,7 @@ export default async function Page() {
                 </div>
               </div>
               <div>
-                <div className="text-sm text-stone-600 font-medium">
+                <div className="text-sm text-secondary font-medium">
                   Phase 3 – Full Ossification
                 </div>
                 <div className="w-[5px] h-[5px] rounded-full bg-stone-300 relative -left-[27px] -top-4"></div>

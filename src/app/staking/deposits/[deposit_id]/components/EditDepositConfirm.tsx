@@ -74,7 +74,7 @@ export const EditDepositConfirm = ({
           Adding {token.symbol} to existing stake
         </div>
 
-        <div className="w-full text-center bg-white font-bold text-3xl text-black">
+        <div className="w-full text-center bg-neutral font-bold text-3xl text-primary">
           {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
           {token.symbol}
         </div>

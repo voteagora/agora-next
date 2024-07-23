@@ -2,7 +2,7 @@ import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { Vote, VotePayload, VotesSort } from "./vote";
+import { SnapshotVote, Vote, VotePayload, VotesSort } from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -17,6 +17,78 @@ const getVotesForDelegate = ({
   addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
     page,
   });
+
+export const getSnapshotVotesForDelegate = async ({
+  addressOrENSName,
+  page,
+}: {
+  addressOrENSName: string;
+  page: number;
+}) => {
+  return await addressOrEnsNameWrap(
+    getSnapshotVotesForDelegateForAddress,
+    addressOrENSName,
+    {
+      page,
+    }
+  );
+};
+
+async function getSnapshotVotesForDelegateForAddress({
+  address,
+  page = 1,
+}: {
+  address: string;
+  page?: number;
+}) {
+  const { slug } = Tenant.current();
+  const pageSize = 10;
+
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT "vote".id,
+             "vote".voter,
+             "vote".created,
+             "vote".choice,
+             "vote".metadata,
+             "vote".reason,
+             "vote".app,
+             "vote".vp,
+             "vote".vp_by_strategy,
+             "vote".vp_state,
+             "vote".proposal_id,
+             "vote".choice_labels,
+             "proposal".title
+      FROM "snapshot".votes as "vote"
+      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
+      WHERE "vote".dao_slug = '${slug}'
+      AND "vote".voter = '${address}'
+      ORDER BY "vote".created DESC
+      OFFSET ${skip}
+      LIMIT ${take};
+    `;
+    // console.log("Executing query:", query);
+    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
+  };
+
+  const { meta, data: votes } = await paginateResult(
+    queryFunction,
+    page,
+    pageSize
+  );
+
+  if (!votes || votes.length === 0) {
+    return {
+      meta,
+      votes: [],
+    };
+  } else {
+    return {
+      meta,
+      votes,
+    };
+  }
+}
 
 async function getVotesForDelegateForAddress({
   address,
