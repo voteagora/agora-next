@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "../../../apiUtils";
-import { fetchCurrentDelegatees } from "@/app/delegates/actions";
+import { fetchCurrentDelegatees } from "@/app/api/common/delegations/getDelegations";
 
 export async function GET(
   request: NextRequest,
