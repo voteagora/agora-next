@@ -1308,7 +1308,6 @@ paths:
         Limit, offset, and sort parameters can be used to customize the returned list.
       operationId: getDelegateVotes
       tags:
-        - delegates
         - votes
       parameters:
         - name: addressOrEnsName
