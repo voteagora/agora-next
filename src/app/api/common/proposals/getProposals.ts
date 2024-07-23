@@ -7,7 +7,6 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 async function getProposals({
   filter,

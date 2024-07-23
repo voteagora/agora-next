@@ -1853,16 +1853,15 @@ view cyber_direct_chains_snaps {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberProposalTypes {
-  id                 String?
-  contract           String? @db.VarChar
-  block_number       BigInt?
-  proposal_type_id   String?
-  quorum             String?
-  approval_threshold String?
-  name               String?
-  inputs             Json?
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
 
-  @@ignore
   @@schema("cyber")
   @@map("proposal_types")
 }
