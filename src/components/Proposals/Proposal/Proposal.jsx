@@ -1,5 +1,4 @@
 import Link from "next/link";
-import styles from "./proposal.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
 import OPStandardProposalStatus from "./OPStandardProposalStatus";
@@ -26,19 +25,24 @@ export default function Proposal({ proposal, votableSupply }) {
       }
       target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
     >
-      <HStack alignItems="center" className={styles.proposal_row}>
-        <VStack className={cn(styles.cell_content, styles.cell_title)}>
+      <div className="border-b border-line items-center flex flex-row bg-neutral">
+        <VStack
+          className={cn(
+            "whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",
+            "w-full sm:w-[55%] items-start justify-center"
+          )}
+        >
           {proposal.proposalType === "SNAPSHOT" ? (
-            <HStack className={styles.cell_content_title} gap={1}>
+            <HStack className="text-xs text-secondary" gap={1}>
               <p>Snapshot Proposal</p>
               <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />
             </HStack>
           ) : (
-            <HStack className={styles.cell_content_title} gap={1}>
+            <HStack className="text-xs text-secondary" gap={1}>
               {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
               <div>
                 {proposalText}{" "}
-                <span className={styles.invisible_on_mobile}>
+                <span className="hidden sm:inline">
                   {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
                     `by The ${ui.organization.title}`
                   ) : (
@@ -48,22 +52,22 @@ export default function Proposal({ proposal, votableSupply }) {
                   )}
                 </span>
               </div>
-              <div className={styles.mobile_status}>
+              <div className="block sm:hidden">
                 <ProposalStatus proposal={proposal} />
               </div>
             </HStack>
           )}
           <div
-            className={`${styles.cell_content_body} ${styles.proposal_title} overflow-visible whitespace-normal break-words`}
+            className={`overflow-ellipsis overflow-visible whitespace-normal break-words`}
           >
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`
               : proposal.markdowntitle}
           </div>
         </VStack>
-        <VStack className={cn(styles.cell_content, styles.cell_status)}>
+        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[20%] flex-start justify-center hidden sm:block">
           <VStack alignItems="flex-end">
-            <div className={styles.cell_content_title}>
+            <div className="text-xs text-secondary">
               <ProposalTimeStatus
                 proposalStatus={proposal.status}
                 proposalStartTime={proposal.start_time}
@@ -74,8 +78,8 @@ export default function Proposal({ proposal, votableSupply }) {
             <ProposalStatus proposal={proposal} />
           </VStack>
         </VStack>
-        <VStack className={cn(styles.cell_content, styles.cell_result)}>
-          <div className={styles.cell_content_body}>
+        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden sm:block">
+          <div className="overflow-hidden overflow-ellipsis">
             {proposal.proposalType === "SNAPSHOT" && (
               <SnapshotProposalStatus proposal={proposal} />
             )}
@@ -95,7 +99,7 @@ export default function Proposal({ proposal, votableSupply }) {
             )}
           </div>
         </VStack>
-      </HStack>
+      </div>
     </Link>
   );
 }

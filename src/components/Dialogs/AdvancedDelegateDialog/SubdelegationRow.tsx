@@ -2,7 +2,6 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { Input } from "@/components/ui/input";
-import styles from "./advancedDelegateDialog.module.scss";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
 import { useState, SetStateAction, useEffect, type Dispatch } from "react";
@@ -119,25 +118,23 @@ function SubdelegationToRow({
 
   return (
     <div
-      className={`flex flex-col border-b border-dashed border-gray-300 ${
+      className={`flex flex-col border-b border-dashed border-line ${
         amountToAllocateRaw < 0 && allowances.length - 1 === index
           ? "opacity-30"
           : ""
       }`}
     >
-      <div className={styles.sub_row}>
+      <div className="flex flex-row justify-between items-center border-b border-dashed border-line py-4 last:border-b-0">
         <HStack gap={3}>
-          <div className={styles.avatar}>
-            <ENSAvatar ensName={data} />
-          </div>
+          <ENSAvatar ensName={data} className="h-10 w-10" />
           <VStack>
-            <p className={styles.subtitle}>Delegated to</p>
-            <div className={styles.address_to}>
+            <p className="text-xs font-medium text-secondary">Delegated to</p>
+            <div className="w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
               <HumanAddress address={to} />
             </div>
           </VStack>
         </HStack>
-        <div className="relative flex rounded-md border border-input bg-gray-fa">
+        <div className="relative flex rounded-md border border-input bg-wash">
           {/* TODO: improve UX of this Input, what if value is 10,000,000 */}
           <Input
             value={newAllowanceInput}

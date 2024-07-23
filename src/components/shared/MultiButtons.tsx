@@ -1,6 +1,5 @@
 import { HStack } from "@/components/Layout/Stack";
 import { Button } from "../ui/button";
-import styles from "./styles.module.scss";
 
 export function MultiButtons({
   buttonsProps,
@@ -8,11 +7,7 @@ export function MultiButtons({
   buttonsProps: [string, () => void][];
 }) {
   return (
-    <HStack
-      className={styles.multi_buttons}
-      gap={4}
-      justifyContent="justify-between"
-    >
+    <HStack className="mt-4" gap={4} justifyContent="justify-between">
       {buttonsProps.map((buttonProps, index) => {
         return (
           <Button

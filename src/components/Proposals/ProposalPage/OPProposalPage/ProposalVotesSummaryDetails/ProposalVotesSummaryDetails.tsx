@@ -76,9 +76,9 @@ export default function ProposalVotesSummaryDetails({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-gray-fa border-t border-b -ml-4 p-4">
+      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b border-line -ml-4 p-4">
         <div className="flex justify-between">
-          <div className="flex items-center gap-1 text-gray-4f font-semibold text-xs">
+          <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
             Quorum
           </div>
           {proposal.quorum && (
@@ -91,7 +91,7 @@ export default function ProposalVotesSummaryDetails({
                   alt="check icon"
                 />
               )}
-              <p className="text-xs font-semibold text-gray-4f">
+              <p className="text-xs font-semibold text-secondary">
                 <TokenAmountDisplay
                   amount={totalVotes}
                   decimals={token.decimals}
@@ -110,12 +110,12 @@ export default function ProposalVotesSummaryDetails({
         </div>
         {proposal.approvalThreshold && (
           <div className="flex justify-between">
-            <div className="flex flex-row gap-1 text-gray-4f font-semibold text-xs">
+            <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
               Threshold
             </div>
             <div className="flex flex-row gap-1 ">
               {hasMetThreshold && <Image src={checkIcon} alt="check icon" />}
-              <p className=" text-xs font-semibold text-gray-4f">
+              <p className=" text-xs font-semibold text-secondary">
                 {voteThresholdPercent.toFixed(2)}% /{" "}
                 {`${apprThresholdPercent}%`} Required
               </p>
@@ -123,7 +123,7 @@ export default function ProposalVotesSummaryDetails({
           </div>
         )}
       </div>
-      <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-gray-fa -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg ">
+      <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
         <StepperRow
           label="Proposal created"
           value={formatTime(proposal.created_time)}
@@ -163,22 +163,22 @@ const StepperRow = ({
 }) => {
   return (
     <li
-      className={`relative flex-1  ${!isLastStep && "after:content-[''] after:w-[1.5px] after:h-[35px]  after:bg-gray-eo after:inline-block after:absolute after:top-3 after:left-0.5"} `}
+      className={`relative flex-1  ${!isLastStep && "after:content-[''] after:w-[1.5px] after:h-[35px]  after:bg-line after:inline-block after:absolute after:top-3 after:left-0.5"} `}
     >
       <Link href={href ?? "#"} className="flex items-center gap-x-3">
         <div
-          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : isActive ? "bg-blue-600" : "bg-gray-af"}`}
+          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : isActive ? "bg-blue-600" : "bg-primary/30"}`}
         />
 
         <div className="w-full flex items-center justify-between text-xs font-semibold">
           <div
-            className={`${isCompleted ? "text-black" : isActive ? "text-blue-600" : "text-gray-4f"} flex items-center gap-x-1`}
+            className={`${isCompleted ? "text-primary" : isActive ? "text-blue-600" : "text-secondary"} flex items-center gap-x-1`}
           >
             {label}
             {href && <Image src={linkIcon} alt="redirect" />}
           </div>
 
-          <p className="text-xs font-medium text-gray-4f">{value}</p>
+          <p className="text-xs font-medium text-secondary">{value}</p>
         </div>
       </Link>
     </li>

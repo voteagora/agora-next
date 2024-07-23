@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-import styles from "@/components/Delegates/DelegateCardList/DelegateCardList.module.scss";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "@/app/staking/components/delegates/DelegateProfileImage";
 import { DelegateSocialLinks } from "@/components/Delegates/DelegateCard/DelegateSocialLinks";
@@ -27,11 +25,16 @@ export const DelegateCard = ({
   warpcast,
 }: DelegateCardProps) => {
   return (
-    <div className={cn(styles.link)}>
-      <VStack gap={4} className={styles.link_container}>
+    <div className="flex flex-col">
+      <VStack
+        gap={4}
+        className="bg-neutral border border-line shadow-newDefault rounded-xl"
+      >
         <VStack gap={4} justifyContent="justify-center">
           <DelegateProfileImage address={address} votingPower={votingPower} />
-          <p className={styles.summary}>{statement}</p>
+          <p className="break-words text-secondary overflow-hidden overflow-ellipsis line-clamp-2 text-base min-h-[48px]">
+            {statement}
+          </p>
         </VStack>
         <div className="min-h-[24px]">
           <HStack alignItems="items-stretch" className="justify-between">

@@ -1,5 +1,4 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-import styles from "./optionResultsPanel.module.scss";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
@@ -65,7 +64,7 @@ export default function OptionsResultsPanel({
     });
 
   return (
-    <VStack className={styles.approval_choices_container}>
+    <VStack className="max-h-[calc(100vh-452px)] overflow-y-scroll flex-shrink px-4">
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);
@@ -146,16 +145,18 @@ function SingleOption({
   }
 
   return (
-    <VStack gap={1} className={styles.singleOptionContainer}>
+    <VStack gap={1} className="last:mb-2">
       {" "}
       <HStack
         justifyContent="justify-between"
-        className={styles.singleOptionHStack}
+        className="font-semibold text-sm mb-1"
       >
-        <div className={styles.descriptionText}>{description}</div>
-        <div className={styles.votesText}>
+        <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem]">
+          {description}
+        </div>
+        <div className="text-secondary">
           <TokenAmountDisplay amount={votes} />
-          <span className={styles.votesMargin}>
+          <span className="ml-1">
             {percentage === 0n
               ? "(0%)"
               : "(" + Math.round(Number(percentage) / 100).toString() + "%)"}
@@ -186,19 +187,19 @@ export function ProgressBar({
       Number(barPercentage) !== 0 ? 1 : 0
     ).toFixed(2) + "%";
 
-  const progressBarColor = isApproved ? "bg-green-positive" : "bg-gray-4f";
+  const progressBarColor = isApproved ? "bg-green-positive" : "bg-secondary";
 
   return (
     <HStack>
       {" "}
-      <div className={`${styles.progressBarContainer}`}>
+      <div className="w-full h-[6px] rounded-[10px] bg-line relative mb-3">
         <div
-          className={`${styles.progressBar} ${progressBarColor}`}
+          className={`h-[6px] absolute rounded-[10px] top-0 right-0 ${progressBarColor}`}
           style={{ width: progressBarWidth }}
         ></div>
         {!!thresholdPosition && (
           <div
-            className={`${styles.thresholdIndicator} bg-gray-4f`}
+            className={`w-[2px] h-[6px] absolute top-0 rounded-[10px] bg-secondary`}
             style={{ right: `${thresholdPosition}%` }}
           ></div>
         )}

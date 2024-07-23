@@ -50,7 +50,7 @@ export default function DraftProposalChecklist({
             return (
               <div key={index} className="relative z-10">
                 <div className="flex flex-row justify-between items-center w-full">
-                  <h3 className="text-stone-900 font-semibold">
+                  <h3 className="text-primary font-semibold">
                     {metadata.title}
                   </h3>
                   {currentStageObject.order > stageObject.order ? (
@@ -83,7 +83,7 @@ export default function DraftProposalChecklist({
             return (
               <div key={index} className="relative z-10">
                 <div className="flex flex-row justify-between items-center w-full">
-                  <h3 className="text-stone-900 font-semibold">
+                  <h3 className="text-primary font-semibold">
                     {metadata.title}
                   </h3>
 

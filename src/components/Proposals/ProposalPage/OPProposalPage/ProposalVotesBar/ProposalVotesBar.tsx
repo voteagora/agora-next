@@ -50,7 +50,7 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
 
       {proposal.approvalThreshold && (
         <div
-          className="bg-[#000000] h-4 w-[2px] absolute -top-[3px] z-50"
+          className="bg-primary h-4 w-[2px] absolute -top-[3px] z-50"
           style={{ left: `${thresholdPercent}%` }}
         />
       )}

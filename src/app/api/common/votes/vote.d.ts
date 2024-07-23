@@ -18,3 +18,19 @@ export type Vote = {
   proposalType: ProposalType;
   timestamp: Date | null;
 };
+
+export type SnapshotVote = {
+  id: string;
+  voter?: string;
+  created?: number;
+  choice?: string;
+  metadata?: Record<string, any>;
+  reason?: string;
+  app?: string;
+  vp?: number;
+  vp_by_strategy?: Record<string, any>;
+  vp_state?: string;
+  proposal_id?: string;
+  choice_labels?: Record<string, any>;
+  dao_slug?: string;
+};
