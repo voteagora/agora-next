@@ -12,7 +12,6 @@ import {
   useFormContext,
   useFieldArray,
   UseFieldArrayRemove,
-  useWatch,
 } from "react-hook-form";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
@@ -115,11 +114,6 @@ const ProposedTransactionsForm = () => {
     const result = await trigger(["transactions"]);
     setAllTransactionFieldsValid(result);
   };
-
-  const transactions = useWatch({
-    control,
-    name: "transactions", // Watch the entire field array
-  });
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {

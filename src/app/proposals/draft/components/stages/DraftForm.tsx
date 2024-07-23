@@ -10,18 +10,15 @@ import FormItem from "../form/FormItem";
 import TextInput from "../form/TextInput";
 import MarkdownTextareaInput from "../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
-import { schema as draftProposalSchema } from "../../schemas/DraftProposalSchema";
+import { DraftProposalSchema } from "../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../actions/createDraftProposal";
 import {
   ProposalType,
   SocialProposalType,
   ProposalTypeMetadata,
+  parseProposalToForm,
+  DraftProposal,
 } from "../../types";
-import {
-  ProposalDraft,
-  ProposalSocialOption,
-  ProposalDraftTransaction,
-} from "@prisma/client";
 import BasicProposalForm from "../BasicProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
 import ApprovalProposalForm from "../ApprovalProposalForm";
@@ -32,37 +29,28 @@ import { useRouter } from "next/navigation";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import Tenant from "@/lib/tenant/tenant";
 
-const DraftForm = ({
-  draftProposal,
-}: {
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-  };
-}) => {
+const DEFAULT_FORM = {
+  type: ProposalType.BASIC,
+  title: "",
+  abstract: "",
+  transactions: [],
+  socialProposal: {
+    type: SocialProposalType.BASIC,
+    start_date: undefined,
+    end_date: undefined,
+    options: [],
+  },
+};
+
+const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const router = useRouter();
   const { address } = useAccount();
   const [isPending, setIsPending] = useState<boolean>(false);
-  const methods = useForm<z.output<typeof draftProposalSchema>>({
-    resolver: zodResolver(draftProposalSchema),
-    defaultValues: {
-      type: (draftProposal.proposal_type || ProposalType.BASIC) as ProposalType,
-      title: draftProposal.title,
-      abstract: draftProposal.abstract,
-      // @ts-ignore (prisma is saying target is string, needs to be `0x${string}` though, don't feel like fighting this)
-      transactions: draftProposal.transactions || [],
-      // TODO: make sure that if a tenant does not have social proposal enabled
-      // it won't be an issue to have this default polluting their data
-      socialProposal: {
-        type: (draftProposal.proposal_social_type ||
-          SocialProposalType.BASIC) as SocialProposalType,
-        start_date: draftProposal.start_date_social || undefined,
-        end_date: draftProposal.end_date_social || undefined,
-        options: draftProposal.social_options,
-      },
-    },
+  const methods = useForm<z.output<typeof DraftProposalSchema>>({
+    resolver: zodResolver(DraftProposalSchema),
+    defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 
   const {
@@ -75,7 +63,7 @@ const DraftForm = ({
   const proposalType = watch("type");
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
 
-  const onSubmit = async (data: z.output<typeof draftProposalSchema>) => {
+  const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
     setIsPending(true);
 
     try {
@@ -141,7 +129,7 @@ const DraftForm = ({
             {proposalType === ProposalType.BASIC && <BasicProposalForm />}
             {proposalType === ProposalType.SOCIAL && <SocialProposalForm />}
             {proposalType === ProposalType.APPROVAL && <ApprovalProposalForm />}
-            {proposalType === ProposalType.OPTIMISIC && (
+            {proposalType === ProposalType.OPTIMISTIC && (
               <OptimisticProposalForm />
             )}
           </FormCard.Section>
