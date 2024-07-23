@@ -138,57 +138,60 @@ async function getDelegates({
           take
         );
 
+      
       case "weighted_random":
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+
+        const allowListString = allowList.map(value => `'${value}'`).join(', ');
+        const tokenAddress = contracts.token.address;
+
+        const QRY = `SELECT *,
+                      CASE
+                        WHEN EXISTS (
+                          SELECT 1
+                          FROM agora.citizens
+                          WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
+                        ) THEN TRUE
+                        ELSE FALSE
+                      END AS citizen,
+                      (SELECT row_to_json(sub)
+                        FROM (
+                          SELECT
+                            signature,
+                            payload,
+                            twitter,
+                            discord,
+                            created_at,
+                            updated_at,
+                            warpcast,
+                            endorsed
+                          FROM agora.delegate_statements s
+                          WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                          ${endorsedFilterQuery}
+                          ${topIssuesFilterQuery}
+                          ${topStakeholdersFilterQuery}
+                          LIMIT 1
+                        ) sub
+                      ) AS statement
+                    FROM ${namespace + ".delegates"} d
+                    WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+                    AND d.contract = '${tokenAddress}'
+                    AND EXISTS (
+                        SELECT 1
+                        FROM agora.delegate_statements s
+                        WHERE s.address = d.delegate
+                        ${endorsedFilterQuery}
+                        ${topIssuesFilterQuery}
+                        ${topStakeholdersFilterQuery}
+                    )
+                  ORDER BY -log(random()) / NULLIF(voting_power, 0)
+                    OFFSET $1
+                    LIMIT $2;`
+
+        console.log(QRY);
+
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast,
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
-            AND d.contract = $4
-            AND EXISTS (
-                SELECT 1
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-            )
-           ORDER BY -log(random()) / NULLIF(voting_power, 0)
-            OFFSET $5
-            LIMIT $6;
-            `,
-          seed,
-          allowList,
-          slug,
-          contracts.token.address,
+          QRY,
           skip,
           take
         );
