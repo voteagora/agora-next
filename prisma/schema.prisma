@@ -466,10 +466,12 @@ view OptimismDelegateChangedEvents {
 }
 
 view ensDelegatees {
-  delegator    String  @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal @db.Decimal
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
 
   @@map("delegatees")
   @@schema("ens")
@@ -488,11 +490,11 @@ view OptimismStakedDeposits {
 
 view ensDelegates {
   delegate          String   @unique
+  contract          String?  @db.VarChar(42)
   num_of_delegators Decimal? @db.Decimal
   direct_vp         Decimal? @db.Decimal
   advanced_vp       Decimal? @db.Decimal
   voting_power      Decimal? @db.Decimal
-  contract          String?  @db.VarChar(42)
 
   @@map("delegates")
   @@schema("ens")
@@ -1758,11 +1760,12 @@ view cyberDelegateChangedEvents {
 }
 
 view cyberDelegatees {
-  delegator    String   @unique
-  delegatee    String
-  block_number BigInt
-  balance      Decimal  @db.Decimal
-  contract     String   @db.VarChar(42)
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String  @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
 
   @@schema("cyber")
   @@map("delegatees")
