@@ -7,7 +7,7 @@ import TextInput from "./form/TextInput";
 import NumberInput from "./form/NumberInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
-import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
+import { DraftProposalSchema } from "./../schemas/DraftProposalSchema";
 import Tenant from "@/lib/tenant/tenant";
 
 const transferABI = [
@@ -36,12 +36,13 @@ const transferABI = [
   },
 ] as const;
 
-type FormType = z.output<typeof draftProposalSchema>;
+type FormType = z.output<typeof DraftProposalSchema>;
 
 const TransferTransactionForm = ({ index }: { index: number }) => {
   const tenant = Tenant.current();
   const {
     register,
+    control,
     watch,
     setValue,
     formState: { errors },
@@ -98,18 +99,12 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         />
       </FormItem>
       <div className="col-span-3">
-        <FormItem
+        <TextInput
           label="Description"
-          required={true}
-          htmlFor={`transactions.${index}.description`}
-        >
-          <TextInput
-            name={`transactions.${index}.description`}
-            register={register}
-            placeholder="What is this transaction all about?"
-            errorMessage={errors.transactions?.[index]?.description?.message}
-          />
-        </FormItem>
+          name={`transactions.${index}.description`}
+          control={control}
+          placeholder="What is this transaction all about?"
+        />
       </div>
       {/* target and calldata are not included in UI of the form, but we need them for consistency */}
       <input type="hidden" {...register(`transactions.${index}.value`)} />

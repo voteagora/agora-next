@@ -75,40 +75,28 @@ const SocialProposalForm = () => {
       <div className="space-y-6">
         {fields.map((field, index) => {
           return (
-            <FormItem
-              key={field.id}
-              label={`Option ${index + 1} text`}
-              required={true}
-              htmlFor={`socialProposal.options[${index}].text`}
-            >
-              <div className="flex flex-row space-x-4">
-                <div className="flex-1">
-                  <TextInput
-                    name={`socialProposal.options[${index}].text`}
-                    register={register}
-                    placeholder="For, against, abstain, etc."
-                    options={{
-                      required: "Text is required.",
-                    }}
-                    errorMessage={
-                      errors.socialProposal?.options?.[index]?.text?.message
-                    }
-                    disabled={proposalType === SocialProposalType.BASIC}
-                  />
-                </div>
-                {proposalType === SocialProposalType.APPROVAL && (
-                  <UpdatedButton
-                    className="self-start"
-                    type="secondary"
-                    onClick={() => {
-                      remove(index);
-                    }}
-                  >
-                    Remove option
-                  </UpdatedButton>
-                )}
+            <div className="flex flex-row space-x-4">
+              <div className="flex-1">
+                <TextInput
+                  label={`Option ${index + 1} text`}
+                  name={`socialProposal.options[${index}].text`}
+                  control={control}
+                  placeholder="For, against, abstain, etc."
+                  disabled={proposalType === SocialProposalType.BASIC}
+                />
               </div>
-            </FormItem>
+              {proposalType === SocialProposalType.APPROVAL && (
+                <UpdatedButton
+                  className="self-start"
+                  type="secondary"
+                  onClick={() => {
+                    remove(index);
+                  }}
+                >
+                  Remove option
+                </UpdatedButton>
+              )}
+            </div>
           );
         })}
       </div>

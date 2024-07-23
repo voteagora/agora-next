@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
-import FormItem from "../form/FormItem";
 import TextInput from "../form/TextInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
@@ -21,11 +20,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
   const { address } = useAccount();
   const [isSkipPending, setIsSkipPending] = useState(false);
   const [isSubmitPending, setIsSubmitPending] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<z.output<typeof tempCheckSchema>>({
+  const { control, handleSubmit } = useForm<z.output<typeof tempCheckSchema>>({
     resolver: zodResolver(tempCheckSchema),
     defaultValues: {
       temp_check_link: draftProposal.temp_check_link,
@@ -89,15 +84,13 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
         <FormCard.Section>
           <div className="flex flex-row justify-between space-x-2">
             <div className="flex-grow">
-              <FormItem label="Link" required={false} htmlFor="tempcheck_link">
-                <TextInput
-                  name="temp_check_link"
-                  register={register}
-                  //   TODO: still ENS branded -- make generalizable
-                  placeholder="https://discuss.ens.domains/"
-                  errorMessage={errors.temp_check_link?.message}
-                />
-              </FormItem>
+              <TextInput
+                label="Link"
+                name="temp_check_link"
+                control={control}
+                //   TODO: still ENS branded -- make generalizable
+                placeholder="https://discuss.ens.domains/"
+              />
             </div>
             <div className="space-x-2 self-start mt-[22px] flex items-center">
               <UpdatedButton
