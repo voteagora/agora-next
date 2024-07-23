@@ -36,13 +36,13 @@
   }
 
   pre {
-    background-color: $white;
+    background-color: var(--neutral);
     border-radius: $border-radius-lg;
-    border: 1px solid $gray-eb;
+    border: 1px solid var(--line);
   }
 
   code {
-    color: $gray-800;
+    color: var(--secondary);
   }
 
   ul,
@@ -56,7 +56,7 @@
 
   li::marker,
   ol::marker {
-    color: $gray-800;
+    color: var(--secondary);
   }
 
   img {
@@ -67,12 +67,12 @@
     text-decoration: none;
     font-weight: inherit;
     padding-bottom: 1px;
-    border-bottom: 1px solid $gray-400;
+    border-bottom: 1px solid var(--line);
     transition: 200ms all;
   }
 
   a:hover {
-    border-bottom: 1px solid $gray-600;
+    border-bottom: 1px solid var(--tertiary);
   }
 
   p {

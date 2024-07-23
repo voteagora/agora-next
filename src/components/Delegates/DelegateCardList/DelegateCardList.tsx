@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
-import styles from "./DelegateCardList.module.scss";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
@@ -61,13 +60,13 @@ export default function DelegateCardList({
     <DialogProvider>
       {/* @ts-ignore */}
       <InfiniteScroll
-        className={styles.infinite_scroll}
+        className="grid grid-flow-row grid-cols-[repeat(auto-fit,_23rem)] sm:grid-cols-[repeat(3,_23rem)] justify-around sm:justify-between py-4 gap-4 sm:gap-8"
         hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}
         loader={
           <div
-            className="w-full h-full min-h-[140px] bg-slate-50 rounded-xl text-slate-300 flex items-center justify-center"
+            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-tertiary flex items-center justify-center"
             key="loader"
           >
             Loading...
@@ -89,14 +88,14 @@ export default function DelegateCardList({
             <div
               key={delegate.address}
               className={cn(
-                styles.link,
+                "flex flex-col",
                 isDelegatesCitizensFetching || isDelegatesFiltering
                   ? "animate-pulse"
                   : ""
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>
-                <div className={`flex flex-col gap-4 ${styles.link_container}`}>
+                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
                   <div className="flex flex-col gap-4 justify-center">
                     <DelegateProfileImage
                       endorsed={delegate.statement?.endorsed}
@@ -104,7 +103,9 @@ export default function DelegateCardList({
                       votingPower={delegate.votingPower.total}
                       citizen={delegate.citizen}
                     />
-                    <p className={styles.summary}>{truncatedStatement}</p>
+                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
+                      {truncatedStatement}
+                    </p>
                   </div>
                   <div className="min-h-[24px]">
                     <DelegateActions

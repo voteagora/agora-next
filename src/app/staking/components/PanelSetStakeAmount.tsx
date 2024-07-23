@@ -45,10 +45,10 @@ export const PanelSetStakeAmount = ({
         Enter {token.symbol} to stake
       </div>
       <div className="text-center text-sm mb-5 bg-gray-100 border border-slate-300 rounded-lg shadow-newDefault">
-        <div className="rounded-lg bg-white border-b border-b-slate-300 p-2">
+        <div className="rounded-lg bg-neutral border-b border-b-slate-300 p-2">
           <div className="flex flex-row gap-3 items-center justify-center">
             <Input
-              className="w-full text-left border-none bg-white font-bold text-3xl text-black"
+              className="w-full text-left border-none bg-neutral font-bold text-3xl text-primary"
               placeholder={`0 ${token.symbol}`}
               value={amount > 0 ? amount : ""}
               onChange={(e) => {
@@ -61,7 +61,7 @@ export const PanelSetStakeAmount = ({
             <div className="w-10">
               {hasTokenBalance && (
                 <Button
-                  className="text-uppercase bg-white text-xs rounded-full border w-10 h-10 items-center justify-center shadow-newDefault"
+                  className="text-uppercase bg-neutral text-xs rounded-full border w-10 h-10 items-center justify-center shadow-newDefault"
                   variant="secondary"
                   onClick={() => {
                     const maxAmount = tokenToHumanNumber(

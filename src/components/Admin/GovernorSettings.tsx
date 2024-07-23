@@ -128,7 +128,9 @@ export default function GovernorSettings() {
   return (
     <div className="gl_box">
       <section>
-        <h1 className="font-extrabold text-2xl">Governor settings</h1>
+        <h1 className="font-extrabold text-2xl text-primary">
+          Governor settings
+        </h1>
         <p>Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
@@ -149,7 +151,7 @@ export default function GovernorSettings() {
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute right-[6px] rounded-sm bg-white"
+                className="absolute right-[6px] rounded-sm bg-neutral"
                 loading={isDisabledSetVotingPeriod}
                 disabled={
                   /* isInitializing || */ isDisabledSetVotingPeriod ||
@@ -197,10 +199,10 @@ export default function GovernorSettings() {
         <Separator className="my-8" />
         <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
           <div className="flex items-center gap-2">
-            <p className="text-gray-4f">Manager Address</p>
-            <Lock className="w-4 h-4 text-gray-af" />
+            <p className="text-secondary">Manager Address</p>
+            <Lock className="w-4 h-4 text-primary/30" />
           </div>
-          <p className="text-gray-4f truncate">{manager}</p>
+          <p className="text-secondary truncate">{manager}</p>
         </div>
         {/* <div className={!isManager ? "opacity-70" : ""}>
           <Label>ManagerAddress</Label>

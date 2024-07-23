@@ -250,19 +250,23 @@ module.exports = {
           900: "#FF007A",
           positive: "#FF007A1A",
         },
+        // custom theme colors
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        tertiary: "var(--tertiary)",
+        neutral: "var(--neutral)",
+        wash: "var(--wash)",
+        line: "var(--line)",
+        positive: "var(--positive)",
+        negative: "var(--negative)",
+        brandPrimary: "var(--brand-primary)",
+        brandSecondary: "var(--brand-secondary)",
+        // shad?
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -332,6 +336,8 @@ module.exports = {
         // ie: shadow-inner
         newDefault:
           "0px 4px 12px rgba(0, 0, 0, 0.02), 0px 2px 2px rgba(0, 0, 0, 0.03)",
+        newHover:
+          "0px 6px 16px rgba(0, 0, 0, 0.05), 0px 2px 2px rgba(0, 0, 0, 0.03)",
         xs: "0 0 0 1px rgba(0, 0, 0, 0.05)",
         sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
         DEFAULT:

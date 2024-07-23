@@ -1,7 +1,4 @@
-import styles from "./voteText.module.scss";
-
 export default function VoteText({ support }) {
-  const className = `${styles["vote_" + support.toLowerCase()]}`;
   const supportText =
     support === "FOR"
       ? "voted for"
@@ -9,5 +6,11 @@ export default function VoteText({ support }) {
         ? "voted against"
         : "abstained";
 
-  return <p className={className}>{supportText}</p>;
+  return (
+    <p
+      className={`${support.toLowerCase() === "against" ? "text-[#d62600]" : support.toLowerCase() === "for" ? "text-[#06ab34]" : "text-tertiary"}`}
+    >
+      {supportText}
+    </p>
+  );
 }

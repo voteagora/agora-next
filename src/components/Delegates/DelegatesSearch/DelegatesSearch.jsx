@@ -24,13 +24,13 @@ export default function DelegatesSearch() {
     >
       <VStack className="relative">
         <VStack className="justify-center absolute left-0 top-0 bottom-0 p-2">
-          <MagnifyingGlassIcon className="text-gray-4f w-4 h-4" />
+          <MagnifyingGlassIcon className="text-secondary w-4 h-4" />
         </VStack>
         <TextInputWithTooltip
           onChange={(value) => setEnteredName(value)}
           placeholder="Exact ENS or address"
           tooltipMessage="Please input exact ENS or address. Partial and fuzzy search is not supported yet."
-          className="py-2 px-4 pl-8 rounded-full bg-gray-fa border border-[#ebebeb] w-full sm:w-auto placeholder-gray-af"
+          className="py-2 px-4 pl-8 rounded-full bg-wash border border-line w-full sm:w-auto placeholder-tertiary text-secondary"
         />
       </VStack>
     </form>

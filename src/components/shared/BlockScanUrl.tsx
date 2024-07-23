@@ -12,7 +12,7 @@ export default function BlockScanUrls({
   className?: string | undefined;
 }) {
   return (
-    <div className={cn("pt-4 text-xs text-gray-4f", className)}>
+    <div className={cn("pt-4 text-xs text-secondary", className)}>
       {hash2 && hash1 ? (
         <div className="flex items-center justify-between">
           <a

@@ -73,7 +73,7 @@ const tableHeadVariants = cva(
     variants: {
       variant: {
         default: "font-medium text-muted-foreground",
-        gray: "text-gray-4f font-semibold",
+        gray: "text-secondary font-semibold",
       },
     },
     defaultVariants: {

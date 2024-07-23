@@ -18,10 +18,10 @@ info:
     - **RetroFundingImpactMetrics**: Connect RetroPGF to Impact Metrics
     - **comments**: Data related to RetroPGF Project Comments
     - **commentsVotes**: Data related to RetroPGF Project Comments' Votes
+    - **delegates**: Delegates data
+    - **delegations**: Delegations data
     ----
     Coming soon. 
-    - **delegates**: Not Live - Use for feedback only. Coming in OP 0.1.2
-    - **delegations**: Not Live - Use for feedback only. Coming in OP 0.1.2
     - **proposals**: Not Live - Use for feedback only. Coming in OP 0.1.3
     - **votes**: Not Live - Use for feedback only. Coming in OP 0.1.3
     - **proposalTypes**: Not Live - Use for feedback only. Coming in OP 0.1.3
@@ -33,9 +33,9 @@ info:
     | Version  | Status  | Release Date  |
     |----------|---------|---------------|
     | OP 0.1.0 | LIVE   | June 7th|
-    | OP 0.1.1 | On Track    | June 27th |
-    | OP 0.1.2 | On Track    | July 18th |
-    | OP 0.1.3 | On Track    | July 30th |
+    | OP 0.1.1 | LIVE   | June 27th |
+    | OP 0.1.2 | LIVE   | July 22th |
+    | OP 0.1.3 | On Track    | July 31th |
   version: 0.1.0
   license:
     name: MIT
@@ -145,48 +145,51 @@ components:
       description: A delegation of voting power from one address to another.
       type: object
       properties:
-        delegatorAddress:
+        from:
           summary: Delegator address
           description: Address of the delegator.
           type: string
           examples:
-            - summary: Address of the delegator.
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-        delegateeAddress:
+            - "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        to:
           summary: Delegatee address
           description: Address of the delegatee.
           type: string
           examples:
-            - summary: Address of the delegatee.
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-        totalAllowance:
-          summary: Voting allowance for delegate
+            - "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+        allowance:
+          summary: Voting allowance for delegate in OP tokens (18 decimals)
           description: Total amount of voting power delegated to or from address.
           type: string
           examples:
-            - summary: Amount of voting power delegated to or from address.
-              value: "100000"
-        delegatedOn:
+            - "100000000000000000000000"
+        timestamp:
           summary: When delegation occured
           description: The datetime on which the delegation of voting power occurred.
           type: string
           format: date-time
           examples:
-            - summary: The datetime on which the delegation of voting power occurred.
+            - "2024-01-17T19:37:15.983Z"
         type:
           summary: Type of delegation
-          description: The type of delegation; can be advanced or standard.
+          description: The type of delegation; can be advanced or direct. Advanced delegations are made through Alligator. Direct delegations are made through OP token.
           type: string
           enum:
-            - advanced
-            - standard
+            - DIRECT
+            - ADVANCED
         amount:
           summary: Amount delegated
           description: The amount of voting power delegated; can be full or partial.
           type: string
           enum:
-            - full
-            - partial
+            - FULL
+            - PARTIAL
+        transaction_hash:
+          summary: Transaction hash of delegation
+          description: The transaction hash of the delegation transaction.
+          type: string
+          examples:
+            - "0x8ed595a6f85b2d21e32602094d261034d11706dc100d8f48e11a03c15378cfcf"
     DelegateChunk:
       summary: A chunk of delegate data
       description: Data associated with a voting delegate. Sub-resources under this delegate are not expanded.
@@ -1305,7 +1308,6 @@ paths:
         Limit, offset, and sort parameters can be used to customize the returned list.
       operationId: getDelegateVotes
       tags:
-        - delegates
         - votes
       parameters:
         - name: addressOrEnsName
@@ -1472,11 +1474,11 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /delegatees/{addressOrEnsName}:
+  /delegates/{addressOrEnsName}/delegatees:
     get:
-      summary: Gets delegatee (delegating from) information for an address
+      summary: Gets delegatees (delegating to) information for an address
       description: >
-        Retrieves a paginated list of the delegatees for a given address. That is, the delegates to which
+        Retrieves a list of the delegatees for a given address. That is, the delegates to which
         the supplied address is delegating votes.
       operationId: getDelegateesByAddress
       tags:
@@ -1502,14 +1504,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  votes:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Delegation"
+                $ref: "#/components/schemas/Delegation"
         "400":
           description: Bad Request
         "401":
@@ -1518,7 +1513,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /delegators/{addressOrEnsName}:
+  /delegates/{addressOrEnsName}/delegators:
     get:
       summary: Gets delegator (delegating to) information for an address
       description: >

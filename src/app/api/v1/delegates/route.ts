@@ -41,11 +41,11 @@ export async function GET(request: NextRequest) {
     try {
       const sort = sortValidator.parse(params.get("sort"));
       const limit = limitValidator.parse(params.get("limit"));
-      const offest = offsetValidator.parse(params.get("offset"));
+      const offset = offsetValidator.parse(params.get("offset"));
       const delegatesResult = await fetchDelegates({
         pagination: {
-          limit: limit,
-          offset: offest,
+          limit,
+          offset,
         },
         sort,
       });

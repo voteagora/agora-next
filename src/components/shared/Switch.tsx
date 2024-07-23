@@ -1,7 +1,6 @@
 "use client";
 
 import { HStack } from "../Layout/Stack";
-import styles from "./styles.module.scss";
 
 type Props = {
   onSelectionChanged: (newSelection: any) => void;
@@ -9,13 +8,17 @@ type Props = {
   options: string[];
 };
 
-const optionStyle = styles.switch__option;
+const optionStyle =
+  "p-[5px] flex-1 text-center cursor-pointer rounded-md text-primary/30 font-medium hover:bg-wash";
 
-const selectedStyle = styles.switch__selected;
+const selectedStyle = "bg-line text-primary font-semibold";
 
 export function Switch({ onSelectionChanged, selection, options }: Props) {
   return (
-    <HStack className={styles.switch} gap={2}>
+    <HStack
+      className="rounded-md border border-line overflow-hidden w-full p-1"
+      gap={2}
+    >
       {options.map((option, index) => (
         <div
           key={index}

@@ -3,7 +3,6 @@ import { HStack } from "@/components/Layout/Stack";
 import CreateProposalForm from "@/components/Proposals/ProposalCreation/CreateProposalForm";
 import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
 import Tenant from "@/lib/tenant/tenant";
-import styles from "./styles.module.scss";
 
 async function getProposalSettingsList() {
   "use server";
@@ -23,10 +22,10 @@ export default async function CreateProposalPage() {
     <HStack
       justifyContent="justify-between"
       gap={16}
-      className={styles.create_prop_container}
+      className="w-full max-w-[76rem] mt-12 mb-8 flex flex-col-reverse items-center sm:flex-row sm:items-start"
     >
       <CreateProposalForm proposalSettingsList={proposalSettingsList} />
-      <div className={styles.create_prop_right_box}>
+      <div className=" shrink-0 w-full sm:w-[24rem]">
         <InfoPanel />
       </div>
     </HStack>
