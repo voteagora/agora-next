@@ -73,9 +73,8 @@ export default async function Page({ searchParams }) {
     }),
   };
 
-  const endorsedFilterEnabled = Boolean(
-    ui.toggle("delegates/endorsed-filter")?.enabled
-  );
+  const endorsedFilterEnabled = ui.toggle("delegates/endorsed-filter")?.enabled;
+
   if (endorsedFilterEnabled) {
     filters.endorsed = !Boolean(
       searchParams?.endorsedFilter && searchParams?.endorsedFilter

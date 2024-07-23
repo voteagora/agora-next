@@ -42,7 +42,7 @@ export async function generateMetadata({}, parent) {
   const { ui, namespace } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
-    return <div>Route not supported for namespace</div>;
+    return;
   }
 
   const page = ui.page("proposals");
