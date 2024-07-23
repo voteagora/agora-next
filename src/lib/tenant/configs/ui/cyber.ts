@@ -27,6 +27,34 @@ export const cyberTenantUIConfig = new TenantUI({
     retired: [],
   },
 
+  governanceIssues: [
+    {
+      icon: "piggyBank",
+      title: "Grants",
+      key: "grants",
+    },
+    {
+      icon: "ballot",
+      title: "Decentralization",
+      key: "decentralization",
+    },
+    {
+      icon: "ballot",
+      title: "Ecosystem development",
+      key: "ecosystemDevelopment",
+    },
+    {
+      icon: "ballot",
+      title: "Public Goods",
+      key: "publicGoods",
+    },
+    {
+      icon: "ballot",
+      key: "daoWorkingGroups",
+      title: "DAO working groups",
+    },
+  ],
+
   pages: [
     {
       route: "/",
