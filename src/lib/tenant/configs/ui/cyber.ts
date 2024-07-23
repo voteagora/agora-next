@@ -93,5 +93,13 @@ export const cyberTenantUIConfig = new TenantUI({
       name: "delegates",
       enabled: true,
     },
+    {
+      name: "delegates/endorsed-filter",
+      enabled: true,
+    },
+    {
+      name: "delegates/edit",
+      enabled: true,
+    },
   ],
 });
