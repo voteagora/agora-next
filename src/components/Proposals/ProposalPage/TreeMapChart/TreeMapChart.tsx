@@ -64,7 +64,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
 const CustomTooltip = ({ payload }: any) => {
   if (payload && payload.length) {
     return (
-      <div className="bg-stone-700 text-white p-1 text-xs rounded">
+      <div className="bg-stone-700 text-neutral p-1 text-xs rounded">
         <ENSName address={payload[0].payload.address} />
       </div>
     );

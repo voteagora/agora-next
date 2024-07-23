@@ -65,6 +65,19 @@ type TenantUIParams = {
   toggles?: UIToggle[];
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
+  customization?: {
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    neutral?: string;
+    wash?: string;
+    line?: string;
+    positive?: string;
+    negative?: string;
+    brandPrimary?: string;
+    brandSecondary?: string;
+    font?: string;
+  };
 };
 
 export class TenantUI {
@@ -80,7 +93,19 @@ export class TenantUI {
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
-
+  private _customization?: {
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    neutral?: string;
+    wash?: string;
+    line?: string;
+    positive?: string;
+    negative?: string;
+    brandPrimary?: string;
+    brandSecondary?: string;
+    font?: string;
+  };
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
@@ -98,6 +123,7 @@ export class TenantUI {
     toggles,
     governanceIssues,
     governanceStakeholders,
+    customization,
   }: TenantUIParams) {
     this._assets = assets;
     this._color = color;
@@ -111,6 +137,7 @@ export class TenantUI {
     this._toggles = toggles;
     this._governanceIssues = governanceIssues;
     this._governanceStakeholders = governanceStakeholders;
+    this._customization = customization;
   }
 
   public get assets(): UIAssets {
@@ -147,6 +174,24 @@ export class TenantUI {
 
   public get organization(): UIOrganization | undefined {
     return this._organization;
+  }
+
+  public get customization():
+    | {
+        primary?: string;
+        secondary?: string;
+        tertiary?: string;
+        neutral?: string;
+        wash?: string;
+        line?: string;
+        positive?: string;
+        negative?: string;
+        brandPrimary?: string;
+        brandSecondary?: string;
+        font?: string;
+      }
+    | undefined {
+    return this._customization;
   }
 
   public link(name: string): UILink | undefined {

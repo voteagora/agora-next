@@ -1,7 +1,6 @@
 import { HStack } from "../Layout/Stack";
 import * as theme from "@/styles/theme";
 import Image from "next/image";
-import styles from "./header.module.scss";
 
 export const SocialLinks = () => {
   const isMobile = useMediaQuery({
@@ -28,14 +27,12 @@ export const SocialLinks = () => {
   return (
     <HStack gap={3} alignItems="center">
       {socialLinks.map(({ icon, alt, url }, index) => (
-        <a
-          key={index}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.social_link}
-        >
-          <Image src={icon} alt={alt} />
+        <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+          <Image
+            src={icon}
+            alt={alt}
+            className="mt-[22px] h-4 w-4 align-middle"
+          />
         </a>
       ))}
     </HStack>

@@ -2,10 +2,10 @@ export default function FAQs() {
   return (
     <aside className="sm:w-[320px]">
       <div className="gl_box gl_box_secondary sm:sticky sm:top-[20px]">
-        <h1 className="font-extrabold text-xl mt-3">FAQ</h1>
+        <h1 className="font-extrabold text-xl mt-3 text-primary">FAQ</h1>
         <div className="prose prose-sm space-y-6">
           <div>
-            <h2 className="font-semibold text-sm">
+            <h2 className="font-semibold text-sm text-primary">
               What’s the difference between voting period and voting delay?
             </h2>
             <p>
@@ -19,7 +19,9 @@ export default function FAQs() {
             </p>
           </div>
           <div>
-            <h2 className="font-semibold text-sm">What are proposal types?</h2>
+            <h2 className="font-semibold text-sm text-primary">
+              What are proposal types?
+            </h2>
             <p>
               A proposal type is a set of parameters that proposals can be
               configured with. These are helpful when different types of
@@ -27,7 +29,7 @@ export default function FAQs() {
             </p>
           </div>
           <div>
-            <h2 className="font-semibold text-sm">
+            <h2 className="font-semibold text-sm text-primary">
               What’s the difference between quorum and approval threshold?
             </h2>
             <p>
