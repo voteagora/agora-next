@@ -15,7 +15,7 @@ interface Props {
   alchemyId: string;
 }
 
-export const cyber = defineChain({
+export const cyber = /*#__PURE__*/ defineChain({
   id: 7560,
   name: "Cyber",
   network: "cyber",
@@ -39,7 +39,7 @@ export const cyber = defineChain({
   contracts: {
     multicall3: {
       address: "0xca11bde05977b3631167028862be2a173976ca11",
-      blockCreated: 14,
+      blockCreated: 0,
     },
   },
   testnet: false,
@@ -54,11 +54,8 @@ export const cyberTenantConfig = ({
     ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"
     : "0x741005a136766e6e03ed8a7cc32d6a91241e5bf5";
 
-  const provider = new JsonRpcProvider(
-    isProd
-      ? "https://cyber.alt.technology"
-      : "https://cyber-testnet.alt.technology/"
-  );
+  // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
+  const provider = new JsonRpcProvider("https://cyber.alt.technology");
   const chain = cyber;
 
   return {
