@@ -1,12 +1,22 @@
 import { z } from "zod";
 import { isAddress } from "viem";
-import { ProposalType, TransactionType, SocialProposalType } from "../types";
+import {
+  ProposalType,
+  TransactionType,
+  SocialProposalType,
+  ApprovalProposalType,
+} from "../types";
+
+type EthereumAddress = string & { __brand: "EthereumAddress" };
+const ethereumAddressSchema = z
+  .string()
+  .refine((value): value is EthereumAddress => isAddress(value), {
+    message: "Target must be a valid Ethereum address.",
+  });
 
 const transaction = z.object({
   type: z.nativeEnum(TransactionType).optional(),
-  target: z.string().refine((value) => isAddress(value), {
-    message: "Target must be an address.",
-  }),
+  target: ethereumAddressSchema,
   value: z.string().min(1),
   calldata: z.string().min(1, { message: "Calldata cannot be empty" }),
   description: z.string().min(1, { message: "Description cannot be empty" }),
@@ -43,10 +53,59 @@ const socialProposal = z
     }
   );
 
+const approvalProposal = z.object({
+  budget: z.string().min(1, { message: "Budget cannot be empty" }),
+  criteria: z.nativeEnum(ApprovalProposalType),
+  maxOptions: z
+    .number()
+    .int()
+    .min(1, { message: "Max options must be at least 1" })
+    .optional(),
+  threshold: z.number().int().optional(),
+  topChoices: z
+    .number()
+    .int()
+    .min(1, { message: "Top choices must be at least 1" }),
+  options: z.array(transaction),
+});
+
+const BaseProposalSchema = z.object({
+  type: z.nativeEnum(ProposalType),
+  title: z.string().min(1, { message: "Title cannot be empty" }),
+  abstract: z.string().min(1, { message: "Abstract cannot be empty" }),
+});
+
+export const BasicProposalSchema = BaseProposalSchema.extend({
+  type: z.literal(ProposalType.BASIC),
+  transactions: z.array(transaction),
+});
+
+export const SocialProposalSchema = BaseProposalSchema.extend({
+  type: z.literal(ProposalType.SOCIAL),
+  socialProposal,
+});
+
+export const ApprovalProposalSchema = BaseProposalSchema.extend({
+  type: z.literal(ProposalType.APPROVAL),
+  approvalProposal,
+});
+
+export const OptimisticProposalSchema = BaseProposalSchema.extend({
+  type: z.literal(ProposalType.OPTIMISTIC),
+});
+
+export const DraftProposalSchema = z.discriminatedUnion("type", [
+  BasicProposalSchema,
+  SocialProposalSchema,
+  ApprovalProposalSchema,
+  OptimisticProposalSchema,
+]);
+
 export const schema = z.object({
   type: z.nativeEnum(ProposalType),
   title: z.string().min(1, { message: "Title cannot be empty" }),
   abstract: z.string().min(1, { message: "Abstract cannot be empty" }),
   transactions: z.array(transaction),
   socialProposal: socialProposal.optional(),
+  approvalProposal: approvalProposal.optional(),
 });

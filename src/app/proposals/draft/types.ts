@@ -1,4 +1,9 @@
-import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import {
+  ProposalStage as PrismaProposalStage,
+  ProposalDraft,
+  ProposalDraftTransaction,
+  ProposalSocialOption,
+} from "@prisma/client";
 
 type TenantProposalLifecycleStage = {
   stage: PrismaProposalStage;
@@ -107,13 +112,18 @@ export enum SocialProposalType {
   APPROVAL = "approval",
 }
 
+export enum ApprovalProposalType {
+  THRESHOLD = "Threshold",
+  TOP_CHOICES = "Top choices",
+}
+
 export enum ProposalType {
   // might make sense to move snapshot to something else since snapshot isn't really a "proposal"
   // It doesn't go through the governor
   SOCIAL = "social",
   BASIC = "basic",
   APPROVAL = "approval",
-  OPTIMISIC = "optimistic",
+  OPTIMISTIC = "optimistic",
 }
 
 export const ProposalTypeMetadata = {
@@ -129,7 +139,7 @@ export const ProposalTypeMetadata = {
     title: "Approval Proposal",
     description: "An approval proposal.",
   },
-  [ProposalType.OPTIMISIC]: {
+  [ProposalType.OPTIMISTIC]: {
     title: "Optimistic Proposal",
     description: "An optimistic proposal.",
   },
@@ -158,4 +168,77 @@ export type PLMConfig = {
   snapshotConfig?: {
     domain: string;
   };
+};
+
+export type BasicProposal = ProposalDraft & {
+  proposal_type: ProposalType.BASIC;
+  transactions: ProposalDraftTransaction[];
+};
+
+export type SocialProposal = ProposalDraft & {
+  proposal_type: ProposalType.SOCIAL;
+  end_date_social: Date;
+  start_date_social: Date;
+  proposal_social_type: SocialProposalType;
+  social_options: ProposalSocialOption[];
+};
+
+export type ApprovalProposal = ProposalDraft & {
+  proposal_type: ProposalType.APPROVAL;
+  budget: string;
+  criteria: ApprovalProposalType;
+  max_options: number;
+  threshold: number;
+  top_choices: number;
+  options: ProposalDraftTransaction[];
+};
+
+export type OptimisticProposal = ProposalDraft & {
+  proposal_type: ProposalType.OPTIMISTIC;
+};
+
+export type DraftProposal =
+  | BasicProposal
+  | SocialProposal
+  | ApprovalProposal
+  | OptimisticProposal;
+
+// Used to translate a draftProposal database record into its form representation
+export const parseProposalToForm = (proposal: DraftProposal) => {
+  switch (proposal.proposal_type) {
+    case ProposalType.BASIC:
+      return {
+        type: ProposalType.BASIC,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        transactions: proposal.transactions,
+      };
+    case ProposalType.SOCIAL:
+      return {
+        type: ProposalType.SOCIAL,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        start_date: proposal.start_date_social,
+        end_date: proposal.end_date_social,
+        options: proposal.social_options,
+      };
+    case ProposalType.APPROVAL:
+      return {
+        type: ProposalType.APPROVAL,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        budget: proposal.budget,
+        criteria: proposal.criteria,
+        maxOptions: proposal.max_options,
+        threshold: proposal.threshold,
+        topChoices: proposal.top_choices,
+        options: proposal.options,
+      };
+    case ProposalType.OPTIMISTIC:
+      return {
+        type: ProposalType.OPTIMISTIC,
+        title: proposal.title,
+        abstract: proposal.abstract,
+      };
+  }
 };

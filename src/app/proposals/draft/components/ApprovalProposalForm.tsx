@@ -1,49 +1,17 @@
 import React from "react";
-import { useEffect } from "react";
 import { z } from "zod";
 import FormItem from "./form/FormItem";
-import TextInput from "./form/TextInput";
-import { SocialProposalType } from "./../types";
 import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
-import { UpdatedButton } from "../../../../components/Button";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import NumberInput from "./form/NumberInput";
 import SwitchInput from "./form/SwitchInput";
 import ProposedTransactionsForm from "./ProposedTransactionsForm";
+import { ApprovalProposalType } from "@/app/proposals/draft/types";
 
 const ApprovalProposalForm = () => {
   type FormType = z.output<typeof draftProposalSchema>;
-  const {
-    register,
-    // watch,
-    // formState: { errors, defaultValues },
-  } = useFormContext<FormType>();
-
-  //   const { fields, append, remove } = useFieldArray({
-  //     control,
-  //     name: "socialProposal.options",
-  //   });
-
-  //   const proposalType = watch("socialProposal.type");
-
-  //   useEffect(() => {
-  //     // removes all array fields
-  //     remove();
-  //     if (proposalType === SocialProposalType.BASIC) {
-  //       append({ text: "FOR" });
-  //       append({ text: "AGAINST" });
-  //       append({ text: "ABSTAIN" });
-  //     } else {
-  //       const defaultOptions = defaultValues?.socialProposal?.options;
-  //       if (defaultOptions && defaultOptions.length > 0) {
-  //         defaultOptions.forEach((option) => {
-  //           append({ text: option?.text || "" });
-  //         });
-  //       } else {
-  //         append({ text: "" });
-  //       }
-  //     }
-  //   }, [proposalType]);
+  const { register, watch } = useFormContext<FormType>();
+  const criteria = watch("approvalProposal.criteria");
 
   return (
     <div className="space-y-6">
@@ -55,21 +23,54 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <FormItem label="Budget" required={true} htmlFor="budget">
+        <FormItem
+          label="Budget"
+          required={true}
+          info="This is the maximum number of tokens that can be transferred from all the options in this proposal."
+          htmlFor="budget"
+        >
           <NumberInput name="approvalProposal.budget" register={register} />
         </FormItem>
-        <FormItem label="Max options" required={true} htmlFor="maxOptions">
+        <FormItem
+          label="Max options"
+          required={true}
+          info="Determines up to how many options each voter may select"
+          htmlFor="maxOptions"
+        >
           <NumberInput name="approvalProposal.maxOptions" register={register} />
         </FormItem>
-        <FormItem label="Criteria" required={true} htmlFor="criteria">
+        <FormItem
+          label="Criteria"
+          required={true}
+          info="Threshold means all options with more than a set amount of votes win. Top choices means only a set number of the most popular options win."
+          htmlFor="criteria"
+        >
           <SwitchInput
             options={["Threshold", "Top choices"]}
             name="approvalProposal.criteria"
           />
         </FormItem>
-        <FormItem label="Threshold" required={true} htmlFor="threshold">
-          <NumberInput name="approvalProposal.threshold" register={register} />
-        </FormItem>
+        {criteria === ApprovalProposalType.TOP_CHOICES && (
+          <FormItem
+            label="Top choices"
+            info="Selects how many votes an option must have to be considered a winner"
+            required={true}
+            htmlFor="topChoices"
+          >
+            <NumberInput
+              name="approvalProposal.topChoices"
+              register={register}
+            />
+          </FormItem>
+        )}
+        {criteria === ApprovalProposalType.THRESHOLD && (
+          <FormItem label="Threshold" required={true} htmlFor="threshold">
+            <NumberInput
+              name="approvalProposal.threshold"
+              register={register}
+            />
+          </FormItem>
+        )}
       </div>
       <div>
         <h3 className="text-stone-900 font-semibold">Proposed transactions</h3>
