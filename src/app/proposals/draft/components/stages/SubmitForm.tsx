@@ -1,26 +1,13 @@
 import DraftPreview from "../DraftPreview";
-import {
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-  ProposalChecklist,
-} from "@prisma/client";
 import { useAccount, useBlockNumber } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import { DraftProposal } from "../../types";
 
-const Actions = ({
-  proposalDraft,
-}: {
-  proposalDraft: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
-}) => {
+const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useGetVotes({
@@ -43,15 +30,7 @@ const Actions = ({
   );
 };
 
-const SubmitForm = ({
-  draftProposal,
-}: {
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
-}) => {
+const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const methods = useForm({});
   return (
     <FormProvider {...methods}>

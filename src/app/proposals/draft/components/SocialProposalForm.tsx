@@ -79,7 +79,7 @@ const SocialProposalForm = () => {
               <div className="flex-1">
                 <TextInput
                   label={`Option ${index + 1} text`}
-                  name={`socialProposal.options[${index}].text`}
+                  name={`socialProposal.options.${index}.text`}
                   control={control}
                   placeholder="For, against, abstain, etc."
                   disabled={proposalType === SocialProposalType.BASIC}

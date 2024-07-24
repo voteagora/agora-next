@@ -10,12 +10,12 @@ import TextInput from "../form/TextInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
-import { ProposalDraft } from "@prisma/client";
 import { useAccount } from "wagmi";
 import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
+import { DraftProposal } from "../../types";
 
-const TempCheckForm = ({ draftProposal }: { draftProposal: ProposalDraft }) => {
+const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
   const { address } = useAccount();
   const [isSkipPending, setIsSkipPending] = useState(false);

@@ -13,12 +13,14 @@ type TextInputProps = {
   description?: string;
   placeholder?: string;
   units?: string;
+  required?: boolean;
 };
 
 function TextInput<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
+  required,
   control,
   name,
   label,
@@ -32,7 +34,12 @@ function TextInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel
+            className="text-xs font-semibold text-agora-stone-700"
+            isRequired={required}
+          >
+            {label}
+          </FormLabel>
           <FormControl>
             <div className="relative">
               <input

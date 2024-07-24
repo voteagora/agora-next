@@ -3,15 +3,14 @@ import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
-import { DraftProposalSchema } from "./../schemas/DraftProposalSchema";
+import { BasicProposalSchema } from "./../schemas/DraftProposalSchema";
 
 // example calldata
 // 0xa9059cbb00000000000000000000000065a3870f48b5237f27f674ec42ea1e017e111d630000000000000000000000000000000000000000000000000000000000000064
 const CustomTransactionForm = ({ index }: { index: number }) => {
-  type FormType = z.output<typeof DraftProposalSchema>;
+  type FormType = z.output<typeof BasicProposalSchema>;
 
   const {
-    register,
     control,
     formState: { errors },
   } = useFormContext<FormType>();

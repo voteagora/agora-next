@@ -7,8 +7,9 @@ import TextInput from "./form/TextInput";
 import NumberInput from "./form/NumberInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
-import { DraftProposalSchema } from "./../schemas/DraftProposalSchema";
+import { BasicProposalSchema } from "./../schemas/DraftProposalSchema";
 import Tenant from "@/lib/tenant/tenant";
+import { EthereumAddress } from "../types";
 
 const transferABI = [
   {
@@ -36,7 +37,7 @@ const transferABI = [
   },
 ] as const;
 
-type FormType = z.output<typeof DraftProposalSchema>;
+type FormType = z.output<typeof BasicProposalSchema>;
 
 const TransferTransactionForm = ({ index }: { index: number }) => {
   const tenant = Tenant.current();
@@ -67,7 +68,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       setValue(`transactions.${index}.calldata`, calldata);
       setValue(
         `transactions.${index}.target`,
-        tenant.contracts.governor.address
+        tenant.contracts.governor.address as EthereumAddress
       );
       setValue(`transactions.${index}.value`, "0");
     }
