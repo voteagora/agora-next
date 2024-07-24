@@ -97,8 +97,8 @@ async function getDelegates({
 
   const includeZeroVPDelegates = true;
 
-  let delegateUniverseCTE : string
-  
+  let delegateUniverseCTE: string;
+
   const tokenAddress = contracts.token.address;
 
   if (includeZeroVPDelegates) {
@@ -109,19 +109,17 @@ async function getDelegates({
                                         coalesce(d.direct_vp, 0) as direct_vp, 
                                         coalesce(d.advanced_vp, 0) as advanced_vp,
                                         coalesce(d.voting_power, 0) as voting_power
-                                        from del_with_del d full join del_statements ds on d.delegate = ds.address)`
-
-  } else { 
+                                        from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
+  } else {
     // This code path is only in case one of the settings makes this query much slower.
-    delegateUniverseCTE = `with del_card_universe as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}')`
+    delegateUniverseCTE = `with del_card_universe as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}')`;
   }
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
-    
     console.log(sort);
 
-    const allowListString = allowList.map(value => `'${value}'`).join(', ');
+    const allowListString = allowList.map((value) => `'${value}'`).join(", ");
 
     switch (sort) {
       case "most_delegators":
@@ -162,18 +160,14 @@ async function getDelegates({
           ORDER BY num_of_delegators DESC
           OFFSET $1
           LIMIT $2;
-          `
+          `;
         // console.log(QRY1);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1,
-          skip,
-          take
-        );
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1, skip, take);
 
       case "weighted_random":
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
 
-        const QRY2 = 
-        ` ${delegateUniverseCTE}
+        const QRY2 = ` ${delegateUniverseCTE}
           SELECT *,
             CASE
               WHEN EXISTS (
@@ -208,16 +202,12 @@ async function getDelegates({
          ORDER BY -log(random()) / NULLIF(voting_power, 0)
           OFFSET $1
           LIMIT $2;
-          `
+          `;
         // console.log(QRY2);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2,
-          skip,
-          take
-        );
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2, skip, take);
 
       default:
-        const QRY3 = 
-        `
+        const QRY3 = `
           ${delegateUniverseCTE}
           SELECT *,
             CASE
@@ -253,12 +243,9 @@ async function getDelegates({
           ORDER BY voting_power DESC
           OFFSET $1
           LIMIT $2;
-          `
+          `;
         // console.log(QRY3);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3,
-          skip,
-          take
-        );
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3, skip, take);
     }
   };
 
