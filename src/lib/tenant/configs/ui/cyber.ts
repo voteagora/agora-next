@@ -2,7 +2,6 @@ import { TenantUI } from "@/lib/tenant/tenantUI";
 import cyberHero from "@/assets/tenant/cyber_hero.svg";
 import cyberLogo from "@/assets/tenant/cyber_logo.svg";
 import delegateImage from "@/assets/tenant/cyber_delegate.svg";
-import delegateImageTwo from "@/assets/tenant/cyber_delegate_placeholder.svg";
 import successImage from "@/assets/tenant/cyber_success.svg";
 import pendingImage from "@/assets/tenant/cyber_pending.svg";
 
@@ -15,8 +14,7 @@ export const cyberTenantUIConfig = new TenantUI({
   assets: {
     success: successImage,
     pending: pendingImage,
-    // delegate: delegateImage,
-    delegate: delegateImageTwo,
+    delegate: delegateImage,
   },
 
   organization: {
