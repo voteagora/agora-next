@@ -163,7 +163,7 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `
-        console.log(QRY1);
+        // console.log(QRY1);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1,
           skip,
           take
@@ -209,7 +209,7 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `
-        console.log(QRY2);
+        // console.log(QRY2);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2,
           skip,
           take
@@ -254,7 +254,7 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `
-        console.log(QRY3);
+        // console.log(QRY3);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3,
           skip,
           take
