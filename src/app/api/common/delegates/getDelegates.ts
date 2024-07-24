@@ -100,6 +100,9 @@ async function getDelegates({
     
     console.log(sort);
 
+    const allowListString = allowList.map(value => `'${value}'`).join(', ');
+    const tokenAddress = contracts.token.address;
+
     switch (sort) {
       case "most_delegators":
         const QRY1 = `
@@ -133,8 +136,8 @@ async function getDelegates({
             ) AS statement
           FROM ${namespace + ".delegates"} d
           WHERE num_of_delegators IS NOT NULL
-          AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
-          AND d.contract = $3
+          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
           ORDER BY num_of_delegators DESC
           OFFSET $4
@@ -183,8 +186,8 @@ async function getDelegates({
               ) sub
             ) AS statement
           FROM ${namespace + ".delegates"} d
-          WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
-          AND d.contract = $4
+          WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
          ORDER BY -log(random()) / NULLIF(voting_power, 0)
           OFFSET $5
@@ -232,8 +235,8 @@ async function getDelegates({
               ) sub
             ) AS statement
           FROM ${namespace + ".delegates"} d
-          WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
-          AND d.contract = $3
+          WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
           ORDER BY voting_power DESC
           OFFSET $4
