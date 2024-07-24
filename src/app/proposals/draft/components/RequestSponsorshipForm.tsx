@@ -8,16 +8,16 @@ import AddressInput from "./form/AddressInput";
 import { useBlockNumber } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
-import { ProposalDraft } from "@prisma/client";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import { DraftProposal } from "../types";
 
 const RequestSponsorshipForm = ({
   draftProposal,
 }: {
-  draftProposal: ProposalDraft;
+  draftProposal: DraftProposal;
 }) => {
   const [isPending, setIsPending] = useState(false);
   const { watch } = useFormContext();

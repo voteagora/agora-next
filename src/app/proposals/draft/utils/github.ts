@@ -8,6 +8,7 @@ import {
 } from "@prisma/client";
 import { markdownTable } from "markdown-table";
 import { formatTransactions } from "./formatTransactions";
+import { DraftProposal } from "../types";
 
 const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
 const AGORA_ENS_FORK = "docs";
@@ -41,12 +42,7 @@ function getFormattedTransactionTable(
   return table;
 }
 
-function formatGithubProposal(
-  proposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-  }
-) {
+function formatGithubProposal(proposal: DraftProposal) {
   const descriptionTable = markdownTable([
     ["description"],
     [proposal.abstract],
@@ -68,7 +64,7 @@ function formatGithubProposal(
       : "N/A"
   }                                                                                              |
   | **Votes**             | ${
-    proposal.proposal_type === "executable"
+    proposal.proposal_type === "basic"
       ? "[Agora](https://agora.ensdao.org/proposals/" + proposal.id + ")"
       : "[Snapshot](https://snapshot.org/#/ens.eth/proposal/" +
         proposal.id +
@@ -78,7 +74,7 @@ function formatGithubProposal(
 
   const abstract = `# Abstract \n ${proposal.abstract}`;
   const transactions =
-    proposal.proposal_type === "executable"
+    proposal.proposal_type === "basic"
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
       : "";
 
@@ -129,10 +125,7 @@ function formatGithubProposal(
 }
 
 export async function createGithubProposal(
-  proposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-  }
+  proposal: DraftProposal
 ): Promise<string> {
   console.log("pr token", process.env.PR_BOT_TOKEN);
   const octokit = new Octokit({

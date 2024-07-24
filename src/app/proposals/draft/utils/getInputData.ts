@@ -87,7 +87,7 @@ const createOptimisticProposalAction = (proposalData: OptimisticProposal) => {
  * @throws Error if the proposal type is invalid
  */
 const useCreateProposalAction = (proposalData: DraftProposal) => {
-  switch (proposalData.type) {
+  switch (proposalData.proposal_type) {
     case ProposalType.BASIC:
       return useCreateBasicProposalAction(proposalData);
     case ProposalType.SOCIAL:

@@ -1,27 +1,19 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import {
-  ProposalChecklist,
-  ProposalSocialOption,
-  ProposalStage,
-} from "@prisma/client";
+import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
 import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
-import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
+import { DraftProposal } from "../types";
 
 export default function DraftProposalForm({
   stage,
   draftProposal,
 }: {
   stage: ProposalStage;
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
+  draftProposal: DraftProposal;
 }) {
   const { address, isConnecting, isReconnecting } = useAccount();
 

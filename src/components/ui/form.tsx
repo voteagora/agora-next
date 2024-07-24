@@ -42,7 +42,7 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
-  const { getFieldState, formState } = useFormContext();
+  const { getFieldState, formState, getValues } = useFormContext();
 
   const fieldState = getFieldState(fieldContext.name, formState);
 
@@ -78,7 +78,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div ref={ref} className={cn("space-y-1", className)} {...props} />
     </FormItemContext.Provider>
   );
 });
@@ -86,8 +86,10 @@ FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+    isRequired?: boolean;
+  }
+>(({ className, isRequired, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
   return (
@@ -96,7 +98,12 @@ const FormLabel = React.forwardRef<
       className={cn(error && "text-destructive", className)}
       htmlFor={formItemId}
       {...props}
-    />
+    >
+      {props.children}
+      {isRequired && (
+        <span className={cn(error && "text-destructive", "ml-1")}>*</span>
+      )}
+    </Label>
   );
 });
 FormLabel.displayName = "FormLabel";

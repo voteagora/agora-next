@@ -4,17 +4,12 @@ import { useAccount } from "wagmi";
 import { useState } from "react";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
-import {
-  ProposalDraft,
-  ProposalSocialOption,
-  ProposalDraftTransaction,
-  ProposalChecklist,
-} from "@prisma/client";
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
 import { onSubmitAction as createGithubChecklistItem } from "../../actions/createGithubChecklistItem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { DraftProposal } from "../../types";
 
 /**
  * TODO:
@@ -22,15 +17,7 @@ import { useRouter } from "next/navigation";
  * So I don't feel like it's worth the effort to make this a generic component.
  * So, keep in mind that currently this component (and the github actions) are tightly coupled to the ENS tenant.
  */
-const GithubPRForm = ({
-  draftProposal,
-}: {
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
-}) => {
+const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address } = useAccount();
