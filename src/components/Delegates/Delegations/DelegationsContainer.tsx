@@ -81,7 +81,7 @@ function DelegationsContainer({
             className="border shadow-sm rounded-xl border-gray-eb overflow-auto max-h-[500px]"
           >
             <Table className="min-w-full">
-              <TableHeader className="text-xs text-slate-700 sticky top-0 bg-white z-10">
+              <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
@@ -127,9 +127,12 @@ function DelegationsContainer({
           </VStack>
         </TabsContent>
         <TabsContent value="delegatedTo">
-          <VStack gap={3} className="border shadow-sm rounded-xl border-line">
+          <VStack
+            gap={3}
+            className="border shadow-sm rounded-xl border-line overflow-auto max-h-[500px]"
+          >
             <Table>
-              <TableHeader className="text-xs text-secondary">
+              <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
@@ -139,7 +142,7 @@ function DelegationsContainer({
                   <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="">
                 {delegatees.length === 0 ? (
                   <div className="w-full p-4">None found</div>
                 ) : (
