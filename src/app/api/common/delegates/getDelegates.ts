@@ -95,17 +95,38 @@ async function getDelegates({
       )`
       : "";
 
+  const includeZeroVPDelegates = true;
+
+  let delegateUniverseCTE : string
+  
+  const tokenAddress = contracts.token.address;
+
+  if (includeZeroVPDelegates) {
+    delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
+                                del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
+                                del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate, 
+                                        coalesce(d.num_of_delegators, 0) as num_of_delegators, 
+                                        coalesce(d.direct_vp, 0) as direct_vp, 
+                                        coalesce(d.advanced_vp, 0) as advanced_vp,
+                                        coalesce(d.voting_power, 0) as voting_power
+                                        from del_with_del d full join del_statements ds on d.delegate = ds.address)`
+
+  } else { 
+    // This code path is only in case one of the settings makes this query much slower.
+    delegateUniverseCTE = `with del_card_universe as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}')`
+  }
+
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
     
     console.log(sort);
 
     const allowListString = allowList.map(value => `'${value}'`).join(', ');
-    const tokenAddress = contracts.token.address;
 
     switch (sort) {
       case "most_delegators":
         const QRY1 = `
+          ${delegateUniverseCTE}
           SELECT *,
             CASE
               WHEN EXISTS (
@@ -134,10 +155,9 @@ async function getDelegates({
                 LIMIT 1
               ) sub
             ) AS statement
-          FROM ${namespace + ".delegates"} d
+          FROM del_card_universe d
           WHERE num_of_delegators IS NOT NULL
           AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-          AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
           ORDER BY num_of_delegators DESC
           OFFSET $1
@@ -153,7 +173,7 @@ async function getDelegates({
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
 
         const QRY2 = 
-        `
+        ` ${delegateUniverseCTE}
           SELECT *,
             CASE
               WHEN EXISTS (
@@ -182,9 +202,8 @@ async function getDelegates({
                 LIMIT 1
               ) sub
             ) AS statement
-          FROM ${namespace + ".delegates"} d
+          FROM del_card_universe d
           WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-          AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
          ORDER BY -log(random()) / NULLIF(voting_power, 0)
           OFFSET $1
@@ -199,6 +218,7 @@ async function getDelegates({
       default:
         const QRY3 = 
         `
+          ${delegateUniverseCTE}
           SELECT *,
             CASE
               WHEN EXISTS (
@@ -227,9 +247,8 @@ async function getDelegates({
                 LIMIT 1
               ) sub
             ) AS statement
-          FROM ${namespace + ".delegates"} d
+          FROM del_card_universe d
           WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-          AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
           ORDER BY voting_power DESC
           OFFSET $1
