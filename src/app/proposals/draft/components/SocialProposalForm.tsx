@@ -53,16 +53,15 @@ const SocialProposalForm = () => {
           Choose the voting strategy and options for your proposal.
         </p>
       </div>
-      <FormItem label="Voting strategy" required={true} htmlFor="type">
-        <RadioGroupInput
-          name="socialProposal.type"
-          control={control}
-          options={Object.values(SocialProposalType).map((value) => {
-            return { label: value, value: value } as any;
-          })}
-        />
-      </FormItem>
-
+      <RadioGroupInput
+        label="Voting strategy"
+        required={true}
+        name="socialProposal.type"
+        control={control}
+        options={Object.values(SocialProposalType).map((value) => {
+          return { label: value, value: value } as any;
+        })}
+      />
       <div className="grid grid-cols-2 gap-4">
         <DateInput
           label="Start date"

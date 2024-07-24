@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-type TextInputProps = {
+type SwitchInputProps = {
   label: string;
   options: string[];
   description?: string;
@@ -32,7 +32,7 @@ function SwitchInput<
   label,
   description,
   options,
-}: Omit<ControllerProps<TFieldValues, TName>, "render"> & TextInputProps) {
+}: Omit<ControllerProps<TFieldValues, TName>, "render"> & SwitchInputProps) {
   const [value, setValue] = useState("");
   const { getValues } = useFormContext();
 
