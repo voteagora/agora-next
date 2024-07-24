@@ -1,7 +1,6 @@
 import { Address } from "viem";
 import { ChainConstants } from "viem/types/chain";
-import { AlchemyProvider } from "ethers";
-import { MulticallProvider } from "ethers-multicall-provider";
+import { Provider } from "ethers";
 
 type TenantContractParams<ContractType> = {
   abi: any;
@@ -9,7 +8,7 @@ type TenantContractParams<ContractType> = {
   chain: ChainConstants;
   contract: ContractType;
   optionBudgetChangeDate?: Date;
-  provider: MulticallProvider | AlchemyProvider;
+  provider: Provider;
   v6UpgradeBlock?: number;
 };
 
@@ -19,7 +18,7 @@ export class TenantContract<ContractType> {
   public chain: ChainConstants;
   public contract: ContractType;
   public optionBudgetChangeDate?: Date;
-  public provider: MulticallProvider | AlchemyProvider;
+  public provider: Provider;
   public v6UpgradeBlock?: number;
 
   constructor({

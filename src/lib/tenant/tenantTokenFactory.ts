@@ -30,6 +30,13 @@ export default class TenantTokenFactory {
           symbol: "UNI",
           decimals: 18,
         };
+
+      case TENANT_NAMESPACES.CYBER:
+        return {
+          name: "Cyber",
+          symbol: "cCYBER",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

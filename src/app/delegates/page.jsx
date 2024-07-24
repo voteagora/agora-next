@@ -28,8 +28,8 @@ async function fetchDelegators(address) {
 }
 
 export async function generateMetadata({}, parent) {
-  const tenant = Tenant.current();
-  const page = tenant.ui.page("delegates");
+  const { ui } = Tenant.current();
+  const page = ui.page("delegates");
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
@@ -57,6 +57,8 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
+  const { ui } = Tenant.current();
+
   const sort =
     delegatesFilterOptions[searchParams.orderBy]?.sort ||
     delegatesFilterOptions.weightedRandom.sort;
@@ -69,10 +71,15 @@ export default async function Page({ searchParams }) {
     ...(searchParams.stakeholderFilter && {
       stakeholders: searchParams.stakeholderFilter,
     }),
-    ...(searchParams.endorsedFilter && {
-      endorsed: searchParams.endorsedFilter,
-    }),
   };
+
+  const endorsedFilterEnabled = ui.toggle("delegates/endorsed-filter")?.enabled;
+
+  if (endorsedFilterEnabled) {
+    filters.endorsed = !Boolean(
+      searchParams?.endorsedFilter && searchParams?.endorsedFilter
+    );
+  }
 
   const tab = searchParams.tab;
   const seed = Math.random();

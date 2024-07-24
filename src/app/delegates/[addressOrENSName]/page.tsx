@@ -157,7 +157,7 @@ export default async function Page({
                     />
                   </div>
                 ) : (
-                  <div className="default-message-class">
+                  <div className="text-secondary">
                     <p>No past votes available.</p>
                   </div>
                 )}
@@ -178,7 +178,7 @@ export default async function Page({
                     }}
                   />
                 ) : (
-                  <div className="default-message-class">
+                  <div className="text-secondary">
                     <p>No past votes available.</p>
                   </div>
                 )}
@@ -197,7 +197,7 @@ export default async function Page({
                 />
               </div>
             ) : (
-              <div className="default-message-class">
+              <div className="text-secondary">
                 <p>No past votes available.</p>
               </div>
             )}
