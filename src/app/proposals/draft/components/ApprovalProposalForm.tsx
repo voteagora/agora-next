@@ -9,7 +9,7 @@ import { ApprovalProposalType } from "@/app/proposals/draft/types";
 
 const ApprovalProposalForm = () => {
   type FormType = z.output<typeof ApprovalProposalSchema>;
-  const { register, watch, control } = useFormContext<FormType>();
+  const { control, watch, control } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
   return (
@@ -29,7 +29,6 @@ const ApprovalProposalForm = () => {
           name="approvalProposal.budget"
           control={control}
         />
-
         {/*  info="Determines up to how many options each voter may select" */}
         <NumberInput
           required={true}
@@ -37,18 +36,14 @@ const ApprovalProposalForm = () => {
           name="approvalProposal.maxOptions"
           control={control}
         />
-
-        <FormItem
+        {/* info="Threshold means all options with more than a set amount of votes win. Top choices means only a set number of the most popular options win." */}
+        <SwitchInput
+          control={control}
           label="Criteria"
           required={true}
-          info="Threshold means all options with more than a set amount of votes win. Top choices means only a set number of the most popular options win."
-          htmlFor="criteria"
-        >
-          <SwitchInput
-            options={["Threshold", "Top choices"]}
-            name="approvalProposal.criteria"
-          />
-        </FormItem>
+          options={["Threshold", "Top choices"]}
+          name="approvalProposal.criteria"
+        />
         {criteria === ApprovalProposalType.TOP_CHOICES && (
           // info="Selects how many votes an option must have to be considered a winner"
           <NumberInput

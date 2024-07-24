@@ -53,7 +53,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 
-  const { watch, handleSubmit } = methods;
+  const { watch, handleSubmit, control } = methods;
 
   const proposalType = watch("type");
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
@@ -91,14 +91,16 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <FormItem label="Proposal type" required={true} htmlFor="type">
-                  <SwitchInput
-                    options={Object.values([
-                      ...(plmToggle?.config?.proposalTypes || []),
-                    ])}
-                    name="type"
-                  />
-                </FormItem>
+                <SwitchInput
+                  control={control}
+                  label="Proposal type"
+                  required={true}
+                  options={Object.values([
+                    ...(plmToggle?.config?.proposalTypes || []),
+                  ])}
+                  name="type"
+                />
+
                 <p className="text-sm self-center text-agora-stone-700 mt-4">
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
