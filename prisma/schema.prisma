@@ -326,6 +326,7 @@ view OptimismVotes {
 view OptimismVotingPower {
   delegate     String  @unique
   voting_power String?
+  contract     String  @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("optimism")
@@ -395,7 +396,7 @@ view OptimismAdvancedVotingPower {
   delegated_vp             Decimal  @db.Decimal
   advanced_vp              Decimal  @db.Decimal
   subdelegated_share       Decimal? @db.Decimal
-  contract                 String?  @db.VarChar(42)
+  contract                 String   @db.VarChar(42)
 
   @@map("advanced_voting_power")
   @@schema("optimism")
@@ -589,6 +590,7 @@ view ensVotes {
 view ensVotingPower {
   delegate     String  @unique
   voting_power String?
+  contract     String  @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("ens")
@@ -628,7 +630,7 @@ view ensAdvancedVotingPower {
   delegated_vp             Decimal  @db.Decimal
   advanced_vp              Decimal  @db.Decimal
   subdelegated_share       Decimal? @db.Decimal
-  contract                 String?  @db.VarChar
+  contract                 String   @db.VarChar
 
   @@map("advanced_voting_power")
   @@schema("ens")
@@ -725,6 +727,7 @@ view etherfiVotableSupply {
 view etherfiVotingPower {
   delegate     String  @unique
   voting_power String?
+  contract     String  @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("etherfi")
@@ -823,7 +826,7 @@ view etherfiAdvancedVotingPower {
   delegated_vp             Decimal  @db.Decimal
   advanced_vp              Decimal  @db.Decimal
   subdelegated_share       Decimal? @db.Decimal
-  contract                 String?  @db.VarChar
+  contract                 String   @db.VarChar
 
   @@map("advanced_voting_power")
   @@schema("etherfi")
@@ -920,6 +923,7 @@ view uniswapVotableSupply {
 view uniswapVotingPower {
   delegate     String  @unique
   voting_power String?
+  contract     String  @db.VarChar(42)
 
   @@map("voting_power")
   @@schema("uniswap")
@@ -1018,7 +1022,7 @@ view uniswapAdvancedVotingPower {
   delegated_vp             Decimal  @db.Decimal
   advanced_vp              Decimal  @db.Decimal
   subdelegated_share       Decimal? @db.Decimal
-  contract                 String?  @db.VarChar
+  contract                 String   @db.VarChar
 
   @@map("advanced_voting_power")
   @@schema("uniswap")
@@ -1707,7 +1711,7 @@ view cyberAdvancedVotingPower {
   vp_delegatable_allowance Decimal  @db.Decimal
   delegated_vp             Decimal  @db.Decimal
   advanced_vp              Decimal  @db.Decimal
-  subdelegated_share       Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
   contract                 String   @db.VarChar
 
   @@schema("cyber")
@@ -1851,18 +1855,16 @@ view cyber_direct_chains_snaps {
   @@schema("cyber")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view cyberProposalTypes {
-  id                 String?
-  contract           String? @db.VarChar
-  block_number       BigInt?
-  proposal_type_id   String?
-  quorum             String?
-  approval_threshold String?
-  name               String?
-  inputs             Json?
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
 
-  @@ignore
   @@schema("cyber")
   @@map("proposal_types")
 }

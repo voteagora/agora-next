@@ -6,6 +6,7 @@ import Link from "next/link";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
+import { getBlockScanUrl } from "@/lib/utils";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -63,7 +64,7 @@ const SponsorOnchainProposalDialog = ({
                   View transaction on block explorer
                 </span>
                 <div className="flex flex-row items-center space-x-2">
-                  <Link href={`${tenant.blockExplorer}/tx/${txHash}`}>
+                  <Link href={`${getBlockScanUrl(txHash)}`}>
                     <Image
                       src={icons.link}
                       height="16"

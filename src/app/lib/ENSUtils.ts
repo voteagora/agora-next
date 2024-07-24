@@ -1,16 +1,19 @@
-import { ethProvider } from "@/app/lib/provider";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { isAddress } from "viem";
 import { cache } from "react";
+import { AlchemyProvider } from "ethers";
+
+const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
+const mainnetProvider = new AlchemyProvider("mainnet", alchemyId);
 
 export async function resolveENSName(nameOrAddress: string) {
   if (isAddress(nameOrAddress)) {
     return nameOrAddress;
   }
 
-  const address = await cache((name: string) => ethProvider.resolveName(name))(
-    nameOrAddress
-  );
+  const address = await cache((name: string) =>
+    mainnetProvider.resolveName(name)
+  )(nameOrAddress);
 
   if (!address) {
     throw new Error("No address found for ENS name");
@@ -23,7 +26,7 @@ export async function reverseResolveENSName(
   address: string
 ): Promise<string | null> {
   try {
-    const ensName = await ethProvider.lookupAddress(address);
+    const ensName = await mainnetProvider.lookupAddress(address);
 
     return ensName || null;
   } catch (error) {
@@ -45,7 +48,7 @@ export async function resolveENSProfileImage(
   }
 
   try {
-    return await ethProvider.getAvatar(lowerCaseAddress);
+    return await mainnetProvider.getAvatar(lowerCaseAddress);
   } catch (error) {
     console.error("ENS Avatar error", error);
     return null;
