@@ -47,7 +47,9 @@ async function getDelegates({
 
   const allowList = ui.delegates?.allowed || [];
 
-  const endorsedFilterQuery = filters?.endorsed ? `AND endorsed = true` : "";
+  const endorsedFilterQuery = filters?.endorsed
+    ? `AND endorsed = true AND s.dao_slug = '${slug}'`
+    : "";
 
   const topIssuesParam = filters?.issues || "";
   const topIssuesFilterQuery =
