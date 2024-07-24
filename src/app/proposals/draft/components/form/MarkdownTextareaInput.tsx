@@ -4,18 +4,6 @@ import { useState, useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 
-// example markdown to test with for the developer convenience :)
-
-// # This is a header
-// ## This is a subheader
-// this is a paragraph. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.
-// ## This is another subheader
-// this is another paragraph. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam, quisque amet, nunc. Sed euismod, diam, quisque amet, nunc.
-// this is list:
-// - item 1
-// - item 2
-// - item 3
-
 type MarkdownTextareaInputProps = {
   name: string;
   placeholder?: string;

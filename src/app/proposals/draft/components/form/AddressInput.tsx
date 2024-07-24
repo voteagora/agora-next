@@ -1,15 +1,37 @@
-import { useFormContext } from "react-hook-form";
+import {
+  ControllerProps,
+  FieldPath,
+  FieldValues,
+  useFormContext,
+} from "react-hook-form";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { isAddress } from "viem";
 
-const AddressInput = ({
+type AddressInputProps = {
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+};
+
+function AddressInput<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  required,
+  control,
   name,
-  errorMessage,
-}: {
-  name: string;
-  errorMessage?: string;
-}) => {
-  const { register, watch, setValue } = useFormContext();
+  label,
+  placeholder,
+}: Omit<ControllerProps<TFieldValues, TName>, "render"> & AddressInputProps) {
+  const { watch, setValue } = useFormContext();
 
   const address = watch(name);
 
@@ -42,31 +64,45 @@ const AddressInput = ({
     if (event.key === "Enter") {
       event.preventDefault();
       if (!isAddress(address) && ensAddress != null) {
-        setValue(name, ensAddress);
+        setValue(name, ensAddress as any);
       }
     }
   };
 
   return (
-    <>
-      <input
-        type="text"
-        className="border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full"
-        placeholder="0x..."
-        {...register(name)}
-        onBlur={() => {
-          if (!isAddress(address) && ensAddress != null) {
-            setValue(name, ensAddress);
-          }
-        }}
-        onKeyDown={handleKeyDown}
-      />
-      <p className="text-xs text-neutral-500 mt-1">{buildHint()}</p>
-      {errorMessage && (
-        <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel
+            className="text-xs font-semibold text-agora-stone-700"
+            isRequired={required}
+          >
+            {label}
+          </FormLabel>
+          <FormControl>
+            <div className="relative">
+              <input
+                {...field}
+                type="text"
+                className={`border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full`}
+                onBlur={() => {
+                  if (!isAddress(address) && ensAddress != null) {
+                    setValue(name, ensAddress as any);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder}
+              />
+            </div>
+          </FormControl>
+          <FormDescription>{buildHint()}</FormDescription>
+          <FormMessage />
+        </FormItem>
       )}
-    </>
+    />
   );
-};
+}
 
 export default AddressInput;

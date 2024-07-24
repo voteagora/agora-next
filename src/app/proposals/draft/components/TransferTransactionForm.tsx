@@ -41,13 +41,7 @@ type FormType = z.output<typeof BasicProposalSchema>;
 
 const TransferTransactionForm = ({ index }: { index: number }) => {
   const tenant = Tenant.current();
-  const {
-    register,
-    control,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext<FormType>();
+  const { register, control, watch, setValue } = useFormContext<FormType>();
 
   const recipient = watch(`transactions.${index}.recipient`);
   const amount = watch(`transactions.${index}.amount`);
@@ -76,17 +70,13 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      <FormItem
-        label="Recipient"
-        required={true}
-        htmlFor={`transactions.${index}.recipient`}
-        className="col-span-2"
-      >
+      <div className="col-span-2">
         <AddressInput
+          control={control}
+          label="Recipient"
           name={`transactions.${index}.recipient`}
-          errorMessage={errors.transactions?.[index]?.recipient?.message}
         />
-      </FormItem>
+      </div>
       <NumberInput
         control={control}
         required={true}
