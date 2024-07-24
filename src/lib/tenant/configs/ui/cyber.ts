@@ -37,18 +37,18 @@ export const cyberTenantUIConfig = new TenantUI({
     },
   ],
 
-  //   customization: {
-  //     primary: "#171717",
-  //     secondary: "#404040",
-  //     tertiary: "#737373",
-  //     neutral: "#FFFFFF",
-  //     wash: "#FAFAFA",
-  //     line: "#E5E5E5",
-  //     positive: "#00992B",
-  //     negative: "#C52F00",
-  //     brandPrimary: "#171717",
-  //     brandSecondary: "#F2F2F2",
-  //   },
+  customization: {
+    primary: "#171717",
+    secondary: "#404040",
+    tertiary: "#737373",
+    neutral: "#FFFFFF",
+    wash: "#FAFAFA",
+    line: "#E5E5E5",
+    positive: "#00992B",
+    negative: "#C52F00",
+    brandPrimary: "#171717",
+    brandSecondary: "#F2F2F2",
+  },
 
   governanceIssues: [
     {
