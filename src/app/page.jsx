@@ -1,16 +1,15 @@
 import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import {
-  fetchProposals as apiFetchProposals,
-  fetchDraftProposals as apiFetchDraftProposals,
   fetchDraftProposalForSponsor as apiFetchDraftProposalsForSponsorship,
+  fetchDraftProposals as apiFetchDraftProposals,
+  fetchProposals as apiFetchProposals,
 } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
-import { VStack } from "@/components/Layout/Stack";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions } from "@/lib/constants";
+import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
@@ -40,8 +39,13 @@ async function fetchGovernanceCalendar() {
 }
 
 export async function generateMetadata({}, parent) {
-  const tenant = Tenant.current();
-  const page = tenant.ui.page("proposals");
+  const { ui, namespace } = Tenant.current();
+
+  if (!ui.toggle("proposals")) {
+    return;
+  }
+
+  const page = ui.page("proposals");
   const { title, description } = page.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
@@ -69,7 +73,12 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Home() {
-  const tenant = Tenant.current();
+  const { ui, namespace } = Tenant.current();
+
+  if (!ui.toggle("proposals")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter
@@ -81,8 +90,8 @@ export default async function Home() {
   const votableSupply = await fetchVotableSupply();
 
   return (
-    <VStack>
-      {tenant.namespace === "optimism" && (
+    <div className="flex flex-col">
+      {namespace === TENANT_NAMESPACES.OPTIMISM && (
         <a
           href=" https://retrofunding.optimism.io/round/results"
           target="_blank"
@@ -124,6 +133,6 @@ export default async function Home() {
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
       />
-    </VStack>
+    </div>
   );
 }

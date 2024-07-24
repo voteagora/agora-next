@@ -59,7 +59,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b bg-neutral transition-colors hover:bg-wash data-[state=selected]:bg-wash",
       className
     )}
     {...props}
@@ -72,7 +72,7 @@ const tableHeadVariants = cva(
   {
     variants: {
       variant: {
-        default: "font-medium text-muted-foreground",
+        default: "font-medium text-tertiary",
         gray: "text-secondary font-semibold",
       },
     },

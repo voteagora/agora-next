@@ -293,36 +293,14 @@ export async function fetchAndSetAll<
 
 export function getBlockScanAddress(address: string) {
   const { contracts } = Tenant.current();
-  const chainId = contracts.token.chain.id;
-  switch (chainId) {
-    case 10:
-      // Optimism
-      return `https://optimistic.etherscan.io/address/${address}`;
-
-    case 11155111:
-      // Sepolia ETH
-      return `https://sepolia.etherscan.io/address/${address}`;
-
-    default:
-      return `https://etherscan.io/tx/${address}`;
-  }
+  const url = contracts.token.chain.blockExplorers?.default.url;
+  return `${url}/io/${address}`;
 }
 
 export function getBlockScanUrl(hash: string | `0x${string}`) {
   const { contracts } = Tenant.current();
-  const chainId = contracts.token.chain.id;
-  switch (chainId) {
-    case 10:
-      // Optimism
-      return `https://optimistic.etherscan.io/tx/${hash}`;
-
-    case 11155111:
-      // Sepolia ETH
-      return `https://sepolia.etherscan.io/tx/${hash}`;
-
-    default:
-      return `https://etherscan.io/tx/${hash}`;
-  }
+  const url = contracts.token.chain.blockExplorers?.default.url;
+  return `${url}/tx/${hash}`;
 }
 
 export const getTextWidth = (text: string, font = "14px inter") => {
