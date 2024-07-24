@@ -87,18 +87,14 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
           errorMessage={errors.transactions?.[index]?.recipient?.message}
         />
       </FormItem>
-      <FormItem
-        label="Amount (in ENS tokens)"
+      <NumberInput
+        control={control}
         required={true}
-        htmlFor={`transactions.${index}.amount`}
-      >
-        <NumberInput
-          name={`transactions.${index}.amount`}
-          register={register}
-          placeholder="100"
-          errorMessage={errors.transactions?.[index]?.amount?.message}
-        />
-      </FormItem>
+        // TODO -- replace "ENS"
+        label="Amount (in ENS tokens)"
+        name={`transactions.${index}.amount`}
+        placeholder="100"
+      />
       <div className="col-span-3">
         <TextInput
           label="Description"

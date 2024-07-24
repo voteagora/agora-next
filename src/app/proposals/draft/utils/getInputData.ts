@@ -1,15 +1,5 @@
 import { ethers } from "ethers";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
-import {
-  ProposalType,
-  DraftProposal,
-  BasicProposal,
-  SocialProposal,
-  ApprovalProposal,
-  OptimisticProposal,
-} from "../types";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import Tenant from "@/lib/tenant/tenant";
 
 type BasicInputData = [`0x${string}`[], bigint[], `0x${string}`[], string];
 
@@ -52,51 +42,3 @@ export function getInputData(
 
   return { inputData };
 }
-
-const useCreateBasicProposalAction = (proposalData: BasicProposal) => {
-  const { contracts } = Tenant.current();
-  const { inputData } = getInputData(proposalData);
-
-  const { config } = usePrepareContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    chainId: contracts.governor.chain.id,
-    abi: contracts.governor.abi,
-    functionName: "propose",
-    args: inputData,
-  });
-
-  const { writeAsync, isLoading: isWriteLoading } = useContractWrite(config);
-};
-
-const createSocialProposalAction = (proposalData: SocialProposal) => {
-  // TODO: implement
-};
-
-const createApprovalProposalAction = (proposalData: ApprovalProposal) => {
-  // TODO: implement
-};
-
-const createOptimisticProposalAction = (proposalData: OptimisticProposal) => {
-  // TODO: implement
-};
-
-/**
- *
- * @param proposalData
- * @returns action to create a proposal based on the proposal type
- * @throws Error if the proposal type is invalid
- */
-const useCreateProposalAction = (proposalData: DraftProposal) => {
-  switch (proposalData.proposal_type) {
-    case ProposalType.BASIC:
-      return useCreateBasicProposalAction(proposalData);
-    case ProposalType.SOCIAL:
-      return createSocialProposalAction(proposalData);
-    case ProposalType.APPROVAL:
-      return createApprovalProposalAction(proposalData);
-    case ProposalType.OPTIMISTIC:
-      return createOptimisticProposalAction(proposalData);
-    default:
-      throw new Error("Invalid proposal type");
-  }
-};
