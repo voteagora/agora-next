@@ -12,10 +12,9 @@ import DateInput from "./form/DateInput";
 const SocialProposalForm = () => {
   type FormType = z.output<typeof SocialProposalSchema>;
   const {
-    register,
     control,
     watch,
-    formState: { errors, defaultValues },
+    formState: { defaultValues },
   } = useFormContext<FormType>();
 
   const { fields, append, remove } = useFieldArray({
@@ -75,7 +74,7 @@ const SocialProposalForm = () => {
       <div className="space-y-6">
         {fields.map((field, index) => {
           return (
-            <div className="flex flex-row space-x-4">
+            <div className="flex flex-row space-x-4" key={`option-${index}`}>
               <div className="flex-1">
                 <TextInput
                   label={`Option ${index + 1} text`}

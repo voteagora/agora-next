@@ -20,7 +20,7 @@ const RequestSponsorshipForm = ({
   draftProposal: DraftProposal;
 }) => {
   const [isPending, setIsPending] = useState(false);
-  const { watch } = useFormContext();
+  const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
 
@@ -38,9 +38,11 @@ const RequestSponsorshipForm = ({
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
-        <FormItem label="Sponsor address">
-          <AddressInput name="sponsorAddress" />
-        </FormItem>
+        <AddressInput
+          control={control}
+          label="Sponsor address"
+          name="sponsorAddress"
+        />
         <FormItem label="Sponsor verification">
           <span className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
             {isAddress(address) && <AvatarAddress address={address} />}

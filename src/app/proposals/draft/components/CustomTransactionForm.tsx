@@ -10,24 +10,17 @@ import { BasicProposalSchema } from "./../schemas/DraftProposalSchema";
 const CustomTransactionForm = ({ index }: { index: number }) => {
   type FormType = z.output<typeof BasicProposalSchema>;
 
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<FormType>();
+  const { control } = useFormContext<FormType>();
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      <FormItem
-        label="Target"
-        required={true}
-        htmlFor={`transactions.${index}.target`}
-        className="col-span-2"
-      >
+      <div className="col-span-2">
         <AddressInput
+          control={control}
+          label="Target"
           name={`transactions.${index}.target`}
-          errorMessage={errors.transactions?.[index]?.target?.message}
         />
-      </FormItem>
+      </div>
 
       <TextInput
         label="Value"
