@@ -15,6 +15,7 @@ export const TENANT_NAMESPACES = {
   ETHERFI: "etherfi",
   OPTIMISM: "optimism",
   UNISWAP: "uniswap",
+  CYBER: "cyber",
 } as const;
 
 export const proposalsFilterOptions = {
