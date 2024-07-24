@@ -64,7 +64,9 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.2 }}
                 exit={{ opacity: 0 }}
-                className={"z-10 bg-black fixed top-0 left-0 right-0 bottom-0"}
+                className={
+                  "z-[60] bg-black fixed top-0 left-0 right-0 bottom-0"
+                }
               />
             </AnimatePresence>
           )}

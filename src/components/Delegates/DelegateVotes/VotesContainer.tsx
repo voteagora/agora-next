@@ -52,7 +52,7 @@ const VotesContainer = ({
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         selected
                           ? "text-black bg-white border-[#ebebeb]"
-                          : "text-[#66676b] border-transparent"
+                          : "text-secondary border-transparent"
                       }`}
                     >
                       {option.label}
