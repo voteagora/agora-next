@@ -1,53 +1,74 @@
 import { useState, useEffect } from "react";
-import { Controller, useFormContext } from "react-hook-form";
 import { Switch } from "@/components/shared/Switch";
+import {
+  ControllerProps,
+  FieldPath,
+  FieldValues,
+  useFormContext,
+} from "react-hook-form";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
-type MarkdownTextareaInputProps = {
-  name: string;
+type TextInputProps = {
+  label: string;
   options: string[];
+  description?: string;
+  required?: boolean;
 };
 
-const MarkdownTextareaInput = ({
+function SwitchInput<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  required,
+  control,
   name,
+  label,
+  description,
   options,
-}: MarkdownTextareaInputProps) => {
+}: Omit<ControllerProps<TFieldValues, TName>, "render"> & TextInputProps) {
   const [value, setValue] = useState("");
-
-  const {
-    control,
-    getValues,
-    formState: { errors },
-  } = useFormContext();
+  const { getValues } = useFormContext();
 
   // make sure default value is set
   useEffect(() => {
     setValue(getValues(name));
-  }, []);
+  }, [getValues, name]);
 
   return (
-    <Controller
+    <FormField
       control={control}
       name={name}
-      render={({ field: { onChange } }) => (
-        <div className="flex flex-col">
-          <Switch
-            options={options}
-            selection={value}
-            onSelectionChanged={(value) => {
-              onChange(value);
-              setValue(value);
-            }}
-          />
-          {!!errors[name] && (
-            <p className="text-red-500 text-sm mb-0 mt-1">
-              {/* @ts-ignore */}
-              {errors[name].message?.toString()}
-            </p>
-          )}
-        </div>
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel
+            className="text-xs font-semibold text-agora-stone-700"
+            isRequired={required}
+          >
+            {label}
+          </FormLabel>
+          <FormControl>
+            <Switch
+              options={options}
+              selection={value}
+              onSelectionChanged={(value) => {
+                field.onChange(value);
+                setValue(value);
+              }}
+            />
+          </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormMessage />
+        </FormItem>
       )}
     />
   );
-};
+}
 
-export default MarkdownTextareaInput;
+export default SwitchInput;
