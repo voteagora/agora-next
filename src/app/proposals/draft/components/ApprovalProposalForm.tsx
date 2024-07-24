@@ -9,7 +9,7 @@ import { ApprovalProposalType } from "@/app/proposals/draft/types";
 
 const ApprovalProposalForm = () => {
   type FormType = z.output<typeof ApprovalProposalSchema>;
-  const { register, watch } = useFormContext<FormType>();
+  const { register, watch, control } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
   return (
@@ -22,22 +22,22 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <FormItem
+        {/*  info="This is the maximum number of tokens that can be transferred from all the options in this proposal." */}
+        <NumberInput
+          required={true}
           label="Budget"
+          name="approvalProposal.budget"
+          control={control}
+        />
+
+        {/*  info="Determines up to how many options each voter may select" */}
+        <NumberInput
           required={true}
-          info="This is the maximum number of tokens that can be transferred from all the options in this proposal."
-          htmlFor="budget"
-        >
-          <NumberInput name="approvalProposal.budget" register={register} />
-        </FormItem>
-        <FormItem
           label="Max options"
-          required={true}
-          info="Determines up to how many options each voter may select"
-          htmlFor="maxOptions"
-        >
-          <NumberInput name="approvalProposal.maxOptions" register={register} />
-        </FormItem>
+          name="approvalProposal.maxOptions"
+          control={control}
+        />
+
         <FormItem
           label="Criteria"
           required={true}
@@ -50,25 +50,21 @@ const ApprovalProposalForm = () => {
           />
         </FormItem>
         {criteria === ApprovalProposalType.TOP_CHOICES && (
-          <FormItem
-            label="Top choices"
-            info="Selects how many votes an option must have to be considered a winner"
+          // info="Selects how many votes an option must have to be considered a winner"
+          <NumberInput
             required={true}
-            htmlFor="topChoices"
-          >
-            <NumberInput
-              name="approvalProposal.topChoices"
-              register={register}
-            />
-          </FormItem>
+            label="Top choices"
+            name="approvalProposal.topChoices"
+            control={control}
+          />
         )}
         {criteria === ApprovalProposalType.THRESHOLD && (
-          <FormItem label="Threshold" required={true} htmlFor="threshold">
-            <NumberInput
-              name="approvalProposal.threshold"
-              register={register}
-            />
-          </FormItem>
+          <NumberInput
+            required={true}
+            label="Threshold"
+            name="approvalProposal.threshold"
+            control={control}
+          />
         )}
       </div>
       <div>
