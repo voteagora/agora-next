@@ -250,8 +250,6 @@ async function getDelegates({
       )
   );
 
-  console.log("Delegates", delegates);
-
   // Voting power detail added for use with API, so as to not break existing
   // components
   return {
