@@ -83,6 +83,18 @@ async function getDelegates({
     `
       : "";
 
+  const delegateStatementFiler =
+    filters?.endorsed || filters?.issues || filters?.stakeholders
+      ? `AND EXISTS (
+        SELECT 1
+        FROM agora.delegate_statements s
+        WHERE s.address = d.delegate
+        ${endorsedFilterQuery}
+        ${topIssuesFilterQuery}
+        ${topStakeholdersFilterQuery}
+      )`
+      : "";
+
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
     switch (sort) {
@@ -121,14 +133,7 @@ async function getDelegates({
             WHERE num_of_delegators IS NOT NULL
             AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             AND d.contract = $3
-            AND EXISTS (
-                SELECT 1
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-            )
+            ${delegateStatementFiler}
             ORDER BY num_of_delegators DESC
             OFFSET $4
             LIMIT $5;
@@ -175,14 +180,7 @@ async function getDelegates({
             FROM ${namespace + ".delegates"} d
             WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
             AND d.contract = $4
-            AND EXISTS (
-                SELECT 1
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-            )
+            ${delegateStatementFiler}
            ORDER BY -log(random()) / NULLIF(voting_power, 0)
             OFFSET $5
             LIMIT $6;
@@ -229,14 +227,7 @@ async function getDelegates({
             FROM ${namespace + ".delegates"} d
             WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
             AND d.contract = $3
-            AND EXISTS (
-                SELECT 1
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-            )
+            ${delegateStatementFiler}
             ORDER BY voting_power DESC
             OFFSET $4
             LIMIT $5;
@@ -258,6 +249,8 @@ async function getDelegates({
         pagination
       )
   );
+
+  console.log("Delegates", delegates);
 
   // Voting power detail added for use with API, so as to not break existing
   // components
