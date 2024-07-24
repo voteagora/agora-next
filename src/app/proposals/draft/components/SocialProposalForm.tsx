@@ -64,12 +64,18 @@ const SocialProposalForm = () => {
       </FormItem>
 
       <div className="grid grid-cols-2 gap-4">
-        <FormItem label="Start date" required={true} htmlFor="start_date">
-          <DateInput name="socialProposal.start_date" control={control} />
-        </FormItem>
-        <FormItem label="End date" required={true} htmlFor="end_date">
-          <DateInput name="socialProposal.end_date" control={control} />
-        </FormItem>
+        <DateInput
+          label="Start date"
+          required={true}
+          name="socialProposal.start_date"
+          control={control}
+        />
+        <DateInput
+          label="End date"
+          required={true}
+          name="socialProposal.end_date"
+          control={control}
+        />
       </div>
       <div className="space-y-6">
         {fields.map((field, index) => {
