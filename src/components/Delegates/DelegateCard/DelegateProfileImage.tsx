@@ -94,7 +94,7 @@ export function DelegateProfileImage({
             <HumanAddress address={address} />
           )}
           {endorsed && (
-            <TooltipProvider>
+            <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger>
                   <Image
