@@ -130,7 +130,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:
-                const exhaustiveCheck: never = proposalType;
+                  const exhaustiveCheck: never = proposalType;
                   return exhaustiveCheck;
               }
             })()}
