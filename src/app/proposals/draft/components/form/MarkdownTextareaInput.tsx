@@ -61,14 +61,6 @@ function MarkdownTextareaInput<
             {label}
           </FormLabel>
           <FormControl>
-            <div className="relative">
-              <input
-                type="number"
-                className={`border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full`}
-                {...field}
-                placeholder={placeholder}
-              />
-            </div>
             <div className="flex flex-col">
               <div className="min-h-[215px] w-full border border-gray-eo rounded-t-lg bg-gray-fa">
                 <textarea
