@@ -13,15 +13,16 @@ export default async function verifyMessage({
   message: string;
 }) {
   const { contracts } = Tenant.current();
-
-  // Alchemy key
   const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
+  const hasAlchemy = contracts.token.chain.rpcUrls?.alchemy;
+
+  const transport = hasAlchemy
+    ? `${contracts.token.chain.rpcUrls.alchemy.http[0]}/${alchemyId}`
+    : `${contracts.token.chain.rpcUrls.default.http[0]}`;
 
   const publicClient = createPublicClient({
     chain: contracts.token.chain,
-    transport: http(
-      `${contracts.token.chain.rpcUrls.alchemy.http[0]}/${alchemyId}`
-    ),
+    transport: http(transport),
   });
 
   return await publicClient.verifyMessage({
