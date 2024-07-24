@@ -85,7 +85,7 @@ export default function SnapshotVotes({
                 <VStack className="py-4 px-6">
                   <div className="flex flex-row justify-between">
                     <div className="flex flex-col flex-1 pr-4">
-                      <span className="text-[#66676b] text-xs font-medium">
+                      <span className="text-secondary text-xs font-medium">
                         {`${propHeader(vote)}`}
                       </span>
                       <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
