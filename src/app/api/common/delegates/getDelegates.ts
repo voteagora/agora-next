@@ -97,47 +97,51 @@ async function getDelegates({
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
+    
+    console.log(sort);
+
     switch (sort) {
       case "most_delegators":
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+        const QRY1 = `
+          SELECT *,
+            CASE
+              WHEN EXISTS (
+                SELECT 1
+                FROM agora.citizens
+                WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
+              ) THEN TRUE
+              ELSE FALSE
+            END AS citizen,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast, 
+                  endorsed
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
+                LIMIT 1
+              ) sub
+            ) AS statement
+          FROM ${namespace + ".delegates"} d
+          WHERE num_of_delegators IS NOT NULL
+          AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+          AND d.contract = $3
+          ${delegateStatementFiler}
+          ORDER BY num_of_delegators DESC
+          OFFSET $4
+          LIMIT $5;
           `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast, 
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE num_of_delegators IS NOT NULL
-            AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
-            AND d.contract = $3
-            ${delegateStatementFiler}
-            ORDER BY num_of_delegators DESC
-            OFFSET $4
-            LIMIT $5;
-            `,
+        console.log(QRY1);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1,
           allowList,
           slug,
           contracts.token.address,
@@ -147,44 +151,47 @@ async function getDelegates({
 
       case "weighted_random":
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+
+        const QRY2 = 
+        `
+          SELECT *,
+            CASE
+              WHEN EXISTS (
+                SELECT 1
+                FROM agora.citizens
+                WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
+              ) THEN TRUE
+              ELSE FALSE
+            END AS citizen,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast,
+                  endorsed
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
+                LIMIT 1
+              ) sub
+            ) AS statement
+          FROM ${namespace + ".delegates"} d
+          WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
+          AND d.contract = $4
+          ${delegateStatementFiler}
+         ORDER BY -log(random()) / NULLIF(voting_power, 0)
+          OFFSET $5
+          LIMIT $6;
           `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast,
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
-            AND d.contract = $4
-            ${delegateStatementFiler}
-           ORDER BY -log(random()) / NULLIF(voting_power, 0)
-            OFFSET $5
-            LIMIT $6;
-            `,
+        console.log(QRY2);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2,
           seed,
           allowList,
           slug,
@@ -194,44 +201,46 @@ async function getDelegates({
         );
 
       default:
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+        const QRY3 = 
+        `
+          SELECT *,
+            CASE
+              WHEN EXISTS (
+                SELECT 1
+                FROM agora.citizens
+                WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
+              ) THEN TRUE
+              ELSE FALSE
+            END AS citizen,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast,
+                  endorsed
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
+                LIMIT 1
+              ) sub
+            ) AS statement
+          FROM ${namespace + ".delegates"} d
+          WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
+          AND d.contract = $3
+          ${delegateStatementFiler}
+          ORDER BY voting_power DESC
+          OFFSET $4
+          LIMIT $5;
           `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast,
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
-            AND d.contract = $3
-            ${delegateStatementFiler}
-            ORDER BY voting_power DESC
-            OFFSET $4
-            LIMIT $5;
-            `,
+        console.log(QRY3);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3,
           allowList,
           slug,
           contracts.token.address,
