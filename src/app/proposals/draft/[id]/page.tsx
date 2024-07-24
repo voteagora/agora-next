@@ -16,6 +16,7 @@ import {
 } from "../utils/stages";
 import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
+import { DraftProposal } from "../types";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -29,11 +30,7 @@ const getDraftProposal = async (id: number) => {
     },
   });
 
-  return draftProposal as ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
+  return draftProposal as DraftProposal;
 };
 
 export default async function DraftProposalPage({
