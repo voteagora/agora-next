@@ -119,12 +119,21 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
             </div>
           </FormCard.Section>
           <FormCard.Section>
-            {proposalType === ProposalType.BASIC && <BasicProposalForm />}
-            {proposalType === ProposalType.SOCIAL && <SocialProposalForm />}
-            {proposalType === ProposalType.APPROVAL && <ApprovalProposalForm />}
-            {proposalType === ProposalType.OPTIMISTIC && (
-              <OptimisticProposalForm />
-            )}
+            {(() => {
+              switch (proposalType) {
+                case ProposalType.BASIC:
+                  return <BasicProposalForm />;
+                case ProposalType.SOCIAL:
+                  return <SocialProposalForm />;
+                case ProposalType.APPROVAL:
+                  return <ApprovalProposalForm />;
+                case ProposalType.OPTIMISTIC:
+                  return <OptimisticProposalForm />;
+                default:
+                const exhaustiveCheck: never = proposalType;
+                  return exhaustiveCheck;
+              }
+            })()}
           </FormCard.Section>
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">
