@@ -34,7 +34,7 @@ export default class TenantTokenFactory {
       case TENANT_NAMESPACES.CYBER:
         return {
           name: "Cyber",
-          symbol: "CYBER",
+          symbol: "cCYBER",
           decimals: 18,
         };
       default:
