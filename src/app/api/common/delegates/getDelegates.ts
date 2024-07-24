@@ -140,14 +140,11 @@ async function getDelegates({
           AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
           ORDER BY num_of_delegators DESC
-          OFFSET $4
-          LIMIT $5;
+          OFFSET $1
+          LIMIT $2;
           `
         console.log(QRY1);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1,
-          allowList,
-          slug,
-          contracts.token.address,
           skip,
           take
         );
@@ -190,15 +187,11 @@ async function getDelegates({
           AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
          ORDER BY -log(random()) / NULLIF(voting_power, 0)
-          OFFSET $5
-          LIMIT $6;
+          OFFSET $1
+          LIMIT $2;
           `
         console.log(QRY2);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2,
-          seed,
-          allowList,
-          slug,
-          contracts.token.address,
           skip,
           take
         );
@@ -239,14 +232,11 @@ async function getDelegates({
           AND d.contract = '${tokenAddress}'
           ${delegateStatementFiler}
           ORDER BY voting_power DESC
-          OFFSET $4
-          LIMIT $5;
+          OFFSET $1
+          LIMIT $2;
           `
         console.log(QRY3);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3,
-          allowList,
-          slug,
-          contracts.token.address,
           skip,
           take
         );
