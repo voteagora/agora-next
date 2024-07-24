@@ -108,7 +108,7 @@ async function getDelegates({
               WHEN EXISTS (
                 SELECT 1
                 FROM agora.citizens
-                WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
+                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
               ) THEN TRUE
               ELSE FALSE
             END AS citizen,
@@ -124,7 +124,7 @@ async function getDelegates({
                   warpcast, 
                   endorsed
                 FROM agora.delegate_statements s
-                WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
                 ${endorsedFilterQuery}
                 ${topIssuesFilterQuery}
                 ${topStakeholdersFilterQuery}
@@ -159,7 +159,7 @@ async function getDelegates({
               WHEN EXISTS (
                 SELECT 1
                 FROM agora.citizens
-                WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
+                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
               ) THEN TRUE
               ELSE FALSE
             END AS citizen,
@@ -175,7 +175,7 @@ async function getDelegates({
                   warpcast,
                   endorsed
                 FROM agora.delegate_statements s
-                WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
+                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
                 ${endorsedFilterQuery}
                 ${topIssuesFilterQuery}
                 ${topStakeholdersFilterQuery}
@@ -208,7 +208,7 @@ async function getDelegates({
               WHEN EXISTS (
                 SELECT 1
                 FROM agora.citizens
-                WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
+                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
               ) THEN TRUE
               ELSE FALSE
             END AS citizen,
@@ -224,7 +224,7 @@ async function getDelegates({
                   warpcast,
                   endorsed
                 FROM agora.delegate_statements s
-                WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
+                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
                 ${endorsedFilterQuery}
                 ${topIssuesFilterQuery}
                 ${topStakeholdersFilterQuery}
