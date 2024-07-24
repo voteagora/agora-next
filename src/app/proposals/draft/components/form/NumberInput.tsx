@@ -12,7 +12,6 @@ type NumberInputProps = {
   label: string;
   description?: string;
   placeholder?: string;
-  units?: string;
   required?: boolean;
 };
 
@@ -26,7 +25,6 @@ function NumberInput<
   label,
   placeholder,
   description,
-  units,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & NumberInputProps) {
   return (
     <FormField
@@ -48,11 +46,6 @@ function NumberInput<
                 {...field}
                 placeholder={placeholder}
               />
-              {units && (
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-agora-stone-500">
-                  {units}
-                </span>
-              )}
             </div>
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}

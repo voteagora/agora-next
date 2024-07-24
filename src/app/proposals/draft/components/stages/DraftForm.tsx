@@ -112,10 +112,12 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                 // TODO: maybe make this customizable per tenant? EP [1.1] feels ENS specific
                 placeholder="EP [1.1] [Executable] title"
               />
-
-              <FormItem label="Abstract" required={true} htmlFor="abstract">
-                <MarkdownTextareaInput name="abstract" />
-              </FormItem>
+              <MarkdownTextareaInput
+                control={methods.control}
+                label="Abstract"
+                required={true}
+                name="abstract"
+              />
             </div>
           </FormCard.Section>
           <FormCard.Section>
