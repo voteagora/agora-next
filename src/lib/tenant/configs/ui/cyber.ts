@@ -122,9 +122,5 @@ export const cyberTenantUIConfig = new TenantUI({
       name: "delegates/edit",
       enabled: true,
     },
-    {
-      name: "delegates/code-of-conduct",
-      enabled: true,
-    },
   ],
 });
