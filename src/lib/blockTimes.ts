@@ -16,6 +16,7 @@ export function getHumanBlockTime(
   latestBlock: Block
 ) {
   switch (chainId) {
+    // Optimism
     case 10:
       const secondsPerBlock = 2;
       const secondsPerBlockBeforeBedrock = 0.5;
@@ -34,15 +35,21 @@ export function getHumanBlockTime(
         (Date.now() / 1000 - timeBeforeBedrock - timeAfterBedrock) * 1000
       );
 
+    //   Cyber Mainnet
+    //   Cyber Testnet
+    case 7560:
+    case 111557560:
+      const estCyberSecondsDiff =
+        Number(latestBlock.number) - Number(blockNumber) * 2; // 2 seconds per block
+      return new Date((latestBlock.timestamp - estCyberSecondsDiff) * 1000);
+
+    //   Ethereum Mainnet
+    //   Ethereum Sepolia
     case 1:
     case 11155111:
-      const latestNumber = latestBlock.number;
-      const latestTimestamp = latestBlock.timestamp;
-      const blockDifference = Number(latestNumber) - Number(blockNumber);
-      const estSecondsDifference = blockDifference * 12; // 12 seconds per block
-
-      const estimatedTimestamp = latestTimestamp - estSecondsDifference;
-      return new Date(estimatedTimestamp * 1000);
+      const estEthSecondsDiff =
+        Number(latestBlock.number) - Number(blockNumber) * 12; // 12 seconds per block
+      return new Date((latestBlock.timestamp - estEthSecondsDiff) * 1000);
 
     default:
       return new Date();
