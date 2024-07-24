@@ -1,6 +1,5 @@
 import React from "react";
 import { z } from "zod";
-import FormItem from "./form/FormItem";
 import { ApprovalProposalSchema } from "./../schemas/DraftProposalSchema";
 import { useFormContext } from "react-hook-form";
 import NumberInput from "./form/NumberInput";
@@ -9,7 +8,7 @@ import { ApprovalProposalType } from "@/app/proposals/draft/types";
 
 const ApprovalProposalForm = () => {
   type FormType = z.output<typeof ApprovalProposalSchema>;
-  const { control, watch, control } = useFormContext<FormType>();
+  const { control, watch } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
   return (

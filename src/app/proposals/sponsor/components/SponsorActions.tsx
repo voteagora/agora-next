@@ -20,7 +20,7 @@ const SponsorActions = ({
       default:
         // ensures that we've handled all cases
         const _exhaustiveCheck: never = proposal;
-        throw new Error(`Unhandled proposal type: ${_exhaustiveCheck}`);
+        throw new Error(`Unhandled proposal type.`);
     }
   };
 
