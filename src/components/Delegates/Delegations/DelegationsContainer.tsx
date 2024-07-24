@@ -111,9 +111,12 @@ function DelegationsContainer({
                 useWindow={false}
               >
                 {delegators.length === 0 ? (
-                  <TableRow>
-                    <TableCell>None found</TableCell>
-                  </TableRow>
+                  <td
+                    className="w-full p-4 bg-neutral text-center text-tertiary text-sm"
+                    colSpan={6}
+                  >
+                    None found
+                  </td>
                 ) : (
                   delegators.map((delegation) => (
                     <DelegationFromRow
@@ -142,9 +145,15 @@ function DelegationsContainer({
                   <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody className="">
                 {delegatees.length === 0 ? (
-                  <div className="w-full p-4">None found</div>
+                  <td
+                    className="w-full p-4 bg-neutral text-center text-tertiary text-sm"
+                    colSpan={6}
+                  >
+                    None found
+                  </td>
                 ) : (
                   delegatees.map((delegation) => (
                     <DelegationToRow
