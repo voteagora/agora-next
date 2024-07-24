@@ -27,14 +27,6 @@ export const cyberTenantUIConfig = new TenantUI({
     retired: [],
   },
 
-  links: [
-    {
-      name: "discord",
-      title: "Discord",
-      url: "https://discord.com/invite/buildoncyber",
-    },
-  ],
-
   customization: {
     primary: "#171717",
     secondary: "#404040",
