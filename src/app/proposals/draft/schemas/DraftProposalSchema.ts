@@ -54,8 +54,8 @@ const socialProposal = z
   );
 
 const approvalProposal = z.object({
-  budget: z.string().min(1, { message: "Budget cannot be empty" }),
   criteria: z.nativeEnum(ApprovalProposalType),
+  budget: z.number().min(1, { message: "Budget cannot be empty" }),
   maxOptions: z
     .number()
     .int()

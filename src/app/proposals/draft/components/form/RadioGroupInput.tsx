@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { cn } from "@/lib/utils";
@@ -39,6 +41,7 @@ function RadioGroupInput<
   const { getValues } = useFormContext();
 
   // make sure default value is set
+
   useEffect(() => {
     setValue(getValues(name));
   }, []);

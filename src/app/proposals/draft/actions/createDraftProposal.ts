@@ -58,7 +58,28 @@ const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
       };
 
     case ProposalType.APPROVAL:
-      return;
+      return {
+        criteria: data.approvalProposal.criteria,
+        threshold: data.approvalProposal.threshold,
+        budget: data.approvalProposal.budget,
+        maxOptions: data.approvalProposal.maxOptions,
+        options: {
+          // deletes all existing options so we aren't stacking on top of old options
+          deleteMany: {},
+          create: data.approvalProposal?.options.map((option, idx) => {
+            const asTransaction = {
+              order: idx,
+              target: option.target as string,
+              value: option.value,
+              calldata: option.calldata,
+              text: option.description,
+              simulation_state: option.simulation_state,
+              simulation_id: option.simulation_id,
+            };
+            return asTransaction;
+          }),
+        },
+      };
 
     case ProposalType.OPTIMISTIC:
       return;

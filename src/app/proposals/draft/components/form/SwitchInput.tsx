@@ -34,12 +34,13 @@ function SwitchInput<
   options,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & SwitchInputProps) {
   const [value, setValue] = useState("");
-  const { getValues } = useFormContext();
+  const { getValues, watch } = useFormContext();
 
   // make sure default value is set
+  const diff = watch(name);
   useEffect(() => {
     setValue(getValues(name));
-  }, [getValues, name]);
+  }, [getValues, name, diff]);
 
   return (
     <FormField

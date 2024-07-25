@@ -73,6 +73,7 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       <div className="col-span-2">
         <AddressInput
           control={control}
+          required={true}
           label="Recipient"
           name={`transactions.${index}.recipient`}
         />
@@ -80,14 +81,14 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
       <NumberInput
         control={control}
         required={true}
-        // TODO -- replace "ENS"
-        label="Amount (in ENS tokens)"
+        label={`Amount (in ${tenant.token.symbol} tokens)`}
         name={`transactions.${index}.amount`}
         placeholder="100"
       />
       <div className="col-span-3">
         <TextInput
           label="Description"
+          required={true}
           name={`transactions.${index}.description`}
           control={control}
           placeholder="What is this transaction all about?"

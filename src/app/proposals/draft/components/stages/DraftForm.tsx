@@ -6,7 +6,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import FormCard from "../form/FormCard";
-import FormItem from "../form/FormItem";
 import TextInput from "../form/TextInput";
 import MarkdownTextareaInput from "../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
