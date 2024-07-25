@@ -1,13 +1,16 @@
 "use client";
+
 import { z } from "zod";
 import { useEffect } from "react";
 import { encodeFunctionData, isAddress, parseUnits } from "viem";
-import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import NumberInput from "./form/NumberInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
-import { BasicProposalSchema } from "./../schemas/DraftProposalSchema";
+import {
+  BasicProposalSchema,
+  ApprovalProposalSchema,
+} from "./../schemas/DraftProposalSchema";
 import Tenant from "@/lib/tenant/tenant";
 import { EthereumAddress } from "../types";
 
@@ -37,14 +40,22 @@ const transferABI = [
   },
 ] as const;
 
-type FormType = z.output<typeof BasicProposalSchema>;
+type FormType =
+  | z.output<typeof BasicProposalSchema>
+  | z.output<typeof ApprovalProposalSchema>;
 
-const TransferTransactionForm = ({ index }: { index: number }) => {
+const TransferTransactionForm = ({
+  index,
+  name,
+}: {
+  index: number;
+  name: "transactions" | "approvalProposal.options";
+}) => {
   const tenant = Tenant.current();
   const { register, control, watch, setValue } = useFormContext<FormType>();
 
-  const recipient = watch(`transactions.${index}.recipient`);
-  const amount = watch(`transactions.${index}.amount`);
+  const recipient = watch(`${name}.${index}.recipient`);
+  const amount = watch(`${name}.${index}.amount`);
   const decimals = tenant.token.decimals;
 
   useEffect(() => {
@@ -59,12 +70,12 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         ],
       });
 
-      setValue(`transactions.${index}.calldata`, calldata);
+      setValue(`${name}.${index}.calldata`, calldata);
       setValue(
-        `transactions.${index}.target`,
+        `${name}.${index}.target`,
         tenant.contracts.governor.address as EthereumAddress
       );
-      setValue(`transactions.${index}.value`, "0");
+      setValue(`${name}.${index}.value`, "0");
     }
   }, [recipient, amount, setValue]);
 
@@ -75,29 +86,29 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
           control={control}
           required={true}
           label="Recipient"
-          name={`transactions.${index}.recipient`}
+          name={`${name}.${index}.recipient`}
         />
       </div>
       <NumberInput
         control={control}
         required={true}
         label={`Amount (in ${tenant.token.symbol} tokens)`}
-        name={`transactions.${index}.amount`}
+        name={`${name}.${index}.amount`}
         placeholder="100"
       />
       <div className="col-span-3">
         <TextInput
           label="Description"
           required={true}
-          name={`transactions.${index}.description`}
+          name={`${name}.${index}.description`}
           control={control}
           placeholder="What is this transaction all about?"
         />
       </div>
       {/* target and calldata are not included in UI of the form, but we need them for consistency */}
-      <input type="hidden" {...register(`transactions.${index}.value`)} />
-      <input type="hidden" {...register(`transactions.${index}.target`)} />
-      <input type="hidden" {...register(`transactions.${index}.calldata`)} />
+      <input type="hidden" {...register(`${name}.${index}.value`)} />
+      <input type="hidden" {...register(`${name}.${index}.target`)} />
+      <input type="hidden" {...register(`${name}.${index}.calldata`)} />
     </div>
   );
 };
