@@ -11,11 +11,6 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/delegate/:addressOrENSName",
-        destination: "/delegates/:addressOrENSName",
-        permanent: true,
-      },
-      {
         source: "/api/v1/proposals/:proposalId",
         destination: "/404",
         permanent: true,
