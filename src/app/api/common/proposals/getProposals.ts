@@ -8,6 +8,7 @@ import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal } from "./proposal";
+import { doInSpan } from "@/app/lib/logging";
 
 async function getProposals({
   filter,
@@ -21,33 +22,42 @@ async function getProposals({
 }): Promise<PaginatedResultEx<Proposal[]>> {
   const { namespace, contracts } = Tenant.current();
 
+  const getProposalsQuery = async (skip: number, take: number) => {
+    if (filter === "relevant") {
+      return prisma[`${namespace}Proposals`].findMany({
+        take,
+        skip,
+        orderBy: {
+          ordinal: "desc",
+        },
+        where: {
+          contract: contracts.governor.address,
+          cancelled_block: null,
+        },
+      });
+    } else {
+      return prisma[`${namespace}Proposals`].findMany({
+        take,
+        skip,
+        orderBy: {
+          ordinal: "desc",
+        },
+        where: {
+          contract: contracts.governor.address,
+        },
+      });
+    }
+  };
+
+  const getProposalsExecution = doInSpan({ name: "getProposals" }, async () =>
+    paginateResultEx(
+      (skip: number, take: number) => getProposalsQuery(skip, take),
+      pagination
+    )
+  );
+
   const [proposals, latestBlock, votableSupply] = await Promise.all([
-    paginateResultEx((skip: number, take: number) => {
-      if (filter === "relevant") {
-        return prisma[`${namespace}Proposals`].findMany({
-          take,
-          skip,
-          orderBy: {
-            ordinal: "desc",
-          },
-          where: {
-            contract: contracts.governor.address,
-            cancelled_block: null,
-          },
-        });
-      } else {
-        return prisma[`${namespace}Proposals`].findMany({
-          take,
-          skip,
-          orderBy: {
-            ordinal: "desc",
-          },
-          where: {
-            contract: contracts.governor.address,
-          },
-        });
-      }
-    }, pagination),
+    getProposalsExecution,
     contracts.token.provider.getBlock("latest"),
     fetchVotableSupply(),
   ]);
