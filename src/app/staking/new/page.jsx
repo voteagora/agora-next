@@ -15,15 +15,19 @@ export default async function Page() {
 
   const sort = delegatesFilterOptions.weightedRandom.sort;
   const seed = Math.random();
-  const delegates = await apiFetchDelegates({ page: 1, seed, sort });
+  const delegates = await apiFetchDelegates({
+    pagination: { limit: 20, offset: 0 },
+    seed,
+    sort,
+  });
 
   return (
     <div className="mt-12">
       <NewStakeFlow
         delegates={delegates}
-        fetchDelegates={async (page, seed) => {
+        fetchDelegates={async (pagination, seed) => {
           "use server";
-          return apiFetchDelegates({ page, seed, sort });
+          return apiFetchDelegates({ pagination, seed, sort });
         }}
         refreshPath={async (path) => {
           "use server";
