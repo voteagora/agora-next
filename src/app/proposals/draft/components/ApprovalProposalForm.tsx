@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { z } from "zod";
 import { ApprovalProposalSchema } from "./../schemas/DraftProposalSchema";
 import {
@@ -18,6 +18,15 @@ import Tenant from "@/lib/tenant/tenant";
 import toast from "react-hot-toast";
 
 type FormType = z.output<typeof ApprovalProposalSchema>;
+
+// just the parts of the transaction that actually matter on-chain
+const stringifyTransactionDetails = (transaction: any) => {
+  return JSON.stringify({
+    target: transaction.target,
+    calldata: transaction.calldata,
+    value: transaction.value,
+  });
+};
 
 const TransactionFormItem = ({
   index,
@@ -80,8 +89,15 @@ const ApprovalProposalForm = () => {
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
   const [simulationPending, setSimulationPending] = useState(false);
-  const { control, watch, setValue, getValues, unregister } =
-    useFormContext<FormType>();
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    unregister,
+    trigger,
+    formState,
+  } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
   const { fields, append, remove } = useFieldArray({
@@ -105,6 +121,22 @@ const ApprovalProposalForm = () => {
     unregister("approvalProposal.topChoices");
   };
 
+  /**
+   * Keeping track of the current validated transaction block so we can compare
+   * changes and encourage re-simulation if the user simulates then changes the
+   * details of the transaction.
+   */
+  const currentlyValidatedTransactions = useRef<any[]>(
+    formState.defaultValues?.approvalProposal?.options?.map((transaction) => {
+      return stringifyTransactionDetails(transaction);
+    }) || []
+  );
+
+  const validateTransactionForms = async () => {
+    const result = await trigger(["approvalProposal.options"]);
+    setAllTransactionFieldsValid(result);
+  };
+
   useEffect(() => {
     // only want to run these if we are in a fresh build -- if we are in edit mode we don't want to reset the values
     setApprovalProposalDefaults();
@@ -112,6 +144,46 @@ const ApprovalProposalForm = () => {
       removeApprovalProposalDefaults();
     };
   }, []);
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      const parts = name?.split(".");
+      console.log("art", parts);
+      if (parts?.length === 4) {
+        const field = parts[3];
+        console.log("field", field);
+        const updatedTransactions = value.approvalProposal?.options;
+        if (
+          field === "recipient" ||
+          field === "amount" ||
+          field === "value" ||
+          field === "target" ||
+          field === "description" ||
+          field === "calldata"
+        ) {
+          validateTransactionForms();
+          updatedTransactions?.forEach((transaction, index) => {
+            if (
+              currentlyValidatedTransactions.current[index] !==
+              stringifyTransactionDetails(transaction)
+            ) {
+              setValue(
+                `approvalProposal.options.${index}.simulation_state`,
+                "UNCONFIRMED"
+              );
+              // should we invalidate ID?
+            } else {
+              setValue(
+                `approvalProposal.options.${index}.simulation_state`,
+                "VALID"
+              );
+            }
+          });
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const simulateTransactions = async () => {
     setSimulationPending(true);
@@ -221,7 +293,10 @@ const ApprovalProposalForm = () => {
                     remove={remove}
                     key={`transfer-${index}`}
                   >
-                    <TransferTransactionForm index={index} />
+                    <TransferTransactionForm
+                      index={index}
+                      name="approvalProposal.options"
+                    />
                   </TransactionFormItem>
                 ) : (
                   <TransactionFormItem
@@ -229,7 +304,10 @@ const ApprovalProposalForm = () => {
                     remove={remove}
                     key={`custom-${index}`}
                   >
-                    <CustomTransactionForm index={index} />
+                    <CustomTransactionForm
+                      index={index}
+                      name="approvalProposal.options"
+                    />
                   </TransactionFormItem>
                 )}
               </>

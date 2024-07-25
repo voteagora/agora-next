@@ -1,14 +1,24 @@
 import { z } from "zod";
-import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
-import { BasicProposalSchema } from "./../schemas/DraftProposalSchema";
+import {
+  BasicProposalSchema,
+  ApprovalProposalSchema,
+} from "./../schemas/DraftProposalSchema";
 
 // example calldata
 // 0xa9059cbb00000000000000000000000065a3870f48b5237f27f674ec42ea1e017e111d630000000000000000000000000000000000000000000000000000000000000064
-const CustomTransactionForm = ({ index }: { index: number }) => {
-  type FormType = z.output<typeof BasicProposalSchema>;
+const CustomTransactionForm = ({
+  index,
+  name,
+}: {
+  index: number;
+  name: "transactions" | "approvalProposal.options";
+}) => {
+  type FormType =
+    | z.output<typeof BasicProposalSchema>
+    | z.output<typeof ApprovalProposalSchema>;
 
   const { control } = useFormContext<FormType>();
 
@@ -18,13 +28,13 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
         <AddressInput
           control={control}
           label="Target"
-          name={`transactions.${index}.target`}
+          name={`${name}.${index}.target`}
         />
       </div>
 
       <TextInput
         label="Value"
-        name={`transactions.${index}.value`}
+        name={`${name}.${index}.value`}
         control={control}
         placeholder="100"
       />
@@ -32,7 +42,7 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
       <div className="col-span-3">
         <TextInput
           label="Calldata"
-          name={`transactions.${index}.calldata`}
+          name={`${name}.${index}.calldata`}
           control={control}
           placeholder="What is this transaction all about?"
         />
@@ -40,7 +50,7 @@ const CustomTransactionForm = ({ index }: { index: number }) => {
       <div className="col-span-3">
         <TextInput
           label="Description"
-          name={`transactions.${index}.description`}
+          name={`${name}.${index}.description`}
           control={control}
           placeholder="What is this transaction all about?"
         />
