@@ -89,6 +89,16 @@ export const cyberTenantUIConfig = new TenantUI({
         description: "Delegate your voting power to a trusted representative",
       },
     },
+    {
+      route: "proposals",
+      title: "Welcome to Cyber governance",
+      description:
+        "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "Voter on Agora",
+        description: "Delegate your voting power to a trusted representative",
+      },
+    },
   ],
 
   toggles: [
