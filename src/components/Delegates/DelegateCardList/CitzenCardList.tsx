@@ -5,50 +5,78 @@ import InfiniteScroll from "react-infinite-scroller";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
+
+export type Citizen = {
+  address: `0x${string}`;
+  votingPower: string;
+  citizen: boolean;
+  statement: {
+    signature: string;
+    payload: {
+      email: string;
+      daoSlug: string;
+      discord: string;
+      twitter: string;
+      warpcast: string;
+      topIssues: string[];
+      agreeCodeConduct: boolean;
+      delegateStatement: string;
+      mostValuableProposals: string[];
+      leastValuableProposals: string[];
+      openToSponsoringProposals: boolean;
+    };
+    twitter: string;
+    discord: string;
+    created_at: Date;
+    updated_at: Date;
+    warpcast: string;
+  };
+};
+
+interface CitizenPaginated {
+  seed: number;
+  meta: any;
+  delegates: Citizen[];
+}
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
-  initialDelegates: PaginatedResultEx<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParamsEx,
-    seed?: number
-  ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
+  initialDelegates: CitizenPaginated;
+  fetchDelegates: (page: number, seed: number) => Promise<CitizenPaginated>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
-export default function DelegateCardList({
+export default function CitizenCardList({
   initialDelegates,
   fetchDelegates,
   isDelegatesCitizensFetching,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.data);
+  const [delegates, setDelegates] = useState(initialDelegates.delegates);
   const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.data);
+    setDelegates(initialDelegates.delegates);
     setMeta(initialDelegates.meta);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta.hasNextPage) {
       fetching.current = true;
       const data = await fetchDelegates(
-        { offset: meta.next_offset, limit: meta.total_returned },
+        meta.currentPage + 1,
         initialDelegates.seed || Math.random()
       );
-      setDelegates(delegates.concat(data.data));
+      setDelegates(delegates.concat(data.delegates));
       setMeta(data.meta);
       fetching.current = false;
     }
@@ -78,10 +106,9 @@ export default function DelegateCardList({
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {
-            const delegateStatement = (
-              delegate?.statement?.payload as { delegateStatement: string }
-            ).delegateStatement;
-            truncatedStatement = delegateStatement.slice(0, 120);
+            const delegateStatement =
+              delegate?.statement?.payload.delegateStatement;
+            truncatedStatement = delegateStatement?.slice(0, 120);
           }
 
           return (
@@ -98,9 +125,9 @@ export default function DelegateCardList({
                 <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
                   <div className="flex flex-col gap-4 justify-center">
                     <DelegateProfileImage
-                      endorsed={delegate.statement?.endorsed}
+                      endorsed={false}
                       address={delegate.address}
-                      votingPower={delegate.votingPower.total}
+                      votingPower={delegate.votingPower}
                       citizen={delegate.citizen}
                     />
                     <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
@@ -109,6 +136,7 @@ export default function DelegateCardList({
                   </div>
                   <div className="min-h-[24px]">
                     <DelegateActions
+                      // @ts-ignore
                       delegate={delegate}
                       isAdvancedUser={isAdvancedUser}
                       delegators={advancedDelegators}
