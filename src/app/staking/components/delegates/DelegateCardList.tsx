@@ -7,17 +7,18 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateCard } from "@/app/staking/components/delegates/DelegateCard";
-
-interface DelegatePaginated {
-  seed: number;
-  meta: any;
-  delegates: DelegateChunk[];
-}
+import { PaginatedResultEx } from "@/app/lib/pagination";
 
 interface Props {
   address: string;
-  initialDelegates: DelegatePaginated;
-  fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
+  initialDelegates: PaginatedResultEx<DelegateChunk[]>;
+  fetchDelegates: (
+    pagination: {
+      offset: number;
+      limit: number;
+    },
+    seed: number
+  ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
   onSelect: (address: string) => void;
 }
 
@@ -29,22 +30,22 @@ export default function DelegateCardList({
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.delegates);
+  const [delegates, setDelegates] = useState(initialDelegates.data);
   const { namespace } = Tenant.current();
 
   useEffect(() => {
-    setDelegates(initialDelegates.delegates);
+    setDelegates(initialDelegates.data);
     setMeta(initialDelegates.meta);
   }, [initialDelegates]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
       const data = await fetchDelegates(
-        meta.currentPage + 1,
-        initialDelegates.seed
+        { offset: meta.next_offset, limit: meta.total_returned },
+        initialDelegates.seed || Math.random()
       );
-      setDelegates(delegates.concat(data.delegates));
+      setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
       fetching.current = false;
     }
@@ -55,7 +56,7 @@ export default function DelegateCardList({
       {/* @ts-ignore */}
       <InfiniteScroll
         className="grid grid-flow-row grid-cols-[repeat(auto-fit,_23rem)] sm:grid-cols-[repeat(3,_23rem)] justify-around sm:justify-between py-4 gap-4 sm:gap-8"
-        hasMore={meta.hasNextPage}
+        hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}
         loader={
