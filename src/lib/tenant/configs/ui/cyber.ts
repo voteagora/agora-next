@@ -71,9 +71,9 @@ export const cyberTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Welcome to Cyber governance",
+      title: "Welcome to the home of Cyber voters",
       description:
-        "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
+        "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
       meta: {
         title: "Welcome to Cyber governance",
         description: "Home of token governance",
@@ -81,11 +81,11 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       route: "delegates",
-      title: "Welcome to Cyber governance",
+      title: "Welcome to the home of Cyber voters",
       description:
-        "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
+        "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
       meta: {
-        title: "Voter on Agora",
+        title: "Cyber Voter",
         description: "Delegate your voting power to a trusted representative",
       },
     },
