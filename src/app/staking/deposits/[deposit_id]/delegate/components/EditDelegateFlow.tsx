@@ -1,6 +1,6 @@
 "use client";
 
-import { type DelegatePaginated, type StakedDeposit } from "@/lib/types";
+import { type StakedDeposit } from "@/lib/types";
 import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
@@ -12,13 +12,21 @@ import { EditDelegateConfirm } from "@/app/staking/deposits/[deposit_id]/delegat
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
+import { PaginatedResultEx } from "@/app/lib/pagination";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 const PAGE_TITLE = ["Edit Delegate", "Confirm your transaction"];
 
 interface EditDelegateFlowProps {
-  delegates: DelegatePaginated;
+  delegates: PaginatedResultEx<DelegateChunk[]>;
   deposit: StakedDeposit;
-  fetchDelegates: (page: number, seed: number) => Promise<DelegatePaginated>;
+  fetchDelegates: (
+    pagination: {
+      offset: number;
+      limit: number;
+    },
+    seed: number
+  ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
   refreshPath: (path: string) => void;
 }
 

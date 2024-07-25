@@ -2,6 +2,7 @@ import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/get
 import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
 import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
+import CitizenCardList from "@/components/Delegates/DelegateCardList/CitzenCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import Hero from "@/components/Hero/Hero";
 import { TabsContent } from "@/components/ui/tabs";
@@ -15,10 +16,10 @@ async function fetchCitizens(sort, seed, page = 1) {
   return apiFetchCitizens({ page, seed, sort });
 }
 
-async function fetchDelegates(sort, seed, filters, page = 1) {
+async function fetchDelegates(sort, seed, filters, pagination) {
   "use server";
 
-  return apiFetchDelegates({ page, seed, sort, filters });
+  return apiFetchDelegates({ pagination, seed, sort, filters });
 }
 
 async function fetchDelegators(address) {
@@ -96,15 +97,15 @@ export default async function Page({ searchParams }) {
           <DelegateCardList
             isDelegatesCitizensFetching={tab === "citizens"}
             initialDelegates={delegates}
-            fetchDelegates={async (page, seed) => {
+            fetchDelegates={async (pagination, seed) => {
               "use server";
-              return apiFetchDelegates({ page, seed, sort, filters });
+              return apiFetchDelegates({ pagination, seed, sort, filters });
             }}
             fetchDelegators={fetchDelegators}
           />
         </TabsContent>
         <TabsContent value="citizens">
-          <DelegateCardList
+          <CitizenCardList
             isDelegatesCitizensFetching={tab !== "citizens"}
             initialDelegates={delegates}
             fetchDelegates={async (page, seed) => {
