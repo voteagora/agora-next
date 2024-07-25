@@ -107,10 +107,10 @@ const ApprovalProposalForm = () => {
 
   const setApprovalProposalDefaults = () => {
     setValue("approvalProposal.criteria", ApprovalProposalType.THRESHOLD);
-    setValue("approvalProposal.budget", 0);
-    setValue("approvalProposal.maxOptions", 1);
-    setValue("approvalProposal.threshold", 0);
-    setValue("approvalProposal.topChoices", 0);
+    setValue("approvalProposal.budget", "0");
+    setValue("approvalProposal.maxOptions", "1");
+    setValue("approvalProposal.threshold", "0");
+    setValue("approvalProposal.topChoices", "0");
   };
 
   const removeApprovalProposalDefaults = () => {
@@ -148,10 +148,8 @@ const ApprovalProposalForm = () => {
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       const parts = name?.split(".");
-      console.log("art", parts);
       if (parts?.length === 4) {
         const field = parts[3];
-        console.log("field", field);
         const updatedTransactions = value.approvalProposal?.options;
         if (
           field === "recipient" ||
