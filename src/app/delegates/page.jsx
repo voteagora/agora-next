@@ -15,10 +15,10 @@ async function fetchCitizens(sort, seed, page = 1) {
   return apiFetchCitizens({ page, seed, sort });
 }
 
-async function fetchDelegates(sort, seed, filters, page = 1) {
+async function fetchDelegates(sort, seed, filters, pagination) {
   "use server";
 
-  return apiFetchDelegates({ page, seed, sort, filters });
+  return apiFetchDelegates({ pagination, seed, sort, filters });
 }
 
 async function fetchDelegators(address) {
@@ -96,9 +96,9 @@ export default async function Page({ searchParams }) {
           <DelegateCardList
             isDelegatesCitizensFetching={tab === "citizens"}
             initialDelegates={delegates}
-            fetchDelegates={async (page, seed) => {
+            fetchDelegates={async (pagination, seed) => {
               "use server";
-              return apiFetchDelegates({ page, seed, sort, filters });
+              return apiFetchDelegates({ pagination, seed, sort, filters });
             }}
             fetchDelegators={fetchDelegators}
           />
