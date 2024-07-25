@@ -18,12 +18,15 @@ import Image from "next/image";
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
 
-async function fetchProposals(filter, page = 1) {
+async function fetchProposals(
+  filter: string,
+  pagination = { limit: 10, offset: 0 }
+) {
   "use server";
-  return apiFetchProposals({ filter, page });
+  return apiFetchProposals({ filter, pagination });
 }
 
-async function fetchNeedsMyVoteProposals(address) {
+async function fetchNeedsMyVoteProposals(address: string) {
   "use server";
   return apiFetchNeedsMyVoteProposals(address);
 }
@@ -38,7 +41,7 @@ async function fetchGovernanceCalendar() {
   return apiFetchGovernanceCalendar();
 }
 
-export async function generateMetadata({}, parent) {
+export async function generateMetadata() {
   const { ui, namespace } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
@@ -46,7 +49,7 @@ export async function generateMetadata({}, parent) {
   }
 
   const page = ui.page("proposals");
-  const { title, description } = page.meta;
+  const { title, description } = page!.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
     title
@@ -72,7 +75,7 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Home() {
+async function Home() {
   const { ui, namespace } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
@@ -126,9 +129,12 @@ export default async function Home() {
       <ProposalsList
         initRelevantProposals={relevalntProposals}
         initAllProposals={allProposals}
-        fetchProposals={async (page, filter) => {
+        fetchProposals={async (
+          pagination: { limit: number; offset: number },
+          filter: string
+        ) => {
           "use server";
-          return apiFetchProposals({ filter, page });
+          return fetchProposals(filter, pagination);
         }}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
@@ -136,3 +142,5 @@ export default async function Home() {
     </div>
   );
 }
+
+export default Home;

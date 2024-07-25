@@ -1,25 +1,28 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { paginateResult } from "@/app/lib/pagination";
+import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { Proposal } from "./proposal";
 
 async function getProposals({
   filter,
-  page = 1,
+  pagination,
 }: {
   filter: string;
-  page: number;
-}) {
-  const pageSize = 10;
+  pagination: {
+    limit: number;
+    offset: number;
+  };
+}): Promise<PaginatedResultEx<Proposal[]>> {
   const { namespace, contracts } = Tenant.current();
 
-  const { meta, data: proposals } = await paginateResult(
-    (skip: number, take: number) => {
+  const [proposals, latestBlock, votableSupply] = await Promise.all([
+    paginateResultEx((skip: number, take: number) => {
       if (filter === "relevant") {
         return prisma[`${namespace}Proposals`].findMany({
           take,
@@ -28,7 +31,7 @@ async function getProposals({
             ordinal: "desc",
           },
           where: {
-            contract: contracts.governor.address.toLowerCase(),
+            contract: contracts.governor.address,
             cancelled_block: null,
           },
         });
@@ -40,20 +43,17 @@ async function getProposals({
             ordinal: "desc",
           },
           where: {
-            contract: contracts.governor.address.toLowerCase(),
+            contract: contracts.governor.address,
           },
         });
       }
-    },
-    page,
-    pageSize
-  );
+    }, pagination),
+    contracts.token.provider.getBlock("latest"),
+    fetchVotableSupply(),
+  ]);
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
-  const votableSupply = await fetchVotableSupply();
-
-  const resolvedProposals = Promise.all(
-    proposals.map(async (proposal) => {
+  const resolvedProposals = await Promise.all(
+    proposals.data.map(async (proposal) => {
       const quorum = await fetchQuorumForProposal(proposal);
       return parseProposal(
         proposal,
@@ -65,8 +65,8 @@ async function getProposals({
   );
 
   return {
-    meta,
-    proposals: await resolvedProposals,
+    meta: proposals.meta,
+    data: resolvedProposals,
   };
 }
 
