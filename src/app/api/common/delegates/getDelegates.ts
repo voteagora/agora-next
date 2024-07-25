@@ -95,149 +95,150 @@ async function getDelegates({
       )`
       : "";
 
+  let delegateUniverseCTE: string;
+
+  const tokenAddress = contracts.token.address;
+
+  delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
+                              del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
+                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate, 
+                                      coalesce(d.num_of_delegators, 0) as num_of_delegators, 
+                                      coalesce(d.direct_vp, 0) as direct_vp, 
+                                      coalesce(d.advanced_vp, 0) as advanced_vp,
+                                      coalesce(d.voting_power, 0) as voting_power
+                                      from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
+
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
+    console.log(sort);
+
+    const allowListString = allowList.map((value) => `'${value}'`).join(", ");
+
     switch (sort) {
       case "most_delegators":
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast, 
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE num_of_delegators IS NOT NULL
-            AND (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
-            AND d.contract = $3
-            ${delegateStatementFiler}
-            ORDER BY num_of_delegators DESC
-            OFFSET $4
-            LIMIT $5;
-            `,
-          allowList,
-          slug,
-          contracts.token.address,
-          skip,
-          take
-        );
+        const QRY1 = `
+          ${delegateUniverseCTE}
+          SELECT *,
+            CASE
+              WHEN EXISTS (
+                SELECT 1
+                FROM agora.citizens
+                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
+              ) THEN TRUE
+              ELSE FALSE
+            END AS citizen,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast, 
+                  endorsed
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
+                LIMIT 1
+              ) sub
+            ) AS statement
+          FROM del_card_universe d
+          WHERE num_of_delegators IS NOT NULL
+          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          ${delegateStatementFiler}
+          ORDER BY num_of_delegators DESC
+          OFFSET $1
+          LIMIT $2;
+          `;
+        // console.log(QRY1);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1, skip, take);
 
       case "weighted_random":
         await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$3::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast,
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $3::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE (ARRAY_LENGTH($2::text[], 1) IS NULL OR delegate = ANY($2::text[]))
-            AND d.contract = $4
-            ${delegateStatementFiler}
-           ORDER BY -log(random()) / NULLIF(voting_power, 0)
-            OFFSET $5
-            LIMIT $6;
-            `,
-          seed,
-          allowList,
-          slug,
-          contracts.token.address,
-          skip,
-          take
-        );
+
+        const QRY2 = ` ${delegateUniverseCTE}
+          SELECT *,
+            CASE
+              WHEN EXISTS (
+                SELECT 1
+                FROM agora.citizens
+                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
+              ) THEN TRUE
+              ELSE FALSE
+            END AS citizen,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast,
+                  endorsed
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
+                LIMIT 1
+              ) sub
+            ) AS statement
+          FROM del_card_universe d
+          WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          ${delegateStatementFiler}
+         ORDER BY -log(random()) / NULLIF(voting_power, 0)
+          OFFSET $1
+          LIMIT $2;
+          `;
+        // console.log(QRY2);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2, skip, take);
 
       default:
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
-          `
-            SELECT *,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1
-                  FROM agora.citizens
-                  WHERE LOWER(address) = d.delegate AND dao_slug=$2::config.dao_slug
-                ) THEN TRUE
-                ELSE FALSE
-              END AS citizen,
-              (SELECT row_to_json(sub)
-                FROM (
-                  SELECT
-                    signature,
-                    payload,
-                    twitter,
-                    discord,
-                    created_at,
-                    updated_at,
-                    warpcast,
-                    endorsed
-                  FROM agora.delegate_statements s
-                  WHERE s.address = d.delegate AND s.dao_slug = $2::config.dao_slug
-                  ${endorsedFilterQuery}
-                  ${topIssuesFilterQuery}
-                  ${topStakeholdersFilterQuery}
-                  LIMIT 1
-                ) sub
-              ) AS statement
-            FROM ${namespace + ".delegates"} d
-            WHERE (ARRAY_LENGTH($1::text[], 1) IS NULL OR delegate = ANY($1::text[]))
-            AND d.contract = $3
-            ${delegateStatementFiler}
-            ORDER BY voting_power DESC
-            OFFSET $4
-            LIMIT $5;
-            `,
-          allowList,
-          slug,
-          contracts.token.address,
-          skip,
-          take
-        );
+        const QRY3 = `
+          ${delegateUniverseCTE}
+          SELECT *,
+            CASE
+              WHEN EXISTS (
+                SELECT 1
+                FROM agora.citizens
+                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
+              ) THEN TRUE
+              ELSE FALSE
+            END AS citizen,
+            (SELECT row_to_json(sub)
+              FROM (
+                SELECT
+                  signature,
+                  payload,
+                  twitter,
+                  discord,
+                  created_at,
+                  updated_at,
+                  warpcast,
+                  endorsed
+                FROM agora.delegate_statements s
+                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                ${endorsedFilterQuery}
+                ${topIssuesFilterQuery}
+                ${topStakeholdersFilterQuery}
+                LIMIT 1
+              ) sub
+            ) AS statement
+          FROM del_card_universe d
+          WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          ${delegateStatementFiler}
+          ORDER BY voting_power DESC
+          OFFSET $1
+          LIMIT $2;
+          `;
+        // console.log(QRY3);
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3, skip, take);
     }
   };
 
