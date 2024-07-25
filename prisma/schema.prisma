@@ -1104,12 +1104,18 @@ model ProposalDraft {
   updated_at               DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
   onchain_transaction_hash String?                    @db.VarChar(255)
   snapshot_link            String?
+  // approval type
+  max_options              Int?
+  top_choices              Int?
+  budget                   Int?
+  threshold                Int?
+  criteria                 String?
+  // end approval type
   contract                 String
   chain_id                 Int
   checklist_items          ProposalChecklist[]
   social_options           ProposalSocialOption[]
   transactions             ProposalDraftTransaction[]
-  approval_options         ProposalApprovalOption[]
 
   @@map("proposals")
   @@schema("alltenant")
@@ -1143,23 +1149,6 @@ model ProposalSocialOption {
 
   @@map("proposal_options")
   @@schema("alltenant")
-}
-
-model ProposalApprovalOption {
-    id               Int           @id @default(autoincrement())
-    proposal_id      Int
-    text             String        @db.VarChar(255)
-    target           String        @db.VarChar(255)
-    value            String        @db.VarChar(255)
-    calldata         String
-    simulation_state String        @default("UNCONFIRMED") @db.VarChar(255)
-    simulation_id    String?       @db.VarChar(255)
-    created_at       DateTime      @default(now()) @db.Timestamptz(6)
-    updated_at       DateTime      @default(now()) @db.Timestamptz(6)
-    proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-    @@map("proposal_approval_options")
-    @@schema("alltenant")
 }
 
 model ProposalChecklist {

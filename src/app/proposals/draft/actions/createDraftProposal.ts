@@ -1,14 +1,14 @@
 "use server";
 
 import { z } from "zod";
-import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import prisma from "@/app/lib/prisma";
+import { ProposalType } from "../types";
+import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import { ProposalDraftTransaction } from "@prisma/client";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
-import { ProposalType } from "../types";
 
 export type FormState = {
   ok: boolean;
@@ -60,10 +60,15 @@ const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
     case ProposalType.APPROVAL:
       return {
         criteria: data.approvalProposal.criteria,
-        threshold: data.approvalProposal.threshold,
-        budget: data.approvalProposal.budget,
-        maxOptions: data.approvalProposal.maxOptions,
-        options: {
+        threshold: data.approvalProposal.threshold
+          ? parseInt(data.approvalProposal.threshold)
+          : null,
+        budget: parseInt(data.approvalProposal.budget),
+        max_options: data.approvalProposal.maxOptions
+          ? parseInt(data.approvalProposal.maxOptions)
+          : null,
+        top_choices: parseInt(data.approvalProposal.topChoices),
+        transactions: {
           // deletes all existing options so we aren't stacking on top of old options
           deleteMany: {},
           create: data.approvalProposal?.options.map((option, idx) => {
@@ -72,7 +77,7 @@ const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
               target: option.target as string,
               value: option.value,
               calldata: option.calldata,
-              text: option.description,
+              description: option.description,
               simulation_state: option.simulation_state,
               simulation_id: option.simulation_id,
             };
@@ -82,6 +87,7 @@ const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
       };
 
     case ProposalType.OPTIMISTIC:
+      // nothing specific to optimistic
       return;
   }
 };
