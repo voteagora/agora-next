@@ -102,55 +102,51 @@ export default function CitizenCardList({
         }
         element="div"
       >
-        {!!delegates ? (
-          delegates.map((delegate) => {
-            let truncatedStatement = "";
+        {delegates?.map((delegate) => {
+          let truncatedStatement = "";
 
-            if (delegate?.statement?.payload) {
-              const delegateStatement =
-                delegate?.statement?.payload.delegateStatement;
-              truncatedStatement = delegateStatement?.slice(0, 120);
-            }
+          if (delegate?.statement?.payload) {
+            const delegateStatement =
+              delegate?.statement?.payload.delegateStatement;
+            truncatedStatement = delegateStatement?.slice(0, 120);
+          }
 
-            return (
-              <div
-                key={delegate.address}
-                className={cn(
-                  "flex flex-col",
-                  isDelegatesCitizensFetching || isDelegatesFiltering
-                    ? "animate-pulse"
-                    : ""
-                )}
-              >
-                <Link href={`/delegates/${delegate.address}`}>
-                  <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
-                    <div className="flex flex-col gap-4 justify-center">
-                      <DelegateProfileImage
-                        endorsed={false}
-                        address={delegate.address}
-                        votingPower={delegate.votingPower}
-                        citizen={delegate.citizen}
-                      />
-                      <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
-                        {truncatedStatement}
-                      </p>
-                    </div>
-                    <div className="min-h-[24px]">
-                      <DelegateActions
-                        // @ts-ignore
-                        delegate={delegate}
-                        isAdvancedUser={isAdvancedUser}
-                        delegators={advancedDelegators}
-                      />
-                    </div>
+          return (
+            <div
+              key={delegate.address}
+              className={cn(
+                "flex flex-col",
+                isDelegatesCitizensFetching || isDelegatesFiltering
+                  ? "animate-pulse"
+                  : ""
+              )}
+            >
+              <Link href={`/delegates/${delegate.address}`}>
+                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
+                  <div className="flex flex-col gap-4 justify-center">
+                    <DelegateProfileImage
+                      endorsed={false}
+                      address={delegate.address}
+                      votingPower={delegate.votingPower}
+                      citizen={delegate.citizen}
+                    />
+                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
+                      {truncatedStatement}
+                    </p>
                   </div>
-                </Link>
-              </div>
-            );
-          })
-        ) : (
-          <span>loading...</span>
-        )}
+                  <div className="min-h-[24px]">
+                    <DelegateActions
+                      // @ts-ignore
+                      delegate={delegate}
+                      isAdvancedUser={isAdvancedUser}
+                      delegators={advancedDelegators}
+                    />
+                  </div>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
       </InfiniteScroll>
     </DialogProvider>
   );
