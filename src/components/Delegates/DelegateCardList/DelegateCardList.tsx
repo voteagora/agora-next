@@ -13,7 +13,6 @@ import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
-import { init } from "@sentry/nextjs";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
@@ -32,7 +31,7 @@ export default function DelegateCardList({
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.delegates);
+  const [delegates, setDelegates] = useState(initialDelegates.data);
   const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
@@ -75,55 +74,51 @@ export default function DelegateCardList({
         }
         element="div"
       >
-        {!!delegates ? (
-          delegates.map((delegate) => {
-            let truncatedStatement = "";
+        {delegates.map((delegate) => {
+          let truncatedStatement = "";
 
-            if (delegate?.statement?.payload) {
-              const delegateStatement = (
-                delegate?.statement?.payload as { delegateStatement: string }
-              ).delegateStatement;
-              truncatedStatement = delegateStatement.slice(0, 120);
-            }
+          if (delegate?.statement?.payload) {
+            const delegateStatement = (
+              delegate?.statement?.payload as { delegateStatement: string }
+            ).delegateStatement;
+            truncatedStatement = delegateStatement.slice(0, 120);
+          }
 
-            return (
-              <div
-                key={delegate.address}
-                className={cn(
-                  "flex flex-col",
-                  isDelegatesCitizensFetching || isDelegatesFiltering
-                    ? "animate-pulse"
-                    : ""
-                )}
-              >
-                <Link href={`/delegates/${delegate.address}`}>
-                  <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
-                    <div className="flex flex-col gap-4 justify-center">
-                      <DelegateProfileImage
-                        endorsed={delegate.statement?.endorsed}
-                        address={delegate.address}
-                        votingPower={delegate.votingPower.total}
-                        citizen={delegate.citizen}
-                      />
-                      <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
-                        {truncatedStatement}
-                      </p>
-                    </div>
-                    <div className="min-h-[24px]">
-                      <DelegateActions
-                        delegate={delegate}
-                        isAdvancedUser={isAdvancedUser}
-                        delegators={advancedDelegators}
-                      />
-                    </div>
+          return (
+            <div
+              key={delegate.address}
+              className={cn(
+                "flex flex-col",
+                isDelegatesCitizensFetching || isDelegatesFiltering
+                  ? "animate-pulse"
+                  : ""
+              )}
+            >
+              <Link href={`/delegates/${delegate.address}`}>
+                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
+                  <div className="flex flex-col gap-4 justify-center">
+                    <DelegateProfileImage
+                      endorsed={delegate.statement?.endorsed}
+                      address={delegate.address}
+                      votingPower={delegate.votingPower.total}
+                      citizen={delegate.citizen}
+                    />
+                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
+                      {truncatedStatement}
+                    </p>
                   </div>
-                </Link>
-              </div>
-            );
-          })
-        ) : (
-          <span>loading...</span>
-        )}
+                  <div className="min-h-[24px]">
+                    <DelegateActions
+                      delegate={delegate}
+                      isAdvancedUser={isAdvancedUser}
+                      delegators={advancedDelegators}
+                    />
+                  </div>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
       </InfiniteScroll>
     </DialogProvider>
   );
