@@ -95,25 +95,18 @@ async function getDelegates({
       )`
       : "";
 
-  const includeZeroVPDelegates = true;
-
   let delegateUniverseCTE: string;
 
   const tokenAddress = contracts.token.address;
 
-  if (includeZeroVPDelegates) {
-    delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
-                                del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
-                                del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate, 
-                                        coalesce(d.num_of_delegators, 0) as num_of_delegators, 
-                                        coalesce(d.direct_vp, 0) as direct_vp, 
-                                        coalesce(d.advanced_vp, 0) as advanced_vp,
-                                        coalesce(d.voting_power, 0) as voting_power
-                                        from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
-  } else {
-    // This code path is only in case one of the settings makes this query much slower.
-    delegateUniverseCTE = `with del_card_universe as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}')`;
-  }
+  delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
+                              del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
+                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate, 
+                                      coalesce(d.num_of_delegators, 0) as num_of_delegators, 
+                                      coalesce(d.direct_vp, 0) as direct_vp, 
+                                      coalesce(d.advanced_vp, 0) as advanced_vp,
+                                      coalesce(d.voting_power, 0) as voting_power
+                                      from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
