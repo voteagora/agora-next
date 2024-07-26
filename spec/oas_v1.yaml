@@ -342,6 +342,81 @@ components:
           type: string
           examples:
             - "Grant funding should be directed to projects with a great track record"
+    SnapshotProposalResults:
+      summary: Results of a snapshot proposal
+      description: An object describing the results of a snapshot proposal, including status and scores.
+      type: object
+      properties:
+        scores:
+          summary: Scores for the proposal
+          type: array
+          items:
+            type: string
+        status:
+          summary: Status of the proposal
+          type: string
+          enum:
+            - pending
+            - active
+            - closed
+    StandardProposalResults:
+      summary: Results of a standard proposal
+      description: An object describing the results of a standard proposal.
+      type: object
+      properties:
+        for:
+          summary: Number of votes for
+          type: string
+        against:
+          summary: Number of votes against
+          type: string
+        abstain:
+          summary: Number of abstentions
+          type: string
+    ApprovalProposalResults:
+      summary: Results of an approval proposal
+      description: An object describing the results of an approval proposal.
+      type: object
+      properties:
+        for:
+          summary: Number of votes for
+          type: string
+        against:
+          summary: Number of votes against
+          type: string
+        abstain:
+          summary: Number of abstentions
+          type: string
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              option:
+                type: string
+              votes:
+                type: string
+        criteria:
+          enum:
+            - THRESHOLD
+            - TOP_CHOICES
+        criteriaValue:
+          summary: Threshold required to pass or number of top choices that is passed
+          type: string
+    OptimisticProposalResults:
+      summary: Results of a standard proposal
+      description: An object describing the results of a standard proposal.
+      type: object
+      properties:
+        for:
+          summary: Number of votes for
+          type: string
+        against:
+          summary: Number of votes against
+          type: string
+        abstain:
+          summary: Number of abstentions
+          type: string
     SnapshotProposalData:
       summary: Data associated with a snapshot proposal
       description: >
@@ -469,12 +544,20 @@ components:
           type: array
           items:
             type: string
+        signatures:
+          summary: Function signatures
+          type: array
+          items:
+            type: string
         calldata:
           summary: Calldata for execution
           type: array
           items:
             type: string
-        functionData:
+        description:
+          summary: Description of the option
+          type: string
+        functionArgsName:
           summary: Functions for execution
           type: array
           items:
@@ -483,11 +566,14 @@ components:
               functionName:
                 summary: Function name
                 type: string
-              data:
+              functionArgs:
                 summary: Data for function
                 type: array
                 items:
                   type: string
+        budgetTokensSpent:
+          summary: Total tokens spent in the option transactions
+          type: string
     Proposal:
       summary: A specific governance proposal for voting
       description: >
@@ -495,46 +581,52 @@ components:
         including the specific measure, proposer, data, etc.
       type: object
       properties:
-        proposalId:
+        id:
           type: string
-        contractAddress:
-          summary: Governor contract address
-          description: Governor contract address to which this proposal was submitted.
-          type: string
-        proposerAddress:
+        proposer:
           summary: Proposer's address
           description: The address which submitted the proposal for voting.
           type: string
+        snapshotBlockNumber:
+          summary: Block number of the voting power snapshot
+          description: Block number of the proposal at which the voting power was calculated
+          type: number
+        createdTime:
+          summary: Proposal creation time
+          description: Timestamp on which this proposal was created.
+          type: string
+        startTime:
+          summary: Start time of the proposal
+          description: Timestamp at which this proposal is open for voting.
+          type: string
+        endTime:
+          summary: End time of the proposal
+          description: Timestamp at which the proposal has closed for voting.
+          type: string
+        cancelledTime:
+          summary: Cancelled time of the proposal
+          description: Timestamp at which this proposal has been canceled. Zero if not canceled.
+          type: string
+        executedTime:
+          summary: Execution time of the proposal
+          description: Timestamp at which this proposal has been executed. Zero if not executed.
+          type: string
+        markdowntitle:
+          summary: Title of the proposal
+          description: Title of the proposal
+          type: string
         description:
-          summary: Description of the voting measure
+          summary: Description of the proposal
           description: Extended information and context around the proposal.
           type: string
-        ordinal:
-          summary: Number of this proposal's order
+        quorum:
+          summary: Minimum participation for passage
           description: >
-            Numeric descriptor of this proposal's ordering among others; Calculated as the concatentation
-            of the proposal's block number left-padded by 10 0's, transaction index left-padded by 3 0's, 
-            and log index left-padded by 3 0's.
+            The minimum number of voting power needed to be involved in a given proposal as a prerequisite for passage
           type: string
-        createBlock:
-          summary: Proposal creation block number
-          description: Block number on which this proposal was created.
-          type: string
-        startBlock:
-          summary: Starting block number
-          description: Block number at which this proposal is open for voting.
-          type: string
-        endBlock:
-          summary: Ending block number
-          description: Block number at which the proposal has closed for voting.
-          type: string
-        cancelledBlock:
-          summary: Cancelled block number
-          description: Block number at which this proposal has been canceled. Zero if not canceled.
-          type: string
-        executedBlock:
-          summary: Execution block number
-          description: Block number at which this proposal has been executed. Zero if not executed.
+        approvalThreshold:
+          summary: Minimum amount needed for option to pass
+          description: The amount of voting power needed to pass an option in the given approval voting proposal.
           type: string
         proposalData:
           oneOf:
@@ -544,6 +636,51 @@ components:
             - $ref: "#/components/schemas/OptimisticProposalData"
           discriminator:
             propertyName: votingStrategy
+        unformattedProposalData:
+          summary: Unformatted proposal data
+          description: >
+            The raw, unformatted data associated with the proposal.
+          type: string
+        proposalResults:
+          oneOf:
+            - $ref: "#/components/schemas/SnapshotProposalResults"
+            - $ref: "#/components/schemas/StandardProposalResults"
+            - $ref: "#/components/schemas/ApprovalProposalResults"
+            - $ref: "#/components/schemas/OptimisticProposalResults"
+        proposalType:
+          summary: Type of proposal
+          description: The type of proposal; can be standard, approval, optimistic, or snapshot.
+          type: string
+          enum:
+            - STANDARD
+            - APPROVAL
+            - OPTIMISTIC
+            - SNAPSHOT
+        status:
+          summary: Status of the proposal
+          description: The current status of the proposal; can be active, closed, or pending.
+          type: string
+          enum:
+            - "CANCELLED"
+            - "SUCCEEDED"
+            - "DEFEATED"
+            - "ACTIVE"
+            - "PENDING"
+            - "QUEUED"
+            - "EXECUTED"
+            - "CLOSED"
+        createdTransactionHash:
+          summary: Transaction hash of proposal creation
+          description: The transaction hash of the transaction which created the proposal.
+          type: string
+        cancelledTransactionHash:
+          summary: Transaction hash of proposal cancellation
+          description: The transaction hash of the transaction which canceled the proposal.
+          type: string
+        executedTransactionHash:
+          summary: Transaction hash of proposal execution
+          description: The transaction hash of the transaction which executed the proposal.
+          type: string
         proposalTemplate:
           $ref: "#/components/schemas/ProposalTemplate"
     ProposalTemplate:
