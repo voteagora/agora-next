@@ -50,7 +50,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
     },
     {
-      name: "governanceForum",
+      name: "governance-forum",
       title: "Governance Forum",
       url: "https://governance.ether.fi/",
     },
