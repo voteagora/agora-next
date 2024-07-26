@@ -82,17 +82,25 @@ async function getProposals({
 
 async function getProposal(proposal_id: string) {
   const { namespace, contracts } = Tenant.current();
-  const proposal = await prisma[`${namespace}Proposals`].findFirst({
-    where: { proposal_id, contract: contracts.governor.address },
-  });
+  const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
+    prisma[`${namespace}Proposals`].findFirst({
+      where: { proposal_id, contract: contracts.governor.address },
+    })
+  );
+
+  const [proposal, votableSupply] = await Promise.all([
+    getProposalExecution,
+    fetchVotableSupply(),
+  ]);
 
   if (!proposal) {
     return notFound();
   }
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
-  const quorum = await fetchQuorumForProposal(proposal);
-  const votableSupply = await fetchVotableSupply();
+  const [latestBlock, quorum] = await Promise.all([
+    contracts.token.provider.getBlock("latest"),
+    fetchQuorumForProposal(proposal),
+  ]);
 
   return parseProposal(
     proposal,
