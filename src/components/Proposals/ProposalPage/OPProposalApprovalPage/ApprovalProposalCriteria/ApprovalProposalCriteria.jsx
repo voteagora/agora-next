@@ -23,10 +23,10 @@ export default function ApprovalProposalCriteria({ proposal }) {
         </HStack>
         <ProposalStatusDetail
           proposalStatus={proposal.status}
-          proposalEndTime={proposal.end_time}
-          proposalStartTime={proposal.start_time}
-          proposalCancelledTime={proposal.cancelled_time}
-          cancelledTransactionHash={proposal.cancelled_transaction_hash}
+          proposalEndTime={proposal.endTime}
+          proposalStartTime={proposal.startTime}
+          proposalCancelledTime={proposal.cancelledTime}
+          cancelledTransactionHash={proposal.cancelledTransactionHash}
         />
       </div>
       <div className="pt-2 text-xs font-semibold text-secondary">

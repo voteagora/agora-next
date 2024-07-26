@@ -84,10 +84,10 @@ const OptimisticProposalVotesCard = ({
             )}
             <ProposalStatusDetail
               proposalStatus={proposal.status}
-              proposalEndTime={proposal.end_time}
-              proposalStartTime={proposal.start_time}
-              proposalCancelledTime={proposal.cancelled_time}
-              cancelledTransactionHash={proposal.cancelled_transaction_hash}
+              proposalEndTime={proposal.endTime}
+              proposalStartTime={proposal.startTime}
+              proposalCancelledTime={proposal.cancelledTime}
+              cancelledTransactionHash={proposal.cancelledTransactionHash}
             />
           </div>
         </div>

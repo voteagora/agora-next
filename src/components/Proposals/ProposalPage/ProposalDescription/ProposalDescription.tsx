@@ -75,13 +75,13 @@ export default function ProposalDescription({
             targets={option.targets}
             calldatas={option.calldatas}
             values={option.values}
-            executedTransactionHash={proposal.executed_transaction_hash}
+            executedTransactionHash={proposal.executedTransactionHash}
           />
         ) : (
           <ApprovedTransactions
             proposalData={proposal.proposalData}
             proposalType={proposal.proposalType}
-            executedTransactionHash={proposal.executed_transaction_hash}
+            executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
         <ReactMarkdown

@@ -70,9 +70,9 @@ export default function Proposal({ proposal, votableSupply }) {
             <div className="text-xs text-secondary">
               <ProposalTimeStatus
                 proposalStatus={proposal.status}
-                proposalStartTime={proposal.start_time}
-                proposalEndTime={proposal.end_time}
-                proposalCancelledTime={proposal.cancelled_time}
+                proposalStartTime={proposal.startTime}
+                proposalEndTime={proposal.endTime}
+                proposalCancelledTime={proposal.cancelledTime}
               />
             </div>
             <ProposalStatus proposal={proposal} />
