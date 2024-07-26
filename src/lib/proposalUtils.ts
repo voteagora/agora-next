@@ -216,14 +216,14 @@ export async function parseProposal(
     cancelledTime:
       proposalData.key === "SNAPSHOT"
         ? null
-        : latestBlock
-          ? getHumanBlockTime(proposal.cancelled_block ?? 0, latestBlock)
+        : latestBlock && proposal.cancelled_block
+          ? getHumanBlockTime(proposal.cancelled_block, latestBlock)
           : null,
     executedTime:
       proposalData.key === "SNAPSHOT"
         ? null
-        : latestBlock
-          ? getHumanBlockTime(proposal.executed_block ?? 0, latestBlock)
+        : latestBlock && proposal.executed_block
+          ? getHumanBlockTime(proposal.executed_block, latestBlock)
           : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
