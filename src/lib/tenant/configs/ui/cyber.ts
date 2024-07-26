@@ -40,6 +40,14 @@ export const cyberTenantUIConfig = new TenantUI({
     brandSecondary: "#F2F2F2",
   },
 
+  links: [
+    {
+      name: "code-of-conduct",
+      title: "Code of Conduct",
+      url: "https://docs.cyber.co/governance/code-of-conduct",
+    },
+  ],
+
   governanceIssues: [
     {
       icon: "piggyBank",
@@ -52,17 +60,17 @@ export const cyberTenantUIConfig = new TenantUI({
       key: "decentralization",
     },
     {
-      icon: "ballot",
+      icon: "globe",
       title: "Ecosystem development",
       key: "ecosystemDevelopment",
     },
     {
-      icon: "ballot",
+      icon: "sparks",
       title: "Public Goods",
       key: "publicGoods",
     },
     {
-      icon: "ballot",
+      icon: "community",
       key: "daoWorkingGroups",
       title: "DAO working groups",
     },
@@ -112,6 +120,10 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates/edit",
+      enabled: true,
+    },
+    {
+      name: "delegates/code-of-conduct",
       enabled: true,
     },
   ],
