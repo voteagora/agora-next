@@ -1,5 +1,5 @@
 import { StaticImageData } from "next/image";
-import { icons } from "@/assets/icons/icons";
+import { icons } from "@/icons/icons";
 
 type UIToggle = {
   name: string;
