@@ -8,13 +8,13 @@ type AddressWeight = {
 };
 
 async function getTopDelegateWeights() {
-  const { contracts } = Tenant.current();
+  const { contracts, namespace } = Tenant.current();
 
   const QRY = `WITH 
                 
                 total_voting_power
                 AS (SELECT Sum(voting_power) tot
-                    FROM   uniswap.delegates
+                    FROM   ${namespace}.delegates
                     WHERE  contract = '${contracts.token.address.toLowerCase()}'),
                 
                 weightings
@@ -22,7 +22,7 @@ async function getTopDelegateWeights() {
                             voting_power / (SELECT tot
                                             FROM   total_voting_power) AS
                             fraction_of_voting_power
-                    FROM   uniswap.delegates
+                    FROM   ${namespace}.delegates
                     WHERE  direct_vp > 0
                     ORDER  BY voting_power)
 
