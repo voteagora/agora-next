@@ -93,8 +93,8 @@ export const cyberTenantUIConfig = new TenantUI({
       description:
         "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
       meta: {
-        title: "Cyber Voter",
-        description: "Delegate your voting power to a trusted representative",
+        title: "Cyber Governance",
+        description: "Participate in the Cyber DAO",
       },
     },
     {
