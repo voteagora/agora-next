@@ -18,7 +18,7 @@ const getVotesForDelegate = ({
     page,
   });
 
-export const getSnapshotVotesForDelegate = async ({
+const getSnapshotVotesForDelegate = async ({
   addressOrENSName,
   page,
 }: {
@@ -352,6 +352,7 @@ async function getVotesForProposalAndDelegate({
 }
 
 export const fetchVotesForDelegate = cache(getVotesForDelegate);
+export const fetchSnapshotVotesForDelegate = cache(getSnapshotVotesForDelegate);
 export const fetchVotesForProposal = cache(getVotesForProposal);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
 export const fetchVotesForProposalAndDelegate = cache(

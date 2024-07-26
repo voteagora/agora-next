@@ -16,7 +16,7 @@ import {
   fetchDelegate,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
-import { getSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
+import { fetchSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
@@ -100,7 +100,7 @@ export default async function Page({
       fetchCurrentDelegatees(address),
       fetchCurrentDelegators(address),
       tenantSupportsSnapshotVote
-        ? getSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 })
+        ? fetchSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 })
         : Promise.resolve({ meta: { total: 0 }, votes: [] }),
     ]);
 
@@ -171,7 +171,7 @@ export default async function Page({
                     initialVotes={snapshotVotes.votes}
                     fetchSnapshotVotes={async (page: number) => {
                       "use server";
-                      return await getSnapshotVotesForDelegate({
+                      return await fetchSnapshotVotesForDelegate({
                         addressOrENSName: addressOrENSName,
                         page: page,
                       });
