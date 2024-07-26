@@ -14,6 +14,13 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { DraftProposal } from "../../../proposals/draft/types";
 
+const PreText = ({ text }: { text: string }) => {
+  return (
+    <pre className="bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] inline-block px-1 py-0.5 rounded">
+      {text}
+    </pre>
+  );
+};
 const DraftPreview = ({
   proposalDraft,
   actions,
@@ -51,6 +58,41 @@ const DraftPreview = ({
       return item.title.toLowerCase() !== self[index + 1].title.toLowerCase();
     });
 
+  const renderProposalDescription = (proposal: DraftProposal) => {
+    switch (proposal.proposal_type) {
+      case "basic":
+        return (
+          <p className="text-agora-stone-700 mt-2">
+            This is a <pre>basic</pre> proposal
+          </p>
+        );
+      case "approval":
+        return (
+          <p className="text-agora-stone-700 mt-2">
+            This is an <PreText text="approval" /> proposal. The maximum number
+            of tokens that can be transferred from all the options in this
+            proposal is <PreText text={proposal.budget} />. The number of
+            options each voter may select is{" "}
+            <PreText text={proposal.max_options.toString()} />.{" "}
+            {proposal.criteria === "Threshold" &&
+              `All options with more than ${proposal.threshold} votes will be considered approved.`}
+            {proposal.criteria === "Top choices" &&
+              `The top ${proposal.threshold} choices will be considered approved.`}
+          </p>
+        );
+
+      case "social":
+        return (
+          <p className="text-agora-stone-700 mt-2">
+            This is a social proposal. Voters will vote on snapshot.
+          </p>
+        );
+
+      default:
+        return <p className="text-agora-stone-700 mt-2">This is a proposal</p>;
+    }
+  };
+
   return (
     <FormCard>
       {!isArchived && (
@@ -65,10 +107,14 @@ const DraftPreview = ({
         <h2 className="font-black text-agora-stone-900 text-2xl">
           {proposalDraft.title}
         </h2>
+        {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
           {"transactions" in proposalDraft &&
             proposalDraft.transactions.length > 0 && (
               <ProposalTransactionDisplay
+                descriptions={proposalDraft.transactions.map(
+                  (t) => t.description
+                )}
                 targets={proposalDraft.transactions.map((t) => t.target)}
                 calldatas={
                   proposalDraft.transactions.map(

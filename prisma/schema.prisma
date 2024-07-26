@@ -1116,6 +1116,7 @@ model ProposalDraft {
   checklist_items          ProposalChecklist[]
   social_options           ProposalSocialOption[]
   transactions             ProposalDraftTransaction[]
+  approval_options         ProposalApprovalOption[]
 
   @@map("proposals")
   @@schema("alltenant")
@@ -1124,6 +1125,7 @@ model ProposalDraft {
 model ProposalDraftTransaction {
   id               Int           @id @default(autoincrement())
   proposal_id      Int
+  proposal_approval_option_id Int?
   order            Int
   target           String        @db.VarChar(255)
   value            String        @db.VarChar(255)
@@ -1134,8 +1136,22 @@ model ProposalDraftTransaction {
   created_at       DateTime      @default(now()) @db.Timestamptz(6)
   updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  approval_option  ProposalApprovalOption?  @relation(fields: [proposal_approval_option_id], references: [id])
 
   @@map("proposal_transactions")
+  @@schema("alltenant")
+}
+
+model ProposalApprovalOption {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  title        String       @db.VarChar(255)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  transactions ProposalDraftTransaction[]
+
+  @@map("proposal_approval_options")
   @@schema("alltenant")
 }
 

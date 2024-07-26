@@ -1,5 +1,7 @@
 import BasicProposalAction from "./BasicProposalAction";
 import SocialProposalAction from "./SocialProposalAction";
+import ApprovalProposalAction from "./ApprovalProposalAction";
+import OptimisticProposalAction from "./OptimisticProposalAction";
 import { DraftProposal, ProposalType } from "../../../proposals/draft/types";
 
 const SponsorActions = ({
@@ -14,9 +16,9 @@ const SponsorActions = ({
       case ProposalType.SOCIAL:
         return <SocialProposalAction draftProposal={proposal} />;
       case ProposalType.APPROVAL:
-        return null;
+        return <ApprovalProposalAction draftProposal={proposal} />;
       case ProposalType.OPTIMISTIC:
-        return null;
+        return <OptimisticProposalAction draftProposal={proposal} />;
       default:
         // ensures that we've handled all cases
         const _exhaustiveCheck: never = proposal;
