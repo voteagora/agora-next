@@ -7,7 +7,7 @@ export const LogoPill = () => {
 
   return (
     <div tw="flex">
-      <div tw="flex flex-row items-center border border-line rounded-full px-[26px] py-[14px]">
+      <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
         <svg
           style={{ width: "30px", height: "30px" }}
           viewBox="0 0 16 16"
@@ -33,7 +33,7 @@ export const LogoPill = () => {
             />
           </g>
         </svg>
-        <div tw="bg-line w-px h-3/4 mx-[18px]"></div>
+        <div tw="bg-gray-300 w-px h-3/4 mx-[18px]"></div>
         {ogLogoForNamespace(namespace)}
       </div>
     </div>
