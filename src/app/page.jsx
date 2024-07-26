@@ -56,7 +56,6 @@ export async function generateMetadata({}, parent) {
     title: title,
     description: description,
     openGraph: {
-      url: parent.url,
       images: [
         {
           url: preview,
