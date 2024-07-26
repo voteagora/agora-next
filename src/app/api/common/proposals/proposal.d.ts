@@ -16,6 +16,7 @@ export type Proposal = {
   startTime: Date | null;
   endTime: Date | null;
   cancelledTime: Date | null;
+  executedTime: Date | null;
   markdowntitle: string;
   description: string | null;
   quorum: BigNumberish | null;
