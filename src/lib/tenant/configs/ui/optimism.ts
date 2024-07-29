@@ -11,7 +11,6 @@ import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
-  color: "#FF0420",
 
   logo: optimismLogo,
   hero: optimismHero,
