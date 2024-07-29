@@ -196,7 +196,7 @@ const BasicProposalForm = () => {
                   remove={remove}
                   key={`transfer-${index}`}
                 >
-                  <TransferTransactionForm index={index} />
+                  <TransferTransactionForm index={index} name="transactions" />
                 </TransactionFormItem>
               ) : (
                 <TransactionFormItem
@@ -204,7 +204,7 @@ const BasicProposalForm = () => {
                   remove={remove}
                   key={`custom-${index}`}
                 >
-                  <CustomTransactionForm index={index} />
+                  <CustomTransactionForm index={index} name="transactions" />
                 </TransactionFormItem>
               )}
             </>

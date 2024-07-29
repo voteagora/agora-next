@@ -1,10 +1,6 @@
 import { StaticImageData } from "next/image";
-<<<<<<< HEAD
 import { icons } from "@/icons/icons";
-=======
-import { icons } from "@/assets/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
->>>>>>> 3f861290 (Spiking ENS with generalized PLM)
 
 type UIToggle = {
   name: string;
