@@ -58,14 +58,33 @@ const socialProposal = z
     }
   );
 
-const approvalProposal = z.object({
-  criteria: z.nativeEnum(ApprovalProposalType),
-  budget: z.string().min(1, { message: "Budget cannot be empty" }),
-  maxOptions: z.string().min(1).optional(),
-  threshold: z.string().min(1).optional(),
-  topChoices: z.string().min(1, { message: "Top choices must be at least 1" }),
-  options: z.array(approval_option),
-});
+const approvalProposal = z
+  .object({
+    criteria: z.nativeEnum(ApprovalProposalType),
+    budget: z.string().min(1, { message: "Budget cannot be empty" }),
+    maxOptions: z.string().min(1).optional(),
+    threshold: z.string().min(1).optional(),
+    topChoices: z
+      .string()
+      .min(1, { message: "Top choices must be at least 1" })
+      .optional(),
+    options: z.array(approval_option),
+  })
+  .refine(
+    (data) => {
+      if (data.topChoices !== undefined) {
+        const topChoices = parseInt(data.topChoices);
+        return !isNaN(topChoices) && topChoices <= data.options.length;
+      }
+
+      return true;
+    },
+    {
+      message:
+        "Top choices must be less than or equal to the number of options",
+      path: ["topChoices"],
+    }
+  );
 
 const BaseProposalSchema = z.object({
   type: z.nativeEnum(ProposalType),

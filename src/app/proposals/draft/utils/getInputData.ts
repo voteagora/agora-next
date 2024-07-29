@@ -99,7 +99,7 @@ export function getInputData(proposal: DraftProposal): {
 
     // inputs for approval type
     // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
-    case ProposalType.APPROVAL:
+    case ProposalType.APPROVAL: {
       let options = [] as {
         budgetTokensSpent: bigint;
         targets: `0x${string}`[];
@@ -193,29 +193,37 @@ export function getInputData(proposal: DraftProposal): {
       ];
 
       return { inputData: approvalInputData };
+    }
 
-    case ProposalType.OPTIMISTIC:
-      //   const calldata = encodeAbiParameters(
-      //     [
-      //       {
-      //         name: "settings",
-      //         type: "tuple(uint248,bool)",
-      //       },
-      //     ],
-      //     [[disapprovalThreshold * 100, true]]
-      //   );
+    case ProposalType.OPTIMISTIC: {
+      const calldata = encodeAbiParameters(
+        [
+          {
+            name: "settings",
+            type: "tuple",
+            components: [
+              { name: "againstThreshold", type: "uint248" },
+              { name: "isRelativeToVotableSupply", type: "bool" },
+            ],
+          },
+        ],
+        [
+          {
+            againstThreshold: BigInt(disapprovalThreshold * 100),
+            isRelativeToVotableSupply: true,
+          },
+        ]
+      );
 
-      //   const optimisticInputData: ApprovalInputData = [
-      //     optimisticModuleAddress,
-      //     calldata,
-      //     description,
-      //     0, // TODO: add proposalSettings
-      //   ];
+      const optimisticInputData: ApprovalInputData = [
+        optimisticModuleAddress,
+        calldata,
+        description,
+        0, // TODO: add proposalSettings
+      ];
 
-      //   return { inputData: optimisticInputData };
-      return {
-        inputData: null,
-      };
+      return { inputData: optimisticInputData };
+    }
 
     default:
       return {

@@ -28,38 +28,39 @@ const ApprovalProposalAction = ({
 
   const { writeAsync, isLoading: isWriteLoading } = useContractWrite(config);
 
-  console.log(error);
-
   return (
-    <UpdatedButton
-      isLoading={isWriteLoading}
-      fullWidth={true}
-      type="primary"
-      onClick={async () => {
-        try {
-          const data = await writeAsync?.();
-          console.log(data);
-          if (!data) {
-            // throw some sort of error?
-            return;
-          }
-          await sponsorDraftProposal({
-            draftProposalId: draftProposal.id,
-            onchain_transaction_hash: data?.hash,
-          });
+    <>
+      <UpdatedButton
+        isLoading={isWriteLoading}
+        fullWidth={true}
+        type="primary"
+        onClick={async () => {
+          try {
+            const data = await writeAsync?.();
+            if (!data) {
+              // for dev
+              console.log(error);
+              return;
+            }
+            await sponsorDraftProposal({
+              draftProposalId: draftProposal.id,
+              onchain_transaction_hash: data?.hash,
+            });
 
-          openDialog({
-            type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
-            params: {
-              redirectUrl: "/",
-              txHash: data?.hash as `0x${string}`,
-            },
-          });
-        } catch (error) {}
-      }}
-    >
-      Submit proposal
-    </UpdatedButton>
+            openDialog({
+              type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
+              params: {
+                redirectUrl: "/",
+                txHash: data?.hash as `0x${string}`,
+              },
+            });
+          } catch (error) {}
+        }}
+      >
+        Submit proposal
+      </UpdatedButton>
+      {onPrepareError && <div>{error?.message}</div>}
+    </>
   );
 };
 

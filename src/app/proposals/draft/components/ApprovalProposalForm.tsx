@@ -8,9 +8,13 @@ import {
 } from "react-hook-form";
 import NumberInput from "./form/NumberInput";
 import SwitchInput from "./form/SwitchInput";
-import { ApprovalProposalType } from "@/app/proposals/draft/types";
+import {
+  ApprovalProposalType,
+  ApprovalProposal,
+  TransactionType,
+  EthereumAddress,
+} from "@/app/proposals/draft/types";
 import SimulationStatusPill from "./SimulateStatusPill";
-import { TransactionType, EthereumAddress } from "../types";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
 import { UpdatedButton } from "@/components/Button";
@@ -180,7 +184,11 @@ const TransactionFormItem = ({
   );
 };
 
-const ApprovalProposalForm = () => {
+const ApprovalProposalForm = ({
+  draftProposal,
+}: {
+  draftProposal: ApprovalProposal;
+}) => {
   const { contracts } = Tenant.current();
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
@@ -199,11 +207,44 @@ const ApprovalProposalForm = () => {
   });
 
   const setApprovalProposalDefaults = () => {
-    setValue("approvalProposal.criteria", ApprovalProposalType.THRESHOLD);
-    setValue("approvalProposal.budget", "0");
-    setValue("approvalProposal.maxOptions", "1");
-    setValue("approvalProposal.threshold", "0");
-    setValue("approvalProposal.topChoices", "0");
+    setValue(
+      "approvalProposal.criteria",
+      draftProposal.criteria || ApprovalProposalType.THRESHOLD
+    );
+    setValue("approvalProposal.budget", draftProposal.budget || "0");
+    setValue(
+      "approvalProposal.maxOptions",
+      draftProposal.max_options.toString() || "1"
+    );
+    setValue(
+      "approvalProposal.threshold",
+      draftProposal.threshold.toString() || "0"
+    );
+    setValue(
+      "approvalProposal.topChoices",
+      draftProposal.top_choices.toString() || "0"
+    );
+
+    console.log(draftProposal);
+
+    const existingOptions = draftProposal.approval_options.map((option) => {
+      return {
+        title: option.title,
+        transactions: option.transactions.map((transaction) => {
+          return {
+            type: TransactionType.TRANSFER,
+            target: transaction.target as EthereumAddress,
+            value: transaction.value,
+            calldata: transaction.calldata,
+            description: transaction.description,
+            simulation_state: "UNCONFIRMED",
+            simulation_id: "",
+          };
+        }),
+      };
+    });
+
+    setValue("approvalProposal.options", existingOptions);
   };
 
   const removeApprovalProposalDefaults = () => {
@@ -214,18 +255,17 @@ const ApprovalProposalForm = () => {
     unregister("approvalProposal.topChoices");
   };
 
+  useEffect(() => {
+    setApprovalProposalDefaults();
+    return () => {
+      removeApprovalProposalDefaults();
+    };
+  }, []);
+
   const validateTransactionForms = async () => {
     const result = await trigger(["approvalProposal.options"]);
     setAllTransactionFieldsValid(result);
   };
-
-  //   useEffect(() => {
-  //     // only want to run these if we are in a fresh build -- if we are in edit mode we don't want to reset the values
-  //     setApprovalProposalDefaults();
-  //     return () => {
-  //       removeApprovalProposalDefaults();
-  //     };
-  //   }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
