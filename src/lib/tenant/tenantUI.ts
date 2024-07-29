@@ -54,8 +54,10 @@ type UIOrganization = {
 
 type TenantUIParams = {
   assets: UIAssets;
-  color: string;
   delegates?: UIDelegates;
+  googleAnalytics?: string;
+  governanceIssues?: UIGovernanceIssue[];
+  governanceStakeholders?: UIGovernanceStakeholder[];
   hero?: string;
   links?: UILink[];
   logo: string;
@@ -63,8 +65,6 @@ type TenantUIParams = {
   pages?: UIPage[];
   title: string;
   toggles?: UIToggle[];
-  governanceIssues?: UIGovernanceIssue[];
-  governanceStakeholders?: UIGovernanceStakeholder[];
   customization?: {
     primary?: string;
     secondary?: string;
@@ -82,8 +82,8 @@ type TenantUIParams = {
 
 export class TenantUI {
   private _assets: UIAssets;
-  private _color: string;
   private _delegates?: UIDelegates;
+  private _googleAnalytics?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hero?: string;
@@ -112,8 +112,11 @@ export class TenantUI {
 
   constructor({
     assets,
-    color,
+    customization,
     delegates,
+    googleAnalytics,
+    governanceIssues,
+    governanceStakeholders,
     hero,
     links,
     logo,
@@ -121,13 +124,13 @@ export class TenantUI {
     pages,
     title,
     toggles,
-    governanceIssues,
-    governanceStakeholders,
-    customization,
   }: TenantUIParams) {
     this._assets = assets;
-    this._color = color;
+    this._customization = customization;
     this._delegates = delegates;
+    this._googleAnalytics = googleAnalytics;
+    this._governanceIssues = governanceIssues;
+    this._governanceStakeholders = governanceStakeholders;
     this._hero = hero;
     this._links = links;
     this._logo = logo;
@@ -135,17 +138,10 @@ export class TenantUI {
     this._pages = pages;
     this._title = title;
     this._toggles = toggles;
-    this._governanceIssues = governanceIssues;
-    this._governanceStakeholders = governanceStakeholders;
-    this._customization = customization;
   }
 
   public get assets(): UIAssets {
     return this._assets;
-  }
-
-  public get color(): string {
-    return this._color;
   }
 
   public get delegates(): UIDelegates | undefined {
@@ -158,6 +154,10 @@ export class TenantUI {
 
   public get governanceStakeholders(): UIGovernanceStakeholder[] | undefined {
     return this._governanceStakeholders;
+  }
+
+  public get googleAnalytics(): string | undefined {
+    return this._googleAnalytics;
   }
 
   public get title(): string {
