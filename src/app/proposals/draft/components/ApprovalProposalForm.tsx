@@ -193,10 +193,18 @@ const ApprovalProposalForm = ({
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
   const [simulationPending, setSimulationPending] = useState(false);
-  const { control, watch, setValue, getValues, unregister, trigger } =
-    useFormContext<FormType>();
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    unregister,
+    trigger,
+    formState,
+  } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
+  console.log("defaultValues", formState.defaultValues);
   const {
     fields: options,
     append: appendOption,
@@ -205,62 +213,6 @@ const ApprovalProposalForm = ({
     control,
     name: "approvalProposal.options",
   });
-
-  const setApprovalProposalDefaults = () => {
-    setValue(
-      "approvalProposal.criteria",
-      draftProposal.criteria || ApprovalProposalType.THRESHOLD
-    );
-    setValue("approvalProposal.budget", draftProposal.budget || "0");
-    setValue(
-      "approvalProposal.maxOptions",
-      draftProposal.max_options.toString() || "1"
-    );
-    setValue(
-      "approvalProposal.threshold",
-      draftProposal.threshold.toString() || "0"
-    );
-    setValue(
-      "approvalProposal.topChoices",
-      draftProposal.top_choices.toString() || "0"
-    );
-
-    console.log(draftProposal);
-
-    const existingOptions = draftProposal.approval_options.map((option) => {
-      return {
-        title: option.title,
-        transactions: option.transactions.map((transaction) => {
-          return {
-            type: TransactionType.TRANSFER,
-            target: transaction.target as EthereumAddress,
-            value: transaction.value,
-            calldata: transaction.calldata,
-            description: transaction.description,
-            simulation_state: "UNCONFIRMED",
-            simulation_id: "",
-          };
-        }),
-      };
-    });
-
-    setValue("approvalProposal.options", existingOptions);
-  };
-
-  const removeApprovalProposalDefaults = () => {
-    unregister("approvalProposal.budget");
-    unregister("approvalProposal.maxOptions");
-    unregister("approvalProposal.criteria");
-    unregister("approvalProposal.threshold");
-    unregister("approvalProposal.topChoices");
-  };
-
-  useEffect(() => {
-    setApprovalProposalDefaults();
-    return () => {
-      removeApprovalProposalDefaults();
-    };
-  }, []);
 
   const validateTransactionForms = async () => {
     const result = await trigger(["approvalProposal.options"]);

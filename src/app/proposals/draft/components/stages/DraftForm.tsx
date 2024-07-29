@@ -17,6 +17,7 @@ import {
   ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
+  ApprovalProposal,
 } from "../../types";
 import BasicProposalForm from "../BasicProposalForm";
 import SocialProposalForm from "../SocialProposalForm";
@@ -129,7 +130,11 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                 case ProposalType.SOCIAL:
                   return <SocialProposalForm />;
                 case ProposalType.APPROVAL:
-                  return <ApprovalProposalForm draftProposal={draftProposal} />;
+                  return (
+                    <ApprovalProposalForm
+                      draftProposal={draftProposal as ApprovalProposal}
+                    />
+                  );
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:
