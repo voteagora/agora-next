@@ -24,21 +24,21 @@ async function fetchProposalVotes(
 async function fetchAllForVoting(
   address: string | `0x${string}`,
   blockNumber: number,
-  proposal_id: string
+  proposalId: string
 ) {
   "use server";
 
-  return await apiFetchAllForVoting(address, blockNumber, proposal_id);
+  return await apiFetchAllForVoting(address, blockNumber, proposalId);
 }
 
 async function fetchUserVotesForProposal(
-  proposal_id: string,
+  proposalId: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
   return await apiFetchUserVotesForProposal({
-    proposal_id,
+    proposalId,
     address,
   });
 }

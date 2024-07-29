@@ -97,7 +97,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
           vote && (
             <VoteDetailsContainer
               key={vote.transactionHash}
-              proposalId={vote.proposal_id}
+              proposalId={vote.proposalId}
             >
               <div>
                 <VStack className="py-4 px-6">
@@ -107,7 +107,7 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
                         {`${propHeader(vote)} with ${pluralizeVote(vote.weight, "optimism")}`}
                       </span>
                       <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
-                        {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
+                        {shortPropTitle(vote.proposalTitle, vote.proposalId)}
                       </h2>
                     </VStack>
                     <DelegateVoteIcon {...vote} />

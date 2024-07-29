@@ -13,7 +13,7 @@ type Props = {
     proposalId: string,
     pagintation: { limit: number; offset: number }
   ) => Promise<PaginatedResultEx<Vote[]>>;
-  fetchUserVotes: (proposal_id: string, address: string) => Promise<Vote[]>;
+  fetchUserVotes: (proposalId: string, address: string) => Promise<Vote[]>;
   proposalId: string;
 };
 

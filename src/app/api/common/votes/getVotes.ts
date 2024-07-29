@@ -286,10 +286,10 @@ async function getVotesForProposal({
 }
 
 async function getUserVotesForProposal({
-  proposal_id,
+  proposalId,
   address,
 }: {
-  proposal_id: string;
+  proposalId: string;
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
@@ -310,7 +310,7 @@ async function getUserVotesForProposal({
     WHERE proposal_id = $1AND voter = $2
     GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
     `,
-    proposal_id,
+    proposalId,
     address.toLowerCase()
   );
 
@@ -329,15 +329,15 @@ async function getUserVotesForProposal({
 }
 
 async function getVotesForProposalAndDelegate({
-  proposal_id,
+  proposalId,
   address,
 }: {
-  proposal_id: string;
+  proposalId: string;
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
   const votes = await prisma[`${namespace}Votes`].findMany({
-    where: { proposal_id, voter: address?.toLowerCase() },
+    where: { proposal_id: proposalId, voter: address?.toLowerCase() },
   });
 
   const latestBlock = await contracts.token.provider.getBlock("latest");

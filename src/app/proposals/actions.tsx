@@ -16,16 +16,16 @@ export const fetchProposalVotes = (
   });
 
 export const fetchUserVotesForProposal = (
-  proposal_id: string,
+  proposalId: string,
   address: string | `0x${string}`
 ) =>
   apiFetchUserVotesForProposal({
-    proposal_id,
+    proposalId,
     address,
   });
 
 export const fetchAllForVoting = (
   address: string | `0x${string}`,
   blockNumber: number,
-  proposal_id: string
-) => apiFetchAllForVoting(address, blockNumber, proposal_id);
+  proposalId: string
+) => apiFetchAllForVoting(address, blockNumber, proposalId);

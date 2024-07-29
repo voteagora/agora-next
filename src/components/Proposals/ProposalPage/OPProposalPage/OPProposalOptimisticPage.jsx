@@ -26,11 +26,11 @@ async function fetchDelegate(addressOrENSName) {
   return await apiFetchDelegate(addressOrENSName);
 }
 
-async function fetchUserVotesForProposal(proposal_id, address) {
+async function fetchUserVotesForProposal(proposalId, address) {
   "use server";
 
   return await apiFetchUserVotesForProposal({
-    proposal_id,
+    proposalId,
     address,
   });
 }
