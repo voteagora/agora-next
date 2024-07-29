@@ -14,10 +14,10 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import StandardProposalDelete from "./StandardProposalDelete";
 import OptimisticProposalVotesCard from "../../ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
 
-async function fetchProposalVotes(proposal_id, page = 1) {
+async function fetchProposalVotes(proposal_id, pagintaion) {
   "use server";
 
-  return fetchVotesForProposal({ proposal_id, page });
+  return fetchVotesForProposal({ proposal_id, pagintaion });
 }
 
 async function fetchDelegate(addressOrENSName) {

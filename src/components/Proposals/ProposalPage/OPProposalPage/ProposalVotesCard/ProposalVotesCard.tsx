@@ -6,13 +6,15 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { PaginatedResultEx } from "@/app/lib/pagination";
+import { Vote } from "@/app/api/common/votes/vote";
 
 const ProposalVotesCard = ({
   proposal,
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: any;
+  proposalVotes: PaginatedResultEx<Vote[]>;
 }) => {
   const [isClicked, setIsClicked] = useState(false);
 
@@ -40,7 +42,7 @@ const ProposalVotesCard = ({
           <div className="px-4 font-semibold mb-2">Proposal votes</div>
 
           <ProposalVotesSummary
-            votes={proposalVotes.votes}
+            votes={proposalVotes.data}
             proposal={proposal}
           />
         </div>

@@ -6,10 +6,13 @@ import {
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 
-export const fetchProposalVotes = (proposal_id: string, page = 1) =>
+export const fetchProposalVotes = (
+  proposal_id: string,
+  pagination?: { limit: number; offset: number }
+) =>
   apiFetchVotesForProposal({
     proposal_id,
-    page,
+    pagination,
   });
 
 export const fetchUserVotesForProposal = (

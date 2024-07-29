@@ -1,4 +1,8 @@
-import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
+import {
+  PaginatedResultEx,
+  paginateResult,
+  paginateResultEx,
+} from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
@@ -188,20 +192,20 @@ async function getSnapshotVotesForDelegateForAddress({
 
 async function getVotesForProposal({
   proposal_id,
-  page = 1,
+  pagination = { offset: 0, limit: 20 },
   sort = "weight",
 }: {
   proposal_id: string;
-  page?: number;
+  pagination?: { offset: number; limit: number };
   sort?: VotesSort;
-}) {
+}): Promise<PaginatedResultEx<Vote[]>> {
   const { namespace, contracts } = Tenant.current();
-  const pageSize = 50;
 
-  const { meta, data: votes } = await paginateResult(
-    (skip: number, take: number) =>
-      prisma.$queryRawUnsafe<VotePayload[]>(
-        `
+  const [{ meta, data: votes }, latestBlock] = await Promise.all([
+    paginateResultEx(
+      (skip: number, take: number) =>
+        prisma.$queryRawUnsafe<VotePayload[]>(
+          `
         SELECT
           transaction_hash,
           proposal_id,
@@ -253,23 +257,23 @@ async function getVotesForProposal({
         OFFSET $3
         LIMIT $4;
       `,
-        proposal_id,
-        contracts.governor.address.toLowerCase(),
-        skip,
-        take
-      ),
-    page,
-    pageSize
-  );
+          proposal_id,
+          contracts.governor.address.toLowerCase(),
+          skip,
+          take
+        ),
+      pagination
+    ),
+    contracts.token.provider.getBlock("latest"),
+  ]);
 
   if (!votes || votes.length === 0) {
     return {
       meta,
-      votes: [],
+      data: [],
     };
   }
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
   const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type
@@ -277,7 +281,7 @@ async function getVotesForProposal({
 
   return {
     meta,
-    votes: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
+    data: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
   };
 }
 

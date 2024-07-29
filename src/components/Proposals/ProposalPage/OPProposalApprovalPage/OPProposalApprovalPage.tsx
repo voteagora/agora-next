@@ -6,15 +6,18 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import StandardProposalDelete from "../OPProposalPage/StandardProposalDelete";
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
-  fetchVotesForProposal as apiFetchVotesForProposal,
+  fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 
-async function fetchProposalVotes(proposal_id: string, page = 1) {
+async function fetchProposalVotes(
+  proposal_id: string,
+  pagination?: { limit: number; offset: number }
+) {
   "use server";
 
-  return apiFetchVotesForProposal({
+  return fetchVotesForProposal({
     proposal_id,
-    page,
+    pagination,
   });
 }
 

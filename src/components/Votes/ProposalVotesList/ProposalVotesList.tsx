@@ -1,7 +1,6 @@
 "use client";
 
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./proposalVotesList.module.scss";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
@@ -12,19 +11,13 @@ import {
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { PaginatedResultEx } from "@/app/lib/pagination";
 
 export default function ProposalVotesList({
   initialProposalVotes,
   proposal_id,
 }: {
-  initialProposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  initialProposalVotes: PaginatedResultEx<Vote[]>;
   proposal_id: string;
 }) {
   const { address: connectedAddress } = useAccount();
@@ -59,15 +52,18 @@ export default function ProposalVotesList({
   }, [connectedAddress, fetchUserVoteAndSet, proposal_id]);
 
   const proposalVotes = pages.reduce(
-    (all, page) => all.concat(page.votes),
+    (all, page) => all.concat(page.data),
     [] as Vote[]
   );
 
   const loadMore = useCallback(async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchProposalVotes(proposal_id, meta.currentPage + 1);
-      setPages((prev) => [...prev, { ...data, votes: data.votes }]);
+      const data = await fetchProposalVotes(proposal_id, {
+        limit: 20,
+        offset: meta.next_offset,
+      });
+      setPages((prev) => [...prev, { ...data, votes: data.data }]);
       setMeta(data.meta);
       fetching.current = false;
     }
@@ -77,9 +73,8 @@ export default function ProposalVotesList({
 
   return (
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
-      {/* @ts-ignore */}
       <InfiniteScroll
-        hasMore={meta.hasNextPage}
+        hasMore={meta.has_next}
         pageStart={0}
         loadMore={loadMore}
         useWindow={false}
