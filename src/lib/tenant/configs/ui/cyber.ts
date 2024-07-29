@@ -10,6 +10,8 @@ export const cyberTenantUIConfig = new TenantUI({
   hero: cyberHero,
   logo: cyberLogo,
 
+  googleAnalytics: "G-KZ3G1HV72Y",
+
   assets: {
     success: successImage,
     pending: pendingImage,
