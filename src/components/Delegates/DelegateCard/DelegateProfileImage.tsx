@@ -80,7 +80,7 @@ export function DelegateProfileImage({
           <Image
             className="absolute bottom-[-5px] right-[-7px] z-10"
             src={icons.badge}
-            alt="badge symbol"
+            alt="citizen badge"
           />
         )}
         <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
