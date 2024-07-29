@@ -1,16 +1,15 @@
-import { HStack } from "@/components/Layout/Stack";
 import Image from "next/image";
 import discordIcon from "@/icons/discord.svg";
-import twitterIcon from "@/icons/twitter.svg";
+import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
 import toast from "react-hot-toast";
 
-const ICON_HEIGHT = 32;
-const ICON_WIDTH = 32;
+const ICON_HEIGHT = 24;
+const ICON_WIDTH = 24;
 
 export function DelegateSocialLinks({ discord, twitter, warpcast }) {
   return (
-    <HStack gap="4" alignItems="center" className="h-auto items-center">
+    <div className="flex flex-row gap-4 h-auto items-center justify-center">
       {twitter && (
         <button
           onClick={(e) => {
@@ -20,10 +19,10 @@ export function DelegateSocialLinks({ discord, twitter, warpcast }) {
           }}
         >
           <Image
-            height={ICON_HEIGHT}
-            width={ICON_WIDTH}
-            src={twitterIcon.src}
-            alt="twitter icon"
+            height={ICON_HEIGHT - 6}
+            width={ICON_WIDTH - 6}
+            src={xIcon.src}
+            alt="x icon"
           />
         </button>
       )}
@@ -62,6 +61,6 @@ export function DelegateSocialLinks({ discord, twitter, warpcast }) {
           />
         </button>
       )}
-    </HStack>
+    </div>
   );
 }
