@@ -8,7 +8,7 @@ export type VotePayload = OptimismVotes;
 export type Vote = {
   transactionHash: string;
   address: string;
-  proposal_id: string;
+  proposalId: string;
   support: Support;
   weight: string;
   reason: string | null;

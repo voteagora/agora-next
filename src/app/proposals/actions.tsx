@@ -6,23 +6,26 @@ import {
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 
-export const fetchProposalVotes = (proposal_id: string, page = 1) =>
+export const fetchProposalVotes = (
+  proposalId: string,
+  pagination?: { limit: number; offset: number }
+) =>
   apiFetchVotesForProposal({
-    proposal_id,
-    page,
+    proposalId,
+    pagination,
   });
 
 export const fetchUserVotesForProposal = (
-  proposal_id: string,
+  proposalId: string,
   address: string | `0x${string}`
 ) =>
   apiFetchUserVotesForProposal({
-    proposal_id,
+    proposalId,
     address,
   });
 
 export const fetchAllForVoting = (
   address: string | `0x${string}`,
   blockNumber: number,
-  proposal_id: string
-) => apiFetchAllForVoting(address, blockNumber, proposal_id);
+  proposalId: string
+) => apiFetchAllForVoting(address, blockNumber, proposalId);

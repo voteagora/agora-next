@@ -1,21 +1,20 @@
+import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "../../../apiUtils";
+import { fetchVotesForProposal } from "../../../../common/votes/getVotes";
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
-} from "../../common/utils/validators";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "../apiUtils";
-import { ZodError } from "zod";
-import { fetchProposals } from "../../common/proposals/getProposals";
+} from "@/app/api/common/utils/validators";
 
-const DEFAULT_FILTER = "relevant";
+const DEFAULT_SORT = "weight";
 const DEFAULT_MAX_LIMIT = 50;
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
-const filterValidator = createOptionalStringValidator(
-  ["relevant", "everything"],
-  DEFAULT_FILTER
+const sortValidator = createOptionalStringValidator(
+  ["weight", "block_number"],
+  DEFAULT_SORT
 );
 const limitValidator = createOptionalNumberValidator(
   1,
@@ -28,7 +27,10 @@ const offsetValidator = createOptionalNumberValidator(
   DEFAULT_OFFSET
 );
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  route: { params: { proposalId: string } }
+) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -38,24 +40,17 @@ export async function GET(request: NextRequest) {
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
-      const filter = filterValidator.parse(params.get("filter"));
+      const { proposalId } = route.params;
+      const sort = sortValidator.parse(params.get("sort"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
-      const delegatesResult = await fetchProposals({
-        pagination: {
-          limit,
-          offset,
-        },
-        filter,
+      const proposal = await fetchVotesForProposal({
+        proposalId,
+        pagination: { limit, offset },
+        sort,
       });
-      return NextResponse.json(delegatesResult);
+      return NextResponse.json(proposal);
     } catch (e: any) {
-      if (e instanceof ZodError) {
-        return new Response("Invalid query parameters: " + e.toString(), {
-          status: 400,
-        });
-      }
-
       return new Response("Internal server error: " + e.toString(), {
         status: 500,
       });

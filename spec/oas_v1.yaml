@@ -740,38 +740,56 @@ components:
       description: Information and metadata about a specific vote on a governance proposal.
       type: object
       properties:
-        transactionId:
-          summary: Transaction ID of the vote
-          description: The transaction ID of the transaction in which the vote was cast.
+        transactionHash:
+          summary: Transaction hash of the vote
+          description: The transaction hash of the transaction in which the vote was cast.
           type: string
         proposalId:
           summary: Proposal ID for the vote
           description: The unique ID of the proposal on which the vote was cast.
           type: string
-        voterAddress:
+        address:
           summary: Address casting the vote
           description: On-chain address of the EOA or contract which cast the vote.
           type: string
         support:
           $ref: "#/components/schemas/VoteSupport"
+        reason:
+          summary: Reason for the vote
+          description: A voter-supplied reason for voting the particular way they did.
+          type: string
         weight:
           summary: Voting power behind the vote
           description: Numeric description of the weight and voting power behind the vote.
           type: string
-        castBlock:
-          summary: Block in which the vote was cast
-          description: The block number in which the transaction for the cast is contained.
-          type: string
-        description:
-          summary: Rationale for the vote
-          description: A voter-supplied reason for voting the particular way they did.
-          type: string
-        approvalParams:
-          summary: Array of items to submit for approval
+        params:
+          summary: Array of votes that have been chosen by the voter
           description: An array of items to submit for approval for multiple choice votes.
           type: array
           items:
             type: string
+        proposalValue:
+          summary: Value of the proposal
+          description: The total value that the proposal will be executed with.
+          type: string
+        proposalTitle:
+          summary: Title of the proposal
+          description: The title of the proposal.
+          type: string
+        proposalType:
+          summary: Type of the proposal
+          description: The type of the proposal.
+          type: string
+          enum:
+            - STANDARD
+            - APPROVAL
+            - OPTIMISTIC
+            - SNAPSHOT
+        timestamp:
+          summary: Timestamp of the vote
+          description: The timestamp at which the vote was cast.
+          type: string
+          format: date-time
     VotingToken:
       allOf:
         - $ref: "#/components/schemas/Contract"

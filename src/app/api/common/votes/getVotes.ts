@@ -1,4 +1,8 @@
-import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
+import {
+  PaginatedResultEx,
+  paginateResult,
+  paginateResultEx,
+} from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
@@ -17,78 +21,6 @@ const getVotesForDelegate = ({
   addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
     page,
   });
-
-export const getSnapshotVotesForDelegate = async ({
-  addressOrENSName,
-  page,
-}: {
-  addressOrENSName: string;
-  page: number;
-}) => {
-  return await addressOrEnsNameWrap(
-    getSnapshotVotesForDelegateForAddress,
-    addressOrENSName,
-    {
-      page,
-    }
-  );
-};
-
-async function getSnapshotVotesForDelegateForAddress({
-  address,
-  page = 1,
-}: {
-  address: string;
-  page?: number;
-}) {
-  const { slug } = Tenant.current();
-  const pageSize = 10;
-
-  const queryFunction = (skip: number, take: number) => {
-    const query = `
-      SELECT "vote".id,
-             "vote".voter,
-             "vote".created,
-             "vote".choice,
-             "vote".metadata,
-             "vote".reason,
-             "vote".app,
-             "vote".vp,
-             "vote".vp_by_strategy,
-             "vote".vp_state,
-             "vote".proposal_id,
-             "vote".choice_labels,
-             "proposal".title
-      FROM "snapshot".votes as "vote"
-      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
-      WHERE "vote".dao_slug = '${slug}'
-      AND "vote".voter = '${address}'
-      ORDER BY "vote".created DESC
-      OFFSET ${skip}
-      LIMIT ${take};
-    `;
-    // console.log("Executing query:", query);
-    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
-  };
-
-  const { meta, data: votes } = await paginateResult(
-    queryFunction,
-    page,
-    pageSize
-  );
-
-  if (!votes || votes.length === 0) {
-    return {
-      meta,
-      votes: [],
-    };
-  } else {
-    return {
-      meta,
-      votes,
-    };
-  }
-}
 
 async function getVotesForDelegateForAddress({
   address,
@@ -187,22 +119,93 @@ async function getVotesForDelegateForAddress({
   };
 }
 
-async function getVotesForProposal({
-  proposal_id,
-  page = 1,
-  sort = "weight",
+async function getSnapshotVotesForDelegate({
+  addressOrENSName,
+  page,
 }: {
-  proposal_id: string;
-  page?: number;
-  sort?: VotesSort;
+  addressOrENSName: string;
+  page: number;
 }) {
-  const { namespace, contracts } = Tenant.current();
-  const pageSize = 50;
+  return await addressOrEnsNameWrap(
+    getSnapshotVotesForDelegateForAddress,
+    addressOrENSName,
+    {
+      page,
+    }
+  );
+}
+
+async function getSnapshotVotesForDelegateForAddress({
+  address,
+  page = 1,
+}: {
+  address: string;
+  page?: number;
+}) {
+  const { slug } = Tenant.current();
+  const pageSize = 10;
+
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT "vote".id,
+             "vote".voter,
+             "vote".created,
+             "vote".choice,
+             "vote".metadata,
+             "vote".reason,
+             "vote".app,
+             "vote".vp,
+             "vote".vp_by_strategy,
+             "vote".vp_state,
+             "vote".proposal_id,
+             "vote".choice_labels,
+             "proposal".title
+      FROM "snapshot".votes as "vote"
+      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
+      WHERE "vote".dao_slug = '${slug}'
+      AND "vote".voter = '${address}'
+      ORDER BY "vote".created DESC
+      OFFSET ${skip}
+      LIMIT ${take};
+    `;
+    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
+  };
 
   const { meta, data: votes } = await paginateResult(
-    (skip: number, take: number) =>
-      prisma.$queryRawUnsafe<VotePayload[]>(
-        `
+    queryFunction,
+    page,
+    pageSize
+  );
+
+  if (!votes || votes.length === 0) {
+    return {
+      meta,
+      votes: [],
+    };
+  } else {
+    return {
+      meta,
+      votes,
+    };
+  }
+}
+
+async function getVotesForProposal({
+  proposalId,
+  pagination = { offset: 0, limit: 20 },
+  sort = "weight",
+}: {
+  proposalId: string;
+  pagination?: { offset: number; limit: number };
+  sort?: VotesSort;
+}): Promise<PaginatedResultEx<Vote[]>> {
+  const { namespace, contracts } = Tenant.current();
+
+  const [{ meta, data: votes }, latestBlock] = await Promise.all([
+    paginateResultEx(
+      (skip: number, take: number) =>
+        prisma.$queryRawUnsafe<VotePayload[]>(
+          `
         SELECT
           transaction_hash,
           proposal_id,
@@ -254,23 +257,23 @@ async function getVotesForProposal({
         OFFSET $3
         LIMIT $4;
       `,
-        proposal_id,
-        contracts.governor.address.toLowerCase(),
-        skip,
-        take
-      ),
-    page,
-    pageSize
-  );
+          proposalId,
+          contracts.governor.address.toLowerCase(),
+          skip,
+          take
+        ),
+      pagination
+    ),
+    contracts.token.provider.getBlock("latest"),
+  ]);
 
   if (!votes || votes.length === 0) {
     return {
       meta,
-      votes: [],
+      data: [],
     };
   }
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
   const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type
@@ -278,15 +281,15 @@ async function getVotesForProposal({
 
   return {
     meta,
-    votes: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
+    data: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
   };
 }
 
 async function getUserVotesForProposal({
-  proposal_id,
+  proposalId,
   address,
 }: {
-  proposal_id: string;
+  proposalId: string;
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
@@ -307,7 +310,7 @@ async function getUserVotesForProposal({
     WHERE proposal_id = $1AND voter = $2
     GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
     `,
-    proposal_id,
+    proposalId,
     address.toLowerCase()
   );
 
@@ -326,15 +329,15 @@ async function getUserVotesForProposal({
 }
 
 async function getVotesForProposalAndDelegate({
-  proposal_id,
+  proposalId,
   address,
 }: {
-  proposal_id: string;
+  proposalId: string;
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
   const votes = await prisma[`${namespace}Votes`].findMany({
-    where: { proposal_id, voter: address?.toLowerCase() },
+    where: { proposal_id: proposalId, voter: address?.toLowerCase() },
   });
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
@@ -352,6 +355,7 @@ async function getVotesForProposalAndDelegate({
 }
 
 export const fetchVotesForDelegate = cache(getVotesForDelegate);
+export const fetchSnapshotVotesForDelegate = cache(getSnapshotVotesForDelegate);
 export const fetchVotesForProposal = cache(getVotesForProposal);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
 export const fetchVotesForProposalAndDelegate = cache(

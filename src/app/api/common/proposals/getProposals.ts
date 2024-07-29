@@ -80,11 +80,11 @@ async function getProposals({
   };
 }
 
-async function getProposal(proposal_id: string) {
+async function getProposal(proposalId: string) {
   const { namespace, contracts } = Tenant.current();
   const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
     prisma[`${namespace}Proposals`].findFirst({
-      where: { proposal_id, contract: contracts.governor.address },
+      where: { proposal_id: proposalId, contract: contracts.governor.address },
     })
   );
 
