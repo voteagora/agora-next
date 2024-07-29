@@ -14,7 +14,10 @@ const CustomTransactionForm = ({
   name,
 }: {
   index: number;
-  name: "transactions" | "approvalProposal.options";
+  name:
+    | "transactions"
+    | "approvalProposal.options"
+    | `approvalProposal.options.${number}.transactions`;
 }) => {
   type FormType =
     | z.output<typeof BasicProposalSchema>

@@ -15,7 +15,10 @@ export type FormState = {
   message: string;
 };
 
-const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
+const formDataByType = (
+  data: z.output<typeof DraftProposalSchema>,
+  id: number
+) => {
   switch (data.type) {
     case ProposalType.BASIC:
       return {
@@ -68,20 +71,29 @@ const formDataByType = (data: z.output<typeof DraftProposalSchema>) => {
           ? parseInt(data.approvalProposal.maxOptions)
           : null,
         top_choices: parseInt(data.approvalProposal.topChoices),
-        transactions: {
+        approval_options: {
           // deletes all existing options so we aren't stacking on top of old options
+          // TODO: do we need to make sure deletes cascade and remove transactions?
           deleteMany: {},
-          create: data.approvalProposal?.options.map((option, idx) => {
-            const asTransaction = {
-              order: idx,
-              target: option.target as string,
-              value: option.value,
-              calldata: option.calldata,
-              description: option.description,
-              simulation_state: option.simulation_state,
-              simulation_id: option.simulation_id,
+          create: data.approvalProposal.options.map((option) => {
+            return {
+              title: option.title,
+              transactions: {
+                create: option.transactions.map((transaction, idx) => {
+                  const asTransaction = {
+                    order: idx,
+                    target: transaction.target as string,
+                    value: transaction.value,
+                    calldata: transaction.calldata,
+                    description: transaction.description,
+                    simulation_state: transaction.simulation_state,
+                    simulation_id: transaction.simulation_id,
+                    proposal: { connect: { id } },
+                  };
+                  return asTransaction;
+                }),
+              },
             };
-            return asTransaction;
           }),
         },
       };
@@ -125,7 +137,7 @@ export async function onSubmitAction(
       },
       data: {
         ...baseformData,
-        ...formDataByType(parsed.data),
+        ...formDataByType(parsed.data, data.draftProposalId),
       },
     });
 

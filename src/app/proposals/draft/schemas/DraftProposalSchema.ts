@@ -33,6 +33,11 @@ const transaction = z.object({
   amount: z.string().min(1, { message: "Amount cannot be empty" }).optional(),
 });
 
+const approval_option = z.object({
+  title: z.string().min(1, { message: "Title cannot be empty" }),
+  transactions: z.array(transaction),
+});
+
 const socialOption = z.object({
   text: z.string().min(1, { message: "Option text cannot be empty" }),
 });
@@ -59,7 +64,7 @@ const approvalProposal = z.object({
   maxOptions: z.string().min(1).optional(),
   threshold: z.string().min(1).optional(),
   topChoices: z.string().min(1, { message: "Top choices must be at least 1" }),
-  options: z.array(transaction),
+  options: z.array(approval_option),
 });
 
 const BaseProposalSchema = z.object({

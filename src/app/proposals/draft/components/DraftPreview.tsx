@@ -13,6 +13,7 @@ import { truncateAddress } from "@/app/lib/utils/text";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { DraftProposal } from "../../../proposals/draft/types";
+import Tenant from "@/lib/tenant/tenant";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -30,6 +31,7 @@ const DraftPreview = ({
   actions?: React.ReactNode;
   isArchived?: boolean;
 }) => {
+  const tenant = Tenant.current();
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
   const { data: blockNumber } = useBlockNumber();
@@ -244,7 +246,11 @@ const DraftPreview = ({
                 <p className="flex-grow">Proposal threshold</p>
                 <span className="text-secondary font-mono text-xs">
                   {threshold
-                    ? Math.round(parseFloat(formatUnits(BigInt(threshold), 18)))
+                    ? Math.round(
+                        parseFloat(
+                          formatUnits(BigInt(threshold), tenant.token.decimals)
+                        )
+                      )
                     : "0"}{" "}
                   required
                 </span>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { ApprovalProposalSchema } from "./../schemas/DraftProposalSchema";
 import {
@@ -16,47 +16,139 @@ import CustomTransactionForm from "./CustomTransactionForm";
 import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
 import toast from "react-hot-toast";
+import TextInput from "./form/TextInput";
+import { XCircleIcon } from "@heroicons/react/20/solid";
 
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
-// just the parts of the transaction that actually matter on-chain
-const stringifyTransactionDetails = (transaction: any) => {
-  return JSON.stringify({
-    target: transaction.target,
-    calldata: transaction.calldata,
-    value: transaction.value,
+const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
+  const { control, watch } = useFormContext<FormType>();
+
+  const {
+    fields: transactions,
+    append: appendTransaction,
+    remove: removeTransaction,
+  } = useFieldArray({
+    control,
+    name: `approvalProposal.options.${optionIndex}.transactions`,
   });
+
+  return (
+    <div>
+      <TextInput
+        required={true}
+        label="Title"
+        name={`approvalProposal.options.${optionIndex}.title`}
+        control={control}
+      />
+      <div className="mt-6 space-y-12">
+        {transactions.map((field, transactionIndex) => {
+          return (
+            <>
+              {field.type === TransactionType.TRANSFER ? (
+                <TransactionFormItem
+                  remove={removeTransaction}
+                  optionIndex={optionIndex}
+                  transactionIndex={transactionIndex}
+                  key={`transfer-${transactionIndex}`}
+                >
+                  <TransferTransactionForm
+                    index={transactionIndex}
+                    name={`approvalProposal.options.${optionIndex}.transactions`}
+                  />
+                </TransactionFormItem>
+              ) : (
+                <TransactionFormItem
+                  remove={removeTransaction}
+                  optionIndex={optionIndex}
+                  transactionIndex={transactionIndex}
+                  key={`custom-${transactionIndex}`}
+                >
+                  <CustomTransactionForm
+                    index={transactionIndex}
+                    name={`approvalProposal.options.${optionIndex}.transactions`}
+                  />
+                </TransactionFormItem>
+              )}
+            </>
+          );
+        })}
+      </div>
+      <div className="flex flex-row space-x-2 w-full mt-6">
+        <UpdatedButton
+          isSubmit={false}
+          type="secondary"
+          className="flex-grow"
+          onClick={() => {
+            appendTransaction({
+              type: TransactionType.TRANSFER,
+              target: "" as EthereumAddress,
+              value: "",
+              calldata: "",
+              description: "",
+              simulation_state: "UNCONFIRMED",
+              simulation_id: "",
+            });
+          }}
+        >
+          Add a transfer transaction
+        </UpdatedButton>
+        <UpdatedButton
+          isSubmit={false}
+          type="secondary"
+          className="flex-grow"
+          onClick={() => {
+            appendTransaction({
+              type: TransactionType.CUSTOM,
+              target: "" as EthereumAddress,
+              value: "",
+              calldata: "",
+              description: "",
+              simulation_state: "UNCONFIRMED",
+              simulation_id: "",
+            });
+          }}
+        >
+          Add a custom transaction
+        </UpdatedButton>
+      </div>
+    </div>
+  );
 };
 
 const TransactionFormItem = ({
-  index,
+  optionIndex,
+  transactionIndex,
   remove,
   children,
 }: {
-  index: number;
+  optionIndex: number;
+  transactionIndex: number;
   remove: UseFieldArrayRemove;
   children: React.ReactNode;
 }) => {
   const { register, watch } = useFormContext<FormType>();
 
   const simulationState = watch(
-    `approvalProposal.options.${index}.simulation_state`
+    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`
   );
-  const simulationId = watch(`approvalProposal.options.${index}.simulation_id`);
+  const simulationId = watch(
+    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`
+  );
 
   return (
-    <div className="p-4 border border-agora-stone-100 rounded-lg">
+    <div className="">
       <div className="flex flex-row justify-between items-center mb-6">
         <h2 className="text-agora-stone-900 font-semibold">
-          Option #{index + 1}
+          Transaction #{transactionIndex + 1}
         </h2>
         <span
           className="text-red-500 text-sm hover:underline cursor-pointer"
           onClick={() => {
-            remove(index);
+            remove(transactionIndex);
           }}
         >
-          Remove
+          Remove transaction
         </span>
       </div>
       {children}
@@ -74,11 +166,15 @@ const TransactionFormItem = ({
       </div>
       <input
         type="hidden"
-        {...register(`approvalProposal.options.${index}.simulation_state`)}
+        {...register(
+          `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`
+        )}
       />
       <input
         type="hidden"
-        {...register(`approvalProposal.options.${index}.simulation_id`)}
+        {...register(
+          `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`
+        )}
       />
     </div>
   );
@@ -89,18 +185,15 @@ const ApprovalProposalForm = () => {
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(false);
   const [simulationPending, setSimulationPending] = useState(false);
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    unregister,
-    trigger,
-    formState,
-  } = useFormContext<FormType>();
+  const { control, watch, setValue, getValues, unregister, trigger } =
+    useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: options,
+    append: appendOption,
+    remove: removeOption,
+  } = useFieldArray({
     control,
     name: "approvalProposal.options",
   });
@@ -121,36 +214,24 @@ const ApprovalProposalForm = () => {
     unregister("approvalProposal.topChoices");
   };
 
-  /**
-   * Keeping track of the current validated transaction block so we can compare
-   * changes and encourage re-simulation if the user simulates then changes the
-   * details of the transaction.
-   */
-  const currentlyValidatedTransactions = useRef<any[]>(
-    formState.defaultValues?.approvalProposal?.options?.map((transaction) => {
-      return stringifyTransactionDetails(transaction);
-    }) || []
-  );
-
   const validateTransactionForms = async () => {
     const result = await trigger(["approvalProposal.options"]);
     setAllTransactionFieldsValid(result);
   };
 
-  useEffect(() => {
-    // only want to run these if we are in a fresh build -- if we are in edit mode we don't want to reset the values
-    setApprovalProposalDefaults();
-    return () => {
-      removeApprovalProposalDefaults();
-    };
-  }, []);
+  //   useEffect(() => {
+  //     // only want to run these if we are in a fresh build -- if we are in edit mode we don't want to reset the values
+  //     setApprovalProposalDefaults();
+  //     return () => {
+  //       removeApprovalProposalDefaults();
+  //     };
+  //   }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       const parts = name?.split(".");
-      if (parts?.length === 4) {
-        const field = parts[3];
-        const updatedTransactions = value.approvalProposal?.options;
+      if (parts?.length === 6) {
+        const field = parts[5];
         if (
           field === "recipient" ||
           field === "amount" ||
@@ -160,23 +241,6 @@ const ApprovalProposalForm = () => {
           field === "calldata"
         ) {
           validateTransactionForms();
-          updatedTransactions?.forEach((transaction, index) => {
-            if (
-              currentlyValidatedTransactions.current[index] !==
-              stringifyTransactionDetails(transaction)
-            ) {
-              setValue(
-                `approvalProposal.options.${index}.simulation_state`,
-                "UNCONFIRMED"
-              );
-              // should we invalidate ID?
-            } else {
-              setValue(
-                `approvalProposal.options.${index}.simulation_state`,
-                "VALID"
-              );
-            }
-          });
         }
       }
     });
@@ -185,7 +249,11 @@ const ApprovalProposalForm = () => {
 
   const simulateTransactions = async () => {
     setSimulationPending(true);
-    const transactions = getValues("approvalProposal.options");
+    const options = getValues("approvalProposal.options");
+    const transactions = [] as any[];
+    options.forEach((option: any) => {
+      transactions.push(...option.transactions);
+    });
 
     try {
       const response = await fetch("/api/simulate-bundle", {
@@ -200,23 +268,34 @@ const ApprovalProposalForm = () => {
         }),
       });
       const res = await response.json();
-      res.response.simulation_results.forEach((result: any, index: number) => {
-        if (result.transaction.status) {
-          setValue(
-            `approvalProposal.options.${index}.simulation_state`,
-            "VALID"
-          );
-          setValue(
-            `approvalProposal.options.${index}.simulation_id`,
-            result.simulation.id
-          );
-        } else {
-          setValue(
-            `approvalProposal.options.${index}.simulation_state`,
-            "INVALID"
-          );
+      const results = res.response.simulation_results;
+
+      for (let optionIndex = 0; optionIndex < options.length; optionIndex++) {
+        const transactions = options[optionIndex].transactions;
+        for (
+          let transactionIndex = 0;
+          transactionIndex < transactions.length;
+          transactionIndex++
+        ) {
+          const result =
+            results[optionIndex * transactions.length + transactionIndex];
+          if (result.transaction.status) {
+            setValue(
+              `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
+              "VALID"
+            );
+            setValue(
+              `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`,
+              result.simulation.id
+            );
+          } else {
+            setValue(
+              `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
+              "INVALID"
+            );
+          }
         }
-      });
+      }
       setSimulationPending(false);
     } catch (e) {
       console.error(e);
@@ -282,37 +361,32 @@ const ApprovalProposalForm = () => {
           skip this step no transactions will be added.
         </p>
         <div className="mt-6 space-y-12">
-          {fields.map((field, index) => {
+          {options.map((_field, index) => {
             return (
-              <>
-                {field.type === TransactionType.TRANSFER ? (
-                  <TransactionFormItem
-                    index={index}
-                    remove={remove}
-                    key={`transfer-${index}`}
-                  >
-                    <TransferTransactionForm
-                      index={index}
-                      name="approvalProposal.options"
-                    />
-                  </TransactionFormItem>
-                ) : (
-                  <TransactionFormItem
-                    index={index}
-                    remove={remove}
-                    key={`custom-${index}`}
-                  >
-                    <CustomTransactionForm
-                      index={index}
-                      name="approvalProposal.options"
-                    />
-                  </TransactionFormItem>
-                )}
-              </>
+              <div
+                className="p-4 border border-agora-stone-100 rounded-lg"
+                key={index}
+              >
+                <div className="flex flex-col mb-6">
+                  <div className="flex flex-row justify-between mb-4">
+                    <h2 className="text-agora-stone-900 font-semibold">
+                      Option #{index + 1}
+                    </h2>
+                    <span
+                      onClick={() => {
+                        removeOption(index);
+                      }}
+                    >
+                      <XCircleIcon className="w-5 h-5 text-red-500 cursor-pointer" />
+                    </span>
+                  </div>
+                  <OptionItem optionIndex={index} />
+                </div>
+              </div>
             );
           })}
         </div>
-        {fields.length > 0 && (
+        {options.length > 0 && (
           <div className="mt-6">
             {!allTransactionFieldsValid ? (
               <UpdatedButton
@@ -344,36 +418,13 @@ const ApprovalProposalForm = () => {
             type="secondary"
             className="flex-grow"
             onClick={() => {
-              append({
-                type: TransactionType.TRANSFER,
-                target: "" as EthereumAddress,
-                value: "",
-                calldata: "",
-                description: "",
-                simulation_state: "UNCONFIRMED",
-                simulation_id: "",
+              appendOption({
+                title: "",
+                transactions: [],
               });
             }}
           >
-            Transfer from the treasury
-          </UpdatedButton>
-          <UpdatedButton
-            isSubmit={false}
-            type="secondary"
-            className="flex-grow"
-            onClick={() => {
-              append({
-                type: TransactionType.CUSTOM,
-                target: "" as EthereumAddress,
-                value: "",
-                calldata: "",
-                description: "",
-                simulation_state: "UNCONFIRMED",
-                simulation_id: "",
-              });
-            }}
-          >
-            Create a custom transaction
+            Add option
           </UpdatedButton>
         </div>
       </div>
