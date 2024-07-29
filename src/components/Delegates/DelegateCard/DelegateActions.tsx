@@ -45,9 +45,7 @@ export function DelegateActions({
   }
 
   return (
-    <div
-      className={`flex flex-row items-stretch ${className ? className + "justify-between" : "justify-between"}`}
-    >
+    <div className="flex flex-row items-stretch justify-between">
       <DelegateSocialLinks
         discord={discord}
         twitter={twitter}
