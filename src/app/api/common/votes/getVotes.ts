@@ -18,78 +18,6 @@ const getVotesForDelegate = ({
     page,
   });
 
-const getSnapshotVotesForDelegate = async ({
-  addressOrENSName,
-  page,
-}: {
-  addressOrENSName: string;
-  page: number;
-}) => {
-  return await addressOrEnsNameWrap(
-    getSnapshotVotesForDelegateForAddress,
-    addressOrENSName,
-    {
-      page,
-    }
-  );
-};
-
-async function getSnapshotVotesForDelegateForAddress({
-  address,
-  page = 1,
-}: {
-  address: string;
-  page?: number;
-}) {
-  const { slug } = Tenant.current();
-  const pageSize = 10;
-
-  const queryFunction = (skip: number, take: number) => {
-    const query = `
-      SELECT "vote".id,
-             "vote".voter,
-             "vote".created,
-             "vote".choice,
-             "vote".metadata,
-             "vote".reason,
-             "vote".app,
-             "vote".vp,
-             "vote".vp_by_strategy,
-             "vote".vp_state,
-             "vote".proposal_id,
-             "vote".choice_labels,
-             "proposal".title
-      FROM "snapshot".votes as "vote"
-      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
-      WHERE "vote".dao_slug = '${slug}'
-      AND "vote".voter = '${address}'
-      ORDER BY "vote".created DESC
-      OFFSET ${skip}
-      LIMIT ${take};
-    `;
-    // console.log("Executing query:", query);
-    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
-  };
-
-  const { meta, data: votes } = await paginateResult(
-    queryFunction,
-    page,
-    pageSize
-  );
-
-  if (!votes || votes.length === 0) {
-    return {
-      meta,
-      votes: [],
-    };
-  } else {
-    return {
-      meta,
-      votes,
-    };
-  }
-}
-
 async function getVotesForDelegateForAddress({
   address,
   page = 1,
@@ -185,6 +113,77 @@ async function getVotesForDelegateForAddress({
       return parseVote(vote, proposalData, latestBlock);
     }),
   };
+}
+
+async function getSnapshotVotesForDelegate({
+  addressOrENSName,
+  page,
+}: {
+  addressOrENSName: string;
+  page: number;
+}) {
+  return await addressOrEnsNameWrap(
+    getSnapshotVotesForDelegateForAddress,
+    addressOrENSName,
+    {
+      page,
+    }
+  );
+}
+
+async function getSnapshotVotesForDelegateForAddress({
+  address,
+  page = 1,
+}: {
+  address: string;
+  page?: number;
+}) {
+  const { slug } = Tenant.current();
+  const pageSize = 10;
+
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT "vote".id,
+             "vote".voter,
+             "vote".created,
+             "vote".choice,
+             "vote".metadata,
+             "vote".reason,
+             "vote".app,
+             "vote".vp,
+             "vote".vp_by_strategy,
+             "vote".vp_state,
+             "vote".proposal_id,
+             "vote".choice_labels,
+             "proposal".title
+      FROM "snapshot".votes as "vote"
+      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
+      WHERE "vote".dao_slug = '${slug}'
+      AND "vote".voter = '${address}'
+      ORDER BY "vote".created DESC
+      OFFSET ${skip}
+      LIMIT ${take};
+    `;
+    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
+  };
+
+  const { meta, data: votes } = await paginateResult(
+    queryFunction,
+    page,
+    pageSize
+  );
+
+  if (!votes || votes.length === 0) {
+    return {
+      meta,
+      votes: [],
+    };
+  } else {
+    return {
+      meta,
+      votes,
+    };
+  }
 }
 
 async function getVotesForProposal({
