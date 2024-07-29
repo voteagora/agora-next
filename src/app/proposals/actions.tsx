@@ -7,11 +7,11 @@ import {
 } from "@/app/api/common/votes/getVotes";
 
 export const fetchProposalVotes = (
-  proposal_id: string,
+  proposalId: string,
   pagination?: { limit: number; offset: number }
 ) =>
   apiFetchVotesForProposal({
-    proposal_id,
+    proposalId,
     pagination,
   });
 

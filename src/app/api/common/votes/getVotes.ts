@@ -191,11 +191,11 @@ async function getSnapshotVotesForDelegateForAddress({
 }
 
 async function getVotesForProposal({
-  proposal_id,
+  proposalId,
   pagination = { offset: 0, limit: 20 },
   sort = "weight",
 }: {
-  proposal_id: string;
+  proposalId: string;
   pagination?: { offset: number; limit: number };
   sort?: VotesSort;
 }): Promise<PaginatedResultEx<Vote[]>> {
@@ -257,7 +257,7 @@ async function getVotesForProposal({
         OFFSET $3
         LIMIT $4;
       `,
-          proposal_id,
+          proposalId,
           contracts.governor.address.toLowerCase(),
           skip,
           take

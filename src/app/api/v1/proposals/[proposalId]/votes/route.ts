@@ -45,7 +45,7 @@ export async function GET(
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
       const proposal = await fetchVotesForProposal({
-        proposal_id: proposalId,
+        proposalId,
         pagination: { limit, offset },
         sort,
       });

@@ -10,18 +10,18 @@ import { PaginatedResultEx } from "@/app/lib/pagination";
 type Props = {
   initialProposalVotes: PaginatedResultEx<Vote[]>;
   fetchVotesForProposal: (
-    proposal_id: string,
+    proposalId: string,
     pagintation: { limit: number; offset: number }
   ) => Promise<PaginatedResultEx<Vote[]>>;
   fetchUserVotes: (proposal_id: string, address: string) => Promise<Vote[]>;
-  proposal_id: string;
+  proposalId: string;
 };
 
 export default function ApprovalProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
   fetchUserVotes,
-  proposal_id,
+  proposalId,
 }: Props) {
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialProposalVotes] || []);
@@ -37,7 +37,7 @@ export default function ApprovalProposalVotesList({
   const loadMore = async () => {
     if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchVotesForProposal(proposal_id, {
+      const data = await fetchVotesForProposal(proposalId, {
         limit: 20,
         offset: meta.next_offset,
       });
@@ -52,10 +52,10 @@ export default function ApprovalProposalVotesList({
   };
 
   const fetchUserVoteAndSet = useCallback(
-    async (proposal_id: string, address: string) => {
+    async (proposalId: string, address: string) => {
       let fetchedUserVotes: Vote[];
       try {
-        fetchedUserVotes = await fetchUserVotes(proposal_id, address);
+        fetchedUserVotes = await fetchUserVotes(proposalId, address);
       } catch (error) {
         fetchedUserVotes = [];
       }
@@ -66,11 +66,11 @@ export default function ApprovalProposalVotesList({
 
   useEffect(() => {
     if (connectedAddress) {
-      fetchUserVoteAndSet(proposal_id, connectedAddress);
+      fetchUserVoteAndSet(proposalId, connectedAddress);
     } else {
       setUserVotes([]);
     }
-  }, [connectedAddress, proposal_id, fetchUserVotes, fetchUserVoteAndSet]);
+  }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
     <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>

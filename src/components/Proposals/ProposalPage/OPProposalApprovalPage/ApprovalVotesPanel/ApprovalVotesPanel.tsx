@@ -17,13 +17,13 @@ type Props = {
   proposal: Proposal;
   initialProposalVotes: PaginatedResultEx<Vote[]>;
   fetchVotesForProposal: (
-    proposal_id: string,
+    proposalId: string,
     pagination?: { limit: number; offset: number }
   ) => Promise<PaginatedResultEx<Vote[]>>;
   fetchAllForVoting: (
     address: string | `0x${string}`,
     blockNumber: number,
-    proposal_id: string
+    proposalId: string
   ) => Promise<{
     votingPower: VotingPowerData;
     authorityChains: string[][];
@@ -31,7 +31,7 @@ type Props = {
     votesForProposalAndDelegate: Vote[];
   }>;
   fetchUserVotesForProposal: (
-    proposal_id: string,
+    proposalId: string,
     address: string | `0x${string}`
   ) => Promise<Vote[]>;
 };
@@ -83,7 +83,7 @@ export default function ApprovalVotesPanel({
             initialProposalVotes={initialProposalVotes}
             fetchVotesForProposal={fetchVotesForProposal}
             fetchUserVotes={fetchUserVotesForProposal}
-            proposal_id={proposal.id}
+            proposalId={proposal.id}
           />
         )}
         <ApprovalProposalCriteria proposal={proposal} />

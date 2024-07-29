@@ -10,13 +10,13 @@ import {
 } from "@/app/api/common/votes/getVotes";
 
 async function fetchProposalVotes(
-  proposal_id: string,
+  proposalId: string,
   pagination?: { limit: number; offset: number }
 ) {
   "use server";
 
   return fetchVotesForProposal({
-    proposal_id,
+    proposalId,
     pagination,
   });
 }

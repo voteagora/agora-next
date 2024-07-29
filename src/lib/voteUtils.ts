@@ -135,7 +135,7 @@ export function parseVote(
   return {
     transactionHash: vote.transaction_hash,
     address: vote.voter,
-    proposal_id: vote.proposal_id,
+    proposalId: vote.proposal_id,
     support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
     weight: vote.weight.toFixed(0),
     reason: vote.reason,

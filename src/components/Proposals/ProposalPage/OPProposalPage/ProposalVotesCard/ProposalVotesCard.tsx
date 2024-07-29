@@ -49,7 +49,7 @@ const ProposalVotesCard = ({
 
         <ProposalVotesList
           initialProposalVotes={proposalVotes}
-          proposal_id={proposal.id}
+          proposalId={proposal.id}
         />
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} />
