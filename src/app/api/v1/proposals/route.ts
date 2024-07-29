@@ -8,14 +8,14 @@ import { traceWithUserId } from "../apiUtils";
 import { ZodError } from "zod";
 import { fetchProposals } from "../../common/proposals/getProposals";
 
-const DEFAULT_SORT = "relevant";
+const DEFAULT_FILTER = "relevant";
 const DEFAULT_MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 
 const filterValidator = createOptionalStringValidator(
   ["relevant", "everything"],
-  DEFAULT_SORT
+  DEFAULT_FILTER
 );
 const limitValidator = createOptionalNumberValidator(
   1,
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
-      const filter = filterValidator.parse(params.get("sort"));
+      const filter = filterValidator.parse(params.get("filter"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
       const delegatesResult = await fetchProposals({
