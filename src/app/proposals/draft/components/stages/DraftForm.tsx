@@ -129,7 +129,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                 case ProposalType.SOCIAL:
                   return <SocialProposalForm />;
                 case ProposalType.APPROVAL:
-                  return <ApprovalProposalForm />;
+                  return <ApprovalProposalForm draftProposal={draftProposal} />;
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:
