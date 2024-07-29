@@ -1,6 +1,5 @@
 "use client";
 
-import { HStack } from "@/components/Layout/Stack";
 import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
 import { useAccount } from "wagmi";
@@ -46,9 +45,8 @@ export function DelegateActions({
   }
 
   return (
-    <HStack
-      alignItems="items-stretch"
-      className={className ? className + "justify-between" : "justify-between"}
+    <div
+      className={`flex flex-row items-stretch ${className ? className + "justify-between" : "justify-between"}`}
     >
       <DelegateSocialLinks
         discord={discord}
@@ -82,6 +80,6 @@ export function DelegateActions({
           </ConnectKitButton.Custom>
         )}
       </div>
-    </HStack>
+    </div>
   );
 }
