@@ -32,7 +32,7 @@ export const optimismTenantUIConfig = new TenantUI({
 
   governanceIssues: [
     {
-      icon: "measure",
+      icon: "banknotes",
       title: "Treasury management",
       key: "treasury",
     },
@@ -42,7 +42,7 @@ export const optimismTenantUIConfig = new TenantUI({
       key: "funding",
     },
     {
-      icon: "ballot",
+      icon: "sparks",
       title: "Public goods",
       key: "publicGoods",
     },
@@ -79,9 +79,19 @@ export const optimismTenantUIConfig = new TenantUI({
       url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
     },
     {
-      name: "governanceForum",
+      name: "governance-forum",
       title: "Governance Forum",
       url: "https://gov.optimism.io/",
+    },
+    {
+      name: "code-of-conduct",
+      title: "Delegate Code of Conduct",
+      url: "https://gov.optimism.io/t/code-of-conduct/5751",
+    },
+    {
+      name: "delegate-statement-template",
+      title: "View Template",
+      url: "https://gov.optimism.io/t/delegate-commitments/235",
     },
   ],
 
