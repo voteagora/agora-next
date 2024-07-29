@@ -34,7 +34,7 @@ import sponsor from "./sponsor.svg";
 import stack from "./stack.svg";
 import sunny from "./sunny.svg";
 import tableView from "./tableView.svg";
-import twitter from "./twitter.svg";
+import x from "./x.svg";
 import vote from "./vote.svg";
 import wallet from "./wallet.svg";
 import walletConnected from "./walletConnected.svg";
@@ -77,7 +77,7 @@ export const icons = {
   stack,
   sunny,
   tableView,
-  twitter,
+  x,
   vote,
   wallet,
   walletConnected,
