@@ -1,45 +1,35 @@
 import "server-only";
 
 import { cache } from "react";
-import { paginateResult } from "@/app/lib/pagination";
-import { Prisma } from "@prisma/client";
+import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-
-type citizen = {
-  address: string;
-  voting_power?: Prisma.Decimal;
-  statement?: {
-    signature: string;
-    payload: string;
-    twitter: string;
-    discord: string;
-    created_at: Date;
-    updated_at: Date;
-    warpcast: string;
-  };
-};
+import { DelegateChunk, DelegatesGetPayload } from "../delegates/delegate";
 
 async function getCitizens({
-  page = 1,
+  pagination = { limit: 10, offset: 0 },
   sort = "shuffle",
   seed,
 }: {
-  page: number;
+  pagination: {
+    limit: number;
+    offset: number;
+  };
   sort: string;
   seed?: number;
-}) {
-  const pageSize = 20;
+}): Promise<PaginatedResultEx<DelegateChunk[]>> {
   const { namespace, slug } = Tenant.current();
 
-  const { meta, data: _citizens } = await paginateResult(
+  const { meta, data: citizens } = await paginateResultEx(
     (skip: number, take: number) => {
       if (sort === "shuffle") {
-        return prisma.$queryRawUnsafe<citizen[]>(
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
           SELECT 
-            citizens.address, 
+            citizens.address AS delegate,
             delegate.voting_power,
+            advanced_vp,
+            TRUE AS citizen,
             (SELECT row_to_json(sub)
               FROM (
                 SELECT
@@ -71,11 +61,14 @@ async function getCitizens({
           take
         );
       } else {
-        return prisma.$queryRawUnsafe<citizen[]>(
+        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
             SELECT 
-              citizens.address, 
+              citizens.address AS delegate,
               delegate.voting_power,
+              direct_vp,
+              advanced_vp,
+              TRUE AS citizen,
               (SELECT row_to_json(sub)
                 FROM (
                   SELECT
@@ -108,23 +101,21 @@ async function getCitizens({
         );
       }
     },
-    page,
-    pageSize
+    pagination
   );
-
-  const citizens = _citizens.map((citizen) => {
-    const { address } = citizen;
-    return {
-      address,
-      votingPower: citizen.voting_power?.toFixed(0) || "0",
-      citizen: true,
-      statement: citizen.statement,
-    };
-  });
 
   return {
     meta,
-    delegates: citizens,
+    data: citizens.map((citizen) => ({
+      address: citizen.delegate,
+      votingPower: {
+        total: citizen.voting_power?.toFixed(0) || "0",
+        direct: citizen.direct_vp?.toFixed(0) || "0",
+        advanced: citizen.advanced_vp?.toFixed(0) || "0",
+      },
+      citizen: citizen.citizen,
+      statement: citizen.statement,
+    })),
     seed,
   };
 }

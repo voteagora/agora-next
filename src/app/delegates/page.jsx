@@ -10,10 +10,10 @@ import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import React from "react";
 
-async function fetchCitizens(sort, seed, page = 1) {
+async function fetchCitizens(sort, seed, pagination) {
   "use server";
 
-  return apiFetchCitizens({ page, seed, sort });
+  return apiFetchCitizens({ pagination, seed, sort });
 }
 
 async function fetchDelegates(sort, seed, filters, pagination) {
@@ -108,10 +108,10 @@ export default async function Page({ searchParams }) {
           <CitizenCardList
             isDelegatesCitizensFetching={tab !== "citizens"}
             initialDelegates={delegates}
-            fetchDelegates={async (page, seed) => {
+            fetchDelegates={async (pagination, seed) => {
               "use server";
 
-              return apiFetchCitizens({ page, seed, sort: citizensSort });
+              return apiFetchCitizens({ pagination, seed, sort: citizensSort });
             }}
             fetchDelegators={fetchDelegators}
           />{" "}
