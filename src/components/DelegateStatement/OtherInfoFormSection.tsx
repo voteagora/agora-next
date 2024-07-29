@@ -18,7 +18,7 @@ export default function OtherInfoFormSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
         <DelegateStatementInputGroup
-          title="Twitter"
+          title="X (formerly Twitter)"
           placeholder="@yourname"
           name="twitter"
           form={form}
