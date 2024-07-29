@@ -11,44 +11,16 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-
-export type Citizen = {
-  address: `0x${string}`;
-  votingPower: string;
-  citizen: boolean;
-  statement: {
-    signature: string;
-    payload: {
-      email: string;
-      daoSlug: string;
-      discord: string;
-      twitter: string;
-      warpcast: string;
-      topIssues: string[];
-      agreeCodeConduct: boolean;
-      delegateStatement: string;
-      mostValuableProposals: string[];
-      leastValuableProposals: string[];
-      openToSponsoringProposals: boolean;
-    };
-    twitter: string;
-    discord: string;
-    created_at: Date;
-    updated_at: Date;
-    warpcast: string;
-  };
-};
-
-interface CitizenPaginated {
-  seed: number;
-  meta: any;
-  delegates: Citizen[];
-}
+import { PaginatedResultEx } from "@/app/lib/pagination";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
-  initialDelegates: CitizenPaginated;
-  fetchDelegates: (page: number, seed: number) => Promise<CitizenPaginated>;
+  initialDelegates: PaginatedResultEx<Delegate[]>;
+  fetchDelegates: (
+    pagination: { limit: number; offset: number },
+    seed: number
+  ) => Promise<PaginatedResultEx<Delegate[]>>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
@@ -59,24 +31,24 @@ export default function CitizenCardList({
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.delegates);
+  const [delegates, setDelegates] = useState(initialDelegates.data);
   const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.delegates);
+    setDelegates(initialDelegates.data);
     setMeta(initialDelegates.meta);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
       const data = await fetchDelegates(
-        meta.currentPage + 1,
+        { limit: 20, offset: meta.next_offset },
         initialDelegates.seed || Math.random()
       );
-      setDelegates(delegates.concat(data.delegates));
+      setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
       fetching.current = false;
     }
@@ -127,7 +99,7 @@ export default function CitizenCardList({
                     <DelegateProfileImage
                       endorsed={false}
                       address={delegate.address}
-                      votingPower={delegate.votingPower}
+                      votingPower={delegate.votingPower.total}
                       citizen={delegate.citizen}
                     />
                     <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
