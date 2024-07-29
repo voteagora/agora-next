@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-BigInt.prototype.toJSON = function(): string {
+BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
@@ -38,8 +38,8 @@ const standard = {
 const defaults = standard;
 
 export default async function RootLayout({
-                                           children,
-                                         }: {
+  children,
+}: {
   children: React.ReactNode;
 }) {
   const metrics = await fetchDaoMetrics();
@@ -74,15 +74,15 @@ export default async function RootLayout({
 
   return (
     <html lang="en" style={style}>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-    </head>
-    <ClientLayout>
-      <Header />
-      {children}
-      <DAOMetricsHeader metrics={metrics} />
-    </ClientLayout>
-    <GoogleAnalytics gaId="G-XYZ" />
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <ClientLayout>
+        <Header />
+        {children}
+        <DAOMetricsHeader metrics={metrics} />
+      </ClientLayout>
+      {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}
     </html>
   );
 }

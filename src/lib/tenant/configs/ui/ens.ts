@@ -7,7 +7,6 @@ import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 
 export const ensTenantUIConfig = new TenantUI({
   title: "ENS Agora",
-  color: "#5BAAF4",
   logo: ensLogo,
   hero: ensHero,
 
