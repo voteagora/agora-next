@@ -52,18 +52,12 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 
-  const {
-    watch,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = methods;
+  const { watch, handleSubmit, control } = methods;
 
   const proposalType = watch("type");
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
 
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
-    console.log("trying to submit");
     setIsPending(true);
 
     try {

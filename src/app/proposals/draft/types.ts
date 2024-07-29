@@ -198,7 +198,7 @@ export type ApprovalProposal = BaseProposal & {
   max_options: number;
   threshold: number;
   top_choices: number;
-  options: ApprovalProposalOption[];
+  approval_options: ApprovalProposalOption[];
 };
 
 type ApprovalProposalOption = {
@@ -245,7 +245,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         maxOptions: proposal.max_options,
         threshold: proposal.threshold,
         topChoices: proposal.top_choices,
-        options: proposal.transactions,
+        options: proposal.approval_options,
       };
     case ProposalType.OPTIMISTIC:
       return {

@@ -17,7 +17,9 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const { data: threshold } = useProposalThreshold();
 
   const hasEnoughVotes =
-    accountVotesData && threshold ? accountVotesData >= threshold : false;
+    accountVotesData !== undefined && threshold !== undefined
+      ? accountVotesData >= threshold
+      : false;
 
   return (
     <div className="mt-6">

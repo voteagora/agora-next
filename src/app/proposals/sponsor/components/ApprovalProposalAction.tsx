@@ -15,23 +15,6 @@ const ApprovalProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
 
-  /**
-   * Notes on proposal methods per governor:
-   * ENS (OZ gov): propose(address[] targets, uint256[] values, string[] calldatas, string description)
-   * OP (Agora gov): tbd
-   * Cyber: tbd
-   * Scroll: tbd
-   * Linea: tbd
-   * Uni: tbd
-   */
-  //   const { config } = usePrepareContractWrite({
-  //     address: contracts.governor.address as `0x${string}`,
-  //     chainId: contracts.governor.chain.id,
-  //     abi: contracts.governor.abi,
-  //     functionName: "propose",
-  //     args: inputData,
-  //   });
-
   const {
     config,
     isError: onPrepareError,
@@ -45,6 +28,8 @@ const ApprovalProposalAction = ({
 
   const { writeAsync, isLoading: isWriteLoading } = useContractWrite(config);
 
+  console.log(error);
+
   return (
     <UpdatedButton
       isLoading={isWriteLoading}
@@ -53,6 +38,11 @@ const ApprovalProposalAction = ({
       onClick={async () => {
         try {
           const data = await writeAsync?.();
+          console.log(data);
+          if (!data) {
+            // throw some sort of error?
+            return;
+          }
           await sponsorDraftProposal({
             draftProposalId: draftProposal.id,
             onchain_transaction_hash: data?.hash,
