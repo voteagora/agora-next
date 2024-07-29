@@ -5,6 +5,41 @@ import {
   ProposalSocialOption,
   ProposalChecklist,
 } from "@prisma/client";
+import { decodeFunctionData, formatUnits } from "viem";
+import Tenant from "@/lib/tenant/tenant";
+
+// TODO: move this to a shared location
+const transferABI = [
+  {
+    constant: false,
+    inputs: [
+      {
+        name: "_to",
+        type: "address",
+      },
+      {
+        name: "_value",
+        type: "uint256",
+      },
+    ],
+    name: "transfer",
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
+    ],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;
+
+const isTransfer = (calldata: string) => {
+  // Function Selector: The first 4 bytes of calldata 0xa9059cbb for transfer(address,uint256)
+  // TODO: might need to add more types if we have other types of "transfers"
+  return calldata.startsWith("0xa9059cbb");
+};
 
 // prisma schema spits out strings so I can't match against `0x{string}`
 export type EthereumAddress = string & { __brand: "EthereumAddress" };
@@ -216,6 +251,40 @@ export type DraftProposal =
   | ApprovalProposal
   | OptimisticProposal;
 
+// TODO: move this to a shared location
+const parseTransaction = (t: ProposalDraftTransaction) => {
+  const tenant = Tenant.current();
+  if (isTransfer(t.calldata)) {
+    const {
+      args: [recipient, amount],
+    } = decodeFunctionData({
+      abi: transferABI,
+      data: t.calldata as `0x${string}`,
+    });
+
+    return {
+      target: t.target,
+      value: t.value,
+      calldata: t.calldata,
+      type: TransactionType.TRANSFER,
+      description: t.description,
+      recipient,
+      amount: formatUnits(amount, tenant.token.decimals),
+      simulation_state: t.simulation_state,
+      simulation_id: t.simulation_id,
+    };
+  } else {
+    return {
+      target: t.target,
+      value: t.value,
+      calldata: t.calldata,
+      description: t.description,
+      type: TransactionType.CUSTOM,
+      simulation_state: t.simulation_state,
+      simulation_id: t.simulation_id,
+    };
+  }
+};
 // Used to translate a draftProposal database record into its form representation
 export const parseProposalToForm = (proposal: DraftProposal) => {
   switch (proposal.proposal_type) {
@@ -224,7 +293,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         type: ProposalType.BASIC,
         title: proposal.title,
         abstract: proposal.abstract,
-        transactions: proposal.transactions,
+        transactions: proposal.transactions.map((t) => parseTransaction(t)),
       };
     case ProposalType.SOCIAL:
       return {
@@ -240,12 +309,19 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         type: ProposalType.APPROVAL,
         title: proposal.title,
         abstract: proposal.abstract,
-        budget: proposal.budget,
-        criteria: proposal.criteria,
-        maxOptions: proposal.max_options,
-        threshold: proposal.threshold,
-        topChoices: proposal.top_choices,
-        options: proposal.approval_options,
+        approvalProposal: {
+          budget: proposal.budget,
+          criteria: proposal.criteria,
+          maxOptions: proposal.max_options.toString(),
+          threshold: proposal.threshold.toString(),
+          topChoices: proposal.top_choices.toString(),
+          options: proposal.approval_options.map((option) => {
+            return {
+              title: option.title,
+              transactions: option.transactions.map((t) => parseTransaction(t)),
+            };
+          }),
+        },
       };
     case ProposalType.OPTIMISTIC:
       return {
