@@ -29,7 +29,7 @@ const OptimisticProposalAction = ({
     chainId: contracts.governor.chain.id,
     abi: contracts.governor.abi,
     functionName: "propose",
-    args: inputData,
+    args: inputData as any,
   });
 
   const { writeAsync, isLoading: isWriteLoading } = useContractWrite(config);

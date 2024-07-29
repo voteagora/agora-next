@@ -49,10 +49,7 @@ const TransferTransactionForm = ({
   name,
 }: {
   index: number;
-  name:
-    | "transactions"
-    | "approvalProposal.options"
-    | `approvalProposal.options.${number}.transactions`;
+  name: "transactions" | `approvalProposal.options.${number}.transactions`;
 }) => {
   const tenant = Tenant.current();
   const { register, control, watch, setValue } = useFormContext<FormType>();

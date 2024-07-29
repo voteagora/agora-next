@@ -100,10 +100,22 @@ export function getInputData(proposal: DraftProposal): {
     // inputs for approval type
     // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
     case ProposalType.APPROVAL:
-      let options: [bigint, string[], bigint[], string[], string][] = [];
+      let options = [] as {
+        budgetTokensSpent: bigint;
+        targets: `0x${string}`[];
+        values: bigint[];
+        calldatas: `0x${string}`[];
+        description: string;
+      }[];
+
       proposal.approval_options.forEach((option) => {
-        const formattedOption: [bigint, string[], bigint[], string[], string] =
-          [BigInt(0), [], [], [], option.title];
+        const formattedOption = {
+          budgetTokensSpent: BigInt(0),
+          targets: [] as `0x${string}`[],
+          values: [] as bigint[],
+          calldatas: [] as `0x${string}`[],
+          description: option.title,
+        };
 
         option.transactions.forEach((t) => {
           if (isTransfer(t.calldata)) {
@@ -114,14 +126,16 @@ export function getInputData(proposal: DraftProposal): {
               data: t.calldata as `0x${string}`,
             });
 
-            formattedOption[0] += amount;
-            formattedOption[1].push(t.target);
-            formattedOption[2].push(BigInt(0));
-            formattedOption[3].push(t.calldata);
+            formattedOption.budgetTokensSpent += amount;
+            formattedOption.targets.push(t.target as `0x${string}`);
+            formattedOption.values.push(BigInt(0));
+            formattedOption.calldatas.push(t.calldata as `0x${string}`);
           } else {
-            formattedOption[1].push(ethers.getAddress(t.target));
-            formattedOption[2].push(parseEther(t.value.toString() || "0"));
-            formattedOption[3].push(t.calldata);
+            formattedOption.targets.push(
+              ethers.getAddress(t.target) as `0x${string}`
+            );
+            formattedOption.values.push(parseEther(t.value.toString() || "0"));
+            formattedOption.calldatas.push(t.calldata as `0x${string}`);
           }
         });
         options.push(formattedOption);
