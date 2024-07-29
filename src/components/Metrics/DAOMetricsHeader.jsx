@@ -20,7 +20,7 @@ export default function DAOMetricsHeader({ metrics }) {
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  const governanceForumLink = ui.link("governanceForum");
+  const governanceForumLink = ui.link("governance-forum");
   const bugsLink = ui.link("bugs");
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
