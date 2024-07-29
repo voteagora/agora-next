@@ -163,7 +163,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             className="w-4 h-[2px]"
           ></div>
           <p className="text-xs font-medium text-gray-4f ">
-            To reach quorum{" "}
+            To reach 50%{" "}
             <span className="font-bold pl-3">{payload[0].value}</span>
           </p>
         </div>
@@ -173,7 +173,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             className="w-4 border border-b-1 border-dashed"
           />
           <p className="text-xs font-medium text-gray-4f">
-            To reach 50%{" "}
+            To reach quorum{" "}
             <span className="font-bold pl-6">{payload[1].value}</span>
           </p>
         </div>
