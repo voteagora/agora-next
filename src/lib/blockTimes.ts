@@ -40,6 +40,12 @@ export function getHumanBlockTime(
       );
     }
 
+    //   Scroll
+    case 534352:
+      const estScrollSecondsDiff =
+        Number(latestBlock.number) - Number(blockNumber) * 3; // 3 seconds per block
+      return new Date((latestBlock.timestamp - estScrollSecondsDiff) * 1000);
+
     //   Cyber Mainnet
     //   Cyber Testnet
     case 7560:
