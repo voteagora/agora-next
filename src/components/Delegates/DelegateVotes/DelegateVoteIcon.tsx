@@ -38,6 +38,8 @@ function DelegateVoteIcon({
         <Bars2Icon className="h-3 w-3 text-neutral" />
       </span>
     );
+
+  return <></>;
 }
 
 export default DelegateVoteIcon;
