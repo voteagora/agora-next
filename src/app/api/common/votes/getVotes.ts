@@ -2,6 +2,7 @@ import {
   PaginatedResultEx,
   paginateResult,
   paginateResultEx,
+  PaginationParamsEx,
 } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseVote } from "@/lib/voteUtils";
@@ -13,26 +14,25 @@ import Tenant from "@/lib/tenant/tenant";
 
 const getVotesForDelegate = ({
   addressOrENSName,
-  page,
+  pagination,
 }: {
   addressOrENSName: string;
-  page: number;
+  pagination?: PaginationParamsEx;
 }) =>
   addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
-    page,
+    pagination,
   });
 
 async function getVotesForDelegateForAddress({
   address,
-  page = 1,
+  pagination = { offset: 0, limit: 20 },
 }: {
   address: string;
-  page: number;
+  pagination?: PaginationParamsEx;
 }) {
   const { namespace, contracts } = Tenant.current();
-  const pageSize = 10;
 
-  const { meta, data: votes } = await paginateResult(
+  const { meta, data: votes } = await paginateResultEx(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -94,14 +94,13 @@ async function getVotesForDelegateForAddress({
         skip,
         take
       ),
-    page,
-    pageSize
+    pagination
   );
 
   if (!votes || votes.length === 0) {
     return {
       meta,
-      votes: [],
+      data: [],
     };
   }
 
@@ -109,7 +108,7 @@ async function getVotesForDelegateForAddress({
 
   return {
     meta,
-    votes: votes.map((vote) => {
+    data: votes.map((vote) => {
       const proposalData = parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type

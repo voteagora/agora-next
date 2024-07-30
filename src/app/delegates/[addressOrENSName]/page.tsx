@@ -5,7 +5,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
@@ -27,6 +26,7 @@ import Tenant from "@/lib/tenant/tenant";
 import TopStakeholders from "@/components/Delegates/DelegateStatement/TopStakeholders";
 import SnapshotVotes from "@/components/Delegates/DelegateVotes/SnapshotVotes";
 import VotesContainer from "@/components/Delegates/DelegateVotes/VotesContainer";
+import { PaginationParamsEx } from "@/app/lib/pagination";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -140,13 +140,19 @@ export default async function Page({
         />
         <VotesContainer
           onchainVotes={
-            <DelegateVotesProvider initialVotes={delegateVotes}>
-              {delegateVotes && delegateVotes.votes.length > 0 ? (
+            <>
+              {delegateVotes && delegateVotes.data.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   <DelegateVotes
-                    fetchDelegateVotes={async (page: number) => {
+                    initialVotes={delegateVotes}
+                    fetchDelegateVotes={async (
+                      pagination: PaginationParamsEx
+                    ) => {
                       "use server";
-                      return fetchVotesForDelegate(addressOrENSName, page);
+                      return fetchVotesForDelegate(
+                        addressOrENSName,
+                        pagination
+                      );
                     }}
                   />
                 </div>
@@ -155,7 +161,7 @@ export default async function Page({
                   <p>No past votes available.</p>
                 </div>
               )}
-            </DelegateVotesProvider>
+            </>
           }
           snapshotVotes={
             <>
