@@ -75,11 +75,14 @@ export async function submitDelegateStatement({
 
 export async function fetchVotesForDelegate(
   addressOrENSName: string,
-  page = 1
+  pagination?: {
+    offset: number;
+    limit: number;
+  }
 ) {
   return apiFetchVotesForDelegate({
     addressOrENSName,
-    page,
+    pagination,
   });
 }
 

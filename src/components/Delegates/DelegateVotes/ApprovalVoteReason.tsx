@@ -1,9 +1,10 @@
+import { Vote } from "@/app/api/common/votes/vote";
 import React, { Fragment } from "react";
 
-function ApprovalVoteReason({ params }) {
+function ApprovalVoteReason({ params }: { params: Vote["params"] }) {
   return (
     <div className="text-xs text-tertiary font-medium">
-      {params?.length > 1 && "Voted: "}
+      {params?.length! > 1 && "Voted: "}
       {params?.map((option, i) => (
         <Fragment key={option}>
           {option}

@@ -1480,17 +1480,6 @@ paths:
               summary: ENS name of the delegate.
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
-        - name: sort
-          in: query
-          description: >
-            The desired method by which returned delegates will be sorted.
-            Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
-          required: false
-          schema:
-            type: string
-            enum:
-              - weight
-              - block
       responses:
         "200":
           description: OK
@@ -1608,7 +1597,7 @@ paths:
             type: string
             enum:
               - weight
-              - block
+              - block_number
       responses:
         "200":
           description: OK

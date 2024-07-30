@@ -1,3 +1,4 @@
+import { Vote } from "@/app/api/common/votes/vote";
 import {
   CheckIcon,
   XMarkIcon,
@@ -5,7 +6,13 @@ import {
   Bars2Icon,
 } from "@heroicons/react/20/solid";
 
-function DelegateVoteIcon({ proposalType, support }) {
+function DelegateVoteIcon({
+  proposalType,
+  support,
+}: {
+  proposalType: Vote["proposalType"];
+  support: string;
+}) {
   if (proposalType === "STANDARD" || proposalType === "OPTIMISTIC") {
     if (support === "FOR")
       return (
@@ -31,6 +38,8 @@ function DelegateVoteIcon({ proposalType, support }) {
         <Bars2Icon className="h-3 w-3 text-neutral" />
       </span>
     );
+
+  return <></>;
 }
 
 export default DelegateVoteIcon;

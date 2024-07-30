@@ -1,7 +1,7 @@
 import React from "react";
 import { VStack } from "@/components/Layout/Stack";
 
-function VoteReason({ reason }) {
+function VoteReason({ reason }: { reason: string }) {
   return (
     <VStack className="overflow-x-hidden text-xs font-medium whitespace-pre-wrap text-secondary break-words scrollbar-hide sm:pt-0 sm:h-fit">
       Reason: {reason}
