@@ -11,14 +11,14 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
   initialDelegates: PaginatedResultEx<Delegate[]>;
   fetchDelegates: (
-    pagination: { limit: number; offset: number },
+    pagination: PaginationParamsEx,
     seed: number
   ) => Promise<PaginatedResultEx<Delegate[]>>;
   fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;

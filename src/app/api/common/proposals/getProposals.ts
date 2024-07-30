@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
+import {
+  PaginatedResultEx,
+  paginateResultEx,
+  PaginationParamsEx,
+} from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -15,10 +19,7 @@ async function getProposals({
   pagination,
 }: {
   filter: string;
-  pagination: {
-    limit: number;
-    offset: number;
-  };
+  pagination: PaginationParamsEx;
 }): Promise<PaginatedResultEx<Proposal[]>> {
   const { namespace, contracts } = Tenant.current();
 

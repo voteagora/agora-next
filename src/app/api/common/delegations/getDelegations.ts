@@ -5,7 +5,11 @@ import prisma from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
-import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
+import {
+  PaginatedResultEx,
+  paginateResultEx,
+  PaginationParamsEx,
+} from "@/app/lib/pagination";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Decimal } from "@prisma/client/runtime";
 
@@ -105,10 +109,7 @@ async function getCurrentDelegatorsForAddress({
   },
 }: {
   address: string;
-  pagination?: {
-    offset: number;
-    limit: number;
-  };
+  pagination?: PaginationParamsEx;
 }): Promise<PaginatedResultEx<Delegation[]>> {
   const { namespace, contracts } = Tenant.current();
 

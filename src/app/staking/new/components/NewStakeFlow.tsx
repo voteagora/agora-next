@@ -9,7 +9,7 @@ import { PanelSetStakeAmount } from "@/app/staking/components/PanelSetStakeAmoun
 import { useAccount } from "wagmi";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
 import { NewStakeConfirm } from "@/app/staking/new/components/NewStakeConfirm";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 const PAGE_TITLE = [
@@ -21,10 +21,7 @@ const PAGE_TITLE = [
 interface NewStakeFlowProps {
   delegates: PaginatedResultEx<DelegateChunk[]>;
   fetchDelegates: (
-    pagination: {
-      offset: number;
-      limit: number;
-    },
+    pagination: PaginationParamsEx,
     seed: number
   ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
   refreshPath: (path: string) => void;

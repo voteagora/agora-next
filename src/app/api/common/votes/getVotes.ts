@@ -197,7 +197,7 @@ async function getVotesForProposal({
   sort = "weight",
 }: {
   proposalId: string;
-  pagination?: { offset: number; limit: number };
+  pagination?: PaginationParamsEx;
   sort?: VotesSort;
 }): Promise<PaginatedResultEx<Vote[]>> {
   const { namespace, contracts } = Tenant.current();

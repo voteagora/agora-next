@@ -1,7 +1,11 @@
 import "server-only";
 
 import { cache } from "react";
-import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
+import {
+  PaginatedResultEx,
+  paginateResultEx,
+  PaginationParamsEx,
+} from "@/app/lib/pagination";
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateChunk, DelegatesGetPayload } from "../delegates/delegate";
@@ -11,10 +15,7 @@ async function getCitizens({
   sort = "shuffle",
   seed,
 }: {
-  pagination: {
-    limit: number;
-    offset: number;
-  };
+  pagination: PaginationParamsEx;
   sort: string;
   seed?: number;
 }): Promise<PaginatedResultEx<DelegateChunk[]>> {

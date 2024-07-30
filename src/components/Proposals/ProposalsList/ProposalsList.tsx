@@ -11,7 +11,7 @@ import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStag
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 
@@ -25,7 +25,7 @@ export default function ProposalsList({
   initRelevantProposals: PaginatedResultEx<ProposalType[]>;
   initAllProposals: PaginatedResultEx<ProposalType[]>;
   fetchProposals: (
-    pagination: { limit: number; offset: number },
+    pagination: PaginationParamsEx,
     filter: string
   ) => Promise<PaginatedResultEx<ProposalType[]>>;
   votableSupply: string;

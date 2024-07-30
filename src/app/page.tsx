@@ -14,6 +14,7 @@ import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 import Image from "next/image";
+import { PaginationParamsEx } from "./lib/pagination";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -130,7 +131,7 @@ async function Home() {
         initRelevantProposals={relevalntProposals}
         initAllProposals={allProposals}
         fetchProposals={async (
-          pagination: { limit: number; offset: number },
+          pagination: PaginationParamsEx,
           filter: string
         ) => {
           "use server";
