@@ -21,18 +21,30 @@ export type Vote = {
   timestamp: Date | null;
 };
 
-export type SnapshotVote = {
+export type SnapshotVotePayload = {
   id: string;
-  voter?: string;
-  created?: number;
-  choice?: string;
+  voter: string;
+  created: BigInt;
+  choice: string;
   metadata?: Record<string, any>;
   reason?: string;
   app?: string;
-  vp?: number;
+  vp: number;
   vp_by_strategy?: Record<string, any>;
   vp_state?: string;
   proposal_id?: string;
   choice_labels?: Record<string, any>;
   dao_slug?: string;
+  title?: string;
+};
+
+export type SnapshotVote = {
+  id: string;
+  address: string;
+  createdAt: Date;
+  choice: string;
+  votingPower: number;
+  title: string;
+  reason: string;
+  choiceLabels: Record<string, any>;
 };

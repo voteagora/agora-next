@@ -96,7 +96,7 @@ export default async function Page({
       fetchVotesForDelegate(address),
       fetchCurrentDelegatees(address),
       fetchCurrentDelegators(address),
-      fetchSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 }),
+      fetchSnapshotVotesForDelegate({ addressOrENSName: address }),
     ]);
 
   const statement = delegate.statement;
@@ -165,15 +165,16 @@ export default async function Page({
           }
           snapshotVotes={
             <>
-              {snapshotVotes && snapshotVotes.votes.length > 0 ? (
+              {snapshotVotes && snapshotVotes.data.length > 0 ? (
                 <SnapshotVotes
-                  meta={snapshotVotes.meta}
-                  initialVotes={snapshotVotes.votes}
-                  fetchSnapshotVotes={async (page: number) => {
+                  initialVotes={snapshotVotes}
+                  fetchSnapshotVotes={async (
+                    pagination: PaginationParamsEx
+                  ) => {
                     "use server";
                     return await fetchSnapshotVotesForDelegate({
                       addressOrENSName: addressOrENSName,
-                      page: page,
+                      pagination,
                     });
                   }}
                 />

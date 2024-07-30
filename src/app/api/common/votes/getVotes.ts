@@ -1,13 +1,18 @@
 import {
   PaginatedResultEx,
-  paginateResult,
   paginateResultEx,
   PaginationParamsEx,
 } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
-import { parseVote } from "@/lib/voteUtils";
+import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import { SnapshotVote, Vote, VotePayload, VotesSort } from "./vote";
+import {
+  SnapshotVote,
+  SnapshotVotePayload,
+  Vote,
+  VotePayload,
+  VotesSort,
+} from "./vote";
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -118,31 +123,29 @@ async function getVotesForDelegateForAddress({
   };
 }
 
-async function getSnapshotVotesForDelegate({
+const getSnapshotVotesForDelegate = async ({
   addressOrENSName,
-  page,
+  pagination,
 }: {
   addressOrENSName: string;
-  page: number;
-}) {
-  return await addressOrEnsNameWrap(
+  pagination?: PaginationParamsEx;
+}) =>
+  addressOrEnsNameWrap(
     getSnapshotVotesForDelegateForAddress,
     addressOrENSName,
     {
-      page,
+      pagination,
     }
   );
-}
 
 async function getSnapshotVotesForDelegateForAddress({
   address,
-  page = 1,
+  pagination = { offset: 0, limit: 20 },
 }: {
   address: string;
-  page?: number;
-}) {
+  pagination?: PaginationParamsEx;
+}): Promise<PaginatedResultEx<SnapshotVote[]>> {
   const { slug } = Tenant.current();
-  const pageSize = 10;
 
   const queryFunction = (skip: number, take: number) => {
     const query = `
@@ -167,24 +170,23 @@ async function getSnapshotVotesForDelegateForAddress({
       OFFSET ${skip}
       LIMIT ${take};
     `;
-    return prisma.$queryRawUnsafe<SnapshotVote[]>(query, skip, take);
+    return prisma.$queryRawUnsafe<SnapshotVotePayload[]>(query, skip, take);
   };
 
-  const { meta, data: votes } = await paginateResult(
+  const { meta, data: votes } = await paginateResultEx(
     queryFunction,
-    page,
-    pageSize
+    pagination
   );
 
   if (!votes || votes.length === 0) {
     return {
       meta,
-      votes: [],
+      data: [],
     };
   } else {
     return {
       meta,
-      votes,
+      data: votes.map((vote) => parseSnapshotVote(vote)),
     };
   }
 }
