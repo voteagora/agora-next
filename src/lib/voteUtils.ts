@@ -85,7 +85,7 @@ export function colorForSupportType(supportType: Support) {
  * Parse vote params
  */
 
-type ParsedParams = {
+export type ParsedParams = {
   APPROVAL: {
     key: "APPROVAL";
     kind: string[];

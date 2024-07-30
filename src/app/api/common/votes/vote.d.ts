@@ -1,4 +1,6 @@
 import { OptimismVotes } from "@prisma/client";
+import { ParsedParams } from "@/lib/voteUtils";
+import { ProposalType } from "@prisma/client";
 
 export type VotesSortOrder = "asc" | "desc";
 export type VotesSort = "weight" | "block_number";
