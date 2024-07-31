@@ -32,7 +32,9 @@ export async function GET(request: NextRequest) {
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
 
-      const projects = await fetchProjectsApi({ limit, offset });
+      const projects = await fetchProjectsApi({
+        pagination: { limit, offset },
+      });
       return NextResponse.json(projects);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
