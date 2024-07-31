@@ -11,9 +11,10 @@ import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
-  color: "#FF007A",
   hero: uniswapHero,
   logo: uniswapLogo,
+
+  googleAnalytics: "G-KBG8GS1R45",
 
   assets: {
     success: successImage,

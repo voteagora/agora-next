@@ -7,9 +7,10 @@ import pendingImage from "@/assets/tenant/cyber_pending.svg";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
-  color: "#2F38FF",
   hero: cyberHero,
   logo: cyberLogo,
+
+  googleAnalytics: "G-KZ3G1HV72Y",
 
   assets: {
     success: successImage,
