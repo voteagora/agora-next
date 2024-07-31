@@ -5,7 +5,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateVotes from "@/components/Delegates/DelegateVotes/DelegateVotes";
-import DelegateVotesProvider from "@/contexts/DelegateVotesContext";
 import DelegationsContainer from "@/components/Delegates/Delegations/DelegationsContainer";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import DelegateStatementContainer from "@/components/Delegates/DelegateStatement/DelegateStatementContainer";
@@ -16,7 +15,7 @@ import {
   fetchDelegate,
   fetchVotesForDelegate,
 } from "@/app/delegates/actions";
-import { getSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
+import { fetchSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
@@ -27,6 +26,7 @@ import Tenant from "@/lib/tenant/tenant";
 import TopStakeholders from "@/components/Delegates/DelegateStatement/TopStakeholders";
 import SnapshotVotes from "@/components/Delegates/DelegateVotes/SnapshotVotes";
 import VotesContainer from "@/components/Delegates/DelegateVotes/VotesContainer";
+import { PaginationParams } from "@/app/lib/pagination";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -89,9 +89,6 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const { ui } = Tenant.current();
-  const tenantSupportsSnapshotVote = ui.toggle("snapshotVotes") || false;
-
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
   const [delegate, delegateVotes, delegates, delegators, snapshotVotes] =
     await Promise.all([
@@ -99,9 +96,7 @@ export default async function Page({
       fetchVotesForDelegate(address),
       fetchCurrentDelegatees(address),
       fetchCurrentDelegators(address),
-      tenantSupportsSnapshotVote
-        ? getSnapshotVotesForDelegate({ addressOrENSName: address, page: 1 })
-        : Promise.resolve({ meta: { total: 0 }, votes: [] }),
+      fetchSnapshotVotesForDelegate({ addressOrENSName: address }),
     ]);
 
   const statement = delegate.statement;
@@ -134,75 +129,58 @@ export default async function Page({
         <DelegationsContainer
           delegatees={delegates}
           initialDelegators={delegators}
-          fetchDelegators={async (pagination: {
-            offset: number;
-            limit: number;
-          }) => {
+          fetchDelegators={async (pagination: PaginationParams) => {
             "use server";
 
             return fetchCurrentDelegators(addressOrENSName, pagination);
           }}
         />
-        {tenantSupportsSnapshotVote ? (
-          <VotesContainer
-            onchainVotes={
-              <DelegateVotesProvider initialVotes={delegateVotes}>
-                {delegateVotes && delegateVotes.votes.length > 0 ? (
-                  <div className="flex flex-col gap-4">
-                    <DelegateVotes
-                      fetchDelegateVotes={async (page: number) => {
-                        "use server";
-                        return fetchVotesForDelegate(addressOrENSName, page);
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="text-secondary">
-                    <p>No past votes available.</p>
-                  </div>
-                )}
-              </DelegateVotesProvider>
-            }
-            snapshotVotes={
-              <>
-                {snapshotVotes && snapshotVotes.votes.length > 0 ? (
-                  <SnapshotVotes
-                    meta={snapshotVotes.meta}
-                    initialVotes={snapshotVotes.votes}
-                    fetchSnapshotVotes={async (page: number) => {
+        <VotesContainer
+          onchainVotes={
+            <>
+              {delegateVotes && delegateVotes.data.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  <DelegateVotes
+                    initialVotes={delegateVotes}
+                    fetchDelegateVotes={async (
+                      pagination: PaginationParams
+                    ) => {
                       "use server";
-                      return await getSnapshotVotesForDelegate({
-                        addressOrENSName: addressOrENSName,
-                        page: page,
-                      });
+                      return fetchVotesForDelegate(
+                        addressOrENSName,
+                        pagination
+                      );
                     }}
                   />
-                ) : (
-                  <div className="text-secondary">
-                    <p>No past votes available.</p>
-                  </div>
-                )}
-              </>
-            }
-          />
-        ) : (
-          <DelegateVotesProvider initialVotes={delegateVotes}>
-            {delegateVotes && delegateVotes.votes.length > 0 ? (
-              <div className="flex flex-col gap-4">
-                <DelegateVotes
-                  fetchDelegateVotes={async (page: number) => {
+                </div>
+              ) : (
+                <div className="text-secondary">
+                  <p>No past votes available.</p>
+                </div>
+              )}
+            </>
+          }
+          snapshotVotes={
+            <>
+              {snapshotVotes && snapshotVotes.data.length > 0 ? (
+                <SnapshotVotes
+                  initialVotes={snapshotVotes}
+                  fetchSnapshotVotes={async (pagination: PaginationParams) => {
                     "use server";
-                    return fetchVotesForDelegate(addressOrENSName, page);
+                    return await fetchSnapshotVotesForDelegate({
+                      addressOrENSName: addressOrENSName,
+                      pagination,
+                    });
                   }}
                 />
-              </div>
-            ) : (
-              <div className="text-secondary">
-                <p>No past votes available.</p>
-              </div>
-            )}
-          </DelegateVotesProvider>
-        )}
+              ) : (
+                <div className="text-secondary">
+                  <p>No past votes available.</p>
+                </div>
+              )}
+            </>
+          }
+        />
       </div>
     </div>
   );

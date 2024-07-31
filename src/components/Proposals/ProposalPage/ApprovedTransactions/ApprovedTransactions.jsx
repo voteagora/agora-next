@@ -51,9 +51,9 @@ export default function ApprovedTransactions({
       </div>
       {!isNoProposedTransactions && (
         <div className="flex flex-col px-4">
-          {proposalData.options.slice(0, displayedOptions).map((option) => {
+          {proposalData.options.slice(0, displayedOptions).map((option, i) => {
             return (
-              <>
+              <div key={i}>
                 {proposalType === "APPROVAL" && (
                   <p className="font-mono text-xs font-medium leading-4 text-tertiary">
                     {"//"} {option.description}
@@ -76,7 +76,7 @@ export default function ApprovedTransactions({
                       </div>
                     );
                   })}
-              </>
+              </div>
             );
           })}
         </div>

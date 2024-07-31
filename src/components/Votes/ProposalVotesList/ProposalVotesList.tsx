@@ -1,7 +1,6 @@
 "use client";
 
 import InfiniteScroll from "react-infinite-scroller";
-import styles from "./proposalVotesList.module.scss";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
@@ -12,20 +11,14 @@ import {
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 export default function ProposalVotesList({
   initialProposalVotes,
-  proposal_id,
+  proposalId,
 }: {
-  initialProposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
-  proposal_id: string;
+  initialProposalVotes: PaginatedResult<Vote[]>;
+  proposalId: string;
 }) {
   const { address: connectedAddress } = useAccount();
   const { advancedDelegators } = useConnectedDelegate();
@@ -35,13 +28,10 @@ export default function ProposalVotesList({
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
 
   const fetchUserVoteAndSet = useCallback(
-    async (proposal_id: string, address: string) => {
+    async (proposalId: string, address: string) => {
       let fetchedUserVotes: Vote[];
       try {
-        fetchedUserVotes = await fetchUserVotesForProposal(
-          proposal_id,
-          address
-        );
+        fetchedUserVotes = await fetchUserVotesForProposal(proposalId, address);
       } catch (error) {
         fetchedUserVotes = [];
       }
@@ -52,34 +42,36 @@ export default function ProposalVotesList({
 
   useEffect(() => {
     if (connectedAddress) {
-      fetchUserVoteAndSet(proposal_id, connectedAddress);
+      fetchUserVoteAndSet(proposalId, connectedAddress);
     } else {
       setUserVotes([]);
     }
-  }, [connectedAddress, fetchUserVoteAndSet, proposal_id]);
+  }, [connectedAddress, fetchUserVoteAndSet, proposalId]);
 
   const proposalVotes = pages.reduce(
-    (all, page) => all.concat(page.votes),
+    (all, page) => all.concat(page.data),
     [] as Vote[]
   );
 
   const loadMore = useCallback(async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchProposalVotes(proposal_id, meta.currentPage + 1);
-      setPages((prev) => [...prev, { ...data, votes: data.votes }]);
+      const data = await fetchProposalVotes(proposalId, {
+        limit: 20,
+        offset: meta.next_offset,
+      });
+      setPages((prev) => [...prev, { ...data, votes: data.data }]);
       setMeta(data.meta);
       fetching.current = false;
     }
-  }, [proposal_id, meta]);
+  }, [proposalId, meta]);
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
-      {/* @ts-ignore */}
       <InfiniteScroll
-        hasMore={meta.hasNextPage}
+        hasMore={meta.has_next}
         pageStart={0}
         loadMore={loadMore}
         useWindow={false}

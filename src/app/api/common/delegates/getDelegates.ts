@@ -1,7 +1,7 @@
 import {
-  paginateResultEx,
-  type PaginatedResultEx,
-  type PaginationParamsEx,
+  paginateResult,
+  type PaginatedResult,
+  type PaginationParams,
 } from "@/app/lib/pagination";
 import prisma from "@/app/lib/prisma";
 import { cache } from "react";
@@ -34,7 +34,7 @@ async function getDelegates({
   seed,
   filters,
 }: {
-  pagination: PaginationParamsEx;
+  pagination: PaginationParams;
   sort: string;
   seed?: number;
   filters?: {
@@ -42,7 +42,7 @@ async function getDelegates({
     stakeholders?: string;
     endorsed?: boolean;
   };
-}): Promise<PaginatedResultEx<DelegateChunk[]>> {
+}): Promise<PaginatedResult<DelegateChunk[]>> {
   const { namespace, ui, slug, contracts } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
@@ -245,7 +245,7 @@ async function getDelegates({
   const { meta, data: delegates } = await doInSpan(
     { name: "getDelegates" },
     async () =>
-      await paginateResultEx<DelegatesGetPayload[]>(
+      await paginateResult<DelegatesGetPayload>(
         paginatedAllowlistQuery,
         pagination
       )

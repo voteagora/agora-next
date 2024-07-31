@@ -4,6 +4,7 @@ import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import ENSName from "@/components/shared/ENSName";
+import { PaginatedResult } from "@/app/lib/pagination";
 /**
  * Transforms an array of votes into chart data suitable for a treemap.
  */
@@ -27,16 +28,9 @@ export default function VotingTimelineChart({
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
-  return <Chart proposal={proposal} votes={proposalVotes.votes} />;
+  return <Chart proposal={proposal} votes={proposalVotes.data} />;
 }
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {

@@ -8,7 +8,9 @@ async function getMetricTS(
   metricId: string,
   frequency: string
 ): Promise<{ result: MetricTimeSeriesValue[] }> {
-  const { namespace } = Tenant.current();
+  const { slug, contracts } = Tenant.current();
+
+  const governorContract = contracts.governor.address;
 
   if (frequency == "latest") {
     const { result } = await getMetricTS(metricId, "3d");
@@ -31,10 +33,6 @@ async function getMetricTS(
 
     "fraction_of_active_delegates",
     "fraction_of_large_active_delegates",
-
-    "quorum_thresh_stalemate", // Out of spec, I just thought it might be a cool overlay to add if we had time.
-    "weight_of_fraction_of_active_delegates", // Out of spec, just might be a cool feature.
-    "weight_of_fraction_of_large_active_delegates", // Out of spec, just might be a cool feature.
   ];
 
   const isGoogleAnalyticMetric = availableGoogleMetrics.includes(metricId);
@@ -62,9 +60,9 @@ async function getMetricTS(
     QRY = `SELECT block_date AS day,
                         TO_CHAR(block_date, 'YYYY-MM-DD') date,
                         (value::numeric * ${scaler})::text as value
-                  FROM   alltenant.dao_engagement_metrics
+                  FROM   alltenant.dao_engagement_metrics_cs
                   WHERE  metric = '${metricId}'
-                     AND tenant = '${namespace}' 
+                     AND contract = '${governorContract}'
                      AND block_date >= (CURRENT_DATE - INTERVAL '${lookback} day')
                      ORDER BY date;`;
   } else if (isGoogleAnalyticMetric) {
@@ -73,9 +71,9 @@ async function getMetricTS(
     QRY = `SELECT date AS day,
                         TO_CHAR(date, 'YYYY-MM-DD') date,
                          value
-                  FROM   google.analytics_24h
+                  FROM   google.analytics
                   WHERE  metric_id = '${metricId}'
-                     AND tenant = '${namespace}' 
+                     AND dao_slug = '${slug}' 
                      AND date >= (CURRENT_DATE - INTERVAL '${lookback} day')
                      ORDER BY date;`;
   } else {

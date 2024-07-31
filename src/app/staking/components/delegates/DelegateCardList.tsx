@@ -7,18 +7,15 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateCard } from "@/app/staking/components/delegates/DelegateCard";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 
 interface Props {
   address: string;
-  initialDelegates: PaginatedResultEx<DelegateChunk[]>;
+  initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
-    pagination: {
-      offset: number;
-      limit: number;
-    },
+    pagination: PaginationParams,
     seed: number
-  ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
+  ) => Promise<PaginatedResult<DelegateChunk[]>>;
   onSelect: (address: string) => void;
 }
 
