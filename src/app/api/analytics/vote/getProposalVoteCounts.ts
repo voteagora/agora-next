@@ -12,7 +12,7 @@ type ProposalCount = {
 async function getProposalVoteCounts() {
   const { slug, contracts } = Tenant.current();
 
-  const govContract = contracts.governor;
+  const govContract = contracts.governor.address;
 
   const QRY = `WITH 
                 proposal_counts AS
