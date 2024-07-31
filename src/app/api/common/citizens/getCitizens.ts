@@ -2,9 +2,9 @@ import "server-only";
 
 import { cache } from "react";
 import {
-  PaginatedResultEx,
-  paginateResultEx,
-  PaginationParamsEx,
+  PaginatedResult,
+  paginateResult,
+  PaginationParams,
 } from "@/app/lib/pagination";
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
@@ -15,13 +15,13 @@ async function getCitizens({
   sort = "shuffle",
   seed,
 }: {
-  pagination: PaginationParamsEx;
+  pagination: PaginationParams;
   sort: string;
   seed?: number;
-}): Promise<PaginatedResultEx<DelegateChunk[]>> {
+}): Promise<PaginatedResult<DelegateChunk[]>> {
   const { namespace, slug } = Tenant.current();
 
-  const { meta, data: citizens } = await paginateResultEx(
+  const { meta, data: citizens } = await paginateResult(
     (skip: number, take: number) => {
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(

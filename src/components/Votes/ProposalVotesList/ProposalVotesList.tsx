@@ -11,13 +11,13 @@ import {
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 export default function ProposalVotesList({
   initialProposalVotes,
   proposalId,
 }: {
-  initialProposalVotes: PaginatedResultEx<Vote[]>;
+  initialProposalVotes: PaginatedResult<Vote[]>;
   proposalId: string;
 }) {
   const { address: connectedAddress } = useAccount();

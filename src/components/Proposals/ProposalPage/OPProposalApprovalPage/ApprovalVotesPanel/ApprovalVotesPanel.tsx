@@ -11,15 +11,15 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 
 type Props = {
   proposal: Proposal;
-  initialProposalVotes: PaginatedResultEx<Vote[]>;
+  initialProposalVotes: PaginatedResult<Vote[]>;
   fetchVotesForProposal: (
     proposalId: string,
-    pagination?: PaginationParamsEx
-  ) => Promise<PaginatedResultEx<Vote[]>>;
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<Vote[]>>;
   fetchAllForVoting: (
     address: string | `0x${string}`,
     blockNumber: number,

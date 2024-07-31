@@ -7,7 +7,7 @@ import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/Proposal
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
 
 const OptimisticProposalVotesCard = ({
@@ -28,7 +28,7 @@ const OptimisticProposalVotesCard = ({
   disapprovalThreshold: number;
   againstRelativeAmount: string;
   againstLengthString: string;
-  fetchProposalVotes: Promise<PaginatedResultEx<Vote[]>>;
+  fetchProposalVotes: Promise<PaginatedResult<Vote[]>>;
   fetchDelegate: (address: string) => void;
   fetchDelegateStatement: (address: string) => void;
   fetchUserVotesForProposal: (proposalId: string) => void;

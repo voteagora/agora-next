@@ -1,4 +1,4 @@
-import { paginateResultEx } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 
@@ -11,7 +11,7 @@ async function getProjectsApi({
   offset: number;
   round?: string;
 }) {
-  const projects = await paginateResultEx(
+  const projects = await paginateResult(
     async (skip, take) => {
       if (round) {
         return prisma.project_applicants.findMany({

@@ -26,7 +26,7 @@ import Tenant from "@/lib/tenant/tenant";
 import TopStakeholders from "@/components/Delegates/DelegateStatement/TopStakeholders";
 import SnapshotVotes from "@/components/Delegates/DelegateVotes/SnapshotVotes";
 import VotesContainer from "@/components/Delegates/DelegateVotes/VotesContainer";
-import { PaginationParamsEx } from "@/app/lib/pagination";
+import { PaginationParams } from "@/app/lib/pagination";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -129,7 +129,7 @@ export default async function Page({
         <DelegationsContainer
           delegatees={delegates}
           initialDelegators={delegators}
-          fetchDelegators={async (pagination: PaginationParamsEx) => {
+          fetchDelegators={async (pagination: PaginationParams) => {
             "use server";
 
             return fetchCurrentDelegators(addressOrENSName, pagination);
@@ -143,7 +143,7 @@ export default async function Page({
                   <DelegateVotes
                     initialVotes={delegateVotes}
                     fetchDelegateVotes={async (
-                      pagination: PaginationParamsEx
+                      pagination: PaginationParams
                     ) => {
                       "use server";
                       return fetchVotesForDelegate(
@@ -165,9 +165,7 @@ export default async function Page({
               {snapshotVotes && snapshotVotes.data.length > 0 ? (
                 <SnapshotVotes
                   initialVotes={snapshotVotes}
-                  fetchSnapshotVotes={async (
-                    pagination: PaginationParamsEx
-                  ) => {
+                  fetchSnapshotVotes={async (pagination: PaginationParams) => {
                     "use server";
                     return await fetchSnapshotVotesForDelegate({
                       addressOrENSName: addressOrENSName,

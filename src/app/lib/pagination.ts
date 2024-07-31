@@ -1,4 +1,4 @@
-export type PaginatedResultEx<T> = {
+export type PaginatedResult<T> = {
   meta: {
     has_next: boolean;
     total_returned: number;
@@ -8,15 +8,15 @@ export type PaginatedResultEx<T> = {
   seed?: number;
 };
 
-export type PaginationParamsEx = {
+export type PaginationParams = {
   limit: number;
   offset: number;
 };
 
-export async function paginateResultEx<T>(
+export async function paginateResult<T>(
   query: (skip: number, take: number) => Promise<T[]>,
-  params: PaginationParamsEx
-): Promise<PaginatedResultEx<T[]>> {
+  params: PaginationParams
+): Promise<PaginatedResult<T[]>> {
   // retrieve one more than requested to see if there is more data
   // for user to query
   const data = await query(params.offset, params.limit + 1);

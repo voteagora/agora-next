@@ -5,7 +5,7 @@ import { HStack, VStack } from "../../Layout/Stack";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import { pluralizeSnapshotVote } from "@/lib/tokenUtils";
-import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { SnapshotVote } from "@/app/api/common/votes/vote";
 
 const propHeader = (vote: SnapshotVote) => {
@@ -38,10 +38,10 @@ export default function SnapshotVotes({
   initialVotes,
   fetchSnapshotVotes,
 }: {
-  initialVotes: PaginatedResultEx<SnapshotVote[]>;
+  initialVotes: PaginatedResult<SnapshotVote[]>;
   fetchSnapshotVotes: (
-    pagination: PaginationParamsEx
-  ) => Promise<PaginatedResultEx<SnapshotVote[]>>;
+    pagination: PaginationParams
+  ) => Promise<PaginatedResult<SnapshotVote[]>>;
 }) {
   const [snapshotVotes, setSnapshotVotes] = useState(initialVotes.data);
   const [snapshotMeta, setSnapshotMeta] = useState(initialVotes.meta);

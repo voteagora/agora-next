@@ -10,14 +10,14 @@ import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 
 import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 export default function ProposalDescription({
   proposal,
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResultEx<Vote[]>;
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",

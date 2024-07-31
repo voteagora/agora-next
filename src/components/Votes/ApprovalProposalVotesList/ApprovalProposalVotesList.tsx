@@ -5,14 +5,14 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
-import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 
 type Props = {
-  initialProposalVotes: PaginatedResultEx<Vote[]>;
+  initialProposalVotes: PaginatedResult<Vote[]>;
   fetchVotesForProposal: (
     proposalId: string,
-    pagintation: PaginationParamsEx
-  ) => Promise<PaginatedResultEx<Vote[]>>;
+    pagintation: PaginationParams
+  ) => Promise<PaginatedResult<Vote[]>>;
   fetchUserVotes: (proposalId: string, address: string) => Promise<Vote[]>;
   proposalId: string;
 };

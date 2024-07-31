@@ -10,7 +10,7 @@ import VoteReason from "./DelegateVotesReason";
 import ApprovalVoteReason from "./ApprovalVoteReason";
 import { pluralizeVote } from "@/lib/tokenUtils";
 import DelegateVoteIcon from "./DelegateVoteIcon";
-import { PaginatedResultEx, PaginationParamsEx } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
 
 function shortPropTitle(title: string, proosalId: string) {
@@ -50,10 +50,10 @@ export default function DelegateVotes({
   initialVotes,
   fetchDelegateVotes,
 }: {
-  initialVotes: PaginatedResultEx<Vote[]>;
+  initialVotes: PaginatedResult<Vote[]>;
   fetchDelegateVotes: (
-    pagination: PaginationParamsEx
-  ) => Promise<PaginatedResultEx<Vote[]>>;
+    pagination: PaginationParams
+  ) => Promise<PaginatedResult<Vote[]>>;
 }) {
   const [delegateVotes, setDelegateVotes] = useState(initialVotes.data);
   const [meta, setMeta] = useState(initialVotes.meta);

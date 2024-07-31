@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import {
-  PaginatedResultEx,
-  paginateResultEx,
-  PaginationParamsEx,
+  PaginatedResult,
+  paginateResult,
+  PaginationParams,
 } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
@@ -19,8 +19,8 @@ async function getProposals({
   pagination,
 }: {
   filter: string;
-  pagination: PaginationParamsEx;
-}): Promise<PaginatedResultEx<Proposal[]>> {
+  pagination: PaginationParams;
+}): Promise<PaginatedResult<Proposal[]>> {
   const { namespace, contracts } = Tenant.current();
 
   const getProposalsQuery = async (skip: number, take: number) => {
@@ -51,7 +51,7 @@ async function getProposals({
   };
 
   const getProposalsExecution = doInSpan({ name: "getProposals" }, async () =>
-    paginateResultEx(
+    paginateResult(
       (skip: number, take: number) => getProposalsQuery(skip, take),
       pagination
     )
