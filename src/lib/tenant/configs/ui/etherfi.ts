@@ -7,7 +7,6 @@ import pendingImage from "@/assets/tenant/etherfi_pending.svg";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ether.fi Agora",
-  color: "#2F38FF",
   hero: etherfiHero,
   logo: etherfiLogo,
 
