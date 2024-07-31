@@ -103,6 +103,8 @@ export const optimismTenantUIConfig = new TenantUI({
       meta: {
         title: "Optimism Agora",
         description: "Home of token house governance and RPGF",
+        imageTitle: "Optimism Agora",
+        imageDescription: "Home of token house governance and RPGF",
       },
     },
     {
@@ -113,6 +115,8 @@ export const optimismTenantUIConfig = new TenantUI({
       meta: {
         title: "Optimism Agora",
         description: "Home of token house governance and RPGF",
+        imageTitle: "Optimism Agora",
+        imageDescription: "Home of token house governance and RPGF",
       },
     },
     {
@@ -123,6 +127,9 @@ export const optimismTenantUIConfig = new TenantUI({
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
+        imageTitle: "Voter on Agora",
+        imageDescription:
+          "Delegate your voting power to a trusted representative",
       },
     },
     {
@@ -133,6 +140,8 @@ export const optimismTenantUIConfig = new TenantUI({
       meta: {
         title: "Info of Agora",
         description: "Welcome to the Optimism Collective",
+        imageTitle: "Info of Agora",
+        imageDescription: "Welcome to the Optimism Collective",
       },
       links: [
         {
