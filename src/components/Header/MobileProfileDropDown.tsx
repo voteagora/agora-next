@@ -5,7 +5,6 @@ import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { HStack, VStack } from "../Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
@@ -34,7 +33,7 @@ const MobileValueWrapper = ({
   isLoading: boolean;
 }) =>
   isLoading ? (
-    <div className="animate-pulse bg-primary/30 h-5 w-[90px] rounded-2xl"></div>
+    <div className="animate-pulse bg-tertiary h-5 w-[90px] rounded-2xl"></div>
   ) : (
     <div className="text-base">{children}</div>
   );
@@ -71,7 +70,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
             </AnimatePresence>
           )}
 
-          <Transition className="absolute z-10">
+          <Transition className="absolute z-[70]">
             <Popover.Panel>
               {({ close }) => (
                 <motion.div
@@ -82,11 +81,8 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                   variants={variants}
                   transition={{ duration: 0.2 }}
                 >
-                  <VStack
-                    gap={3}
-                    className="min-h-[325px] justify-center mb-10"
-                  >
-                    <HStack gap={2} alignItems="items-center" className="mb-1">
+                  <div className="flex flex-col gap-3 min-h-[325px] justify-center mb-10">
+                    <div className="flex flex-row items-center gap-2 mb-1">
                       <div
                         className={`relative aspect-square ${
                           isLoading && "animate-pulse"
@@ -94,7 +90,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       >
                         <ENSAvatar ensName={ensName} />
                       </div>
-                      <VStack className={"flex-1"}>
+                      <div className="flex flex-col flex-1">
                         {ensName ? (
                           <>
                             <span className="text-base">{ensName}</span>
@@ -109,14 +105,14 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             </span>
                           </>
                         )}
-                      </VStack>
+                      </div>
                       <Image
                         src={icons.power}
                         onClick={() => disconnect()}
                         alt="Disconnect Wallet"
                         className="cursor-pointer"
                       />
-                    </HStack>
+                    </div>
 
                     <PanelRow
                       title="My token balance"
@@ -173,7 +169,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 text-primary/30 bg-black flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border py-3 px-2 text-neutral bg-primary flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -181,7 +177,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 text-primary/30 bg-black flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border py-3 px-2 text-neutral bg-primary flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Create delegate statement
@@ -201,7 +197,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                         )}
                       </>
                     )}
-                  </VStack>
+                  </div>
                 </motion.div>
               )}
             </Popover.Panel>

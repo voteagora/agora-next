@@ -6,11 +6,7 @@ import { getInputData } from "../../draft/utils/getInputData";
 import Tenant from "@/lib/tenant/tenant";
 import { createSnapshot } from "../../draft/utils/createSnapshot";
 import { ProposalType } from "../../../proposals/draft/types";
-import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
 import { useAccount } from "wagmi";
 import {
