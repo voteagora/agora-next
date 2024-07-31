@@ -245,7 +245,7 @@ async function getDelegates({
   const { meta, data: delegates } = await doInSpan(
     { name: "getDelegates" },
     async () =>
-      await paginateResultEx<DelegatesGetPayload[]>(
+      await paginateResultEx<DelegatesGetPayload>(
         paginatedAllowlistQuery,
         pagination
       )
