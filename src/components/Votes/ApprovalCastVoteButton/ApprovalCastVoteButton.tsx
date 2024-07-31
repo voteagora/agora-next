@@ -18,7 +18,7 @@ type Props = {
   fetchAllForVoting: (
     address: string | `0x${string}`,
     blockNumber: number,
-    proposal_id: string
+    proposalId: string
   ) => Promise<{
     votingPower: VotingPowerData;
     authorityChains: string[][];

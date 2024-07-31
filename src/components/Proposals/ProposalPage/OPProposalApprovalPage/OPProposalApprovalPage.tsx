@@ -6,36 +6,40 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import StandardProposalDelete from "../OPProposalPage/StandardProposalDelete";
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
-  fetchVotesForProposal as apiFetchVotesForProposal,
+  fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
+import { PaginationParams } from "@/app/lib/pagination";
 
-async function fetchProposalVotes(proposal_id: string, page = 1) {
+async function fetchProposalVotes(
+  proposalId: string,
+  pagination?: PaginationParams
+) {
   "use server";
 
-  return apiFetchVotesForProposal({
-    proposal_id,
-    page,
+  return fetchVotesForProposal({
+    proposalId,
+    pagination,
   });
 }
 
 async function fetchAllForVoting(
   address: string | `0x${string}`,
   blockNumber: number,
-  proposal_id: string
+  proposalId: string
 ) {
   "use server";
 
-  return await apiFetchAllForVoting(address, blockNumber, proposal_id);
+  return await apiFetchAllForVoting(address, blockNumber, proposalId);
 }
 
 async function fetchUserVotesForProposal(
-  proposal_id: string,
+  proposalId: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
   return await apiFetchUserVotesForProposal({
-    proposal_id,
+    proposalId,
     address,
   });
 }

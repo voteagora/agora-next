@@ -63,11 +63,11 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
                 </>
               </div>
               <ProposalStatusDetail
-                proposalStartTime={proposal.start_time}
-                proposalEndTime={proposal.end_time}
+                proposalStartTime={proposal.startTime}
+                proposalEndTime={proposal.endTime}
                 proposalStatus={proposal.status}
-                proposalCancelledTime={proposal.cancelled_time}
-                cancelledTransactionHash={proposal.cancelled_transaction_hash}
+                proposalCancelledTime={proposal.cancelledTime}
+                cancelledTransactionHash={proposal.cancelledTransactionHash}
               />
             </div>
           </div>
