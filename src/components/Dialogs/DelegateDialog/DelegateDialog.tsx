@@ -1,8 +1,11 @@
-import { useAccount, useContractWrite, useEnsName } from "wagmi";
+import {
+  useAccount,
+  useContractWrite,
+  useEnsName,
+  useWaitForTransaction,
+} from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import { Button } from "@/components/Button";
-import { useModal } from "connectkit";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useCallback, useEffect, useState } from "react";
@@ -13,7 +16,6 @@ import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/Advan
 import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { waitForTransaction } from "wagmi/actions";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -30,39 +32,15 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
-  const { contracts, namespace, slug } = Tenant.current();
+  const { contracts, slug } = Tenant.current();
 
   const { address: accountAddress } = useAccount();
-  const [isLoading, setIsLoading] = useState(false);
-  const { setOpen } = useModal();
+
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
+  const { setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee = delegate.address === delegatee?.delegatee;
-
-  const writeWithTracking = async () => {
-    setIsLoading(true);
-    const trackingData = {
-      dao_slug: slug,
-      delegateAddress: delegate.address || "unknown",
-      address: accountAddress || "unknown",
-      delegateEnsName: delegateEnsName || "unknown",
-      votingPower: votingPower || "unknown",
-    };
-
-    track("Delegate", trackingData);
-
-    const tx = await writeAsync();
-    await waitForTransaction({ hash: tx.hash });
-    if (Number(votingPower) > 0) {
-      setRefetchDelegate({
-        address: trackingData.delegateAddress,
-        prevVotingPowerDelegatee: delegate.votingPower.total,
-      });
-    }
-    setIsLoading(false);
-  };
 
   const { data: delegateEnsName } = useEnsName({
     chainId: 1,
@@ -74,11 +52,19 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isSuccess, isError, writeAsync, data } = useContractWrite({
+  const { isError, writeAsync, write, data } = useContractWrite({
     address: contracts.token.address as any,
     abi: contracts.token.abi,
     functionName: "delegate",
     args: [delegate.address as any],
+  });
+
+  const {
+    isLoading: isProcessingDelegation,
+    isSuccess: didProcessDelegation,
+    isError: didFailDelegation,
+  } = useWaitForTransaction({
+    hash: data?.hash,
   });
 
   const fetchData = useCallback(async () => {
@@ -94,82 +80,117 @@ export function DelegateDialog({
     setIsReady(true);
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
+  const renderActionButtons = () => {
+    if (sameDelegatee) {
+      return (
+        <ShadcnButton variant="outline" className="cursor-not-allowed">
+          You cannot delegate to the same address again
+        </ShadcnButton>
+      );
+    }
+
+    if (isError || didFailDelegation) {
+      return (
+        <Button disabled={false} onClick={() => write?.()}>
+          Delegation failed - try again
+        </Button>
+      );
+    }
+
+    if (isProcessingDelegation) {
+      return <Button disabled={true}>Submitting your delegation...</Button>;
+    }
+
+    if (didProcessDelegation) {
+      return (
+        <div>
+          <Button className="w-full" disabled={false}>
+            Delegation completed!
+          </Button>
+          <BlockScanUrls hash1={data?.hash} />
+        </div>
+      );
+    }
+
+    return <ShadcnButton onClick={() => write?.()}>Delegate</ShadcnButton>;
+  };
+
   useEffect(() => {
-    fetchData();
-  }, [fetchData, namespace]);
+    if (!isReady) {
+      fetchData();
+    }
+
+    if (didProcessDelegation) {
+      // Refresh delegation
+      if (Number(votingPower) > 0) {
+        setRefetchDelegate({
+          address: delegate.address,
+          prevVotingPowerDelegatee: delegate.votingPower.total,
+        });
+      }
+      // Track delegation event
+      // TODO: Andrei - verify that vercel analytics are still needed given that tenants now support Google Analytics
+      const trackingData = {
+        dao_slug: slug,
+        delegateAddress: delegate.address || "unknown",
+        address: accountAddress || "unknown",
+        delegateEnsName: delegateEnsName || "unknown",
+        votingPower: votingPower || "unknown",
+      };
+
+      track("Delegate", trackingData);
+    }
+  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
 
   if (!isReady) {
     return (
-      <VStack
-        className="w-full h-[318px]"
-        alignItems="items-center"
-        justifyContent="justify-center"
-      >
+      <div className="flex flex-col items-center justify-center w-full h-[318px]">
         <AgoraLoaderSmall />
-      </VStack>
+      </div>
     );
   }
 
   return (
-    <VStack
-      alignItems="items-center"
-      className="w-full bg-neutral max-w-[28rem]"
-    >
-      <VStack
-        gap={6}
-        justifyContent="justify-center"
-        className="min-h-[318px] w-full"
-      >
+    <div className="flex flex-col items-center w-full bg-neutral max-w-[28rem]">
+      <div className="flex flex-col gap-6 justify-center min-h-[318px] w-full">
         {delegatee ? (
-          <VStack
-            gap={3}
-            alignItems="items-center"
-            className="py-3 w-full text-tertiary text-xs"
-          >
-            <VStack className="text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
-              <HStack alignItems="items-center" gap={1}>
+          <div className="flex flex-col gap-3 items-center py-3 w-full text-tertiary text-xs">
+            <div className="flex flex-col text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
+              <div className="flex flex-row items-center gap-1">
                 Your total delegatable votes
-              </HStack>
+              </div>
               <AdvancedDelegationDisplayAmount amount={votingPower} />
-            </VStack>
-            <VStack className="relative w-full">
-              <HStack
-                gap={3}
-                alignItems="items-center"
-                className="p-2 pb-4 pl-0 border-b border-line"
-              >
+            </div>
+            <div className="flex flex-col relative w-full">
+              <div className="flex flex-row items-center gap-3 p-2 pb-4 pl-0 border-b border-line">
                 <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
-                <VStack>
+                <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegatee.delegatee} />
                   </div>
-                </VStack>
-              </HStack>
+                </div>
+              </div>
               <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-neutral border border-line rounded-full right-1/2 top-1/2">
                 <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
-              <HStack
-                gap={3}
-                alignItems="items-center"
-                className="p-2 pt-4 pl-0"
-              >
+              <div className="flex flex-row items-center gap-3 p-2 pt-4 pl-0">
                 <ENSAvatar ensName={delegateEnsName} className="h-10 w-10" />
-                <VStack>
+                <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Delegating to
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
                   </div>
-                </VStack>
-              </HStack>
-            </VStack>
-          </VStack>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
-          <VStack gap={4}>
+          <div className="flex flex-col gap-4">
             <p className="text-xl font-bold text-left">
               Set <ENSName address={delegate.address} /> as your delegate
             </p>
@@ -177,69 +198,39 @@ export function DelegateDialog({
               <ENSName address={delegate.address} /> will be able to vote with
               any token owned by your address
             </div>
-            <VStack className="relative border border-line rounded-lg">
-              <HStack
-                gap={3}
-                alignItems="items-center"
-                className="p-2 border-b border-line"
-              >
+            <div className="flex flex-col relative border border-line rounded-lg">
+              <div className="flex flex-row items-center gap-3 p-2 border-b border-line">
                 <ENSAvatar ensName={""} className="h-10 w-10" />
-                <VStack>
+                <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <p>N/A</p>
                   </div>
-                </VStack>
-              </HStack>
+                </div>
+              </div>
               <div className="w-10 h-10 flex items-center justify-center bg-neutral border border-line rounded-full absolute right-4 top-[50%] translate-y-[-50%]">
                 <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
-              <HStack gap={3} alignItems="items-center" className="p-2">
+              <div className="flex flex-row gap-3 items-center p-2">
                 <ENSAvatar ensName={delegateEnsName} className="w-10 h-10" />
 
-                <VStack>
+                <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Delegating to
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
                   </div>
-                </VStack>
-              </HStack>
-            </VStack>
-          </VStack>
-        )}
-        {accountAddress ? (
-          sameDelegatee ? (
-            <ShadcnButton variant="outline" className="cursor-not-allowed">
-              You cannot delegate to the same address again
-            </ShadcnButton>
-          ) : isError ? (
-            <Button disabled={false} onClick={() => writeWithTracking()}>
-              Delegation failed - try again
-            </Button>
-          ) : isLoading || refetchDelegate ? (
-            <Button disabled={false}>Submitting your delegation...</Button>
-          ) : isSuccess ? (
-            <div>
-              <Button className="w-full" disabled={false}>
-                Delegation completed!
-              </Button>
-              <BlockScanUrls hash1={data?.hash} />
+                </div>
+              </div>
             </div>
-          ) : (
-            <ShadcnButton onClick={() => writeWithTracking()}>
-              Delegate
-            </ShadcnButton>
-          )
-        ) : (
-          <ShadcnButton variant="outline" onClick={() => setOpen(true)}>
-            Connect wallet to delegate
-          </ShadcnButton>
+          </div>
         )}
-      </VStack>
-    </VStack>
+
+        {renderActionButtons()}
+      </div>
+    </div>
   );
 }
