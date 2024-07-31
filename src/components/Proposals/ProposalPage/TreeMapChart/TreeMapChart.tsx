@@ -4,7 +4,7 @@ import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import ENSName from "@/components/shared/ENSName";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 /**
  * Transforms an array of votes into chart data suitable for a treemap.
  */
@@ -28,7 +28,7 @@ export default function VotingTimelineChart({
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResultEx<Vote[]>;
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   return <Chart proposal={proposal} votes={proposalVotes.data} />;
 }

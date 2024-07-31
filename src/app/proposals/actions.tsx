@@ -5,10 +5,11 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
+import { PaginationParams } from "../lib/pagination";
 
 export const fetchProposalVotes = (
   proposalId: string,
-  pagination?: { limit: number; offset: number }
+  pagination?: PaginationParams
 ) =>
   apiFetchVotesForProposal({
     proposalId,

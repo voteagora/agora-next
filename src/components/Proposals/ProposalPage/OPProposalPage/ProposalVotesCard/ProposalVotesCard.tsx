@@ -6,7 +6,7 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
 
 const ProposalVotesCard = ({
@@ -14,7 +14,7 @@ const ProposalVotesCard = ({
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResultEx<Vote[]>;
+  proposalVotes: PaginatedResult<Vote[]>;
 }) => {
   const [isClicked, setIsClicked] = useState(false);
 

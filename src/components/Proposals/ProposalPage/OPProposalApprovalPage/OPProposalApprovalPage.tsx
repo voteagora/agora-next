@@ -8,10 +8,11 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
+import { PaginationParams } from "@/app/lib/pagination";
 
 async function fetchProposalVotes(
   proposalId: string,
-  pagination?: { limit: number; offset: number }
+  pagination?: PaginationParams
 ) {
   "use server";
 

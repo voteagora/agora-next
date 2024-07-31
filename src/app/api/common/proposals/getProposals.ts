@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
+import {
+  PaginatedResult,
+  paginateResult,
+  PaginationParams,
+} from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
 import prisma from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -15,11 +19,8 @@ async function getProposals({
   pagination,
 }: {
   filter: string;
-  pagination: {
-    limit: number;
-    offset: number;
-  };
-}): Promise<PaginatedResultEx<Proposal[]>> {
+  pagination: PaginationParams;
+}): Promise<PaginatedResult<Proposal[]>> {
   const { namespace, contracts } = Tenant.current();
 
   const getProposalsQuery = async (skip: number, take: number) => {
@@ -50,7 +51,7 @@ async function getProposals({
   };
 
   const getProposalsExecution = doInSpan({ name: "getProposals" }, async () =>
-    paginateResultEx(
+    paginateResult(
       (skip: number, take: number) => getProposalsQuery(skip, take),
       pagination
     )

@@ -18,7 +18,7 @@ import {
   formatNumberWithScientificNotation,
   isScientificNotation,
 } from "@/lib/utils";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 const { token } = Tenant.current();
 
@@ -80,7 +80,7 @@ export default function VotingTimelineChart({
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResultEx<Vote[]>;
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   return <Chart proposal={proposal} votes={proposalVotes.data} />;
 }

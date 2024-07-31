@@ -1,7 +1,7 @@
 import {
-  PaginatedResultEx,
-  paginateResultEx,
-  PaginationParamsEx,
+  PaginatedResult,
+  paginateResult,
+  PaginationParams,
 } from "@/app/lib/pagination";
 import { parseProposalData } from "@/lib/proposalUtils";
 import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
@@ -22,7 +22,7 @@ const getVotesForDelegate = ({
   pagination,
 }: {
   addressOrENSName: string;
-  pagination?: PaginationParamsEx;
+  pagination?: PaginationParams;
 }) =>
   addressOrEnsNameWrap(getVotesForDelegateForAddress, addressOrENSName, {
     pagination,
@@ -33,11 +33,11 @@ async function getVotesForDelegateForAddress({
   pagination = { offset: 0, limit: 20 },
 }: {
   address: string;
-  pagination?: PaginationParamsEx;
+  pagination?: PaginationParams;
 }) {
   const { namespace, contracts } = Tenant.current();
 
-  const { meta, data: votes } = await paginateResultEx(
+  const { meta, data: votes } = await paginateResult(
     (skip: number, take: number) =>
       prisma.$queryRawUnsafe<VotePayload[]>(
         `
@@ -128,7 +128,7 @@ const getSnapshotVotesForDelegate = async ({
   pagination,
 }: {
   addressOrENSName: string;
-  pagination?: PaginationParamsEx;
+  pagination?: PaginationParams;
 }) =>
   addressOrEnsNameWrap(
     getSnapshotVotesForDelegateForAddress,
@@ -143,8 +143,8 @@ async function getSnapshotVotesForDelegateForAddress({
   pagination = { offset: 0, limit: 20 },
 }: {
   address: string;
-  pagination?: PaginationParamsEx;
-}): Promise<PaginatedResultEx<SnapshotVote[]>> {
+  pagination?: PaginationParams;
+}): Promise<PaginatedResult<SnapshotVote[]>> {
   const { slug } = Tenant.current();
 
   const queryFunction = (skip: number, take: number) => {
@@ -173,10 +173,7 @@ async function getSnapshotVotesForDelegateForAddress({
     return prisma.$queryRawUnsafe<SnapshotVotePayload[]>(query, skip, take);
   };
 
-  const { meta, data: votes } = await paginateResultEx(
-    queryFunction,
-    pagination
-  );
+  const { meta, data: votes } = await paginateResult(queryFunction, pagination);
 
   if (!votes || votes.length === 0) {
     return {
@@ -197,13 +194,13 @@ async function getVotesForProposal({
   sort = "weight",
 }: {
   proposalId: string;
-  pagination?: { offset: number; limit: number };
+  pagination?: PaginationParams;
   sort?: VotesSort;
-}): Promise<PaginatedResultEx<Vote[]>> {
+}): Promise<PaginatedResult<Vote[]>> {
   const { namespace, contracts } = Tenant.current();
 
   const [{ meta, data: votes }, latestBlock] = await Promise.all([
-    paginateResultEx(
+    paginateResult(
       (skip: number, take: number) =>
         prisma.$queryRawUnsafe<VotePayload[]>(
           `
