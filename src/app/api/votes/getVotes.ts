@@ -7,18 +7,18 @@ import { cache } from "react";
 async function getAllForVoting(
   address: string | `0x${string}`,
   blockNumber: number,
-  proposal_id: string
+  proposalId: string
 ) {
   const [votingPower, authorityChains, delegate, votesForProposalAndDelegate] =
     await Promise.all([
       fetchVotingPowerForProposal({
         addressOrENSName: address,
         blockNumber,
-        proposalId: proposal_id,
+        proposalId,
       }),
       fetchAuthorityChains({ address, blockNumber }),
       fetchDelegate(address),
-      fetchVotesForProposalAndDelegate({ proposal_id, address }),
+      fetchVotesForProposalAndDelegate({ proposalId, address }),
     ]);
 
   return {

@@ -5,15 +5,15 @@ import { HStack, VStack } from "../../Layout/Stack";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import { pluralizeSnapshotVote } from "@/lib/tokenUtils";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { SnapshotVote } from "@/app/api/common/votes/vote";
 
-const propHeader = (vote: any) => {
-  let headerString = "Snapshot vote - ";
-  headerString += `${formatDistanceToNow(new Date(vote.created * 1000))} ago`;
-  return headerString;
+const propHeader = (vote: SnapshotVote) => {
+  return `Snapshot vote - ${formatDistanceToNow(vote.createdAt)} ago`;
 };
 
-const VoteDetails = ({ vote }: { vote: any }) => {
-  const choiceLabels = vote.choice_labels;
+const VoteDetails = ({ vote }: { vote: SnapshotVote }) => {
+  const choiceLabels = vote.choiceLabels;
   const isFor = choiceLabels[0] === "For";
   const isAgainst = choiceLabels[0] === "Against";
 
@@ -29,38 +29,41 @@ const VoteDetails = ({ vote }: { vote: any }) => {
           </span>
         );
       })}
-      <span>{pluralizeSnapshotVote(BigInt(Math.trunc(vote.vp)))}</span>
+      <span>{pluralizeSnapshotVote(BigInt(Math.trunc(vote.votingPower)))}</span>
     </div>
   );
 };
 
 export default function SnapshotVotes({
-  meta,
   initialVotes,
   fetchSnapshotVotes,
 }: {
-  meta: any;
-  initialVotes: any;
-  fetchSnapshotVotes: any;
+  initialVotes: PaginatedResult<SnapshotVote[]>;
+  fetchSnapshotVotes: (
+    pagination: PaginationParams
+  ) => Promise<PaginatedResult<SnapshotVote[]>>;
 }) {
-  const [snapshotVotes, setSnapshotVotes] = useState(initialVotes);
-  const [snapshotMeta, setSnapshotMeta] = useState(meta);
+  const [snapshotVotes, setSnapshotVotes] = useState(initialVotes.data);
+  const [snapshotMeta, setSnapshotMeta] = useState(initialVotes.meta);
 
   const fetching = useRef(false);
 
   const loadMore = async () => {
-    if (!fetching.current && snapshotMeta?.hasNextPage) {
+    if (!fetching.current && snapshotMeta.has_next) {
       fetching.current = true;
-      const data = await fetchSnapshotVotes(snapshotMeta?.currentPage + 1);
-      setSnapshotMeta(data.snapshotMeta);
-      setSnapshotVotes((prev: any) => prev.concat(data.votes));
+      const votes = await fetchSnapshotVotes({
+        limit: 20,
+        offset: snapshotMeta.next_offset,
+      });
+      setSnapshotMeta(votes.meta);
+      setSnapshotVotes((prev) => prev.concat(votes.data));
       fetching.current = false;
     }
   };
 
   return (
     <InfiniteScroll
-      hasMore={snapshotMeta?.hasNextPage}
+      hasMore={snapshotMeta.has_next}
       pageStart={0}
       loadMore={loadMore}
       useWindow={false}
@@ -78,7 +81,7 @@ export default function SnapshotVotes({
       className="divide-y divide-line overflow-hidden bg-white shadow-newDefault ring-1 ring-line rounded-xl"
     >
       {snapshotVotes.map(
-        (vote: any, idx: number) =>
+        (vote, idx) =>
           vote && (
             <div key={`vote-${idx}`}>
               <div>
@@ -93,11 +96,13 @@ export default function SnapshotVotes({
                       </h2>
                       <VoteDetails vote={vote} />
                     </div>
-                    <div className="flex-1 border-l border-line pl-4">
-                      <span className="text-xs text-tertiary leading-5 block">
-                        {vote.reason}
-                      </span>
-                    </div>
+                    {vote.reason && (
+                      <div className="flex-1 border-l border-line pl-4">
+                        <span className="text-xs text-tertiary leading-5 block">
+                          {vote.reason}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </VStack>
               </div>

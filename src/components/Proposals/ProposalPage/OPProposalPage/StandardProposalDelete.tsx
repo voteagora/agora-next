@@ -57,7 +57,7 @@ export default function StandardProposalDelete({
   }
 
   // If proposal is cancelled, it means it has been deleted and we don't need to show the button
-  if (!!proposal.cancelled_transaction_hash) {
+  if (!!proposal.cancelledTransactionHash) {
     return null;
   }
 

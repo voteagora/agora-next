@@ -1,4 +1,4 @@
-import { paginateResultEx } from "@/app/lib/pagination";
+import { paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { Ballots } from "@prisma/client";
@@ -15,7 +15,7 @@ async function getBallotsApi({
   limit: number;
   offset: number;
 }) {
-  return paginateResultEx(
+  return paginateResult(
     (skip: number, take: number) => {
       return prisma.$queryRawUnsafe<Ballots[]>(
         `
