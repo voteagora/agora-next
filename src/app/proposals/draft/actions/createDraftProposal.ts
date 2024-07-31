@@ -70,7 +70,9 @@ const formDataByType = (
         max_options: data.approvalProposal.maxOptions
           ? parseInt(data.approvalProposal.maxOptions)
           : null,
-        top_choices: parseInt(data.approvalProposal.topChoices),
+        top_choices: data.approvalProposal.topChoices
+          ? parseInt(data.approvalProposal.topChoices)
+          : null,
         approval_options: {
           // deletes all existing options so we aren't stacking on top of old options
           // TODO: do we need to make sure deletes cascade and remove transactions?
