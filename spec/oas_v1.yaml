@@ -20,12 +20,8 @@ info:
     - **commentsVotes**: Data related to RetroPGF Project Comments' Votes
     - **delegates**: Delegates data
     - **delegations**: Delegations data
-    ----
-    Coming soon. 
-    - **proposals**: Not Live - Use for feedback only. Coming in OP 0.1.3
-    - **votes**: Not Live - Use for feedback only. Coming in OP 0.1.3
-    - **proposalTypes**: Not Live - Use for feedback only. Coming in OP 0.1.3
-    - **spec**: Not Live - Use for feedback only. Coming in OP 0.1.3
+    - **proposals**: Proposal data
+    - **votes**: Vote data
     - **contracts**: Data for the current onchain contracts
 
     ### Release Schedule
@@ -35,8 +31,8 @@ info:
     | OP 0.1.0 | LIVE   | June 7th|
     | OP 0.1.1 | LIVE   | June 27th |
     | OP 0.1.2 | LIVE   | July 22th |
-    | OP 0.1.3 | On Track    | July 31th |
-  version: 0.1.0
+    | OP 0.1.3 | LIVE   | July 31th |
+  version: 0.1.3
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -63,17 +59,13 @@ tags:
   - name: commentsVotes
     description: Data related to RetroPGF Project Comments' Votes
   - name: delegates
-    description: Not Live - Use for feedback only. Coming in OP 0.1.2 (see above)
+    description: Delegates data
   - name: delegations
-    description: Not Live - Use for feedback only. Coming in OP 0.1.2 (see above)
+    description: Delegations data
   - name: proposals
-    description: Not Live - Use for feedback only.  Coming in OP 0.1.3 (see above)
+    description: Proposal data
   - name: votes
-    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
-  - name: proposalTypes
-    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
-  - name: spec
-    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
+    description: Vote data
   - name: contracts
     description: Data for the current onchain contracts
 security:
@@ -795,14 +787,6 @@ components:
         - $ref: "#/components/schemas/Contract"
         - type: object
           properties:
-            tokenName:
-              summary: Name of the voting token
-              description: The name of the voting token.
-              type: string
-            tokenSymbol:
-              summary: Symbol of the voting token
-              description: The symbol of the voting token.
-              type: string
             totalSupply:
               summary: Total supply of the voting token
               description: The total supply of the voting token.
@@ -823,18 +807,6 @@ components:
         chainId:
           summary: Chain ID of the contract
           description: The chain ID on which the contract is deployed.
-          type: string
-        deployer:
-          summary: Deployer address
-          description: The address of the entity which deployed the contract.
-          type: string
-        creationBlock:
-          summary: Block in which the contract was deployed
-          description: The block number in which the contract was deployed.
-          type: string
-        transactionId:
-          summary: Transaction ID of the deployment
-          description: The transaction ID of the transaction in which the contract was deployed.
           type: string
     Comment:
       summary: A comment
@@ -1775,50 +1747,6 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /proposals/types:
-    get:
-      summary: Gets a paginated list of proposal types
-      description: >
-        Retrieves a paginated list of proposal types on Agora as a JSON array.
-        Limit, offset, and sort parameters can be used to customize the returned list.
-      operationId: getProposalTypes
-      tags:
-        - proposals
-        - proposalTypes
-      parameters:
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-        - name: sort
-          in: query
-          description: >
-            The desired method by which returned delegates will be sorted.
-            Supported values are: 'most_delegators', 'weighted_random'
-          required: false
-          schema:
-            type: string
-            enum:
-              - most_delegators
-              - weighted_random
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  proposalTypes:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ProposalTemplate"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
   /projects:
     # Should this be paginated? How many ballots per round are expected?
     get:
@@ -1895,7 +1823,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /contracts/votingToken:
+  /contracts/token:
     get:
       summary: Gets the voting token contract address
       description: >
