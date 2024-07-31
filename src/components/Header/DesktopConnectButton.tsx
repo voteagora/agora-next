@@ -8,7 +8,7 @@ export function DesktopConnectButton() {
         return (
           <div
             onClick={!isConnected ? () => show?.() : undefined}
-            className="border border-line font-medium bg-wash py-2 px-4 rounded-full cursor-pointer flex items-center transition-all hover:shadow-newDefault"
+            className="border border-line font-medium bg-wash py-2 px-4 rounded-full cursor-pointer hidden sm:flex items-center transition-all hover:shadow-newDefault"
           >
             {isConnected ? (
               <DesktopProfileDropDown ensName={ensName} />
