@@ -11,32 +11,19 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 
 type Props = {
   proposal: Proposal;
-  initialProposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  initialProposalVotes: PaginatedResult<Vote[]>;
   fetchVotesForProposal: (
-    proposal_id: string,
-    page?: number
-  ) => Promise<{
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  }>;
+    proposalId: string,
+    pagination?: PaginationParams
+  ) => Promise<PaginatedResult<Vote[]>>;
   fetchAllForVoting: (
     address: string | `0x${string}`,
     blockNumber: number,
-    proposal_id: string
+    proposalId: string
   ) => Promise<{
     votingPower: VotingPowerData;
     authorityChains: string[][];
@@ -44,7 +31,7 @@ type Props = {
     votesForProposalAndDelegate: Vote[];
   }>;
   fetchUserVotesForProposal: (
-    proposal_id: string,
+    proposalId: string,
     address: string | `0x${string}`
   ) => Promise<Vote[]>;
 };
@@ -96,7 +83,7 @@ export default function ApprovalVotesPanel({
             initialProposalVotes={initialProposalVotes}
             fetchVotesForProposal={fetchVotesForProposal}
             fetchUserVotes={fetchUserVotesForProposal}
-            proposal_id={proposal.id}
+            proposalId={proposal.id}
           />
         )}
         <ApprovalProposalCriteria proposal={proposal} />

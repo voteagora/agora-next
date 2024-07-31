@@ -14,10 +14,10 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import StandardProposalDelete from "./StandardProposalDelete";
 import OptimisticProposalVotesCard from "../../ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
 
-async function fetchProposalVotes(proposal_id, page = 1) {
+async function fetchProposalVotes(proposalId, pagintaion) {
   "use server";
 
-  return fetchVotesForProposal({ proposal_id, page });
+  return fetchVotesForProposal({ proposalId, pagintaion });
 }
 
 async function fetchDelegate(addressOrENSName) {
@@ -26,11 +26,11 @@ async function fetchDelegate(addressOrENSName) {
   return await apiFetchDelegate(addressOrENSName);
 }
 
-async function fetchUserVotesForProposal(proposal_id, address) {
+async function fetchUserVotesForProposal(proposalId, address) {
   "use server";
 
   return await apiFetchUserVotesForProposal({
-    proposal_id,
+    proposalId,
     address,
   });
 }
