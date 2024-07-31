@@ -30,6 +30,8 @@ export const ensTenantUIConfig = new TenantUI({
       meta: {
         title: "ENS Agora",
         description: "Home of token governance",
+        imageTitle: "ENS Agora",
+        imageDescription: "Home of token governance",
       },
     },
     {
@@ -40,6 +42,8 @@ export const ensTenantUIConfig = new TenantUI({
       meta: {
         title: "ENS Agora",
         description: "Home of token governance",
+        imageTitle: "ENS Agora",
+        imageDescription: "Home of token governance",
       },
     },
     {
@@ -50,6 +54,9 @@ export const ensTenantUIConfig = new TenantUI({
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
+        imageTitle: "Voter on Agora",
+        imageDescription:
+          "Delegate your voting power to a trusted representative",
       },
     },
   ],

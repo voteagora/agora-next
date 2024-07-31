@@ -31,11 +31,11 @@ async function fetchDelegators(address) {
 export async function generateMetadata({}, parent) {
   const { ui } = Tenant.current();
   const page = ui.page("delegates");
-  const { title, description } = page.meta;
+  const { title, description, imageTitle, imageDescription } = page.meta;
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
-    title
-  )}&description=${encodeURIComponent(description)}`;
+    imageTitle
+  )}&description=${encodeURIComponent(imageDescription)}`;
 
   return {
     title: title,
