@@ -9,18 +9,7 @@ module.exports = {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
-    return [
-      {
-        source: "/api/v1/proposals/:proposalId",
-        destination: "/404",
-        permanent: true,
-      },
-      {
-        source: "/api/v1/proposals",
-        destination: "/404",
-        permanent: true,
-      },
-    ];
+    return [];
   },
   async headers() {
     return [

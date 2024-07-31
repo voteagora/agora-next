@@ -126,20 +126,20 @@ export default function ProposalVotesSummaryDetails({
       <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
         <StepperRow
           label="Proposal created"
-          value={formatTime(proposal.created_time)}
+          value={formatTime(proposal.createdTime)}
         />
         <StepperRow
           label="Voting period start"
-          value={formatTime(proposal.start_time)}
+          value={formatTime(proposal.startTime)}
         />
         <StepperRow
           label="Voting period end"
-          value={formatTime(proposal.end_time)}
+          value={formatTime(proposal.endTime)}
         />
         <StepperRow
           isLastStep
           label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
-          value={formatTime(proposal.end_time)}
+          value={formatTime(proposal.endTime)}
         />
       </ol>
     </div>

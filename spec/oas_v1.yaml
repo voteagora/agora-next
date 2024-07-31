@@ -20,12 +20,8 @@ info:
     - **commentsVotes**: Data related to RetroPGF Project Comments' Votes
     - **delegates**: Delegates data
     - **delegations**: Delegations data
-    ----
-    Coming soon. 
-    - **proposals**: Not Live - Use for feedback only. Coming in OP 0.1.3
-    - **votes**: Not Live - Use for feedback only. Coming in OP 0.1.3
-    - **proposalTypes**: Not Live - Use for feedback only. Coming in OP 0.1.3
-    - **spec**: Not Live - Use for feedback only. Coming in OP 0.1.3
+    - **proposals**: Proposal data
+    - **votes**: Vote data
     - **contracts**: Data for the current onchain contracts
 
     ### Release Schedule
@@ -35,8 +31,8 @@ info:
     | OP 0.1.0 | LIVE   | June 7th|
     | OP 0.1.1 | LIVE   | June 27th |
     | OP 0.1.2 | LIVE   | July 22th |
-    | OP 0.1.3 | On Track    | July 31th |
-  version: 0.1.0
+    | OP 0.1.3 | LIVE   | July 31th |
+  version: 0.1.3
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -63,17 +59,13 @@ tags:
   - name: commentsVotes
     description: Data related to RetroPGF Project Comments' Votes
   - name: delegates
-    description: Not Live - Use for feedback only. Coming in OP 0.1.2 (see above)
+    description: Delegates data
   - name: delegations
-    description: Not Live - Use for feedback only. Coming in OP 0.1.2 (see above)
+    description: Delegations data
   - name: proposals
-    description: Not Live - Use for feedback only.  Coming in OP 0.1.3 (see above)
+    description: Proposal data
   - name: votes
-    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
-  - name: proposalTypes
-    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
-  - name: spec
-    description: Not Live - Use for feedback only. Coming in OP 0.1.3 (see above)
+    description: Vote data
   - name: contracts
     description: Data for the current onchain contracts
 security:
@@ -342,6 +334,81 @@ components:
           type: string
           examples:
             - "Grant funding should be directed to projects with a great track record"
+    SnapshotProposalResults:
+      summary: Results of a snapshot proposal
+      description: An object describing the results of a snapshot proposal, including status and scores.
+      type: object
+      properties:
+        scores:
+          summary: Scores for the proposal
+          type: array
+          items:
+            type: string
+        status:
+          summary: Status of the proposal
+          type: string
+          enum:
+            - pending
+            - active
+            - closed
+    StandardProposalResults:
+      summary: Results of a standard proposal
+      description: An object describing the results of a standard proposal.
+      type: object
+      properties:
+        for:
+          summary: Number of votes for
+          type: string
+        against:
+          summary: Number of votes against
+          type: string
+        abstain:
+          summary: Number of abstentions
+          type: string
+    ApprovalProposalResults:
+      summary: Results of an approval proposal
+      description: An object describing the results of an approval proposal.
+      type: object
+      properties:
+        for:
+          summary: Number of votes for
+          type: string
+        against:
+          summary: Number of votes against
+          type: string
+        abstain:
+          summary: Number of abstentions
+          type: string
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              option:
+                type: string
+              votes:
+                type: string
+        criteria:
+          enum:
+            - THRESHOLD
+            - TOP_CHOICES
+        criteriaValue:
+          summary: Threshold required to pass or number of top choices that is passed
+          type: string
+    OptimisticProposalResults:
+      summary: Results of a standard proposal
+      description: An object describing the results of a standard proposal.
+      type: object
+      properties:
+        for:
+          summary: Number of votes for
+          type: string
+        against:
+          summary: Number of votes against
+          type: string
+        abstain:
+          summary: Number of abstentions
+          type: string
     SnapshotProposalData:
       summary: Data associated with a snapshot proposal
       description: >
@@ -469,12 +536,20 @@ components:
           type: array
           items:
             type: string
+        signatures:
+          summary: Function signatures
+          type: array
+          items:
+            type: string
         calldata:
           summary: Calldata for execution
           type: array
           items:
             type: string
-        functionData:
+        description:
+          summary: Description of the option
+          type: string
+        functionArgsName:
           summary: Functions for execution
           type: array
           items:
@@ -483,11 +558,14 @@ components:
               functionName:
                 summary: Function name
                 type: string
-              data:
+              functionArgs:
                 summary: Data for function
                 type: array
                 items:
                   type: string
+        budgetTokensSpent:
+          summary: Total tokens spent in the option transactions
+          type: string
     Proposal:
       summary: A specific governance proposal for voting
       description: >
@@ -495,46 +573,52 @@ components:
         including the specific measure, proposer, data, etc.
       type: object
       properties:
-        proposalId:
+        id:
           type: string
-        contractAddress:
-          summary: Governor contract address
-          description: Governor contract address to which this proposal was submitted.
-          type: string
-        proposerAddress:
+        proposer:
           summary: Proposer's address
           description: The address which submitted the proposal for voting.
           type: string
+        snapshotBlockNumber:
+          summary: Block number of the voting power snapshot
+          description: Block number of the proposal at which the voting power was calculated
+          type: number
+        createdTime:
+          summary: Proposal creation time
+          description: Timestamp on which this proposal was created.
+          type: string
+        startTime:
+          summary: Start time of the proposal
+          description: Timestamp at which this proposal is open for voting.
+          type: string
+        endTime:
+          summary: End time of the proposal
+          description: Timestamp at which the proposal has closed for voting.
+          type: string
+        cancelledTime:
+          summary: Cancelled time of the proposal
+          description: Timestamp at which this proposal has been canceled. Zero if not canceled.
+          type: string
+        executedTime:
+          summary: Execution time of the proposal
+          description: Timestamp at which this proposal has been executed. Zero if not executed.
+          type: string
+        markdowntitle:
+          summary: Title of the proposal
+          description: Title of the proposal
+          type: string
         description:
-          summary: Description of the voting measure
+          summary: Description of the proposal
           description: Extended information and context around the proposal.
           type: string
-        ordinal:
-          summary: Number of this proposal's order
+        quorum:
+          summary: Minimum participation for passage
           description: >
-            Numeric descriptor of this proposal's ordering among others; Calculated as the concatentation
-            of the proposal's block number left-padded by 10 0's, transaction index left-padded by 3 0's, 
-            and log index left-padded by 3 0's.
+            The minimum number of voting power needed to be involved in a given proposal as a prerequisite for passage
           type: string
-        createBlock:
-          summary: Proposal creation block number
-          description: Block number on which this proposal was created.
-          type: string
-        startBlock:
-          summary: Starting block number
-          description: Block number at which this proposal is open for voting.
-          type: string
-        endBlock:
-          summary: Ending block number
-          description: Block number at which the proposal has closed for voting.
-          type: string
-        cancelledBlock:
-          summary: Cancelled block number
-          description: Block number at which this proposal has been canceled. Zero if not canceled.
-          type: string
-        executedBlock:
-          summary: Execution block number
-          description: Block number at which this proposal has been executed. Zero if not executed.
+        approvalThreshold:
+          summary: Minimum amount needed for option to pass
+          description: The amount of voting power needed to pass an option in the given approval voting proposal.
           type: string
         proposalData:
           oneOf:
@@ -544,6 +628,51 @@ components:
             - $ref: "#/components/schemas/OptimisticProposalData"
           discriminator:
             propertyName: votingStrategy
+        unformattedProposalData:
+          summary: Unformatted proposal data
+          description: >
+            The raw, unformatted data associated with the proposal.
+          type: string
+        proposalResults:
+          oneOf:
+            - $ref: "#/components/schemas/SnapshotProposalResults"
+            - $ref: "#/components/schemas/StandardProposalResults"
+            - $ref: "#/components/schemas/ApprovalProposalResults"
+            - $ref: "#/components/schemas/OptimisticProposalResults"
+        proposalType:
+          summary: Type of proposal
+          description: The type of proposal; can be standard, approval, optimistic, or snapshot.
+          type: string
+          enum:
+            - STANDARD
+            - APPROVAL
+            - OPTIMISTIC
+            - SNAPSHOT
+        status:
+          summary: Status of the proposal
+          description: The current status of the proposal; can be active, closed, or pending.
+          type: string
+          enum:
+            - "CANCELLED"
+            - "SUCCEEDED"
+            - "DEFEATED"
+            - "ACTIVE"
+            - "PENDING"
+            - "QUEUED"
+            - "EXECUTED"
+            - "CLOSED"
+        createdTransactionHash:
+          summary: Transaction hash of proposal creation
+          description: The transaction hash of the transaction which created the proposal.
+          type: string
+        cancelledTransactionHash:
+          summary: Transaction hash of proposal cancellation
+          description: The transaction hash of the transaction which canceled the proposal.
+          type: string
+        executedTransactionHash:
+          summary: Transaction hash of proposal execution
+          description: The transaction hash of the transaction which executed the proposal.
+          type: string
         proposalTemplate:
           $ref: "#/components/schemas/ProposalTemplate"
     ProposalTemplate:
@@ -603,51 +732,61 @@ components:
       description: Information and metadata about a specific vote on a governance proposal.
       type: object
       properties:
-        transactionId:
-          summary: Transaction ID of the vote
-          description: The transaction ID of the transaction in which the vote was cast.
+        transactionHash:
+          summary: Transaction hash of the vote
+          description: The transaction hash of the transaction in which the vote was cast.
           type: string
         proposalId:
           summary: Proposal ID for the vote
           description: The unique ID of the proposal on which the vote was cast.
           type: string
-        voterAddress:
+        address:
           summary: Address casting the vote
           description: On-chain address of the EOA or contract which cast the vote.
           type: string
         support:
           $ref: "#/components/schemas/VoteSupport"
+        reason:
+          summary: Reason for the vote
+          description: A voter-supplied reason for voting the particular way they did.
+          type: string
         weight:
           summary: Voting power behind the vote
           description: Numeric description of the weight and voting power behind the vote.
           type: string
-        castBlock:
-          summary: Block in which the vote was cast
-          description: The block number in which the transaction for the cast is contained.
-          type: string
-        description:
-          summary: Rationale for the vote
-          description: A voter-supplied reason for voting the particular way they did.
-          type: string
-        approvalParams:
-          summary: Array of items to submit for approval
+        params:
+          summary: Array of votes that have been chosen by the voter
           description: An array of items to submit for approval for multiple choice votes.
           type: array
           items:
             type: string
+        proposalValue:
+          summary: Value of the proposal
+          description: The total value that the proposal will be executed with.
+          type: string
+        proposalTitle:
+          summary: Title of the proposal
+          description: The title of the proposal.
+          type: string
+        proposalType:
+          summary: Type of the proposal
+          description: The type of the proposal.
+          type: string
+          enum:
+            - STANDARD
+            - APPROVAL
+            - OPTIMISTIC
+            - SNAPSHOT
+        timestamp:
+          summary: Timestamp of the vote
+          description: The timestamp at which the vote was cast.
+          type: string
+          format: date-time
     VotingToken:
       allOf:
         - $ref: "#/components/schemas/Contract"
         - type: object
           properties:
-            tokenName:
-              summary: Name of the voting token
-              description: The name of the voting token.
-              type: string
-            tokenSymbol:
-              summary: Symbol of the voting token
-              description: The symbol of the voting token.
-              type: string
             totalSupply:
               summary: Total supply of the voting token
               description: The total supply of the voting token.
@@ -668,18 +807,6 @@ components:
         chainId:
           summary: Chain ID of the contract
           description: The chain ID on which the contract is deployed.
-          type: string
-        deployer:
-          summary: Deployer address
-          description: The address of the entity which deployed the contract.
-          type: string
-        creationBlock:
-          summary: Block in which the contract was deployed
-          description: The block number in which the contract was deployed.
-          type: string
-        transactionId:
-          summary: Transaction ID of the deployment
-          description: The transaction ID of the transaction in which the contract was deployed.
           type: string
     Comment:
       summary: A comment
@@ -1309,6 +1436,7 @@ paths:
       operationId: getDelegateVotes
       tags:
         - votes
+        - delegates
       parameters:
         - name: addressOrEnsName
           in: path
@@ -1325,17 +1453,6 @@ paths:
               summary: ENS name of the delegate.
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
-        - name: sort
-          in: query
-          description: >
-            The desired method by which returned delegates will be sorted.
-            Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
-          required: false
-          schema:
-            type: string
-            enum:
-              - weight
-              - block
       responses:
         "200":
           description: OK
@@ -1453,7 +1570,7 @@ paths:
             type: string
             enum:
               - weight
-              - block
+              - block_number
       responses:
         "200":
           description: OK
@@ -1631,50 +1748,6 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /proposals/types:
-    get:
-      summary: Gets a paginated list of proposal types
-      description: >
-        Retrieves a paginated list of proposal types on Agora as a JSON array.
-        Limit, offset, and sort parameters can be used to customize the returned list.
-      operationId: getProposalTypes
-      tags:
-        - proposals
-        - proposalTypes
-      parameters:
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-        - name: sort
-          in: query
-          description: >
-            The desired method by which returned delegates will be sorted.
-            Supported values are: 'most_delegators', 'weighted_random'
-          required: false
-          schema:
-            type: string
-            enum:
-              - most_delegators
-              - weighted_random
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  proposalTypes:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ProposalTemplate"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
   /projects:
     # Should this be paginated? How many ballots per round are expected?
     get:
@@ -1751,7 +1824,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /contracts/votingToken:
+  /contracts/token:
     get:
       summary: Gets the voting token contract address
       description: >
