@@ -16,6 +16,7 @@ import {
 import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
+import { doInSpan } from "@/app/lib/logging";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -37,10 +38,8 @@ async function getVotesForDelegateForAddress({
 }) {
   const { namespace, contracts } = Tenant.current();
 
-  const { meta, data: votes } = await paginateResult(
-    (skip: number, take: number) =>
-      prisma.$queryRawUnsafe<VotePayload[]>(
-        `
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
         SELECT
           transaction_hash,
           proposal_id,
@@ -93,13 +92,19 @@ async function getVotesForDelegateForAddress({
         ORDER BY block_number DESC
         OFFSET $3
         LIMIT $4;
-      `,
-        address.toLocaleLowerCase(),
-        contracts.governor.address.toLowerCase(),
-        skip,
-        take
-      ),
-    pagination
+        `;
+    return prisma.$queryRawUnsafe<VotePayload[]>(
+      query,
+      address,
+      contracts.governor.address.toLowerCase(),
+      skip,
+      take
+    );
+  };
+
+  const { meta, data: votes } = await doInSpan(
+    { name: "getVotesForDelegate" },
+    async () => paginateResult(queryFunction, pagination)
   );
 
   if (!votes || votes.length === 0) {
@@ -199,68 +204,71 @@ async function getVotesForProposal({
 }): Promise<PaginatedResult<Vote[]>> {
   const { namespace, contracts } = Tenant.current();
 
-  const [{ meta, data: votes }, latestBlock] = await Promise.all([
-    paginateResult(
-      (skip: number, take: number) =>
-        prisma.$queryRawUnsafe<VotePayload[]>(
-          `
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT
+        transaction_hash,
+        proposal_id,
+        voter,
+        support,
+        weight,
+        reason,
+        block_number,
+        params,
+        start_block,
+        description,
+        proposal_data,
+        proposal_type
+      FROM (
+        SELECT * FROM (
         SELECT
-          transaction_hash,
+          STRING_AGG(transaction_hash,'|') as transaction_hash,
           proposal_id,
           voter,
           support,
-          weight,
-          reason,
-          block_number,
+          SUM(weight::numeric) as weight,
+          STRING_AGG(distinct reason, '\n --------- \n') as reason,
+          MAX(block_number) as block_number,
           params,
-          start_block,
-          description,
-          proposal_data,
-          proposal_type
+          contract
         FROM (
-          SELECT * FROM (
           SELECT
-            STRING_AGG(transaction_hash,'|') as transaction_hash,
-            proposal_id,
-            voter,
-            support,
-            SUM(weight::numeric) as weight,
-            STRING_AGG(distinct reason, '\n --------- \n') as reason,
-            MAX(block_number) as block_number,
-            params,
-            contract
-          FROM (
-            SELECT
-              *
-            FROM ${namespace + ".vote_cast_events"}
-            WHERE proposal_id = $1 AND contract = $2
-            UNION ALL
-            SELECT
-              *
-            FROM ${namespace + ".vote_cast_with_params_events"}
-            WHERE proposal_id = $1 AND contract = $2
-          ) t
-          GROUP BY 2,3,4,8,9
-          ) av
-          LEFT JOIN LATERAL (
-            SELECT
-              proposals.start_block,
-              proposals.description,
-              proposals.proposal_data,
-              proposals.proposal_type::config.proposal_type AS proposal_type
-            FROM ${namespace + ".proposals"} proposals
-            WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
-        ) q
-        ORDER BY ${sort} DESC
-        OFFSET $3
-        LIMIT $4;
-      `,
-          proposalId,
-          contracts.governor.address.toLowerCase(),
-          skip,
-          take
-        ),
-      pagination
+            *
+          FROM ${namespace + ".vote_cast_events"}
+          WHERE proposal_id = $1 AND contract = $2
+          UNION ALL
+          SELECT
+            *
+          FROM ${namespace + ".vote_cast_with_params_events"}
+          WHERE proposal_id = $1 AND contract = $2
+        ) t
+        GROUP BY 2,3,4,8,9
+        ) av
+        LEFT JOIN LATERAL (
+          SELECT
+            proposals.start_block,
+            proposals.description,
+            proposals.proposal_data,
+            proposals.proposal_type::config.proposal_type AS proposal_type
+          FROM ${namespace + ".proposals"} proposals
+          WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
+      ) q
+      ORDER BY ${sort} DESC
+      OFFSET $3
+      LIMIT $4;
+    `;
+    return prisma.$queryRawUnsafe<VotePayload[]>(
+      query,
+      proposalId,
+      contracts.governor.address.toLowerCase(),
+      skip,
+      take
+    );
+  };
+
+  const [{ meta, data: votes }, latestBlock] = await Promise.all([
+    doInSpan({ name: "getVotesForProposal" }, async () =>
+      paginateResult(queryFunction, pagination)
     ),
     contracts.token.provider.getBlock("latest"),
   ]);
@@ -291,7 +299,7 @@ async function getUserVotesForProposal({
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
-  const votes = await prisma.$queryRawUnsafe<VotePayload[]>(
+  const queryFunciton = prisma.$queryRawUnsafe<VotePayload[]>(
     `
     SELECT
       STRING_AGG(transaction_hash,'|') as transaction_hash,
@@ -310,6 +318,11 @@ async function getUserVotesForProposal({
     `,
     proposalId,
     address.toLowerCase()
+  );
+
+  const votes = await doInSpan(
+    { name: "getUserVotesForProposal" },
+    async () => queryFunciton
   );
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
