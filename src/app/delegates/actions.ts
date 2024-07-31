@@ -20,6 +20,7 @@ import {
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
+import { PaginationParams } from "../lib/pagination";
 
 export async function fetchDelegate(address: string) {
   return apiFetchDelegate(address);
@@ -75,11 +76,14 @@ export async function submitDelegateStatement({
 
 export async function fetchVotesForDelegate(
   addressOrENSName: string,
-  page = 1
+  pagination?: {
+    offset: number;
+    limit: number;
+  }
 ) {
   return apiFetchVotesForDelegate({
     addressOrENSName,
-    page,
+    pagination,
   });
 }
 
@@ -90,10 +94,7 @@ export async function fetchCurrentDelegatees(addressOrENSName: string) {
 
 export async function fetchCurrentDelegators(
   addressOrENSName: string,
-  pagination: {
-    offset: number;
-    limit: number;
-  } = {
+  pagination: PaginationParams = {
     offset: 0,
     limit: 20,
   }

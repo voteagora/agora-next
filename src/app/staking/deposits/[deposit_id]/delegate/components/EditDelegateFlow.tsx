@@ -12,21 +12,18 @@ import { EditDelegateConfirm } from "@/app/staking/deposits/[deposit_id]/delegat
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 const PAGE_TITLE = ["Edit Delegate", "Confirm your transaction"];
 
 interface EditDelegateFlowProps {
-  delegates: PaginatedResultEx<DelegateChunk[]>;
+  delegates: PaginatedResult<DelegateChunk[]>;
   deposit: StakedDeposit;
   fetchDelegates: (
-    pagination: {
-      offset: number;
-      limit: number;
-    },
+    pagination: PaginationParams,
     seed: number
-  ) => Promise<PaginatedResultEx<DelegateChunk[]>>;
+  ) => Promise<PaginatedResult<DelegateChunk[]>>;
   refreshPath: (path: string) => void;
 }
 

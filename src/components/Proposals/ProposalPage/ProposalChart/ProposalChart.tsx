@@ -5,20 +5,14 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 export default function ProposalChart({
   proposal,
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   const [tabIndex, setTabIndex] = useState(0);
 

@@ -18,6 +18,7 @@ import {
   formatNumberWithScientificNotation,
   isScientificNotation,
 } from "@/lib/utils";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 const { token } = Tenant.current();
 
@@ -79,16 +80,9 @@ export default function VotingTimelineChart({
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
-  return <Chart proposal={proposal} votes={proposalVotes.votes} />;
+  return <Chart proposal={proposal} votes={proposalVotes.data} />;
 }
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
@@ -105,7 +99,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
 
   const modifiedChartData = [
     {
-      timestamp: proposal.start_time,
+      timestamp: proposal.startTime,
       for: 0,
       against: 0,
       abstain: 0,
@@ -113,7 +107,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     },
     ...chartData,
     {
-      timestamp: proposal.end_time,
+      timestamp: proposal.endTime,
       for: chartData[chartData.length - 1]?.for,
       abstain: chartData[chartData.length - 1]?.abstain,
       against: chartData[chartData.length - 1]?.against,
@@ -131,8 +125,8 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           tickLine={false}
           interval="preserveStartEnd"
           ticks={[
-            (proposal.start_time as unknown as string) || "",
-            (proposal.end_time as unknown as string) || "",
+            (proposal.startTime as unknown as string) || "",
+            (proposal.endTime as unknown as string) || "",
           ]}
           tickFormatter={tickFormatter}
           tick={customizedXTick}
