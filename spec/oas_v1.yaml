@@ -1436,6 +1436,7 @@ paths:
       operationId: getDelegateVotes
       tags:
         - votes
+        - delegates
       parameters:
         - name: addressOrEnsName
           in: path
