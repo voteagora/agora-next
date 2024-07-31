@@ -7,11 +7,13 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import Proposal from "../Proposal/Proposal";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
+import Proposal from "../Proposal/Proposal";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -19,11 +21,24 @@ export default function ProposalsList({
   fetchProposals,
   votableSupply,
   governanceCalendar,
+}: {
+  initRelevantProposals: PaginatedResult<ProposalType[]>;
+  initAllProposals: PaginatedResult<ProposalType[]>;
+  fetchProposals: (
+    pagination: PaginationParams,
+    filter: string
+  ) => Promise<PaginatedResult<ProposalType[]>>;
+  votableSupply: string;
+  governanceCalendar?: {
+    title: string;
+    endDate: string;
+    reviewPeriod: boolean;
+  } | null;
 }) {
   const { address } = useAccount();
   const { ui } = Tenant.current();
   const tenantSupportsProposalLifecycle = ui.toggle("proposal-lifecycle");
-  const filter = useSearchParams().get("filter") || "relevant";
+  const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
   const [meta, setMeta] = useState(initRelevantProposals.meta);
@@ -39,15 +54,18 @@ export default function ProposalsList({
   }, [initRelevantProposals, initAllProposals, filter]);
 
   const loadMore = async () => {
-    if (fetching.current || !meta.hasNextPage) return;
+    if (fetching.current || !meta.has_next) return;
     fetching.current = true;
-    const data = await fetchProposals(meta.currentPage + 1, filter);
-    setPages((prev) => [...prev, { ...data, proposals: data.proposals }]);
+    const data = await fetchProposals(
+      { limit: 10, offset: meta.next_offset },
+      filter
+    );
+    setPages((prev) => [...prev, { ...data, proposals: data.data }]);
     setMeta(data.meta);
     fetching.current = false;
   };
 
-  const proposals = pages.flatMap((page) => page.proposals);
+  const proposals = pages.flatMap((page) => page.data);
 
   return (
     <VStack className="max-w-[76rem]">
@@ -72,7 +90,7 @@ export default function ProposalsList({
       <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
           <InfiniteScroll
-            hasMore={meta.hasNextPage}
+            hasMore={meta.has_next}
             pageStart={0}
             loadMore={loadMore}
             loader={

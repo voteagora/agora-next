@@ -195,29 +195,35 @@ export async function parseProposal(
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    created_time:
+    createdTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
         : latestBlock
           ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
           : null,
-    start_time:
+    startTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.start_ts * 1000)
         : latestBlock
           ? getHumanBlockTime(proposal.start_block, latestBlock)
           : null,
-    end_time:
+    endTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.end_ts * 1000)
         : latestBlock
           ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
           : null,
-    cancelled_time:
+    cancelledTime:
       proposalData.key === "SNAPSHOT"
         ? null
-        : latestBlock
-          ? getHumanBlockTime(proposal.cancelled_block ?? 0, latestBlock)
+        : latestBlock && proposal.cancelled_block
+          ? getHumanBlockTime(proposal.cancelled_block, latestBlock)
+          : null,
+    executedTime:
+      proposalData.key === "SNAPSHOT"
+        ? null
+        : latestBlock && proposal.executed_block
+          ? getHumanBlockTime(proposal.executed_block, latestBlock)
           : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
@@ -238,9 +244,9 @@ export async function parseProposal(
           votableSupply
         )
       : null,
-    created_transaction_hash: proposal.created_transaction_hash,
-    cancelled_transaction_hash: proposal.cancelled_transaction_hash,
-    executed_transaction_hash: proposal.executed_transaction_hash,
+    createdTransactionHash: proposal.created_transaction_hash,
+    cancelledTransactionHash: proposal.cancelled_transaction_hash,
+    executedTransactionHash: proposal.executed_transaction_hash,
   };
 }
 

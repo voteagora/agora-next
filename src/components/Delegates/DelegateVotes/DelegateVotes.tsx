@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
 import { formatNumber } from "@/lib/tokenUtils";
 import { formatDistanceToNow } from "date-fns";
@@ -8,12 +8,12 @@ import InfiniteScroll from "react-infinite-scroller";
 import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
 import VoteReason from "./DelegateVotesReason";
 import ApprovalVoteReason from "./ApprovalVoteReason";
-import { useDelegateVotesContext } from "@/contexts/DelegateVotesContext";
-import { delegatesVotesSortOptions } from "@/lib/constants";
 import { pluralizeVote } from "@/lib/tokenUtils";
 import DelegateVoteIcon from "./DelegateVoteIcon";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { Vote } from "@/app/api/common/votes/vote";
 
-function shortPropTitle(title, proosalId) {
+function shortPropTitle(title: string, proosalId: string) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
   const proposalsWithBadFormatting = [
     "114732572201709734114347859370226754519763657304898989580338326275038680037913",
@@ -27,7 +27,7 @@ function shortPropTitle(title, proosalId) {
     : title;
 }
 
-function propHeader(vote) {
+function propHeader(vote: Vote) {
   let headerString = "";
   if (vote.proposalType === "STANDARD" || vote.proposalType === "OPTIMISTIC")
     headerString = `Voted ${vote.support.toLowerCase()} this proposal `;
@@ -42,40 +42,40 @@ function propHeader(vote) {
   if (vote.proposalValue != 0n)
     headerString += ` asking ${formatNumber(vote.proposalValue)} ETH `;
 
-  headerString += `${formatDistanceToNow(new Date(vote.timestamp))} ago`;
+  headerString += `${formatDistanceToNow(new Date(vote.timestamp ?? 0))} ago`;
   return headerString;
 }
 
-const getUniqueDelegateVotes = (delegateVotes) => {
-  return delegateVotes
-    .map((e) => JSON.stringify(e))
-    .filter((e, i, a) => a.indexOf(e) === i)
-    .map((e) => JSON.parse(e));
-};
-
-export default function DelegateVotes({ fetchDelegateVotes }) {
-  const { delegatesVotesSort, delegateVotes, setDelegateVotes, meta, setMeta } =
-    useDelegateVotesContext();
-
-  const sortOrder = delegatesVotesSortOptions[delegatesVotesSort].sortOrder;
+export default function DelegateVotes({
+  initialVotes,
+  fetchDelegateVotes,
+}: {
+  initialVotes: PaginatedResult<Vote[]>;
+  fetchDelegateVotes: (
+    pagination: PaginationParams
+  ) => Promise<PaginatedResult<Vote[]>>;
+}) {
+  const [delegateVotes, setDelegateVotes] = useState(initialVotes.data);
+  const [meta, setMeta] = useState(initialVotes.meta);
 
   const fetching = useRef(false);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.hasNextPage) {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchDelegateVotes(meta.currentPage + 1, sortOrder);
+      const data = await fetchDelegateVotes({
+        offset: meta.next_offset,
+        limit: 20,
+      });
       setMeta(data.meta);
-      setDelegateVotes((prev) =>
-        getUniqueDelegateVotes(prev.concat(data.votes))
-      );
+      setDelegateVotes((prev) => prev.concat(data.data));
       fetching.current = false;
     }
   };
 
   return (
     <InfiniteScroll
-      hasMore={meta.hasNextPage}
+      hasMore={meta.has_next}
       pageStart={0}
       loadMore={loadMore}
       useWindow={false}
@@ -97,17 +97,17 @@ export default function DelegateVotes({ fetchDelegateVotes }) {
           vote && (
             <VoteDetailsContainer
               key={vote.transactionHash}
-              proposalId={vote.proposal_id}
+              proposalId={vote.proposalId}
             >
               <div>
                 <VStack className="py-4 px-6">
                   <HStack justifyContent="justify-between" gap={2}>
                     <VStack>
                       <span className="text-tertiary text-xs font-medium">
-                        {`${propHeader(vote)} with ${pluralizeVote(vote.weight, "optimism")}`}
+                        {`${propHeader(vote)} with ${pluralizeVote(BigInt(vote.weight))}`}
                       </span>
                       <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
-                        {shortPropTitle(vote.proposalTitle, vote.proposal_id)}
+                        {shortPropTitle(vote.proposalTitle, vote.proposalId)}
                       </h2>
                     </VStack>
                     <DelegateVoteIcon {...vote} />

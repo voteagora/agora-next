@@ -70,7 +70,7 @@ export default function OptionsResultsPanel({
         const votesAmountBN = BigInt(option?.votes || 0);
 
         const optionBudget =
-          (proposal?.created_time as Date) >
+          (proposal?.createdTime as Date) >
           contracts.governor.optionBudgetChangeDate!
             ? BigInt(option?.budgetTokensSpent || 0)
             : parseUnits(

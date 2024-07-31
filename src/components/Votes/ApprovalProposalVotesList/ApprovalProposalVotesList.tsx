@@ -1,40 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 
 type Props = {
-  initialProposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  initialProposalVotes: PaginatedResult<Vote[]>;
   fetchVotesForProposal: (
-    proposal_id: string,
-    page?: number
-  ) => Promise<{
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  }>;
-  fetchUserVotes: (proposal_id: string, address: string) => Promise<Vote[]>;
-  proposal_id: string;
+    proposalId: string,
+    pagintation: PaginationParams
+  ) => Promise<PaginatedResult<Vote[]>>;
+  fetchUserVotes: (proposalId: string, address: string) => Promise<Vote[]>;
+  proposalId: string;
 };
 
 export default function ApprovalProposalVotesList({
   initialProposalVotes,
   fetchVotesForProposal,
   fetchUserVotes,
-  proposal_id,
+  proposalId,
 }: Props) {
   const fetching = useRef(false);
   const [pages, setPages] = useState([initialProposalVotes] || []);
@@ -43,16 +30,19 @@ export default function ApprovalProposalVotesList({
   const { address: connectedAddress } = useAccount();
 
   const proposalVotes = pages.reduce(
-    (all: Vote[], page) => all.concat(page.votes),
+    (all: Vote[], page) => all.concat(page.data),
     []
   );
 
-  const loadMore = async (page: number) => {
-    if (!fetching.current && meta.hasNextPage) {
+  const loadMore = async () => {
+    if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchVotesForProposal(proposal_id, page);
+      const data = await fetchVotesForProposal(proposalId, {
+        limit: 20,
+        offset: meta.next_offset,
+      });
       const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
-      const uniqueVotes = data.votes.filter(
+      const uniqueVotes = data.data.filter(
         (v) => !existingIds.has(v.transactionHash)
       );
       setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
@@ -61,29 +51,31 @@ export default function ApprovalProposalVotesList({
     }
   };
 
-  const fetchUserVoteAndSet = async (proposal_id: string, address: string) => {
-    let fetchedUserVotes: Vote[];
-    try {
-      fetchedUserVotes = await fetchUserVotes(proposal_id, address);
-    } catch (error) {
-      fetchedUserVotes = [];
-    }
-    setUserVotes(fetchedUserVotes);
-  };
+  const fetchUserVoteAndSet = useCallback(
+    async (proposalId: string, address: string) => {
+      let fetchedUserVotes: Vote[];
+      try {
+        fetchedUserVotes = await fetchUserVotes(proposalId, address);
+      } catch (error) {
+        fetchedUserVotes = [];
+      }
+      setUserVotes(fetchedUserVotes);
+    },
+    [fetchUserVotes]
+  );
 
   useEffect(() => {
     if (connectedAddress) {
-      fetchUserVoteAndSet(proposal_id, connectedAddress);
+      fetchUserVoteAndSet(proposalId, connectedAddress);
     } else {
       setUserVotes([]);
     }
-  }, [connectedAddress, proposal_id]);
+  }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
     <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
-      {/* @ts-ignore */}
       <InfiniteScroll
-        hasMore={meta.hasNextPage}
+        hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}
         useWindow={false}

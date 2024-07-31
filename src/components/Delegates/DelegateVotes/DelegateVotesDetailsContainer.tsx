@@ -2,7 +2,13 @@ import React from "react";
 import { VStack } from "@/components/Layout/Stack";
 import Link from "next/link";
 
-function VoteDetailsContainer({ children, proposalId }) {
+function VoteDetailsContainer({
+  children,
+  proposalId,
+}: {
+  children: React.ReactNode;
+  proposalId: string;
+}) {
   return (
     <Link
       href={`/proposals/${proposalId}`}

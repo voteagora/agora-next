@@ -37,8 +37,7 @@ export async function GET(
       const offset = offsetValidator.parse(params.get("offset"));
 
       const projects = await fetchProjectsApi({
-        limit,
-        offset,
+        pagination: { limit, offset },
         round: roundId,
       });
       return NextResponse.json(projects);

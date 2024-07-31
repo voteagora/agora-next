@@ -28,7 +28,7 @@ export default function ProposalTitle({
           </>
         )}
         <a
-          href={getBlockScanUrl(proposal.created_transaction_hash ?? "")}
+          href={getBlockScanUrl(proposal.createdTransactionHash ?? "")}
           target="_blank"
           rel="noreferrer noopener"
         >
