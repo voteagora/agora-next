@@ -219,7 +219,7 @@ export function getInputData(proposal: DraftProposal): {
         optimisticModuleAddress,
         calldata,
         description,
-        0, // TODO: add proposalSettings
+        22, // TODO: add proposalSettings (22 is the optimistic proposal type for OP)
       ];
 
       return { inputData: optimisticInputData };

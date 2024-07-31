@@ -65,7 +65,7 @@ const DraftPreview = ({
       case "basic":
         return (
           <p className="text-agora-stone-700 mt-2">
-            This is a <pre>basic</pre> proposal
+            This is a <pre>basic</pre> proposal.
           </p>
         );
       case "approval":
@@ -91,7 +91,11 @@ const DraftPreview = ({
         );
 
       default:
-        return <p className="text-agora-stone-700 mt-2">This is a proposal</p>;
+        return (
+          <p className="text-agora-stone-700 mt-2">
+            This is an optimistic proposal
+          </p>
+        );
     }
   };
 
