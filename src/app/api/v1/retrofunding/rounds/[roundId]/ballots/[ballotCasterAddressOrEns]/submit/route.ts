@@ -31,6 +31,10 @@ export async function POST(
     });
   }
 
+  return new Response("Ballot submission for Round 4 is closed", {
+    status: 403,
+  });
+
   return await traceWithUserId(
     route.params.ballotCasterAddressOrEns as string,
     async () => {

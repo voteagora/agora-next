@@ -1,10 +1,10 @@
-import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { fetchProjectsApi } from "@/app/api/common/projects/getProjects";
-import { createOptionalNumberValidator } from "../../common/utils/validators";
+import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "../../../apiUtils";
+import { fetchVotesForDelegate } from "../../../../common/votes/getVotes";
+import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
 
-const DEFAULT_MAX_LIMIT = 100;
+const DEFAULT_MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
@@ -19,7 +19,10 @@ const offsetValidator = createOptionalNumberValidator(
   DEFAULT_OFFSET
 );
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  route: { params: { addressOrENSName: string } }
+) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -29,13 +32,14 @@ export async function GET(request: NextRequest) {
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
+      const { addressOrENSName } = route.params;
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
-
-      const projects = await fetchProjectsApi({
+      const proposal = await fetchVotesForDelegate({
+        addressOrENSName,
         pagination: { limit, offset },
       });
-      return NextResponse.json(projects);
+      return NextResponse.json(proposal);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

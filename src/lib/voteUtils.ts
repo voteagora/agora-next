@@ -6,7 +6,12 @@ import {
   ParsedProposalData,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
-import { Vote, VotePayload } from "@/app/api/common/votes/vote";
+import {
+  SnapshotVote,
+  Vote,
+  VotePayload,
+  SnapshotVotePayload,
+} from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -85,7 +90,7 @@ export function colorForSupportType(supportType: Support) {
  * Parse vote params
  */
 
-type ParsedParams = {
+export type ParsedParams = {
   APPROVAL: {
     key: "APPROVAL";
     kind: string[];
@@ -123,6 +128,19 @@ export function parseParams(
   }
 }
 
+export function parseSnapshotVote(vote: SnapshotVotePayload): SnapshotVote {
+  return {
+    id: vote.id,
+    title: vote.title || "",
+    address: vote.voter,
+    createdAt: new Date(Number(vote.created)),
+    choice: vote.choice,
+    votingPower: vote.vp,
+    reason: vote.reason || "",
+    choiceLabels: vote.choice_labels || {},
+  };
+}
+
 /**
  * Parse votes into votes response
  */
@@ -135,7 +153,7 @@ export function parseVote(
   return {
     transactionHash: vote.transaction_hash,
     address: vote.voter,
-    proposal_id: vote.proposal_id,
+    proposalId: vote.proposal_id,
     support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
     weight: vote.weight.toFixed(0),
     reason: vote.reason,

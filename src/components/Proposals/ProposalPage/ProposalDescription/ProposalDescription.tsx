@@ -10,20 +10,14 @@ import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 
 import { Vote } from "@/app/api/common/votes/vote";
+import { PaginatedResult } from "@/app/lib/pagination";
 
 export default function ProposalDescription({
   proposal,
   proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: {
-    meta: {
-      currentPage: number;
-      pageSize: number;
-      hasNextPage: boolean;
-    };
-    votes: Vote[];
-  };
+  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
@@ -75,13 +69,13 @@ export default function ProposalDescription({
             targets={option.targets}
             calldatas={option.calldatas}
             values={option.values}
-            executedTransactionHash={proposal.executed_transaction_hash}
+            executedTransactionHash={proposal.executedTransactionHash}
           />
         ) : (
           <ApprovedTransactions
             proposalData={proposal.proposalData}
             proposalType={proposal.proposalType}
-            executedTransactionHash={proposal.executed_transaction_hash}
+            executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
         <ReactMarkdown

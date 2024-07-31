@@ -1,4 +1,4 @@
-import { PaginatedResultEx, paginateResultEx } from "@/app/lib/pagination";
+import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import {
@@ -18,8 +18,8 @@ async function getImpactMetricCommentsApi({
   sort: string;
   limit: number;
   offset: number;
-}): Promise<PaginatedResultEx<ImpactMetricComment[]>> {
-  const comments = await paginateResultEx(
+}): Promise<PaginatedResult<ImpactMetricComment[]>> {
+  const comments = await paginateResult(
     (skip: number, take: number) => {
       switch (sort) {
         case "votes":

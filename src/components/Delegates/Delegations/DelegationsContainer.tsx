@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PaginatedResultEx } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -23,11 +23,11 @@ function DelegationsContainer({
   fetchDelegators,
 }: {
   delegatees: Delegation[];
-  initialDelegators: PaginatedResultEx<Delegation[]>;
+  initialDelegators: PaginatedResult<Delegation[]>;
   fetchDelegators: (params: {
     offset: number;
     limit: number;
-  }) => Promise<PaginatedResultEx<Delegation[]>>;
+  }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegators.meta);
