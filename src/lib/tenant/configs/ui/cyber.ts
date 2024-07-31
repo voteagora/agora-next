@@ -19,7 +19,7 @@ export const cyberTenantUIConfig = new TenantUI({
   },
 
   organization: {
-    title: "Cyber DAO",
+    title: "Cyber",
   },
 
   delegates: {
