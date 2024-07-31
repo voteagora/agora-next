@@ -1,15 +1,11 @@
-import {
-  fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals,
-} from "@/app/api/common/proposals/getNeedsMyVoteProposals";
+import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import {
   fetchDraftProposalForSponsor as apiFetchDraftProposalsForSponsorship,
   fetchDraftProposals as apiFetchDraftProposals,
   fetchProposals as apiFetchProposals,
 } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import {
-  fetchGovernanceCalendar as apiFetchGovernanceCalendar,
-} from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
+import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
@@ -25,7 +21,7 @@ export const revalidate = 60;
 
 async function fetchProposals(
   filter: string,
-  pagination = { limit: 10, offset: 0 },
+  pagination = { limit: 10, offset: 0 }
 ) {
   "use server";
   return apiFetchProposals({ filter, pagination });
@@ -53,7 +49,7 @@ export async function generateMetadata() {
   const { title, description, imageTitle, imageDescription } = page!.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
-    imageTitle,
+    imageTitle
   )}&description=${encodeURIComponent(imageDescription)}`;
 
   return {
@@ -85,10 +81,10 @@ async function Home() {
 
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
-    proposalsFilterOptions.relevant.filter,
+    proposalsFilterOptions.relevant.filter
   );
   const allProposals = await fetchProposals(
-    proposalsFilterOptions.everything.filter,
+    proposalsFilterOptions.everything.filter
   );
 
   const votableSupply = await fetchVotableSupply();
@@ -132,7 +128,7 @@ async function Home() {
         initAllProposals={allProposals}
         fetchProposals={async (
           pagination: PaginationParams,
-          filter: string,
+          filter: string
         ) => {
           "use server";
           return fetchProposals(filter, pagination);
