@@ -114,14 +114,19 @@ async function getProposal(proposalId: string) {
 async function getProposalTypes() {
   const { namespace, contracts } = Tenant.current();
 
-  return prisma[`${namespace}ProposalTypes`].findMany({
-    where: {
-      contract: contracts.proposalTypesConfigurator!.address,
-      name: {
-        not: "",
+  try {
+    const results = await prisma[`${namespace}ProposalTypes`].findMany({
+      where: {
+        contract: contracts.proposalTypesConfigurator!.address,
+        name: {
+          not: "",
+        },
       },
-    },
-  });
+    });
+    return results;
+  } catch (error) {
+    return [];
+  }
 }
 
 async function getDraftProposals(address: `0x${string}`) {

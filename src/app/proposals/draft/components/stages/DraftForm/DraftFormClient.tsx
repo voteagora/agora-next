@@ -1,16 +1,17 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
-import FormCard from "../form/FormCard";
-import TextInput from "../form/TextInput";
-import MarkdownTextareaInput from "../form/MarkdownTextareaInput";
+import FormCard from "../../form/FormCard";
+import TextInput from "../../form/TextInput";
+import SelectInput from "../../form/SelectInput";
+import MarkdownTextareaInput from "../../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
-import { DraftProposalSchema } from "../../schemas/DraftProposalSchema";
-import { onSubmitAction as draftProposalAction } from "../../actions/createDraftProposal";
+import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
+import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
 import {
   ProposalType,
   SocialProposalType,
@@ -18,12 +19,12 @@ import {
   parseProposalToForm,
   DraftProposal,
   ApprovalProposal,
-} from "../../types";
-import BasicProposalForm from "../BasicProposalForm";
-import SocialProposalForm from "../SocialProposalForm";
-import ApprovalProposalForm from "../ApprovalProposalForm";
-import OptimisticProposalForm from "../OptimisticProposalForm";
-import SwitchInput from "../form/SwitchInput";
+} from "../../../types";
+import BasicProposalForm from "../../BasicProposalForm";
+import SocialProposalForm from "../../SocialProposalForm";
+import ApprovalProposalForm from "../../ApprovalProposalForm";
+import OptimisticProposalForm from "../../OptimisticProposalForm";
+import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
@@ -42,7 +43,35 @@ const DEFAULT_FORM = {
   },
 };
 
-const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
+const getValidProposalTypesForVotingType = (
+  proposalTypes: any[],
+  proposalType: ProposalType
+) => {
+  switch (proposalType) {
+    case ProposalType.OPTIMISTIC:
+      return proposalTypes.filter((type) => {
+        return type.quorum === "0" && type.approval_threshold === "0";
+      });
+
+    // currently no constraints on these voting modules
+    case ProposalType.BASIC:
+    case ProposalType.SOCIAL:
+    case ProposalType.APPROVAL:
+    default:
+      return proposalTypes;
+  }
+};
+
+const DraftFormClient = ({
+  draftProposal,
+  proposalTypes,
+}: {
+  draftProposal: DraftProposal;
+  proposalTypes: any[];
+}) => {
+  const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
+    getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
+  );
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const router = useRouter();
@@ -57,6 +86,22 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
 
   const proposalType = watch("type");
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
+
+  useEffect(() => {
+    const newValidProposalTypes = getValidProposalTypesForVotingType(
+      proposalTypes,
+      proposalType
+    );
+
+    setValidProposalTypes(newValidProposalTypes);
+
+    if (newValidProposalTypes.length > 0) {
+      methods.setValue(
+        "proposalConfigType",
+        newValidProposalTypes[0].proposal_type_id
+      );
+    }
+  }, [proposalType, proposalTypes, methods]);
 
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
     setIsPending(true);
@@ -93,7 +138,7 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               <div className="grid grid-cols-2 gap-4">
                 <SwitchInput
                   control={control}
-                  label="Proposal type"
+                  label="Voting module"
                   required={true}
                   options={Object.values([
                     ...(plmToggle?.config?.proposalTypes || []),
@@ -104,6 +149,20 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                 <p className="text-sm self-center text-agora-stone-700 mt-4">
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 relative">
+                <SelectInput
+                  control={control}
+                  label="Proposal type"
+                  required={true}
+                  options={validProposalTypes.map((typeConfig) => {
+                    return {
+                      label: typeConfig.name,
+                      value: typeConfig.proposal_type_id,
+                    };
+                  })}
+                  name="proposalConfigType"
+                />
               </div>
 
               <TextInput
@@ -162,4 +221,4 @@ const DraftForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   );
 };
 
-export default DraftForm;
+export default DraftFormClient;

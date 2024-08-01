@@ -4,12 +4,6 @@ import DraftProposalChecklist from "../components/DraftProposalChecklist";
 import BackButton from "../components/BackButton";
 import prisma from "@/app/lib/prisma";
 import {
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-  ProposalChecklist,
-} from "@prisma/client";
-import {
   getStageMetadata,
   isPostSubmission,
   GET_DRAFT_STAGES,
