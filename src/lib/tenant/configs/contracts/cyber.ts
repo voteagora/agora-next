@@ -57,6 +57,12 @@ export const cyberTenantConfig = ({
     ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"
     : "0x741005a136766e6E03eD8A7cc32D6a91241E5BF5";
 
+  // Right now there are no sepolia treasury accounts for uniswap.
+  // They are set to match.
+  const TREASURY = isProd
+    ? ["0x23f4F627EC82001c422658d87BA65C2D4AdDa794"]
+    : ["0xEb3aef5D867109E734fB08E7b1f7b7bba8226aa3"];
+
   // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
   const provider = new JsonRpcProvider("https://cyber.alt.technology");
   const chain = cyber;
@@ -77,5 +83,7 @@ export const cyberTenantConfig = ({
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
+
+    treasury: TREASURY,
   };
 };

@@ -59,9 +59,35 @@ const infoAbout = {
       },
     ],
   },
+  cyber: {
+    description:
+      "The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
+    sectionImage: uniswapInfoAbout,
+
+    featureList: [
+      {
+        icon: icons.coins,
+        title: "Delegate voting power",
+        description:
+          "The collective is governed by the project’s token holders who are represented by delegates.",
+      },
+      {
+        icon: icons.notificationMessage,
+        title: "Browse proposals",
+        description:
+          "Governance decisions begin as proposals and are a lens into the community’s priorities.",
+      },
+      {
+        icon: icons.checkCircleBroken,
+        title: "Vote on proposals",
+        description:
+          "Proposals that move to a vote are accepted or rejected by delegates.",
+      },
+    ],
+  },
 };
 
-const About = () => {
+const InfoAbout = () => {
   const { namespace } = Tenant.current();
 
   return (
@@ -116,4 +142,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default InfoAbout;

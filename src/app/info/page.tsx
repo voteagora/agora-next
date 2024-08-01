@@ -1,5 +1,5 @@
 import React from "react";
-import About from "@/app/info/components/InfoAbout";
+import InfoAbout from "@/app/info/components/InfoAbout";
 import { InfoHero } from "@/app/info/components/InfoHero";
 
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
@@ -51,19 +51,25 @@ export default async function Page() {
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     // Default treasury data
-    const data = await apiFetchTreasuryBalanceTS(FREQUENCY_FILTERS.YEAR);
+    const treasuryData = await apiFetchTreasuryBalanceTS(
+      FREQUENCY_FILTERS.YEAR
+    );
+    const hasTreasuryData = treasuryData.result.length > 0;
+
     return (
       <div className="flex flex-col font-inter">
         <InfoHero />
-        <About />
+        <InfoAbout />
         <GovernorSettings />
-        <ChartTreasury
-          initialData={data.result}
-          getData={async (frequency: string) => {
-            "use server";
-            return apiFetchTreasuryBalanceTS(frequency);
-          }}
-        />
+        {hasTreasuryData && (
+          <ChartTreasury
+            initialData={treasuryData.result}
+            getData={async (frequency: string) => {
+              "use server";
+              return apiFetchTreasuryBalanceTS(frequency);
+            }}
+          />
+        )}
         <GovernanceCharts
           getDelegates={async () => {
             "use server";
