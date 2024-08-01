@@ -1,3 +1,5 @@
+"use client";
+
 import DraftPreview from "../DraftPreview";
 import { useAccount, useBlockNumber } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
