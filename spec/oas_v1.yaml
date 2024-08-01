@@ -1485,14 +1485,17 @@ paths:
       parameters:
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
-        - name: sort
+        - name: filter
           in: query
           description: >
-            The desired method by which returned votes will be sorted.
-            Supported values are: 'status', 'term'
+            The desired method by which returned votes will be filtered.
+            Supported values are: 'relevant', 'everything'
           required: false
           schema:
             type: string
+            enum:
+              - relevant
+              - everything
       responses:
         "200":
           description: OK
