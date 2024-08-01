@@ -88,6 +88,8 @@ export const uniswapTenantUIConfig = new TenantUI({
       meta: {
         title: "Uniswap Agora",
         description: "Home of token governance",
+        imageTitle: "Uniswap Agora",
+        imageDescription: "Home of token governance",
       },
     },
     {
@@ -98,6 +100,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
+        imageTitle: "Voter on Agora",
+        imageDescription:
+          "Delegate your voting power to a trusted representative",
       },
     },
     {
@@ -108,6 +113,8 @@ export const uniswapTenantUIConfig = new TenantUI({
       meta: {
         title: "Uniswap Agora",
         description: "Home of token governance",
+        imageTitle: "Uniswap Agora",
+        imageDescription: "Home of token governance",
       },
     },
     {
@@ -118,6 +125,8 @@ export const uniswapTenantUIConfig = new TenantUI({
       meta: {
         title: "Info of Agora",
         description: "Welcome to the Optimism Collective",
+        imageTitle: "Info of Agora",
+        imageDescription: "Welcome to the Optimism Collective",
       },
       links: [
         {
