@@ -9,6 +9,8 @@ import infoPageCard02 from "@/assets/tenant/cyber_info_2.png";
 import infoPageCard03 from "@/assets/tenant/cyber_info_3.png";
 import infoPageCard04 from "@/assets/tenant/cyber_info_4.png";
 import infoPageHero from "@/assets/tenant/cyber_info_hero.png";
+import { ProposalType } from "@/app/proposals/draft/types";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
@@ -203,6 +205,45 @@ export const cyberTenantUIConfig = new TenantUI({
     {
       name: "info",
       enabled: true,
+    },
+    {
+      name: "proposal-lifecycle",
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [
+          ProposalType.BASIC,
+          ProposalType.APPROVAL,
+          ProposalType.OPTIMISTIC,
+        ],
+        copy: {},
+      },
     },
   ],
 });
