@@ -45,16 +45,12 @@ async function fetchGovernanceCalendar() {
 export async function generateMetadata() {
   const { ui, namespace } = Tenant.current();
 
-  if (!ui.toggle("proposals")) {
-    return;
-  }
-
   const page = ui.page("proposals");
-  const { title, description } = page!.meta;
+  const { title, description, imageTitle, imageDescription } = page!.meta;
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
-    title
-  )}&description=${encodeURIComponent(description)}`;
+    imageTitle
+  )}&description=${encodeURIComponent(imageDescription)}`;
 
   return {
     title: title,

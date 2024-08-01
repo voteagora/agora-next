@@ -19,7 +19,7 @@ export const cyberTenantUIConfig = new TenantUI({
   },
 
   organization: {
-    title: "Cyber DAO",
+    title: "Cyber",
   },
 
   delegates: {
@@ -86,6 +86,8 @@ export const cyberTenantUIConfig = new TenantUI({
       meta: {
         title: "Welcome to Cyber governance",
         description: "Home of token governance",
+        imageTitle: "IN IMAGE",
+        imageDescription: "IN IMAGE DESCRIPTION",
       },
     },
     {
@@ -94,8 +96,11 @@ export const cyberTenantUIConfig = new TenantUI({
       description:
         "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
       meta: {
-        title: "Cyber Governance",
-        description: "Participate in the Cyber DAO",
+        title: "Contribute to CyberDAO with your staked CYBER",
+        description:
+          "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
+        imageTitle: "Cyber Governance",
+        imageDescription: "Participate in the CyberDAO",
       },
     },
     {
@@ -106,6 +111,8 @@ export const cyberTenantUIConfig = new TenantUI({
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
+        imageTitle: "IN IMAGE",
+        imageDescription: "IN IMAGE DESCRIPTION",
       },
     },
   ],
