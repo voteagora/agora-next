@@ -22,6 +22,8 @@ type UIPage = {
   meta: {
     title: string;
     description: string;
+    imageTitle: string;
+    imageDescription: string;
   };
 };
 

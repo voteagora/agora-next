@@ -99,14 +99,14 @@ export function DelegateProfileImage({
                 <TooltipTrigger>
                   <Image
                     src={icons.endorsed}
-                    alt={`Endorsed by ${ui.organization?.title}`}
+                    alt={`Endorsed by ${ui.organization?.title} team`}
                     className="w-4 h-4"
                   />
                 </TooltipTrigger>
 
                 <TooltipContent>
                   <div className="text-xs">
-                    Endorsed by {ui.organization?.title}
+                    Endorsed by {ui.organization?.title} team
                   </div>
                 </TooltipContent>
               </Tooltip>
