@@ -80,7 +80,7 @@ export function getInputData(proposal: DraftProposal): {
         values,
         calldatas,
         description,
-        0,
+        parseInt(proposal.proposal_config_type || "0"),
       ];
 
       if (proposal.transactions.length === 0) {
@@ -189,7 +189,7 @@ export function getInputData(proposal: DraftProposal): {
         approvalModuleAddress,
         calldata,
         description,
-        0, // TODO: add proposalSettings
+        parseInt(proposal.proposal_config_type || "0"),
       ];
 
       return { inputData: approvalInputData };
@@ -219,7 +219,7 @@ export function getInputData(proposal: DraftProposal): {
         optimisticModuleAddress,
         calldata,
         description,
-        22, // TODO: add proposalSettings (22 is the optimistic proposal type for OP)
+        parseInt(proposal.proposal_config_type || "0"),
       ];
 
       return { inputData: optimisticInputData };

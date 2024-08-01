@@ -19,11 +19,6 @@ const DraftFormServer = async ({
   draftProposal: DraftProposal;
 }) => {
   const proposalTypes = await getProposalTypes();
-  //   const proposalTypes = [
-  //     { id: 1, name: "test" },
-  //     { id: 2, name: "test2" },
-  //     { id: 3, name: "test3" },
-  //   ];
 
   return (
     <DraftFormClient
