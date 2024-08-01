@@ -100,7 +100,7 @@ export const cyberTenantUIConfig = new TenantUI({
         description:
           "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
         imageTitle: "Cyber Governance",
-        imageDescription: "Participate in the CyberDAO",
+        imageDescription: "Participate in CyberDAO",
       },
     },
     {
