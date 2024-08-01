@@ -4,6 +4,10 @@ import cyberLogo from "@/assets/tenant/cyber_logo.svg";
 import delegateImage from "@/assets/tenant/cyber_delegate.svg";
 import successImage from "@/assets/tenant/cyber_success.svg";
 import pendingImage from "@/assets/tenant/cyber_pending.svg";
+import infoPageCard01 from "@/assets/tenant/uniswap_info_1.png";
+import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
+import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
+import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
@@ -115,9 +119,51 @@ export const cyberTenantUIConfig = new TenantUI({
         imageDescription: "IN IMAGE DESCRIPTION",
       },
     },
+    {
+      route: "info",
+      title: "CyberDAO Governance",
+      description:
+        "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
+      meta: {
+        title: "Info of Agora",
+        description: "Welcome to the CyberDAO",
+        imageTitle: "Info of Agora",
+        imageDescription: "Welcome to CyberDAO",
+      },
+      links: [
+        {
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "https://discord.com/invite/FCfyBSbCU5",
+          image: infoPageCard01,
+        },
+        {
+          name: "Governance Forums",
+          title: "Governance Forums",
+          url: "https://gov.uniswap.org",
+          image: infoPageCard02,
+        },
+        {
+          name: "Protocol Docs",
+          title: "Protocol Docs",
+          url: "https://docs.uniswap.org",
+          image: infoPageCard03,
+        },
+        {
+          name: "Uniswap Labs",
+          title: "Uniswap Labs",
+          url: "https://x.com/Uniswap",
+          image: infoPageCard04,
+        },
+      ],
+    },
   ],
 
   toggles: [
+    {
+      name: "proposals",
+      enabled: true,
+    },
     {
       name: "delegates",
       enabled: true,
@@ -133,6 +179,10 @@ export const cyberTenantUIConfig = new TenantUI({
     {
       name: "delegates/code-of-conduct",
       enabled: true,
+    },
+    {
+      name: "info",
+      enabled: false,
     },
   ],
 });
