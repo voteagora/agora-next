@@ -24,6 +24,9 @@ const BasicProposalAction = ({
    * Linea: tbd
    * Uni: tbd
    */
+
+  // TODO: input data contains proposal type, but I don't think OZ based proposals have proposal type
+  // So we need to check which type of governor we are dealing with, based on the tenant, and act accordingly.
   const { config } = usePrepareContractWrite({
     address: contracts.governor.address as `0x${string}`,
     chainId: contracts.governor.chain.id,

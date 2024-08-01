@@ -69,14 +69,16 @@ const DraftFormClient = ({
   draftProposal: DraftProposal;
   proposalTypes: any[];
 }) => {
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
-  const tenant = Tenant.current();
-  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
   const router = useRouter();
   const { address } = useAccount();
-  const [isPending, setIsPending] = useState<boolean>(false);
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,

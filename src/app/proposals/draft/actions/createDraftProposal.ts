@@ -131,6 +131,7 @@ export async function onSubmitAction(
       title: parsed.data.title,
       abstract: parsed.data.abstract,
       proposal_type: parsed.data.type,
+      proposal_config_type: parsed.data.proposalConfigType,
     };
 
     const updateDraft = prisma.proposalDraft.update({
