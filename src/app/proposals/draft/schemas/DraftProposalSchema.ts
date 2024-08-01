@@ -88,7 +88,7 @@ const approvalProposal = z
 
 const BaseProposalSchema = z.object({
   type: z.nativeEnum(ProposalType),
-  proposalConfigType: z.string(),
+  proposalConfigType: z.string().optional(),
   title: z.string().min(1, { message: "Title cannot be empty" }),
   abstract: z.string().min(1, { message: "Abstract cannot be empty" }),
 });

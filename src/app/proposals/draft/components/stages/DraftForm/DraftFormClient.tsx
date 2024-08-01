@@ -164,6 +164,7 @@ const DraftFormClient = ({
                     };
                   })}
                   name="proposalConfigType"
+                  emptyCopy="Default"
                 />
               </div>
 

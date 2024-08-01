@@ -245,9 +245,9 @@ export const optimismTenantUIConfig = new TenantUI({
           },
         ],
         proposalTypes: [
-          ProposalType.BASIC,
-          ProposalType.APPROVAL,
-          ProposalType.OPTIMISTIC,
+          ProposalType?.BASIC,
+          ProposalType?.APPROVAL,
+          ProposalType?.OPTIMISTIC,
         ],
         copy: {},
       },
