@@ -182,7 +182,7 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
-      enabled: false,
+      enabled: true,
     },
   ],
 });
