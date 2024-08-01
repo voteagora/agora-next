@@ -27,7 +27,11 @@ const BasicProposalAction = ({
 
   // TODO: input data contains proposal type, but I don't think OZ based proposals have proposal type
   // So we need to check which type of governor we are dealing with, based on the tenant, and act accordingly.
-  const { config } = usePrepareContractWrite({
+  const {
+    config,
+    isError: onPrepareError,
+    error,
+  } = usePrepareContractWrite({
     address: contracts.governor.address as `0x${string}`,
     chainId: contracts.governor.chain.id,
     abi: contracts.governor.abi,
@@ -38,30 +42,38 @@ const BasicProposalAction = ({
   const { writeAsync, isLoading: isWriteLoading } = useContractWrite(config);
 
   return (
-    <UpdatedButton
-      isLoading={isWriteLoading}
-      fullWidth={true}
-      type="primary"
-      onClick={async () => {
-        try {
-          const data = await writeAsync?.();
-          await sponsorDraftProposal({
-            draftProposalId: draftProposal.id,
-            onchain_transaction_hash: data?.hash,
-          });
+    <>
+      <UpdatedButton
+        isLoading={isWriteLoading}
+        fullWidth={true}
+        type="primary"
+        onClick={async () => {
+          try {
+            const data = await writeAsync?.();
+            await sponsorDraftProposal({
+              draftProposalId: draftProposal.id,
+              onchain_transaction_hash: data?.hash,
+            });
 
-          openDialog({
-            type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
-            params: {
-              redirectUrl: "/",
-              txHash: data?.hash as `0x${string}`,
-            },
-          });
-        } catch (error) {}
-      }}
-    >
-      Submit proposal
-    </UpdatedButton>
+            openDialog({
+              type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
+              params: {
+                redirectUrl: "/",
+                txHash: data?.hash as `0x${string}`,
+              },
+            });
+          } catch (error) {}
+        }}
+      >
+        Submit proposal
+      </UpdatedButton>
+
+      {onPrepareError && (
+        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary">
+          {error?.message}
+        </div>
+      )}
+    </>
   );
 };
 
