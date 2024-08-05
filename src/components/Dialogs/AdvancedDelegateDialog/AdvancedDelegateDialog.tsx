@@ -1,4 +1,3 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import useAdvancedDelegation from "./useAdvancedDelegation";
@@ -11,7 +10,7 @@ import {
 } from "react";
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
-import { ChevronsRight, DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
+import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
@@ -189,11 +188,7 @@ export function AdvancedDelegateDialog({
 
   return (
     <>
-      <VStack
-        justifyContent="justify-center"
-        alignItems="items-center"
-        className="w-full"
-      >
+      <div className="flex flex-col w-full justify-center items-center">
         {showMessage ? (
           <div>
             <Message setShowMessage={setShowMessage} />
@@ -206,20 +201,20 @@ export function AdvancedDelegateDialog({
               availableBalance !== "" &&
               !!delegatees &&
               proxyAddress !== "" ? (
-              <VStack className="relative" gap={1}>
-                <VStack className="text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative">
-                  <HStack alignItems="items-center" gap={1}>
+              <div className="flex flex-col relative gap-1">
+                <div className="flex flex-col text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative">
+                  <div className="flex flex-row items-center gap-1">
                     Your total delegatable votes{" "}
                     <InfoIcon
                       size={12}
                       className="cursor-pointer opacity-70"
                       onClick={() => setShowInfo(true)}
                     />
-                  </HStack>
+                  </div>
                   <AdvancedDelegationDisplayAmount amount={availableBalance} />
-                </VStack>
-                <VStack
-                  className={`overflow-y-scroll ${overflowDelegation ? "max-h-[240px] sm:max-h-[400px]" : "max-h-[400px]"}`}
+                </div>
+                <div
+                  className={`flex flex-col overflow-y-scroll ${overflowDelegation ? "max-h-[240px] sm:max-h-[400px]" : "max-h-[400px]"}`}
                 >
                   {delegatees.map((delegatee, index) => (
                     <SubdelegationToRow
@@ -232,7 +227,7 @@ export function AdvancedDelegateDialog({
                       setOverFlowDelegation={setOverFlowDelegation}
                     />
                   ))}
-                </VStack>
+                </div>
 
                 {showInfo && (
                   <InfoDialog
@@ -243,6 +238,15 @@ export function AdvancedDelegateDialog({
                     directDelegatedVP={directDelegatedVP}
                   />
                 )}
+
+                {overflowDelegation && (
+                  <div className="text-xs max-w-md rounded-bl-xl mt-4">
+                    You have delegated more than the total delegatable votes you
+                    have. Please reduce your current delegation before
+                    delegating more
+                  </div>
+                )}
+
                 {address ? (
                   isError ? (
                     <Button
@@ -270,28 +274,15 @@ export function AdvancedDelegateDialog({
                     Connect wallet to delegate
                   </Button>
                 )}
-              </VStack>
+              </div>
             ) : (
-              <VStack
-                className="w-full h-[318px]"
-                alignItems="items-center"
-                justifyContent="justify-center"
-              >
+              <div className="flex flex-col w-full h-[318px] items-center justify-center">
                 <AgoraLoaderSmall />
-              </VStack>
+              </div>
             )}
           </div>
         )}
-      </VStack>
-      {overflowDelegation && (
-        <p
-          className="text-xs bg-wash p-6 pb-3 pt-6 mt-3 left-0 max-w-md rounded-bl-xl rounded-br-xl absolute"
-          style={{ transform: "translateZ(-1px)" }}
-        >
-          You have delegated more than the total delegatable votes you have.
-          Please reduce your current delegation before delegating more
-        </p>
-      )}
+      </div>
     </>
   );
 }
@@ -312,9 +303,9 @@ function InfoDialog({
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
   return (
     <div className="absolute w-full bg-neutral rounded-lg shadow-newDefault">
-      <VStack
+      <div
         className={
-          "text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative" +
+          "flex flex-col text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative" +
           " !pb-0 !px-0"
         }
       >
@@ -324,29 +315,19 @@ function InfoDialog({
         >
           <CloseIcon className="w-4" />
         </div>
-        <HStack alignItems="items-center" gap={1}>
+        <div className="flex flex-row items-center gap-1">
           Your total delegatable votes{" "}
           <InfoIcon size={12} className="opacity-50" />
-        </HStack>
+        </div>
         <AdvancedDelegationDisplayAmount amount={availableBalance} />
-        <VStack
-          className="w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-line max-h-[256px] overflow-y-scroll"
-          alignItems="items-start"
-          gap={3}
-        >
-          <HStack
-            alignItems="items-center"
-            justifyContent="justify-between"
-            className="w-full"
-          >
+        <div className="flex flex-col items-start gap-3 w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-line max-h-[256px] overflow-y-scroll">
+          <div className="flex flex-row w-full items-center justify-between">
             <p>You own</p>
             <TokenAmountDisplay amount={balance} />
-          </HStack>
+          </div>
           {delegators?.map((delegator, index) => (
-            <HStack
-              alignItems="items-center"
-              justifyContent="justify-between"
-              className="w-full"
+            <div
+              className="flex flex-row w-full items-center justify-between"
               key={index}
             >
               <p>
@@ -354,9 +335,9 @@ function InfoDialog({
                 &apos;s delegation
               </p>
               <TokenAmountDisplay amount={BigInt(delegator.allowance)} />
-            </HStack>
+            </div>
           ))}
-        </VStack>
+        </div>
         {directDelegatedFromOthers > 0n && (
           <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
             You’ve been delegated an additional{" "}
@@ -365,7 +346,7 @@ function InfoDialog({
             votes and cannot pass them to others.
           </p>
         )}
-      </VStack>
+      </div>
     </div>
   );
 }
@@ -377,8 +358,8 @@ function Message({
 }) {
   return (
     <div className="relative">
-      <VStack gap={4}>
-        <VStack gap={1}>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
           <div className="text-primary text-xl font-bold">
             Welcome to advanced delegation
           </div>
@@ -387,9 +368,9 @@ function Message({
             which lets you manage your voting power with more control and
             flexibility.
           </div>
-        </VStack>
+        </div>
 
-        <VStack gap={3} className="border border-line rounded-lg p-4">
+        <div className="flex flex-col gap-3 border border-line rounded-lg p-4">
           <div className="flex items-center">
             <DivideIcon size={20} className="mr-2 text-red-500" />
             <p>Split your delegation to multiple people</p>
@@ -398,7 +379,7 @@ function Message({
             <Repeat2 size={20} className="mr-2 text-red-500" />
             <p>Let your delegates re-delegate</p>
           </div>
-        </VStack>
+        </div>
         <Button
           className="bg-black text-neutral text-center w-full h-full"
           onClick={() => {
@@ -407,7 +388,7 @@ function Message({
         >
           Continue
         </Button>
-      </VStack>
+      </div>
     </div>
   );
 }
