@@ -40,6 +40,12 @@ export function getHumanBlockTime(
       );
     }
 
+    //
+    case 0:
+      const estNewDaoSecondsDiff =
+        Number(latestBlock.number) - Number(blockNumber) * 3; // 3 seconds per block
+      return new Date((latestBlock.timestamp - estNewDaoSecondsDiff) * 1000);
+
     //   Cyber Mainnet
     //   Cyber Testnet
     case 7560:
