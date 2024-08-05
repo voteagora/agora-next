@@ -43,8 +43,10 @@ type BasicInputData = [
   string,
   Number,
 ];
+
+type OZBasicInputData = [`0x${string}`[], bigint[], `0x${string}`[], string];
 type ApprovalInputData = [string, string, string, Number];
-type InputData = BasicInputData | ApprovalInputData | null;
+type InputData = OZBasicInputData | BasicInputData | ApprovalInputData | null;
 
 const isTransfer = (calldata: string) => {
   // Function Selector: The first 4 bytes of calldata 0xa9059cbb for transfer(address,uint256)
@@ -75,7 +77,7 @@ export function getInputData(proposal: DraftProposal): {
       let targets: `0x${string}`[] = [];
       let values: bigint[] = [];
       let calldatas: `0x${string}`[] = [];
-      let inputData: BasicInputData = [
+      let inputData: BasicInputData | OZBasicInputData = [
         targets,
         values,
         calldatas,
@@ -93,6 +95,13 @@ export function getInputData(proposal: DraftProposal): {
           values.push(parseEther(t.value.toString() || "0"));
           calldatas.push(t.calldata as `0x${string}`);
         });
+      }
+
+      // OZ governor does not have proposal types
+      // need a better way to read which governor a particular tenant is on
+      // would be great if we could read this from the contract, or the tenant
+      if (tenant.namespace === "ens") {
+        inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
       return { inputData };

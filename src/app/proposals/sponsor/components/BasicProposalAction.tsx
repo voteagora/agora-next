@@ -46,10 +46,16 @@ const BasicProposalAction = ({
       <UpdatedButton
         isLoading={isWriteLoading}
         fullWidth={true}
-        type="primary"
+        type={onPrepareError ? "disabled" : "primary"}
         onClick={async () => {
           try {
             const data = await writeAsync?.();
+            if (!data) {
+              // for dev
+              console.log(error);
+              return;
+            }
+
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data?.hash,
@@ -69,7 +75,7 @@ const BasicProposalAction = ({
       </UpdatedButton>
 
       {onPrepareError && (
-        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary">
+        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary break-words hyphens-auto">
           {error?.message}
         </div>
       )}

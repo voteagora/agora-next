@@ -65,7 +65,7 @@ const DraftPreview = ({
       case "basic":
         return (
           <p className="text-agora-stone-700 mt-2">
-            This is a <pre>basic</pre> proposal.
+            This is a <PreText text="basic" /> proposal.
           </p>
         );
       case "approval":
@@ -86,14 +86,15 @@ const DraftPreview = ({
       case "social":
         return (
           <p className="text-agora-stone-700 mt-2">
-            This is a social proposal. Voters will vote on snapshot.
+            This is a <PreText text="social" /> proposal. Voters will vote on
+            snapshot.
           </p>
         );
 
       default:
         return (
           <p className="text-agora-stone-700 mt-2">
-            This is an optimistic proposal
+            This is an <PreText text="optimistic" /> proposal
           </p>
         );
     }

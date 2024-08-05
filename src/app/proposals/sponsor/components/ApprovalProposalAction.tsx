@@ -33,7 +33,7 @@ const ApprovalProposalAction = ({
       <UpdatedButton
         isLoading={isWriteLoading}
         fullWidth={true}
-        type="primary"
+        type={onPrepareError ? "disabled" : "primary"}
         onClick={async () => {
           try {
             const data = await writeAsync?.();
