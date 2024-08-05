@@ -96,11 +96,11 @@ const PriorityPill = ({
   return (
     <div
       className={`${
-        active ? "border-agora-stone-700" : "border-agora-stone-100"
+        active ? "border-secondary" : "border-line"
       } flex flex-row border rounded-full px-4 py-2 cursor-pointer`}
       onClick={onClick}
     >
-      <span className="flex-1 font-medium text-agora-stone-700">
+      <span className="flex-1 font-medium text-secondary">
         <span className="mr-2">{icon}</span>
         <span>{title}</span>
       </span>
@@ -119,14 +119,14 @@ const DelegateCard = ({
 }) => {
   return (
     <div
-      className={`${active ? "bg-agora-stone-50" : "bg-white"} border border-agora-stone-100 rounded-xl p-4 cursor-pointer`}
+      className={`${active ? "bg-agora-stone-50" : "bg-white"} border border-line rounded-xl p-4 cursor-pointer`}
       onClick={onClick}
     >
       <div className="flex flex-row">
-        <span className="h-10 w-10 rounded-full bg-agora-stone-500 mr-4"></span>
+        <span className="h-10 w-10 rounded-full bg-tertiary mr-4"></span>
         <div className="flex flex-col flex-1">
           <h3 className="font-semibold">Delegate 1</h3>
-          <span className="text-xs text-agora-stone-700 font-semibold">
+          <span className="text-xs text-secondary font-semibold">
             700k total voting power • 8 delegates
           </span>
         </div>
@@ -170,9 +170,9 @@ const DelegationStage = ({
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+        <div className="bg-white rounded-2xl border border-line p-6">
           <h2 className="font-black text-2xl">Choose one or more delegates</h2>
-          <p className="text-agora-stone-700">
+          <p className="text-secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
             lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
             consectetur adipiscing elit. Aliquam eu lectus dignissim, porta
@@ -221,10 +221,10 @@ const DelegationStage = ({
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-white rounded-2xl border border-agora-stone-100 p-6 shadow-newDefault relative">
+          <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault relative">
             <h2 className="font-black text-2xl mb-6">Your delegates</h2>
             {selectedDelegates.length === 0 ? (
-              <p className="text-agora-stone-700">
+              <p className="text-secondary">
                 You have not selected any delegates
               </p>
             ) : (
@@ -233,10 +233,10 @@ const DelegationStage = ({
                   key={`selected-delegate-${idx}`}
                   className="first:mt-0 mt-4 flex flex-row items-center"
                 >
-                  <span className="h-10 w-10 rounded-full bg-agora-stone-100 mr-4"></span>
+                  <span className="h-10 w-10 rounded-full bg-wash mr-4"></span>
                   <div className="flex flex-col flex-1">
                     <h3 className="font-semibold">Delegate {idx + 1}</h3>
-                    <p className="text-agora-stone-700 text-xs font-semibold">
+                    <p className="text-secondary text-xs font-semibold">
                       123 total voting power
                     </p>
                   </div>
@@ -244,7 +244,7 @@ const DelegationStage = ({
                     <h3 className="font-semibold">
                       {getPercentage(100, selectedDelegates.length)}%
                     </h3>
-                    <p className="text-agora-stone-700 text-xs font-semibold">
+                    <p className="text-secondary text-xs font-semibold">
                       ~
                       {getPercentage(
                         MOCK_CLAIM_AMOUNT,
@@ -254,7 +254,7 @@ const DelegationStage = ({
                   </div>
                   <div className="">
                     <XMarkIcon
-                      className="h-6 w-6 text-agora-stone-700 cursor-pointer"
+                      className="h-6 w-6 text-secondary cursor-pointer"
                       onClick={() => {
                         setSelectedDelegates((prev) =>
                           prev.filter((a) => a !== address)
@@ -279,7 +279,7 @@ const DelegationStage = ({
               </Button>
             </div>
           </div>
-          <footer className="px-6 pb-6 pt-12 bg-agora-stone-50 border border-agora-stone-100 rounded-b-2xl z-10 mt-[-24px]">
+          <footer className="px-6 pb-6 pt-12 bg-agora-stone-50 border border-line rounded-b-2xl z-10 mt-[-24px]">
             <h4>Your voting power</h4>
             <span className="font-semibold text-2xl mt-2">600</span>
           </footer>

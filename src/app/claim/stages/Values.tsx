@@ -23,14 +23,14 @@ const PriorityCard = ({
 }) => {
   return (
     <div
-      className={`${active ? "bg-agora-stone-50" : "bg-white"} flex flex-col py-4 border border-agora-stone-100 rounded-lg p-4 cursor-pointer`}
+      className={`${active ? "bg-agora-stone-50" : "bg-white"} flex flex-col py-4 border border-line rounded-lg p-4 cursor-pointer`}
       onClick={onClick}
     >
       <div className="flex flex-row items-center space-x-2">
         <span>{icon}</span>
         <span className="flex-1 mr-4 font-medium">{title}</span>
       </div>
-      <span className="font-medium text-agora-stone-700">{description}</span>
+      <span className="font-medium text-secondary">{description}</span>
     </div>
   );
 };
@@ -47,11 +47,11 @@ const ValuesStage = ({
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+        <div className="bg-white rounded-2xl border border-line p-6">
           <h1 className="text-2xl font-black">
             Choose a delegate who shares your values
           </h1>
-          <p className="text-agora-stone-700 mt-4">
+          <p className="text-secondary mt-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
             lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
             consectetur adipiscing elit. Aliquam eu lectus dignissim, porta
@@ -90,7 +90,7 @@ const ValuesStage = ({
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+          <div className="bg-white rounded-2xl border border-line p-6">
             <h1 className="text-2xl font-black">
               Proceed to delegate selection
             </h1>

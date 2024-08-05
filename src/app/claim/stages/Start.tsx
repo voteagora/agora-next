@@ -16,10 +16,10 @@ const StartStage = ({ onSuccess }: { onSuccess: () => void }) => {
           fill
         />
       </div>
-      <h1 className="font-black text-[40px] text-center mt-4">
+      <h1 className="text-primary font-black text-[40px] text-center mt-4">
         Govern the Scroll Protocol
       </h1>
-      <p className="text-center text-agora-stone-700 mt-4">
+      <p className="text-center text-secondary mt-4">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
         lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
         consectetur adipiscing elit. Aliquam eu lectus dignissim, porta tortor

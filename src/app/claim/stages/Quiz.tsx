@@ -6,12 +6,12 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+        <div className="bg-white rounded-2xl border border-line p-6">
           <div className="bg-[url('/images/scroll/scroll-vision.png')] bg-contain w-full h-44 rounded-lg"></div>
           <h1 className="font-black text-2xl mt-6">
             Scroll&apos;s vision and values
           </h1>
-          <p className="mt-6 text-agora-stone-700">
+          <p className="mt-6 text-secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
             lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
             consectetur adipiscing elit. Aliquam eu lectus dignissim, porta
@@ -28,7 +28,7 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
               />
               <div className="flex flex-col">
                 <h4 className="mb-4 font-medium">Empowering humanity</h4>
-                <p className="text-agora-stone-700">
+                <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
                   dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus
@@ -45,7 +45,7 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
               />
               <div className="flex flex-col">
                 <h4 className="mb-4 font-medium">Building in the open</h4>
-                <p className="text-agora-stone-700">
+                <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
                   dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus
@@ -64,7 +64,7 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 <h4 className="mb-4 font-medium">
                   Fighting for decentralization
                 </h4>
-                <p className="text-agora-stone-700">
+                <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
                   dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus

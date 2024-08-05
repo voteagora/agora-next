@@ -12,10 +12,10 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
+        <div className="bg-neutral rounded-2xl border border-line p-6">
           <div className="bg-[url('/images/scroll/scroll-constitution.png')] bg-contain w-full h-44 rounded-lg"></div>
           <h1 className="font-black text-2xl mt-6">Working Constitution</h1>
-          <p className="mt-6 text-agora-stone-700">
+          <p className="mt-6 text-secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
             lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
             consectetur adipiscing elit. Aliquam eu lectus dignissim, porta
@@ -32,7 +32,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
               />
               <div className="flex flex-col">
                 <h4 className="mb-4 font-medium">Empowering humanity</h4>
-                <p className="text-agora-stone-700">
+                <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
                   dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus
@@ -49,7 +49,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
               />
               <div className="flex flex-col">
                 <h4 className="mb-4 font-medium">Building in the open</h4>
-                <p className="text-agora-stone-700">
+                <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
                   dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus
@@ -68,7 +68,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 <h4 className="mb-4 font-medium">
                   Fighting for decentralization
                 </h4>
-                <p className="text-agora-stone-700">
+                <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
                   dolor sit amet, consectetur adipiscing elit. Aliquam eu lectus
@@ -81,10 +81,10 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-white rounded-2xl border border-agora-stone-100">
+          <div className="bg-white rounded-2xl border border-line">
             <div className="p-6 border-b">
               <h1 className="font-black text-2xl">Review the Constitution</h1>
-              <p className="mt-2 text-agora-stone-700">
+              <p className="mt-2 text-secondary">
                 All community members should review the Constitution.
               </p>
             </div>
@@ -92,7 +92,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
               <div className="flex flex-row space-x-2 items-center">
                 <input
                   type="checkbox"
-                  className="rounded border-agora-stone-100 text-agora-stone-900"
+                  className="rounded border-line text-primary"
                 />
                 <label>I have read the Constitution</label>
               </div>

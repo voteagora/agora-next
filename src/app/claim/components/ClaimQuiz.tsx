@@ -48,16 +48,18 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-agora-stone-100 p-6">
-      <span className="text-xs text-agora-stone-700 font-semibold">
+    <div className="bg-neutral rounded-2xl border border-line p-6">
+      <span className="text-xs text-secondary font-semibold">
         QUESTION {currentQuestionIndex + 1} of {TEMP_QUIZ_QUESTIONS.length}
       </span>
-      <h1 className="font-black text-2xl">{currentQuestion.question}</h1>
+      <h1 className="text-primary font-black text-2xl">
+        {currentQuestion.question}
+      </h1>
       <ul className="mt-10">
         {currentQuestion.answers.map((answer, idx) => (
           <li
             key={`answer-${idx}`}
-            className={`border ${currentAnswer === "" || answer !== currentAnswer ? "border-agora-stone-100" : isCorrectAnswer ? "border-green-500 bg-green-100 text-green-600" : "border-red-500 bg-red-100 text-red-600"} rounded-full p-3 mt-2 text-center font-semibold text-agora-stone-900`}
+            className={`border ${currentAnswer === "" || answer !== currentAnswer ? "border-line" : isCorrectAnswer ? "border-green-500 bg-green-100 text-green-600" : "border-red-500 bg-red-100 text-red-600"} rounded-full p-3 mt-2 text-center font-semibold text-primary`}
             onClick={() => validateAnswer(answer)}
           >
             {answer}
@@ -65,7 +67,7 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
         ))}
       </ul>
       {currentAnswer !== "" && (
-        <p className="text-center font-medium text-agora-stone-700 mt-10">
+        <p className="text-center font-medium text-secondary mt-10">
           {canProceed
             ? "That's correct!"
             : "Incorrect answer, please try again."}
@@ -73,7 +75,7 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
       )}
       <div className="mt-10">
         <button
-          className={`${canProceed ? "bg-agora-stone-900 text-white" : " bg-agora-stone-100 text-agora-stone-500"} font-semibold w-full py-3 rounded-lg`}
+          className={`${canProceed ? "bg-primary text-white" : " bg-wash text-tertiary"} font-semibold w-full py-3 rounded-lg`}
           onClick={canProceed ? next : () => {}}
         >
           Continue
