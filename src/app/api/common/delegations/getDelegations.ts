@@ -239,9 +239,11 @@ const getCurrentAdvancedDelegators = (addressOrENSName: string) =>
     addressOrENSName
   );
 
-async function getCurrentAdvancedDelegatorsForAddress(
-  address: string
-): Promise<Delegation[]> {
+async function getCurrentAdvancedDelegatorsForAddress({
+  address,
+}: {
+  address: string;
+}): Promise<Delegation[]> {
   const { namespace, contracts } = Tenant.current();
 
   const [advancedDelegators, latestBlock] = await Promise.all([
