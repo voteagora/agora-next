@@ -6,11 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-<<<<<<< HEAD
-  schemas  = ["agora", "alltenant", "config", "cyber", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap"]
-=======
-  schemas  = ["agora", "config", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap", "scroll"]
->>>>>>> 1fb0a388 (Updates prisma schema to add scroll)
+  schemas  = ["agora", "alltenant", "config", "cyber", "ens", "etherfi", "optimism", "retro_funding", "scroll", "snapshot", "uniswap"]
 }
 
 model DelegateStatements {
