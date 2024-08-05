@@ -1,13 +1,11 @@
 import { Suspense } from "react";
 import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
-import DraftForm from "./stages/DraftForm/DraftForm";
 import DraftFormServer from "./stages/DraftForm/DraftFormServer";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
 import CreatorAuthCheck from "./CreatorAuthCheck";
-import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 
 export default function DraftProposalForm({
   stage,
