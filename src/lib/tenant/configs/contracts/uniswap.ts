@@ -1,7 +1,7 @@
 import {
+  ERC20__factory,
   UniswapGovernor__factory,
   UniswapStaker__factory,
-  UniswapToken__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -45,10 +45,10 @@ export const uniswapTenantContractConfig = ({
 
   return {
     token: new TenantContract<ITokenContract>({
-      abi: UniswapToken__factory.abi,
+      abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: UniswapToken__factory.connect(TOKEN, provider),
+      contract: ERC20__factory.connect(TOKEN, provider),
       provider,
     }),
 

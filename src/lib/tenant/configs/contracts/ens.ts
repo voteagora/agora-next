@@ -1,5 +1,5 @@
 import {
-  EtherfiToken__factory,
+  ERC20__factory,
   OptimismGovernor__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
@@ -34,10 +34,10 @@ export const ensTenantContractConfig = ({
 
   return {
     token: new TenantContract<ITokenContract>({
-      abi: EtherfiToken__factory.abi,
+      abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain: mainnet,
-      contract: EtherfiToken__factory.connect(TOKEN, provider),
+      contract: ERC20__factory.connect(TOKEN, provider),
       provider,
     }),
 
