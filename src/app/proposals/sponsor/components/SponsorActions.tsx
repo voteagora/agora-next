@@ -9,7 +9,6 @@ const SponsorActions = ({
 }: {
   draftProposal: DraftProposal;
 }) => {
-  console.log("draftProposal", draftProposal);
   const renderAction = (proposal: DraftProposal) => {
     switch (proposal.proposal_type) {
       case ProposalType.BASIC:
