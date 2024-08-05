@@ -7,7 +7,6 @@ import pendingImage from "@/assets/tenant/cyber_pending.svg";
 
 export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Agora",
-  color: "#2F38FF",
   hero: cyberHero,
   logo: cyberLogo,
 
@@ -49,6 +48,8 @@ export const scrollTenantUIConfig = new TenantUI({
       meta: {
         title: "Welcome to Scroll governance",
         description: "Home of token governance",
+        imageTitle: "Welcome to Scroll governance",
+        imageDescription: "Home of token governance",
       },
     },
   ],
