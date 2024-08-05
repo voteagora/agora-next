@@ -21,13 +21,13 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   const currentStageMetadata = getStageMetadata(proposal.stage);
 
   return (
-    <div className="bg-stone-100 border border-stone-200 rounded-2xl p-2 shadow-sm">
-      <div className="flex flex-row justify-between bg-white border border-stone-200 rounded-2xl px-6 py-5 shadow-sm">
+    <div className="bg-wash border border-line rounded-2xl p-2 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between bg-neutral border border-line rounded-2xl px-6 py-5 shadow-sm">
         <div>
           <p className="font-semibold text-secondary text-xs">{`By ${proposal.author_address}`}</p>
           <p className="font-medium">{proposal.title || "[Title pending]"}</p>
         </div>
-        <div className="flex flex-row gap-x-16">
+        <div className="flex flex-col sm:flex-row gap-x-16 space-y-4 sm:space-y-0 mt-4 sm:mt-0">
           <div className="w-[140px]">
             <p className="font-semibold text-secondary text-xs">{`Status`}</p>
             <p className="font-medium">{currentStageMetadata.shortTitle}</p>
