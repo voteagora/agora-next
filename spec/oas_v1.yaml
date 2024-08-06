@@ -1141,7 +1141,7 @@ components:
           type: string
         locked:
           type: boolean
-    RetroFundingBallotProjectsAllocation:
+    RetroFundingBallot4ProjectsAllocation:
       summary: Projects allocation distribution based on the vote
       description: >
         Projects allocation distribution based on the vote out of total 10M OP
@@ -1166,10 +1166,44 @@ components:
                 type: string
               allocation:
                 type: number
-    RetroFundingBallot:
-      summary: A ballot for an RetroFunding round
+    RetroFundingBallot5ProjectsAllocation:
+      summary: Projects allocation distribution based on the vote
       description: >
-        A ballot for an RetroFunding round, including information about the ballot.
+        Projects allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        project_id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        is_os:
+          type: boolean
+        allocation:
+          type: number
+        impact:
+          type: string
+          enum:
+            - VERY_HIGH
+            - HIGH
+            - MEDIUM
+            - LOW
+            - VERY_LOW
+    RetroFundingBallotCategoriesAllocation:
+      summary: Categories allocation distribution based on the vote
+      description: >
+        Categories allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        category_id:
+          type: integer
+        allocation:
+          type: string
+    Round4Ballot:
+      summary: A ballot for RetroFunding Round 4
+      description: >
+        A ballot for RetroFunding Round 4, including information about the ballot.
       type: object
       properties:
         address:
@@ -1199,8 +1233,46 @@ components:
         projects_allocation:
           type: array
           items:
-            $ref: "#/components/schemas/RetroFundingBallotProjectsAllocation"
-    RetroFundingBallotSubmission:
+            $ref: "#/components/schemas/RetroFundingBallot4ProjectsAllocation"
+    Round5Ballot:
+      summary: A ballot for RetroFunding Round 5
+      description: >
+        A ballot for RetroFunding Round 5, including information about the ballot.
+      type: object
+      properties:
+        address:
+          summary: Address of the voter
+          description: Address of the voter
+          type: string
+        round_id:
+          type: integer
+        status:
+          type: string
+          enum:
+            - PENDING
+            - SUBMITTED
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
+        voting_step:
+          type: integer
+        catgory_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallotCategoriesAllocation"
+        projects_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallot5ProjectsAllocation"
+        distribution_method:
+          type: string
+    RetroFunding4BallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
       type: object
@@ -1222,6 +1294,36 @@ components:
               type: boolean
             os_multiplier:
               type: number
+        signature:
+          summary: Badgeholder signature of the ballot
+          description: >
+            Badgeholder's signature of the contents of their ballot.
+          type: string
+          pattern: "^0x[a-fA-F0-9]{130}$"
+    RetroFunding5BallotSubmission:
+      summary: Fields required for ballot submission
+      description: An object containing the information required to submit a ballot.
+      type: object
+      properties:
+        address:
+          summary: Address or ENS of the ballot caster
+          description: Address or ENS of the ballot caster.
+          type: string
+        ballot_content:
+          type: object
+          properties:
+            category_allocation:
+              type: array
+              items:
+                type: object
+                categoryId:
+                  type: string
+            projects_allocation:
+              type: array
+              items:
+                type: object
+                projectId:
+                  type: string
         signature:
           summary: Badgeholder signature of the ballot
           description: >
@@ -1898,7 +2000,8 @@ paths:
                   ballots:
                     type: array
                     items:
-                      $ref: "#/components/schemas/RetroFundingBallot"
+                      $ref: "#/components/schemas/Round4Ballot"
+                      $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -1925,7 +2028,53 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                oneOf:
+                  - $ref: "#/components/schemas/Round4Ballot"
+                  - $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/categories/{categoryId}:
+    put:
+      summary: Updates the category allocation for a specific RetroFunding ballot
+      description: >
+        Updates the category allocation for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotCategoryAllocation
+      tags:
+        - RetroFunding
+        - RetroFundingBallots
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/ballotIdParam"
+        - name: categoryId
+          in: path
+          description: The category ID to update the ballot with
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allocation:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Round4Ballot"
+                  - $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -1961,7 +2110,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":
@@ -1996,7 +2145,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2022,14 +2171,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RetroFundingBallotSubmission"
+              oneOf:
+                - $ref: "#/components/schemas/RetroFunding4BallotSubmission"
+                - $ref: "#/components/schemas/RetroFunding5BallotSubmission"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                oneOf:
+                  - $ref: "#/components/schemas/Round4Ballot"
+                  - $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2134,41 +2287,6 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/categories/{categoryId}:
-    get:
-      summary: Gets a specific category for a RetroFunding round
-      description: >
-        Retrieves a specific category for a specific RetroFunding round on Agora.
-      operationId: getRetroFundingRoundCategoryById
-      tags:
-        - RetroFunding
-        - RetroFundingProjects
-        - RetroFundingCategories
-        - Round 5
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/projectIdParam"
-        - name: categoryId
-          in: path
-          description: The category ID of the category to retrieve.
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RetroFundingCategory"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
   /retrofunding/rounds/{roundId}/categories/{categoryId}/projects:
     get:
       summary: Gets a list of projects for a category in a RetroFunding round
@@ -2235,6 +2353,90 @@ paths:
           description: Bad Request
         "401":
           description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/projects/{projectId}:
+    post:
+      summary: Updates a specific project in ballot for an RetroFunding round
+      description: >
+        Updates a specific project for a specific RetroFunding round.
+      operationId: updateRetroFundingRoundProjectById
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allocation:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/categories/{categoryId}:
+    post:
+      summary: Updates a specific allocation for an RetroFunding round
+      description: >
+        Updates a specific project for a specific RetroFunding round on Agora.
+      operationId: updateRetroFundingRoundProjectById
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/categoryIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allocation:
+                  type: string
+                impact:
+                  type: string
+                  enum:
+                    - VERY_HIGH
+                    - HIGH
+                    - MEDIUM
+                    - LOW
+                    - VERY_LOW
+                rank:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics/{impactMetricId}:
