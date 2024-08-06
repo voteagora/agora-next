@@ -2397,7 +2397,7 @@ paths:
       summary: Updates a specific allocation for an RetroFunding round
       description: >
         Updates a specific project for a specific RetroFunding round on Agora.
-      operationId: updateRetroFundingRoundProjectById
+      operationId: updateRetroFundingRoundCategoryAllocation
       tags:
         - RetroFunding
         - projects
@@ -2424,6 +2424,42 @@ paths:
                     - VERY_LOW
                 rank:
                   type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/distribution_method:
+    post:
+      summary: Updates the distribution method for a specific RetroFunding ballot
+      description: >
+        Updates the distribution method for a specific ballot for an RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotDistributionMethod
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                distribution_method:
+                  type: string
       responses:
         "200":
           description: OK
