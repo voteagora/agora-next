@@ -4,10 +4,13 @@
 export { AlligatorOPV5__factory } from "./AlligatorOPV5__factory";
 export { ApprovalVotingModule__factory } from "./ApprovalVotingModule__factory";
 export { EtherfiToken__factory } from "./EtherfiToken__factory";
+export { L2GovToken__factory } from "./L2GovToken__factory";
 export { NounsGovernor__factory } from "./NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./OptimismGovernor__factory";
 export { OptimismToken__factory } from "./OptimismToken__factory";
 export { ProposalTypesConfigurator__factory } from "./ProposalTypesConfigurator__factory";
+export { ScrollGovernor__factory } from "./ScrollGovernor__factory";
+export { TokenDistributor__factory } from "./TokenDistributor__factory";
 export { UniswapGovernor__factory } from "./UniswapGovernor__factory";
 export { UniswapStaker__factory } from "./UniswapStaker__factory";
 export { UniswapToken__factory } from "./UniswapToken__factory";

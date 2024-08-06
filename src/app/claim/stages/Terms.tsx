@@ -16,7 +16,9 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
         <div className="bg-white rounded-2xl border border-line p-6">
-          <h1 className="text-4xl font-black">Terms and Conditions</h1>
+          <h1 className="text-4xl font-black text-primary">
+            Terms and Conditions
+          </h1>
           <p className="text-secondary mt-4">Last updated: October 9, 2023</p>
           {/* TODO (mg) update this copy with real terms from scroll */}
           <p className="text-secondary mt-10">
@@ -98,7 +100,9 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
       </section>
       <section className="col-span-3">
         <div className="bg-white rounded-2xl border border-line p-6 sticky top-4">
-          <h1 className="text-2xl font-black">Agree to Terms and Conditions</h1>
+          <h1 className="text-2xl font-black text-primary">
+            Agree to Terms and Conditions
+          </h1>
           <p className="text-secondary mt-2">Please sign to continue</p>
           <div className="mt-10">
             <Button

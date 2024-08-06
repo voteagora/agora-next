@@ -20,23 +20,19 @@ const MOCK_ELIGIBILITY_CRITERIA = {
 const StatCard = ({ className }: { className?: string }) => {
   return (
     <div
-      className={`border border-line bg-agora-stone-50 rounded-2xl flex flex-row ${className}`}
+      className={`border border-line bg-neutral rounded-2xl flex flex-row ${className}`}
     >
       <span className="flex flex-1 flex-col items-center py-6 border-r border-line last:border-0">
         <p className="text-xs text-secondary font-medium">Total supply</p>
-        <p className="font-semibold">2,000,000</p>
-      </span>
-      <span className="flex flex-1 flex-col items-center py-6 border-r border-line last:border-0">
-        <p className="text-xs text-secondary font-medium">Airdrop 1</p>
-        <p className="font-semibold">500,000</p>
+        <p className="font-semibold text-primary">2,000,000</p>
       </span>
       <span className="flex flex-1 flex-col items-center py-6 border-r border-line last:border-0">
         <p className="text-xs text-secondary font-medium">Eligible addresses</p>
-        <p className="font-semibold">133,543</p>
+        <p className="font-semibold text-primary">133,543</p>
       </span>
       <span className="flex flex-1 flex-col items-center py-6 border-r border-line last:border-0">
         <p className="text-xs text-secondary font-medium">Average allocation</p>
-        <p className="font-semibold">493.24</p>
+        <p className="font-semibold text-primary">493.24</p>
       </span>
     </div>
   );
@@ -52,12 +48,12 @@ const EligibilityCriteriaItem = ({
   return (
     <div className="flex flex-row items-center py-4 border-b border-dotted last:border-solid border-line">
       {amount > 0 ? (
-        <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+        <CheckCircleIcon className="h-5 w-5 text-positive mr-2" />
       ) : (
-        <XCircleIcon className="h-5 w-5 text-tertiary mr-2" />
+        <XCircleIcon className="h-5 w-5 text-negative mr-2" />
       )}
-      <span className="flex-1 mr-4 font-medium">{title}</span>
-      <span className="text-right font-medium">{amount}</span>
+      <span className="flex-1 mr-4 font-medium text-primary">{title}</span>
+      <span className="text-right font-medium text-primary">{amount}</span>
     </div>
   );
 };
@@ -70,7 +66,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
         <div className="bg-white rounded-2xl border border-line p-6">
-          <h1 className="text-2xl font-black">
+          <h1 className="text-2xl font-black text-primary">
             {MOCK_ELIGIBILITY_CRITERIA.total > 0
               ? "Congratulations, you qualify for the airdrop"
               : "You do not quality for the airdrop"}
@@ -93,8 +89,10 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
           <StatCard className="mt-10" />
           <div className="mt-10">
             <div className="flex flex-row justify-between items-center">
-              <h3 className="font-semibold">Eligiblity criteria</h3>
-              <span className="font-semibold text-xs text-secondary">
+              <h3 className="font-semibold text-primary">
+                Eligiblity criteria
+              </h3>
+              <span className="font-semibold text-sm text-secondary">
                 Learn more
               </span>
             </div>
@@ -111,8 +109,8 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 />
               ))}
               <div className="flex flex-row items-center justify-between pt-4">
-                <span className="font-medium">Total</span>
-                <span className="font-medium">
+                <span className="font-medium text-primary">Total</span>
+                <span className="font-medium text-primary">
                   {MOCK_ELIGIBILITY_CRITERIA.total}
                 </span>
               </div>
@@ -122,13 +120,15 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-white rounded-2xl border border-line p-6">
-            <h1 className="text-2xl font-black">Your allocation</h1>
+          <div className="bg-neutral rounded-2xl border border-line p-6">
+            <h1 className="text-2xl font-black text-primary">
+              Your allocation
+            </h1>
             <p className="text-secondary mb-4">
               You are eligible for the airdrop
             </p>
             <div className="h-48 w-full border border-dotted border-line rounded-2xl bg-[url('/images/receipt_bg.svg')] bg-center relative flex items-center justify-center">
-              <p className="font-semibold text-5xl">
+              <p className="font-semibold text-5xl text-primary">
                 {MOCK_ELIGIBILITY_CRITERIA.total}
               </p>
             </div>

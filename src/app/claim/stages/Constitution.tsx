@@ -14,7 +14,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
       <section className="col-span-5">
         <div className="bg-neutral rounded-2xl border border-line p-6">
           <div className="bg-[url('/images/scroll/scroll-constitution.png')] bg-contain w-full h-44 rounded-lg"></div>
-          <h1 className="font-black text-2xl mt-6">Working Constitution</h1>
+          <h1 className="font-black text-2xl mt-6 text-primary">Working Constitution</h1>
           <p className="mt-6 text-secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
             lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
@@ -31,7 +31,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 alt="Scroll's vision and values"
               />
               <div className="flex flex-col">
-                <h4 className="mb-4 font-medium">Empowering humanity</h4>
+                <h4 className="mb-4 font-medium text-primary">Empowering humanity</h4>
                 <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
@@ -48,7 +48,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 alt="Scroll's vision and values"
               />
               <div className="flex flex-col">
-                <h4 className="mb-4 font-medium">Building in the open</h4>
+                <h4 className="mb-4 font-medium text-primary">Building in the open</h4>
                 <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
@@ -65,7 +65,7 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 alt="Scroll's vision and values"
               />
               <div className="flex flex-col">
-                <h4 className="mb-4 font-medium">
+                <h4 className="mb-4 font-medium text-primary">
                   Fighting for decentralization
                 </h4>
                 <p className="text-secondary">
@@ -82,8 +82,8 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
       <section className="col-span-3">
         <div className="sticky top-4">
           <div className="bg-white rounded-2xl border border-line">
-            <div className="p-6 border-b">
-              <h1 className="font-black text-2xl">Review the Constitution</h1>
+            <div className="p-6 border-b border-line">
+              <h1 className="font-black text-2xl text-primary">Review the Constitution</h1>
               <p className="mt-2 text-secondary">
                 All community members should review the Constitution.
               </p>
@@ -94,10 +94,10 @@ const ConstitutionStage = ({ onSuccess }: { onSuccess: () => void }) => {
                   type="checkbox"
                   className="rounded border-line text-primary"
                 />
-                <label>I have read the Constitution</label>
+                <label className="text-secondary text-sm">I have read the Constitution</label>
               </div>
               <Button
-                className="w-full mt-4"
+                className="w-full mt-4 bg-primary text-neutral"
                 onClick={() => {
                   onSuccess();
                 }}

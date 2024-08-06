@@ -27,16 +27,16 @@ export const scrollTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    primary: "#171717",
-    secondary: "#404040",
-    tertiary: "#737373",
+    primary: "#190602",
+    secondary: "#756A67",
+    tertiary: "#D1CDCC",
     neutral: "#FFFFFF",
-    wash: "#FAFAFA",
-    line: "#E5E5E5",
+    wash: "#FAF2E8",
+    line: "#FAF2E8",
     positive: "#00992B",
     negative: "#C52F00",
-    brandPrimary: "#171717",
-    brandSecondary: "#F2F2F2",
+    brandPrimary: "#FF4C00",
+    brandSecondary: "#FFF8F3",
   },
 
   pages: [

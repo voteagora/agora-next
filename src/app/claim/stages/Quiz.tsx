@@ -6,9 +6,9 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-line p-6">
+        <div className="bg-neutral rounded-2xl border border-line p-6">
           <div className="bg-[url('/images/scroll/scroll-vision.png')] bg-contain w-full h-44 rounded-lg"></div>
-          <h1 className="font-black text-2xl mt-6">
+          <h1 className="font-black text-2xl mt-6 text-primary">
             Scroll&apos;s vision and values
           </h1>
           <p className="mt-6 text-secondary">
@@ -27,7 +27,7 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 alt="Scroll's vision and values"
               />
               <div className="flex flex-col">
-                <h4 className="mb-4 font-medium">Empowering humanity</h4>
+                <h4 className="mb-4 font-medium text-primary">Empowering humanity</h4>
                 <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
@@ -44,7 +44,7 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 alt="Scroll's vision and values"
               />
               <div className="flex flex-col">
-                <h4 className="mb-4 font-medium">Building in the open</h4>
+                <h4 className="mb-4 font-medium text-primary">Building in the open</h4>
                 <p className="text-secondary">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Aliquam eu lectus dignissim, porta tortor nec.Lorem ipsum
@@ -61,7 +61,7 @@ const QuizStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 alt="Scroll's vision and values"
               />
               <div className="flex flex-col">
-                <h4 className="mb-4 font-medium">
+                <h4 className="mb-4 font-medium text-primary">
                   Fighting for decentralization
                 </h4>
                 <p className="text-secondary">
