@@ -10,7 +10,8 @@ info:
     ### API Categories
     Live and stable. 
     - **auth**: Authenticate with the Agora API
-    - **RetroFunding**: Data related to RetroPGF Funding for Optimism Round 4 and beyond
+    - **Round 4**: Data related to Retro Funding for Optimism Round 4
+    - **RetroFunding**: Data related to Retro Funding for Optimism Round 4 and beyond
     - **projects**: Data related to RetroPGF Projects
     - **RetroFundingRounds**: Data related to RetroPGF Funding Rounds
     - **RetroFundingBallots**: Data related to RetroPGF Funding Ballots
@@ -24,14 +25,30 @@ info:
     - **votes**: Vote data
     - **contracts**: Data for the current onchain contracts
 
+    Not Live.
+    - **Round 5**: Data related to Retro Funding for Optimism Round 5
+    - 0.2.0: **projects** Round 5 Projects and categories with mock data
+    - 0.2.0: **RetroFundingCategories** Round 5 Projects and categories with mock data
+    - 0.2.1: **RetroFundingBallots** Round 5 Ballots with mock data
+    - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
+    - 0.2.3: **comments** Round 5 Comments & Comments votes
+    - 0.2.3: **commentsVotes** Round 5 Comments & Comments votes
+    - 0.2.4: Round 5 Production release with real data
+
     ### Release Schedule
 
     | Version  | Status  | Release Date  |
     |----------|---------|---------------|
-    | OP 0.1.0 | LIVE   | June 7th|
+    | OP 0.1.0 | LIVE   | June 7th |
     | OP 0.1.1 | LIVE   | June 27th |
     | OP 0.1.2 | LIVE   | July 22th |
     | OP 0.1.3 | LIVE   | July 31th |
+    |----------|---------|---------------|
+    | OP 0.2.0 | LIVE   | Aug 10th |
+    | OP 0.2.1 | LIVE   | Aug 16th |
+    | OP 0.2.2 | LIVE   | Aug 23th |
+    | OP 0.2.3 | LIVE   | Aug 30th |
+    | OP 0.2.4 | LIVE   | Sep 13th |
   version: 0.1.3
   license:
     name: MIT
@@ -42,22 +59,30 @@ servers:
 tags:
   - name: auth
     description: Authenticate with the Agora API
+  - name: Round 4
+    description: Data related to Retro Funding for Optimism Round 4
+  - nane: Round 5
+    description: Data related to Retro Funding for Optimism Round 5
   - name: RetroFunding
-    description: Data related to RetoPGF Funding for Optimism Round 4 and beyond
+    description: Data related to Retro Funding for Optimism Round 4 and beyond
   - name: projects
-    description: Data related to RetroPGF Projects
+    description: Data related to Retro Projects
   - name: RetroFundingRounds
-    description: Data related to RetoPGF Funding Rounds
+    description: Data related to Retro Funding Rounds
   - name: RetroFundingBallots
-    description: Data related to RetoPGF Funding Ballots
+    description: Data related to Retro Funding Ballots
+  - name: DistributionStrategies
+    description: Data related to Retro Funding Distribution Strategies
   - name: impactMetrics
     description: Data related to the Impact Metrics for RetroFunding Round 4
   - name: RetroFundingImpactMetrics
     description: Connect RetroPGF to Impact Metrics
+  - name: RetroFundingCategories
+    description: Data related to Retro Funding Categories
   - name: comments
-    description: Data related to RetroPGF Project Comments
+    description: Data related to Retro Funding Project Comments
   - name: commentsVotes
-    description: Data related to RetroPGF Project Comments' Votes
+    description: Data related to Retro Funding Project Comments' Votes
   - name: delegates
     description: Delegates data
   - name: delegations
@@ -1679,40 +1704,6 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /projects:
-    # Should this be paginated? How many ballots per round are expected?
-    get:
-      summary: Gets a list of projects
-      description: >
-        Retrieves a list of projects on Agora as a JSON array.
-        Limit, offset, and sort parameters can be used to customize the returned list.
-      operationId: getProjects
-      tags:
-        - RetroFunding
-        - projects
-      parameters:
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  projects:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Project"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
   /contracts/governor:
     get:
       summary: Gets the governor contract address
@@ -1770,6 +1761,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VotingToken"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /projects:
+    # Should this be paginated? How many ballots per round are expected?
+    get:
+      summary: Gets a list of projects
+      description: >
+        Retrieves a list of projects on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProjects
+      tags:
+        - RetroFunding
+        - projects
+        - Round 4
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: "#/components/schemas/PageMetadata"
+                  projects:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Project"
         "400":
           description: Bad Request
         "401":
@@ -1847,6 +1874,8 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
+        - Round 5
       parameters:
         - name: roundId
           in: path
@@ -1885,6 +1914,8 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
+        - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1912,6 +1943,7 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1947,6 +1979,7 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1980,6 +2013,8 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
+        - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -2013,6 +2048,8 @@ paths:
       tags:
         - RetroFunding
         - projects
+        - Round 4
+        - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/limitParam"
@@ -2037,6 +2074,129 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/projects/{projectId}:
+    get:
+      summary: Gets a specific project for an RetroFunding round
+      description: >
+        Retrieves a specific project for a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundProjectById
+      tags:
+        - RetroFunding
+        - projects
+        - Round 4
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/categories:
+    get:
+      summary: Gets a list of categories for a RetroFunding round
+      description: >
+        Retrieves a paginated list of categories for a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundCategories
+      tags:
+        - RetroFunding
+        - RetroFundingProjects
+        - RetroFundingCategories
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RetroFundingCategory"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/categories/{categoryId}:
+    get:
+      summary: Gets a specific category for a RetroFunding round
+      description: >
+        Retrieves a specific category for a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundCategoryById
+      tags:
+        - RetroFunding
+        - RetroFundingProjects
+        - RetroFundingCategories
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - name: categoryId
+          in: path
+          description: The category ID of the category to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetroFundingCategory"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/categories/{categoryId}/projects:
+    get:
+      summary: Gets a list of projects for a category in a RetroFunding round
+      description: >
+        Retrieves a list of projects for a specific category in a specific RetroFunding round on Agora as a JSON array.
+      operationId: getRetroFundingRoundCategoryProjects
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+      response:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
     post:
       summary: Adds or updates an impact metric on a specific RetroFunding ballot
@@ -2048,6 +2208,7 @@ paths:
         - RetroFunding
         - RetroFundingBallots
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -2086,6 +2247,7 @@ paths:
         - RetroFunding
         - RetroFundingBallots
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -2111,6 +2273,7 @@ paths:
         - RetroFunding
         - RetroFundingRounds
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
       responses:
@@ -2138,6 +2301,7 @@ paths:
         - RetroFunding
         - RetroFundingRounds
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2165,6 +2329,7 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingImpactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2203,6 +2368,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2252,6 +2418,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2289,6 +2456,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2319,6 +2487,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2356,6 +2525,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2383,6 +2553,7 @@ paths:
         - impactMetrics
         - comments
         - commentsVotes
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2417,6 +2588,7 @@ paths:
         - impactMetrics
         - comments
         - commentsVotes
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
