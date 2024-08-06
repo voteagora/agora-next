@@ -8,10 +8,10 @@ import infoPageCard01 from "@/assets/tenant/uniswap_info_1.png";
 import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
+import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
-  hero: cyberHero,
   logo: cyberLogo,
 
   googleAnalytics: "G-KZ3G1HV72Y",
@@ -85,6 +85,7 @@ export const cyberTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Welcome to the home of Cyber voters",
+      hero: cyberHero,
       description:
         "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
       meta: {
@@ -99,6 +100,7 @@ export const cyberTenantUIConfig = new TenantUI({
       title: "Welcome to the home of Cyber voters",
       description:
         "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
+      hero: cyberHero,
       meta: {
         title: "Contribute to CyberDAO with your staked CYBER",
         description:
@@ -112,6 +114,7 @@ export const cyberTenantUIConfig = new TenantUI({
       title: "Welcome to Cyber governance",
       description:
         "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
+      hero: cyberHero,
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -121,9 +124,9 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "CyberDAO Governance",
+      title: "Welcome to the Community",
       description:
-        "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
+        "Agora is your home for onchain proposals, voting, and governance.",
       meta: {
         title: "Info of Agora",
         description: "Welcome to the CyberDAO",
@@ -156,6 +159,19 @@ export const cyberTenantUIConfig = new TenantUI({
           image: infoPageCard04,
         },
       ],
+    },
+    {
+      route: "info/about",
+      title: "About Cyber",
+      hero: optimismInfoAbout,
+      description:
+        "Cyber is the L2 for Social. It’s a decentralized platform optimized for social data sharing. Built on hyper scale EigenDA and the open-source OP Stack from Optimism, its built-in account abstraction and seedless wallets deliver a smooth user experience. Cyber’s decentralized sequencer and verifier network eliminates developer platform risk, and its native yield for bridged assets and innovative revenue sharing model provide powerful incentives and rewards. #BuildOnCyber",
+      meta: {
+        title: "Info of Agora",
+        description: "Welcome to the CyberDAO",
+        imageTitle: "",
+        imageDescription: "",
+      },
     },
   ],
 

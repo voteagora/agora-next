@@ -7,7 +7,6 @@ import pendingImage from "@/assets/tenant/cyber_pending.svg";
 
 export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Agora",
-  hero: cyberHero,
   logo: cyberLogo,
 
   assets: {
@@ -45,6 +44,7 @@ export const scrollTenantUIConfig = new TenantUI({
       title: "Welcome to the home of Scroll voters",
       description:
         "Scroll delegates are the stewards of ScrollDAO. They are volunteers and members of the Scroll community who have been elected to represent other token holders and make governance decisions on their behalf.",
+      hero: cyberHero,
       meta: {
         title: "Welcome to Scroll governance",
         description: "Home of token governance",
