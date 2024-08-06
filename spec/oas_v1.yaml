@@ -144,7 +144,7 @@ components:
       type: object
       properties:
         has_next:
-          summary: Flag indicating if there's more data for retieval
+          summary: Flag indicating if there's more data for retrieval
           description: A boolean flag indicating if there is additional data past the returned page to retrieve.
           type: boolean
         total_returned:
@@ -181,7 +181,7 @@ components:
           examples:
             - "100000000000000000000000"
         timestamp:
-          summary: When delegation occured
+          summary: When delegation occurred
           description: The datetime on which the delegation of voting power occurred.
           type: string
           format: date-time
@@ -312,7 +312,7 @@ components:
           description: The delegate's voting participation.
           type: string
         lastTenProps:
-          summary: number of proposals voted on out of the last ten
+          summary: Number of proposals voted on out of the last ten
           description: The number of proposals voted on out of the last ten.
           type: string
         numOfDelegators:
@@ -320,7 +320,7 @@ components:
           description: The number of delegators.
           type: string
     DelegateStatement:
-      summmary: A delegate's statement
+      summary: A delegate's statement
       description: A delegate's statement, including the social links and topIssues.
       type: object
       properties:
@@ -414,6 +414,7 @@ components:
               votes:
                 type: string
         criteria:
+          type: string
           enum:
             - THRESHOLD
             - TOP_CHOICES
@@ -421,8 +422,8 @@ components:
           summary: Threshold required to pass or number of top choices that is passed
           type: string
     OptimisticProposalResults:
-      summary: Results of a standard proposal
-      description: An object describing the results of a standard proposal.
+      summary: Results of an optimistic proposal
+      description: An object describing the results of an optimistic proposal.
       type: object
       properties:
         for:
@@ -546,7 +547,7 @@ components:
           summary: Description of the proposal
           type: string
     ExecutionData:
-      summary: Structured exceution data for proposal
+      summary: Structured execution data for proposal
       description: >
         Provides the values, targets, calldata, and functions for proposal execution.
       type: object
@@ -716,10 +717,8 @@ components:
           type: integer
         votingStrategy:
           $ref: "#/components/schemas/VotingStrategy"
-        # Note: quorum and threshold are strings since I'm not sure about the unit/size here
-        # (i.e. if they can be contained in an int32/int64 type)
         quorum:
-          summary: Minimmum participation for passage
+          summary: Minimum participation for passage
           description: >
             The minimum number of voting power needed to be involved in a given proposal as a prerequisite for passage
           type: string
@@ -889,7 +888,7 @@ components:
           type: integer
         created_at:
           summary: Timestamp of the vote
-          description: The timestamp at which the comment was created.
+          description: The timestamp at which the vote was created.
           type: string
           format: date-time
         updated_at:
@@ -898,8 +897,8 @@ components:
           type: string
           format: date-time
     RetroFundingRoundStatus:
-      summary: Status of an RetroFunding round
-      description: Enum description of the status of an RetroFunding round.
+      summary: Status of a RetroFunding round
+      description: Enum description of the status of a RetroFunding round.
       type: string
       enum:
         - PLANNED
@@ -914,9 +913,9 @@ components:
         - DONE
         - CANCELLED
     RetroFundingRoundEvent:
-      summary: An event within an RetroFunding round
+      summary: An event within a RetroFunding round
       description: >
-        An event within an RetroFunding round, including status and timestamp.
+        An event within a RetroFunding round, including status and timestamp.
         For example, a round may have events for the start of voting, application review, etc.
       type: object
       properties:
@@ -928,7 +927,7 @@ components:
           type: string
           format: date-time
     RetroFundingRound:
-      summary: An RetroFunding round
+      summary: A RetroFunding round
       description: >
         A Retroactive Public Goods Funding round on Agora, including 
         information about the round, and all events within the round.
@@ -947,12 +946,9 @@ components:
           items:
             $ref: "#/components/schemas/RetroFundingRoundEvent"
     RetroFundingImpactMetric:
-      # Note: these are externally defined on Open Source Observer,
-      # So it's not completely clear what information needs to be represented here
-      # The most important aspect are that IDs are present for linking metrics on ballots
-      summary: Impact metric for an RetroFunding project
+      summary: Impact metric for a RetroFunding project
       description: >
-        An impact metric for an RetroFunding project with associated metadata.
+        An impact metric for a RetroFunding project with associated metadata.
       type: object
       properties:
         metric_id:
@@ -992,27 +988,14 @@ components:
         A team member on a RetroFunding project.
       type: object
       properties:
-        # address:
-        #   summary: EOA address of the team member
-        #   type: string
-        # name:
-        #   type: string
-        # description:
-        #   type: string
         farcasterId:
           summary: Farcaster ID for project team member
           description: Farcaster ID for project team member.
           type: string
-        # externalLink:
-        #   type: string
-        # avatarUrls:
-        #   type: array
-        #   items:
-        #     type: string
     RetroFundingCategory:
-      summary: A category for an RetroFunding project
+      summary: A category for a RetroFunding project
       description: >
-        A category for an RetroFunding project, including information about the category.
+        A category for a RetroFunding project, including information about the category.
       type: object
       properties:
         name:
@@ -1035,7 +1018,7 @@ components:
           type: string
         profileAvatarUrl:
           type: string
-        proejctCoverImageUrl:
+        projectCoverImageUrl:
           type: string
         socialLinks:
           $ref: "#/components/schemas/SocialLinks"
@@ -1130,9 +1113,9 @@ components:
         website:
           type: string
     RetroFundingBallotMetricsAllocation:
-      summary: A vote for an RetroFunding ballot
+      summary: A vote for a RetroFunding ballot
       description: >
-        A vote for an RetroFunding ballot, including information about the vote.
+        A vote for a RetroFunding ballot, including information about the vote.
       type: object
       properties:
         metric_id:
@@ -1288,7 +1271,7 @@ components:
               type: array
               items:
                 type: object
-                metrciId:
+                metricId:
                   type: number
             os_only:
               type: boolean
@@ -1353,7 +1336,6 @@ components:
         minimum: 0
         default: 0
     blockParam:
-      # What is a reasonable default?
       name: blockNumber
       in: query
       description: The block number in which requested resources are to be sought.
@@ -1870,7 +1852,6 @@ paths:
         "500":
           description: Internal Server Error
   /projects:
-    # Should this be paginated? How many ballots per round are expected?
     get:
       summary: Gets a list of projects
       description: >
@@ -1927,7 +1908,7 @@ paths:
                 properties:
                   metadata:
                     $ref: "#/components/schemas/PageMetadata"
-                  ballots:
+                  rounds:
                     type: array
                     items:
                       $ref: "#/components/schemas/RetroFundingRound"
@@ -2269,7 +2250,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2278,7 +2259,7 @@ paths:
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/projects/{projectId}:
     post:
-      summary: Updates a specific project in ballot for an RetroFunding round
+      summary: Updates a specific project in ballot for a RetroFunding round
       description: >
         Updates a specific project for a specific RetroFunding round.
       operationId: updateRetroFundingRoundProjectById
@@ -2315,7 +2296,7 @@ paths:
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/categories/{categoryId}:
     post:
-      summary: Updates a specific allocation for an RetroFunding round
+      summary: Updates a specific allocation for a RetroFunding round
       description: >
         Updates a specific project for a specific RetroFunding round on Agora.
       operationId: updateRetroFundingRoundCategoryAllocation
@@ -2364,7 +2345,7 @@ paths:
     post:
       summary: Updates the distribution method for a specific RetroFunding ballot
       description: >
-        Updates the distribution method for a specific ballot for an RetroFunding round on Agora.
+        Updates the distribution method for a specific ballot for a RetroFunding round on Agora.
       operationId: updateRetroFundingBallotDistributionMethod
       tags:
         - RetroFunding
@@ -2400,7 +2381,7 @@ paths:
     delete:
       summary: Removes an impact metric from a ballot
       description: >
-        Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
+        Removes an impact metric from a specific ballot for a RetroFunding round on Agora.
       operationId: removeImpactMetricFromRetroFundingBallot
       tags:
         - RetroFunding
