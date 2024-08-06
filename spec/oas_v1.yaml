@@ -59,10 +59,10 @@ servers:
 tags:
   - name: auth
     description: Authenticate with the Agora API
+  - name: Round 5
+    description: Data related to Retro Funding for Optimism Round 5
   - name: Round 4
     description: Data related to Retro Funding for Optimism Round 4
-  - nane: Round 5
-    description: Data related to Retro Funding for Optimism Round 5
   - name: RetroFunding
     description: Data related to Retro Funding for Optimism Round 4 and beyond
   - name: projects
