@@ -1001,7 +1001,7 @@ components:
         #   type: string
         farcasterId:
           summary: Farcaster ID for project team member
-          desription: Farcaster ID for project team member.
+          description: Farcaster ID for project team member.
           type: string
         # externalLink:
         #   type: string
@@ -2000,8 +2000,9 @@ paths:
                   ballots:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Round4Ballot"
-                      $ref: "#/components/schemas/Round5Ballot"
+                      oneOf:
+                        - $ref: "#/components/schemas/Round4Ballot"
+                        - $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2031,86 +2032,6 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/Round4Ballot"
                   - $ref: "#/components/schemas/Round5Ballot"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/categories/{categoryId}:
-    put:
-      summary: Updates the category allocation for a specific RetroFunding ballot
-      description: >
-        Updates the category allocation for a specific ballot for an RetroFunding round on Agora.
-      operationId: updateRetroFundingBallotCategoryAllocation
-      tags:
-        - RetroFunding
-        - RetroFundingBallots
-        - Round 5
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/ballotIdParam"
-        - name: categoryId
-          in: path
-          description: The category ID to update the ballot with
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                allocation:
-                  type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Round4Ballot"
-                  - $ref: "#/components/schemas/Round5Ballot"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osMultiplier/{osMultiplier}:
-    post:
-      summary: Updates the OS multiplier for a specific RetroFunding ballot
-      description: >
-        Updates the OS multiplier for a specific ballot for an RetroFunding round on Agora.
-      operationId: updateRetroFundingBallotOSMultiplier
-      tags:
-        - RetroFunding
-        - RetroFundingBallots
-        - Round 4
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/ballotIdParam"
-        - name: osMultiplier
-          in: path
-          description: The OS multiplier to update the ballot with (1 - 5)
-          required: true
-          schema:
-            type: number
-            minimum: 1
-            maximum: 5
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":
