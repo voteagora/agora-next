@@ -4,11 +4,11 @@ import cyberLogo from "@/assets/tenant/cyber_logo.svg";
 import delegateImage from "@/assets/tenant/cyber_delegate.svg";
 import successImage from "@/assets/tenant/cyber_success.svg";
 import pendingImage from "@/assets/tenant/cyber_pending.svg";
-import infoPageCard01 from "@/assets/tenant/uniswap_info_1.png";
-import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
-import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
-import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
-import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
+import infoPageCard01 from "@/assets/tenant/cyber_info_1.png";
+import infoPageCard02 from "@/assets/tenant/cyber_info_2.png";
+import infoPageCard03 from "@/assets/tenant/cyber_info_3.png";
+import infoPageCard04 from "@/assets/tenant/cyber_info_4.png";
+import infoPageHero from "@/assets/tenant/cyber_info_hero.png";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
@@ -137,25 +137,25 @@ export const cyberTenantUIConfig = new TenantUI({
         {
           name: "Community Discord",
           title: "Community Discord",
-          url: "https://discord.com/invite/FCfyBSbCU5",
+          url: "https://discord.com/invite/buildoncyber",
           image: infoPageCard01,
         },
         {
           name: "Governance Forums",
           title: "Governance Forums",
-          url: "https://gov.uniswap.org",
+          url: "https://forum.cyber.co",
           image: infoPageCard02,
         },
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
-          url: "https://docs.uniswap.org",
+          url: "https://docs.cyber.co/build-on-cyber/contract-deployment",
           image: infoPageCard03,
         },
         {
-          name: "Uniswap Labs",
-          title: "Uniswap Labs",
-          url: "https://x.com/Uniswap",
+          name: "Protocol Vision",
+          title: "Protocol Vision",
+          url: "https://cyber.co/blog",
           image: infoPageCard04,
         },
       ],
@@ -163,7 +163,7 @@ export const cyberTenantUIConfig = new TenantUI({
     {
       route: "info/about",
       title: "About Cyber",
-      hero: optimismInfoAbout,
+      hero: infoPageHero,
       description:
         "Cyber is the L2 for Social. It’s a decentralized platform optimized for social data sharing. Built on hyper scale EigenDA and the open-source OP Stack from Optimism, its built-in account abstraction and seedless wallets deliver a smooth user experience. Cyber’s decentralized sequencer and verifier network eliminates developer platform risk, and its native yield for bridged assets and innovative revenue sharing model provide powerful incentives and rewards. #BuildOnCyber",
       meta: {

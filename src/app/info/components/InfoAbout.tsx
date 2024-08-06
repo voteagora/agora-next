@@ -2,30 +2,9 @@ import React from "react";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
-
-import optimismInfoAbout from "@/assets/tenant/optimism_info_about.png";
-import uniswapInfoAbout from "@/assets/tenant/uniswap_info_about.png";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
-const infoAbout = {
-  optimism: {
-    description:
-      "Both Houses make decisions through governance proposals. Proposals are accepted or rejected using a voting process. Anyone can submit a proposal to governance. The proposal must be one of the valid proposal types listed below, and it must follow the voting process described here.",
-    sectionImage: optimismInfoAbout,
-  },
-  uniswap: {
-    description:
-      "The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
-    sectionImage: uniswapInfoAbout,
-  },
-  cyber: {
-    description:
-      "Cyber is the L2 for Social. It’s a decentralized platform optimized for social data sharing. Built on hyper scale EigenDA and the open-source OP Stack from Optimism, its built-in account abstraction and seedless wallets deliver a smooth user experience. Cyber’s decentralized sequencer and verifier network eliminates developer platform risk, and its native yield for bridged assets and innovative revenue sharing model provide powerful incentives and rewards. #BuildOnCyber",
-    sectionImage: uniswapInfoAbout,
-  },
-};
-
-const infoTabs = [
+const tabs = [
   {
     icon: icons.coins,
     title: "Delegate voting power",
@@ -64,7 +43,6 @@ const InfoAbout = () => {
             alt={page.title}
             className="w-full rounded-lg"
             height="366"
-            width="172"
           />
           <div>
             <h3 className="text-lg font-bold text-black">
@@ -78,7 +56,7 @@ const InfoAbout = () => {
 
         <div className="p-6  rounded-b-xl border-t bg-white">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
-            {infoTabs.map((item, index) => (
+            {tabs.map((item, index) => (
               <div
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
