@@ -26,6 +26,8 @@ import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dial
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
+import ClaimFlowGithubCheckDialog from "@/app/claim/dialogs/ClaimFlowGithubCheckDialog";
+import ClaimFlowEmailCheckDialog from "@/app/claim/dialogs/ClaimFlowEmailCheckDialog";
 
 export type DialogType =
   | DelegateDialogType
@@ -40,7 +42,10 @@ export type DialogType =
   | UpdateDraftProposalDialog
   | SponsorSnapshotDraftProposalDialog
   | SponsorOnchainDraftProposalDialog
-  | OpenGithubPRDialog;
+  | OpenGithubPRDialog
+  | ClaimFlowGithubCheckDialog
+  | ClaimFlowEmailCheckDialog;
+
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -169,6 +174,16 @@ export type SponsorOnchainDraftProposalDialog = {
 export type OpenGithubPRDialog = {
   type: "OPEN_GITHUB_PR";
   params: { redirectUrl: string; githubUrl: string };
+};
+
+export type ClaimFlowGithubCheckDialog = {
+  type: "CLAIM_FLOW_GITHUB_CHECK";
+  params: {};
+};
+
+export type ClaimFlowEmailCheckDialog = {
+  type: "CLAIM_FLOW_EMAIL_CHECK";
+  params: {};
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -313,6 +328,12 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
     />
   ),
+  CLAIM_FLOW_GITHUB_CHECK: ({}, closeDialog) => {
+    return <ClaimFlowGithubCheckDialog closeDialog={closeDialog} />;
+  },
+  CLAIM_FLOW_EMAIL_CHECK: ({}, closeDialog) => {
+    return <ClaimFlowEmailCheckDialog closeDialog={closeDialog} />;
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

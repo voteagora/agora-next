@@ -15,13 +15,15 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-line p-6">
-          <h1 className="text-4xl font-black text-primary">
+        <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault">
+          <h1 className="text-2xl font-black text-primary">
             Terms and Conditions
           </h1>
-          <p className="text-secondary mt-4">Last updated: October 9, 2023</p>
+          <p className="text-secondary mt-4 font-medium">
+            Last updated: October 9, 2023
+          </p>
           {/* TODO (mg) update this copy with real terms from scroll */}
-          <p className="text-secondary mt-10">
+          <p className="text-secondary mt-10 font-medium">
             Scroll Foundation (“Scroll Foundation”, “we,” “us,” or “our”),
             currently provides a website-hosted user interface that can be
             accessed at https://scroll.io/bridge (the “Interface”) for
@@ -36,7 +38,7 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
             technologies (the Interface and all such features, functionalities
             and technologies, collectively, the “Service”).
           </p>
-          <p className="text-secondary mt-10">
+          <p className="text-secondary mt-10 font-medium">
             Scroll Foundation (“Scroll Foundation”, “we,” “us,” or “our”),
             currently provides a website-hosted user interface that can be
             accessed at https://scroll.io/bridge (the “Interface”) for
@@ -51,7 +53,7 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
             technologies (the Interface and all such features, functionalities
             and technologies, collectively, the “Service”).
           </p>
-          <p className="text-secondary mt-10">
+          <p className="text-secondary mt-10 font-medium">
             Scroll Foundation (“Scroll Foundation”, “we,” “us,” or “our”),
             currently provides a website-hosted user interface that can be
             accessed at https://scroll.io/bridge (the “Interface”) for
@@ -66,7 +68,7 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
             technologies (the Interface and all such features, functionalities
             and technologies, collectively, the “Service”).
           </p>
-          <p className="text-secondary mt-10">
+          <p className="text-secondary mt-10 font-medium">
             Scroll Foundation (“Scroll Foundation”, “we,” “us,” or “our”),
             currently provides a website-hosted user interface that can be
             accessed at https://scroll.io/bridge (the “Interface”) for
@@ -81,7 +83,7 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
             technologies (the Interface and all such features, functionalities
             and technologies, collectively, the “Service”).
           </p>
-          <p className="text-secondary mt-10">
+          <p className="text-secondary mt-10 font-medium">
             Scroll Foundation (“Scroll Foundation”, “we,” “us,” or “our”),
             currently provides a website-hosted user interface that can be
             accessed at https://scroll.io/bridge (the “Interface”) for
@@ -99,13 +101,16 @@ const TermsStage = ({ onSuccess }: { onSuccess: () => void }) => {
         </div>
       </section>
       <section className="col-span-3">
-        <div className="bg-white rounded-2xl border border-line p-6 sticky top-4">
+        <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault sticky top-4 shadow-newDefault">
           <h1 className="text-2xl font-black text-primary">
             Agree to Terms and Conditions
           </h1>
-          <p className="text-secondary mt-2">Please sign to continue</p>
+          <p className="text-secondary mt-2 font-medium">
+            Please sign to continue
+          </p>
           <div className="mt-10">
             <Button
+              variant="brandPrimary"
               className="w-full"
               onClick={() => {
                 // TODO (mg) update this message with real terms from scroll

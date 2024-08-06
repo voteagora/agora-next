@@ -16,31 +16,31 @@ const StartStage = ({ onSuccess }: { onSuccess: () => void }) => {
           fill
         />
       </div>
-      <h1 className="text-primary font-black text-[40px] text-center mt-4">
-        Govern the Scroll Protocol
-      </h1>
-      <p className="text-center text-secondary mt-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
-        lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
-        consectetur adipiscing elit. Aliquam eu lectus dignissim, porta tortor
-        nec.
-      </p>
-      <Button
-        className="w-full mt-4"
-        onClick={() => {
-          // try to connect wallet
-          if (!address) {
-            setOpen(true);
-            return;
-          }
-          onSuccess();
-        }}
-      >
-        {!!address ? "Next" : "Connect"}
-      </Button>
-      <Button className="w-full mt-4" variant="secondary">
-        Apply for organizational grant
-      </Button>
+      <div className="border rounded-2xl bg-neutral p-6 shadow-newDefault mt-4">
+        <h1 className="text-primary font-black text-[56px] text-center">
+          Govern the Scroll Protocol
+        </h1>
+        <p className="text-center text-secondary mt-4">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
+          lectus dignissim, porta tortor nec.Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit. Aliquam eu lectus dignissim, porta tortor
+          nec.
+        </p>
+        <Button
+          variant="brandPrimary"
+          className="w-full mt-4"
+          onClick={() => {
+            // try to connect wallet
+            if (!address) {
+              setOpen(true);
+              return;
+            }
+            onSuccess();
+          }}
+        >
+          {!!address ? "Get started" : "Connect wallet"}
+        </Button>
+      </div>
     </div>
   );
 };

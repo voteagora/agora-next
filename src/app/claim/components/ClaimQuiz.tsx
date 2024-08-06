@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../../../components/ui/button";
 
 // These are fake quiz questions for the sake of the example
 // We can sub them out with the real scroll quiz questions once we have them
@@ -59,27 +60,32 @@ const ClaimQuiz = ({ onSuccess }: { onSuccess: () => void }) => {
         {currentQuestion.answers.map((answer, idx) => (
           <li
             key={`answer-${idx}`}
-            className={`border ${currentAnswer === "" || answer !== currentAnswer ? "border-line" : isCorrectAnswer ? "border-green-500 bg-green-100 text-green-600" : "border-red-500 bg-red-100 text-red-600"} rounded-full p-3 mt-2 text-center font-semibold text-primary`}
+            className={`border ${currentAnswer === "" || answer !== currentAnswer ? "border-line" : isCorrectAnswer ? "border-green-500 bg-green-100 text-green-600" : "border-red-500 bg-red-100 text-red-600"} rounded-xl p-3 mt-2 text-center font-semibold text-primary flex fle-row justify-between`}
             onClick={() => validateAnswer(answer)}
           >
-            {answer}
+            <span>{answer}</span>
+            {answer === currentAnswer && (
+              <span
+                className={
+                  isCorrectAnswer
+                    ? "border-green-500 bg-green-100 text-green-600"
+                    : "border-red-500 bg-red-100 text-red-600"
+                }
+              >
+                {canProceed ? "Correct" : "Incorrect"}
+              </span>
+            )}
           </li>
         ))}
       </ul>
-      {currentAnswer !== "" && (
-        <p className="text-center font-medium text-secondary mt-10">
-          {canProceed
-            ? "That's correct!"
-            : "Incorrect answer, please try again."}
-        </p>
-      )}
-      <div className="mt-10">
-        <button
-          className={`${canProceed ? "bg-primary text-white" : " bg-wash text-tertiary"} font-semibold w-full py-3 rounded-lg`}
+      <div className="mt-6">
+        <Button
+          variant="brandPrimary"
+          className="w-full"
           onClick={canProceed ? next : () => {}}
         >
           Continue
-        </button>
+        </Button>
       </div>
     </div>
   );

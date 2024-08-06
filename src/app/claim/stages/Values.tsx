@@ -23,7 +23,7 @@ const PriorityCard = ({
 }) => {
   return (
     <div
-      className={`${active ? "bg-agora-stone-50" : "bg-white"} flex flex-col py-4 border border-line rounded-lg p-4 cursor-pointer`}
+      className={`${active ? "bg-brandSecondary" : "bg-neutral"} flex flex-col py-4 border border-line rounded-lg p-4 cursor-pointer`}
       onClick={onClick}
     >
       <div className="flex flex-row items-center space-x-2">
@@ -47,7 +47,7 @@ const ValuesStage = ({
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-line p-6">
+        <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault">
           <h1 className="text-2xl font-black">
             Choose a delegate who shares your values
           </h1>
@@ -58,7 +58,9 @@ const ValuesStage = ({
             tortor nec.
           </p>
           <div className="mt-4">
-            <h3 className="font-semibold">Select 3 governance priorities:</h3>
+            <h3 className="font-semibold">
+              Select your governance priorities:
+            </h3>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-4">
             {Object.values(Priority).map((priority, idx) => {
@@ -90,15 +92,14 @@ const ValuesStage = ({
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-white rounded-2xl border border-line p-6">
+          <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault">
             <h1 className="text-2xl font-black">
               Proceed to delegate selection
             </h1>
             <div className="mt-6">
-              {/* TODO (mg) fix this button */}
               <Button
-                variant={values.length === 3 ? "default" : "secondary"}
-                className="w-full"
+                variant={values.length > 0 ? "default" : "secondary"}
+                className={`w-full ${values.length > 0 ? "bg-brandPrimary hover:bg-brandPrimary" : "bg-brandPrimary/60 hover:bg-brandPrimary/60 cursor-not-allowed"}`}
                 onClick={() => {
                   onSuccess();
                 }}

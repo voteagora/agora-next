@@ -96,8 +96,8 @@ const PriorityPill = ({
   return (
     <div
       className={`${
-        active ? "border-secondary" : "border-line"
-      } flex flex-row border rounded-full px-4 py-2 cursor-pointer`}
+        active ? "bg-brandSecondary" : "bg-neutral"
+      } flex flex-row border border-line rounded-full px-4 py-2 cursor-pointer`}
       onClick={onClick}
     >
       <span className="flex-1 font-medium text-secondary">
@@ -119,7 +119,7 @@ const DelegateCard = ({
 }) => {
   return (
     <div
-      className={`${active ? "bg-agora-stone-50" : "bg-white"} border border-line rounded-xl p-4 cursor-pointer`}
+      className={`${active ? "bg-brandSecondary" : "bg-neutral"} border border-line rounded-xl p-4 cursor-pointer`}
       onClick={onClick}
     >
       <div className="flex flex-row">
@@ -170,7 +170,7 @@ const DelegationStage = ({
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-line p-6">
+        <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault">
           <h2 className="font-black text-2xl">Choose one or more delegates</h2>
           <p className="text-secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu
@@ -187,7 +187,7 @@ const DelegationStage = ({
                   icon={PriorityMetadata[priority].icon}
                   active={values.includes(priority)}
                   onClick={() => {
-                    if (values.length >= 3 && !values.includes(priority)) {
+                    if (!values.includes(priority)) {
                       // throw toast
                       return;
                     }
@@ -221,7 +221,7 @@ const DelegationStage = ({
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault relative">
+          <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault shadow-newDefault relative">
             <h2 className="font-black text-2xl mb-6">Your delegates</h2>
             {selectedDelegates.length === 0 ? (
               <p className="text-secondary">
@@ -267,10 +267,7 @@ const DelegationStage = ({
             )}
             <div className="mt-6">
               <Button
-                variant={
-                  selectedDelegates.length === 0 ? "secondary" : "default"
-                }
-                className="w-full"
+                className={`w-full ${selectedDelegates.length > 0 ? "bg-brandPrimary hover:bg-brandPrimary" : "bg-brandPrimary/60 hover:bg-brandPrimary/60 cursor-not-allowed"}`}
                 onClick={() => {
                   onSuccess();
                 }}
@@ -279,11 +276,33 @@ const DelegationStage = ({
               </Button>
             </div>
           </div>
-          <footer className="px-6 pb-6 pt-12 bg-agora-stone-50 border border-line rounded-b-2xl z-10 mt-[-24px]">
-            <h4>Your voting power</h4>
-            <span className="font-semibold text-2xl mt-2">600</span>
+          <footer className="px-6 pb-6 pt-12 bg-wash border border-line rounded-b-2xl z-10 mt-[-24px]">
+            <h4 className="text-secondary">Your voting power</h4>
+            <span className="font-semibold text-2xl mt-2 text-primary">
+              600
+            </span>
           </footer>
-          <Accordion type="single" collapsible className="mt-10">
+          <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault shadow-newDefault relative mt-6">
+            <h2 className="font-black text-lg mb-4">
+              Keep up with your delegates
+            </h2>
+            <p className="text-secondary">
+              Subscribe to receive email notifications when your delegates
+              participates in a governance vote
+            </p>
+            <div className="mt-6">
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => {
+                  onSuccess();
+                }}
+              >
+                Subscribe
+              </Button>
+            </div>
+          </div>
+          <Accordion type="single" collapsible className="mt-6">
             <AccordionItem value="item-1">
               <AccordionTrigger>FAQ</AccordionTrigger>
               <AccordionContent>

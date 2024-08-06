@@ -1,4 +1,3 @@
-import React from "react";
 import ClaimFlow from "./components/ClaimFlow";
 
 const TokenClaimPage = () => {

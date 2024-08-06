@@ -1,13 +1,18 @@
 import React from "react";
 import Image from "next/image";
 import { Button } from "../../../components/ui/button";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/24/outline";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const MOCK_ELIGIBILITY_CRITERIA = {
   "Bridged to Scroll": 100,
@@ -58,6 +63,8 @@ const EligibilityCriteriaItem = ({
   );
 };
 const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
+  const openDialog = useOpenDialog();
+
   const criteriaOnly = Object.keys(MOCK_ELIGIBILITY_CRITERIA).filter(
     (key) => key !== "total"
   );
@@ -65,13 +72,13 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <main className="grid grid-cols-8 gap-10 mt-12">
       <section className="col-span-5">
-        <div className="bg-white rounded-2xl border border-line p-6">
+        <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault">
           <h1 className="text-2xl font-black text-primary">
             {MOCK_ELIGIBILITY_CRITERIA.total > 0
-              ? "Congratulations, you qualify for the airdrop"
-              : "You do not quality for the airdrop"}
+              ? `Congratulations, you can claim ${MOCK_ELIGIBILITY_CRITERIA.total} SCROLL`
+              : "No allocation found"}
           </h1>
-          <div className="flex flex-row space-x-4 mt-10">
+          <div className="flex flex-row space-x-4 mt-4">
             {/* TODO (mg) edit copy */}
             <p className="text-secondary">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
@@ -86,7 +93,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
               alt="People float in a field of colored cubes"
             />
           </div>
-          <StatCard className="mt-10" />
+          <StatCard className="mt-4" />
           <div className="mt-10">
             <div className="flex flex-row justify-between items-center">
               <h3 className="font-semibold text-primary">
@@ -108,6 +115,40 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
                   }
                 />
               ))}
+              <div className="flex flex-row items-center py-4 border-b border-dotted last:border-solid border-line">
+                <QuestionMarkCircleIcon className="h-5 w-5 text-secondary mr-2" />
+                <span className="flex-1 mr-4 font-medium text-primary">
+                  Community contributor
+                </span>
+                <span
+                  className="text-brandPrimary font-medium cursor-pointer"
+                  onClick={() => {
+                    openDialog({
+                      type: "CLAIM_FLOW_GITHUB_CHECK",
+                      params: {},
+                    });
+                  }}
+                >
+                  Check eligibility
+                </span>
+              </div>
+              <div className="flex flex-row items-center py-4 border-b border-dotted last:border-solid border-line">
+                <QuestionMarkCircleIcon className="h-5 w-5 text-secondary mr-2" />
+                <span className="flex-1 mr-4 font-medium text-primary">
+                  Community developer
+                </span>
+                <span
+                  className="text-brandPrimary font-medium cursor-pointer"
+                  onClick={() => {
+                    openDialog({
+                      type: "CLAIM_FLOW_EMAIL_CHECK",
+                      params: {},
+                    });
+                  }}
+                >
+                  Check eligibility
+                </span>
+              </div>
               <div className="flex flex-row items-center justify-between pt-4">
                 <span className="font-medium text-primary">Total</span>
                 <span className="font-medium text-primary">
@@ -120,29 +161,42 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
       </section>
       <section className="col-span-3">
         <div className="sticky top-4">
-          <div className="bg-neutral rounded-2xl border border-line p-6">
-            <h1 className="text-2xl font-black text-primary">
-              Your allocation
-            </h1>
-            <p className="text-secondary mb-4">
-              You are eligible for the airdrop
-            </p>
-            <div className="h-48 w-full border border-dotted border-line rounded-2xl bg-[url('/images/receipt_bg.svg')] bg-center relative flex items-center justify-center">
-              <p className="font-semibold text-5xl text-primary">
-                {MOCK_ELIGIBILITY_CRITERIA.total}
-              </p>
+          {MOCK_ELIGIBILITY_CRITERIA.total > 0 && (
+            <div className="bg-neutral rounded-2xl border border-line p-6 shadow-newDefault">
+              <h1 className="text-2xl font-black text-primary">
+                Your token claim
+              </h1>
+              <div className="w-full border border-line rounded-2xl mt-4 p-4">
+                <span className="flex flex-row justify-between items-center border-b border-dotted border-line last:border-b-0">
+                  <p className="font-medium text-5xl text-primary">
+                    {MOCK_ELIGIBILITY_CRITERIA.total}
+                  </p>
+                  <span className="text-sm w-1/3 text-secondary text-right">
+                    Scroll available to claim now
+                  </span>
+                </span>
+                <span className="flex flex-row justify-between items-center">
+                  <p className="font-medium text-5xl text-primary">
+                    {MOCK_ELIGIBILITY_CRITERIA.total}
+                  </p>
+                  <span className="text-sm w-1/3 text-secondary text-right">
+                    Sent to your wallet soon. Learn more
+                  </span>
+                </span>
+              </div>
+              <div className="mt-6">
+                <Button
+                  variant="brandPrimary"
+                  className="w-full"
+                  onClick={() => {
+                    onSuccess();
+                  }}
+                >
+                  Begin claim process
+                </Button>
+              </div>
             </div>
-            <div className="mt-10">
-              <Button
-                className="w-full"
-                onClick={() => {
-                  onSuccess();
-                }}
-              >
-                Begin claim process
-              </Button>
-            </div>
-          </div>
+          )}
           <Accordion type="single" collapsible className="mt-10">
             <AccordionItem value="item-1">
               <AccordionTrigger>FAQ</AccordionTrigger>

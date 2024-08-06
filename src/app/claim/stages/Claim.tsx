@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { Button } from "../../../components/ui/button";
 
 const ClaimStage = ({ onSuccess }: { onSuccess: () => void }) => {
@@ -12,29 +11,38 @@ const ClaimStage = ({ onSuccess }: { onSuccess: () => void }) => {
             You will be prompted to complete the claiming process from your
             connected wallet.
           </p>
-          <div className="mt-6 h-48 w-full border border-dotted border-line rounded-2xl bg-[url('/images/receipt_bg.svg')] bg-center relative flex items-center justify-center">
-            <p className="font-semibold text-5xl">600</p>
+          <div className="mt-6 w-full border border-line rounded-2xl px-8 py-6">
+            <div className="flex flex-row justify-between items-center">
+              <p className="font-semibold text-5xl">600</p>
+              <span className="text-secondary text-right text-sm">
+                Scroll available to claim
+              </span>
+            </div>
           </div>
-          <Button className="w-full mt-6" onClick={onSuccess}>
-            Claim
+          <Button
+            variant="brandPrimary"
+            className="w-full mt-6"
+            onClick={onSuccess}
+          >
+            Claim tokens
           </Button>
         </div>
-        <footer className="px-6 pb-6 pt-12 bg-agora-stone-50 border border-line rounded-b-2xl z-10 mt-[-24px]">
+        <footer className="px-6 pb-6 pt-12 bg-wash border border-line rounded-b-2xl z-10 mt-[-24px]">
           <div className="flex flex-col">
-            <span className="text-xs font-semibold text-tertiary">
+            <span className="text-xs font-semibold text-secondary">
               Your voting power has been delegated
             </span>
             <div className="flex flex-row space-x-2 items-center mt-4">
               <span className="h-6 w-6 rounded-full bg-tertiary"></span>
-              <p>linda.eth</p>
+              <p className="text-primary">linda.eth</p>
               <span className="h-1 border-b border-dotted border-line flex-1"></span>
-              <span>est. 355</span>
+              <span className="text-primary">est. 355</span>
             </div>
             <div className="flex flex-row space-x-2 items-center mt-4">
               <span className="h-6 w-6 rounded-full bg-tertiary"></span>
-              <p>linda.eth</p>
+              <p className="text-primary">linda.eth</p>
               <span className="h-1 border-b border-dotted border-line flex-1"></span>
-              <span>est. 355</span>
+              <span className="text-primary">est. 355</span>
             </div>
           </div>
         </footer>
