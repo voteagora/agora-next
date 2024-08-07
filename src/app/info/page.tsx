@@ -15,10 +15,10 @@ import Hero from "@/components/Hero/Hero";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
-  const page = tenant.ui.page("proposals");
+  const page = tenant.ui.page("info");
   const { title, description } = page!.meta;
 
-  const preview = `/api/images/og/proposals?title=${encodeURIComponent(
+  const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
   )}&description=${encodeURIComponent(description)}`;
 
@@ -55,6 +55,7 @@ export default async function Page() {
       FREQUENCY_FILTERS.YEAR
     );
     const hasTreasuryData = treasuryData.result.length > 0;
+    const hasGovernanceCharts = ui.toggle("info/governance-charts")?.enabled;
 
     return (
       <div className="flex flex-col font-inter">
@@ -70,20 +71,22 @@ export default async function Page() {
             }}
           />
         )}
-        <GovernanceCharts
-          getDelegates={async () => {
-            "use server";
-            return apiFetchDelegateWeights();
-          }}
-          getVotes={async () => {
-            "use server";
-            return apiFetchProposalVoteCounts();
-          }}
-          getMetrics={async (metric: string, frequency: string) => {
-            "use server";
-            return apiFetchMetricTS(metric, frequency);
-          }}
-        />
+        {hasGovernanceCharts && (
+          <GovernanceCharts
+            getDelegates={async () => {
+              "use server";
+              return apiFetchDelegateWeights();
+            }}
+            getVotes={async () => {
+              "use server";
+              return apiFetchProposalVoteCounts();
+            }}
+            getMetrics={async (metric: string, frequency: string) => {
+              "use server";
+              return apiFetchMetricTS(metric, frequency);
+            }}
+          />
+        )}
 
         <div className="h-[350px]"></div>
       </div>

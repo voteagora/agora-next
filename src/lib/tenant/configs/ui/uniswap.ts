@@ -202,5 +202,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "info",
       enabled: true,
     },
+    {
+      name: "info/governance-charts",
+      enabled: true,
+    },
   ],
 });
