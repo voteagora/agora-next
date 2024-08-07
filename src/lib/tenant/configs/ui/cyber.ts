@@ -4,7 +4,7 @@ import cyberLogo from "@/assets/tenant/cyber_logo.svg";
 import delegateImage from "@/assets/tenant/cyber_delegate.svg";
 import successImage from "@/assets/tenant/cyber_success.svg";
 import pendingImage from "@/assets/tenant/cyber_pending.svg";
-import { ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const cyberTenantUIConfig = new TenantUI({
@@ -173,6 +173,7 @@ export const cyberTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [ProposalType?.BASIC],
         copy: {},
+        gatingType: ProposalGatingType.TOKEN_THRESHOLD,
       },
     },
   ],

@@ -194,6 +194,11 @@ export enum TransactionType {
   CUSTOM = "custom",
 }
 
+export enum ProposalGatingType {
+  MANAGER = "manager",
+  TOKEN_THRESHOLD = "token threshold",
+}
+
 export type PLMConfig = {
   // the stages of the proposal lifecycle that
   // this tenant wants to use
@@ -207,6 +212,13 @@ export type PLMConfig = {
   snapshotConfig?: {
     domain: string;
   };
+  // The method for gating who can create a proposal
+  // Manager -- only the manager can create proposals
+  // Token Threshold -- a certain amount of tokens must be held
+  // OZ (ENS, UNI): Token threshold
+  // Agora gov 0.1 (OP): manager
+  // Agora gov 1.0+ (everyone else): manager or voting threshold
+  gatingType: ProposalGatingType;
 };
 
 export type BaseProposal = ProposalDraft & {
