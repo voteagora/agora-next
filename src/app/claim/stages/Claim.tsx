@@ -1,7 +1,14 @@
 import React from "react";
 import { Button } from "../../../components/ui/button";
+import { useMerkleTree } from "@/hooks/useMerkleTree";
 
 const ClaimStage = ({ onSuccess }: { onSuccess: () => void }) => {
+  const { data } = useMerkleTree({
+    // address: address!,
+    address: "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
+    tree: "scroll-test",
+  });
+
   return (
     <main className="h-[800px] w-full bg-[url('/images/scroll/scroll-claim-bg.png')] bg-contain bg-center flex items-center justify-center">
       <div className="relative w-[600px]">
@@ -13,7 +20,7 @@ const ClaimStage = ({ onSuccess }: { onSuccess: () => void }) => {
           </p>
           <div className="mt-6 w-full border border-line rounded-2xl px-8 py-6">
             <div className="flex flex-row justify-between items-center">
-              <p className="font-semibold text-5xl">600</p>
+              <p className="font-semibold text-5xl">{data?.value}</p>
               <span className="text-secondary text-right text-sm">
                 Scroll available to claim
               </span>

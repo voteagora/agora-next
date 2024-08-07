@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useMerkleTree } from "@/hooks/useMerkleTree";
 
 const MOCK_ELIGIBILITY_CRITERIA = {
   "Bridged to Scroll": 100,
@@ -65,6 +66,12 @@ const EligibilityCriteriaItem = ({
 const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
   const openDialog = useOpenDialog();
 
+  const { data } = useMerkleTree({
+    // address: address!,
+    address: "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
+    tree: "scroll-test",
+  });
+
   const criteriaOnly = Object.keys(MOCK_ELIGIBILITY_CRITERIA).filter(
     (key) => key !== "total"
   );
@@ -75,7 +82,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
         <div className="bg-white rounded-2xl border border-line p-6 shadow-newDefault">
           <h1 className="text-2xl font-black text-primary">
             {MOCK_ELIGIBILITY_CRITERIA.total > 0
-              ? `Congratulations, you can claim ${MOCK_ELIGIBILITY_CRITERIA.total} SCROLL`
+              ? `Congratulations, you can claim ${data?.value} SCROLL`
               : "No allocation found"}
           </h1>
           <div className="flex flex-row space-x-4 mt-4">
@@ -151,9 +158,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
               </div>
               <div className="flex flex-row items-center justify-between pt-4">
                 <span className="font-medium text-primary">Total</span>
-                <span className="font-medium text-primary">
-                  {MOCK_ELIGIBILITY_CRITERIA.total}
-                </span>
+                <span className="font-medium text-primary">{data.value}</span>
               </div>
             </div>
           </div>
@@ -169,7 +174,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
               <div className="w-full border border-line rounded-2xl mt-4 p-4">
                 <span className="flex flex-row justify-between items-center border-b border-dotted border-line last:border-b-0">
                   <p className="font-medium text-5xl text-primary">
-                    {MOCK_ELIGIBILITY_CRITERIA.total}
+                    {data?.value}
                   </p>
                   <span className="text-sm w-1/3 text-secondary text-right">
                     Scroll available to claim now
@@ -177,7 +182,7 @@ const EligibilityStage = ({ onSuccess }: { onSuccess: () => void }) => {
                 </span>
                 <span className="flex flex-row justify-between items-center">
                   <p className="font-medium text-5xl text-primary">
-                    {MOCK_ELIGIBILITY_CRITERIA.total}
+                    {data?.value}
                   </p>
                   <span className="text-sm w-1/3 text-secondary text-right">
                     Sent to your wallet soon. Learn more
