@@ -69,5 +69,4 @@ const GovernorSettingsParams = () => {
     </Table>
   );
 };
-
 export default GovernorSettingsParams;

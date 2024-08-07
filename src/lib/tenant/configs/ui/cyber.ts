@@ -128,10 +128,10 @@ export const cyberTenantUIConfig = new TenantUI({
       description:
         "Agora is your home for onchain proposals, voting, and governance.",
       meta: {
-        title: "Info of Agora",
-        description: "Welcome to the CyberDAO",
-        imageTitle: "Info of Agora",
-        imageDescription: "Welcome to CyberDAO",
+        title: "Cyber Agora",
+        description: "Home of Cyber governance",
+        imageTitle: "Cyber Agora",
+        imageDescription: "Home of Cyber governance",
       },
       links: [
         {

@@ -1,6 +1,6 @@
 import {
+  AgoraGovernor__factory,
   ERC20__factory,
-  OptimismGovernor__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -80,7 +80,7 @@ export const cyberTenantConfig = ({
       abi: [],
       address: GOVERNOR,
       chain,
-      contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
+      contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
 
