@@ -2209,7 +2209,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
-      response:
+      responses:
         "200":
           description: OK
           content:
