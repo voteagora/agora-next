@@ -2270,7 +2270,12 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
-        - $ref: "#/components/parameters/addressOrEnsName"
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the viewer
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -2307,7 +2312,12 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/categoryIdParam"
-        - $ref: "#/components/parameters/addressOrEnsName"
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the viewer
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -2353,7 +2363,12 @@ paths:
         - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/addressOrEnsName"
+        - name: addressOrEnsName
+          in: path
+          description: The address or ENS name of the viewer
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
