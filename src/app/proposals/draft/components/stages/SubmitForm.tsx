@@ -7,9 +7,15 @@ import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
-import { DraftProposal } from "../../types";
+import { useManager } from "@/hooks/useManager";
+import { DraftProposal, ProposalGatingType } from "../../types";
+import Tenant from "@/lib/tenant/tenant";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const gatingType = plmToggle?.config?.gatingType;
+
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useGetVotes({
@@ -17,15 +23,26 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
     blockNumber: blockNumber || BigInt(0),
   });
   const { data: threshold } = useProposalThreshold();
+  const { data: manager } = useManager();
 
-  const hasEnoughVotes =
-    accountVotesData !== undefined && threshold !== undefined
-      ? accountVotesData >= threshold
-      : false;
+  const canSponsor = () => {
+    switch (gatingType) {
+      case ProposalGatingType.MANAGER:
+        return manager === address;
+      case ProposalGatingType.TOKEN_THRESHOLD:
+        return accountVotesData !== undefined && threshold !== undefined
+          ? accountVotesData >= threshold
+          : false;
+      default:
+        return false;
+    }
+  };
+
+  const canAddressSponsor = canSponsor();
 
   return (
     <div className="mt-6">
-      {hasEnoughVotes ? (
+      {canAddressSponsor ? (
         <SponsorActions draftProposal={proposalDraft} />
       ) : (
         <RequestSponsorshipForm draftProposal={proposalDraft} />

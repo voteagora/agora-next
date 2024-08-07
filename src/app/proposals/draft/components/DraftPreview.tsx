@@ -11,8 +11,12 @@ import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { DraftProposal } from "../../../proposals/draft/types";
+import {
+  DraftProposal,
+  ProposalGatingType,
+} from "../../../proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 
 const PreText = ({ text }: { text: string }) => {
@@ -32,16 +36,31 @@ const DraftPreview = ({
   isArchived?: boolean;
 }) => {
   const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const gatingType = plmToggle?.config?.gatingType;
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
+  const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber || BigInt(0),
   });
 
-  const hasEnoughVotes =
-    accountVotesData && threshold ? accountVotesData >= threshold : false;
+  const canSponsor = () => {
+    switch (gatingType) {
+      case ProposalGatingType.MANAGER:
+        return manager === address;
+      case ProposalGatingType.TOKEN_THRESHOLD:
+        return accountVotesData !== undefined && threshold !== undefined
+          ? accountVotesData >= threshold
+          : false;
+      default:
+        return false;
+    }
+  };
+
+  const canAddressSponsor = canSponsor();
 
   // sorted and filtered checklist items
   // take most recent of each checklist item by title
@@ -206,7 +225,7 @@ const DraftPreview = ({
         ) : (
           <>
             <h3 className="font-semibold">Ready to submit?</h3>
-            {!hasEnoughVotes && (
+            {!canAddressSponsor && (
               <p className="text-agora-stone-700 mt-2">
                 You do not meet the requirement to submit this proposal.
                 However, you can ask someone who does to help you by sharing
@@ -248,21 +267,30 @@ const DraftPreview = ({
                 );
               })}
               <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                <p className="flex-grow">Proposal threshold</p>
+                <p className="flex-grow">
+                  {gatingType === ProposalGatingType.MANAGER
+                    ? "Manager only"
+                    : "Proposal threshold"}
+                </p>
                 <span className="text-secondary font-mono text-xs">
-                  {threshold
-                    ? Math.round(
-                        parseFloat(
-                          formatUnits(BigInt(threshold), tenant.token.decimals)
+                  {gatingType === ProposalGatingType.MANAGER
+                    ? manager?.toString()
+                    : threshold
+                      ? Math.round(
+                          parseFloat(
+                            formatUnits(
+                              BigInt(threshold),
+                              tenant.token.decimals
+                            )
+                          )
                         )
-                      )
-                    : "0"}{" "}
+                      : "0"}{" "}
                   required
                 </span>
                 <input
                   type="checkbox"
                   className="rounded text-agora-stone-900"
-                  checked={hasEnoughVotes}
+                  checked={canAddressSponsor}
                 />
               </div>
             </div>
