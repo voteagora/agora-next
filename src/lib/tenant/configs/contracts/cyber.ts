@@ -77,7 +77,7 @@ export const cyberTenantConfig = ({
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: AgoraGovernor__factory.abi,
       address: GOVERNOR,
       chain,
       contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
