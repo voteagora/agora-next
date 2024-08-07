@@ -23,16 +23,17 @@ async function fetchDaoMetrics() {
 }
 
 const standard = {
-  primary: "#171717",
-  secondary: "#404040",
-  tertiary: "#737373",
-  neutral: "#FFFFFF",
-  wash: "#FAFAFA",
-  line: "#EAEAEA",
-  positive: "#00992B",
-  negative: "#C52F00",
-  brandPrimary: "#171717",
-  brandSecondary: "#FFFFFF",
+  primary: "23 23 23",
+  secondary: "64 64 64",
+  tertiary: "115 115 115",
+  neutral: "255 255 255",
+  wash: "250 250 250",
+  line: "229 229 229",
+  positive: "0 153 43",
+  negative: "197 47 0",
+  brandPrimary: "23 23 23",
+  brandSecondary: "255 255 255",
+  font: "TransSansPremium",
 };
 
 const defaults = standard;

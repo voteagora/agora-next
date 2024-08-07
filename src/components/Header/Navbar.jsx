@@ -16,6 +16,11 @@ export default function Navbar() {
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
 
+  // Hide the navbar when on the claim page
+  if (pathname === "/claim") {
+    return null;
+  }
+
   return (
     <div
       className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium shadow-newDefault`}

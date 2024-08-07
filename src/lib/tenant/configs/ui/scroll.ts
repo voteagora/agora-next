@@ -27,16 +27,17 @@ export const scrollTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    primary: "#171717",
-    secondary: "#404040",
-    tertiary: "#737373",
-    neutral: "#FFFFFF",
-    wash: "#FAFAFA",
-    line: "#E5E5E5",
-    positive: "#00992B",
-    negative: "#C52F00",
-    brandPrimary: "#171717",
-    brandSecondary: "#F2F2F2",
+    primary: "25 6 2",
+    secondary: "117 106 103",
+    tertiary: "209 205 204",
+    neutral: "255 255 255",
+    wash: "250 242 232",
+    line: "241 217 185",
+    positive: "0 153 43",
+    negative: "197 47 0",
+    brandPrimary: "255 76 0",
+    brandSecondary: "255 248 243",
+    font: "TransSansPremium",
   },
 
   pages: [
