@@ -2507,12 +2507,14 @@ paths:
           content:
             application/json:
               schema:
-                metric_id:
-                  type: string
-                address:
-                  type: string
-                ts:
-                  type: string
+                type: object
+                properties:
+                  impact_metric_id:
+                    type: string
+                  address:
+                    type: string
+                  ts:
+                    type: string
         "400":
           description: Bad Request
         "401":
