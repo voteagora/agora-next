@@ -1314,6 +1314,20 @@ components:
           type: string
           pattern: "^0x[a-fA-F0-9]{130}$"
   parameters:
+    addressOrEnsName:
+      name: addressOrEns
+      in: path
+      description: The address or ENS name of the delegate to retrieve
+      required: true
+      schema:
+        type: string
+      examples:
+        address:
+          value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+          summary: Address of the delegate.
+        ensName:
+          value: "flipliquid.eth"
+          summary: ENS name of the delegate.
     limitParam:
       name: limit
       in: query
@@ -1515,19 +1529,7 @@ paths:
       tags:
         - delegates
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
@@ -1554,19 +1556,7 @@ paths:
         - votes
         - delegates
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
       responses:
@@ -1721,19 +1711,7 @@ paths:
         - delegates
         - delegations
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
@@ -1760,19 +1738,7 @@ paths:
         - delegates
         - delegations
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
@@ -2264,7 +2230,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/projects/{projectId}:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/projects/{projectId}:
     post:
       summary: Updates a specific project in ballot for a RetroFunding round
       description: >
@@ -2277,12 +2243,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the viewer
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/addressOrEnsName"
       requestBody:
         content:
           application/json:
@@ -2306,7 +2267,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/categories/{categoryId}:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/categories/{categoryId}:
     post:
       summary: Updates a specific allocation for a RetroFunding round
       description: >
@@ -2319,12 +2280,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/categoryIdParam"
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the viewer
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/addressOrEnsName"
       requestBody:
         content:
           application/json:
@@ -2358,7 +2314,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/distribution_method:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/distribution_method:
     post:
       summary: Updates the distribution method for a specific RetroFunding ballot
       description: >
@@ -2370,12 +2326,7 @@ paths:
         - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the viewer
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/addressOrEnsName"
       requestBody:
         content:
           application/json:
@@ -2495,12 +2446,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the viewer
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
