@@ -18,8 +18,15 @@ export const scrollTenantContractConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = "0x5300000000000000000000000000000000000004";
-  const GOVERNOR = "0x0";
+  // other contracts (testnet)
+  // 0xE27B7b6DB440b27249b49E3C0A686B82c36A0D7e -- timelock
+  // 0x011EE4D990219F5ee8718005fc3484890E170042 -- proposal types
+  // 0x2e0C197f1fca7628ADfa2bdaabd1df4670186C06 -- proxy admin
+
+  const TOKEN = isProd ? "0x0" : "0xBa61Bf34b51aD4710a784dc5B675df67817FCDa6";
+  const GOVERNOR = isProd
+    ? "0x0"
+    : "0x9394E163ce253f29086A4A2733BcfC0ca28fFc6c";
 
   const provider = new JsonRpcProvider(
     `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
