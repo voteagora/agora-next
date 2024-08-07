@@ -1362,6 +1362,13 @@ components:
       required: true
       schema:
         type: integer
+    categoryIdParam:
+      name: categoryId
+      in: path
+      description: The category ID of the RetroFunding category to retrieve.
+      required: true
+      schema:
+        type: string
     ballotIdParam:
       name: ballotCasterAddressOrEns
       in: path
