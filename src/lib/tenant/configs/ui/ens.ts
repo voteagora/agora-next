@@ -3,7 +3,7 @@ import ensLogo from "@/assets/tenant/ens_logo.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
-import { ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const ensTenantUIConfig = new TenantUI({
@@ -124,6 +124,7 @@ export const ensTenantUIConfig = new TenantUI({
           domain: "ens.eth",
         },
         copy: {},
+        gatingType: ProposalGatingType.TOKEN_THRESHOLD,
       },
     },
   ],

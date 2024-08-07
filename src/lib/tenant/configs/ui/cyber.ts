@@ -9,7 +9,7 @@ import infoPageCard02 from "@/assets/tenant/cyber_info_2.png";
 import infoPageCard03 from "@/assets/tenant/cyber_info_3.png";
 import infoPageCard04 from "@/assets/tenant/cyber_info_4.png";
 import infoPageHero from "@/assets/tenant/cyber_info_hero.png";
-import { ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const cyberTenantUIConfig = new TenantUI({
@@ -239,6 +239,7 @@ export const cyberTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [ProposalType?.BASIC],
         copy: {},
+        gatingType: ProposalGatingType.TOKEN_THRESHOLD,
       },
     },
   ],
