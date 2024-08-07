@@ -11,9 +11,7 @@ import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
-
   logo: optimismLogo,
-  hero: optimismHero,
 
   assets: {
     success: successImage,
@@ -100,6 +98,7 @@ export const optimismTenantUIConfig = new TenantUI({
       title: "Agora is the home of Optimism voters",
       description:
         "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      hero: optimismHero,
       meta: {
         title: "Optimism Agora",
         description: "Home of token house governance and RPGF",
@@ -112,6 +111,7 @@ export const optimismTenantUIConfig = new TenantUI({
       title: "Agora is the home of Optimism voters",
       description:
         "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      hero: optimismHero,
       meta: {
         title: "Optimism Agora",
         description: "Home of token house governance and RPGF",
@@ -124,6 +124,7 @@ export const optimismTenantUIConfig = new TenantUI({
       title: "Agora is the home of Optimism voters",
       description:
         "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      hero: optimismHero,
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -137,6 +138,7 @@ export const optimismTenantUIConfig = new TenantUI({
       title: "Welcome to the Optimism Collective",
       description:
         "A collective of companies, communities, and citizens working together.",
+      hero: optimismHero,
       meta: {
         title: "Info of Agora",
         description: "Welcome to the Optimism Collective",

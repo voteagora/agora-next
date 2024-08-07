@@ -7,7 +7,6 @@ import pendingImage from "@/assets/tenant/etherfi_pending.svg";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ether.fi Agora",
-  hero: etherfiHero,
   logo: etherfiLogo,
 
   assets: {
@@ -61,6 +60,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       title: "Agora is the home of ether.fi governance",
       description:
         "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      hero: etherfiHero,
       meta: {
         title: "ether.fi Agora",
         description: "Home of token governance",
@@ -73,6 +73,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       title: "Agora is the home of ether.fi governance",
       description:
         "ether.fi governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      hero: etherfiHero,
       meta: {
         title: "ether.fi Agora",
         description: "Home of token governance",
@@ -85,6 +86,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       title: "Agora is the home of ether.fi delegates",
       description:
         "ether.fi voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      hero: etherfiHero,
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -99,6 +101,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       title: "Agora is the home of ether.fi delegates",
       description:
         "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      hero: etherfiHero,
       meta: {
         title: "ether.fi Agora",
         description: "Home of token governance",

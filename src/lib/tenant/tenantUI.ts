@@ -15,10 +15,11 @@ export type UILink = {
 
 type UIPage = {
   description: string;
-  route: string;
-  title: string;
+  hero?: StaticImageData | string;
   href?: string;
   links?: UILink[];
+  route: string;
+  title: string;
   meta: {
     title: string;
     description: string;
@@ -60,7 +61,6 @@ type TenantUIParams = {
   googleAnalytics?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
-  hero?: string;
   links?: UILink[];
   logo: string;
   organization?: UIOrganization;
@@ -119,7 +119,6 @@ export class TenantUI {
     googleAnalytics,
     governanceIssues,
     governanceStakeholders,
-    hero,
     links,
     logo,
     organization,
@@ -133,7 +132,6 @@ export class TenantUI {
     this._googleAnalytics = googleAnalytics;
     this._governanceIssues = governanceIssues;
     this._governanceStakeholders = governanceStakeholders;
-    this._hero = hero;
     this._links = links;
     this._logo = logo;
     this._organization = organization;
@@ -164,10 +162,6 @@ export class TenantUI {
 
   public get title(): string {
     return this._title;
-  }
-
-  public get hero(): string | undefined {
-    return this._hero;
   }
 
   public get logo(): string {

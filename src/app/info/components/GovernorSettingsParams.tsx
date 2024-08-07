@@ -15,6 +15,7 @@ import { SECONDS_IN_HOUR } from "@/lib/constants";
 
 const GovernorSettingsParams = () => {
   const { contracts } = Tenant.current();
+
   const { data: votingDelay, isFetched: isDelayFetched } = useContractRead({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
@@ -69,5 +70,4 @@ const GovernorSettingsParams = () => {
     </Table>
   );
 };
-
 export default GovernorSettingsParams;

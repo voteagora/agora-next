@@ -14,16 +14,15 @@ async function getTreasuryBalanceTS(
   }
 
   const { contracts } = Tenant.current();
-
+  const chainId = contracts.token?.chain?.id;
   const { lookback } = frequencyToLookbackDayCount(frequency);
-
   const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ")})`;
 
   const QRY = `SELECT day,
                 TO_CHAR(day, 'YYYY-MM-DD') date,
                 ROUND(SUM(balance_usd)::numeric,0) balance_usd
               FROM   dune.token_balances tb
-              WHERE  chain_id = 1
+              WHERE  chain_id = ${chainId}
                 AND day >= (CURRENT_DATE - INTERVAL '${lookback} day')
                 AND address IN ${crit}
               GROUP BY 1 
