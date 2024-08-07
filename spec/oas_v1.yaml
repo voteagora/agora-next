@@ -10,7 +10,8 @@ info:
     ### API Categories
     Live and stable. 
     - **auth**: Authenticate with the Agora API
-    - **RetroFunding**: Data related to RetroPGF Funding for Optimism Round 4 and beyond
+    - **Round 4**: Data related to Retro Funding for Optimism Round 4
+    - **RetroFunding**: Data related to Retro Funding for Optimism Round 4 and beyond
     - **projects**: Data related to RetroPGF Projects
     - **RetroFundingRounds**: Data related to RetroPGF Funding Rounds
     - **RetroFundingBallots**: Data related to RetroPGF Funding Ballots
@@ -24,14 +25,30 @@ info:
     - **votes**: Vote data
     - **contracts**: Data for the current onchain contracts
 
+    Not Live.
+    - **Round 5**: Data related to Retro Funding for Optimism Round 5
+    - 0.2.0: **projects** Round 5 Projects and categories with mock data
+    - 0.2.0: **RetroFundingCategories** Round 5 Projects and categories with mock data
+    - 0.2.1: **RetroFundingBallots** Round 5 Ballots with mock data
+    - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
+    - 0.2.3: **comments** Round 5 Comments & Comments votes
+    - 0.2.3: **commentsVotes** Round 5 Comments & Comments votes
+    - 0.2.4: Round 5 Production release with real data
+
     ### Release Schedule
 
     | Version  | Status  | Release Date  |
     |----------|---------|---------------|
-    | OP 0.1.0 | LIVE   | June 7th|
+    | OP 0.1.0 | LIVE   | June 7th |
     | OP 0.1.1 | LIVE   | June 27th |
     | OP 0.1.2 | LIVE   | July 22th |
     | OP 0.1.3 | LIVE   | July 31th |
+    |----------|---------|---------------|
+    | OP 0.2.0 | LIVE   | Aug 10th |
+    | OP 0.2.1 | LIVE   | Aug 16th |
+    | OP 0.2.2 | LIVE   | Aug 23th |
+    | OP 0.2.3 | LIVE   | Aug 30th |
+    | OP 0.2.4 | LIVE   | Sep 13th |
   version: 0.1.3
   license:
     name: MIT
@@ -42,22 +59,30 @@ servers:
 tags:
   - name: auth
     description: Authenticate with the Agora API
+  - name: Round 5
+    description: Data related to Retro Funding for Optimism Round 5
+  - name: Round 4
+    description: Data related to Retro Funding for Optimism Round 4
   - name: RetroFunding
-    description: Data related to RetoPGF Funding for Optimism Round 4 and beyond
+    description: Data related to Retro Funding for Optimism Round 4 and beyond
   - name: projects
-    description: Data related to RetroPGF Projects
+    description: Data related to Retro Projects
   - name: RetroFundingRounds
-    description: Data related to RetoPGF Funding Rounds
+    description: Data related to Retro Funding Rounds
   - name: RetroFundingBallots
-    description: Data related to RetoPGF Funding Ballots
+    description: Data related to Retro Funding Ballots
+  - name: DistributionStrategies
+    description: Data related to Retro Funding Distribution Strategies
   - name: impactMetrics
     description: Data related to the Impact Metrics for RetroFunding Round 4
   - name: RetroFundingImpactMetrics
     description: Connect RetroPGF to Impact Metrics
+  - name: RetroFundingCategories
+    description: Data related to Retro Funding Categories
   - name: comments
-    description: Data related to RetroPGF Project Comments
+    description: Data related to Retro Funding Project Comments
   - name: commentsVotes
-    description: Data related to RetroPGF Project Comments' Votes
+    description: Data related to Retro Funding Project Comments' Votes
   - name: delegates
     description: Delegates data
   - name: delegations
@@ -119,7 +144,7 @@ components:
       type: object
       properties:
         has_next:
-          summary: Flag indicating if there's more data for retieval
+          summary: Flag indicating if there's more data for retrieval
           description: A boolean flag indicating if there is additional data past the returned page to retrieve.
           type: boolean
         total_returned:
@@ -156,7 +181,7 @@ components:
           examples:
             - "100000000000000000000000"
         timestamp:
-          summary: When delegation occured
+          summary: When delegation occurred
           description: The datetime on which the delegation of voting power occurred.
           type: string
           format: date-time
@@ -287,7 +312,7 @@ components:
           description: The delegate's voting participation.
           type: string
         lastTenProps:
-          summary: number of proposals voted on out of the last ten
+          summary: Number of proposals voted on out of the last ten
           description: The number of proposals voted on out of the last ten.
           type: string
         numOfDelegators:
@@ -295,7 +320,7 @@ components:
           description: The number of delegators.
           type: string
     DelegateStatement:
-      summmary: A delegate's statement
+      summary: A delegate's statement
       description: A delegate's statement, including the social links and topIssues.
       type: object
       properties:
@@ -389,6 +414,7 @@ components:
               votes:
                 type: string
         criteria:
+          type: string
           enum:
             - THRESHOLD
             - TOP_CHOICES
@@ -396,8 +422,8 @@ components:
           summary: Threshold required to pass or number of top choices that is passed
           type: string
     OptimisticProposalResults:
-      summary: Results of a standard proposal
-      description: An object describing the results of a standard proposal.
+      summary: Results of an optimistic proposal
+      description: An object describing the results of an optimistic proposal.
       type: object
       properties:
         for:
@@ -521,7 +547,7 @@ components:
           summary: Description of the proposal
           type: string
     ExecutionData:
-      summary: Structured exceution data for proposal
+      summary: Structured execution data for proposal
       description: >
         Provides the values, targets, calldata, and functions for proposal execution.
       type: object
@@ -691,10 +717,8 @@ components:
           type: integer
         votingStrategy:
           $ref: "#/components/schemas/VotingStrategy"
-        # Note: quorum and threshold are strings since I'm not sure about the unit/size here
-        # (i.e. if they can be contained in an int32/int64 type)
         quorum:
-          summary: Minimmum participation for passage
+          summary: Minimum participation for passage
           description: >
             The minimum number of voting power needed to be involved in a given proposal as a prerequisite for passage
           type: string
@@ -864,7 +888,7 @@ components:
           type: integer
         created_at:
           summary: Timestamp of the vote
-          description: The timestamp at which the comment was created.
+          description: The timestamp at which the vote was created.
           type: string
           format: date-time
         updated_at:
@@ -873,8 +897,8 @@ components:
           type: string
           format: date-time
     RetroFundingRoundStatus:
-      summary: Status of an RetroFunding round
-      description: Enum description of the status of an RetroFunding round.
+      summary: Status of a RetroFunding round
+      description: Enum description of the status of a RetroFunding round.
       type: string
       enum:
         - PLANNED
@@ -889,9 +913,9 @@ components:
         - DONE
         - CANCELLED
     RetroFundingRoundEvent:
-      summary: An event within an RetroFunding round
+      summary: An event within a RetroFunding round
       description: >
-        An event within an RetroFunding round, including status and timestamp.
+        An event within a RetroFunding round, including status and timestamp.
         For example, a round may have events for the start of voting, application review, etc.
       type: object
       properties:
@@ -903,7 +927,7 @@ components:
           type: string
           format: date-time
     RetroFundingRound:
-      summary: An RetroFunding round
+      summary: A RetroFunding round
       description: >
         A Retroactive Public Goods Funding round on Agora, including 
         information about the round, and all events within the round.
@@ -922,12 +946,9 @@ components:
           items:
             $ref: "#/components/schemas/RetroFundingRoundEvent"
     RetroFundingImpactMetric:
-      # Note: these are externally defined on Open Source Observer,
-      # So it's not completely clear what information needs to be represented here
-      # The most important aspect are that IDs are present for linking metrics on ballots
-      summary: Impact metric for an RetroFunding project
+      summary: Impact metric for a RetroFunding project
       description: >
-        An impact metric for an RetroFunding project with associated metadata.
+        An impact metric for a RetroFunding project with associated metadata.
       type: object
       properties:
         metric_id:
@@ -967,27 +988,14 @@ components:
         A team member on a RetroFunding project.
       type: object
       properties:
-        # address:
-        #   summary: EOA address of the team member
-        #   type: string
-        # name:
-        #   type: string
-        # description:
-        #   type: string
         farcasterId:
           summary: Farcaster ID for project team member
-          desription: Farcaster ID for project team member.
+          description: Farcaster ID for project team member.
           type: string
-        # externalLink:
-        #   type: string
-        # avatarUrls:
-        #   type: array
-        #   items:
-        #     type: string
     RetroFundingCategory:
-      summary: A category for an RetroFunding project
+      summary: A category for a RetroFunding project
       description: >
-        A category for an RetroFunding project, including information about the category.
+        A category for a RetroFunding project, including information about the category.
       type: object
       properties:
         name:
@@ -1010,7 +1018,7 @@ components:
           type: string
         profileAvatarUrl:
           type: string
-        proejctCoverImageUrl:
+        projectCoverImageUrl:
           type: string
         socialLinks:
           $ref: "#/components/schemas/SocialLinks"
@@ -1105,9 +1113,9 @@ components:
         website:
           type: string
     RetroFundingBallotMetricsAllocation:
-      summary: A vote for an RetroFunding ballot
+      summary: A vote for a RetroFunding ballot
       description: >
-        A vote for an RetroFunding ballot, including information about the vote.
+        A vote for a RetroFunding ballot, including information about the vote.
       type: object
       properties:
         metric_id:
@@ -1116,7 +1124,7 @@ components:
           type: string
         locked:
           type: boolean
-    RetroFundingBallotProjectsAllocation:
+    RetroFundingBallot4ProjectsAllocation:
       summary: Projects allocation distribution based on the vote
       description: >
         Projects allocation distribution based on the vote out of total 10M OP
@@ -1141,10 +1149,44 @@ components:
                 type: string
               allocation:
                 type: number
-    RetroFundingBallot:
-      summary: A ballot for an RetroFunding round
+    RetroFundingBallot5ProjectsAllocation:
+      summary: Projects allocation distribution based on the vote
       description: >
-        A ballot for an RetroFunding round, including information about the ballot.
+        Projects allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        project_id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        is_os:
+          type: boolean
+        allocation:
+          type: number
+        impact:
+          type: string
+          enum:
+            - VERY_HIGH
+            - HIGH
+            - MEDIUM
+            - LOW
+            - VERY_LOW
+    RetroFundingBallotCategoriesAllocation:
+      summary: Categories allocation distribution based on the vote
+      description: >
+        Categories allocation distribution based on the vote out of total 10M OP
+      type: object
+      properties:
+        category_id:
+          type: integer
+        allocation:
+          type: string
+    Round4Ballot:
+      summary: A ballot for RetroFunding Round 4
+      description: >
+        A ballot for RetroFunding Round 4, including information about the ballot.
       type: object
       properties:
         address:
@@ -1174,8 +1216,46 @@ components:
         projects_allocation:
           type: array
           items:
-            $ref: "#/components/schemas/RetroFundingBallotProjectsAllocation"
-    RetroFundingBallotSubmission:
+            $ref: "#/components/schemas/RetroFundingBallot4ProjectsAllocation"
+    Round5Ballot:
+      summary: A ballot for RetroFunding Round 5
+      description: >
+        A ballot for RetroFunding Round 5, including information about the ballot.
+      type: object
+      properties:
+        address:
+          summary: Address of the voter
+          description: Address of the voter
+          type: string
+        round_id:
+          type: integer
+        status:
+          type: string
+          enum:
+            - PENDING
+            - SUBMITTED
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
+        voting_step:
+          type: integer
+        catgory_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallotCategoriesAllocation"
+        projects_allocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetroFundingBallot5ProjectsAllocation"
+        distribution_method:
+          type: string
+    RetroFunding4BallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
       type: object
@@ -1191,7 +1271,7 @@ components:
               type: array
               items:
                 type: object
-                metrciId:
+                metricId:
                   type: number
             os_only:
               type: boolean
@@ -1203,7 +1283,51 @@ components:
             Badgeholder's signature of the contents of their ballot.
           type: string
           pattern: "^0x[a-fA-F0-9]{130}$"
+    RetroFunding5BallotSubmission:
+      summary: Fields required for ballot submission
+      description: An object containing the information required to submit a ballot.
+      type: object
+      properties:
+        address:
+          summary: Address or ENS of the ballot caster
+          description: Address or ENS of the ballot caster.
+          type: string
+        ballot_content:
+          type: object
+          properties:
+            category_allocation:
+              type: array
+              items:
+                type: object
+                categoryId:
+                  type: string
+            projects_allocation:
+              type: array
+              items:
+                type: object
+                projectId:
+                  type: string
+        signature:
+          summary: Badgeholder signature of the ballot
+          description: >
+            Badgeholder's signature of the contents of their ballot.
+          type: string
+          pattern: "^0x[a-fA-F0-9]{130}$"
   parameters:
+    addressOrEnsName:
+      name: addressOrEns
+      in: path
+      description: The address or ENS name of the delegate to retrieve
+      required: true
+      schema:
+        type: string
+      examples:
+        address:
+          value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
+          summary: Address of the delegate.
+        ensName:
+          value: "flipliquid.eth"
+          summary: ENS name of the delegate.
     limitParam:
       name: limit
       in: query
@@ -1226,7 +1350,6 @@ components:
         minimum: 0
         default: 0
     blockParam:
-      # What is a reasonable default?
       name: blockNumber
       in: query
       description: The block number in which requested resources are to be sought.
@@ -1253,6 +1376,13 @@ components:
       required: true
       schema:
         type: integer
+    categoryIdParam:
+      name: categoryId
+      in: path
+      description: The category ID of the RetroFunding category to retrieve.
+      required: true
+      schema:
+        type: string
     ballotIdParam:
       name: ballotCasterAddressOrEns
       in: path
@@ -1399,19 +1529,7 @@ paths:
       tags:
         - delegates
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
@@ -1438,19 +1556,7 @@ paths:
         - votes
         - delegates
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
       responses:
@@ -1605,19 +1711,7 @@ paths:
         - delegates
         - delegations
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
@@ -1644,19 +1738,7 @@ paths:
         - delegates
         - delegations
       parameters:
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the delegate to retrieve
-          required: true
-          schema:
-            type: string
-          examples:
-            address:
-              value: "0xDa6d1F091B672C0f9e215eB9fa6B5a84bF2c5e11"
-              summary: Address of the delegate.
-            ensName:
-              value: "flipliquid.eth"
-              summary: ENS name of the delegate.
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
@@ -1677,40 +1759,6 @@ paths:
           description: Unauthorized
         "404":
           description: Not Found
-        "500":
-          description: Internal Server Error
-  /projects:
-    # Should this be paginated? How many ballots per round are expected?
-    get:
-      summary: Gets a list of projects
-      description: >
-        Retrieves a list of projects on Agora as a JSON array.
-        Limit, offset, and sort parameters can be used to customize the returned list.
-      operationId: getProjects
-      tags:
-        - RetroFunding
-        - projects
-      parameters:
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  projects:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Project"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
         "500":
           description: Internal Server Error
   /contracts/governor:
@@ -1776,6 +1824,41 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
+  /projects:
+    get:
+      summary: Gets a list of projects
+      description: >
+        Retrieves a list of projects on Agora as a JSON array.
+        Limit, offset, and sort parameters can be used to customize the returned list.
+      operationId: getProjects
+      tags:
+        - RetroFunding
+        - projects
+        - Round 4
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: "#/components/schemas/PageMetadata"
+                  projects:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds:
     get:
       summary: Gets a list of RetroFunding rounds
@@ -1798,7 +1881,7 @@ paths:
                 properties:
                   metadata:
                     $ref: "#/components/schemas/PageMetadata"
-                  ballots:
+                  rounds:
                     type: array
                     items:
                       $ref: "#/components/schemas/RetroFundingRound"
@@ -1847,6 +1930,8 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
+        - Round 5
       parameters:
         - name: roundId
           in: path
@@ -1869,7 +1954,9 @@ paths:
                   ballots:
                     type: array
                     items:
-                      $ref: "#/components/schemas/RetroFundingBallot"
+                      oneOf:
+                        - $ref: "#/components/schemas/Round4Ballot"
+                        - $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -1885,6 +1972,8 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
+        - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1894,42 +1983,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/osMultiplier/{osMultiplier}:
-    post:
-      summary: Updates the OS multiplier for a specific RetroFunding ballot
-      description: >
-        Updates the OS multiplier for a specific ballot for an RetroFunding round on Agora.
-      operationId: updateRetroFundingBallotOSMultiplier
-      tags:
-        - RetroFunding
-        - RetroFundingBallots
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/ballotIdParam"
-        - name: osMultiplier
-          in: path
-          description: The OS multiplier to update the ballot with (1 - 5)
-          required: true
-          schema:
-            type: number
-            minimum: 1
-            maximum: 5
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                oneOf:
+                  - $ref: "#/components/schemas/Round4Ballot"
+                  - $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -1947,6 +2003,7 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1963,7 +2020,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":
@@ -1980,6 +2037,8 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingBallots
+        - Round 4
+        - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -1987,14 +2046,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RetroFundingBallotSubmission"
+              oneOf:
+                - $ref: "#/components/schemas/RetroFunding4BallotSubmission"
+                - $ref: "#/components/schemas/RetroFunding5BallotSubmission"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                oneOf:
+                  - $ref: "#/components/schemas/Round4Ballot"
+                  - $ref: "#/components/schemas/Round5Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2013,6 +2076,8 @@ paths:
       tags:
         - RetroFunding
         - projects
+        - Round 4
+        - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/limitParam"
@@ -2037,6 +2102,94 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/projects/{projectId}:
+    get:
+      summary: Gets a specific project for an RetroFunding round
+      description: >
+        Retrieves a specific project for a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundProjectById
+      tags:
+        - RetroFunding
+        - projects
+        - Round 4
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/categories:
+    get:
+      summary: Gets a list of categories for a RetroFunding round
+      description: >
+        Retrieves a paginated list of categories for a specific RetroFunding round on Agora.
+      operationId: getRetroFundingRoundCategories
+      tags:
+        - RetroFunding
+        - RetroFundingProjects
+        - RetroFundingCategories
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RetroFundingCategory"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/categories/{categoryId}/projects:
+    get:
+      summary: Gets a list of projects for a category in a RetroFunding round
+      description: >
+        Retrieves a list of projects for a specific category in a specific RetroFunding round on Agora as a JSON array.
+      operationId: getRetroFundingRoundCategoryProjects
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
     post:
       summary: Adds or updates an impact metric on a specific RetroFunding ballot
@@ -2048,6 +2201,7 @@ paths:
         - RetroFunding
         - RetroFundingBallots
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -2069,23 +2223,144 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RetroFundingBallot"
+                $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":
           description: Unauthorized
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/projects/{projectId}:
+    post:
+      summary: Updates a specific project in ballot for a RetroFunding round
+      description: >
+        Updates a specific project for a specific RetroFunding round.
+      operationId: updateRetroFundingRoundProjectById
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allocation:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/categories/{categoryId}:
+    post:
+      summary: Updates a specific allocation for a RetroFunding round
+      description: >
+        Updates a specific project for a specific RetroFunding round on Agora.
+      operationId: updateRetroFundingRoundCategoryAllocation
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/categoryIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allocation:
+                  type: string
+                impact:
+                  type: string
+                  enum:
+                    - VERY_HIGH
+                    - HIGH
+                    - MEDIUM
+                    - LOW
+                    - VERY_LOW
+                rank:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/distribution_method:
+    post:
+      summary: Updates the distribution method for a specific RetroFunding ballot
+      description: >
+        Updates the distribution method for a specific ballot for a RetroFunding round on Agora.
+      operationId: updateRetroFundingBallotDistributionMethod
+      tags:
+        - RetroFunding
+        - projects
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                distribution_method:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics/{impactMetricId}:
     delete:
       summary: Removes an impact metric from a ballot
       description: >
-        Removes an impact metric from a specific ballot for an RetroFunding round on Agora.
+        Removes an impact metric from a specific ballot for a RetroFunding round on Agora.
       operationId: removeImpactMetricFromRetroFundingBallot
       tags:
         - RetroFunding
         - RetroFundingBallots
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/ballotIdParam"
@@ -2111,6 +2386,7 @@ paths:
         - RetroFunding
         - RetroFundingRounds
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
       responses:
@@ -2138,6 +2414,7 @@ paths:
         - RetroFunding
         - RetroFundingRounds
         - impactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2165,27 +2442,25 @@ paths:
       tags:
         - RetroFunding
         - RetroFundingImpactMetrics
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
-        - name: addressOrEnsName
-          in: path
-          description: The address or ENS name of the viewer
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/addressOrEnsName"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                metric_id:
-                  type: string
-                address:
-                  type: string
-                ts:
-                  type: string
+                type: object
+                properties:
+                  impact_metric_id:
+                    type: string
+                  address:
+                    type: string
+                  ts:
+                    type: string
         "400":
           description: Bad Request
         "401":
@@ -2203,6 +2478,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2252,6 +2528,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2289,6 +2566,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2319,6 +2597,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2356,6 +2635,7 @@ paths:
         - RetroFundingRounds
         - impactMetrics
         - comments
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2383,6 +2663,7 @@ paths:
         - impactMetrics
         - comments
         - commentsVotes
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
@@ -2417,9 +2698,269 @@ paths:
         - impactMetrics
         - comments
         - commentsVotes
+        - Round 4
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/impactMetricParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vote:
+                  type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentVote"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/projects/{projectId}/comments:
+    get:
+      summary: Gets comments on a project
+      description: >
+        Gets a paginated list of comments on a particular project. Ordered by creation date.
+      operationId: getProjectComments
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - name: sort
+          in: query
+          description: >
+            The desired method by which returned comments will be sorted.
+            Supported values are: 'newest', 'votes'
+          required: false
+          schema:
+            type: string
+            enum:
+              - newest
+              - votes
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: "#/components/schemas/PageMetadata"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Comment"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Creates a comment on a project
+      description: >
+        Creates a comment on a specific impact metric for a specific round.
+        Returns created comment.
+      operationId: putProjectComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/projects/{projectId}/comments/{commentId}:
+    get:
+      summary: Gets a specific comment on an impact metric
+      description: >
+        Gets a specific comment on a particular impact metric.
+      operationId: getProjectComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Updates existing comment
+      description: >
+        Updates a comment on a specific impact metric for a specific round.
+        Returns updated comment.
+      operationId: updateProjectComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    delete:
+      summary: Deletes a comment on an impact metric
+      description: >
+        Deletes a comment on a specific impact metric for a specific round.
+      operationId: deleteProjectComment
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/projects/{projectId}/comments/{commentId}/votes:
+    get:
+      summary: Gets all votes for a speciffic comment
+      description: >
+        Gets all votes for a speciffic comment
+      operationId: getPprojectCommentVote
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - commentsVotes
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
+        - $ref: "#/components/parameters/commentIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentVote"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Creates or updates vote for a speciffic comment
+      description: >
+        Creates or updates vote for a speciffic comment.
+        Address of the voter is taken from the auth token.
+        Input is a number, where 1 is upvote, -1 is downvote, 0 is neutral.
+      operationId: putProjectCommentVote
+      tags:
+        - RetroFunding
+        - RetroFundingRounds
+        - projects
+        - comments
+        - commentsVotes
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/projectIdParam"
         - $ref: "#/components/parameters/commentIdParam"
       requestBody:
         content:
