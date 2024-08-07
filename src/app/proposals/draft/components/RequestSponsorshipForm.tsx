@@ -2,7 +2,6 @@
 
 import { isAddress } from "viem";
 import { useState } from "react";
-import FormItem from "./form/FormItem";
 import { useFormContext } from "react-hook-form";
 import AddressInput from "./form/AddressInput";
 import { useBlockNumber } from "wagmi";
@@ -12,28 +11,45 @@ import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
-import { DraftProposal } from "../types";
+import { useManager } from "@/hooks/useManager";
+import { DraftProposal, ProposalGatingType } from "../types";
+import Tenant from "@/lib/tenant/tenant";
 
 const RequestSponsorshipForm = ({
   draftProposal,
 }: {
   draftProposal: DraftProposal;
 }) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const gatingType = plmToggle?.config?.gatingType;
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
 
   const { data: threshold } = useProposalThreshold();
+  const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
   const { data: accountVotesData } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber || BigInt(0),
   });
 
-  const hasEnoughVotes = accountVotesData
-    ? accountVotesData >= threshold!
-    : false;
+  const canSponsor = () => {
+    switch (gatingType) {
+      case ProposalGatingType.MANAGER:
+        return manager === address;
+      case ProposalGatingType.TOKEN_THRESHOLD:
+        return accountVotesData !== undefined && threshold !== undefined
+          ? accountVotesData >= threshold
+          : false;
+      default:
+        return false;
+    }
+  };
+
+  const canAddressSponsor = canSponsor();
 
   return (
     <>
@@ -43,16 +59,19 @@ const RequestSponsorshipForm = ({
           label="Sponsor address"
           name="sponsorAddress"
         />
-        <FormItem label="Sponsor verification">
-          <span className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
+        <div className="space-y-1">
+          <label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs font-semibold text-agora-stone-700">
+            Sponsor verification
+          </label>
+          <div className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
             {isAddress(address) && <AvatarAddress address={address} />}
-            <span
-              className={`absolute right-2 top-2 ${hasEnoughVotes ? "text-green-500" : "text-red-500"}`}
+            <div
+              className={`absolute right-2 top-2 ${canAddressSponsor ? "text-green-500" : "text-red-500"}`}
             >
-              {hasEnoughVotes ? "Can sponsor" : "Cannot sponsor"}
-            </span>
-          </span>
-        </FormItem>
+              {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
+            </div>
+          </div>
+        </div>
       </div>
       <UpdatedButton
         fullWidth={true}
