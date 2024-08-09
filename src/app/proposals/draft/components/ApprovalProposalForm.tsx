@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { ApprovalProposalSchema } from "./../schemas/DraftProposalSchema";
 import {
@@ -10,16 +9,12 @@ import NumberInput from "./form/NumberInput";
 import SwitchInput from "./form/SwitchInput";
 import {
   ApprovalProposalType,
-  ApprovalProposal,
   TransactionType,
   EthereumAddress,
 } from "@/app/proposals/draft/types";
-import SimulationStatusPill from "./SimulateStatusPill";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
 import { UpdatedButton } from "@/components/Button";
-import Tenant from "@/lib/tenant/tenant";
-import toast from "react-hot-toast";
 import TextInput from "./form/TextInput";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 
@@ -120,6 +115,17 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
   );
 };
 
+/**
+ * Dev note:
+ * I am deciding to take out simulation for approval type transactions.
+ * To be honest, it feels too complex to warrent time effort right now.
+ * In order to properly simulate transactions we would need to look at
+ * threshold, top choices, etc and simulate every possible permutation of
+ * choices to make sure no permuation is invalid. Simulating ALL of the
+ * transactions sequentially doesn't make sense because that is not
+ * guaranteed to happen. If we are going to simulate, we might as well
+ * do it right, but doing it right at this time is too much work to justify.
+ */
 const TransactionFormItem = ({
   optionIndex,
   transactionIndex,
@@ -131,14 +137,7 @@ const TransactionFormItem = ({
   remove: UseFieldArrayRemove;
   children: React.ReactNode;
 }) => {
-  const { register, watch } = useFormContext<FormType>();
-
-  const simulationState = watch(
-    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`
-  );
-  const simulationId = watch(
-    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`
-  );
+  const { register } = useFormContext<FormType>();
 
   return (
     <div className="">
@@ -152,22 +151,10 @@ const TransactionFormItem = ({
             remove(transactionIndex);
           }}
         >
-          Remove transaction
+          Remove
         </span>
       </div>
       {children}
-      {/* simulate transaction and flip to true -- form should fail if not simulated */}
-      <div className="col-span-2 mt-4 flex flex-row items-center space-x-3">
-        <div className="flex flex-col w-full space-y-1">
-          <label className="text-xs font-semibold text-agora-stone-700">
-            Validity
-          </label>
-          <SimulationStatusPill
-            status={simulationState}
-            simulationId={simulationId}
-          />
-        </div>
-      </div>
       <input
         type="hidden"
         {...register(
@@ -184,27 +171,10 @@ const TransactionFormItem = ({
   );
 };
 
-const ApprovalProposalForm = ({
-  draftProposal,
-}: {
-  draftProposal: ApprovalProposal;
-}) => {
-  const { contracts } = Tenant.current();
-  const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
-    useState(false);
-  const [simulationPending, setSimulationPending] = useState(false);
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    unregister,
-    trigger,
-    formState,
-  } = useFormContext<FormType>();
+const ApprovalProposalForm = () => {
+  const { control, watch } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
 
-  console.log("defaultValues", formState.defaultValues);
   const {
     fields: options,
     append: appendOption,
@@ -213,88 +183,6 @@ const ApprovalProposalForm = ({
     control,
     name: "approvalProposal.options",
   });
-
-  const validateTransactionForms = async () => {
-    const result = await trigger(["approvalProposal.options"]);
-    setAllTransactionFieldsValid(result);
-  };
-
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      const parts = name?.split(".");
-      if (parts?.length === 6) {
-        const field = parts[5];
-        if (
-          field === "recipient" ||
-          field === "amount" ||
-          field === "value" ||
-          field === "target" ||
-          field === "description" ||
-          field === "calldata"
-        ) {
-          validateTransactionForms();
-        }
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  const simulateTransactions = async () => {
-    setSimulationPending(true);
-    const options = getValues("approvalProposal.options");
-    const transactions = [] as any[];
-    options.forEach((option: any) => {
-      transactions.push(...option.transactions);
-    });
-
-    try {
-      const response = await fetch("/api/simulate-bundle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          transactions,
-          networkId: contracts.governor.chain.id,
-          from: contracts.governor.address,
-        }),
-      });
-      const res = await response.json();
-      const results = res.response.simulation_results;
-
-      for (let optionIndex = 0; optionIndex < options.length; optionIndex++) {
-        const transactions = options[optionIndex].transactions;
-        for (
-          let transactionIndex = 0;
-          transactionIndex < transactions.length;
-          transactionIndex++
-        ) {
-          const result =
-            results[optionIndex * transactions.length + transactionIndex];
-          if (result.transaction.status) {
-            setValue(
-              `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
-              "VALID"
-            );
-            setValue(
-              `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`,
-              result.simulation.id
-            );
-          } else {
-            setValue(
-              `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
-              "INVALID"
-            );
-          }
-        }
-      }
-      setSimulationPending(false);
-    } catch (e) {
-      console.error(e);
-      toast.error("Error simulating transactions");
-      setSimulationPending(false);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -378,32 +266,6 @@ const ApprovalProposalForm = ({
             );
           })}
         </div>
-        {options.length > 0 && (
-          <div className="mt-6">
-            {!allTransactionFieldsValid ? (
-              <UpdatedButton
-                isLoading={simulationPending}
-                isSubmit={false}
-                type={"disabled"}
-                fullWidth={true}
-              >
-                Simulate transactions
-              </UpdatedButton>
-            ) : (
-              <UpdatedButton
-                isLoading={simulationPending}
-                isSubmit={false}
-                type={"secondary"}
-                fullWidth={true}
-                onClick={() => {
-                  simulateTransactions();
-                }}
-              >
-                Simulate transactions
-              </UpdatedButton>
-            )}
-          </div>
-        )}
         <div className="flex flex-row space-x-2 w-full mt-6">
           <UpdatedButton
             isSubmit={false}

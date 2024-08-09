@@ -12,11 +12,7 @@ const ArchivedDraftProposal = ({
     <main className="max-w-screen-xl mx-auto mt-10">
       <div className="grid grid-cols-3 gap-12">
         <div className="col-span-2">
-          <DraftPreview
-            proposalDraft={draftProposal}
-            actions={null}
-            isArchived={true}
-          />
+          <DraftPreview proposalDraft={draftProposal} actions={null} />
         </div>
         <div className="self-start">
           {/* yellow color for draft proposal -- not themeable right now */}
