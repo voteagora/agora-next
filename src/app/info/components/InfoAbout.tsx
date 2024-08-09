@@ -34,8 +34,10 @@ const InfoAbout = () => {
 
   return (
     <>
-      <h3 className="text-2xl font-black text-black mt-10">Getting started</h3>
-      <div className="mt-4 rounded-xl border bg-white shadow-sm ">
+      <h3 className="text-2xl font-black text-primary mt-10">
+        Getting started
+      </h3>
+      <div className="mt-4 rounded-xl bg-neutral shadow-sm">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
           <Image
             src={page.hero!}
@@ -44,7 +46,7 @@ const InfoAbout = () => {
             height="366"
           />
           <div>
-            <h3 className="text-lg font-bold text-black capitalize">
+            <h3 className="text-lg font-bold text-primary capitalize">
               About {namespace}
             </h3>
             <p className="text-base font-medium text-gray-4f mt-3">
@@ -53,14 +55,14 @@ const InfoAbout = () => {
           </div>
         </div>
 
-        <div className="p-6  rounded-b-xl border-t bg-white">
+        <div className="p-6  rounded-b-xl bg-neutral border-t border-line">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
             {tabs.map((item, index) => (
               <div
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
               >
-                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border bg-gray-eb">
+                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line">
                   <Image
                     src={item.icon}
                     width={24}
@@ -69,7 +71,7 @@ const InfoAbout = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-black">
+                  <h3 className="text-sm font-semibold text-primary">
                     {item.title}
                   </h3>
                   <p className="text-sm font-normal">{item.description}</p>
