@@ -1,6 +1,5 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
-import ensHero from "@/assets/tenant/ens_hero.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
@@ -26,7 +25,6 @@ export const ensTenantUIConfig = new TenantUI({
       title: "Agora is the home of ENS voters",
       description:
         "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
-      hero: ensHero,
       meta: {
         title: "ENS Agora",
         description: "Home of token governance",
@@ -39,7 +37,6 @@ export const ensTenantUIConfig = new TenantUI({
       title: "Agora is the home of ENS voters",
       description:
         "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
-      hero: ensHero,
       meta: {
         title: "ENS Agora",
         description: "Home of token governance",
@@ -52,7 +49,6 @@ export const ensTenantUIConfig = new TenantUI({
       title: "Agora is the home of ENS voters",
       description:
         "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
-      hero: ensHero,
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
