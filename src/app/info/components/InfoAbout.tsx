@@ -2,7 +2,6 @@ import React from "react";
 import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
-import { capitalizeFirstLetter } from "@/lib/utils";
 
 const tabs = [
   {
@@ -45,8 +44,8 @@ const InfoAbout = () => {
             height="366"
           />
           <div>
-            <h3 className="text-lg font-bold text-black">
-              About {capitalizeFirstLetter(namespace)}
+            <h3 className="text-lg font-bold text-black capitalize">
+              About {namespace}
             </h3>
             <p className="text-base font-medium text-gray-4f mt-3">
               {page.description}
