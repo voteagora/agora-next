@@ -56,11 +56,6 @@ const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   return (
     <FormProvider {...methods}>
       <form>
-        <p className="text-agora-stone-700 mb-6">
-          Please proofread a preview of your proposal below. If you need to
-          change any of its content, please edit your draft in the previous
-          step.
-        </p>
         <DraftPreview
           proposalDraft={draftProposal}
           actions={<Actions proposalDraft={draftProposal} />}

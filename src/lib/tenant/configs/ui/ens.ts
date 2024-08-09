@@ -126,7 +126,7 @@ export const ensTenantUIConfig = new TenantUI({
           domain: "ens.eth",
         },
         copy: {},
-        gatingType: ProposalGatingType.TOKEN_THRESHOLD,
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
   ],

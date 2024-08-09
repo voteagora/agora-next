@@ -148,11 +148,11 @@ const DraftFormClient = ({
                   name="type"
                 />
 
-                <p className="text-sm self-center text-agora-stone-700 mt-4">
+                <p className="text-sm self-center text-agora-stone-700 mt-6">
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-4 relative">
+              <div className="relative">
                 <SelectInput
                   control={control}
                   label="Proposal type"
@@ -192,11 +192,7 @@ const DraftFormClient = ({
                 case ProposalType.SOCIAL:
                   return <SocialProposalForm />;
                 case ProposalType.APPROVAL:
-                  return (
-                    <ApprovalProposalForm
-                      draftProposal={draftProposal as ApprovalProposal}
-                    />
-                  );
+                  return <ApprovalProposalForm />;
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:

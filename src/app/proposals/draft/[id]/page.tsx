@@ -1,6 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
-import DraftProposalChecklist from "../components/DraftProposalChecklist";
 import BackButton from "../components/BackButton";
 import prisma from "@/app/lib/prisma";
 import {
@@ -11,6 +10,7 @@ import {
 import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import { DraftProposal } from "../types";
+import DeleteDraftButton from "../components/DeleteDraftButton";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -62,22 +62,25 @@ export default async function DraftProposalPage({
   return (
     <OnlyOwner ownerAddress={draftProposal.author_address as `0x${string}`}>
       <main className="max-w-screen-xl mx-auto mt-10">
-        <div className="mb-4 flex flex-row items-center space-x-6">
-          {stageIndex > 0 && (
-            <BackButton
-              draftProposalId={parseInt(params.id)}
-              index={stageIndex}
-            />
-          )}
-          <h1 className="font-black text-primary text-2xl m-0">
-            {stageMetadata?.title}
-          </h1>
-          <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">
-            {/* stageObject.order + 1 is becuase order is zero indexed */}
-            Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
-          </span>
+        <div className="flex flex-row items-center justify-between">
+          <div className="flex flex-row items-center space-x-6">
+            {stageIndex > 0 && (
+              <BackButton
+                draftProposalId={parseInt(params.id)}
+                index={stageIndex}
+              />
+            )}
+            <h1 className="font-black text-primary text-2xl m-0">
+              {stageMetadata?.title}
+            </h1>
+            <span className="bg-agora-stone-100 text-agora-stone-700 rounded-full px-2 py-1 text-sm">
+              {/* stageObject.order + 1 is becuase order is zero indexed */}
+              Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
+            </span>
+          </div>
+          <DeleteDraftButton proposalId={draftProposal.id} />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
           <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
             <DraftProposalForm
               stage={stageObject.stage}
@@ -85,10 +88,16 @@ export default async function DraftProposalPage({
             />
           </section>
           <section className="col-span-1">
-            <DraftProposalChecklist
-              draftProposal={draftProposal}
-              stage={stageObject.stage}
-            />
+            <div className="bg-wash border border-line rounded-2xl p-4">
+              <h3 className="text-primary font-semibold">
+                Additional information
+              </h3>
+              <p className="text-tertiary mt-2">
+                Help! We need to figure out what copy we want to include here.
+                Otherwise, we will have this junk copy left over, and we don't
+                want that, right? Let's get some better copy in here asap.
+              </p>
+            </div>
           </section>
         </div>
       </main>

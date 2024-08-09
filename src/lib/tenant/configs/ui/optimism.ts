@@ -248,7 +248,7 @@ export const optimismTenantUIConfig = new TenantUI({
           ProposalType?.OPTIMISTIC,
         ],
         copy: {},
-        gatingType: ProposalGatingType.MANAGER,
+        gatingType: ProposalGatingType?.MANAGER,
       },
     },
   ],

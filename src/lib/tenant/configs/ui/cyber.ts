@@ -173,7 +173,7 @@ export const cyberTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [ProposalType?.BASIC],
         copy: {},
-        gatingType: ProposalGatingType.TOKEN_THRESHOLD,
+        gatingType: ProposalGatingType?.MANAGER,
       },
     },
   ],

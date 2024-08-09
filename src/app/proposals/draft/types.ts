@@ -172,15 +172,18 @@ export const ProposalTypeMetadata = {
   },
   [ProposalType.BASIC]: {
     title: "Basic Proposal",
-    description: "A basic proposal.",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
   },
   [ProposalType.APPROVAL]: {
     title: "Approval Proposal",
-    description: "An approval proposal.",
+    description:
+      "Voters are asked to choose among multiple options. If the proposal passes quorum, options will be approved according to the approval criteria.",
   },
   [ProposalType.OPTIMISTIC]: {
     title: "Optimistic Proposal",
-    description: "An optimistic proposal.",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
   },
 } as {
   [key in ProposalType]: {

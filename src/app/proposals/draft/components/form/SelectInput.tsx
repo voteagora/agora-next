@@ -67,7 +67,6 @@ function SelectInput<
                 <Listbox
                   value={value}
                   onChange={(v) => {
-                    console.log("changing", v);
                     field.onChange(v);
                     setValue(v);
                   }}
