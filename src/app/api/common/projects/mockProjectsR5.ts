@@ -51,7 +51,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "CryptoPaws Inc.",
+    organization: {
+      name: "CryptoPaws Inc.",
+      profileAvatarUrl: "",
+    },
     links: ["https://cryptopaws.com", "https://blockchainnews.com/cryptopaws"],
   },
   {
@@ -106,7 +109,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "PixelVerse Labs",
+    organization: {
+      name: "PixelVerse Labs",
+      profileAvatarUrl: "",
+    },
     links: ["https://pixelverse.org", "https://nftworlds.com/pixelverse"],
   },
   {
@@ -161,7 +167,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "MetaCollective DAO",
+    organization: {
+      name: "MetaCollective DAO",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://metaverse.com/metacollective",
       "https://decentralized.org/metacollective",
@@ -218,7 +227,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "BattleCraft Studios",
+    organization: {
+      name: "BattleCraft Studios",
+      profileAvatarUrl: "",
+    },
     links: ["https://battlecraftgame.com", "https://gamershub.com/battlecraft"],
   },
   {
@@ -273,7 +285,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "ChatterBox Labs",
+    organization: {
+      name: "ChatterBox Labs",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://chatworld.com/chatterbox",
       "https://technews.com/chatterbox",
@@ -330,7 +345,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "Artify Ltd.",
+    organization: {
+      name: "Artify Ltd.",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://artworld.com/artify",
       "https://creativespotlight.com/artify",
@@ -387,7 +405,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "TokenTrust Foundation",
+    organization: {
+      name: "TokenTrust Foundation",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://financetrust.com/tokentrust",
       "https://auditblock.org/tokentrust",
@@ -445,7 +466,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "EduChain Labs",
+    organization: {
+      name: "EduChain Labs",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://blocklearn.com/educhain",
       "https://edtechnews.com/educhain",
@@ -503,7 +527,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "ChainTrace Inc.",
+    organization: {
+      name: "ChainTrace Inc.",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://traceblock.com/chaintrace",
       "https://logisticsnews.com/chaintrace",
@@ -561,7 +588,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "MediLink Labs",
+    organization: {
+      name: "MediLink Labs",
+      profileAvatarUrl: "",
+    },
     links: ["https://healthchain.com/medilink", "https://mednews.com/medilink"],
   },
   {
@@ -616,7 +646,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "InsureChain Labs",
+    organization: {
+      name: "InsureChain Labs",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://blockinsurance.com/insurechain",
       "https://techinsure.com/insurechain",
@@ -674,7 +707,10 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "PropChain Labs",
+    organization: {
+      name: "PropChain Labs",
+      profileAvatarUrl: "",
+    },
     links: [
       "https://realestateblock.com/propchain",
       "https://propertynews.com/propchain",
@@ -731,7 +767,7 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "VoteChain Labs",
+    organization: null,
     links: [
       "https://govblock.com/votechain",
       "https://democracytech.com/votechain",
@@ -789,7 +825,7 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "EnergyWeb Labs",
+    organization: null,
     links: [
       "https://powerblock.com/energyweb",
       "https://energynews.com/energyweb",
@@ -848,7 +884,7 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "IdenChain Labs",
+    organization: null,
     links: [
       "https://identityblock.com/idenchain",
       "https://techidentity.com/idenchain",
@@ -907,7 +943,7 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "LogiChain Labs",
+    organization: null,
     links: [
       "https://supplyblock.com/logichain",
       "https://logisticnews.com/logichain",
@@ -965,7 +1001,7 @@ export const mockProjectsR5 = [
         },
       ],
     },
-    organization: "IoTChain Labs",
+    organization: null,
     links: ["https://iotblock.com/iotchain", "https://techiot.com/iotchain"],
   },
 ];
