@@ -155,7 +155,7 @@ export const cyberTenantUIConfig = new TenantUI({
         {
           name: "Protocol Vision",
           title: "Protocol Vision",
-          url: "https://cyber.co/blog",
+          url: "https://docs.cyber.co",
           image: infoPageCard04,
         },
       ],
