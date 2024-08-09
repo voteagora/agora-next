@@ -49,7 +49,7 @@ function SwitchInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold text-secondary"
             isRequired={required}
           >
             {label}

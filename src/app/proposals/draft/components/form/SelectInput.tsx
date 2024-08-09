@@ -56,7 +56,7 @@ function SelectInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold text-secondary"
             isRequired={required}
           >
             {label}
@@ -72,7 +72,7 @@ function SelectInput<
                   }}
                 >
                   <div className="relative mt-1">
-                    <Listbox.Button className="relative cursor-default py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full">
+                    <Listbox.Button className="relative cursor-default py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full">
                       <span className="block truncate">
                         {getOptionByValue(value)?.label}
                       </span>
@@ -97,7 +97,7 @@ function SelectInput<
                               `relative cursor-default select-none py-2 pl-10 pr-4 ${
                                 active
                                   ? "bg-wash text-primary"
-                                  : "text-gray-900"
+                                  : "text-tertiary"
                               }`
                             }
                             value={option.value}

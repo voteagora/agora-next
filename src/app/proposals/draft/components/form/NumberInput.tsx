@@ -33,7 +33,7 @@ function NumberInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold secondary"
             isRequired={required}
           >
             {label}
@@ -42,7 +42,7 @@ function NumberInput<
             <div className="relative">
               <input
                 type="number"
-                className={`border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full`}
+                className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary`}
                 {...field}
                 placeholder={placeholder}
               />

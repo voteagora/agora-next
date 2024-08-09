@@ -53,7 +53,7 @@ function RadioGroupInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold text-secondary"
             isRequired={required}
           >
             {label}
@@ -80,9 +80,9 @@ function RadioGroupInput<
                     className={({ checked }) =>
                       cn(
                         checked
-                          ? "ring-2 ring-agora-stone-900 bg-agora-stone-50"
-                          : "bg-white ring-1 ring-agora-stone-100",
-                        "ring-inset flex items-center justify-center rounded-md py-3 px-4 sm:flex-1 cursor-pointer focus:outline-none text-agora-stone-900 hover:bg-gray-50 text-base sm:text-[16px]"
+                          ? "ring-2 ring-primary bg-wash"
+                          : "bg-white ring-1 ring-line",
+                        "ring-inset flex items-center justify-center rounded-md py-3 px-4 sm:flex-1 cursor-pointer focus:outline-none text-primary hover:bg-wash text-base sm:text-[16px]"
                       )
                     }
                   >

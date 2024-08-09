@@ -94,8 +94,8 @@ export default async function DraftProposalPage({
               </h3>
               <p className="text-tertiary mt-2">
                 Help! We need to figure out what copy we want to include here.
-                Otherwise, we will have this junk copy left over, and we don't
-                want that, right? Let's get some better copy in here asap.
+                Otherwise, we will have this junk copy left over, and we dont
+                want that, right? Lets get some better copy in here asap.
               </p>
             </div>
           </section>

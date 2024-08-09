@@ -55,16 +55,16 @@ function MarkdownTextareaInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold text-secondary"
             isRequired={required}
           >
             {label}
           </FormLabel>
           <FormControl>
             <div className="flex flex-col">
-              <div className="min-h-[215px] w-full border border-gray-eo rounded-t-lg bg-gray-fa">
+              <div className="min-h-[215px] w-full border border-line rounded-t-lg bg-wash">
                 <textarea
-                  className={`py-3 px-4 border-0 placeholder-gray-af w-full bg-gray-fa rounded-t-lg focus:outline-none focus:ring-0 resize-none
+                  className={`py-3 px-4 border-0 placeholder-gray-af w-full bg-wash rounded-t-lg focus:outline-none focus:ring-0 resize-none
                 ${selectedMode === "write" ? "visible" : "hidden"}`}
                   placeholder={placeholder}
                   value={value}
@@ -88,13 +88,13 @@ function MarkdownTextareaInput<
                   />
                 </div>
               </div>
-              <div className="w-full flex flex-row justify-end py-3 gap-x-1 rounded-b-lg border-x border-b border-gray-eo pr-2">
+              <div className="w-full flex flex-row justify-end py-3 gap-x-1 rounded-b-lg border-x border-b border-line pr-2">
                 <button
                   type="button"
                   className={`py-2 px-3 rounded-full font-medium ${
                     selectedMode === "write"
-                      ? "bg-gray-fa text-black"
-                      : "text-gray-af"
+                      ? "bg-wash text-black"
+                      : "text-tertiary"
                   }`}
                   onClick={() => setSelectedMode("write")}
                 >
@@ -104,8 +104,8 @@ function MarkdownTextareaInput<
                   type="button"
                   className={`py-2 px-3 rounded-full font-medium ${
                     selectedMode === "preview"
-                      ? "bg-gray-fa text-black"
-                      : "text-gray-af"
+                      ? "bg-wash text-black"
+                      : "text-tertiary"
                   }`}
                   onClick={() => setSelectedMode("preview")}
                 >

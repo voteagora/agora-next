@@ -6,10 +6,7 @@ import { useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import toast from "react-hot-toast";
-import Image from "next/image";
-import { icons } from "@/assets/icons/icons";
 import { formatFullDate } from "@/lib/utils";
-import { truncateAddress } from "@/app/lib/utils/text";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
@@ -59,23 +56,6 @@ const DraftPreview = ({
   };
 
   const canAddressSponsor = canSponsor();
-
-  // sorted and filtered checklist items
-  // take most recent of each checklist item by title
-  // sort by completed_at
-  const filteredAndSortedChecklistItems = proposalDraft.checklist_items
-    .sort((a, b) => {
-      // sort by alphabetical of the title field then by the completed at field
-      if (a.title.toLowerCase() === b.title.toLowerCase()) {
-        return a.completed_at > b.completed_at ? 1 : -1;
-      } else {
-        return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1;
-      }
-    })
-    .filter((item, index, self) => {
-      if (index === self.length - 1) return true; // keep last item
-      return item.title.toLowerCase() !== self[index + 1].title.toLowerCase();
-    });
 
   const renderProposalDescription = (proposal: DraftProposal) => {
     switch (proposal.proposal_type) {
@@ -223,43 +203,10 @@ const DraftPreview = ({
               </p>
             )}
             <div className="mt-6">
-              {filteredAndSortedChecklistItems.map((item, index) => {
-                return (
-                  <div
-                    className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
-                    key={`checklist-${index}`}
-                  >
-                    <p className="flex-grow">{item.title}</p>
-                    <span className="text-secondary font-mono text-xs">
-                      on {formatFullDate(item.completed_at)}
-                    </span>
-                    <span className="text-secondary font-mono text-xs">
-                      {item.link
-                        ? `(by ${truncateAddress(item.completed_by)})`
-                        : "(skipped)"}
-                    </span>
-                    <input
-                      type="checkbox"
-                      className="rounded text-agora-stone-900"
-                      checked={!!item.link}
-                    />
-                    {item.link && (
-                      <a href={item.link} target="_blank" rel="noreferrer">
-                        <Image
-                          src={icons.link}
-                          height="16"
-                          width="16"
-                          alt="link icon"
-                        />
-                      </a>
-                    )}
-                  </div>
-                );
-              })}
               <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
                 <p className="flex-grow">
                   {gatingType === ProposalGatingType.MANAGER
-                    ? "Manager only"
+                    ? "Manager address"
                     : "Proposal threshold"}
                 </p>
                 <span className="text-secondary font-mono text-xs">
@@ -274,8 +221,7 @@ const DraftPreview = ({
                             )
                           )
                         )
-                      : "0"}{" "}
-                  required
+                      : "0"}
                 </span>
                 <input
                   type="checkbox"
