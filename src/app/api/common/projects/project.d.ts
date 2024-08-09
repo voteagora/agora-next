@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 export type Project = {
   id: string;
   category: string | null;
+  organization: string | null;
   name: string | null;
   description: string | null;
   profileAvatarUrl: string | null;
@@ -16,6 +17,7 @@ export type Project = {
   team: Prisma.JsonValue;
   github: Prisma.JsonValue;
   packages: Prisma.JsonValue;
+  links: Prisma.JsonValue;
   contracts: Prisma.JsonValue;
   grantsAndFunding: {
     ventureFunding: Prisma.JsonValue;

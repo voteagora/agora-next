@@ -61,6 +61,7 @@ async function getProjectsApi({
       return {
         id: project.project_id,
         category: project.category,
+        organization: null,
         name: project.name,
         description: project.description,
         profileAvatarUrl: project.project_avatar_url,
@@ -74,6 +75,7 @@ async function getProjectsApi({
         team: project.team,
         github: project.github,
         packages: project.packages,
+        links: [],
         contracts: project.contracts,
         grantsAndFunding: {
           ventureFunding: project.grants_and_funding_venture_funding,
