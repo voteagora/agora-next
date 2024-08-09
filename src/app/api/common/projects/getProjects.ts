@@ -8,21 +8,34 @@ import prisma from "@/app/lib/prisma";
 import { Project } from "./project";
 import { mockProjectsR5 } from "./mockProjectsR5";
 
+const filterMap = {
+  all: null,
+  eth_core: "ETHEREUM_CORE_CONTRIBUTIONS",
+  op_tooling: "OP_STACK_TOOLING",
+  op_rnd: "OP_STACK_RESEARCH_AND_DEVELOPMENT",
+};
+
 async function getProjectsApi({
   pagination,
   round,
+  category,
 }: {
   pagination: PaginationParams;
   round?: string;
+  category?: keyof typeof filterMap;
 }): Promise<PaginatedResult<Project[]>> {
   if (round === "5") {
+    const projects = mockProjectsR5.filter((project) => {
+      return !category || project.category === filterMap[category];
+    });
+
     return {
       meta: {
         has_next: false,
-        total_returned: mockProjectsR5.length,
-        next_offset: mockProjectsR5.length,
+        total_returned: projects.length,
+        next_offset: projects.length,
       },
-      data: mockProjectsR5,
+      data: projects,
     };
   }
 

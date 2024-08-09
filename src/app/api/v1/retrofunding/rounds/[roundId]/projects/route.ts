@@ -2,11 +2,20 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { fetchProjectsApi } from "@/app/api/common/projects/getProjects";
-import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
+import {
+  createOptionalNumberValidator,
+  createOptionalStringValidator,
+} from "@/app/api/common/utils/validators";
 
 const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
+const DEFAULT_FILTER = "all";
+
+const filterValidator = createOptionalStringValidator(
+  ["all", "eth_core", "op_tooling", "op_rnd"],
+  DEFAULT_FILTER
+);
 
 const limitValidator = createOptionalNumberValidator(
   1,
@@ -33,12 +42,14 @@ export async function GET(
     const params = request.nextUrl.searchParams;
     try {
       const { roundId } = route.params;
+      const category = filterValidator.parse(params.get("category"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
 
       const projects = await fetchProjectsApi({
         pagination: { limit, offset },
         round: roundId,
+        category,
       });
       return NextResponse.json(projects);
     } catch (e: any) {
