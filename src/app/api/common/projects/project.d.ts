@@ -7,7 +7,7 @@ export type Project = {
   name: string | null;
   description: string | null;
   profileAvatarUrl: string | null;
-  proejctCoverImageUrl: string | null;
+  projectCoverImageUrl: string | null;
   socialLinks: {
     twitter: string | null;
     farcaster: Prisma.JsonValue;

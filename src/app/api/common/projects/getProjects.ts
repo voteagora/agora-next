@@ -6,6 +6,7 @@ import {
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import { Project } from "./project";
+import { mockProjectsR5 } from "./mockProjectsR5";
 
 async function getProjectsApi({
   pagination,
@@ -14,6 +15,17 @@ async function getProjectsApi({
   pagination: PaginationParams;
   round?: string;
 }): Promise<PaginatedResult<Project[]>> {
+  if (round === "5") {
+    return {
+      meta: {
+        has_next: false,
+        total_returned: mockProjectsR5.length,
+        next_offset: mockProjectsR5.length,
+      },
+      data: mockProjectsR5,
+    };
+  }
+
   const projects = await paginateResult(async (skip, take) => {
     if (round) {
       return (
@@ -65,7 +77,7 @@ async function getProjectsApi({
         name: project.name,
         description: project.description,
         profileAvatarUrl: project.project_avatar_url,
-        proejctCoverImageUrl: project.project_cover_image_url,
+        projectCoverImageUrl: project.project_cover_image_url,
         socialLinks: {
           twitter: project.social_links_twitter,
           farcaster: project.social_links_farcaster,
