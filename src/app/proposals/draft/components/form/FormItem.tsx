@@ -21,9 +21,9 @@ const FormItem = ({
   return (
     <div className={cn("flex flex-col flex-1", className)}>
       <div className="flex flex-row items-center mb-1">
-        <label className="text-xs font-semibold text-agora-stone-700">
+        <label className="text-xs font-semibold text-secondary">
           {label}
-          {required && <span className="text-agora-stone-700">*</span>}
+          {required && <span className="text-secondary">*</span>}
         </label>
         {info && (
           <InfoPop>

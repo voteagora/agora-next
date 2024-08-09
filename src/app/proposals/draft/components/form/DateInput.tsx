@@ -57,7 +57,7 @@ function DateInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold text-secondary"
             isRequired={required}
           >
             {label}
@@ -73,7 +73,7 @@ function DateInput<
                   field.onChange(e.target.value);
                 }}
                 type="date"
-                className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg text-agora-stone-900 placehoder:text-agora-stone-500 w-full"
+                className="bg-wash border border-line rounded-lg text-primary placehoder:text-tertiary w-full"
               />
             </div>
           </FormControl>

@@ -35,7 +35,7 @@ function TextInput<
       render={({ field }) => (
         <FormItem>
           <FormLabel
-            className="text-xs font-semibold text-agora-stone-700"
+            className="text-xs font-semibold text-secondary"
             isRequired={required}
           >
             {label}
@@ -44,12 +44,12 @@ function TextInput<
             <div className="relative">
               <input
                 type="text"
-                className={`border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 p-2 rounded-lg w-full`}
+                className={`border bg-wash border-line placeholder:text-tertiary text-primary p-2 rounded-lg w-full`}
                 {...field}
                 placeholder={placeholder}
               />
               {units && (
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-agora-stone-500">
+                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-tertiary">
                   {units}
                 </span>
               )}
