@@ -2,63 +2,76 @@
 
 import { isAddress } from "viem";
 import { useState } from "react";
-import FormItem from "./form/FormItem";
 import { useFormContext } from "react-hook-form";
 import AddressInput from "./form/AddressInput";
-import { useContractRead, useBlockNumber } from "wagmi";
-import { ENSGovernorABI } from "@/lib/contracts/abis/ENSGovernor";
-import Tenant from "@/lib/tenant/tenant";
+import { useBlockNumber } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
-import { ProposalDraft } from "@prisma/client";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
+import { useGetVotes } from "@/hooks/useGetVotes";
+import { useManager } from "@/hooks/useManager";
+import { DraftProposal, ProposalGatingType } from "../types";
+import Tenant from "@/lib/tenant/tenant";
 
 const RequestSponsorshipForm = ({
   draftProposal,
 }: {
-  draftProposal: ProposalDraft;
+  draftProposal: DraftProposal;
 }) => {
   const tenant = Tenant.current();
-  const { data: threshold } = useProposalThreshold();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const gatingType = plmToggle?.config?.gatingType;
   const [isPending, setIsPending] = useState(false);
-  const { watch } = useFormContext();
+  const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
 
+  const { data: threshold } = useProposalThreshold();
+  const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useContractRead({
-    abi: ENSGovernorABI,
-    address: tenant.contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    chainId: tenant.contracts.governor.chain.id,
-    args: [
-      address as `0x${string}`,
-      blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    ],
+  const { data: accountVotesData } = useGetVotes({
+    address: address as `0x${string}`,
+    blockNumber: blockNumber || BigInt(0),
   });
 
-  const hasEnoughVotes = accountVotesData
-    ? accountVotesData >= threshold!
-    : false;
+  const canSponsor = () => {
+    switch (gatingType) {
+      case ProposalGatingType.MANAGER:
+        return manager === address;
+      case ProposalGatingType.TOKEN_THRESHOLD:
+        return accountVotesData !== undefined && threshold !== undefined
+          ? accountVotesData >= threshold
+          : false;
+      default:
+        return false;
+    }
+  };
+
+  const canAddressSponsor = canSponsor();
 
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
-        <FormItem label="Sponsor address">
-          <AddressInput name="sponsorAddress" />
-        </FormItem>
-        <FormItem label="Sponsor verification">
-          <span className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
+        <AddressInput
+          control={control}
+          label="Sponsor address"
+          name="sponsorAddress"
+        />
+        <div className="space-y-1">
+          <label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs font-semibold text-agora-stone-700">
+            Sponsor verification
+          </label>
+          <div className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
             {isAddress(address) && <AvatarAddress address={address} />}
-            <span
-              className={`absolute right-2 top-2 ${hasEnoughVotes ? "text-green-500" : "text-red-500"}`}
+            <div
+              className={`absolute right-2 top-2 ${canAddressSponsor ? "text-green-500" : "text-red-500"}`}
             >
-              {hasEnoughVotes ? "Can sponsor" : "Cannot sponsor"}
-            </span>
-          </span>
-        </FormItem>
+              {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
+            </div>
+          </div>
+        </div>
       </div>
       <UpdatedButton
         fullWidth={true}

@@ -1,14 +1,18 @@
 "use client";
+
 import { z } from "zod";
 import { useEffect } from "react";
 import { encodeFunctionData, isAddress, parseUnits } from "viem";
-import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import NumberInput from "./form/NumberInput";
 import AddressInput from "./form/AddressInput";
 import { useFormContext } from "react-hook-form";
-import { schema as draftProposalSchema } from "./../schemas/DraftProposalSchema";
+import {
+  BasicProposalSchema,
+  ApprovalProposalSchema,
+} from "./../schemas/DraftProposalSchema";
 import Tenant from "@/lib/tenant/tenant";
+import { EthereumAddress } from "../types";
 
 const transferABI = [
   {
@@ -36,19 +40,22 @@ const transferABI = [
   },
 ] as const;
 
-type FormType = z.output<typeof draftProposalSchema>;
+type FormType =
+  | z.output<typeof BasicProposalSchema>
+  | z.output<typeof ApprovalProposalSchema>;
 
-const TransferTransactionForm = ({ index }: { index: number }) => {
+const TransferTransactionForm = ({
+  index,
+  name,
+}: {
+  index: number;
+  name: "transactions" | `approvalProposal.options.${number}.transactions`;
+}) => {
   const tenant = Tenant.current();
-  const {
-    register,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext<FormType>();
+  const { register, control, watch, setValue } = useFormContext<FormType>();
 
-  const recipient = watch(`transactions.${index}.recipient`);
-  const amount = watch(`transactions.${index}.amount`);
+  const recipient = watch(`${name}.${index}.recipient`);
+  const amount = watch(`${name}.${index}.amount`);
   const decimals = tenant.token.decimals;
 
   useEffect(() => {
@@ -63,58 +70,45 @@ const TransferTransactionForm = ({ index }: { index: number }) => {
         ],
       });
 
-      setValue(`transactions.${index}.calldata`, calldata);
+      setValue(`${name}.${index}.calldata`, calldata);
       setValue(
-        `transactions.${index}.target`,
-        tenant.contracts.governor.address
+        `${name}.${index}.target`,
+        tenant.contracts.governor.address as EthereumAddress
       );
-      setValue(`transactions.${index}.value`, "0");
+      setValue(`${name}.${index}.value`, "0");
     }
   }, [recipient, amount, setValue]);
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      <FormItem
-        label="Recipient"
-        required={true}
-        htmlFor={`transactions.${index}.recipient`}
-        className="col-span-2"
-      >
+      <div className="col-span-2">
         <AddressInput
-          name={`transactions.${index}.recipient`}
-          errorMessage={errors.transactions?.[index]?.recipient?.message}
+          control={control}
+          required={true}
+          label="Recipient"
+          name={`${name}.${index}.recipient`}
         />
-      </FormItem>
-      <FormItem
-        label="Amount (in ENS tokens)"
+      </div>
+      <NumberInput
+        control={control}
         required={true}
-        htmlFor={`transactions.${index}.amount`}
-      >
-        <NumberInput
-          name={`transactions.${index}.amount`}
-          register={register}
-          placeholder="100"
-          errorMessage={errors.transactions?.[index]?.amount?.message}
-        />
-      </FormItem>
+        label={`Amount (in ${tenant.token.symbol} tokens)`}
+        name={`${name}.${index}.amount`}
+        placeholder="100"
+      />
       <div className="col-span-3">
-        <FormItem
+        <TextInput
           label="Description"
           required={true}
-          htmlFor={`transactions.${index}.description`}
-        >
-          <TextInput
-            name={`transactions.${index}.description`}
-            register={register}
-            placeholder="What is this transaction all about?"
-            errorMessage={errors.transactions?.[index]?.description?.message}
-          />
-        </FormItem>
+          name={`${name}.${index}.description`}
+          control={control}
+          placeholder="What is this transaction all about?"
+        />
       </div>
       {/* target and calldata are not included in UI of the form, but we need them for consistency */}
-      <input type="hidden" {...register(`transactions.${index}.value`)} />
-      <input type="hidden" {...register(`transactions.${index}.target`)} />
-      <input type="hidden" {...register(`transactions.${index}.calldata`)} />
+      <input type="hidden" {...register(`${name}.${index}.value`)} />
+      <input type="hidden" {...register(`${name}.${index}.target`)} />
+      <input type="hidden" {...register(`${name}.${index}.calldata`)} />
     </div>
   );
 };

@@ -36,16 +36,16 @@ export const ensTenantContractConfig = ({
     token: new TenantContract<ITokenContract>({
       abi: EtherfiToken__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain: mainnet,
+      chain: chain,
       contract: EtherfiToken__factory.connect(TOKEN, provider),
       provider,
     }),
 
     // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: OptimismGovernor__factory.abi,
       address: GOVERNOR,
-      chain: mainnet,
+      chain: chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),

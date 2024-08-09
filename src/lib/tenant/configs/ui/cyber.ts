@@ -4,6 +4,8 @@ import cyberLogo from "@/assets/tenant/cyber_logo.svg";
 import delegateImage from "@/assets/tenant/cyber_delegate.svg";
 import successImage from "@/assets/tenant/cyber_success.svg";
 import pendingImage from "@/assets/tenant/cyber_pending.svg";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
@@ -119,6 +121,10 @@ export const cyberTenantUIConfig = new TenantUI({
 
   toggles: [
     {
+      name: "proposals",
+      enabled: true,
+    },
+    {
       name: "delegates",
       enabled: true,
     },
@@ -133,6 +139,42 @@ export const cyberTenantUIConfig = new TenantUI({
     {
       name: "delegates/code-of-conduct",
       enabled: true,
+    },
+    {
+      name: "proposal-lifecycle",
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [ProposalType?.BASIC],
+        copy: {},
+        gatingType: ProposalGatingType?.MANAGER,
+      },
     },
   ],
 });

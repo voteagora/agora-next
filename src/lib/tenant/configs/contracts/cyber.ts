@@ -5,7 +5,6 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
@@ -71,7 +70,7 @@ export const cyberTenantConfig = ({
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: OptimismGovernor__factory.abi,
       address: GOVERNOR,
       chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),

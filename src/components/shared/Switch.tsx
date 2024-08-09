@@ -1,7 +1,5 @@
 "use client";
 
-import { HStack } from "../Layout/Stack";
-
 type Props = {
   onSelectionChanged: (newSelection: any) => void;
   selection: string;
@@ -9,16 +7,13 @@ type Props = {
 };
 
 const optionStyle =
-  "p-[5px] flex-1 text-center cursor-pointer rounded-md text-primary/30 font-medium hover:bg-wash";
+  "p-[5px] flex-1 text-center cursor-pointer rounded-md text-primary/30 font-medium hover:bg-line hover:font-semibold transition-all";
 
 const selectedStyle = "bg-line text-primary font-semibold";
 
 export function Switch({ onSelectionChanged, selection, options }: Props) {
   return (
-    <HStack
-      className="rounded-md border border-line overflow-hidden w-full p-1"
-      gap={2}
-    >
+    <div className="flex flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1">
       {options.map((option, index) => (
         <div
           key={index}
@@ -30,6 +25,6 @@ export function Switch({ onSelectionChanged, selection, options }: Props) {
           {option}
         </div>
       ))}
-    </HStack>
+    </div>
   );
 }
