@@ -1,6 +1,11 @@
-import { paginateResult, PaginationParams } from "@/app/lib/pagination";
+import {
+  PaginatedResult,
+  paginateResult,
+  PaginationParams,
+} from "@/app/lib/pagination";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
+import { Project } from "./project";
 
 async function getProjectsApi({
   pagination,
@@ -8,7 +13,7 @@ async function getProjectsApi({
 }: {
   pagination: PaginationParams;
   round?: string;
-}) {
+}): Promise<PaginatedResult<Project[]>> {
   const projects = await paginateResult(async (skip, take) => {
     if (round) {
       return (
