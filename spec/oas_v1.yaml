@@ -1028,6 +1028,12 @@ components:
           type: array
           items:
             type: string
+        links:
+          type: array
+          items:
+            type: string
+        organization:
+          $ref: "#/components/schemas/Organization"
         contracts:
           summary: Deployed contracts for the project
           description: >
@@ -1105,6 +1111,16 @@ components:
         mirror:
           type: string
         website:
+          type: string
+    Organization:
+      summary: Organization information for a project
+      description: >
+        Information about the organization behind a project, including name and avatar.
+      type: object
+      properties:
+        name:
+          type: string
+        profileAvatarUrl:
           type: string
     RetroFundingBallotMetricsAllocation:
       summary: A vote for a RetroFunding ballot
