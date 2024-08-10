@@ -27,8 +27,7 @@ info:
 
     Not Live.
     - **Round 5**: Data related to Retro Funding for Optimism Round 5
-    - 0.2.0: **projects** Round 5 Projects and categories with mock data
-    - 0.2.0: **RetroFundingCategories** Round 5 Projects and categories with mock data
+    - 0.2.0: **projects** Round 5 Projects with mock data
     - 0.2.1: **RetroFundingBallots** Round 5 Ballots with mock data
     - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
     - 0.2.3: Round 5 Production release with real data
@@ -74,8 +73,6 @@ tags:
     description: Data related to the Impact Metrics for RetroFunding Round 4
   - name: RetroFundingImpactMetrics
     description: Connect RetroPGF to Impact Metrics
-  - name: RetroFundingCategories
-    description: Data related to Retro Funding Categories
   - name: comments
     description: Data related to Retro Funding Project Comments
   - name: commentsVotes
@@ -1031,6 +1028,12 @@ components:
           type: array
           items:
             type: string
+        links:
+          type: array
+          items:
+            type: string
+        organization:
+          $ref: "#/components/schemas/Organization"
         contracts:
           summary: Deployed contracts for the project
           description: >
@@ -1108,6 +1111,16 @@ components:
         mirror:
           type: string
         website:
+          type: string
+    Organization:
+      summary: Organization information for a project
+      description: >
+        Information about the organization behind a project, including name and avatar.
+      type: object
+      properties:
+        name:
+          type: string
+        profileAvatarUrl:
           type: string
     RetroFundingBallotMetricsAllocation:
       summary: A vote for a RetroFunding ballot
@@ -2079,6 +2092,19 @@ paths:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/offsetParam"
+        - name: category
+          in: query
+          description: >
+            The desired method by which returned votes will be filtered.
+            Supported values are: 'all', 'eth_core', "op_tooling", "op_rnd"
+          required: false
+          schema:
+            type: string
+            enum:
+              - all
+              - eth_core
+              - op_tooling
+              - op_rnd
       responses:
         "200":
           description: OK
@@ -2126,65 +2152,6 @@ paths:
           description: Unauthorized
         "404":
           description: Not Found
-        "500":
-          description: Internal Server Error
-  /retrofunding/rounds/{roundId}/categories:
-    get:
-      summary: Gets a list of categories for a RetroFunding round
-      description: >
-        Retrieves a paginated list of categories for a specific RetroFunding round on Agora.
-      operationId: getRetroFundingRoundCategories
-      tags:
-        - RetroFunding
-        - RetroFundingProjects
-        - RetroFundingCategories
-        - Round 5
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/projectIdParam"
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RetroFundingCategory"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-  /retrofunding/rounds/{roundId}/categories/{categoryId}/projects:
-    get:
-      summary: Gets a list of projects for a category in a RetroFunding round
-      description: >
-        Retrieves a list of projects for a specific category in a specific RetroFunding round on Agora as a JSON array.
-      operationId: getRetroFundingRoundCategoryProjects
-      tags:
-        - RetroFunding
-        - projects
-        - Round 5
-      parameters:
-        - $ref: "#/components/parameters/roundIdParam"
-        - $ref: "#/components/parameters/projectIdParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Project"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
         "500":
           description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{ballotCasterAddressOrEns}/impactMetrics:
