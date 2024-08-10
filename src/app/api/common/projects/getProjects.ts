@@ -1,14 +1,44 @@
-import { paginateResult, PaginationParams } from "@/app/lib/pagination";
+import {
+  PaginatedResult,
+  paginateResult,
+  PaginationParams,
+} from "@/app/lib/pagination";
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
+import { Project } from "./project";
+import { mockProjectsR5 } from "./mockProjectsR5";
+
+const filterMap = {
+  all: null,
+  eth_core: "ETHEREUM_CORE_CONTRIBUTIONS",
+  op_tooling: "OP_STACK_TOOLING",
+  op_rnd: "OP_STACK_RESEARCH_AND_DEVELOPMENT",
+};
 
 async function getProjectsApi({
   pagination,
   round,
+  category,
 }: {
   pagination: PaginationParams;
   round?: string;
-}) {
+  category?: keyof typeof filterMap;
+}): Promise<PaginatedResult<Project[]>> {
+  if (round === "5") {
+    const projects = mockProjectsR5.filter((project) => {
+      return !category || project.category === filterMap[category];
+    });
+
+    return {
+      meta: {
+        has_next: false,
+        total_returned: projects.length,
+        next_offset: projects.length,
+      },
+      data: projects,
+    };
+  }
+
   const projects = await paginateResult(async (skip, take) => {
     if (round) {
       return (
@@ -56,10 +86,11 @@ async function getProjectsApi({
       return {
         id: project.project_id,
         category: project.category,
+        organization: null,
         name: project.name,
         description: project.description,
         profileAvatarUrl: project.project_avatar_url,
-        proejctCoverImageUrl: project.project_cover_image_url,
+        projectCoverImageUrl: project.project_cover_image_url,
         socialLinks: {
           twitter: project.social_links_twitter,
           farcaster: project.social_links_farcaster,
@@ -69,6 +100,7 @@ async function getProjectsApi({
         team: project.team,
         github: project.github,
         packages: project.packages,
+        links: [],
         contracts: project.contracts,
         grantsAndFunding: {
           ventureFunding: project.grants_and_funding_venture_funding,
