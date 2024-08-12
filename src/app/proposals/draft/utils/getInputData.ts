@@ -7,6 +7,7 @@ import Tenant from "@/lib/tenant/tenant";
 import {
   approvalModuleAddress,
   optimisticModuleAddress,
+  cyberApprovalModuleAddress,
 } from "@/lib/contracts/contracts";
 import { disapprovalThreshold } from "@/lib/constants";
 
@@ -194,8 +195,15 @@ export function getInputData(proposal: DraftProposal): {
         [options, settings]
       );
 
+      // TODO: change this so the module addresses are set via the tenant
+      // moving quickly atm
+      const finalApprovalModuleAddress =
+        tenant.namespace === "cyber"
+          ? cyberApprovalModuleAddress
+          : approvalModuleAddress;
+
       const approvalInputData: ApprovalInputData = [
-        approvalModuleAddress,
+        finalApprovalModuleAddress,
         calldata,
         description,
         parseInt(proposal.proposal_config_type || "0"),
