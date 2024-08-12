@@ -2,8 +2,6 @@ import {
   AgoraGovernor__factory,
   CyberProposalTypes__factory,
   ERC20__factory,
-  OptimismGovernor__factory,
-  ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -57,8 +55,8 @@ export const cyberTenantConfig = ({
     : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
 
   const GOVERNOR = isProd
-    ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"
-    : "0x741005a136766e6E03eD8A7cc32D6a91241E5BF5";
+    ? "0x58E53131c339aA3cBA35904538eA5948f751050a"
+    : "0x963f3645ff2dB82f607fcf5b70c8bB133D53bD36";
 
   const TREASURY = isProd
     ? ["0x23f4F627EC82001c422658d87BA65C2D4AdDa794"]
