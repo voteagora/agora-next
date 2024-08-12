@@ -13,7 +13,7 @@ const GovernorSettings = () => {
     <Accordion
       type="single"
       collapsible
-      className="w-full border p-6 mt-4 rounded-lg"
+      className="w-full border p-6 mt-4 rounded-lg bg-neutral"
     >
       <AccordionItem className="border-none" value="item-1">
         <AccordionTrigger className="text-base font-bold text-black hover:no-underline p-0">

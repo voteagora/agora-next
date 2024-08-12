@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Hero() {
   const { namespace, ui } = Tenant.current();
-  const { title, description } = ui.page("/");
+  const { title, description, hero } = ui.page("/");
 
   return (
     <div className="flex flex-col sm:flex-row justify-between mt-12 mb-0 sm:my-12 w-[76rem] max-w-full sm:max-w-[76rem]">
@@ -11,11 +11,11 @@ export default function Hero() {
         <h1 className="font-extrabold text-2xl mb-2 text-primary">{title}</h1>
         <p className="text-secondary text-base">{description}</p>
       </div>
-      {ui.hero && (
+      {hero && (
         <Image
           className="h-[110px] w-auto"
           alt={`${namespace} cover`}
-          src={ui.hero}
+          src={hero}
         />
       )}
     </div>

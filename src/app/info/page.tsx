@@ -1,5 +1,5 @@
 import React from "react";
-import About from "@/app/info/components/InfoAbout";
+import InfoAbout from "@/app/info/components/InfoAbout";
 import { InfoHero } from "@/app/info/components/InfoHero";
 
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
@@ -15,10 +15,11 @@ import Hero from "@/components/Hero/Hero";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
-  const page = tenant.ui.page("proposals");
+  const page = tenant.ui.page("info") || tenant.ui.page("/");
+
   const { title, description } = page!.meta;
 
-  const preview = `/api/images/og/proposals?title=${encodeURIComponent(
+  const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
   )}&description=${encodeURIComponent(description)}`;
 
@@ -51,33 +52,42 @@ export default async function Page() {
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     // Default treasury data
-    const data = await apiFetchTreasuryBalanceTS(FREQUENCY_FILTERS.YEAR);
+    const treasuryData = await apiFetchTreasuryBalanceTS(
+      FREQUENCY_FILTERS.YEAR
+    );
+    const hasTreasuryData = treasuryData.result.length > 0;
+    const hasGovernanceCharts = ui.toggle("info/governance-charts")?.enabled;
+
     return (
       <div className="flex flex-col font-inter">
         <InfoHero />
-        <About />
+        <InfoAbout />
         <GovernorSettings />
-        <ChartTreasury
-          initialData={data.result}
-          getData={async (frequency: string) => {
-            "use server";
-            return apiFetchTreasuryBalanceTS(frequency);
-          }}
-        />
-        <GovernanceCharts
-          getDelegates={async () => {
-            "use server";
-            return apiFetchDelegateWeights();
-          }}
-          getVotes={async () => {
-            "use server";
-            return apiFetchProposalVoteCounts();
-          }}
-          getMetrics={async (metric: string, frequency: string) => {
-            "use server";
-            return apiFetchMetricTS(metric, frequency);
-          }}
-        />
+        {hasTreasuryData && (
+          <ChartTreasury
+            initialData={treasuryData.result}
+            getData={async (frequency: string) => {
+              "use server";
+              return apiFetchTreasuryBalanceTS(frequency);
+            }}
+          />
+        )}
+        {hasGovernanceCharts && (
+          <GovernanceCharts
+            getDelegates={async () => {
+              "use server";
+              return apiFetchDelegateWeights();
+            }}
+            getVotes={async () => {
+              "use server";
+              return apiFetchProposalVoteCounts();
+            }}
+            getMetrics={async (metric: string, frequency: string) => {
+              "use server";
+              return apiFetchMetricTS(metric, frequency);
+            }}
+          />
+        )}
 
         <div className="h-[350px]"></div>
       </div>
