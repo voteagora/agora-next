@@ -50,6 +50,13 @@ const DraftPreview = ({
         return accountVotesData !== undefined && threshold !== undefined
           ? accountVotesData >= threshold
           : false;
+      case ProposalGatingType.GOVERNOR_V1:
+        return (
+          manager === address ||
+          (accountVotesData !== undefined && threshold !== undefined
+            ? accountVotesData >= threshold
+            : false)
+        );
       default:
         return false;
     }
@@ -155,7 +162,7 @@ const DraftPreview = ({
         <h3 className="font-semibold mt-6">Abstract</h3>
         <p className="text-agora-stone-700 mt-2">{proposalDraft.abstract}</p>
       </FormCard.Section>
-      <FormCard.Section className="!z-0">
+      <FormCard.Section className="z-0">
         {proposalDraft.sponsor_address &&
         address != proposalDraft.sponsor_address ? (
           <>
@@ -194,7 +201,7 @@ const DraftPreview = ({
           </>
         ) : (
           <>
-            <h3 className="font-semibold">Ready to submit?</h3>
+            <h3 className="font-semibold">Requirements</h3>
             {!canAddressSponsor && (
               <p className="text-agora-stone-700 mt-2">
                 You do not meet the requirement to submit this proposal.
@@ -203,32 +210,42 @@ const DraftPreview = ({
               </p>
             )}
             <div className="mt-6">
-              <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                <p className="flex-grow">
-                  {gatingType === ProposalGatingType.MANAGER
-                    ? "Manager address"
-                    : "Proposal threshold"}
-                </p>
-                <span className="text-secondary font-mono text-xs">
-                  {gatingType === ProposalGatingType.MANAGER
-                    ? manager?.toString()
-                    : threshold
-                      ? Math.round(
-                          parseFloat(
-                            formatUnits(
-                              BigInt(threshold),
-                              tenant.token.decimals
+              {gatingType === ProposalGatingType.MANAGER ||
+                (gatingType === ProposalGatingType.GOVERNOR_V1 && (
+                  <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+                    <p className="flex-grow">Manager address</p>
+                    <span className="text-secondary font-mono text-xs">
+                      {manager?.toString()}
+                    </span>
+                  </div>
+                ))}
+              {(gatingType === ProposalGatingType.MANAGER ||
+                gatingType === ProposalGatingType.GOVERNOR_V1) && (
+                <div className="relative">
+                  {gatingType === ProposalGatingType.GOVERNOR_V1 && (
+                    <div className="absolute top-[-15px] left-[calc(48%)] bg-neutral border border-line py-1 px-2 text-xs font-semibold rounded">
+                      OR
+                    </div>
+                  )}
+                  <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+                    <p className="flex-grow">Token balance</p>
+                    <span className="text-secondary font-mono text-xs">
+                      {"> "}
+                      {threshold
+                        ? Math.round(
+                            parseFloat(
+                              formatUnits(
+                                BigInt(threshold),
+                                tenant.token.decimals
+                              )
                             )
                           )
-                        )
-                      : "0"}
-                </span>
-                <input
-                  type="checkbox"
-                  className="rounded text-agora-stone-900"
-                  checked={canAddressSponsor}
-                />
-              </div>
+                        : "0"}{" "}
+                      tokens
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             {actions}
           </>

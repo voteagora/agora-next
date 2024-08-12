@@ -44,6 +44,13 @@ const RequestSponsorshipForm = ({
         return accountVotesData !== undefined && threshold !== undefined
           ? accountVotesData >= threshold
           : false;
+      case ProposalGatingType.GOVERNOR_V1:
+        return (
+          manager === address ||
+          (accountVotesData !== undefined && threshold !== undefined
+            ? accountVotesData >= threshold
+            : false)
+        );
       default:
         return false;
     }

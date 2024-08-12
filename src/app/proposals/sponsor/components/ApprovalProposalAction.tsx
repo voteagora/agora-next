@@ -59,7 +59,11 @@ const ApprovalProposalAction = ({
       >
         Submit proposal
       </UpdatedButton>
-      {onPrepareError && <div>{error?.message}</div>}
+      {onPrepareError && (
+        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary break-words hyphens-auto">
+          {error?.message}
+        </div>
+      )}
     </>
   );
 };

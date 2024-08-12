@@ -200,6 +200,7 @@ export enum TransactionType {
 export enum ProposalGatingType {
   MANAGER = "manager",
   TOKEN_THRESHOLD = "token threshold",
+  GOVERNOR_V1 = "governor v1",
 }
 
 export type PLMConfig = {
@@ -327,10 +328,10 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         approvalProposal: {
           budget: proposal.budget,
           criteria: proposal.criteria,
-          maxOptions: proposal.max_options.toString(),
-          threshold: proposal.threshold.toString(),
-          topChoices: proposal.top_choices.toString(),
-          options: proposal.approval_options.map((option) => {
+          maxOptions: proposal.max_options?.toString(),
+          threshold: proposal.threshold?.toString(),
+          topChoices: proposal.top_choices?.toString(),
+          options: proposal.approval_options?.map((option) => {
             return {
               title: option.title,
               transactions: option.transactions.map((t) => parseTransaction(t)),

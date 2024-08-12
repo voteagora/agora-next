@@ -239,7 +239,7 @@ export const cyberTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [ProposalType?.BASIC],
         copy: {},
-        gatingType: ProposalGatingType?.MANAGER,
+        gatingType: ProposalGatingType?.GOVERNOR_V1,
       },
     },
   ],
