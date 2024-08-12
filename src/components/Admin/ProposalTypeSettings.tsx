@@ -54,7 +54,7 @@ export default function ProposalTypeSettings({
       >
         <Button
           size="icon"
-          className="w-8 h-8 rounded-full"
+          className="w-8 h-8 rounded-full bg-neutral"
           variant="secondary"
         >
           <Plus className="w-3.5 h-3.5" />

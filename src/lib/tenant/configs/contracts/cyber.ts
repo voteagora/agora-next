@@ -1,13 +1,16 @@
 import {
   AgoraGovernor__factory,
+  CyberProposalTypes__factory,
   ERC20__factory,
+  OptimismGovernor__factory,
+  ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { JsonRpcProvider } from "ethers";
+import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 
 interface Props {
@@ -61,6 +64,10 @@ export const cyberTenantConfig = ({
     ? ["0x23f4F627EC82001c422658d87BA65C2D4AdDa794"]
     : ["0xEb3aef5D867109E734fB08E7b1f7b7bba8226aa3"];
 
+  const TYPES = isProd
+    ? "0xf3f3841948e3B3D744D1ACd5770EbfFCa3742ACA"
+    : "0x0B629B2ff953a9f0216816342685514798E18819";
+
   // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
   const provider = new JsonRpcProvider("https://cyber.alt.technology");
   const chain = cyber;
@@ -79,6 +86,14 @@ export const cyberTenantConfig = ({
       address: GOVERNOR,
       chain,
       contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
+      provider,
+    }),
+
+    proposalTypesConfigurator: new TenantContract<BaseContract>({
+      abi: CyberProposalTypes__factory.abi,
+      address: TYPES,
+      chain,
+      contract: CyberProposalTypes__factory.connect(TYPES, provider),
       provider,
     }),
 

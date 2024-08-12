@@ -4,6 +4,7 @@
 export type { AgoraGovernor } from "./AgoraGovernor";
 export type { AlligatorOPV5 } from "./AlligatorOPV5";
 export type { ApprovalVotingModule } from "./ApprovalVotingModule";
+export type { CyberProposalTypes } from "./CyberProposalTypes";
 export type { ERC20 } from "./ERC20";
 export type { NounsGovernor } from "./NounsGovernor";
 export type { OptimismGovernor } from "./OptimismGovernor";
@@ -15,6 +16,7 @@ export * as factories from "./factories";
 export { AgoraGovernor__factory } from "./factories/AgoraGovernor__factory";
 export { AlligatorOPV5__factory } from "./factories/AlligatorOPV5__factory";
 export { ApprovalVotingModule__factory } from "./factories/ApprovalVotingModule__factory";
+export { CyberProposalTypes__factory } from "./factories/CyberProposalTypes__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
 export { NounsGovernor__factory } from "./factories/NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./factories/OptimismGovernor__factory";

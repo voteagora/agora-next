@@ -4,6 +4,7 @@
 export { AgoraGovernor__factory } from "./AgoraGovernor__factory";
 export { AlligatorOPV5__factory } from "./AlligatorOPV5__factory";
 export { ApprovalVotingModule__factory } from "./ApprovalVotingModule__factory";
+export { CyberProposalTypes__factory } from "./CyberProposalTypes__factory";
 export { ERC20__factory } from "./ERC20__factory";
 export { NounsGovernor__factory } from "./NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./OptimismGovernor__factory";
