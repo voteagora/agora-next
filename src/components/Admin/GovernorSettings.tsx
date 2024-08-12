@@ -126,7 +126,7 @@ export default function GovernorSettings() {
   //   isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction
 
   return (
-    <div className="gl_box">
+    <div className="gl_box bg-neutral">
       <section>
         <h1 className="font-extrabold text-2xl text-primary">
           Governor settings

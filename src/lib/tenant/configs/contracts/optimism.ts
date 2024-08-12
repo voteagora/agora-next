@@ -1,7 +1,7 @@
 import {
   AlligatorOPV5__factory,
+  ERC20__factory,
   OptimismGovernor__factory,
-  OptimismToken__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { AlchemyProvider, BaseContract } from "ethers";
@@ -37,10 +37,10 @@ export const optimismTenantContractConfig = ({
 
   return {
     token: new TenantContract<ITokenContract>({
-      abi: OptimismToken__factory.abi,
+      abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: OptimismToken__factory.connect(TOKEN, provider),
+      contract: ERC20__factory.connect(TOKEN, provider),
       provider,
     }),
 

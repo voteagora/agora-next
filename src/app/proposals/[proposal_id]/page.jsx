@@ -10,7 +10,7 @@ export async function generateMetadata({ params }, parent) {
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
   const description = truncateString(cleanString(proposal.description), 80);
 
-  const preview = `/api/images/og/proposal?title=${encodeURIComponent(
+  const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
   )}&description=${encodeURIComponent(description)}`;
 
