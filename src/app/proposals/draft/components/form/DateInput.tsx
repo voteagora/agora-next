@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
+import {
   ControllerProps,
   FieldPath,
   FieldValues,
@@ -27,6 +34,7 @@ const formatDate = (date: Date) => {
 type DateInputProps = {
   label: string;
   required?: boolean;
+  tooltip?: string;
   description?: string;
 };
 
@@ -38,6 +46,7 @@ function DateInput<
   control,
   name,
   label,
+  tooltip,
   description,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & DateInputProps) {
   const [value, setValue] = useState("");
@@ -56,12 +65,26 @@ function DateInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="text-xs font-semibold text-secondary"
-            isRequired={required}
-          >
-            {label}
-          </FormLabel>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex flex-row space-x-1">
+                <FormLabel
+                  className="text-xs font-semibold secondary"
+                  isRequired={required}
+                >
+                  {label}
+                </FormLabel>
+                {!!tooltip && (
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                )}
+              </TooltipTrigger>
+              {!!tooltip && (
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {tooltip}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <FormControl>
             <div className="relative">
               <input

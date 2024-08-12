@@ -17,6 +17,7 @@ import CustomTransactionForm from "./CustomTransactionForm";
 import { UpdatedButton } from "@/components/Button";
 import TextInput from "./form/TextInput";
 import { XCircleIcon } from "@heroicons/react/20/solid";
+import { useEffect } from "react";
 
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
@@ -172,8 +173,19 @@ const TransactionFormItem = ({
 };
 
 const ApprovalProposalForm = () => {
-  const { control, watch } = useFormContext<FormType>();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { defaultValues },
+  } = useFormContext<FormType>();
   const criteria = watch("approvalProposal.criteria");
+
+  useEffect(() => {
+    if (!defaultValues?.approvalProposal?.criteria) {
+      setValue("approvalProposal.criteria", ApprovalProposalType.THRESHOLD);
+    }
+  }, [defaultValues?.approvalProposal?.criteria, setValue]);
 
   const {
     fields: options,
@@ -194,18 +206,19 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        {/*  info="This is the maximum number of tokens that can be transferred from all the options in this proposal." */}
         <NumberInput
           required={true}
           label="Budget"
           name="approvalProposal.budget"
           control={control}
+          tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
         />
-        {/*  info="Determines up to how many options each voter may select" */}
+
         <NumberInput
           required={true}
           label="Max options"
           name="approvalProposal.maxOptions"
+          tooltip=" Determines up to how many options each voter may select."
           control={control}
         />
         {/* info="Threshold means all options with more than a set amount of votes win. Top choices means only a set number of the most popular options win." */}
@@ -217,11 +230,11 @@ const ApprovalProposalForm = () => {
           name="approvalProposal.criteria"
         />
         {criteria === ApprovalProposalType.TOP_CHOICES && (
-          // info="Selects how many votes an option must have to be considered a winner"
           <NumberInput
             required={true}
             label="Top choices"
             name="approvalProposal.topChoices"
+            tooltip="This is how many of the most voted for options win."
             control={control}
           />
         )}
@@ -230,6 +243,7 @@ const ApprovalProposalForm = () => {
             required={true}
             label="Threshold"
             name="approvalProposal.threshold"
+            tooltip="This is the minimum number of votes an option must have to be considered a winner"
             control={control}
           />
         )}

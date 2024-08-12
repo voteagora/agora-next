@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 import { useState, useEffect } from "react";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import {
@@ -22,6 +29,7 @@ type MarkdownTextareaInputProps = {
   description?: string;
   placeholder?: string;
   required?: boolean;
+  tooltip?: string;
 };
 
 function MarkdownTextareaInput<
@@ -33,6 +41,7 @@ function MarkdownTextareaInput<
   name,
   label,
   placeholder,
+  tooltip,
   description,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> &
   MarkdownTextareaInputProps) {
@@ -54,12 +63,26 @@ function MarkdownTextareaInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="text-xs font-semibold text-secondary"
-            isRequired={required}
-          >
-            {label}
-          </FormLabel>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex flex-row space-x-1">
+                <FormLabel
+                  className="text-xs font-semibold secondary"
+                  isRequired={required}
+                >
+                  {label}
+                </FormLabel>
+                {!!tooltip && (
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                )}
+              </TooltipTrigger>
+              {!!tooltip && (
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {tooltip}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <FormControl>
             <div className="flex flex-col">
               <div className="min-h-[215px] w-full border border-line rounded-t-lg bg-wash">

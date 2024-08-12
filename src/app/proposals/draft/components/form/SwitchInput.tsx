@@ -1,4 +1,11 @@
 import { useState, useEffect } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 import { Switch } from "@/components/shared/Switch";
 import {
   ControllerProps,
@@ -20,6 +27,7 @@ type SwitchInputProps = {
   options: string[];
   description?: string;
   required?: boolean;
+  tooltip?: string;
 };
 
 function SwitchInput<
@@ -30,6 +38,7 @@ function SwitchInput<
   control,
   name,
   label,
+  tooltip,
   description,
   options,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & SwitchInputProps) {
@@ -48,12 +57,26 @@ function SwitchInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="text-xs font-semibold text-secondary"
-            isRequired={required}
-          >
-            {label}
-          </FormLabel>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex flex-row space-x-1">
+                <FormLabel
+                  className="text-xs font-semibold secondary"
+                  isRequired={required}
+                >
+                  {label}
+                </FormLabel>
+                {!!tooltip && (
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                )}
+              </TooltipTrigger>
+              {!!tooltip && (
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {tooltip}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <FormControl>
             <Switch
               options={options}

@@ -7,6 +7,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 
 type TextInputProps = {
   label: string;
@@ -14,6 +21,7 @@ type TextInputProps = {
   placeholder?: string;
   units?: string;
   required?: boolean;
+  tooltip?: string;
 };
 
 function TextInput<
@@ -26,6 +34,7 @@ function TextInput<
   label,
   placeholder,
   description,
+  tooltip,
   units,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & TextInputProps) {
   return (
@@ -34,12 +43,26 @@ function TextInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="text-xs font-semibold text-secondary"
-            isRequired={required}
-          >
-            {label}
-          </FormLabel>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex flex-row space-x-1">
+                <FormLabel
+                  className="text-xs font-semibold secondary"
+                  isRequired={required}
+                >
+                  {label}
+                </FormLabel>
+                {!!tooltip && (
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                )}
+              </TooltipTrigger>
+              {!!tooltip && (
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {tooltip}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <FormControl>
             <div className="relative">
               <input

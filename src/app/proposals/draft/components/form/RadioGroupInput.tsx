@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 import { useState, useEffect } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { cn } from "@/lib/utils";
@@ -23,6 +30,7 @@ type RadioGroupInputProps = {
   options: { label: string; value: string; icon?: string }[];
   description?: string;
   required?: boolean;
+  tooltip?: string;
 };
 
 function RadioGroupInput<
@@ -35,6 +43,7 @@ function RadioGroupInput<
   label,
   description,
   options,
+  tooltip,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> &
   RadioGroupInputProps) {
   const [value, setValue] = useState("");
@@ -52,12 +61,26 @@ function RadioGroupInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="text-xs font-semibold text-secondary"
-            isRequired={required}
-          >
-            {label}
-          </FormLabel>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex flex-row space-x-1">
+                <FormLabel
+                  className="text-xs font-semibold secondary"
+                  isRequired={required}
+                >
+                  {label}
+                </FormLabel>
+                {!!tooltip && (
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                )}
+              </TooltipTrigger>
+              {!!tooltip && (
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {tooltip}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <FormControl>
             <RadioGroup
               value={value}

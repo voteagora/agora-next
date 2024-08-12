@@ -1,5 +1,12 @@
 import { useState, useEffect, Fragment } from "react";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
+import {
   ControllerProps,
   FieldPath,
   FieldValues,
@@ -22,6 +29,7 @@ type SwitchInputProps = {
   description?: string;
   required?: boolean;
   emptyCopy?: string;
+  tooltip?: string;
 };
 
 function SelectInput<
@@ -35,6 +43,7 @@ function SelectInput<
   description,
   options,
   emptyCopy,
+  tooltip,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & SwitchInputProps) {
   const [value, setValue] = useState<string>();
   const { getValues, watch } = useFormContext();
@@ -55,12 +64,26 @@ function SelectInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="text-xs font-semibold text-secondary"
-            isRequired={required}
-          >
-            {label}
-          </FormLabel>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex flex-row space-x-1">
+                <FormLabel
+                  className="text-xs font-semibold secondary"
+                  isRequired={required}
+                >
+                  {label}
+                </FormLabel>
+                {!!tooltip && (
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                )}
+              </TooltipTrigger>
+              {!!tooltip && (
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {tooltip}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <FormControl>
             {options.length > 0 ? (
               <div className="">
