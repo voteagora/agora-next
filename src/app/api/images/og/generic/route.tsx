@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   ).then((res) => res.arrayBuffer());
 
   const bg = await fetch(
-    new URL("../assets/og-proposal-bg.png", import.meta.url)
+    new URL("../assets/og-generic-bg.png", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(

@@ -1,13 +1,14 @@
 import {
-  EtherfiToken__factory,
-  OptimismGovernor__factory,
+  AgoraGovernor__factory,
+  CyberProposalTypes__factory,
+  ERC20__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { JsonRpcProvider } from "ethers";
+import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 
 interface Props {
@@ -54,8 +55,16 @@ export const cyberTenantConfig = ({
     : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
 
   const GOVERNOR = isProd
-    ? "0x176A107b77B09973d9fBE6AE2643D0bB6c4B3A7D"
-    : "0x741005a136766e6E03eD8A7cc32D6a91241E5BF5";
+    ? "0x58E53131c339aA3cBA35904538eA5948f751050a"
+    : "0x963f3645ff2dB82f607fcf5b70c8bB133D53bD36";
+
+  const TREASURY = isProd
+    ? ["0x23f4F627EC82001c422658d87BA65C2D4AdDa794"]
+    : ["0xEb3aef5D867109E734fB08E7b1f7b7bba8226aa3"];
+
+  const TYPES = isProd
+    ? "0xf3f3841948e3B3D744D1ACd5770EbfFCa3742ACA"
+    : "0x0B629B2ff953a9f0216816342685514798E18819";
 
   // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
   const provider = new JsonRpcProvider("https://cyber.alt.technology");
@@ -63,19 +72,29 @@ export const cyberTenantConfig = ({
 
   return {
     token: new TenantContract<ITokenContract>({
-      abi: EtherfiToken__factory.abi,
+      abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: EtherfiToken__factory.connect(TOKEN, provider),
+      contract: ERC20__factory.connect(TOKEN, provider),
       provider,
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: AgoraGovernor__factory.abi,
       address: GOVERNOR,
       chain,
-      contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
+      contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
+
+    proposalTypesConfigurator: new TenantContract<BaseContract>({
+      abi: CyberProposalTypes__factory.abi,
+      address: TYPES,
+      chain,
+      contract: CyberProposalTypes__factory.connect(TYPES, provider),
+      provider,
+    }),
+
+    treasury: TREASURY,
   };
 };

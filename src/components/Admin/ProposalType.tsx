@@ -21,6 +21,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 type Props = {
   proposalType: ProposalType;
@@ -46,7 +47,7 @@ export default function ProposalType({
   index,
   votableSupply,
 }: Props) {
-  const { contracts } = Tenant.current();
+  const { namespace, contracts, token } = Tenant.current();
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
@@ -62,11 +63,18 @@ export default function ProposalType({
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
 
+  const deleteProposalTypeArgs = [BigInt(index), 0, 0, ""];
+  // TODO: Replace this with a governor-level flag
+  // TODO: Aso add proposal type configurator version flag
+  if (namespace === TENANT_NAMESPACES.CYBER) {
+    deleteProposalTypeArgs.push("0x" + "0".repeat(40));
+  }
+
   const { config: deleteProposalTypeConfig } = usePrepareContractWrite({
     address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
     abi: contracts.proposalTypesConfigurator!.abi,
     functionName: "setProposalType",
-    args: [BigInt(index), 0, 0, ""],
+    args: deleteProposalTypeArgs,
   });
   const {
     data: resultDeleteProposalType,
@@ -79,18 +87,27 @@ export default function ProposalType({
     });
 
   const formValues = form.watch();
+  const setProposalTypeArgs = [
+    BigInt(index),
+    Math.round(formValues.quorum * 100),
+    Math.round(formValues.approval_threshold * 100),
+    formValues.name,
+  ];
+
+  // TODO: Replace this with a governor-level flag
+  // TODO: Aso add proposal type configurator version flag.
+  if (namespace === TENANT_NAMESPACES.CYBER) {
+    setProposalTypeArgs.push("0x" + "0".repeat(40));
+  }
+
   const { config: setProposalTypeConfig, isError: setProposalTypeError } =
     usePrepareContractWrite({
       address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
       abi: contracts.proposalTypesConfigurator!.abi,
       functionName: "setProposalType",
-      args: [
-        BigInt(index),
-        Math.round(formValues.quorum * 100),
-        Math.round(formValues.approval_threshold * 100),
-        formValues.name,
-      ],
+      args: setProposalTypeArgs,
     });
+
   const {
     data: resultSetProposalType,
     write: writeSetProposalType,
@@ -183,7 +200,7 @@ export default function ProposalType({
                           0,
                           1
                         )}{" "}
-                        OP
+                        {token.symbol}
                       </p>
                     </div>
                   </div>

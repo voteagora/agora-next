@@ -2151,6 +2151,11 @@
     "@opentelemetry/resources" "^1.12.0"
     "@opentelemetry/sdk-node" "^0.49.1"
 
+"@opentelemetry/context-async-hooks@1.19.0":
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/context-async-hooks/-/context-async-hooks-1.19.0.tgz#86406105280d428f99afccd65b092ad4a3540347"
+  integrity sha512-0i1ECOc9daKK3rjUgDDXf0GDD5XfCou5lXnt2DALIc2qKoruPPcesobNKE54laSVUWnC3jX26RzuOa31g0V32A==
+
 "@opentelemetry/context-async-hooks@1.22.0", "@opentelemetry/context-async-hooks@^1.19.0":
   version "1.22.0"
   resolved "https://registry.npmjs.org/@opentelemetry/context-async-hooks/-/context-async-hooks-1.22.0.tgz"
@@ -2707,12 +2712,26 @@
   dependencies:
     "@opentelemetry/core" "^1.0.0"
 
+"@opentelemetry/propagator-b3@1.19.0":
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/propagator-b3/-/propagator-b3-1.19.0.tgz#9fbf15922aca1e09a599272ba7edb766732f848f"
+  integrity sha512-v7y5IBOKBm0vP3yf0DHzlw4L2gL6tZ0KeeMTaxfO5IuomMffDbrGWcvYFp0Dt4LdZctTSK523rVLBB9FBHBciQ==
+  dependencies:
+    "@opentelemetry/core" "1.19.0"
+
 "@opentelemetry/propagator-b3@1.22.0":
   version "1.22.0"
   resolved "https://registry.npmjs.org/@opentelemetry/propagator-b3/-/propagator-b3-1.22.0.tgz"
   integrity sha512-qBItJm9ygg/jCB5rmivyGz1qmKZPsL/sX715JqPMFgq++Idm0x+N9sLQvWFHFt2+ZINnCSojw7FVBgFW6izcXA==
   dependencies:
     "@opentelemetry/core" "1.22.0"
+
+"@opentelemetry/propagator-jaeger@1.19.0":
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/propagator-jaeger/-/propagator-jaeger-1.19.0.tgz#e30913b4ba75b734c7269602902d5a205c802624"
+  integrity sha512-dedkOoTzKg+nYoLWCMp0Im+wo+XkTRW6aXhi8VQRtMW/9SNJGOllCJSu8llToLxMDF0+6zu7OCrKkevAof2tew==
+  dependencies:
+    "@opentelemetry/core" "1.19.0"
 
 "@opentelemetry/propagator-jaeger@1.22.0":
   version "1.22.0"
