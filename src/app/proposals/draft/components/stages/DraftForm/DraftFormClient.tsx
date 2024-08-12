@@ -178,7 +178,7 @@ const DraftFormClient = ({
               />
               <MarkdownTextareaInput
                 control={methods.control}
-                label="Abstract"
+                label="Description"
                 required={true}
                 name="abstract"
               />

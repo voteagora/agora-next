@@ -67,7 +67,7 @@ export function getInputData(proposal: DraftProposal): {
       proposal.temp_check_link &&
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
     }` +
-    "\n\n ## Abstract \n" +
+    "\n\n ## Description \n" +
     proposal.abstract;
 
   // Inputs for basic type

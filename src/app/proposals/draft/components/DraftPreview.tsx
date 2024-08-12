@@ -159,7 +159,7 @@ const DraftPreview = ({
           </div>
         )}
 
-        <h3 className="font-semibold mt-6">Abstract</h3>
+        <h3 className="font-semibold mt-6">Description</h3>
         <p className="text-agora-stone-700 mt-2">{proposalDraft.abstract}</p>
       </FormCard.Section>
       <FormCard.Section className="z-0">

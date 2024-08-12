@@ -72,7 +72,7 @@ function formatGithubProposal(proposal: DraftProposal) {
   }                                                                                                                                     |
   `;
 
-  const abstract = `# Abstract \n ${proposal.abstract}`;
+  const abstract = `# Description \n ${proposal.abstract}`;
   const transactions =
     proposal.proposal_type === "basic"
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
