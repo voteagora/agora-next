@@ -84,16 +84,19 @@ const RequestSponsorshipForm = ({
         fullWidth={true}
         isSubmit={false}
         isLoading={isPending}
+        type={canAddressSponsor ? "primary" : "disabled"}
         className="mt-6"
         onClick={async () => {
-          setIsPending(true);
-          const res = await requestSponsorshipAction({
-            draftProposalId: draftProposal.id,
-            sponsor_address: address,
-          });
-          setIsPending(false);
-          if (res.ok) {
-            invalidatePath(draftProposal.id);
+          if (canAddressSponsor) {
+            setIsPending(true);
+            const res = await requestSponsorshipAction({
+              draftProposalId: draftProposal.id,
+              sponsor_address: address,
+            });
+            setIsPending(false);
+            if (res.ok) {
+              invalidatePath(draftProposal.id);
+            }
           }
         }}
       >
