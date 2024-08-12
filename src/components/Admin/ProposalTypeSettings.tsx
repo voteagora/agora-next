@@ -26,7 +26,7 @@ export default function ProposalTypeSettings({
   const [propTypes, setPropTypes] = useState(fmtPropTypes);
 
   return (
-    <section className="gl_box">
+    <section className="gl_box bg-neutral">
       <h1 className="font-extrabold text-2xl text-primary">
         Proposal type settings
       </h1>
