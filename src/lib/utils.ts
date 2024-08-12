@@ -294,7 +294,7 @@ export async function fetchAndSetAll<
 export function getBlockScanAddress(address: string) {
   const { contracts } = Tenant.current();
   const url = contracts.token.chain.blockExplorers?.default.url;
-  return `${url}/io/${address}`;
+  return `${url}/address/${address}`;
 }
 
 export function getBlockScanUrl(hash: string | `0x${string}`) {

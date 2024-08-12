@@ -26,7 +26,7 @@ export default function ProposalTypeSettings({
   const [propTypes, setPropTypes] = useState(fmtPropTypes);
 
   return (
-    <section className="gl_box">
+    <section className="gl_box bg-neutral">
       <h1 className="font-extrabold text-2xl text-primary">
         Proposal type settings
       </h1>
@@ -57,7 +57,7 @@ export default function ProposalTypeSettings({
           className="w-8 h-8 rounded-full"
           variant="secondary"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-3.5 h-3.5 text-neutral" />
         </Button>
         <p className="text-sm">Add another proposal type</p>
       </div>

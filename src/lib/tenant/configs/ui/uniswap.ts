@@ -8,10 +8,10 @@ import infoPageCard01 from "@/assets/tenant/uniswap_info_1.png";
 import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
+import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
-  hero: uniswapHero,
   logo: uniswapLogo,
 
   googleAnalytics: "G-KBG8GS1R45",
@@ -85,6 +85,7 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "Agora is the home of Uniswap governance",
       description:
         "Uniswap governance is a collective of companies, communities, and token holders working together to steward the future of the Uniswap protocol",
+      hero: uniswapHero,
       meta: {
         title: "Uniswap Agora",
         description: "Home of token governance",
@@ -97,6 +98,7 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "Agora is the home of Uniswap delegates",
       description:
         " Uniswap governance is a collective of companies, communities, and token holders working together to steward the future of the Uniswap protocol",
+      hero: uniswapHero,
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -110,6 +112,7 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "Agora is the home of Uniswap delegates",
       description:
         "Uniswap governance is a collective of companies, communities, and token holders working together to steward the future of the Uniswap protocol",
+      hero: uniswapHero,
       meta: {
         title: "Uniswap Agora",
         description: "Home of token governance",
@@ -123,10 +126,12 @@ export const uniswapTenantUIConfig = new TenantUI({
       description:
         "Uniswap is a public good owned and governed by UNI token holders.",
       meta: {
-        title: "Info of Agora",
-        description: "Welcome to the Optimism Collective",
-        imageTitle: "Info of Agora",
-        imageDescription: "Welcome to the Optimism Collective",
+        title: "Uniswap Protocol Governance",
+        description:
+          "Uniswap is a public good owned and governed by UNI token holders.",
+        imageTitle: "Uniswap Protocol Governance",
+        imageDescription:
+          "Uniswap is a public good owned and governed by UNI token holders.",
       },
       links: [
         {
@@ -155,6 +160,21 @@ export const uniswapTenantUIConfig = new TenantUI({
         },
       ],
     },
+    {
+      route: "info/about",
+      title: "About Uniswap",
+      hero: infoPageHero,
+      description:
+        "The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
+      meta: {
+        title: "Uniswap Protocol Governance",
+        description:
+          "Uniswap is a public good owned and governed by UNI token holders.",
+        imageTitle: "Uniswap Protocol Governance",
+        imageDescription:
+          "Uniswap is a public good owned and governed by UNI token holders.",
+      },
+    },
   ],
 
   toggles: [
@@ -180,6 +200,10 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
+      enabled: true,
+    },
+    {
+      name: "info/governance-charts",
       enabled: true,
     },
   ],

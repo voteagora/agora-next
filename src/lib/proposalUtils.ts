@@ -361,23 +361,27 @@ export function parseProposalData(
     }
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
-      const calldatas = JSON.parse(parsedProposalData.calldatas);
-      const functionArgsName = decodeCalldata(calldatas);
+      try {
+        const calldatas = JSON.parse(parsedProposalData.calldatas);
+        const functionArgsName = decodeCalldata(calldatas);
 
-      return {
-        key: "STANDARD",
-        kind: {
-          options: [
-            {
-              targets: JSON.parse(parsedProposalData.targets),
-              values: JSON.parse(parsedProposalData.values),
-              signatures: JSON.parse(parsedProposalData.signatures),
-              calldatas: calldatas,
-              functionArgsName,
-            },
-          ],
-        },
-      };
+        return {
+          key: "STANDARD",
+          kind: {
+            options: [
+              {
+                targets: JSON.parse(parsedProposalData.targets),
+                values: JSON.parse(parsedProposalData.values),
+                signatures: JSON.parse(parsedProposalData.signatures),
+                calldatas: calldatas,
+                functionArgsName,
+              },
+            ],
+          },
+        };
+      } catch (error) {
+        console.log("Error parsing proposal calldatas", error);
+      }
     }
     case "OPTIMISTIC": {
       return {

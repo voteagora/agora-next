@@ -1,0 +1,193 @@
+[
+  {
+    "type": "function",
+    "name": "PERCENT_DIVISOR",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "governor",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IAgoraGovernor"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "initialize",
+    "inputs": [
+      {
+        "name": "_governor",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_proposalTypesInit",
+        "type": "tuple[]",
+        "internalType": "struct IProposalTypesConfigurator.ProposalType[]",
+        "components": [
+          {
+            "name": "quorum",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "approvalThreshold",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "module",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "proposalTypes",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct IProposalTypesConfigurator.ProposalType",
+        "components": [
+          {
+            "name": "quorum",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "approvalThreshold",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "module",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setProposalType",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "quorum",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "approvalThreshold",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "module",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "ProposalTypeSet",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "quorum",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "approvalThreshold",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "AlreadyInit",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidApprovalThreshold",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidQuorum",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotAdminOrTimelock",
+    "inputs": []
+  }
+]
