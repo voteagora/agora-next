@@ -54,10 +54,10 @@ export default function ProposalTypeSettings({
       >
         <Button
           size="icon"
-          className="w-8 h-8 rounded-full bg-neutral"
+          className="w-8 h-8 rounded-full"
           variant="secondary"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-3.5 h-3.5 text-neutral" />
         </Button>
         <p className="text-sm">Add another proposal type</p>
       </div>
