@@ -173,8 +173,6 @@ const DraftFormClient = ({
                 name="title"
                 required={true}
                 control={methods.control}
-                // TODO: maybe make this customizable per tenant? EP [1.1] feels ENS specific
-                placeholder="EP [1.1] [Executable] title"
               />
               <MarkdownTextareaInput
                 control={methods.control}
