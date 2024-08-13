@@ -8,7 +8,7 @@ const tabs = [
     icon: icons.coins,
     title: "Delegate voting power",
     description:
-      "The collective is governed by the project’s token holders who are represented by delegates.",
+      "The collective is governed by the community who are represented by delegates.",
   },
   {
     icon: icons.notificationMessage,
@@ -42,8 +42,8 @@ const InfoAbout = () => {
           <Image
             src={page.hero!}
             alt={page.title}
-            className="w-full rounded-lg"
-            height="366"
+            width={400}
+            className="rounded-lg"
           />
           <div>
             <h3 className="text-lg font-bold text-primary capitalize">

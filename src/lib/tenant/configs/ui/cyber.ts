@@ -126,7 +126,7 @@ export const cyberTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to the Community",
       description:
-        "Agora is your home for onchain proposals, voting, and governance.",
+        "Agora is the home of CyberDAO governance, where CYBER stakers delegate, vote, and make decisions to steward the future of the Cyber ecosystem.",
       meta: {
         title: "Cyber Agora",
         description: "Home of Cyber governance",
@@ -165,7 +165,7 @@ export const cyberTenantUIConfig = new TenantUI({
       title: "About Cyber",
       hero: infoPageHero,
       description:
-        "Cyber is the L2 for Social. It’s a decentralized platform optimized for social data sharing. Built on hyper scale EigenDA and the open-source OP Stack from Optimism, its built-in account abstraction and seedless wallets deliver a smooth user experience. Cyber’s decentralized sequencer and verifier network eliminates developer platform risk, and its native yield for bridged assets and innovative revenue sharing model provide powerful incentives and rewards. #BuildOnCyber",
+        "Cyber is a Layer 2 blockchain designed for social applications. Cyber facilitates the creation of more engaging and meaningful web3 experiences by enabling onchain dapps to integrate social features. The Cyber ecosystem, its technology, and associated protocols are governed by CyberDAO, which is composed of CYBER token stakers and delegates.",
       meta: {
         title: "Info of Agora",
         description: "Welcome to the CyberDAO",
