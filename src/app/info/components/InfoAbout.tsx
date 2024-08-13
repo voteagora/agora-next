@@ -39,7 +39,6 @@ const InfoAbout = () => {
       </h3>
       <div className="mt-4 rounded-xl bg-neutral shadow-sm">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
-          Hello world
           <Image
             src={page.hero!}
             alt={page.title}
