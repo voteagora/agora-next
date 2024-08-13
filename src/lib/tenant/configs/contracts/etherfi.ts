@@ -5,7 +5,7 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { mainnet, sepolia } from "viem/chains";
+import { mainnet } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider } from "ethers";
 
@@ -21,11 +21,9 @@ export const etherfiTenantContractConfig = ({
   const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
   const GOVERNOR = "0x0";
 
-  const provider = isProd
-    ? new AlchemyProvider("mainnet", alchemyId)
-    : new AlchemyProvider("sepolia", alchemyId);
+  const provider = new AlchemyProvider("mainnet", alchemyId);
 
-  const chain = isProd ? mainnet : sepolia;
+  const chain = mainnet;
 
   return {
     token: new TenantContract<ITokenContract>({
