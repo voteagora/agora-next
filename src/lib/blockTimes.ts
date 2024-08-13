@@ -4,6 +4,35 @@ import { Block } from "ethers";
 
 const chainId = Tenant.current().contracts.token.chain.id;
 
+export function secondsToBlocks(seconds: number): number {
+  return Math.floor(seconds / getSecondsPerBlock());
+}
+
+export function blocksToSeconds(blocks: number): number {
+  return blocks * getSecondsPerBlock();
+}
+
+export function getSecondsPerBlock(): number {
+  switch (chainId) {
+    case 10: // Optimism
+      return 2;
+
+    case 534352: // Scroll
+      return 3;
+    case 7560: // Cyber Mainnet
+
+    case 111557560: // Cyber Testnet
+      return 2;
+
+    case 1: // Eth Mainnet
+    case 11155111: // Sepolia Testnet
+      return 12.05;
+
+    default:
+      throw new Error(`Block time for chain:${chainId} not specified`);
+  }
+}
+
 /*
  * @param {number} blockNumber
  * @param {number} latestBlockNumber
@@ -18,7 +47,7 @@ export function getHumanBlockTime(
   switch (chainId) {
     // Optimism
     case 10: {
-      const secondsPerBlock = 2;
+      const blockSeconds = getSecondsPerBlock();
       const secondsPerBlockBeforeBedrock = 0.5;
       const bedrockBlockNumber = 105235062;
 
@@ -33,7 +62,7 @@ export function getHumanBlockTime(
 
       const timeBeforeBedrock =
         blocksBeforeBedrock * secondsPerBlockBeforeBedrock;
-      const timeAfterBedrock = blocksAfterBedrock * secondsPerBlock;
+      const timeAfterBedrock = blocksAfterBedrock * blockSeconds;
 
       return new Date(
         (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
@@ -42,16 +71,18 @@ export function getHumanBlockTime(
 
     //   Scroll
     case 534352:
+      const blockSeconds = getSecondsPerBlock();
       const estScrollSecondsDiff =
-        Number(latestBlock.number) - Number(blockNumber) * 3; // 3 seconds per block
+        Number(latestBlock.number) - Number(blockNumber) * blockSeconds;
       return new Date((latestBlock.timestamp - estScrollSecondsDiff) * 1000);
 
     //   Cyber Mainnet
     //   Cyber Testnet
     case 7560:
     case 111557560: {
+      const blockSeconds = getSecondsPerBlock();
       const estCyberSecondsDiff =
-        (Number(latestBlock.number) - Number(blockNumber)) * 2; // 2 seconds per block
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estCyberSecondsDiff) * 1000);
     }
 
@@ -59,8 +90,9 @@ export function getHumanBlockTime(
     //   Ethereum Sepolia
     case 1:
     case 11155111: {
+      const blockSeconds = getSecondsPerBlock();
       const estEthSecondsDiff =
-        (Number(latestBlock.number) - Number(blockNumber)) * 12.05; // 12.05 seconds per block
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estEthSecondsDiff) * 1000);
     }
 
