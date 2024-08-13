@@ -11,6 +11,7 @@ import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import { DraftProposal } from "../types";
 import DeleteDraftButton from "../components/DeleteDraftButton";
+import ReactMarkdown from "react-markdown";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -40,7 +41,10 @@ export default async function DraftProposalPage({
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const { ui } = Tenant.current();
-  const tenantSupportsProposalLifecycle = ui.toggle("proposal-lifecycle");
+  const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+  const tenantSupportsProposalLifecycle = proposalLifecycleToggle?.enabled;
+
+  console.log(proposalLifecycleToggle?.config?.copy.helperText);
 
   if (!tenantSupportsProposalLifecycle) {
     return <div>This feature is not supported by this tenant.</div>;
@@ -89,13 +93,10 @@ export default async function DraftProposalPage({
           </section>
           <section className="col-span-1">
             <div className="bg-wash border border-line rounded-2xl p-4">
-              <h3 className="text-primary font-semibold">
-                Additional information
-              </h3>
-              <p className="text-tertiary mt-2">
-                Help! We need to figure out what copy we want to include here.
-                Otherwise, we will have this junk copy left over, and we dont
-                want that, right? Lets get some better copy in here asap.
+              <p className="mt-2">
+                <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2">
+                  {proposalLifecycleToggle.config?.copy.helperText}
+                </ReactMarkdown>
               </p>
             </div>
           </section>
