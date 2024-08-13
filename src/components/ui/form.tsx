@@ -95,13 +95,13 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className)}
+      className={cn(error && "text-negative", className)}
       htmlFor={formItemId}
       {...props}
     >
       {props.children}
       {isRequired && (
-        <span className={cn(error && "text-destructive", "ml-1")}>*</span>
+        <span className={cn(error && "text-negative", "ml-1")}>*</span>
       )}
     </Label>
   );
