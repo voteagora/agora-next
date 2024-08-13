@@ -210,16 +210,16 @@ const DraftPreview = ({
               </p>
             )}
             <div className="mt-6">
-              {gatingType === ProposalGatingType.MANAGER ||
-                (gatingType === ProposalGatingType.GOVERNOR_V1 && (
-                  <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                    <p className="flex-grow">Manager address</p>
-                    <span className="text-secondary font-mono text-xs">
-                      {manager?.toString()}
-                    </span>
-                  </div>
-                ))}
               {(gatingType === ProposalGatingType.MANAGER ||
+                gatingType === ProposalGatingType.GOVERNOR_V1) && (
+                <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+                  <p className="flex-grow">Manager address</p>
+                  <span className="text-secondary font-mono text-xs">
+                    {manager?.toString()}
+                  </span>
+                </div>
+              )}
+              {(gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
                 gatingType === ProposalGatingType.GOVERNOR_V1) && (
                 <div className="relative">
                   {gatingType === ProposalGatingType.GOVERNOR_V1 && (

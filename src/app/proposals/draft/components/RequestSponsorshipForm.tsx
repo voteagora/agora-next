@@ -67,13 +67,13 @@ const RequestSponsorshipForm = ({
           name="sponsorAddress"
         />
         <div className="space-y-1">
-          <label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs font-semibold text-agora-stone-700">
+          <label className="text-xs font-semibold text-secondary block">
             Sponsor verification
           </label>
-          <div className="border border-agora-stone-100 p-2 rounded-lg w-full relative h-[42px]">
+          <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
             {isAddress(address) && <AvatarAddress address={address} />}
             <div
-              className={`absolute right-2 top-2 ${canAddressSponsor ? "text-green-500" : "text-red-500"}`}
+              className={`absolute right-2 top-2.5 text-sm ${canAddressSponsor ? "text-positive" : "text-negative"}`}
             >
               {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
             </div>
