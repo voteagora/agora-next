@@ -27,16 +27,15 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       return quorum;
 
     case TENANT_NAMESPACES.CYBER:
+      // Why is the cyber implementation hardcoded to 30%? Rather than checking based on every proposal?
 
-      // Why is this crap here?
-      
       // Because...
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657375357649?thread_ts=1723579392.179389&cid=C07ATDL9P8F
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657834565499
 
-      const votableSupply = await prisma[
-        `${namespace}VotableSupply`
-      ].findFirst({});
+      const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
+        {}
+      );
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
   }
 }
