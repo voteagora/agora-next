@@ -1325,7 +1325,7 @@ components:
           pattern: "^0x[a-fA-F0-9]{130}$"
   parameters:
     addressOrEnsName:
-      name: addressOrEns
+      name: addressOrEnsName
       in: path
       description: The address or ENS name of the delegate to retrieve
       required: true
