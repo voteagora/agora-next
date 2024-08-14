@@ -236,7 +236,7 @@ export function SuccessMessage({
       </div>
       <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected. Thank you
-        for participating in Optimism’s token house.
+        for your active participation in governance.
       </div>
       <div>
         <div
