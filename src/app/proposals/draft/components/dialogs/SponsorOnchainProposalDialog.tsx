@@ -38,7 +38,7 @@ const SponsorOnchainProposalDialog = ({
               {isLoading ? "Creating your proposal ..." : "Proposal complete!"}
             </div>
             {isLoading && (
-              <div className="mb-5 text-base font-medium text-gray-4f">
+              <div className="mb-5 text-base text-secondary">
                 It might take up to a minute for the changes to be reflected.
               </div>
             )}
@@ -60,7 +60,7 @@ const SponsorOnchainProposalDialog = ({
             </div>
             {!isLoading && (
               <div className="flex flex-row justify-between items-center mt-4">
-                <span className="text-agora-stone-700">
+                <span className="text-secondary">
                   View transaction on block explorer
                 </span>
                 <div className="flex flex-row items-center space-x-2">

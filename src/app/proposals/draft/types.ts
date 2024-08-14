@@ -1,63 +1,55 @@
-import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import {
+  ProposalStage as PrismaProposalStage,
+  ProposalDraft,
+  ProposalDraftTransaction,
+  ProposalSocialOption,
+  ProposalChecklist,
+} from "@prisma/client";
+import { decodeFunctionData, formatUnits } from "viem";
+import Tenant from "@/lib/tenant/tenant";
 
-/**
- * This is my attempt at "generalizing" the lifecycle stages of a proposal before actually generalizing it
- * I think to properly generalize it, we need to have a way to define the stages in the db so we aren't
- * hardcoding them here.
- *
- * The idea is that we have a list of stages that are shared across all tenants. These stages have metadata
- * so we can pull things like description and title from them.
- *
- * Then, each tenant defines the order of these stages and which ones are pre-submission.
- * This way all tenants are sharing the same core stages and we can build UI components that are shared
- * but each tenant is able to customize the order and existence of certain stages.
- */
+// TODO: move this to a shared location
+const transferABI = [
+  {
+    constant: false,
+    inputs: [
+      {
+        name: "_to",
+        type: "address",
+      },
+      {
+        name: "_value",
+        type: "uint256",
+      },
+    ],
+    name: "transfer",
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
+    ],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;
+
+const isTransfer = (calldata: string) => {
+  // Function Selector: The first 4 bytes of calldata 0xa9059cbb for transfer(address,uint256)
+  // TODO: might need to add more types if we have other types of "transfers"
+  return calldata.startsWith("0xa9059cbb");
+};
+
+// prisma schema spits out strings so I can't match against `0x{string}`
+export type EthereumAddress = string & { __brand: "EthereumAddress" };
+
 type TenantProposalLifecycleStage = {
   stage: PrismaProposalStage;
   order: number;
   isPreSubmission: boolean;
+  config?: any;
 };
-
-export const ENS_PROPOSAL_LIFECYCLE_STAGES: TenantProposalLifecycleStage[] = [
-  {
-    stage: PrismaProposalStage.ADDING_TEMP_CHECK,
-    order: 0,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.DRAFTING,
-    order: 1,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.ADDING_GITHUB_PR,
-    order: 2,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.AWAITING_SUBMISSION,
-    order: 3,
-    isPreSubmission: true,
-  },
-  {
-    stage: PrismaProposalStage.PENDING,
-    order: 4,
-    isPreSubmission: false,
-  },
-  // order kinda falls apart since we could get into failed, approved, etc
-  // I think we might need a proper state machine for that
-  // athough the pre-submission stages seem like they are linear
-  {
-    stage: PrismaProposalStage.QUEUED,
-    order: 5,
-    isPreSubmission: false,
-  },
-  {
-    stage: PrismaProposalStage.EXECUTED,
-    order: 6,
-    isPreSubmission: false,
-  },
-];
 
 export const ProposalLifecycleStageMetadata = {
   [PrismaProposalStage.ADDING_TEMP_CHECK]: {
@@ -159,23 +151,199 @@ export enum SocialProposalType {
   APPROVAL = "approval",
 }
 
+export enum ApprovalProposalType {
+  THRESHOLD = "Threshold",
+  TOP_CHOICES = "Top choices",
+}
+
 export enum ProposalType {
-  EXECUTABLE = "executable",
+  // might make sense to move snapshot to something else since snapshot isn't really a "proposal"
+  // It doesn't go through the governor
   SOCIAL = "social",
+  BASIC = "basic",
+  APPROVAL = "approval",
+  OPTIMISTIC = "optimistic",
 }
 
 export const ProposalTypeMetadata = {
-  [ProposalType.EXECUTABLE]: {
-    title: "Executable Proposal",
-    description: "A proposal that executes on-chain and accepts transactions.",
-  },
   [ProposalType.SOCIAL]: {
     title: "Social Proposal",
     description: "A proposal that resolves via a snapshot vote.",
   },
+  [ProposalType.BASIC]: {
+    title: "Basic Proposal",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
+  },
+  [ProposalType.APPROVAL]: {
+    title: "Approval Proposal",
+    description:
+      "Voters are asked to choose among multiple options. If the proposal passes quorum, options will be approved according to the approval criteria.",
+  },
+  [ProposalType.OPTIMISTIC]: {
+    title: "Optimistic Proposal",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
+  },
+} as {
+  [key in ProposalType]: {
+    title: string;
+    description: string;
+  };
 };
 
 export enum TransactionType {
   TRANSFER = "transfer",
   CUSTOM = "custom",
 }
+
+export enum ProposalGatingType {
+  MANAGER = "manager",
+  TOKEN_THRESHOLD = "token threshold",
+  GOVERNOR_V1 = "governor v1",
+}
+
+export type PLMConfig = {
+  // the stages of the proposal lifecycle that
+  // this tenant wants to use
+  stages: TenantProposalLifecycleStage[];
+  // We can read proposal type from the governor
+  // but others might be desired, like snapshot
+  proposalTypes: any[];
+  // custom copy for the proposal lifecycle feature
+  copy: any;
+  // optional config for including snapshot as a proposal type
+  snapshotConfig?: {
+    domain: string;
+  };
+  // The method for gating who can create a proposal
+  // Manager -- only the manager can create proposals
+  // Token Threshold -- a certain amount of tokens must be held
+  // OZ (ENS, UNI): Token threshold
+  // Agora gov 0.1 (OP): manager
+  // Agora gov 1.0+ (everyone else): manager or voting threshold
+  gatingType: ProposalGatingType;
+};
+
+export type BaseProposal = ProposalDraft & {
+  checklist_items: ProposalChecklist[];
+};
+
+export type BasicProposal = BaseProposal & {
+  proposal_type: ProposalType.BASIC;
+  transactions: ProposalDraftTransaction[];
+};
+
+export type SocialProposal = BaseProposal & {
+  proposal_type: ProposalType.SOCIAL;
+  end_date_social: Date;
+  start_date_social: Date;
+  proposal_social_type: SocialProposalType;
+  social_options: ProposalSocialOption[];
+};
+
+export type ApprovalProposal = BaseProposal & {
+  proposal_type: ProposalType.APPROVAL;
+  budget: string;
+  criteria: ApprovalProposalType;
+  max_options: number;
+  threshold: number;
+  top_choices: number;
+  approval_options: ApprovalProposalOption[];
+};
+
+type ApprovalProposalOption = {
+  title: string;
+  transactions: ProposalDraftTransaction[];
+};
+
+export type OptimisticProposal = BaseProposal & {
+  proposal_type: ProposalType.OPTIMISTIC;
+};
+
+export type DraftProposal =
+  | BasicProposal
+  | SocialProposal
+  | ApprovalProposal
+  | OptimisticProposal;
+
+// TODO: move this to a shared location
+const parseTransaction = (t: ProposalDraftTransaction) => {
+  const tenant = Tenant.current();
+  if (isTransfer(t.calldata)) {
+    const {
+      args: [recipient, amount],
+    } = decodeFunctionData({
+      abi: transferABI,
+      data: t.calldata as `0x${string}`,
+    });
+
+    return {
+      target: t.target,
+      value: t.value,
+      calldata: t.calldata,
+      type: TransactionType.TRANSFER,
+      description: t.description,
+      recipient,
+      amount: formatUnits(amount, tenant.token.decimals),
+      simulation_state: t.simulation_state,
+      simulation_id: t.simulation_id,
+    };
+  } else {
+    return {
+      target: t.target,
+      value: t.value,
+      calldata: t.calldata,
+      description: t.description,
+      type: TransactionType.CUSTOM,
+      simulation_state: t.simulation_state,
+      simulation_id: t.simulation_id,
+    };
+  }
+};
+// Used to translate a draftProposal database record into its form representation
+export const parseProposalToForm = (proposal: DraftProposal) => {
+  switch (proposal.proposal_type) {
+    case ProposalType.BASIC:
+      return {
+        type: ProposalType.BASIC,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        transactions: proposal.transactions.map((t) => parseTransaction(t)),
+      };
+    case ProposalType.SOCIAL:
+      return {
+        type: ProposalType.SOCIAL,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        start_date: proposal.start_date_social,
+        end_date: proposal.end_date_social,
+        options: proposal.social_options,
+      };
+    case ProposalType.APPROVAL:
+      return {
+        type: ProposalType.APPROVAL,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        approvalProposal: {
+          budget: proposal.budget,
+          criteria: proposal.criteria,
+          maxOptions: proposal.max_options?.toString(),
+          threshold: proposal.threshold?.toString(),
+          topChoices: proposal.top_choices?.toString(),
+          options: proposal.approval_options?.map((option) => {
+            return {
+              title: option.title,
+              transactions: option.transactions.map((t) => parseTransaction(t)),
+            };
+          }),
+        },
+      };
+    case ProposalType.OPTIMISTIC:
+      return {
+        type: ProposalType.OPTIMISTIC,
+        title: proposal.title,
+        abstract: proposal.abstract,
+      };
+  }
+};

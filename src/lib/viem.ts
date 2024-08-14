@@ -1,5 +1,6 @@
 import { createWalletClient, createPublicClient, custom, http } from "viem";
 import { mainnet, sepolia, optimism } from "viem/chains";
+import { cyber } from "@/lib/tenant/configs/contracts/cyber";
 import "viem/window";
 
 export const getWalletClient = (chainId: number) => {
@@ -17,6 +18,11 @@ export const getWalletClient = (chainId: number) => {
     case optimism.id:
       return createWalletClient({
         chain: optimism,
+        transport: custom(window.ethereum!),
+      });
+    case cyber.id:
+      return createWalletClient({
+        chain: cyber,
         transport: custom(window.ethereum!),
       });
     default:
@@ -41,6 +47,12 @@ export const getPublicClient = (chainId: number) => {
         chain: optimism,
         transport: http(),
       });
+    case cyber.id:
+      return createPublicClient({
+        chain: cyber,
+        transport: http(),
+      });
+
     default:
       throw new Error("Invalid chainId");
   }
