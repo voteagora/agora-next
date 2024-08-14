@@ -83,6 +83,7 @@ export const cyberTenantUIConfig = new TenantUI({
     },
   ],
 
+  // MIsc
   pages: [
     {
       route: "/",
