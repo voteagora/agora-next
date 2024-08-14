@@ -13,11 +13,12 @@ import {
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
 import Tenant from "@/lib/tenant/tenant";
-
-const secondsPerBlock = 2;
+import { getSecondsPerBlock } from "@/lib/blockTimes";
+import { SECONDS_IN_HOUR } from "@/lib/constants";
 
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
+  const secondsPerBlock = getSecondsPerBlock();
   const { contracts } = Tenant.current();
 
   const govContract = {
@@ -48,10 +49,10 @@ export default function GovernorSettings() {
   useEffect(() => {
     if (data) {
       setVotingPeriod(
-        (Number(initVotingPeriod!.result) * secondsPerBlock) / 3600
+        (Number(initVotingPeriod!.result) * secondsPerBlock) / SECONDS_IN_HOUR
       );
       setVotingDelay(
-        (Number(initVotingDelay!.result) * secondsPerBlock) / 3600
+        (Number(initVotingDelay!.result) * secondsPerBlock) / SECONDS_IN_HOUR
       );
       setManager(String(initManager!.result));
     }
@@ -66,7 +67,7 @@ export default function GovernorSettings() {
       functionName: "setVotingPeriod",
       args: [
         (votingPeriod
-          ? BigInt(Math.floor(votingPeriod)) * 3600n
+          ? BigInt(Math.floor(votingPeriod) * SECONDS_IN_HOUR)
           : BigInt(secondsPerBlock)) / BigInt(secondsPerBlock),
       ],
     });
@@ -88,7 +89,7 @@ export default function GovernorSettings() {
       ...govContract,
       functionName: "setVotingDelay",
       args: [
-        (BigInt(Math.floor(votingDelay || 0)) * 3600n) /
+        BigInt(Math.floor((votingDelay || 0) * SECONDS_IN_HOUR)) /
           BigInt(secondsPerBlock),
       ],
     });
@@ -103,27 +104,6 @@ export default function GovernorSettings() {
     });
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
-
-  // const [managerAddress, setManagerAddress] = useState(currentManager as string)
-  // const { config: setManagerAddressConfig } = usePrepareContractWrite({
-  //   ...governorContract,
-  //   functionName: "setManagerAddress",
-  //   args: [
-  //     (BigInt(managerAddress || 0) * 3600n) / BigInt(secondsPerBlock)
-  //   ]
-  // })
-  // const {
-  //   data: resultSetManagerAddress,
-  //   write: writeSetManagerAddress,
-  //   isLoading: isLoadingSetManagerAddress,
-  //   isError: isErrorSetManagerAddress
-  // } = useContractWrite(setManagerAddressConfig)
-  // const { isLoading: isLoadingSetManagerAddressTransaction } =
-  //   useWaitForTransaction({
-  //     hash: resultSetManagerAddress?.hash
-  //   })
-  // const isDisabledSetManagerAddress =
-  //   isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction
 
   return (
     <div className="gl_box bg-neutral">
@@ -204,27 +184,6 @@ export default function GovernorSettings() {
           </div>
           <p className="text-secondary truncate">{manager}</p>
         </div>
-        {/* <div className={!isManager ? "opacity-70" : ""}>
-          <Label>ManagerAddress</Label>
-          <div className="relative flex items-center">
-            <Input
-              value={managerAddress}
-              onChange={(e) => setManagerAddress(e.target.value)}
-              disabled={!isManager}
-            />
-            {!isManager && (
-              <Lock className="absolute text-sm text-muted-foreground right-[96px] w-3.5 h-3.5 cursor-not-allowed" />
-            )}
-            <Button
-              className="absolute top-0 right-0"
-              variant="outline"
-              size='sm'
-              disabled={!isManager}
-            >
-              Update
-            </Button>
-          </div>
-        </div> */}
       </div>
     </div>
   );
