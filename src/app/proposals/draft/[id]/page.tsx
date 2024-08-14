@@ -1,7 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
 import BackButton from "../components/BackButton";
-import prisma from "@/app/lib/prisma";
 import {
   getStageMetadata,
   isPostSubmission,
@@ -9,29 +8,9 @@ import {
 } from "../utils/stages";
 import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
-import { DraftProposal } from "../types";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
-
-const getDraftProposal = async (id: number) => {
-  const draftProposal = await prisma.proposalDraft.findUnique({
-    where: {
-      id: id,
-    },
-    include: {
-      transactions: true,
-      social_options: true,
-      checklist_items: true,
-      approval_options: {
-        include: {
-          transactions: true,
-        },
-      },
-    },
-  });
-
-  return draftProposal as DraftProposal;
-};
+import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
 
 export default async function DraftProposalPage({
   params,
@@ -44,13 +23,11 @@ export default async function DraftProposalPage({
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const tenantSupportsProposalLifecycle = proposalLifecycleToggle?.enabled;
 
-  console.log(proposalLifecycleToggle?.config?.copy.helperText);
-
   if (!tenantSupportsProposalLifecycle) {
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await getDraftProposal(parseInt(params.id));
+  const draftProposal = await fetchDraftProposal(parseInt(params.id));
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
 
   if (isPostSubmissionStage) {

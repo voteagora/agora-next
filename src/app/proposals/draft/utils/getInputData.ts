@@ -9,6 +9,7 @@ import {
   optimisticModuleAddress,
   cyberApprovalModuleAddress,
 } from "@/lib/contracts/contracts";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
 
 const transferABI = [
@@ -198,7 +199,7 @@ export function getInputData(proposal: DraftProposal): {
       // TODO: change this so the module addresses are set via the tenant
       // moving quickly atm
       const finalApprovalModuleAddress =
-        tenant.namespace === "cyber"
+        tenant.namespace === TENANT_NAMESPACES.CYBER
           ? cyberApprovalModuleAddress
           : approvalModuleAddress;
 

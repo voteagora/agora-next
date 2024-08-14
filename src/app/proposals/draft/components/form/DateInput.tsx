@@ -91,7 +91,6 @@ function DateInput<
                 value={value}
                 defaultValue={value}
                 onChange={(e: any) => {
-                  console.log(e.target.value);
                   setValue(e.target.value);
                   field.onChange(e.target.value);
                 }}

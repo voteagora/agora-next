@@ -1,20 +1,18 @@
 "use client";
 
 import FormCard from "./form/FormCard";
-import ProposalTransactionDisplay from "../../../../components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
+import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
-import toast from "react-hot-toast";
 import { formatFullDate } from "@/lib/utils";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import {
-  DraftProposal,
-  ProposalGatingType,
-} from "../../../proposals/draft/types";
+import { DraftProposal, ProposalGatingType } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalType } from "@/app/proposals/draft/types";
+import toast from "react-hot-toast";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -66,13 +64,13 @@ const DraftPreview = ({
 
   const renderProposalDescription = (proposal: DraftProposal) => {
     switch (proposal.proposal_type) {
-      case "basic":
+      case ProposalType.BASIC:
         return (
           <p className="text-agora-stone-700 mt-2">
             This is a <PreText text="basic" /> proposal.
           </p>
         );
-      case "approval":
+      case ProposalType.APPROVAL:
         return (
           <p className="text-agora-stone-700 mt-2">
             This is an <PreText text="approval" /> proposal. The maximum number
@@ -87,7 +85,7 @@ const DraftPreview = ({
           </p>
         );
 
-      case "social":
+      case ProposalType.SOCIAL:
         return (
           <p className="text-agora-stone-700 mt-2">
             This is a <PreText text="social" /> proposal. Voters will vote on
@@ -95,12 +93,15 @@ const DraftPreview = ({
           </p>
         );
 
-      default:
+      case ProposalType.OPTIMISTIC:
         return (
           <p className="text-agora-stone-700 mt-2">
             This is an <PreText text="optimistic" /> proposal
           </p>
         );
+
+      default:
+        return null;
     }
   };
 

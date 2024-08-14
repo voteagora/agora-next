@@ -14,6 +14,7 @@ import { useAccount } from "wagmi";
 import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { DraftProposal } from "../../types";
+import toast from "react-hot-toast";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
@@ -43,7 +44,8 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const sharedOnSubmit = async (data: z.output<typeof tempCheckSchema>) => {
     try {
       if (!address) {
-        throw new Error("No address connected");
+        toast.error("No address connected");
+        return;
       }
       await tempCheckAction({
         ...data,
@@ -54,7 +56,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
       );
     } catch (e) {
-      console.error(e);
+      toast.error("Something went wrong...");
     }
   };
 

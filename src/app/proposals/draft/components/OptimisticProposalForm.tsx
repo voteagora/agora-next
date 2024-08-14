@@ -1,9 +1,6 @@
 import React from "react";
-// import { OptimisticProposalSchema } from "./../schemas/DraftProposalSchema";
 
 const OptimisticProposalForm = () => {
-  //   type FormType = z.output<typeof OptimisticProposalSchema>;
-
   return (
     <div className="space-y-6">
       <div>

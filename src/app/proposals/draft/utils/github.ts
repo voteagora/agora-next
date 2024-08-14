@@ -1,14 +1,10 @@
 "use server";
 
 import { Octokit } from "@octokit/rest";
-import {
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-} from "@prisma/client";
+import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { markdownTable } from "markdown-table";
 import { formatTransactions } from "./formatTransactions";
-import { DraftProposal } from "../types";
+import { DraftProposal, ProposalType } from "../types";
 
 const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
 const AGORA_ENS_FORK = "docs";
@@ -64,7 +60,7 @@ function formatGithubProposal(proposal: DraftProposal) {
       : "N/A"
   }                                                                                              |
   | **Votes**             | ${
-    proposal.proposal_type === "basic"
+    proposal.proposal_type === ProposalType.BASIC
       ? "[Agora](https://agora.ensdao.org/proposals/" + proposal.id + ")"
       : "[Snapshot](https://snapshot.org/#/ens.eth/proposal/" +
         proposal.id +
@@ -74,28 +70,28 @@ function formatGithubProposal(proposal: DraftProposal) {
 
   const abstract = `# Description \n ${proposal.abstract}`;
   const transactions =
-    proposal.proposal_type === "basic"
+    proposal.proposal_type === ProposalType.BASIC
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
       : "";
 
   const votingStrategy =
-    proposal.proposal_type === "social"
+    proposal.proposal_type === ProposalType.SOCIAL
       ? `# Voting Strategy \n ${proposal.proposal_social_type}`
       : ``;
 
   const votingStrategyDates =
-    proposal.proposal_type === "social"
+    proposal.proposal_type === ProposalType.SOCIAL
       ? `# Voting Dates \n ${proposal.start_date_social} - ${proposal.end_date_social}`
       : ``;
 
   const socialOptionsBasic =
-    proposal.proposal_type === "social" &&
+    proposal.proposal_type === ProposalType.SOCIAL &&
     proposal.proposal_social_type === "basic"
       ? `# Voting options \n For, Against, Abstain`
       : ``;
 
   const socialOptionsApproval =
-    proposal.proposal_type === "social" &&
+    proposal.proposal_type === ProposalType.SOCIAL &&
     proposal.proposal_social_type === "approval"
       ? `# Voting options \n ${proposal.social_options
           .map((option) => option.text)
