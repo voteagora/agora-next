@@ -42,9 +42,9 @@ info:
     | OP 0.1.3 | LIVE   | July 31th |
     |----------|---------|---------------|
     | OP 0.2.0 | LIVE   | Aug 10th |
-    | OP 0.2.1 | ON TRACK   | Aug 16th |
-    | OP 0.2.2 | ON TRACK   | Aug 23th |
-    | OP 0.2.3 | ON TRACK   | Sep 13th |
+    | OP 0.2.1 | ON TRACK   | Aug 23th |
+    | OP 0.2.2 | ON TRACK   | Aug 30th |
+    | OP 0.2.3 | ON TRACK   | Sep 20th |
   version: 0.1.3
   license:
     name: MIT
