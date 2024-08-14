@@ -6,7 +6,6 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";

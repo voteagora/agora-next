@@ -77,7 +77,7 @@ export async function createSnapshot({
       proposal.temp_check_link &&
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
     }` +
-    "\n\n ## Abstract \n" +
+    "\n\n ## Description \n" +
     proposal.abstract;
 
   const blockNumber = await publicClient.getBlockNumber();

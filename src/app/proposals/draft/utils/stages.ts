@@ -1,20 +1,32 @@
-import {
-  ProposalLifecycleStageMetadata,
-  ENS_PROPOSAL_LIFECYCLE_STAGES,
-} from "../types";
+import { ProposalLifecycleStageMetadata } from "../types";
 import { ProposalStage } from "@prisma/client";
+import Tenant from "@/lib/tenant/tenant";
 
-/**
- * TODO:
- * Eventually want to abstract this into the UI factory
- * This is a way for tenant to define which stages are available
- */
-export const DRAFT_STAGES_FOR_TENANT = ENS_PROPOSAL_LIFECYCLE_STAGES.filter(
-  (stage) => stage.isPreSubmission
-);
+export const GET_DRAFT_STAGES = () => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-export const POST_DRAFT_STAGES_FOR_TENANT =
-  ENS_PROPOSAL_LIFECYCLE_STAGES.filter((stage) => !stage.isPreSubmission);
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  return plmToggle.config?.stages.filter((stage) => stage.isPreSubmission);
+};
+
+export const GET_POST_DRAFT_STAGES = () => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  return plmToggle.config?.stages.filter((stage) => !stage.isPreSubmission);
+};
 
 /**
  * getStageMetadata
@@ -29,9 +41,46 @@ export const getStageMetadata = (stage: ProposalStage) => {
 };
 
 export const getStageIndexForTenant = (stage: ProposalStage) => {
-  return ENS_PROPOSAL_LIFECYCLE_STAGES.find((s) => s.stage === stage)?.order;
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  return plmToggle.config?.stages.find((s) => s.stage === stage)?.order;
+};
+
+export const getStageByIndex = (index: number) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  const stages = plmToggle.config?.stages;
+  if (!stages || stages.length - 1 < index) {
+    throw new Error("Index out of bounds.");
+  }
+
+  return plmToggle.config?.stages[index];
 };
 
 export const isPostSubmission = (stage: ProposalStage) => {
-  return POST_DRAFT_STAGES_FOR_TENANT.some((s) => s.stage === stage);
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  const postDraftStages = GET_POST_DRAFT_STAGES()!;
+  return postDraftStages.some((s) => s.stage === stage);
 };

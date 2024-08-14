@@ -3,7 +3,10 @@
 import { z } from "zod";
 import { schema as SponsorProposalSchema } from "../schemas/sponsorProposalSchema";
 import prisma from "@/app/lib/prisma";
-import { ProposalStage } from "@prisma/client";
+import {
+  getStageByIndex,
+  getStageIndexForTenant,
+} from "@/app/proposals/draft/utils/stages";
 
 export type FormState = {
   ok: boolean;
@@ -24,15 +27,16 @@ export async function onSubmitAction(
     };
   }
 
+  const currentIndex = getStageIndexForTenant("AWAITING_SUBMISSION") as number;
+
   try {
+    const nextStage = getStageByIndex(currentIndex + 1);
     const updateDraft = prisma.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
       data: {
-        // TODO: this shouldn't really be queue...
-        // queue is next action we would take but it's more like "ready for voting"
-        stage: ProposalStage.PENDING,
+        stage: nextStage?.stage,
         ...(parsed.data.snapshot_link && {
           snapshot_link: parsed.data.snapshot_link,
         }),

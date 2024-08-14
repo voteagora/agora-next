@@ -1,7 +1,10 @@
 "use server";
 
 import prisma from "@/app/lib/prisma";
-import { ProposalStage } from "@prisma/client";
+import {
+  getStageByIndex,
+  getStageIndexForTenant,
+} from "@/app/proposals/draft/utils/stages";
 
 export type FormState = {
   ok: boolean;
@@ -13,13 +16,15 @@ export async function onSubmitAction(data: {
   draftProposalId: number;
   creatorAddress: string;
 }): Promise<FormState> {
+  const currentIndex = getStageIndexForTenant("ADDING_GITHUB_PR") as number;
   try {
+    const nextStage = getStageByIndex(currentIndex + 1);
     const updateDraft = prisma.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
       data: {
-        stage: ProposalStage.AWAITING_SUBMISSION,
+        stage: nextStage?.stage,
       },
     });
 
