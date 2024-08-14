@@ -10,6 +10,17 @@ export enum FREQUENCY_FILTERS {
   YEAR = "1y",
 }
 
+export enum PROPOSAL_STATUS {
+  ACTIVE = "ACTIVE",
+  CANCELLED = "CANCELLED",
+  CLOSED = "CLOSED",
+  DEFEATED = "DEFEATED",
+  EXECUTED = "EXECUTED",
+  PENDING = "PENDING",
+  QUEUED = "QUEUED",
+  SUCCEEDED = "SUCCEEDED",
+}
+
 export const TENANT_NAMESPACES = {
   ENS: "ens",
   ETHERFI: "etherfi",
