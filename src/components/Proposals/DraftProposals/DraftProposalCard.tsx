@@ -1,31 +1,33 @@
 import { ProposalDraft } from "@prisma/client";
 import { ProposalLifecycleStageMetadata } from "@/app/proposals/draft/types";
-import {
-  DRAFT_STAGES_FOR_TENANT,
-  POST_DRAFT_STAGES_FOR_TENANT,
-  getStageMetadata,
-} from "@/app/proposals/draft/utils/stages";
+import { getStageMetadata } from "@/app/proposals/draft/utils/stages";
+import Tenant from "@/lib/tenant/tenant";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
-  const ALL_STAGES_FOR_TENANT = [
-    ...DRAFT_STAGES_FOR_TENANT,
-    ...POST_DRAFT_STAGES_FOR_TENANT,
-  ];
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-  const currentStageObject = ALL_STAGES_FOR_TENANT.find(
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  const ALL_STAGES_FOR_TENANT = plmToggle.config?.stages || [];
+  const currentStageObject = plmToggle.config?.stages.find(
     (stage) => stage.stage === proposal.stage
   )!;
 
   const currentStageMetadata = getStageMetadata(proposal.stage);
 
   return (
-    <div className="bg-stone-100 border border-stone-200 rounded-2xl p-2 shadow-sm">
-      <div className="flex flex-row justify-between bg-white border border-stone-200 rounded-2xl px-6 py-5 shadow-sm">
+    <div className="bg-wash border border-line rounded-2xl p-2 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between bg-neutral border border-line rounded-2xl px-6 py-5 shadow-sm">
         <div>
           <p className="font-semibold text-secondary text-xs">{`By ${proposal.author_address}`}</p>
           <p className="font-medium">{proposal.title || "[Title pending]"}</p>
         </div>
-        <div className="flex flex-row gap-x-16">
+        <div className="flex flex-col sm:flex-row gap-x-16 space-y-4 sm:space-y-0 mt-4 sm:mt-0">
           <div className="w-[140px]">
             <p className="font-semibold text-secondary text-xs">{`Status`}</p>
             <p className="font-medium">{currentStageMetadata.shortTitle}</p>
