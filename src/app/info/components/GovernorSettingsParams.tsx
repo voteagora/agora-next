@@ -12,6 +12,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useContractRead } from "wagmi";
 import { pluralize } from "@/lib/utils";
 import { SECONDS_IN_HOUR } from "@/lib/constants";
+import { blocksToSeconds } from "@/lib/blockTimes";
 
 const GovernorSettingsParams = () => {
   const { contracts } = Tenant.current();
@@ -52,7 +53,7 @@ const GovernorSettingsParams = () => {
           </TableCell>
           <TableCell className="text-base font-semibold text-right text-black">
             {isDelayFetched && votingDelay
-              ? secondsToHuman(Number(votingDelay))
+              ? secondsToHuman(blocksToSeconds(Number(votingDelay)))
               : "Loading..."}
           </TableCell>
         </TableRow>
@@ -62,7 +63,7 @@ const GovernorSettingsParams = () => {
           </TableCell>
           <TableCell className="text-base font-semibold text-right text-black">
             {isPeriodFetched && votingPeriod
-              ? secondsToHuman(Number(votingPeriod))
+              ? secondsToHuman(blocksToSeconds(Number(votingPeriod)))
               : "Loading..."}
           </TableCell>
         </TableRow>
