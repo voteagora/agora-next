@@ -89,16 +89,16 @@ model SnapshotProposal {
 model SnapshotVotes {
   id             String   @id @unique
   voter          String?  // enforced lower case at ingestion
-  created        Int? 
-  choice         String? 
-  metadata       Json? 
-  reason         String? 
-  app            String? 
-  vp             Float? 
-  vp_by_strategy Json? 
-  vp_state       String? 
-  proposal_id    String? 
-  choice_labels  Json? 
+  created        Int?
+  choice         String?
+  metadata       Json?
+  reason         String?
+  app            String?
+  vp             Float?
+  vp_by_strategy Json?
+  vp_state       String?
+  proposal_id    String?
+  choice_labels  Json?
   dao_slug       String?
 
   @@index([id], name: "ix_snapshot_votes_id")
@@ -1089,7 +1089,8 @@ view uniswapDelegateChangedEvents {
 model ProposalDraft {
   id                       Int                        @id @default(autoincrement())
   temp_check_link          String
-  proposal_type            String?                    @db.VarChar(50)
+  proposal_type            String?                    @db.VarChar(50) // "voting module"
+  proposal_config_type     String?                    @db.VarChar(50) // "proposal type"
   proposal_social_type     String?                    @db.VarChar(50)
   title                    String                     @db.VarChar(255)
   abstract                 String
@@ -1104,11 +1105,19 @@ model ProposalDraft {
   updated_at               DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
   onchain_transaction_hash String?                    @db.VarChar(255)
   snapshot_link            String?
+  // approval type
+  max_options              Int?
+  top_choices              Int?
+  budget                   Int?
+  threshold                Int?
+  criteria                 String?
+  // end approval type
   contract                 String
   chain_id                 Int
   checklist_items          ProposalChecklist[]
   social_options           ProposalSocialOption[]
   transactions             ProposalDraftTransaction[]
+  approval_options         ProposalApprovalOption[]
 
   @@map("proposals")
   @@schema("alltenant")
@@ -1117,6 +1126,7 @@ model ProposalDraft {
 model ProposalDraftTransaction {
   id               Int           @id @default(autoincrement())
   proposal_id      Int
+  proposal_approval_option_id Int?
   order            Int
   target           String        @db.VarChar(255)
   value            String        @db.VarChar(255)
@@ -1127,8 +1137,22 @@ model ProposalDraftTransaction {
   created_at       DateTime      @default(now()) @db.Timestamptz(6)
   updated_at       DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
   proposal         ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  approval_option  ProposalApprovalOption?  @relation(fields: [proposal_approval_option_id], references: [id])
 
   @@map("proposal_transactions")
+  @@schema("alltenant")
+}
+
+model ProposalApprovalOption {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  title        String       @db.VarChar(255)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  transactions ProposalDraftTransaction[]
+
+  @@map("proposal_approval_options")
   @@schema("alltenant")
 }
 
@@ -1754,7 +1778,7 @@ view cyber_authority_chains {
 
 view cyberAuthorityChainsSnaps {
   id                   String   @unique
-  delegate             String 
+  delegate             String
   rules                Json?
   chain                String[]
   proxy                String
@@ -1872,10 +1896,10 @@ view cyberProposalTypes {
 view cyberProposals {
   proposal_id                String        @unique
   contract                   String        @db.VarChar
-  proposer                   String 
-  description                String? 
+  proposer                   String
+  description                String?
   ordinal                    Decimal       @db.Decimal
-  created_block              BigInt? 
+  created_block              BigInt?
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?

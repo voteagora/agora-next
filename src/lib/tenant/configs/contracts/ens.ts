@@ -43,9 +43,9 @@ export const ensTenantContractConfig = ({
 
     // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: OptimismGovernor__factory.abi,
       address: GOVERNOR,
-      chain: mainnet,
+      chain: chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),

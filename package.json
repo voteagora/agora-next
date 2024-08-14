@@ -103,7 +103,7 @@
     "@typechain/ethers-v6": "^0.5.1",
     "@types/jest": "^29.5.12",
     "@types/node": "20.1.1",
-    "@types/react": "^18.2.79",
+    "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.25",
     "@types/react-infinite-scroller": "^1.2.5",
     "@types/swagger-ui-dist": "^3.30.4",
@@ -118,6 +118,6 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.7.3",
     "typechain": "^8.3.2",
-    "typescript": "5.0.4"
+    "typescript": "5.1.3"
   }
 }

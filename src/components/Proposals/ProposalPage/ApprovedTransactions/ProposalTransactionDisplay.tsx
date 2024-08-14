@@ -19,17 +19,19 @@ const ProposalTransactionDisplay = ({
   targets,
   calldatas,
   values,
+  descriptions,
   executedTransactionHash,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
   values: string[];
+  descriptions?: string[];
   executedTransactionHash?: string | null;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
   return (
     <div>
-      <div className="flex flex-col border border-b-0 rounded-t-lg border-[#e0e0e0] bg-gray-fa p-4 text-xs text-secondary font-mono break-words overflow-hidden">
+      <div className="flex flex-col border border-b-0 rounded-t-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
         <div className="w-full flex items-center justify-between">
           <span className="text-xs text-tertiary">Proposed transactions</span>
           {executedTransactionHash && (
@@ -49,12 +51,13 @@ const ProposalTransactionDisplay = ({
             target={target}
             calldata={calldatas[idx]}
             value={values[idx]}
+            description={descriptions?.[idx]}
             collapsed={collapsed}
           />
         ))}
       </div>
       <div
-        className="border border-[#e0e0e0] rounded-b-lg bg-gray-fa p-4 cursor-pointer text-xs text-tertiary font-mono"
+        className="border border-line rounded-b-lg bg-wash p-4 cursor-pointer text-xs text-tertiary font-mono"
         onClick={() => {
           setCollapsed(!collapsed);
         }}
@@ -69,11 +72,13 @@ const ProposalTransactionItem = ({
   target,
   calldata,
   value,
+  description,
   collapsed,
 }: {
   target: string;
   calldata: `0x${string}`;
   value: string;
+  description?: string;
   collapsed: boolean;
 }) => {
   const [decodingMetadata, setDecodingMetadata] = useState<any>(null);
@@ -90,6 +95,9 @@ const ProposalTransactionItem = ({
 
   return (
     <div className="mt-4">
+      {description && (
+        <div className="text-tertiary">{`// ${description}`}</div>
+      )}
       <a
         className="underline"
         href={getBlockScanAddress(target)}
@@ -99,6 +107,7 @@ const ProposalTransactionItem = ({
         {target}
       </a>
       {(() => {
+        if (!value) return;
         const bigValue = BigInt(value);
         if (bigValue === 0n && !calldata) {
           return;
@@ -132,6 +141,7 @@ const ProposalTransactionItem = ({
               .{decodingMetadata.functionFragment.name}(
               <div className="flex flex-col ml-4">
                 {(() => {
+                  if (!value) return;
                   const bigValue = BigInt(value);
                   if (bigValue !== 0n) {
                     return <div>{ethers.formatEther(value)} ETH</div>;

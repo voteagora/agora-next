@@ -1,31 +1,18 @@
-import {
-  ProposalDraft,
-  ProposalDraftTransaction,
-  ProposalSocialOption,
-  ProposalChecklist,
-} from "@prisma/client";
 import DraftPreview from "./DraftPreview";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
+import { DraftProposal } from "../../../proposals/draft/types";
 
 const ArchivedDraftProposal = ({
   draftProposal,
 }: {
-  draftProposal: ProposalDraft & {
-    transactions: ProposalDraftTransaction[];
-    social_options: ProposalSocialOption[];
-    checklist_items: ProposalChecklist[];
-  };
+  draftProposal: DraftProposal;
 }) => {
   return (
     <main className="max-w-screen-xl mx-auto mt-10">
       <div className="grid grid-cols-3 gap-12">
         <div className="col-span-2">
-          <DraftPreview
-            proposalDraft={draftProposal}
-            actions={null}
-            isArchived={true}
-          />
+          <DraftPreview proposalDraft={draftProposal} actions={null} />
         </div>
         <div className="self-start">
           {/* yellow color for draft proposal -- not themeable right now */}
