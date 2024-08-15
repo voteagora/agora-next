@@ -4,7 +4,7 @@ import StandardProposalDelete from "./StandardProposalDelete";
 import { fetchProposalVotes } from "@/app/proposals/actions";
 import ProposalVotesCard from "./ProposalVotesCard/ProposalVotesCard";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalLifecycle } from "@/app/proposals/components/ProposalLifecycle";
+import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 
 export default async function StandardProposalPage({
   proposal,
@@ -19,7 +19,7 @@ export default async function StandardProposalPage({
 
   return (
     <div className="flex flex-col">
-      <ProposalLifecycle proposal={proposal} />
+      <ProposalStateAdmin proposal={proposal} />
       <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
         <ProposalDescription
           proposalVotes={proposalVotes}

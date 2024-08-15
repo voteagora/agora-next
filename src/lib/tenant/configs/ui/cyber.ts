@@ -185,7 +185,7 @@ export const cyberTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/lifecycle",
+      name: "proposals/state-admin",
       enabled: true,
     },
     {

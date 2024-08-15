@@ -24,11 +24,12 @@ export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
 export type TenantContracts = {
-  token: TenantContract<ITokenContract>;
   governor: TenantContract<IGovernorContract>;
-  staker?: TenantContract<IStaker>;
-  alligator?: TenantContract<IAlligatorContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
+  token: TenantContract<ITokenContract>;
+  staker?: TenantContract<IStaker>;
+  timelock?: TenantContract<BaseContract>;
+  alligator?: TenantContract<IAlligatorContract>;
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
 };
 
