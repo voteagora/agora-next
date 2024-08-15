@@ -208,7 +208,7 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: true,
+      enabled: false,
       config: {
         stages: [
           {
