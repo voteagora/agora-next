@@ -84,7 +84,7 @@ export function getInputData(proposal: DraftProposal): {
         values,
         calldatas,
         description,
-        parseInt(proposal.proposal_type || "0"),
+        parseInt(proposal.voting_module_type || "0"),
       ];
 
       if (proposal.transactions.length === 0) {
