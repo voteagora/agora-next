@@ -16,17 +16,17 @@ import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 
 export default function ProposalsList({
-                                        initRelevantProposals,
-                                        initAllProposals,
-                                        fetchProposals,
-                                        votableSupply,
-                                        governanceCalendar,
-                                      }: {
+  initRelevantProposals,
+  initAllProposals,
+  fetchProposals,
+  votableSupply,
+  governanceCalendar,
+}: {
   initRelevantProposals: PaginatedResult<ProposalType[]>;
   initAllProposals: PaginatedResult<ProposalType[]>;
   fetchProposals: (
     pagination: PaginationParams,
-    filter: string,
+    filter: string
   ) => Promise<PaginatedResult<ProposalType[]>>;
   votableSupply: string;
   governanceCalendar?: {
@@ -37,7 +37,8 @@ export default function ProposalsList({
 }) {
   const { address } = useAccount();
   const { ui } = Tenant.current();
-  const tenantSupportsProposalLifecycle = ui.toggle("proposal-lifecycle")?.enabled;
+  const tenantSupportsProposalLifecycle =
+    ui.toggle("proposal-lifecycle")?.enabled;
   const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
@@ -58,7 +59,7 @@ export default function ProposalsList({
     fetching.current = true;
     const data = await fetchProposals(
       { limit: 10, offset: meta.next_offset },
-      filter,
+      filter
     );
     setPages((prev) => [...prev, { ...data, proposals: data.data }]);
     setMeta(data.meta);
