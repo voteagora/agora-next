@@ -37,7 +37,8 @@ export default function ProposalsList({
 }) {
   const { address } = useAccount();
   const { ui } = Tenant.current();
-  const tenantSupportsProposalLifecycle = ui.toggle("proposal-lifecycle");
+  const tenantSupportsProposalLifecycle =
+    ui.toggle("proposal-lifecycle")?.enabled;
   const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);
