@@ -10,7 +10,7 @@ const SponsorActions = ({
   draftProposal: DraftProposal;
 }) => {
   const renderAction = (proposal: DraftProposal) => {
-    switch (proposal.proposal_type) {
+    switch (proposal.voting_module_type) {
       case ProposalType.BASIC:
         return <BasicProposalAction draftProposal={proposal} />;
       case ProposalType.SOCIAL:

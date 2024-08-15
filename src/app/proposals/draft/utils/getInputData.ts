@@ -74,7 +74,7 @@ export function getInputData(proposal: DraftProposal): {
   // Inputs for basic type
   // [targets, values, calldatas, description]
   // [string[], bigint[], string[], string]
-  switch (proposal.proposal_type) {
+  switch (proposal.voting_module_type) {
     case ProposalType.BASIC:
       let targets: `0x${string}`[] = [];
       let values: bigint[] = [];
@@ -84,7 +84,7 @@ export function getInputData(proposal: DraftProposal): {
         values,
         calldatas,
         description,
-        parseInt(proposal.proposal_config_type || "0"),
+        parseInt(proposal.proposal_type || "0"),
       ];
 
       if (proposal.transactions.length === 0) {
@@ -207,7 +207,7 @@ export function getInputData(proposal: DraftProposal): {
         finalApprovalModuleAddress,
         calldata,
         description,
-        parseInt(proposal.proposal_config_type || "0"),
+        parseInt(proposal.proposal_type || "0"),
       ];
 
       return { inputData: approvalInputData };
@@ -237,7 +237,7 @@ export function getInputData(proposal: DraftProposal): {
         optimisticModuleAddress,
         calldata,
         description,
-        parseInt(proposal.proposal_config_type || "0"),
+        parseInt(proposal.proposal_type || "0"),
       ];
 
       return { inputData: optimisticInputData };

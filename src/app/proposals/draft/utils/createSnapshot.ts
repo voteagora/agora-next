@@ -89,7 +89,8 @@ export async function createSnapshot({
         ? "ens.eth"
         : process.env.TESTNET_SNAPSHOT_SPACE ?? "michaelagora.eth",
     timestamp,
-    type: proposal.proposal_type === "basic" ? "single-choice" : "approval",
+    type:
+      proposal.voting_module_type === "basic" ? "single-choice" : "approval",
     title: proposal.title,
     body: description,
     discussion: "",
