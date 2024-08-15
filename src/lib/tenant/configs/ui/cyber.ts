@@ -208,6 +208,7 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
+      // Disable proposal lifecycle until  votableSupply is fixed
       enabled: false,
       config: {
         stages: [
