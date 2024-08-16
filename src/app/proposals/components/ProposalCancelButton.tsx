@@ -39,28 +39,29 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
     args: [proposal.proposalData],
   });
 
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        {!canCancel ? (
-          <TooltipTrigger>
-            <Button disabled={true} variant="outline">
+  return (<div>
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          {!canCancel ? (
+            <TooltipTrigger>
+              <Button disabled={true} variant="outline">
+                Cancel
+              </Button>
+            </TooltipTrigger>
+          ) : (
+            <Button onClick={() => write?.()} variant="outline">
               Cancel
             </Button>
-          </TooltipTrigger>
-        ) : (
-          <Button onClick={() => write?.()} variant="outline">
-            Cancel
-          </Button>
-        )}
+          )}
 
-        <TooltipContent>
-          <div className="flex flex-col gap-1 p-2">
-            <div>Only the admin wallet can cancel proposals:</div>
-            <div className="font-semibold">{adminAddress}</div>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          <TooltipContent>
+            <div className="flex flex-col gap-1 p-2">
+              <div>Only the admin wallet can cancel proposals:</div>
+              <div className="font-semibold">{adminAddress}</div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
   );
 };

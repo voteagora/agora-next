@@ -53,7 +53,8 @@ export const cyberTenantConfig = ({
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x522d3a9c2bc14ce1c4d210ed41ab239fded02f2b"
-    : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
+    : "0x0000000000000000000000000000000000000000";
+    // : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
 
   const GOVERNOR = isProd
     ? "0x58E53131c339aA3cBA35904538eA5948f751050a"
