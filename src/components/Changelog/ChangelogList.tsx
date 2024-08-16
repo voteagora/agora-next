@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Changelog } from "@/app/api/common/changelogs/changelog";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import ChangelogListEntry from "./ChangelogListEntry";
+import Image from "next/image";
 
 const ChangelogList = ({
   initChangelog,
@@ -44,39 +45,52 @@ const ChangelogList = ({
   };
 
   if (!changelogEntries.length) {
-    return <div>No changelog entries found.</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full py-16">
+        <h2 className="mt-4 text-3xl font-bold text-gray-900">
+          Times are not a changin&apos;
+        </h2>
+        <p className="mt-2 text-lg text-gray-600">
+          It seems nothing has happened on the change log yet.
+        </p>
+        <div className="mt-8">
+          <Image
+            alt="Vacationing changelog"
+            src="https://i.pinimg.com/originals/97/52/18/97521834afab9745868c144cfe189b69.gif"
+            width={300}
+            height={300}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <VStack className="max-w-[76rem]">
-      <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-        <div>
-          <InfiniteScroll
-            hasMore={meta.has_next}
-            pageStart={0}
-            loadMore={loadMore}
-            loader={
-              <div key={0}>
-                <HStack
-                  key="loader"
-                  className="gl_loader justify-center py-6 text-sm text-secondary"
-                >
-                  Loading...
-                </HStack>
-              </div>
-            }
-            element="main"
-          >
-            {changelogEntries.map((changelogEntry) => (
-              <ChangelogListEntry
-                key={changelogEntry.id}
-                changelogEntry={changelogEntry}
-              />
-            ))}
-          </InfiniteScroll>
-        </div>
-      </VStack>
-    </VStack>
+    <div>
+      <InfiniteScroll
+        hasMore={meta.has_next}
+        pageStart={0}
+        loadMore={loadMore}
+        loader={
+          <div key={0}>
+            <HStack
+              key="loader"
+              className="gl_loader justify-center py-6 text-sm text-secondary"
+            >
+              Loading...
+            </HStack>
+          </div>
+        }
+        element="main"
+      >
+        {changelogEntries.map((changelogEntry) => (
+          <ChangelogListEntry
+            key={changelogEntry.id}
+            changelogEntry={changelogEntry}
+          />
+        ))}
+      </InfiniteScroll>
+    </div>
   );
 };
 
