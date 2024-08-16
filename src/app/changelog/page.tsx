@@ -1,9 +1,6 @@
-import { formatFullDate } from "@/lib/utils";
-import styles from "./changelog.module.scss";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { fetchChangelogForDAO } from "@/app/api/common/changelogs/getChangelogs";
 import ChangelogList from "@/components/Changelog/ChangelogList";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata() {
   return {
@@ -14,8 +11,9 @@ export async function generateMetadata() {
 }
 
 export default async function Page() {
+  const { slug } = Tenant.current();
   const initChangelog = await fetchChangelogForDAO({
-    daoSlug: "OP",
+    daoSlug: slug,
     pagination: {
       limit: 1,
       offset: 0,
@@ -23,39 +21,21 @@ export default async function Page() {
   });
 
   return (
-    <div className="bg-neutral">
-      <div className="mx-auto max-w-full py-20 sm:py-12">
-        <div className="flex flex-col sm:flex-row sm:gap-32 ">
-          <div className="sm:flex-1 sm:basis-1/3 max-w-xs rounded-xl border p-5 h-48 shadow-sm">
-            <h2 className="mt-1 font-semibold text-primary">Agora Changelog</h2>
-            <p className="mt-1 text-base leading-7 text-secondary">
-              Stay up to date with the latest changes with Agora&apos;s
-              development. Please report bugs and feedback{" "}
-              <a
-                href="https://agora.deform.cc/bugreport/"
-                className="font-semibold text-indigo-600 hover:text-indigo-500"
-              >
-                using this form
-              </a>
-              .
-            </p>
-          </div>
-          <div className="sm:flex-1 sm:basis-2/3 mt-10 sm:mt-0 border-l pl-8 relative">
-            <ChangelogList
-              initChangelog={initChangelog}
-              fetchChangelogForDAO={async ({ limit, offset }) => {
-                "use server";
-                return fetchChangelogForDAO({
-                  daoSlug: "OP",
-                  pagination: {
-                    limit,
-                    offset,
-                  },
-                });
-              }}
-            />
-          </div>
-        </div>
+    <div className="bg-white px-6 py-16 lg:px-8">
+      <div className="mx-auto max-w-3xl">
+        <ChangelogList
+          initChangelog={initChangelog}
+          fetchChangelogForDAO={async ({ limit, offset }) => {
+            "use server";
+            return fetchChangelogForDAO({
+              daoSlug: slug,
+              pagination: {
+                limit,
+                offset,
+              },
+            });
+          }}
+        />
       </div>
     </div>
   );
