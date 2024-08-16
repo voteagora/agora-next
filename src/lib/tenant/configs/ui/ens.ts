@@ -21,6 +21,13 @@ export const ensTenantUIConfig = new TenantUI({
     title: "ENS Foundation",
   },
 
+  links: [
+    {
+      name: "changelog",
+      title: "Change log",
+      url: "/changelog",
+    },
+  ],
   pages: [
     {
       route: "/",
