@@ -1,6 +1,10 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractRead, useContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { toUtf8Bytes } from "ethers";
 import { Button } from "@/components/ui/button";
 import { keccak256 } from "viem";
@@ -29,7 +33,7 @@ export const ProposalQueueButton = ({ proposal }: Props) => {
     args: [keccak256(toUtf8Bytes(proposal.id))],
   });
 
-  console.log(isQeueueReady)
+  console.log(isQeueueReady);
 
   const { data, write } = useContractWrite({
     address: contracts.governor.address as `0x${string}`,
@@ -42,6 +46,13 @@ export const ProposalQueueButton = ({ proposal }: Props) => {
     hash: data?.hash,
   });
 
-  return <Button loading={isLoading} disabled={Boolean(isQeueueReady === undefined || !isQeueueReady)}
-                 onClick={() => write?.()}>Queue</Button>;
+  return (
+    <Button
+      loading={isLoading}
+      disabled={Boolean(isQeueueReady === undefined || !isQeueueReady)}
+      onClick={() => write?.()}
+    >
+      Queue
+    </Button>
+  );
 };

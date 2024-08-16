@@ -39,7 +39,8 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
     args: [proposal.proposalData],
   });
 
-  return (<div>
+  return (
+    <div>
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           {!canCancel ? (
