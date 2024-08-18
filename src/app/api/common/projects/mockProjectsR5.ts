@@ -16,7 +16,22 @@ export const mockProjectsR5 = [
       website: ["https://cryptopaws.io"],
     },
     team: ["57293", "12893"],
-    github: ["https://github.com/cryptopaws/contracts"],
+    github: [
+      {
+        "https://github.com/cryptopaws/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -74,7 +89,22 @@ export const mockProjectsR5 = [
       website: ["https://pixelverse.art"],
     },
     team: ["48293", "23948"],
-    github: ["https://github.com/pixelverse/contracts"],
+    github: [
+      {
+        "https://github.com/pixelverse/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -132,7 +162,22 @@ export const mockProjectsR5 = [
       website: ["https://metacollective.org"],
     },
     team: ["73948", "39482"],
-    github: ["https://github.com/metacollective/contracts"],
+    github: [
+      {
+        "https://github.com/metacollective/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -193,7 +238,22 @@ export const mockProjectsR5 = [
       website: ["https://battlecraft.io"],
     },
     team: ["59284", "94837"],
-    github: ["https://github.com/battlecraft/contracts"],
+    github: [
+      {
+        "https://github.com/battlecraft/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -250,7 +310,22 @@ export const mockProjectsR5 = [
       website: ["https://chatterbox.app"],
     },
     team: ["48293", "83947"],
-    github: ["https://github.com/chatterbox/contracts"],
+    github: [
+      {
+        "https://github.com/chatterbox/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -311,7 +386,22 @@ export const mockProjectsR5 = [
       website: ["https://artify.io"],
     },
     team: ["29384", "58392"],
-    github: ["https://github.com/artify/contracts"],
+    github: [
+      {
+        "https://github.com/artify/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -371,7 +461,22 @@ export const mockProjectsR5 = [
       website: ["https://tokentrust.org"],
     },
     team: ["39485", "28476"],
-    github: ["https://github.com/tokentrust/contracts"],
+    github: [
+      {
+        "https://github.com/tokentrust/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -431,7 +536,22 @@ export const mockProjectsR5 = [
       website: ["https://educhain.io"],
     },
     team: ["58392", "27483"],
-    github: ["https://github.com/educhain/contracts"],
+    github: [
+      {
+        "https://github.com/educhain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -492,7 +612,22 @@ export const mockProjectsR5 = [
       website: ["https://chaintrace.io"],
     },
     team: ["39572", "58472"],
-    github: ["https://github.com/chaintrace/contracts"],
+    github: [
+      {
+        "https://github.com/chaintrace/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -553,7 +688,22 @@ export const mockProjectsR5 = [
       website: ["https://medilink.io"],
     },
     team: ["29485", "37492"],
-    github: ["https://github.com/medilink/contracts"],
+    github: [
+      {
+        "https://github.com/medilink/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -611,7 +761,22 @@ export const mockProjectsR5 = [
       website: ["https://insurechain.io"],
     },
     team: ["38594", "29485"],
-    github: ["https://github.com/insurechain/contracts"],
+    github: [
+      {
+        "https://github.com/insurechain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -672,7 +837,22 @@ export const mockProjectsR5 = [
       website: ["https://propchain.io"],
     },
     team: ["39485", "58473"],
-    github: ["https://github.com/propchain/contracts"],
+    github: [
+      {
+        "https://github.com/propchain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -733,7 +913,22 @@ export const mockProjectsR5 = [
       website: ["https://votechain.io"],
     },
     team: ["29485", "39572"],
-    github: ["https://github.com/votechain/contracts"],
+    github: [
+      {
+        "https://github.com/votechain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -790,7 +985,22 @@ export const mockProjectsR5 = [
       website: ["https://energyweb.io"],
     },
     team: ["48392", "29485"],
-    github: ["https://github.com/energyweb/contracts"],
+    github: [
+      {
+        "https://github.com/energyweb/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -848,7 +1058,22 @@ export const mockProjectsR5 = [
       website: ["https://idenchain.io"],
     },
     team: ["39485", "58473"],
-    github: ["https://github.com/idenchain/contracts"],
+    github: [
+      {
+        "https://github.com/idenchain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -907,7 +1132,22 @@ export const mockProjectsR5 = [
       website: ["https://logichain.io"],
     },
     team: ["29485", "48572"],
-    github: ["https://github.com/logichain/contracts"],
+    github: [
+      {
+        "https://github.com/logichain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
@@ -966,7 +1206,22 @@ export const mockProjectsR5 = [
       website: ["https://iotchain.io"],
     },
     team: ["39485", "29485"],
-    github: ["https://github.com/iotchain/contracts"],
+    github: [
+      {
+        "https://github.com/iotchain/contracts": {
+          repo_rank: 2,
+          star_count: 100,
+          starred_events: 104,
+          starred_by_top_devs: 24,
+          fork_count: 14,
+          forked_events: 17,
+          forked_by_top_devs: 5,
+          fulltime_developer_average_6_months: 0.03,
+          new_contributor_count_6_months: 10,
+          age_of_project_years: 1.5,
+        },
+      },
+    ],
     packages: [],
     contracts: [
       {
