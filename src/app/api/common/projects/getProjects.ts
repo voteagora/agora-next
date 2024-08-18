@@ -22,7 +22,7 @@ async function getProjectsApi({
 }: {
   pagination: PaginationParams;
   round?: string;
-  category: keyof typeof filterMap;
+  category?: keyof typeof filterMap;
 }): Promise<PaginatedResult<Project[]>> {
   if (round === "5") {
     const projects = mockProjectsR5.filter((project) => {
