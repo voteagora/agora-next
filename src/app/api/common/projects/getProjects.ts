@@ -18,15 +18,15 @@ const filterMap = {
 async function getProjectsApi({
   pagination,
   round,
-  category,
+  category = "all",
 }: {
   pagination: PaginationParams;
   round?: string;
-  category?: keyof typeof filterMap;
+  category: keyof typeof filterMap;
 }): Promise<PaginatedResult<Project[]>> {
   if (round === "5") {
     const projects = mockProjectsR5.filter((project) => {
-      return !category || project.category === filterMap[category];
+      return !filterMap[category] || project.category === filterMap[category];
     });
 
     return {
