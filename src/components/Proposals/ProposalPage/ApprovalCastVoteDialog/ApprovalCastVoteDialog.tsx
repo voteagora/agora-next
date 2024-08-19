@@ -1,6 +1,5 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder } from "ethers";
 import { useMemo, useState } from "react";
 import {
@@ -14,7 +13,7 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
-import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
+import { getVpToDisplay } from "@/lib/voteUtils";
 
 const abiCoder = new AbiCoder();
 
@@ -30,7 +29,7 @@ export function ApprovalCastVoteDialog({
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState<string>("");
-  const [abstain, setAbstain] = useState<boolean>(true);
+  const [abstain, setAbstain] = useState<boolean>(false);
   const [encodedParams, setEncodedParams] = useState<`0x${string}`>("0x");
   const maxChecked = proposalData.proposalSettings.maxApprovals;
   const abstainOptionId = proposalData.options.length; // Abstain option is always last
@@ -38,7 +37,9 @@ export function ApprovalCastVoteDialog({
   const handleOnChange = (optionId: number) => {
     if (optionId === abstainOptionId) {
       if (abstain) {
-        setSelectedOptions([proposalData.options.length - 1]);
+        setSelectedOptions((prev) =>
+          prev.filter((value) => value !== optionId)
+        );
       } else {
         setSelectedOptions([]);
       }
@@ -49,9 +50,9 @@ export function ApprovalCastVoteDialog({
           prev.filter((value) => value !== optionId)
         );
 
-        if (selectedOptions.length === 1) {
-          setAbstain(true);
-        }
+        // if (selectedOptions.length === 1) {
+        //   setAbstain(true);
+        // }
       } else if (selectedOptions.length < maxChecked) {
         setAbstain(false);
         setSelectedOptions((prev) => [...prev, optionId]);
@@ -93,16 +94,16 @@ export function ApprovalCastVoteDialog({
       {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (
         <>
-          <VStack gap={3}>
-            <VStack>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               <p className="text-xl font-extrabold">
                 Select up to {maxChecked} option{maxChecked > 1 && "s"}
               </p>
               <p className="text-secondary mt-1">
                 Your vote is final and cannot be edited once submitted.
               </p>
-            </VStack>
-            <VStack className="max-h-[46vh] overflow-y-scroll">
+            </div>
+            <div className="flex flex-col max-h-[46vh] overflow-y-scroll">
               {proposalData.options.map((option, index) => (
                 <CheckCard
                   key={index}
@@ -139,7 +140,7 @@ export function ApprovalCastVoteDialog({
                 onClick={() => handleOnChange(abstainOptionId)}
                 abstain={abstain}
               />
-            </VStack>
+            </div>
             <CastVoteWithReason
               onVoteClick={write}
               reason={reason}
@@ -148,7 +149,7 @@ export function ApprovalCastVoteDialog({
               abstain={abstain}
               votingPower={vpToDisplay}
             />
-          </VStack>
+          </div>
         </>
       )}
     </div>
@@ -173,14 +174,14 @@ function CastVoteWithReason({
   copy?: string;
 }) {
   return (
-    <VStack gap={4}>
+    <div className="flex flex-col gap-4">
       <textarea
         className="p-4 resize-none rounded-lg bg-line border-line transition-all"
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
       />
-      <VStack justifyContent="justify-between" alignItems="items-stretch">
+      <div className="flex flex-col justify-between items-stretch">
         {!abstain && numberOfOptions > 0 && (
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
@@ -195,7 +196,7 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             {!copy ? (
               <>
-                Vote for no options with{"\u00A0"}
+                Abstain from voting with{"\u00A0"}
                 <TokenAmountDisplay amount={votingPower} />
               </>
             ) : (
@@ -203,8 +204,8 @@ function CastVoteWithReason({
             )}
           </Button>
         )}
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }
 
