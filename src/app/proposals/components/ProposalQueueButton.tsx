@@ -1,13 +1,12 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite, useWaitForTransaction } from "wagmi";
 import { toUtf8Bytes } from "ethers";
 import { Button } from "@/components/ui/button";
 import { keccak256 } from "viem";
+import { ParsedProposalData } from "@/lib/proposalUtils";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   proposal: Proposal;
@@ -15,44 +14,50 @@ interface Props {
 
 export const ProposalQueueButton = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const { targets, values, calldatas } = proposal.proposalData.options[0];
 
-  const descriptionHash = keccak256(toUtf8Bytes(proposal.description!)); // Hash of the proposal description
-
-  // const { data: proposalId, isFetched: isProposalIdFetched } = useContractRead({
-  //   address: contracts.governor.address as `0x${string}`,
-  //   abi: contracts.governor.abi,
-  //   functionName: "hashProposal",
-  //   args: [targets, values, calldatas, descriptionHash],
-  // });
-
-  const { data: isQeueueReady } = useContractRead({
-    address: contracts.timelock!.address as `0x${string}`,
-    abi: contracts.timelock!.abi,
-    functionName: "isOperationReady",
-    args: [keccak256(toUtf8Bytes(proposal.id))],
-  });
-
-  console.log(isQeueueReady);
+  const dynamicProposalType: keyof ParsedProposalData =
+    proposal.proposalType as keyof ParsedProposalData;
+  const proposalData =
+    proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
 
   const { data, write } = useContractWrite({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "queue",
-    args: [targets, values, calldatas, descriptionHash],
+    args: [
+      "options" in proposalData ? proposalData.options[0].targets : "",
+      "options" in proposalData ? proposalData.options[0].values : "",
+      "options" in proposalData ? proposalData.options[0].calldatas : "",
+      keccak256(toUtf8Bytes(proposal.description!)),
+    ],
   });
 
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  const { isLoading, isSuccess, isFetched, isError, error } =
+    useWaitForTransaction({
+      hash: data?.hash,
+    });
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(
+        "Proposal Queued. It might take a minute to see the updated status.",
+        { duration: 10000 }
+      );
+    }
+    if (isError) {
+      toast.error(`Error queuing proposal ${error?.message}`, {
+        duration: 10000,
+      });
+    }
+  }, [isSuccess, isError, error]);
 
   return (
-    <Button
-      loading={isLoading}
-      disabled={Boolean(isQeueueReady === undefined || !isQeueueReady)}
-      onClick={() => write?.()}
-    >
-      Queue
-    </Button>
+    <>
+      {!isFetched && (
+        <Button loading={isLoading} onClick={() => write?.()}>
+          Queue
+        </Button>
+      )}
+    </>
   );
 };

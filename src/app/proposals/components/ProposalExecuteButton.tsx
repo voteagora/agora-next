@@ -1,8 +1,12 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractRead, useContractWrite } from "wagmi";
-import { encodeBytes32String } from "ethers";
+import { useContractWrite, useWaitForTransaction } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { ParsedProposalData } from "@/lib/proposalUtils";
+import { keccak256 } from "viem";
+import { toUtf8Bytes } from "ethers";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   proposal: Proposal;
@@ -11,20 +15,49 @@ interface Props {
 export const ProposalExecuteButton = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
-  // TODO: Figure out how to get this to work
-  // const { data, isFetched: isFetchedReady } = useContractRead({
-  //   address: contracts.timelock!.address as `0x${string}`,
-  //   abi: contracts.timelock!.abi,
-  //   functionName: "isOperationReady",
-  //   args: [proposal.id],
-  // });
+  const dynamicProposalType: keyof ParsedProposalData =
+    proposal.proposalType as keyof ParsedProposalData;
+  const proposalData =
+    proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
 
-  const { write } = useContractWrite({
+  const { data, write } = useContractWrite({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "execute",
-    args: [proposal.proposalData],
+    args: [
+      "options" in proposalData ? proposalData.options[0].targets : "",
+      "options" in proposalData ? proposalData.options[0].values : "",
+      "options" in proposalData ? proposalData.options[0].calldatas : "",
+      keccak256(toUtf8Bytes(proposal.description!)),
+    ],
   });
 
-  return <Button onClick={() => write?.()}>Execute</Button>;
+  const { isLoading, isSuccess, isError, isFetched, error } =
+    useWaitForTransaction({
+      hash: data?.hash,
+    });
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(
+        "Proposal Executed. It might take a minute to see the updated status.",
+        { duration: 10000 }
+      );
+    }
+    if (isError) {
+      toast.error(`Error executing proposal ${error?.message}`, {
+        duration: 10000,
+      });
+    }
+  }, [isSuccess, isError, error]);
+
+  return (
+    <>
+      {!isFetched && (
+        <Button onClick={() => write?.()} loading={isLoading}>
+          Execute
+        </Button>
+      )}
+    </>
+  );
 };

@@ -61,12 +61,17 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success("Proposal cancelled. It might take a minute to see the updated status.", { duration: 10000 });
+      toast.success(
+        "Proposal Cancelled. It might take a minute to see the updated status.",
+        { duration: 10000 }
+      );
     }
     if (isError) {
-      toast.error(`"Error cancelling proposal ${error?.message}`, { duration: 10000 });
+      toast.error(`Error cancelling proposal ${error?.message}`, {
+        duration: 10000,
+      });
     }
-  }, [isSuccess, isError]);
+  }, [isSuccess, isError, error]);
 
   return (
     <div>
