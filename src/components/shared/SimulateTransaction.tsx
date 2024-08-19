@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
 import { opAdminAddress } from "@/lib/contracts/contracts";
+import Tenant from "@/lib/tenant/tenant";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";
 
@@ -19,6 +20,7 @@ export default function SimulateTransaction({
   value: BigInt;
   calldata: string;
 }) {
+  const tenant = Tenant.current();
   const [status, setStatus] = useState<Status>("Unconfirmed");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,8 +43,8 @@ export default function SimulateTransaction({
             target,
             value: value.toString(),
             calldata,
-            networkId: "10",
-            from: opAdminAddress,
+            networkId: tenant.contracts.governor.chain.id,
+            from: tenant.contracts.governor.address,
           }),
         });
 

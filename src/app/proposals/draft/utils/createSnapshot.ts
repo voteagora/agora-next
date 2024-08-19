@@ -77,7 +77,7 @@ export async function createSnapshot({
       proposal.temp_check_link &&
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
     }` +
-    "\n\n ## Abstract \n" +
+    "\n\n ## Description \n" +
     proposal.abstract;
 
   const blockNumber = await publicClient.getBlockNumber();
@@ -89,7 +89,8 @@ export async function createSnapshot({
         ? "ens.eth"
         : process.env.TESTNET_SNAPSHOT_SPACE ?? "michaelagora.eth",
     timestamp,
-    type: proposal.proposal_type === "basic" ? "single-choice" : "approval",
+    type:
+      proposal.voting_module_type === "basic" ? "single-choice" : "approval",
     title: proposal.title,
     body: description,
     discussion: "",

@@ -7,7 +7,6 @@ import {
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
@@ -65,7 +64,7 @@ export const cyberTenantConfig = ({
     : ["0xEb3aef5D867109E734fB08E7b1f7b7bba8226aa3"];
 
   const TYPES = isProd
-    ? "0xf3f3841948e3B3D744D1ACd5770EbfFCa3742ACA"
+    ? "0x36a8529335AdBE769Dd9180C275e9b8eCD3C6C72"
     : "0x0B629B2ff953a9f0216816342685514798E18819";
 
   const TIMELOCK = isProd
