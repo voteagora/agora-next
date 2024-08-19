@@ -1,14 +1,14 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } from "wagmi";
 import { Button } from "@/components/ui/button";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ParsedProposalData } from "@/lib/proposalUtils";
+import { keccak256 } from "viem";
+import { toUtf8Bytes } from "ethers";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   proposal: Proposal;
@@ -18,26 +18,45 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
-  // TODO: Implement admin
-  // admin
 
-  // TODO: Figure out how to get this to work
   const { data: adminAddress, isFetched: isAdminFetched } = useContractRead({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "admin",
   });
 
-  const canCancel =
-    isAdminFetched &&
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+  const canCancel = isAdminFetched && adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+  const dynamicProposalType: keyof ParsedProposalData = proposal.proposalType as keyof ParsedProposalData;
+  const proposalData = proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
 
-  const { write } = useContractWrite({
+  const { data, write } = useContractWrite({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "cancel",
-    args: [proposal.proposalData],
+    args: [
+      "options" in proposalData ? proposalData.options[0].targets : "",
+      "options" in proposalData ? proposalData.options[0].values : "",
+      "options" in proposalData ? proposalData.options[0].calldatas : "",
+      keccak256(toUtf8Bytes(proposal.description!)),
+    ],
   });
+
+  const { isLoading, isSuccess, isError, isFetched, error } =
+    useWaitForTransaction({
+      hash: data?.hash,
+    });
+
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("Hello");
+      toast.success("Proposal cancelled. It might take a minute to see the updated status.");
+    }
+    if (isError) {
+      console.log("Hello");
+      toast.error(`"Error cancelling proposal ${error?.message}`);
+    }
+  }, [isSuccess, isError, isFetched]);
 
   return (
     <div>
@@ -50,9 +69,13 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
               </Button>
             </TooltipTrigger>
           ) : (
-            <Button onClick={() => write?.()} variant="outline">
-              Cancel
-            </Button>
+            <>
+              {!isFetched && (
+                <Button onClick={() => write?.()} variant="outline" loading={isLoading}>
+                  Cancel
+                </Button>
+              )}
+            </>
           )}
 
           <TooltipContent>
