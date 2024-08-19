@@ -1,9 +1,19 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useAccount, useContractRead, useContractWrite, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { Button } from "@/components/ui/button";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
@@ -18,16 +28,19 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
-
   const { data: adminAddress, isFetched: isAdminFetched } = useContractRead({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "admin",
   });
 
-  const canCancel = isAdminFetched && adminAddress?.toString().toLowerCase() === address?.toLowerCase();
-  const dynamicProposalType: keyof ParsedProposalData = proposal.proposalType as keyof ParsedProposalData;
-  const proposalData = proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
+  const canCancel =
+    isAdminFetched &&
+    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+  const dynamicProposalType: keyof ParsedProposalData =
+    proposal.proposalType as keyof ParsedProposalData;
+  const proposalData =
+    proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
 
   const { data, write } = useContractWrite({
     address: contracts.governor.address as `0x${string}`,
@@ -46,17 +59,14 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
       hash: data?.hash,
     });
 
-
   useEffect(() => {
     if (isSuccess) {
-      console.log("Hello");
-      toast.success("Proposal cancelled. It might take a minute to see the updated status.");
+      toast.success("Proposal cancelled. It might take a minute to see the updated status.", { duration: 10000 });
     }
     if (isError) {
-      console.log("Hello");
-      toast.error(`"Error cancelling proposal ${error?.message}`);
+      toast.error(`"Error cancelling proposal ${error?.message}`, { duration: 10000 });
     }
-  }, [isSuccess, isError, isFetched]);
+  }, [isSuccess, isError]);
 
   return (
     <div>
@@ -71,7 +81,11 @@ export const ProposalCancelButton = ({ proposal }: Props) => {
           ) : (
             <>
               {!isFetched && (
-                <Button onClick={() => write?.()} variant="outline" loading={isLoading}>
+                <Button
+                  onClick={() => write?.()}
+                  variant="outline"
+                  loading={isLoading}
+                >
                   Cancel
                 </Button>
               )}
