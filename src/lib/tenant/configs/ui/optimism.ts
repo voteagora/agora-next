@@ -255,7 +255,7 @@ export const optimismTenantUIConfig = new TenantUI({
 
 **1. Select proposal type**
 
-Proposal types set the quorum and approval thresholds for your proposal. You can view, edit, or create a new one via the [admin panel](https://vote.optimism.io/admin).
+Proposal types set the quorum and approval thresholds for your proposal. You can view, edit, or create a new one via the [admin panel](https://vote.optimism.io/admin).
 
 **2. Choose your vote type**
 
