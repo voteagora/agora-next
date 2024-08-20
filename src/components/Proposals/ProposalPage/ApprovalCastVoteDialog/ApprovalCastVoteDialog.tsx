@@ -180,8 +180,6 @@ export function ApprovalCastVoteDialog({
         options={proposalData.options}
         reason={reason}
         write={write}
-        isLoading={isLoading}
-        error={isError ? "Something went wrong" : ""}
         votingPower={vpToDisplay}
         onClose={() => {
           setInReviewStep(false);
