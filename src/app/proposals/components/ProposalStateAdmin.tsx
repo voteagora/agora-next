@@ -17,9 +17,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
   const { ui } = Tenant.current();
 
-  const hasProposalLifecycle = Boolean(
-    ui.toggle("proposals/state-admin")?.enabled
-  );
+  const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
 
   const actionableStates: string[] = [
     PROPOSAL_STATUS.ACTIVE,
@@ -61,7 +59,13 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
       case PROPOSAL_STATUS.ACTIVE:
       case PROPOSAL_STATUS.PENDING:
-        return <ProposalCancelButton proposal={proposal} />;
+        return (
+          <>
+            <ProposalCancelButton proposal={proposal} />
+            {/*TODO: Remove execute button */}
+            <ProposalExecuteButton proposal={proposal} />
+          </>
+        );
 
       case PROPOSAL_STATUS.QUEUED:
         return <ProposalExecuteButton proposal={proposal} />;

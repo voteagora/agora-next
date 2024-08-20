@@ -187,10 +187,6 @@ export const cyberTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/state-admin",
-      enabled: true,
-    },
-    {
       name: "delegates",
       enabled: true,
     },
@@ -208,6 +204,10 @@ export const cyberTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
+      enabled: true,
+    },
+    {
+      name: "proposal-execute",
       enabled: true,
     },
     {

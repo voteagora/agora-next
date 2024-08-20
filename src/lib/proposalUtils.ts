@@ -639,6 +639,7 @@ export async function getProposalStatus(
   if (proposal.executed_block) {
     return "EXECUTED";
   }
+
   if (
     !proposal.start_block ||
     !latestBlock ||

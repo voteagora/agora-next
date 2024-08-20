@@ -92,7 +92,7 @@ export const cyberTenantConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<BaseContract>({
+    timelock: new TenantContract<IGovernorContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,
