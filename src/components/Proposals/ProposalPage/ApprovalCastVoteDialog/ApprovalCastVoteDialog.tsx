@@ -14,8 +14,96 @@ import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { getVpToDisplay } from "@/lib/voteUtils";
+import { useEnsName, useAccount } from "wagmi";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const abiCoder = new AbiCoder();
+
+export function ReviewApprovalVoteDialog({
+  selectedOptions,
+  options,
+  reason,
+  write,
+  votingPower,
+  onClose,
+}: {
+  selectedOptions: number[];
+  options: ParsedProposalData["APPROVAL"]["kind"]["options"];
+  reason: string;
+  write: () => void;
+  votingPower: string;
+  onClose: () => void;
+}) {
+  const { address } = useAccount();
+  const { data } = useEnsName({
+    chainId: 1,
+    address: address as `0x${string}`,
+  });
+
+  return (
+    <div>
+      <div className="flex flex-col">
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-col">
+            <span className="text-xs">
+              {data || truncateAddress(address as string)}
+            </span>
+            <p className="text-xl font-extrabold">
+              Casting vote for {selectedOptions.length} option
+              {selectedOptions.length > 1 && "s"}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs self-end">with</span>
+            <span className="mt-[2px]">
+              <TokenAmountDisplay amount={votingPower} />
+            </span>
+          </div>
+        </div>
+        <div className="border border-line rounded-lg p-4 space-y-4 mt-6">
+          {selectedOptions.map((optionId, index) => {
+            const option = options[optionId];
+            return (
+              <div
+                className="flex flex-row items-center justify-between relative"
+                key={`option-${index}`}
+              >
+                <p className="font-medium">{option.description}</p>
+                <div
+                  className={
+                    "border border-line bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
+                  }
+                >
+                  <CheckIcon className="w-4 h-4 text-neutral" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="line-clamp-5 overflow-hidden">
+          {!!reason ? (
+            <p className="mt-6 text-secondary">{reason}</p>
+          ) : (
+            <span className="border border-line p-4 mt-6 rounded-lg text-tertiary text-sm flex items-center justify-center">
+              <p>No reason given</p>
+            </span>
+          )}
+        </div>
+        <Button
+          onClick={() => {
+            write();
+            onClose();
+          }}
+          className="mt-6"
+        >
+          Vote for {selectedOptions.length} option
+          {selectedOptions.length > 1 && "s"} with{"\u00A0"}
+          {<TokenAmountDisplay amount={votingPower} />}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function ApprovalCastVoteDialog({
   proposal,
@@ -25,6 +113,7 @@ export function ApprovalCastVoteDialog({
   authorityChains,
   missingVote,
 }: ApprovalCastVoteDialogProps) {
+  const [inReviewStep, setInReviewStep] = useState<boolean>(false);
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
@@ -84,6 +173,21 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
+  if (inReviewStep) {
+    return (
+      <ReviewApprovalVoteDialog
+        selectedOptions={selectedOptions}
+        options={proposalData.options}
+        reason={reason}
+        write={write}
+        votingPower={vpToDisplay}
+        onClose={() => {
+          setInReviewStep(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div style={{ transformStyle: "preserve-3d" }}>
       {hasStatement && isLoading && <LoadingVote />}
@@ -142,7 +246,10 @@ export function ApprovalCastVoteDialog({
               />
             </div>
             <CastVoteWithReason
-              onVoteClick={write}
+              //   onVoteClick={write}
+              onVoteClick={() => {
+                setInReviewStep(true);
+              }}
               reason={reason}
               setReason={setReason}
               numberOfOptions={selectedOptions.length}
