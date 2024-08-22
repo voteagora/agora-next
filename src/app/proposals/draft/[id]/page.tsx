@@ -2,15 +2,16 @@ import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
 import BackButton from "../components/BackButton";
 import {
+  GET_DRAFT_STAGES,
   getStageMetadata,
   isPostSubmission,
-  GET_DRAFT_STAGES,
 } from "../utils/stages";
 import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
 import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
+import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 
 export default async function DraftProposalPage({
   params,
@@ -28,6 +29,7 @@ export default async function DraftProposalPage({
   }
 
   const draftProposal = await fetchDraftProposal(parseInt(params.id));
+  const proposalTypes = await fetchProposalTypes();
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
 
   if (isPostSubmissionStage) {
@@ -64,6 +66,7 @@ export default async function DraftProposalPage({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
           <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
             <DraftProposalForm
+              proposalTypes={proposalTypes}
               stage={stageObject.stage}
               draftProposal={draftProposal}
             />

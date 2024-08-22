@@ -1,6 +1,6 @@
 import {
+  AgoraGovernor__factory,
   ERC20__factory,
-  OptimismGovernor__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -20,8 +20,8 @@ export const scrollTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = "0x5300000000000000000000000000000000000004";
-  const GOVERNOR = "0x0";
-
+  const GOVERNOR = "0x0000000000000000000000000000000000000000";
+  const TREASURY = "0x0000000000000000000000000000000000000000";
   const provider = new JsonRpcProvider(
     `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
   );
@@ -38,11 +38,13 @@ export const scrollTenantContractConfig = ({
 
     // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: AgoraGovernor__factory.abi,
       address: GOVERNOR,
       chain,
-      contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
+      contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
+
+    treasury: [TREASURY],
   };
 };

@@ -15,12 +15,22 @@ async function getMetrics() {
   }
 
   const totalSupply = await contracts.token.contract.totalSupply();
-  const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
 
-  return {
-    votableSupply: votableSupply?.votable_supply || "0",
-    totalSupply: totalSupply.toString(),
-  };
+  try {
+    const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
+      {}
+    );
+    return {
+      votableSupply: votableSupply?.votable_supply || "0",
+      totalSupply: totalSupply.toString(),
+    };
+  } catch (e) {
+    // Handle prisma errors for new tenants
+    return {
+      votableSupply: "0",
+      totalSupply: totalSupply.toString(),
+    };
+  }
 }
 
 export const fetchMetrics = cache(getMetrics);
