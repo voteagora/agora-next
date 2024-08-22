@@ -5,6 +5,7 @@ import { etherfiTenantContractConfig } from "@/lib/tenant/configs/contracts/ethe
 import { optimismTenantContractConfig } from "@/lib/tenant/configs/contracts/optimism";
 import { uniswapTenantContractConfig } from "@/lib/tenant/configs/contracts/uniswap";
 import { cyberTenantConfig } from "@/lib/tenant/configs/contracts/cyber";
+import { newdaoTenantContractConfig } from "@/lib/tenant/configs/contracts/newdao";
 
 export default class TenantContractFactory {
   public static create(
@@ -23,6 +24,8 @@ export default class TenantContractFactory {
         return uniswapTenantContractConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.CYBER:
         return cyberTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.NEW_DAO:
+        return newdaoTenantContractConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
