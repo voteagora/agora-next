@@ -5,6 +5,7 @@ import { etherfiTenantUIConfig } from "@/lib/tenant/configs/ui/etherfi";
 import { ensTenantUIConfig } from "@/lib/tenant/configs/ui/ens";
 import { optimismTenantUIConfig } from "@/lib/tenant/configs/ui/optimism";
 import { cyberTenantUIConfig } from "@/lib/tenant/configs/ui/cyber";
+import { newdaoTenantUIConfig } from "@/lib/tenant/configs/ui/newdao";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -23,6 +24,9 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.CYBER:
         return cyberTenantUIConfig;
+
+      case TENANT_NAMESPACES.NEW_DAO:
+        return newdaoTenantUIConfig;
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

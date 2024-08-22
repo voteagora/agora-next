@@ -38,6 +38,7 @@ type UIPage = {
 type UIAssets = {
   success: string;
   pending: string;
+  failed?: string; //TODO: make this required for all tenants
   delegate: string;
 };
 
