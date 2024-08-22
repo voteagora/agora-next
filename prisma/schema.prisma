@@ -761,6 +761,7 @@ view etherfiProposals {
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?
+  queued_block               BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
@@ -768,6 +769,7 @@ view etherfiProposals {
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?
+  queued_transaction_hash    String?
   cancelled_transaction_hash String?
   executed_transaction_hash  String?
 
@@ -1903,53 +1905,28 @@ view cyberProposalTypes {
 }
 
 view cyberProposals {
-  proposal_id                String        @unique
-  contract                   String        @db.VarChar
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
   proposer                   String
   description                String?
-  ordinal                    Decimal       @db.Decimal
+  ordinal                    Decimal      @db.Decimal
   created_block              BigInt?
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?
+  queued_block               BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
   proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?       @db.VarChar(66)
-  cancelled_transaction_hash String?       @db.VarChar
-  executed_transaction_hash  String?       @db.VarChar
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  queued_transaction_hash    String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
 
-  @@schema("cyber")
   @@map("proposals")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view cyber_proposals_wrapper {
-  proposal_id                String?
-  contract                   String?       @db.VarChar
-  proposer                   String?
-  description                String?
-  ordinal                    Decimal?      @db.Decimal
-  created_block              BigInt?
-  start_block                String?
-  end_block                  String?
-  cancelled_block            BigInt?
-  executed_block             BigInt?
-  proposal_data              Json?
-  proposal_data_raw          String?
-  proposal_type              ProposalType?
-  proposal_type_data         Json?
-  proposal_results           Json?
-  created_transaction_hash   String?       @db.VarChar(66)
-  cancelled_transaction_hash String?       @db.VarChar
-  executed_transaction_hash  String?       @db.VarChar
-
-  @@map("proposals_wrapper")
-  @@ignore
   @@schema("cyber")
 }
 
@@ -2251,53 +2228,28 @@ view scrollProposalTypes {
 }
 
 view scrollProposals {
-  proposal_id                String        @unique
-  contract                   String        @db.VarChar
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
   proposer                   String
   description                String?
-  ordinal                    Decimal       @db.Decimal
+  ordinal                    Decimal      @db.Decimal
   created_block              BigInt?
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?
+  queued_block               BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
   proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?       @db.VarChar(66)
-  cancelled_transaction_hash String?       @db.VarChar
-  executed_transaction_hash  String?       @db.VarChar
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  queued_transaction_hash    String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
 
-  @@schema("scroll")
   @@map("proposals")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-view scroll_proposals_wrapper {
-  proposal_id                String?
-  contract                   String?       @db.VarChar
-  proposer                   String?
-  description                String?
-  ordinal                    Decimal?      @db.Decimal
-  created_block              BigInt?
-  start_block                String?
-  end_block                  String?
-  cancelled_block            BigInt?
-  executed_block             BigInt?
-  proposal_data              Json?
-  proposal_data_raw          String?
-  proposal_type              ProposalType?
-  proposal_type_data         Json?
-  proposal_results           Json?
-  created_transaction_hash   String?       @db.VarChar(66)
-  cancelled_transaction_hash String?       @db.VarChar
-  executed_transaction_hash  String?       @db.VarChar
-
-  @@map("proposals_wrapper")
-  @@ignore
   @@schema("scroll")
 }
 
