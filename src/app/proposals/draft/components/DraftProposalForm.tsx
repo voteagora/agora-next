@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
-import DraftFormServer from "./stages/DraftForm/DraftFormServer";
+import DraftFormClient from "./stages/DraftForm/DraftFormClient";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
@@ -10,9 +10,11 @@ import CreatorAuthCheck from "./CreatorAuthCheck";
 export default function DraftProposalForm({
   stage,
   draftProposal,
+  proposalTypes,
 }: {
   stage: ProposalStage;
   draftProposal: DraftProposal;
+  proposalTypes: any[];
 }) {
   const renderStage = (stage: ProposalStage) => {
     switch (stage) {
@@ -21,7 +23,10 @@ export default function DraftProposalForm({
       case ProposalStage.DRAFTING:
         return (
           <Suspense fallback={"loading!"}>
-            <DraftFormServer draftProposal={draftProposal} />
+            <DraftFormClient
+              proposalTypes={proposalTypes}
+              draftProposal={draftProposal}
+            />
           </Suspense>
         );
       case ProposalStage.ADDING_GITHUB_PR:

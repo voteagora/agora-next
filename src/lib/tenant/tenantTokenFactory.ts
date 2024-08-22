@@ -37,6 +37,12 @@ export default class TenantTokenFactory {
           symbol: "cCYBER",
           decimals: 18,
         };
+      case TENANT_NAMESPACES.NEW_DAO:
+        return {
+          name: "NewDAO",
+          symbol: "NEWDAO",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
