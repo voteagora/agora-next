@@ -636,6 +636,9 @@ export async function getProposalStatus(
   if (proposal.cancelled_block) {
     return "CANCELLED";
   }
+  if (proposal.queued_block) {
+    return "QUEUED";
+  }
   if (proposal.executed_block) {
     return "EXECUTED";
   }
