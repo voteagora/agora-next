@@ -20,7 +20,6 @@ model DelegateStatements {
   createdAt DateTime? @default(now()) @map("created_at") @db.Date
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
   warpcast  String?
-  endorsed  Boolean   @default(false)
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -362,7 +361,6 @@ view OptimismProposals {
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?
-  queued_block               BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
@@ -371,7 +369,6 @@ view OptimismProposals {
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
   cancelled_transaction_hash String?      @db.VarChar
-  queued_transaction_hash    String?
   executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
@@ -535,16 +532,14 @@ view ensProposals {
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?
-  queued_block               BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
   proposal_type              ProposalType
   proposal_type_data         Json?
   proposal_results           Json?
-  created_transaction_hash   String?      @db.VarChar(66)
+  created_transaction_hash   String?      @db.VarChar
   cancelled_transaction_hash String?      @db.VarChar
-  queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
@@ -957,7 +952,6 @@ view uniswapProposals {
   start_block                String
   end_block                  String?
   cancelled_block            BigInt?
-  queued_block               BigInt?
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
@@ -966,7 +960,6 @@ view uniswapProposals {
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
   cancelled_transaction_hash String?      @db.VarChar
-  queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
   @@map("proposals")
@@ -1380,8 +1373,6 @@ view proposals_wrapper {
   created_transaction_hash   String?       @db.VarChar(66)
   cancelled_transaction_hash String?       @db.VarChar
   executed_transaction_hash  String?       @db.VarChar
-  queued_block               BigInt?
-  queued_transaction_hash    String?
 
   @@ignore
   @@schema("optimism")
