@@ -2,16 +2,11 @@
 
 import { useState, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import Link from "next/link";
 import { Changelog } from "@/app/api/common/changelogs/changelog";
-import { VStack, HStack } from "@/components/Layout/Stack";
 import ChangelogListEntry from "./ChangelogListEntry";
 import Image from "next/image";
 
-const ChangelogList = ({
-  initChangelog,
-  fetchChangelogForDAO,
-}: {
+interface ChangelogListProps {
   initChangelog: {
     data: Changelog[];
     meta: { has_next: boolean; next_offset: number };
@@ -23,6 +18,11 @@ const ChangelogList = ({
     data: Changelog[];
     meta: { has_next: boolean; next_offset: number };
   }>;
+}
+
+const ChangelogList: React.FC<ChangelogListProps> = ({
+  initChangelog,
+  fetchChangelogForDAO,
 }) => {
   const [changelogEntries, setChangelogEntries] = useState<Changelog[]>(
     initChangelog.data
@@ -72,13 +72,11 @@ const ChangelogList = ({
         pageStart={0}
         loadMore={loadMore}
         loader={
-          <div key={0}>
-            <HStack
-              key="loader"
-              className="gl_loader justify-center py-6 text-sm text-secondary"
-            >
-              Loading...
-            </HStack>
+          <div
+            key={0}
+            className="gl_loader flex flex-row justify-center py-6 text-sm text-secondary"
+          >
+            Loading...
           </div>
         }
         element="main"
