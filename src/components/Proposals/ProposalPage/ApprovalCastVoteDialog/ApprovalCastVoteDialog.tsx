@@ -1,6 +1,5 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import { AbiCoder } from "ethers";
 import { useMemo, useState } from "react";
 import {
@@ -14,9 +13,97 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
-import { MissingVote, getVpToDisplay } from "@/lib/voteUtils";
+import { getVpToDisplay } from "@/lib/voteUtils";
+import { useEnsName, useAccount } from "wagmi";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const abiCoder = new AbiCoder();
+
+export function ReviewApprovalVoteDialog({
+  selectedOptions,
+  options,
+  reason,
+  write,
+  votingPower,
+  onClose,
+}: {
+  selectedOptions: number[];
+  options: ParsedProposalData["APPROVAL"]["kind"]["options"];
+  reason: string;
+  write: () => void;
+  votingPower: string;
+  onClose: () => void;
+}) {
+  const { address } = useAccount();
+  const { data } = useEnsName({
+    chainId: 1,
+    address: address as `0x${string}`,
+  });
+
+  return (
+    <div>
+      <div className="flex flex-col">
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-col">
+            <span className="text-xs">
+              {data || truncateAddress(address as string)}
+            </span>
+            <p className="text-xl font-extrabold">
+              Casting vote for {selectedOptions.length} option
+              {selectedOptions.length > 1 && "s"}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs self-end">with</span>
+            <span className="mt-[2px]">
+              <TokenAmountDisplay amount={votingPower} />
+            </span>
+          </div>
+        </div>
+        <div className="border border-line rounded-lg p-4 space-y-4 mt-6">
+          {selectedOptions.map((optionId, index) => {
+            const option = options[optionId];
+            return (
+              <div
+                className="flex flex-row items-center justify-between relative"
+                key={`option-${index}`}
+              >
+                <p className="font-medium">{option.description}</p>
+                <div
+                  className={
+                    "border border-line bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
+                  }
+                >
+                  <CheckIcon className="w-4 h-4 text-neutral" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="line-clamp-5 overflow-hidden">
+          {!!reason ? (
+            <p className="mt-6 text-secondary">{reason}</p>
+          ) : (
+            <span className="border border-line p-4 mt-6 rounded-lg text-tertiary text-sm flex items-center justify-center">
+              <p>No reason given</p>
+            </span>
+          )}
+        </div>
+        <Button
+          onClick={() => {
+            write();
+            onClose();
+          }}
+          className="mt-6"
+        >
+          Vote for {selectedOptions.length} option
+          {selectedOptions.length > 1 && "s"} with{"\u00A0"}
+          {<TokenAmountDisplay amount={votingPower} />}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function ApprovalCastVoteDialog({
   proposal,
@@ -26,11 +113,12 @@ export function ApprovalCastVoteDialog({
   authorityChains,
   missingVote,
 }: ApprovalCastVoteDialogProps) {
+  const [inReviewStep, setInReviewStep] = useState<boolean>(false);
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState<string>("");
-  const [abstain, setAbstain] = useState<boolean>(true);
+  const [abstain, setAbstain] = useState<boolean>(false);
   const [encodedParams, setEncodedParams] = useState<`0x${string}`>("0x");
   const maxChecked = proposalData.proposalSettings.maxApprovals;
   const abstainOptionId = proposalData.options.length; // Abstain option is always last
@@ -38,7 +126,9 @@ export function ApprovalCastVoteDialog({
   const handleOnChange = (optionId: number) => {
     if (optionId === abstainOptionId) {
       if (abstain) {
-        setSelectedOptions([proposalData.options.length - 1]);
+        setSelectedOptions((prev) =>
+          prev.filter((value) => value !== optionId)
+        );
       } else {
         setSelectedOptions([]);
       }
@@ -49,9 +139,9 @@ export function ApprovalCastVoteDialog({
           prev.filter((value) => value !== optionId)
         );
 
-        if (selectedOptions.length === 1) {
-          setAbstain(true);
-        }
+        // if (selectedOptions.length === 1) {
+        //   setAbstain(true);
+        // }
       } else if (selectedOptions.length < maxChecked) {
         setAbstain(false);
         setSelectedOptions((prev) => [...prev, optionId]);
@@ -83,6 +173,21 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
+  if (inReviewStep) {
+    return (
+      <ReviewApprovalVoteDialog
+        selectedOptions={selectedOptions}
+        options={proposalData.options}
+        reason={reason}
+        write={write}
+        votingPower={vpToDisplay}
+        onClose={() => {
+          setInReviewStep(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div style={{ transformStyle: "preserve-3d" }}>
       {hasStatement && isLoading && <LoadingVote />}
@@ -93,16 +198,16 @@ export function ApprovalCastVoteDialog({
       {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (
         <>
-          <VStack gap={3}>
-            <VStack>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               <p className="text-xl font-extrabold">
                 Select up to {maxChecked} option{maxChecked > 1 && "s"}
               </p>
               <p className="text-secondary mt-1">
                 Your vote is final and cannot be edited once submitted.
               </p>
-            </VStack>
-            <VStack className="max-h-[46vh] overflow-y-scroll">
+            </div>
+            <div className="flex flex-col max-h-[46vh] overflow-y-scroll">
               {proposalData.options.map((option, index) => (
                 <CheckCard
                   key={index}
@@ -139,16 +244,19 @@ export function ApprovalCastVoteDialog({
                 onClick={() => handleOnChange(abstainOptionId)}
                 abstain={abstain}
               />
-            </VStack>
+            </div>
             <CastVoteWithReason
-              onVoteClick={write}
+              //   onVoteClick={write}
+              onVoteClick={() => {
+                setInReviewStep(true);
+              }}
               reason={reason}
               setReason={setReason}
               numberOfOptions={selectedOptions.length}
               abstain={abstain}
               votingPower={vpToDisplay}
             />
-          </VStack>
+          </div>
         </>
       )}
     </div>
@@ -173,14 +281,14 @@ function CastVoteWithReason({
   copy?: string;
 }) {
   return (
-    <VStack gap={4}>
+    <div className="flex flex-col gap-4">
       <textarea
         className="p-4 resize-none rounded-lg bg-line border-line transition-all"
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
       />
-      <VStack justifyContent="justify-between" alignItems="items-stretch">
+      <div className="flex flex-col justify-between items-stretch">
         {!abstain && numberOfOptions > 0 && (
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
@@ -195,7 +303,7 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             {!copy ? (
               <>
-                Vote for no options with{"\u00A0"}
+                Abstain from voting with{"\u00A0"}
                 <TokenAmountDisplay amount={votingPower} />
               </>
             ) : (
@@ -203,8 +311,8 @@ function CastVoteWithReason({
             )}
           </Button>
         )}
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }
 

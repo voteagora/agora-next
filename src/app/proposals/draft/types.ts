@@ -230,12 +230,12 @@ export type BaseProposal = ProposalDraft & {
 };
 
 export type BasicProposal = BaseProposal & {
-  proposal_type: ProposalType.BASIC;
+  voting_module_type: ProposalType.BASIC;
   transactions: ProposalDraftTransaction[];
 };
 
 export type SocialProposal = BaseProposal & {
-  proposal_type: ProposalType.SOCIAL;
+  voting_module_type: ProposalType.SOCIAL;
   end_date_social: Date;
   start_date_social: Date;
   proposal_social_type: SocialProposalType;
@@ -243,7 +243,7 @@ export type SocialProposal = BaseProposal & {
 };
 
 export type ApprovalProposal = BaseProposal & {
-  proposal_type: ProposalType.APPROVAL;
+  voting_module_type: ProposalType.APPROVAL;
   budget: string;
   criteria: ApprovalProposalType;
   max_options: number;
@@ -258,7 +258,7 @@ type ApprovalProposalOption = {
 };
 
 export type OptimisticProposal = BaseProposal & {
-  proposal_type: ProposalType.OPTIMISTIC;
+  voting_module_type: ProposalType.OPTIMISTIC;
 };
 
 export type DraftProposal =
@@ -303,7 +303,7 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 };
 // Used to translate a draftProposal database record into its form representation
 export const parseProposalToForm = (proposal: DraftProposal) => {
-  switch (proposal.proposal_type) {
+  switch (proposal.voting_module_type) {
     case ProposalType.BASIC:
       return {
         type: ProposalType.BASIC,

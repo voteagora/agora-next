@@ -63,7 +63,7 @@ const DraftPreview = ({
   const canAddressSponsor = canSponsor();
 
   const renderProposalDescription = (proposal: DraftProposal) => {
-    switch (proposal.proposal_type) {
+    switch (proposal.voting_module_type) {
       case ProposalType.BASIC:
         return (
           <p className="text-agora-stone-700 mt-2">
@@ -129,7 +129,7 @@ const DraftPreview = ({
               />
             )}
         </div>
-        {proposalDraft.proposal_type === "social" && (
+        {proposalDraft.voting_module_type === "social" && (
           <div>
             <h3 className="font-semibold mt-6">Voting strategy</h3>
             <p className="text-agora-stone-700 mt-2">

@@ -18,7 +18,7 @@ const filterMap = {
 async function getProjectsApi({
   pagination,
   round,
-  category,
+  category = "all",
 }: {
   pagination: PaginationParams;
   round?: string;
@@ -26,7 +26,7 @@ async function getProjectsApi({
 }): Promise<PaginatedResult<Project[]>> {
   if (round === "5") {
     const projects = mockProjectsR5.filter((project) => {
-      return !category || project.category === filterMap[category];
+      return !filterMap[category] || project.category === filterMap[category];
     });
 
     return {
@@ -112,4 +112,59 @@ async function getProjectsApi({
   };
 }
 
+async function getProjectApi({
+  projectId,
+  round,
+}: {
+  round: string;
+  projectId: string;
+}) {
+  if (round === "5") {
+    const project = mockProjectsR5.find((project) => project.id === projectId);
+
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    return project;
+  }
+
+  const project = await prisma.projects.findUnique({
+    where: {
+      project_id: projectId,
+    },
+  });
+
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  return {
+    id: project.project_id,
+    category: project.category,
+    organization: null,
+    name: project.name,
+    description: project.description,
+    profileAvatarUrl: project.project_avatar_url,
+    projectCoverImageUrl: project.project_cover_image_url,
+    socialLinks: {
+      twitter: project.social_links_twitter,
+      farcaster: project.social_links_farcaster,
+      mirror: project.social_links_mirror,
+      website: project.social_links_website,
+    },
+    team: project.team,
+    github: project.github,
+    packages: project.packages,
+    links: [],
+    contracts: project.contracts,
+    grantsAndFunding: {
+      ventureFunding: project.grants_and_funding_venture_funding,
+      grants: project.grants_and_funding_grants,
+      revenue: project.grants_and_funding_revenue,
+    },
+  };
+}
+
 export const fetchProjectsApi = cache(getProjectsApi);
+export const fetchProjectApi = cache(getProjectApi);

@@ -157,18 +157,12 @@ const DraftFormClient = ({
                   control={control}
                   label="Proposal type"
                   required={true}
-                  //   options={validProposalTypes.map((typeConfig) => {
-                  //     return {
-                  //       label: typeConfig.name,
-                  //       value: typeConfig.proposal_type_id,
-                  //     };
-                  //   })}
-                  options={[
-                    {
-                      label: "default",
-                      value: "0",
-                    },
-                  ]}
+                  options={validProposalTypes.map((typeConfig) => {
+                    return {
+                      label: typeConfig.name,
+                      value: typeConfig.proposal_type_id,
+                    };
+                  })}
                   name="proposalConfigType"
                   emptyCopy="Default"
                 />
