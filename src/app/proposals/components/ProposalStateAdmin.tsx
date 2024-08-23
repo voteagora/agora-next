@@ -59,13 +59,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
       case PROPOSAL_STATUS.ACTIVE:
       case PROPOSAL_STATUS.PENDING:
-        return (
-          <>
-            <ProposalCancelButton proposal={proposal} />
-            {/*TODO: Remove execute button */}
-            <ProposalExecuteButton proposal={proposal} />
-          </>
-        );
+        return <ProposalCancelButton proposal={proposal} />;
 
       case PROPOSAL_STATUS.QUEUED:
         return <ProposalExecuteButton proposal={proposal} />;

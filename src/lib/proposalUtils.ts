@@ -225,6 +225,12 @@ export async function parseProposal(
         : latestBlock && proposal.executed_block
           ? getHumanBlockTime(proposal.executed_block, latestBlock)
           : null,
+    queuedTime:
+      proposalData.key === "SNAPSHOT"
+        ? null
+        : latestBlock && proposal.queued_block
+          ? getHumanBlockTime(proposal.queued_block, latestBlock)
+          : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
@@ -636,11 +642,12 @@ export async function getProposalStatus(
   if (proposal.cancelled_block) {
     return "CANCELLED";
   }
-  if (proposal.queued_block) {
-    return "QUEUED";
-  }
   if (proposal.executed_block) {
     return "EXECUTED";
+  }
+
+  if (proposal.queued_block) {
+    return "QUEUED";
   }
 
   if (
