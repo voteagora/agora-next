@@ -39,7 +39,6 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
 
   let canExecute = false;
   const delayInSeconds = blocksToSeconds(Number(executionDelayInBlocks));
-  // const delayInSeconds = 86400;
 
   if (proposal.queuedTime) {
     const queuedTimeInSeconds = Math.floor(
