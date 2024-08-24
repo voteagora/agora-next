@@ -45,7 +45,6 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
       (proposal.queuedTime as Date).getTime() / 1000
     );
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-
     canExecute = currentTimeInSeconds >= queuedTimeInSeconds + delayInSeconds;
   }
 
