@@ -19,8 +19,8 @@ export function getSecondsPerBlock(): number {
 
     case 534352: // Scroll
       return 3;
-    case 7560: // Cyber Mainnet
 
+    case 7560: // Cyber Mainnet
     case 111557560: // Cyber Testnet
       return 2;
 

@@ -14,10 +14,10 @@ import toast from "react-hot-toast";
 import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
+  Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  Tooltip,
 } from "@/components/ui/tooltip";
 
 interface Props {
@@ -39,13 +39,15 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
 
   let canExecute = false;
   const delayInSeconds = blocksToSeconds(Number(executionDelayInBlocks));
+  let executeTimeInSeconds = 0;
 
   if (proposal.queuedTime) {
     const queuedTimeInSeconds = Math.floor(
       (proposal.queuedTime as Date).getTime() / 1000
     );
+    executeTimeInSeconds = queuedTimeInSeconds + delayInSeconds;
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-    canExecute = currentTimeInSeconds >= queuedTimeInSeconds + delayInSeconds;
+    canExecute = currentTimeInSeconds >= executeTimeInSeconds;
   }
 
   const { data, write } = useContractWrite({
@@ -102,7 +104,10 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
           )}
           <TooltipContent>
             <div className="flex flex-col gap-1 p-2">
-              <div>This proposal can be executed after a 24hr delay.</div>
+              <div>
+                This proposal can be executed on{" "}
+                {new Date(executeTimeInSeconds * 1000).toLocaleString()}
+              </div>
             </div>
           </TooltipContent>
         </Tooltip>
