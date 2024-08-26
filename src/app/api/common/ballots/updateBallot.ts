@@ -2,6 +2,7 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import prisma from "@/app/lib/prisma";
 import { fetchBallot } from "./getBallots";
+import { autobalanceAllocations } from "./autobalance";
 
 type BallotContent = {
   metric_id: string;
@@ -68,7 +69,7 @@ async function updateBallotMetricForAddress({
     },
   });
 
-  await autobalanceAllocations(address, roundId, data.metric_id);
+  await autobalanceMetricsAllocations(address, roundId, data.metric_id);
 
   // Return full ballot
   return fetchBallot(roundId, address);
@@ -101,60 +102,49 @@ async function deleteBallotMetricForAddress({
     },
   });
 
-  await autobalanceAllocations(address, roundId, metricId);
+  await autobalanceMetricsAllocations(address, roundId, metricId);
 
   return fetchBallot(roundId, address);
 }
 
-async function autobalanceAllocations(
+async function autobalanceMetricsAllocations(
   address: string,
   roundId: number,
   metricToSkip: string
 ) {
-  const allocations = await prisma.allocations.findMany({
-    where: {
-      address,
-      round: roundId,
-    },
+  const allocations = (
+    await prisma.allocations.findMany({
+      where: {
+        address,
+        round: roundId,
+      },
+    })
+  ).map((allocation) => ({
+    ...allocation,
+    id: allocation.metric_id,
+    locked: allocation.locked || false,
+  }));
+
+  const autobalancedAllocations = autobalanceAllocations({
+    allocations,
+    idToSkip: metricToSkip,
   });
 
-  const [amountToBalance, totalUnlocked] = allocations.reduce(
-    (acc, allocation) => {
-      acc[0] -=
-        allocation.locked || allocation.metric_id === metricToSkip
-          ? Number(allocation.allocation.toFixed(2))
-          : 0;
-      return [
-        acc[0] < 0 ? 0 : acc[0],
-        acc[1] +
-          (allocation.locked || allocation.metric_id === metricToSkip
-            ? 0
-            : Number(allocation.allocation.toFixed(2))),
-      ];
-    },
-    [100, 0]
-  );
-
   await Promise.all(
-    allocations.map(async (allocation) => {
-      if (!allocation.locked && allocation.metric_id !== metricToSkip) {
-        await prisma.allocations.update({
-          where: {
-            address_round_metric_id: {
-              metric_id: allocation.metric_id,
-              round: roundId,
-              address,
-            },
+    autobalancedAllocations.map(async (allocation) => {
+      await prisma.allocations.update({
+        where: {
+          address_round_metric_id: {
+            metric_id: allocation.id,
+            address,
+            round: roundId,
           },
-          data: {
-            ...allocation,
-            allocation: totalUnlocked
-              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
-                amountToBalance
-              : 0,
-          },
-        });
-      }
+        },
+        data: {
+          allocation: allocation.allocation,
+          locked: allocation.locked,
+        },
+      });
     })
   );
 }

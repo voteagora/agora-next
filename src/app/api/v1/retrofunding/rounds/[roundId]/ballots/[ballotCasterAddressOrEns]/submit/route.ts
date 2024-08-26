@@ -4,18 +4,29 @@ import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
 import { fetchIsCitizen } from "@/app/api/common/citizens/isCitizen";
 
-const ballotContentSchema = z.object({
+const r4BallotContentSchema = z.object({
   allocations: z.array(z.record(z.string(), z.number())),
   os_only: z.boolean(),
   os_multiplier: z.number(),
 });
 
-const ballotSubmissionSchema = z.object({
-  ballot_content: ballotContentSchema,
+const r5BallotContentSchema = z.object({
+  project_allocations: z.array(z.record(z.string(), z.number())),
+  category_allocations: z.array(z.record(z.string(), z.number())),
+});
+
+const r4BallotSubmissionSchema = z.object({
+  ballot_content: r4BallotContentSchema,
   signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
 });
 
-export type BallotSubmission = z.infer<typeof ballotSubmissionSchema>;
+const r5BallotSubmissionSchema = z.object({
+  ballot_content: r5BallotContentSchema,
+  signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
+});
+
+export type R4BallotSubmission = z.infer<typeof r4BallotSubmissionSchema>;
+export type R5BallotSubmission = z.infer<typeof r5BallotSubmissionSchema>;
 
 export async function POST(
   request: NextRequest,
@@ -31,9 +42,11 @@ export async function POST(
     });
   }
 
-  return new Response("Ballot submission for Round 4 is closed", {
-    status: 403,
-  });
+  if (route.params.roundId === "4") {
+    return new Response("Ballot submission for Round 4 is closed", {
+      status: 403,
+    });
+  }
 
   return await traceWithUserId(
     route.params.ballotCasterAddressOrEns as string,
@@ -41,8 +54,11 @@ export async function POST(
       const { roundId, ballotCasterAddressOrEns } = route.params;
       try {
         const payload = await request.json();
-        const parsedPayload = ballotSubmissionSchema.parse(payload);
 
+        const parsedPayload =
+          roundId === "5"
+            ? r5BallotSubmissionSchema.parse(payload)
+            : r4BallotSubmissionSchema.parse(payload);
         const ballot = await submitBallot(
           parsedPayload,
           Number(roundId),
