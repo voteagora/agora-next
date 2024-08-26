@@ -2,10 +2,13 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import prisma from "@/app/lib/prisma";
-import { BallotSubmission } from "../../v1/retrofunding/rounds/[roundId]/ballots/[ballotCasterAddressOrEns]/submit/route";
+import {
+  R4BallotSubmission,
+  R5BallotSubmission,
+} from "../../v1/retrofunding/rounds/[roundId]/ballots/[ballotCasterAddressOrEns]/submit/route";
 
 const submitBallotApi = async (
-  data: BallotSubmission,
+  data: R4BallotSubmission | R5BallotSubmission,
   roundId: number,
   ballotCasterAddressOrEns: string
 ) =>
@@ -19,7 +22,7 @@ async function submitBallotForAddress({
   roundId,
   address,
 }: {
-  data: BallotSubmission;
+  data: R4BallotSubmission | R5BallotSubmission;
   roundId: number;
   address: string;
 }) {
