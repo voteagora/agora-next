@@ -137,13 +137,16 @@ model chain {
 }
 
 model Ballots {
-  address       String        @db.VarChar(255)
-  round         Int
-  os_only       Boolean       @default(false)
-  os_multiplier Float         @default(1)
-  created_at    DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime      @default(now()) @db.Timestamptz(6)
-  allocations   allocations[]
+  address            String               @db.VarChar(255)
+  round              Int
+  os_only            Boolean              @default(false)
+  os_multiplier      Float                @default(1)
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
+
+  allocations        allocations[]
+  project_allocations ProjectAllocations[]
+  category_allocations CategoryAllocations[]
 
   @@id([address, round])
   @@map("ballots")
@@ -162,6 +165,54 @@ model allocations {
   metrics_data metrics_data @relation(fields: [metric_id], references: [metric_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([address, round, metric_id])
+  @@schema("retro_funding")
+}
+
+model ProjectAllocations {
+  address       String        @db.VarChar(255)
+  round         Int
+  project_id    String        @db.VarChar(255)
+  allocation    Decimal?
+  locked        Boolean       @default(false)
+  rank          Int
+  impact        Int           @default(0)
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime      @default(now()) @db.Timestamptz(6)
+  ballots       Ballots       @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+  projects_data projects_data @relation(fields: [project_id], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([address, round, project_id])
+  @@map("project_allocations")
+  @@schema("retro_funding")
+}
+
+model Categories {
+  slug        String   @id
+  name        String   
+  description String?  
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  category_allocations CategoryAllocations[]
+
+  @@map("categories")
+  @@schema("retro_funding")
+}
+
+model CategoryAllocations {
+  address       String
+  round         Int
+  category_slug String
+  allocation    Decimal
+  locked        Boolean  @default(false)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  categories  Categories @relation(fields: [category_slug], references: [slug], onDelete: Cascade, onUpdate: NoAction)
+  ballots     Ballots   @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([category_slug, address, round])
+  @@map("category_allocations")
   @@schema("retro_funding")
 }
 
@@ -240,10 +291,11 @@ model metrics_views {
 }
 
 model projects_data {
-  project_id       String             @id @db.VarChar
-  project_name     String             @db.VarChar
-  project_image    String?            @db.VarChar
-  metrics_projects metrics_projects[]
+  project_id         String               @id @db.VarChar
+  project_name       String               @db.VarChar
+  project_image      String?              @db.VarChar
+  metrics_projects   metrics_projects[]
+  ProjectAllocations ProjectAllocations[]
 
   @@schema("retro_funding")
 }
