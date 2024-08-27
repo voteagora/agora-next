@@ -90,30 +90,36 @@ export default function ProposalsList({
       )}
       <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
-          <InfiniteScroll
-            hasMore={meta.has_next}
-            pageStart={0}
-            loadMore={loadMore}
-            loader={
-              <div key={0}>
-                <HStack
-                  key="loader"
-                  className="gl_loader justify-center py-6 text-sm text-secondary"
-                >
-                  Loading...
-                </HStack>
-              </div>
-            }
-            element="main"
-          >
-            {proposals.map((proposal) => (
-              <Proposal
-                key={`${proposal.id}_${proposal.status}`}
-                proposal={proposal}
-                votableSupply={votableSupply}
-              />
-            ))}
-          </InfiniteScroll>
+          {proposals.length === 0 ? (
+            <div className="flex flex-row justify-center py-8 text-secondary">
+              No proposals currently
+            </div>
+          ) : (
+            <InfiniteScroll
+              hasMore={meta.has_next}
+              pageStart={0}
+              loadMore={loadMore}
+              loader={
+                <div key={0}>
+                  <HStack
+                    key="loader"
+                    className="gl_loader justify-center py-6 text-sm text-secondary"
+                  >
+                    Loading...
+                  </HStack>
+                </div>
+              }
+              element="main"
+            >
+              {proposals.map((proposal) => (
+                <Proposal
+                  key={`${proposal.id}_${proposal.status}`}
+                  proposal={proposal}
+                  votableSupply={votableSupply}
+                />
+              ))}
+            </InfiniteScroll>
+          )}
         </div>
       </VStack>
     </VStack>
