@@ -1,7 +1,7 @@
 import { paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { Ballots, Prisma, projects_data } from "@prisma/client";
+import { Ballots, Prisma, MockProjects } from "@prisma/client";
 import { Ballot } from "./ballot";
 import prisma from "@/app/lib/prisma";
 import { calculateAllocations } from "./ballotAllocations";
@@ -109,11 +109,11 @@ async function getR5Ballot({
         },
       },
     }),
-    prisma.$queryRaw<projects_data[]>`
+    prisma.$queryRaw<MockProjects[]>`
       SELECT 
         *
       FROM 
-        retro_funding.projects_data
+        retro_funding.mock_projects
       ORDER BY RANDOM();
     `,
   ]);
@@ -125,7 +125,7 @@ async function getR5Ballot({
       status: "NOT STARTED",
       project_allocations: [],
       category_allocations: [],
-      projects_to_be_evaluated: projects.map((project) => project.project_id),
+      projects_to_be_evaluated: projects.map((project) => project.id),
       total_projects: projects.length,
     };
   }
@@ -141,10 +141,10 @@ async function getR5Ballot({
         .filter(
           (project) =>
             !ballot.project_allocations.some(
-              (allocation) => allocation.project_id === project.project_id
+              (allocation) => allocation.project_id === project.id
             )
         )
-        .map((project) => project.project_id),
+        .map((project) => project.id),
       total_projects: projects.length,
     };
   }
@@ -167,8 +167,8 @@ function parseProjectAllocations(
 ) {
   return allocations.map((allocation, i) => ({
     project_id: allocation.project_id,
-    name: allocation.projects_data.project_name,
-    image: allocation.projects_data.project_image,
+    name: allocation.projects_data.name,
+    image: allocation.projects_data.description,
     position: i,
     allocation: allocation.allocation,
     impact: allocation.impact,

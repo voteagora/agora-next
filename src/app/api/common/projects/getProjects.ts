@@ -6,7 +6,6 @@ import {
 import { cache } from "react";
 import prisma from "@/app/lib/prisma";
 import { Project } from "./project";
-import { mockProjectsR5 } from "./mockProjectsR5";
 
 const filterMap = {
   all: null,
@@ -25,9 +24,13 @@ async function getProjectsApi({
   category?: keyof typeof filterMap;
 }): Promise<PaginatedResult<Project[]>> {
   if (round === "5") {
-    const projects = mockProjectsR5.filter((project) => {
-      return !filterMap[category] || project.category === filterMap[category];
-    });
+    const projects = filterMap[category]
+      ? await prisma.mockProjects.findMany({
+          where: {
+            category_slug: filterMap[category] as string,
+          },
+        })
+      : await prisma.mockProjects.findMany();
 
     return {
       meta: {
@@ -35,7 +38,18 @@ async function getProjectsApi({
         total_returned: projects.length,
         next_offset: projects.length,
       },
-      data: projects,
+      data: projects.map((project) => ({
+        ...project,
+        project_id: project.id,
+        category: project.category_slug,
+        organization: project.organization as any,
+        socialLinks: project.socialLinks as any,
+        team: project.team as any,
+        github: project.github as any,
+        packages: project.packages as any,
+        contracts: project.contracts as any,
+        grantsAndFunding: project.grantsAndFunding as any,
+      })),
     };
   }
 
@@ -120,7 +134,11 @@ async function getProjectApi({
   projectId: string;
 }) {
   if (round === "5") {
-    const project = mockProjectsR5.find((project) => project.id === projectId);
+    const project = await prisma.mockProjects.findUnique({
+      where: {
+        id: projectId,
+      },
+    });
 
     if (!project) {
       throw new Error("Project not found");
