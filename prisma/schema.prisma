@@ -179,7 +179,7 @@ model ProjectAllocations {
   created_at    DateTime      @default(now()) @db.Timestamptz(6)
   updated_at    DateTime      @default(now()) @db.Timestamptz(6)
   ballots       Ballots       @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
-  projects_data projects_data @relation(fields: [project_id], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
+  projects_data MockProjects @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([address, round, project_id])
   @@map("project_allocations")
@@ -194,6 +194,7 @@ model Categories {
   updated_at  DateTime @default(now()) @db.Timestamptz(6)
 
   category_allocations CategoryAllocations[]
+  mock_projects        MockProjects[]
 
   @@map("categories")
   @@schema("retro_funding")
@@ -295,8 +296,33 @@ model projects_data {
   project_name       String               @db.VarChar
   project_image      String?              @db.VarChar
   metrics_projects   metrics_projects[]
+
+  @@schema("retro_funding")
+}
+
+model MockProjects {
+  id                      String   @id
+  category_slug           String
+  name                    String
+  description             String?
+  profileAvatarUrl        String? @map("profile_avatar_url")
+  projectCoverImageUrl    String? @map("project_cover_image_url")
+  socialLinks             Json?   @map("social_links")
+  team                    String[]
+  github                  Json
+  packages                Json
+  contracts               Json
+  grantsAndFunding        Json  @map("grants_and_funding")
+  organization            Json?
+  links                   String[]
+  impactStatement         Json @map("impact_statement")
+  pricingModel            Json @map("pricing_model")
+
+  category Categories @relation(fields: [category_slug], references: [slug], onDelete: NoAction, onUpdate: NoAction)
+  
   ProjectAllocations ProjectAllocations[]
 
+  @@map("mock_projects")
   @@schema("retro_funding")
 }
 
