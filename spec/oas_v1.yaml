@@ -1457,14 +1457,14 @@ components:
         type: string
     allocationParam:
       name: allocation
-      in: query
+      in: path
       description: The allocation to be set in percentage
       required: true
       schema:
         type: string
     impactParam:
       name: impact
-      in: query
+      in: path
       description: The impact of the project on the ecosystem
       required: true
       schema:
@@ -1473,7 +1473,7 @@ components:
         maximum: 5
     positionParam:
       name: position
-      in: query
+      in: path
       description: The position of the project on the ballot
       required: true
       schema:
