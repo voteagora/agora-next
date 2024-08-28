@@ -308,7 +308,7 @@ model MockProjects {
   profileAvatarUrl        String? @map("profile_avatar_url")
   projectCoverImageUrl    String? @map("project_cover_image_url")
   socialLinks             Json?   @map("social_links")
-  team                    String[]
+  team                    Json
   github                  Json
   packages                Json
   contracts               Json
