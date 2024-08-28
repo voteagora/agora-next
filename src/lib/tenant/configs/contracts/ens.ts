@@ -36,7 +36,7 @@ export const ensTenantContractConfig = ({
     token: new TenantContract<ITokenContract>({
       abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain: mainnet,
+      chain: chain,
       contract: ERC20__factory.connect(TOKEN, provider),
       provider,
     }),

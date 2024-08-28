@@ -66,7 +66,7 @@ export async function createSnapshot({
 }) {
   const tenant = Tenant.current();
   const walletClient = getWalletClient(tenant.contracts.token.chain.id);
-  const publicClient = getPublicClient(tenant.contracts.token.chain.id);
+  const publicClient = getPublicClient(1);
 
   if (!address) {
     throw new Error("address not available");
