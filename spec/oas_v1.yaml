@@ -1286,11 +1286,11 @@ components:
         published_at:
           type: string
           format: date-time
-        catgory_allocation:
+        category_allocations:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallotCategoriesAllocation"
-        projects_allocation:
+        projects_allocations:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallot5ProjectsAllocation"
