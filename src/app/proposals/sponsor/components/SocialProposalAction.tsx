@@ -49,7 +49,9 @@ const SocialProposalAction = ({
             type: "SPONSOR_SNAPSHOT_DRAFT_PROPOSAL",
             params: { redirectUrl: "/", snapshotLink },
           });
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
       }}
     >
       Submit proposal
