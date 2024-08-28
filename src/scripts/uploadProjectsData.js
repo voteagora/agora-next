@@ -17,7 +17,148 @@ const projects = [
       mirror: null,
       website: ["https://cryptopaws.io"],
     },
-    team: ["57293", "12893"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/cryptopaws/contracts": {
@@ -89,7 +230,148 @@ const projects = [
       mirror: null,
       website: ["https://pixelverse.art"],
     },
-    team: ["48293", "23948"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/pixelverse/contracts": {
@@ -145,6 +427,24 @@ const projects = [
       profileAvatarUrl: "",
     },
     links: ["https://pixelverse.org", "https://nftworlds.com/pixelverse"],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x3a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
@@ -161,7 +461,148 @@ const projects = [
       mirror: null,
       website: ["https://metacollective.org"],
     },
-    team: ["73948", "39482"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/metacollective/contracts": {
@@ -220,6 +661,24 @@ const projects = [
       "https://metaverse.com/metacollective",
       "https://decentralized.org/metacollective",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
@@ -235,7 +694,148 @@ const projects = [
       mirror: null,
       website: ["https://battlecraft.io"],
     },
-    team: ["59284", "94837"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/battlecraft/contracts": {
@@ -290,6 +890,24 @@ const projects = [
       profileAvatarUrl: "",
     },
     links: ["https://battlecraftgame.com", "https://gamershub.com/battlecraft"],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a",
@@ -306,7 +924,148 @@ const projects = [
       mirror: null,
       website: ["https://chatterbox.app"],
     },
-    team: ["48293", "83947"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/chatterbox/contracts": {
@@ -365,6 +1124,24 @@ const projects = [
       "https://chatworld.com/chatterbox",
       "https://technews.com/chatterbox",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
@@ -381,7 +1158,148 @@ const projects = [
       mirror: null,
       website: ["https://artify.io"],
     },
-    team: ["29384", "58392"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/artify/contracts": {
@@ -439,6 +1357,24 @@ const projects = [
       "https://artworld.com/artify",
       "https://creativespotlight.com/artify",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x7a8b9c0d1e2f3a4b5c6d7e8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c",
@@ -456,7 +1392,148 @@ const projects = [
       mirror: null,
       website: ["https://tokentrust.org"],
     },
-    team: ["39485", "28476"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/tokentrust/contracts": {
@@ -514,6 +1591,24 @@ const projects = [
       "https://financetrust.com/tokentrust",
       "https://auditblock.org/tokentrust",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d",
@@ -531,7 +1626,148 @@ const projects = [
       mirror: null,
       website: ["https://educhain.io"],
     },
-    team: ["58392", "27483"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/educhain/contracts": {
@@ -590,6 +1826,24 @@ const projects = [
       "https://blocklearn.com/educhain",
       "https://edtechnews.com/educhain",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0x9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e",
@@ -607,7 +1861,148 @@ const projects = [
       mirror: null,
       website: ["https://chaintrace.io"],
     },
-    team: ["39572", "58472"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/chaintrace/contracts": {
@@ -666,6 +2061,24 @@ const projects = [
       "https://traceblock.com/chaintrace",
       "https://logisticsnews.com/chaintrace",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c",
@@ -683,7 +2096,148 @@ const projects = [
       mirror: null,
       website: ["https://medilink.io"],
     },
-    team: ["29485", "37492"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/medilink/contracts": {
@@ -739,6 +2293,24 @@ const projects = [
       profileAvatarUrl: "",
     },
     links: ["https://healthchain.com/medilink", "https://mednews.com/medilink"],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xb2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d",
@@ -756,7 +2328,148 @@ const projects = [
       mirror: null,
       website: ["https://insurechain.io"],
     },
-    team: ["38594", "29485"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/insurechain/contracts": {
@@ -815,6 +2528,24 @@ const projects = [
       "https://blockinsurance.com/insurechain",
       "https://techinsure.com/insurechain",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xc3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e",
@@ -832,7 +2563,148 @@ const projects = [
       mirror: null,
       website: ["https://propchain.io"],
     },
-    team: ["39485", "58473"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/propchain/contracts": {
@@ -891,6 +2763,24 @@ const projects = [
       "https://realestateblock.com/propchain",
       "https://propertynews.com/propchain",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
@@ -908,7 +2798,148 @@ const projects = [
       mirror: null,
       website: ["https://votechain.io"],
     },
-    team: ["29485", "39572"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/votechain/contracts": {
@@ -963,6 +2994,24 @@ const projects = [
       "https://govblock.com/votechain",
       "https://democracytech.com/votechain",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xe5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a",
@@ -980,7 +3029,148 @@ const projects = [
       mirror: null,
       website: ["https://energyweb.io"],
     },
-    team: ["48392", "29485"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/energyweb/contracts": {
@@ -1036,6 +3226,24 @@ const projects = [
       "https://powerblock.com/energyweb",
       "https://energynews.com/energyweb",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xf6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
@@ -1053,7 +3261,148 @@ const projects = [
       mirror: null,
       website: ["https://idenchain.io"],
     },
-    team: ["39485", "58473"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/idenchain/contracts": {
@@ -1110,6 +3459,24 @@ const projects = [
       "https://identityblock.com/idenchain",
       "https://techidentity.com/idenchain",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xa8b9c0d1e2f3a4b5c6d7e8a9d0e1f2c3b4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f",
@@ -1127,7 +3494,148 @@ const projects = [
       mirror: null,
       website: ["https://logichain.io"],
     },
-    team: ["29485", "48572"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/logichain/contracts": {
@@ -1184,6 +3692,24 @@ const projects = [
       "https://supplyblock.com/logichain",
       "https://logisticnews.com/logichain",
     ],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
   {
     id: "0xb9c0d1e2f3a4b5c6d7e8a9d0e1f2c3b4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
@@ -1201,7 +3727,148 @@ const projects = [
       mirror: null,
       website: ["https://iotchain.io"],
     },
-    team: ["39485", "29485"],
+    team: [
+      {
+        id: "62478f78-127b-49cd-baea-cba370470bbc",
+        name: "Jonas",
+        username: "jonassft",
+        farcasterId: "191212",
+        imageUrl: "https://i.imgur.com/aITPyu3.jpg",
+        bio: "Contributing to RetroPGF @ Optimism",
+        email: "d",
+        emailVerified: false,
+        github: "JSeiferth",
+        notDeveloper: false,
+        createdAt: "2024-05-22T19:20:11.991Z",
+        updatedAt: "2024-08-23T09:35:29.486Z",
+        deletedAt: null,
+        object: "user",
+        fid: 191212,
+        custody_address: "0x29d417f4456d1ba69dcdcef6b86dc5a5b727ec50",
+        display_name: "Jonas",
+        pfp_url: "https://i.imgur.com/aITPyu3.jpg",
+        profile: {
+          bio: {
+            text: "Contributing to RetroPGF @ Optimism",
+          },
+        },
+        follower_count: 305,
+        following_count: 90,
+        verifications: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+        verified_addresses: {
+          eth_addresses: ["0x4a6894dd556fab996f8d50b521f900caeedc168e"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "99b1cf9e-3e97-46f8-8ea4-875add11c274",
+        name: "Stepan",
+        username: "arsent",
+        farcasterId: "17905",
+        imageUrl: "https://i.imgur.com/c2Oz6SX.png",
+        bio: "engineer @ agora.xyz",
+        email: "stepan@voteagora.com",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-24T14:24:09.067Z",
+        updatedAt: "2024-08-23T22:39:00.633Z",
+        deletedAt: null,
+        object: "user",
+        fid: 17905,
+        custody_address: "0x8013eab83b253fbe6cf183ad13c8d741f49be041",
+        display_name: "Stepan",
+        pfp_url: "https://i.imgur.com/c2Oz6SX.png",
+        profile: {
+          bio: {
+            text: "Curious about privacy. Founding engineer @ agora.xyz",
+          },
+        },
+        follower_count: 77,
+        following_count: 98,
+        verifications: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+        verified_addresses: {
+          eth_addresses: ["0xa18d0226043a76683950f3baabf0a87cfb32e1cb"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "fa02386f-f4cb-4b43-80fd-1e4124763902",
+        name: "pif ",
+        username: "pifafu",
+        farcasterId: "5779",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        bio: "Head of Design @optimism 🌞 · grateful delegate in the game of Nouns • let’s take care of each other",
+        email: "pifafu@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-05-23T15:32:21.894Z",
+        updatedAt: "2024-07-31T16:42:57.795Z",
+        deletedAt: null,
+        object: "user",
+        fid: 5779,
+        custody_address: "0xa0ee62200453ed18d7a9a16af5fda9833edcf132",
+        display_name: "pif ",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43fc6f4f-101d-46bc-0431-7828250a3a00/rectcrop3",
+        profile: {
+          bio: {
+            text: "design stuff @optimism 🌞 · grateful delegate in the game of Nouns",
+          },
+        },
+        follower_count: 444,
+        following_count: 106,
+        verifications: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+        verified_addresses: {
+          eth_addresses: ["0xe30acddc6782d82c0cbe00349c27cb4e78c51510"],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+      {
+        id: "8f2c874e-c6b6-4f2d-b19d-0f7ea647292c",
+        name: "Shaun",
+        username: "shaun-testing-2",
+        farcasterId: "844381",
+        imageUrl:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        bio: "I’m a friend, designer, and optimist.",
+        email: "shaun@optimism.io",
+        emailVerified: false,
+        github: null,
+        notDeveloper: false,
+        createdAt: "2024-08-26T18:31:46.057Z",
+        updatedAt: "2024-08-26T19:24:26.877Z",
+        deletedAt: null,
+        object: "user",
+        fid: 844381,
+        custody_address: "0x669ba2fda182152f493d21eff990425e2cf118e3",
+        display_name: "Shaun",
+        pfp_url:
+          "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/fcabf5a2-4e9f-49e4-8b61-79f8a7a04500/rectcrop3",
+        profile: {
+          bio: {
+            text: "I’m a friend, designer, and optimist.",
+          },
+        },
+        follower_count: 0,
+        following_count: 5,
+        verifications: [],
+        verified_addresses: {
+          eth_addresses: [],
+          sol_addresses: [],
+        },
+        active_status: "inactive",
+        power_badge: false,
+      },
+    ],
     github: [
       {
         "https://github.com/iotchain/contracts": {
@@ -1254,6 +3921,24 @@ const projects = [
     },
     organization: null,
     links: ["https://iotblock.com/iotchain", "https://techiot.com/iotchain"],
+    impactStatement: [
+      {
+        question:
+          "How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?",
+        answer:
+          "The PixelVerse platform has been instrumental in enabling the testing, deployment, and operation of OP chains by providing a secure and scalable environment for creators and collectors to interact with NFTs. Our infrastructure supports the creation, minting, and trading of NFTs, as well as the development of decentralized applications and smart contracts. By leveraging blockchain technology, we have created a vibrant ecosystem that empowers users to explore, create, and exchange digital assets in a decentralized and transparent manner.",
+      },
+      {
+        question: "Who has used your tooling and how has it benefited them?",
+        answer:
+          "Our tooling has been used by a diverse range of users, including artists, developers, collectors, and investors. Artists have leveraged our platform to create and showcase their digital artwork, while developers have utilized our APIs and SDKs to build custom applications and integrations. Collectors and investors have benefited from our marketplace, which provides a seamless and secure environment for buying, selling, and trading NFTs. By offering a user-friendly interface, robust security features, and low transaction fees, we have enabled users to engage with the PixelVerse ecosystem in a meaningful and rewarding way.",
+      },
+    ],
+    pricingModel: {
+      model: "freemium",
+      details:
+        "Our platform follows a freemium pricing model, offering basic features for free and premium features for a subscription fee. Users can access core functionality, such as creating and minting NFTs, for no cost, while advanced features, such as analytics and marketing tools, are available through a paid subscription. By providing a tiered pricing structure, we cater to users with varying needs and budgets, ensuring that everyone can participate in the PixelVerse ecosystem.",
+    },
   },
 ];
 
@@ -1268,35 +3953,6 @@ async function main() {
   //   };
   // });
 
-  console.log("projects.length", projects.length);
-  console.log(
-    "ETH_core",
-    projects.filter((p) => p.category_slug === "ETHEREUM_CORE_CONTRIBUTIONS")
-      .length
-  );
-  console.log(
-    "OP_stack",
-    projects.filter((p) => p.category_slug === "OP_STACK_TOOLING").length
-  );
-  console.log(
-    "OP_stack_research",
-    projects.filter(
-      (p) => p.category_slug === "OP_STACK_RESEARCH_AND_DEVELOPMENT"
-    ).length
-  );
-
-  console.log(
-    projects.forEach((p) => {
-      if (
-        p.category_slug !== "ETHEREUM_CORE_CONTRIBUTIONS" &&
-        p.category_slug !== "OP_STACK_TOOLING" &&
-        p.category_slug !== "OP_STACK_RESEARCH_AND_DEVELOPMENT"
-      ) {
-        console.log(p.category_slug);
-      }
-    })
-  );
-
   for (const project of projects) {
     await prisma.mockProjects.create({
       data: {
@@ -1304,18 +3960,18 @@ async function main() {
         category_slug: project.category_slug,
         name: project.name,
         description: project.description,
-        profile_avatar_url: project.profileAvatarUrl,
-        project_cover_image_url: project.projectCoverImageUrl,
-        social_links: project.socialLinks,
+        profileAvatarUrl: project.profileAvatarUrl,
+        projectCoverImageUrl: project.projectCoverImageUrl,
+        socialLinks: project.socialLinks,
         team: project.team,
         github: project.github,
         packages: project.packages,
         contracts: project.contracts,
-        grants_and_funding: project.grantsAndFunding,
+        grantsAndFunding: project.grantsAndFunding,
         organization: project.organization || {},
         links: project.links,
-        impact_statement: {},
-        pricing_model: {},
+        impactStatement: {},
+        pricingModel: {},
       },
     });
   }
