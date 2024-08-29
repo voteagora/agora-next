@@ -14,7 +14,8 @@
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
-    "test": "jest"
+    "test": "jest",
+    "test:orchestrator": "tsx -r tsconfig-paths/register tests/orchestrator/orchestrator.ts"
   },
   "dependencies": {
     "@babel/core": "^7.0.0-0",
@@ -102,6 +103,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@typechain/ethers-v6": "^0.5.1",
     "@types/jest": "^29.5.12",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "20.1.1",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.25",
@@ -109,14 +111,15 @@
     "@types/swagger-ui-dist": "^3.30.4",
     "@types/uuid": "^9.0.8",
     "csv-parser": "^3.0.0",
-    "cypress": "^12.11.0",
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
+    "jest-transform-stub": "^2.0.0",
     "prettier": "^3.2.5",
     "sass": "^1.62.1",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "tsx": "^4.7.3",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.0",
     "typechain": "^8.3.2",
     "typescript": "5.1.3"
   }
