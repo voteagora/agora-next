@@ -24,4 +24,6 @@ export type Project = {
     grants: Prisma.JsonValue;
     revenue: Prisma.JsonValue;
   };
+  pricingModel?: Prisma.JsonValue;
+  impactStatement?: Prisma.JsonValue;
 };

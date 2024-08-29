@@ -2,11 +2,10 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber } from "wagmi";
+import { useAccount, useBlockNumber, useContractRead } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
-import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { DraftProposal, ProposalGatingType } from "@/app/proposals/draft/types";
@@ -35,24 +34,28 @@ const DraftPreview = ({
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useGetVotes({
-    address: address as `0x${string}`,
-    blockNumber: blockNumber || BigInt(0),
-  });
+
+  const { data: accountVotes } = useContractRead({
+    chainId: tenant.contracts.governor.chain.id,
+    abi: tenant.contracts.governor.abi,
+    address: tenant.contracts.governor.address as `0x${string}`,
+    functionName: "getVotes",
+    args: [address, blockNumber ? blockNumber - BigInt(1) : BigInt(0)],
+  }) as { data: bigint };
 
   const canSponsor = () => {
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
       case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotesData !== undefined && threshold !== undefined
-          ? accountVotesData >= threshold
+        return accountVotes !== undefined && threshold !== undefined
+          ? accountVotes >= threshold
           : false;
       case ProposalGatingType.GOVERNOR_V1:
         return (
           manager === address ||
-          (accountVotesData !== undefined && threshold !== undefined
-            ? accountVotesData >= threshold
+          (accountVotes !== undefined && threshold !== undefined
+            ? accountVotes >= threshold
             : false)
         );
       default:

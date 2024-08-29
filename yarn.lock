@@ -2889,7 +2889,7 @@
     "@opentelemetry/resources" "1.22.0"
     "@opentelemetry/semantic-conventions" "1.22.0"
 
-"@opentelemetry/sdk-trace-node@1.19.0":
+"@opentelemetry/sdk-trace-node@1.19.0", "@opentelemetry/semantic-conventions@1.19.0", "@opentelemetry/semantic-conventions@^1.19.0":
   version "1.19.0"
   resolved "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.19.0.tgz"
   integrity sha512-14jRpC8f5c0gPSwoZ7SbEJni1PqI+AhAE8m1bMz6v+RPM4OlP1PT2UHBJj5Qh/ALLPjhVU/aZUK3YyjTUqqQVg==
@@ -2905,11 +2905,6 @@
     "@opentelemetry/propagator-jaeger" "1.22.0"
     "@opentelemetry/sdk-trace-base" "1.22.0"
     semver "^7.5.2"
-
-"@opentelemetry/semantic-conventions@1.19.0", "@opentelemetry/semantic-conventions@^1.19.0":
-  version "1.19.0"
-  resolved "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.19.0.tgz"
-  integrity sha512-14jRpC8f5c0gPSwoZ7SbEJni1PqI+AhAE8m1bMz6v+RPM4OlP1PT2UHBJj5Qh/ALLPjhVU/aZUK3YyjTUqqQVg==
 
 "@opentelemetry/semantic-conventions@1.22.0", "@opentelemetry/semantic-conventions@^1.0.0", "@opentelemetry/semantic-conventions@^1.22.0":
   version "1.22.0"
@@ -5360,9 +5355,9 @@
     csstype "^3.0.2"
 
 "@types/react@^18.2.8":
-  version "18.3.3"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.3.tgz#9679020895318b0915d7a3ab004d92d33375c45f"
-  integrity sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==
+  version "18.3.4"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.4.tgz#dfdd534a1d081307144c00e325c06e00312c93a3"
+  integrity sha512-J7W30FTdfCxDDjmfRM+/JqLHBIyl7xUIp9kwK637FGmY7+mkSFSe6L4jpZzhj5QMfLssSDP4/i75AKkrdC7/Jw==
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
