@@ -1,5 +1,6 @@
 import {
   AgoraGovernor__factory,
+  AgoraTimelock__factory,
   CyberProposalTypes__factory,
   ERC20__factory,
 } from "@/lib/contracts/generated";
@@ -65,6 +66,10 @@ export const cyberTenantConfig = ({
     ? "0x36a8529335AdBE769Dd9180C275e9b8eCD3C6C72"
     : "0x0B629B2ff953a9f0216816342685514798E18819";
 
+  const TIMELOCK = isProd
+    ? "0x11caA7DF2a1FCAea7149fc01aC8D2DB5d3C82421"
+    : "0xa9E1A6856bcd9e8b3c4B336f229061c1C5461Bc6";
+
   // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
   const provider = new JsonRpcProvider("https://cyber.alt.technology");
   const chain = cyber;
@@ -83,6 +88,14 @@ export const cyberTenantConfig = ({
       address: GOVERNOR,
       chain,
       contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
+      provider,
+    }),
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
 
