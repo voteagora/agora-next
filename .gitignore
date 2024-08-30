@@ -30,6 +30,9 @@ yarn-error.log*
 .env*
 .env
 
+# Test config files
+tenant-config.yml
+
 # vercel
 .vercel
 
