@@ -29,6 +29,16 @@ export default function ProposalStatusDetail({
             ACTIVE
           </p>
         )}
+        {proposalStatus === "QUEUED" && (
+          <p className="text-blue-600 bg-blue-200 rounded-sm px-1 py-0.5 font-semibold">
+            QUEUED
+          </p>
+        )}
+        {proposalStatus === "EXECUTED" && (
+          <p className="text-green-600 bg-green-200 rounded-sm px-1 py-0.5 font-semibold">
+            EXECUTED
+          </p>
+        )}
         {proposalStatus === "SUCCEEDED" && (
           <p className="text-green-600 bg-green-200 rounded-sm px-1 py-0.5 font-semibold">
             SUCCEEDED
