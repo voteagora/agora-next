@@ -3,9 +3,10 @@ import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const InfoHero = () => {
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const page = ui!.page("info");
 
   const rotationClasses = ["-rotate-2", "rotate-4", "-rotate-5", "rotate-1"];
@@ -20,17 +21,20 @@ export const InfoHero = () => {
           {page!.description}
         </p>
       </div>
-      <div className="flex flex-row">
-        {page!.links!.map((link, idx) => (
-          <Card
-            className={rotationClasses[idx % rotationClasses.length]}
-            image={link.image || ""}
-            key={`card-${idx}`}
-            link={link.url}
-            linkText={link.title}
-          />
-        ))}
-      </div>
+
+      {namespace !== TENANT_NAMESPACES.NEW_DAO && (
+        <div className="flex flex-row">
+          {page!.links!.map((link, idx) => (
+            <Card
+              className={rotationClasses[idx % rotationClasses.length]}
+              image={link.image || ""}
+              key={`card-${idx}`}
+              link={link.url}
+              linkText={link.title}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
