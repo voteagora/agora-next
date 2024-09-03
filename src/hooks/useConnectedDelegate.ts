@@ -8,6 +8,8 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useQuery } from "@tanstack/react-query";
 import { timeout } from "@/lib/utils";
 import { fetchDelegate } from "@/app/delegates/actions";
+import Tenant from "@/lib/tenant/tenant";
+import { ZERO_ADDRESS } from "@/lib/constants";
 
 /**
  * Define maximum number of retries, max retries 10 means 180 seconds waiting in total (advanced delegation voting power
@@ -18,13 +20,16 @@ const MAX_RETRIES = 10;
 // TODO: think about strategy to fetch, since balance and voting power can change on every block,
 // also to prevent additional unnecessary fetches being done right now
 const useConnectedDelegate = () => {
+  const { contracts } = Tenant.current();
+  const isTestToken = contracts.token.address === ZERO_ADDRESS;
+
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
   const { address } = useAccount();
   const [retries, setRetries] = useState<number>(0);
   const [lastVotingPower, setLastVotingPower] = useState<string | null>(null);
 
   const data = useQuery({
-    enabled: !!address,
+    enabled: !(!address || isTestToken),
     queryKey: ["useConnectedDelegate", address, refetchDelegate, retries],
     queryFn: async () => {
       const [delegate, advancedDelegators, balance] =

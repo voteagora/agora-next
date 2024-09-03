@@ -32,7 +32,7 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
-  const { contracts, slug } = Tenant.current();
+  const { ui, contracts, slug, token } = Tenant.current();
 
   const { address: accountAddress } = useAccount();
 
@@ -41,6 +41,8 @@ export function DelegateDialog({
   const [isReady, setIsReady] = useState(false);
   const { setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee = delegate.address === delegatee?.delegatee;
+
+  const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
 
   const { data: delegateEnsName } = useEnsName({
     chainId: 1,
@@ -71,16 +73,26 @@ export function DelegateDialog({
     setIsReady(false);
     if (!accountAddress) return;
 
-    const vp = await fetchBalanceForDirectDelegation(accountAddress);
-    setVotingPower(vp.toString());
+    try {
+      const vp = await fetchBalanceForDirectDelegation(accountAddress);
+      setVotingPower(vp.toString());
 
-    const direct = await fetchDirectDelegatee(accountAddress);
-    setDelegatee(direct);
-
-    setIsReady(true);
+      const direct = await fetchDirectDelegatee(accountAddress);
+      setDelegatee(direct);
+    } finally {
+      setIsReady(true);
+    }
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   const renderActionButtons = () => {
+    if (isDisabledInTenant) {
+      return (
+        <Button disabled={true}>
+          {token.symbol} delegation is disabled at this time
+        </Button>
+      );
+    }
+
     if (sameDelegatee) {
       return (
         <ShadcnButton variant="outline" className="cursor-not-allowed">

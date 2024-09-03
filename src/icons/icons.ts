@@ -39,10 +39,23 @@ import vote from "./vote.svg";
 import wallet from "./wallet.svg";
 import walletConnected from "./walletConnected.svg";
 import world from "./world.svg";
+import wrenchScrewdriverIcon from "./wrenchScredriver.svg";
+import globeAlt from "./globeAlt.svg";
+import presentationChartLine from "./presentationChartLine.svg";
+import scale from "./scale.svg";
+import codeBracketSquare from "./codeBracketSquare.svg";
+import beaker from "./beaker.svg";
+import shieldCheck from "./shieldCheck.svg";
 
 export const icons = {
   anonNoun,
   badge,
+  scale,
+  codeBracketSquare,
+  beaker,
+  shieldCheck,
+  wrenchScrewdriverIcon,
+  presentationChartLine,
   ballot,
   banknotes,
   cardView,
@@ -58,6 +71,7 @@ export const icons = {
   expand,
   github,
   globe,
+  globeAlt,
   info,
   link,
   liquid,
