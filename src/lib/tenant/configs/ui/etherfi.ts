@@ -34,6 +34,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       "0xe2f6659e0209c3f79132abdeb95abeba0f1f672f",
       "0x27c7ced729280060577a68a54a94075d18614d19",
       "0x4f894bfc9481110278c356ade1473ebe2127fd3c",
+      "0x3fb19771947072629c8eee7995a2ef23b72d4c8a",
     ],
     advanced: [],
     retired: [],
