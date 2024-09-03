@@ -4,9 +4,9 @@ import { cache } from "react";
 
 async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
-  const totalSupply = await contracts.token.contract.totalSupply();
 
   try {
+    const totalSupply = await contracts.token.contract.totalSupply();
     const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
       {}
     );
@@ -18,7 +18,7 @@ async function getMetrics() {
     // Handle prisma errors for new tenants
     return {
       votableSupply: "0",
-      totalSupply: totalSupply.toString(),
+      totalSupply: "0",
     };
   }
 }
