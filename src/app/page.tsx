@@ -91,21 +91,6 @@ async function Home() {
 
   return (
     <div className="flex flex-col">
-      {namespace === TENANT_NAMESPACES.OPTIMISM && (
-        <a
-          href=" https://retrofunding.optimism.io/round/results"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="h-[100px] w-full relative mt-12 block"
-        >
-          <Image
-            src="/images/results_banner.png"
-            alt="Retro banner"
-            fill={true}
-            className=" object-cover rounded-lg"
-          />
-        </a>
-      )}
       <Hero />
       <MyDraftProposals
         fetchDraftProposals={async (address) => {
