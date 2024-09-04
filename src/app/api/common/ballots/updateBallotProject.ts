@@ -141,10 +141,10 @@ async function updateBallotProjectImpactForAddress({
       estimated_rank AS (
           SELECT
               CASE
-                  WHEN ${impact} = 0 THEN NULL
+                  WHEN ${impact} = 0 THEN 0
                   ELSE 
                       CASE
-                          WHEN lowest_rank_in_group IS NOT NULL THEN 
+                          WHEN lowest_rank_in_group !=0 THEN 
                               ROUND(COALESCE((lowest_rank_in_group + COALESCE(highest_rank_in_lower_group, 100000 * (${impact} - 1))) / 1.4, lowest_rank_in_group))
                           ELSE 
                               100000 * ${impact}
