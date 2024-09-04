@@ -1478,6 +1478,16 @@ components:
       required: true
       schema:
         type: number
+    distributionMethodParam:
+      name: distributionMethod
+      in: path
+      description: The distribution method of the ballot
+      required: true
+      schema:
+        type: string
+        enum:
+          - "IMPACT_GROUPS"
+          - "TOP_TO_BOTTOM"
 paths:
   /spec:
     get:
@@ -2402,7 +2412,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/distribution_method:
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/distribution_method/{distributionMethod}:
     post:
       summary: Updates the distribution method for a specific RetroFunding ballot
       description: >
@@ -2415,14 +2425,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                distribution_method:
-                  type: string
+        - $ref: "#/components/parameters/distributionMethodParam"
       responses:
         "200":
           description: OK
