@@ -10,6 +10,7 @@ import { Button } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export function DelegateActions({
   delegate,
@@ -28,7 +29,7 @@ export function DelegateActions({
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
 
-  const { contracts, ui } = Tenant.current();
+  const { contracts, ui, namespace } = Tenant.current();
   const hasAlligator = contracts?.alligator;
 
   const isRetired = ui.delegates?.retired.includes(
@@ -51,33 +52,35 @@ export function DelegateActions({
         twitter={twitter}
         warpcast={warpcast}
       />
-      <div>
-        {isConnected ? (
-          address &&
-          (isAdvancedUser && hasAlligator ? (
-            <AdvancedDelegateButton
-              delegate={delegate}
-              delegators={delegators}
-            />
+      {namespace !== TENANT_NAMESPACES.NEW_DAO && (
+        <div>
+          {isConnected ? (
+            address &&
+            (isAdvancedUser && hasAlligator ? (
+              <AdvancedDelegateButton
+                delegate={delegate}
+                delegators={delegators}
+              />
+            ) : (
+              <DelegateButton full={!twitter && !discord} delegate={delegate} />
+            ))
           ) : (
-            <DelegateButton full={!twitter && !discord} delegate={delegate} />
-          ))
-        ) : (
-          <ConnectKitButton.Custom>
-            {({ show }) => (
-              <Button
-                onClick={(e: SyntheticEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  show?.();
-                }}
-              >
-                Delegate
-              </Button>
-            )}
-          </ConnectKitButton.Custom>
-        )}
-      </div>
+            <ConnectKitButton.Custom>
+              {({ show }) => (
+                <Button
+                  onClick={(e: SyntheticEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    show?.();
+                  }}
+                >
+                  Delegate
+                </Button>
+              )}
+            </ConnectKitButton.Custom>
+          )}
+        </div>
+      )}
     </div>
   );
 }
