@@ -127,6 +127,7 @@ async function getR5Ballot({
       category_allocations: [],
       projects_to_be_evaluated: projects.map((project) => project.id),
       total_projects: projects.length,
+      payload_for_signature: {},
     };
   }
 
@@ -146,6 +147,7 @@ async function getR5Ballot({
         )
         .map((project) => project.id),
       total_projects: projects.length,
+      payload_for_signature: {},
     };
   }
 
@@ -157,6 +159,14 @@ async function getR5Ballot({
     category_allocations: ballot.category_allocations,
     projects_to_be_evaluated: [],
     total_projects: projects.length,
+    payload_for_signature: {
+      project_allocations: ballot.project_allocations.map((allocation) => ({
+        [allocation.project_id]: allocation.allocation,
+      })),
+      category_allocations: ballot.category_allocations.map((allocation) => ({
+        [allocation.category_slug]: allocation.allocation,
+      })),
+    },
   };
 }
 
