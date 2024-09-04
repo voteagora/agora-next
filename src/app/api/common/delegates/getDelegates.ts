@@ -51,7 +51,12 @@ async function getDelegates({
     ? `AND endorsed = true AND s.dao_slug = '${slug}'`
     : "";
 
+  // The top issues filter supports multiple selection - a comma separated list of issues
   const topIssuesParam = filters?.issues || "";
+  const topIssuesArray = topIssuesParam
+    ? topIssuesParam.split(",").map((issue) => issue.trim())
+    : [];
+
   const topIssuesFilterQuery =
     topIssuesParam && topIssuesParam !== ""
       ? `
@@ -59,7 +64,7 @@ async function getDelegates({
       AND EXISTS (
         SELECT 1
         FROM jsonb_array_elements(s.payload -> 'topIssues') elem
-        WHERE elem ->> 'type' = '${topIssuesParam}'
+        WHERE elem ->> 'type' IN (${topIssuesArray.map((issue) => `'${issue}'`).join(", ")})
         AND elem ->> 'value' IS NOT NULL
         AND elem ->> 'value' <> ''
       )
