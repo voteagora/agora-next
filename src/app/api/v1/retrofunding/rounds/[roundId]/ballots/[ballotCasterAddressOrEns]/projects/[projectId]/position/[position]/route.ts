@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
   authenticateApiUser,
+  getCategoryScope,
   validateAddressScope,
   validateProjectCategoryScope,
 } from "@/app/lib/auth/serverAuth";
@@ -45,10 +46,13 @@ export async function POST(
       );
       if (projectScopeError) return projectScopeError;
 
+      const categoryScope = getCategoryScope(authResponse);
+
       const ballot = await updateBallotProjectPosition(
         impactParser.parse(Number(position)),
         projectId,
         Number(roundId),
+        categoryScope!,
         ballotCasterAddressOrEns
       );
       return NextResponse.json(ballot);
