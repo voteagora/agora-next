@@ -23,7 +23,8 @@ export async function POST(
   }
 
   const { roundId, addressOrENSName, impactMetricId } = route.params;
-  await validateAddressScope(addressOrENSName, authResponse);
+  const scopeError = await validateAddressScope(addressOrENSName, authResponse);
+  if (scopeError) return scopeError;
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {

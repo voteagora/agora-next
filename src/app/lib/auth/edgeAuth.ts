@@ -11,6 +11,7 @@ import {
   REASON_TOKEN_SCOPE_ROUTE_MISMATCH,
   ROLE_BADGEHOLDER,
   ROLE_PUBLIC_READER,
+  ROLE_RF_DEMO_USER,
 } from "@/app/lib/auth/constants";
 import { AuthInfo } from "@/app/lib/auth/types";
 
@@ -118,15 +119,16 @@ export async function validateScopeAgainstRoute(
   request: NextRequest
 ): Promise<boolean> {
   const roles = scope.split(";");
-  const isBadge = roles.includes("badgeholder");
-  const isPublic = roles.includes("reader:public");
+  const isBadge = roles.includes(ROLE_BADGEHOLDER);
+  const isDemoUser = roles.includes(ROLE_RF_DEMO_USER);
+  const isPublic = roles.includes(ROLE_PUBLIC_READER);
   if (
-    request.nextUrl.pathname.includes("/api/v1/retrofunding/ballots") ||
+    request.nextUrl.pathname.includes("ballots") ||
     request.method === "POST" ||
     request.method === "PUT" ||
     request.method === "DELETE"
   ) {
-    return isBadge;
+    return isBadge || isDemoUser;
   } else {
     return isPublic;
   }
