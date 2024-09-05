@@ -306,7 +306,7 @@ export const updateBallotProjectPosition = cache(
 
 const updateAllProjectsInBallotApi = async (
   projects: {
-    projectId: string;
+    project_id: string;
     allocation: string;
     impact: number;
   }[],
@@ -331,7 +331,7 @@ async function updateAllProjectsInBallotForAddress({
   address,
 }: {
   projects: {
-    projectId: string;
+    project_id: string;
     allocation: string;
     impact: number;
   }[];
@@ -349,7 +349,7 @@ async function updateAllProjectsInBallotForAddress({
   const isValid =
     projects.every((project) =>
       categoryProjects.some(
-        (categoryProject) => categoryProject.id === project.projectId
+        (categoryProject) => categoryProject.id === project.project_id
       )
     ) && projects.length === categoryProjects.length;
 
@@ -384,7 +384,7 @@ async function updateAllProjectsInBallotForAddress({
       prisma.projectAllocations.upsert({
         where: {
           address_round_project_id: {
-            project_id: project.projectId,
+            project_id: project.project_id,
             round: roundId,
             address,
           },
@@ -394,7 +394,7 @@ async function updateAllProjectsInBallotForAddress({
           updated_at: new Date(),
         },
         create: {
-          project_id: project.projectId,
+          project_id: project.project_id,
           round: roundId,
           address,
           allocation: project.allocation,

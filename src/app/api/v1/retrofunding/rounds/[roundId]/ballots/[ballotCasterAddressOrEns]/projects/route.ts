@@ -11,7 +11,7 @@ import { z } from "zod";
 const ballotPayloadSchema = z.object({
   projects: z.array(
     z.object({
-      projectId: z.string(),
+      project_id: z.string(),
       allocation: z.string(z.number().min(0).max(100)),
       impact: z.number(),
     })

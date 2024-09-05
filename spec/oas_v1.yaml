@@ -2252,7 +2252,7 @@ paths:
                   items:
                     type: object
                     properties:
-                      projectId:
+                      project_id:
                         type: string
                       allocation:
                         type: string
