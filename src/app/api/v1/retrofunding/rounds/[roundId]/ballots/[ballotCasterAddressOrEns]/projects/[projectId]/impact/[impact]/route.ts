@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   authenticateApiUser,
   validateAddressScope,
+  validateProjectCategoryScope,
 } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { updateBallotProjectImpact } from "@/app/api/common/ballots/updateBallotProject";
@@ -35,6 +36,14 @@ export async function POST(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
+      // Check project category & reject update if address scope is not correct
+      const projectScopeError = await validateProjectCategoryScope(
+        projectId,
+        roundId,
+        authResponse
+      );
+      if (projectScopeError) return projectScopeError;
+
       const ballot = await updateBallotProjectImpact(
         impactParser.parse(Number(impact)),
         projectId,
