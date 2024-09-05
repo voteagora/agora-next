@@ -2228,6 +2228,51 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/projects:
+    post:
+      summary: Updates all projects data for a specific RetroFunding ballot
+      description: >
+        Updates all projects data for a specific ballot for a RetroFunding round on Agora.
+      operationId: updateRetroFundingRoundProjects
+      tags:
+        - RetroFunding
+        - ballots
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projects:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      projectId:
+                        type: string
+                      allocation:
+                        type: string
+                      impact:
+                        type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
   /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/projects/{projectId}/allocation/{allocation}:
     post:
       summary: Updates allocation for a specific project for a RetroFunding round
@@ -2237,7 +2282,7 @@ paths:
       operationId: updateRetroFundingRoundProjectAllocation
       tags:
         - RetroFunding
-        - projects
+        - ballots
         - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
@@ -2274,7 +2319,7 @@ paths:
       operationId: updateRetroFundingRoundProjectImpact
       tags:
         - RetroFunding
-        - projects
+        - ballots
         - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
@@ -2305,7 +2350,7 @@ paths:
       operationId: updateRetroFundingRoundProjectPosition
       tags:
         - RetroFunding
-        - projects
+        - ballots
         - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
