@@ -284,3 +284,110 @@ async function updateBallotProjectPositionForAddress({
 export const updateBallotProjectPosition = cache(
   updateBallotProjectPositionApi
 );
+
+const updateAllProjectsInBallotApi = async (
+  projects: {
+    projectId: string;
+    allocation: string;
+    impact: number;
+  }[],
+  category: string,
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) =>
+  addressOrEnsNameWrap(
+    updateAllProjectsInBallotForAddress,
+    ballotCasterAddressOrEns,
+    {
+      projects,
+      category,
+      roundId,
+    }
+  );
+
+async function updateAllProjectsInBallotForAddress({
+  projects,
+  category,
+  roundId,
+  address,
+}: {
+  projects: {
+    projectId: string;
+    allocation: string;
+    impact: number;
+  }[];
+  category: string;
+  roundId: number;
+  address: string;
+}) {
+  const categoryProjects = await prisma.mockProjects.findMany({
+    where: {
+      category_slug: category,
+    },
+  });
+
+  // check if all projects are valid
+  const isValid =
+    projects.every((project) =>
+      categoryProjects.some(
+        (categoryProject) => categoryProject.id === project.projectId
+      )
+    ) && projects.length === categoryProjects.length;
+
+  if (!isValid) {
+    throw new Error("Invalid projects for badgeholder category");
+  }
+
+  // Sort projects by impact and allocation lowest to highest
+  projects.sort(
+    (a, b) => a.impact - b.impact || Number(a.allocation) - Number(b.allocation)
+  );
+
+  // Create ballot if it doesn't exist
+  await prisma.ballots.upsert({
+    where: {
+      address_round: {
+        address,
+        round: roundId,
+      },
+    },
+    update: {
+      updated_at: new Date(),
+    },
+    create: {
+      round: roundId,
+      address,
+    },
+  });
+
+  await Promise.all(
+    projects.map((project, i) =>
+      prisma.projectAllocations.upsert({
+        where: {
+          address_round_project_id: {
+            project_id: project.projectId,
+            round: roundId,
+            address,
+          },
+        },
+        update: {
+          allocation: project.allocation,
+          updated_at: new Date(),
+        },
+        create: {
+          project_id: project.projectId,
+          round: roundId,
+          address,
+          allocation: project.allocation,
+          impact: project.impact,
+          rank: (500_000 / projects.length) * (i + 1),
+        },
+      })
+    )
+  );
+
+  // Return full ballot
+  return fetchBallot(roundId, address, category);
+}
+
+export const updateAllProjectsInBallot = cache(updateAllProjectsInBallotApi);
