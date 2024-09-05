@@ -7,6 +7,7 @@ const updateBallotProjectAllocationApi = async (
   allocation: string,
   projectId: string,
   roundId: number,
+  category: string,
   ballotCasterAddressOrEns: string
 ) =>
   addressOrEnsNameWrap(
@@ -16,6 +17,7 @@ const updateBallotProjectAllocationApi = async (
       allocation,
       projectId,
       roundId,
+      category,
     }
   );
 
@@ -23,11 +25,13 @@ async function updateBallotProjectAllocationForAddress({
   allocation,
   projectId,
   roundId,
+  category,
   address,
 }: {
   allocation: string;
   projectId: string;
   roundId: number;
+  category: string;
   address: string;
 }) {
   // Create ballot if it doesn't exist
@@ -69,7 +73,7 @@ async function updateBallotProjectAllocationForAddress({
   }
 
   // Return full ballot
-  return fetchBallot(roundId, address);
+  return fetchBallot(roundId, address, category);
 }
 
 export const updateBallotProjectAllocation = cache(
@@ -80,6 +84,7 @@ const updateBallotProjectImpactApi = async (
   impact: number,
   projectId: string,
   roundId: number,
+  category: string,
   ballotCasterAddressOrEns: string
 ) =>
   addressOrEnsNameWrap(
@@ -89,18 +94,25 @@ const updateBallotProjectImpactApi = async (
       impact,
       projectId,
       roundId,
+      category,
     }
   );
+
+// Rank is calcualted based on the impact of the project. The higher the impact, the higher the rank.
+// If project's impact is 0 (conflict of interest), the rank is 0.
+// The rank is a number between 0 and >500,000. The spread is to allow for easy reordering of projects.
 
 async function updateBallotProjectImpactForAddress({
   impact,
   projectId,
   roundId,
+  category,
   address,
 }: {
   impact: number;
   projectId: string;
   roundId: number;
+  category: string;
   address: string;
 }) {
   // Create ballot if it doesn't exist
@@ -145,7 +157,7 @@ async function updateBallotProjectImpactForAddress({
                   ELSE 
                       CASE
                           WHEN lowest_rank_in_group != 0 THEN 
-                              ROUND(COALESCE((lowest_rank_in_group + COALESCE(highest_rank_in_lower_group, 100000 * (${impact} - 1))) / 1.4, lowest_rank_in_group))
+                              ROUND(COALESCE((lowest_rank_in_group + COALESCE(highest_rank_in_lower_group, 100000 * (${impact} - 1))) / 2, lowest_rank_in_group))
                           ELSE 
                               100000 * ${impact}
                       END
@@ -166,7 +178,7 @@ async function updateBallotProjectImpactForAddress({
   );
 
   // Return full ballot
-  return fetchBallot(roundId, address);
+  return fetchBallot(roundId, address, category);
 }
 
 export const updateBallotProjectImpact = cache(updateBallotProjectImpactApi);
@@ -175,6 +187,7 @@ const updateBallotProjectPositionApi = async (
   position: number,
   projectId: string,
   roundId: number,
+  category: string,
   ballotCasterAddressOrEns: string
 ) =>
   addressOrEnsNameWrap(
@@ -184,18 +197,24 @@ const updateBallotProjectPositionApi = async (
       position,
       projectId,
       roundId,
+      category,
     }
   );
+
+// Rank is assigned based on the position of the project in the list. The lower the position, the higher the rank.
+// New rank is calculated as the average of the ranks of the projects above and below the new position.
 
 async function updateBallotProjectPositionForAddress({
   position,
   projectId,
   roundId,
+  category,
   address,
 }: {
   position: number;
   projectId: string;
   roundId: number;
+  category: string;
   address: string;
 }) {
   // Create ballot if it doesn't exist
@@ -223,7 +242,7 @@ async function updateBallotProjectPositionForAddress({
               project_id,
               rank,
               impact,
-              ROW_NUMBER() OVER (ORDER BY rank) AS current_position
+              ROW_NUMBER() OVER (ORDER BY rank DESC) AS current_position
           FROM
               retro_funding.project_allocations
       ),
@@ -278,7 +297,7 @@ async function updateBallotProjectPositionForAddress({
   );
 
   // Return full ballot
-  return fetchBallot(roundId, address);
+  return fetchBallot(roundId, address, category);
 }
 
 export const updateBallotProjectPosition = cache(

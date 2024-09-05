@@ -1,12 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
   authenticateApiUser,
+  getCategoryScope,
   validateAddressScope,
   validateProjectCategoryScope,
 } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { updateBallotProjectAllocation } from "@/app/api/common/ballots/updateBallotProject";
-import { fetchProjectApi } from "@/app/api/common/projects/getProjects";
+import { z } from "zod";
+
+const allocationParser = z.string(z.number().min(0).max(100)); // number between 0 and 100
 
 export async function POST(
   request: NextRequest,
@@ -43,10 +46,13 @@ export async function POST(
       );
       if (projectScopeError) return projectScopeError;
 
+      const categoryScope = getCategoryScope(authResponse);
+
       const ballot = await updateBallotProjectAllocation(
-        allocation,
+        allocationParser.parse(allocation),
         projectId,
         Number(roundId),
+        categoryScope!,
         ballotCasterAddressOrEns
       );
       return NextResponse.json(ballot);
