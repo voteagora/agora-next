@@ -159,7 +159,7 @@ async function getProjectApi({
 
   return {
     id: project.project_id,
-    category: project.category,
+    category_slug: project.category,
     organization: null,
     name: project.name,
     description: project.description,

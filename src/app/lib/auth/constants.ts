@@ -13,3 +13,13 @@ export const REASON_TOKEN_SCOPE_ROUTE_MISMATCH =
 export const ROLE_PUBLIC_READER = "reader:public";
 export const ROLE_BADGEHOLDER = "badgeholder";
 export const ROLE_RF_DEMO_USER = "rf-demo-user";
+export const ROLE_CATEGORY_ETH_CORE = "category:ethereum_core_contributions";
+export const ROLE_CATEGORY_OP_STACK =
+  "category:op_stack_research_and_development";
+export const ROLE_CATEGORY_OP_STACK_TOOLING = "category:op_stack_tooling";
+
+export enum CATEGORY_ROLES {
+  "ETHEREUM_CORE_CONTRIBUTIONS" = ROLE_CATEGORY_ETH_CORE,
+  "OP_STACK_RESEARCH_AND_DEVELOPMENT" = ROLE_CATEGORY_OP_STACK,
+  "OP_STACK_TOOLING" = ROLE_CATEGORY_OP_STACK_TOOLING,
+}

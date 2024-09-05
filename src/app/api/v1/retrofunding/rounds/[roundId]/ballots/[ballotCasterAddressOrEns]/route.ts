@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
   authenticateApiUser,
+  getCategoryScope,
   validateAddressScope,
 } from "@/app/lib/auth/serverAuth";
 import { fetchBallot } from "@/app/api/common/ballots/getBallots";
@@ -25,9 +26,21 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
+      const categoryScope = getCategoryScope(authResponse);
+
+      if (!categoryScope) {
+        return new Response(
+          "This user does not have a category scope. Regenerate the JWT token",
+          {
+            status: 401,
+          }
+        );
+      }
+
       const ballots = await fetchBallot(
         Number(roundId),
-        ballotCasterAddressOrEns
+        ballotCasterAddressOrEns,
+        categoryScope
       );
       return NextResponse.json(ballots);
     } catch (e: any) {
