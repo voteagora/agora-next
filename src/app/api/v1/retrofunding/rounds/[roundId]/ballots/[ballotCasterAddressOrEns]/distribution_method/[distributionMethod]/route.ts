@@ -33,7 +33,9 @@ export async function POST(
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const ballot = await applyDistributionStrategy(
-        distributionMethod as DistributionStrategy,
+        distributionMethodValidator.parse(
+          distributionMethod
+        ) as DistributionStrategy,
         Number(roundId),
         ballotCasterAddressOrEns
       );

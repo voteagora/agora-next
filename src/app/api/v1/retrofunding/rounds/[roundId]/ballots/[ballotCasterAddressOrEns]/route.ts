@@ -17,7 +17,11 @@ export async function GET(
   }
 
   const { roundId, ballotCasterAddressOrEns } = route.params;
-  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
+  const scopeError = await validateAddressScope(
+    ballotCasterAddressOrEns,
+    authResponse
+  );
+  if (scopeError) return scopeError;
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {

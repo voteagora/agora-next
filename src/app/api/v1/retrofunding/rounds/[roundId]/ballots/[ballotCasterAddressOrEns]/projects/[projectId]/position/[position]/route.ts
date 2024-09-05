@@ -28,7 +28,11 @@ export async function POST(
 
   const { roundId, ballotCasterAddressOrEns, projectId, position } =
     route.params;
-  await validateAddressScope(ballotCasterAddressOrEns, authResponse);
+  const scopeError = await validateAddressScope(
+    ballotCasterAddressOrEns,
+    authResponse
+  );
+  if (scopeError) return scopeError;
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
