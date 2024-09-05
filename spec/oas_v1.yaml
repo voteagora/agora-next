@@ -43,7 +43,7 @@ info:
     |----------|---------|---------------|
     | OP 0.2.0 | LIVE   | Aug 10th |
     | OP 0.2.1 | LIVE   | Aug 26th |
-    | OP 0.2.2 | ON TRACK   | Aug 30th |
+    | OP 0.2.2 | LIVE   | Sep 4th |
     | OP 0.2.3 | ON TRACK   | Sep 20th |
   version: 0.2.1
   license:
@@ -1990,47 +1990,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RetroFundingRound"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-  /retrofunding/rounds/{roundId}/ballots:
-    get:
-      summary: Gets a list of ballots for an RetroFunding round
-      description: >
-        Retrieves a list of ballots for a specific RetroFunding round on Agora as a JSON array.
-        Limit, offset parameters can be used to customize the returned list sorted by ballot ordinal.
-      operationId: getRetroFundingRoundBallots
-      tags:
-        - RetroFunding
-        - RetroFundingBallots
-        - Round 4
-      parameters:
-        - name: roundId
-          in: path
-          description: The round ID of the RetroFunding round to retrieve.
-          required: true
-          schema:
-            type: integer
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/offsetParam"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metadata:
-                    $ref: "#/components/schemas/PageMetadata"
-                  ballots:
-                    type: array
-                    items:
-                      oneOf:
-                        - $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
         "401":

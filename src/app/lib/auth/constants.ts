@@ -12,3 +12,4 @@ export const REASON_TOKEN_SCOPE_ROUTE_MISMATCH =
 // Roles
 export const ROLE_PUBLIC_READER = "reader:public";
 export const ROLE_BADGEHOLDER = "badgeholder";
+export const ROLE_RF_DEMO_USER = "rf-demo-user";

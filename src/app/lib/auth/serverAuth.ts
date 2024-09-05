@@ -8,6 +8,7 @@ import {
   REASON_INVALID_BEARER_TOKEN,
   ROLE_PUBLIC_READER,
   ROLE_BADGEHOLDER,
+  ROLE_RF_DEMO_USER,
 } from "@/app/lib/auth/constants";
 import { isBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
@@ -126,6 +127,7 @@ export async function getRolesForUser(
 ): Promise<string[]> {
   const defaultRoles = [ROLE_PUBLIC_READER];
   if (siweData) {
+    defaultRoles.push(ROLE_RF_DEMO_USER); // All Siwe users are RF voters
     const isBadge = await fetchIsCitizen(siweData.address);
     return isBadge ? [ROLE_BADGEHOLDER, ...defaultRoles] : defaultRoles;
   }
