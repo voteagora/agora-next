@@ -58,16 +58,20 @@ async function getBallotsApi({
 
 const getBallotApi = async (
   roundId: number,
-  ballotCasterAddressOrEns: string
+  ballotCasterAddressOrEns: string,
+  category?: string
 ) =>
   addressOrEnsNameWrap(getBallotForAddress, ballotCasterAddressOrEns, {
+    category,
     roundId,
   });
 
 async function getBallotForAddress({
+  category,
   roundId,
   address,
 }: {
+  category?: string;
   roundId: number;
   address: string;
 }) {
@@ -76,16 +80,21 @@ async function getBallotForAddress({
   }
 
   if (roundId === 5) {
-    return getR5Ballot({ roundId, address });
+    if (!category) {
+      throw new Error("Category scope is required for round 5");
+    }
+    return getR5Ballot({ roundId, address, category });
   }
 }
 
 async function getR5Ballot({
   roundId,
   address,
+  category,
 }: {
   roundId: number;
   address: string;
+  category: string;
 }) {
   const [ballot, projects] = await Promise.all([
     prisma.ballots.findFirst({
@@ -114,6 +123,7 @@ async function getR5Ballot({
         *
       FROM 
         retro_funding.mock_projects
+      WHERE category_slug = ${category}
       ORDER BY RANDOM();
     `,
   ]);

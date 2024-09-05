@@ -10,12 +10,16 @@ import {
   ROLE_BADGEHOLDER,
   ROLE_RF_DEMO_USER,
 } from "@/app/lib/auth/constants";
-import { isBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
+import {
+  isBadgeholder,
+  votingCategory,
+} from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
 import { resolveENSName } from "../ENSUtils";
 import { fetchIsCitizen } from "@/app/api/common/citizens/isCitizen";
 import { SiweMessage } from "siwe";
+import { fetchProjectApi } from "@/app/api/common/projects/getProjects";
 
 const HASH_FN = "sha256";
 const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
@@ -94,6 +98,10 @@ export async function generateJwt(
     sub: userId,
     scope: scope,
     isBadgeholder: scope.includes(ROLE_BADGEHOLDER),
+    category: suppliedRoles
+      .find((role) => role.startsWith("category:"))
+      ?.substring("category:".length)
+      .toUpperCase(),
     siwe: siweData ? { ...siweData } : undefined,
   };
 
@@ -125,14 +133,20 @@ export async function getRolesForUser(
   userId: string,
   siweData?: SiweMessage | null
 ): Promise<string[]> {
-  const defaultRoles = [ROLE_PUBLIC_READER];
+  const roles = [ROLE_PUBLIC_READER];
   if (siweData) {
-    defaultRoles.push(ROLE_RF_DEMO_USER); // All Siwe users are RF voters
+    roles.push(ROLE_RF_DEMO_USER); // All Siwe users are RF voters
+    // TODO: fetch category based on badgeholder data
+    const categoryRole = votingCategory(siweData.address);
+    roles.push(categoryRole);
+
     const isBadge = await fetchIsCitizen(siweData.address);
-    return isBadge ? [ROLE_BADGEHOLDER, ...defaultRoles] : defaultRoles;
+    if (isBadge) {
+      roles.push(ROLE_BADGEHOLDER);
+    }
   }
 
-  return defaultRoles;
+  return roles;
 }
 
 export async function validateAddressScope(
@@ -146,4 +160,33 @@ export async function validateAddressScope(
       status: 401,
     });
   }
+}
+
+export async function validateProjectCategoryScope(
+  projectId: string,
+  roundId: string,
+  authResponse: AuthInfo
+) {
+  const project = await fetchProjectApi({ projectId, round: roundId });
+  const category = project.category_slug;
+
+  if (
+    !category ||
+    !authResponse.scope?.includes(`category:${category.toLowerCase()}`)
+  ) {
+    return new Response(
+      "Unauthorized to perform action on projects assisiated with this category",
+      {
+        status: 401,
+      }
+    );
+  }
+}
+
+export function getCategoryScope(authResponse: AuthInfo) {
+  return authResponse.scope
+    ?.split(";")
+    .find((role) => role.startsWith("category:"))
+    ?.substring("category:".length)
+    .toUpperCase();
 }
