@@ -13,6 +13,6 @@ export async function isBadgeholder(address: string) {
 export function votingCategory(address: string) {
   // get a number seeded by the address
   const seed = parseInt(address.slice(2, 10), 16);
-  const categoryIndex = seed % Object.entries(CATEGORY_ROLES).length;
+  const categoryIndex = seed % Object.keys(CATEGORY_ROLES).length;
   return Object.entries(CATEGORY_ROLES)[categoryIndex][1];
 }
