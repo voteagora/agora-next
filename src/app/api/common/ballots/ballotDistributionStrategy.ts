@@ -5,7 +5,7 @@ import { fetchBallot } from "./getBallots";
 export enum DistributionStrategy {
   IMPACT_GROUPS = "IMPACT_GROUPS",
   TOP_TO_BOTTOM = "TOP_TO_BOTTOM",
-  // TOP_WEIGHTED = "TOP_WEIGHTED",
+  TOP_WEIGHTED = "TOP_WEIGHTED",
 }
 
 const applyDistributionStrategyApi = async (
@@ -75,27 +75,27 @@ async function applyDistributionStrategyForAddress({
     });
   }
 
-  // if (strategy === DistributionStrategy.TOP_WEIGHTED) {
-  //   const y = topWeighted({
-  //     max,
-  //     total: totalFunding,
-  //     n,
-  //   });
+  if (strategy === DistributionStrategy.TOP_WEIGHTED) {
+    const y = topWeighted({
+      max: 500_000, // TODO: adjust this number
+      total: totalFunding,
+      n,
+    });
 
-  //   projectsAllocation.forEach((project, i) => {
-  //     if (project.impact) {
-  //       newProjectsAllocation.push({
-  //         ...project,
-  //         allocation: y(i),
-  //       });
-  //     }
-  //   });
+    projectsAllocation.forEach((project, i) => {
+      if (project.impact) {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: y(i),
+        });
+      }
+    });
 
-  //   console.log(
-  //     "total",
-  //     newProjectsAllocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
-  //   );
-  // }
+    console.log(
+      "total",
+      newProjectsAllocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
+    );
+  }
 
   if (strategy === DistributionStrategy.IMPACT_GROUPS) {
     const nk = projectsAllocation.reduce(
