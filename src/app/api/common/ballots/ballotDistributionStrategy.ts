@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { fetchBallot } from "./getBallots";
+import prisma from "@/app/lib/prisma";
 
 export enum DistributionStrategy {
   IMPACT_GROUPS = "IMPACT_GROUPS",
