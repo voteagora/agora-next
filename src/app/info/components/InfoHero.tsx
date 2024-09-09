@@ -4,6 +4,7 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
 
 export const InfoHero = () => {
   const { ui, namespace } = Tenant.current();
@@ -19,6 +20,14 @@ export const InfoHero = () => {
         </h1>
         <p className="text-base font-medium text-gray-4f mt-2 sm:mt-0 ">
           {page!.description}
+
+          {namespace === TENANT_NAMESPACES.NEW_DAO && (
+            <Link href={"https://www.somesite.com"}>
+              <Button className="bg-brandPrimary hover:bg-brandPrimary mt-4">
+                .
+              </Button>
+            </Link>
+          )}
         </p>
       </div>
 
