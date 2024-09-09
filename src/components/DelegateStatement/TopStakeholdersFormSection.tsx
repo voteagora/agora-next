@@ -55,7 +55,7 @@ export default function TopStakeholdersFormSection({
         <h3 className="font-bold">Stakeholders I represent</h3>
         <DropdownMenu>
           <DropdownMenuTrigger
-            className={`${canAddMoreStakeholders ? "text-tertiary" : "text-gray-500"} outline-none`}
+            className={`${canAddMoreStakeholders ? "text-tertiary cursor-pointer" : "text-gray-500"} outline-none`}
             disabled={!canAddMoreStakeholders}
           >
             + Add a stakeholder
