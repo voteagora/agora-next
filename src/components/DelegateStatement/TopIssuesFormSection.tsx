@@ -66,6 +66,7 @@ export default function TopIssuesFormSection({
           <DropdownMenuContent>
             {ui.governanceIssues!.map((issue) => (
               <DropdownMenuItem
+                className="cursor-pointer"
                 key={issue.title}
                 onClick={() => addIssue(issue.key)}
               >
