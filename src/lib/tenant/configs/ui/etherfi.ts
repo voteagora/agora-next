@@ -56,6 +56,11 @@ export const etherfiTenantUIConfig = new TenantUI({
       title: "Governance Forum",
       url: "https://governance.ether.fi/",
     },
+    {
+      name: "changelog",
+      title: "Change log",
+      url: "/changelog",
+    },
   ],
 
   pages: [

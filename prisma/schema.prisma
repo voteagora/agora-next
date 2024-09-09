@@ -2106,6 +2106,19 @@ view cyberVotingPower {
   @@map("voting_power")
 }
 
+model changelog {
+  id             Int      @id @default(autoincrement())
+  dao_slug       DaoSlug
+  title          String   @db.VarChar(255)
+  body           String
+  author_address String   @db.VarChar(255)
+  created_at     DateTime @default(now()) @db.Timestamp(6)
+  updated_at     DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([dao_slug], map: "idx_changelog_dao_slug")
+  @@schema("alltenant")
+}
+
 view cyberVotingPowerSnaps {
   id                String   @id
   delegate          String?
