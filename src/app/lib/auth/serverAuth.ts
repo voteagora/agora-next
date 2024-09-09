@@ -168,14 +168,14 @@ export async function validateProjectCategoryScope(
   authResponse: AuthInfo
 ) {
   const project = await fetchProjectApi({ projectId, round: roundId });
-  const category = project.category_slug;
+  const category = project.applicationCategory;
 
   if (
     !category ||
     !authResponse.scope?.includes(`category:${category.toLowerCase()}`)
   ) {
     return new Response(
-      "Unauthorized to perform action on projects assisiated with this category",
+      "Unauthorized to perform action on projects associated with this category",
       {
         status: 401,
       }

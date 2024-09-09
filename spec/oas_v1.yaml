@@ -1004,9 +1004,15 @@ components:
       properties:
         id:
           type: string
+        projectId:
+          type: string
+        applicationId:
+          type: string
         name:
           type: string
         category:
+          type: string
+        applicationCategory:
           type: string
         description:
           type: string
@@ -1121,6 +1127,26 @@ components:
                     type: string
                   details:
                     type: string
+        pricingModel:
+          type: string
+        pricingModelDetails:
+          type: string
+        impactStatement:
+          type: object
+          properties:
+            category:
+              type: string
+            subcategory:
+              type: array
+              items:
+                type: string
+            statement:
+              type: object
+              properties:
+                question:
+                  type: string
+                answer:
+                  type: string
     SocialLinks:
       summary: Social media links for a project
       description: >
@@ -1143,7 +1169,9 @@ components:
       properties:
         name:
           type: string
-        profileAvatarUrl:
+        description:
+          type: string
+        organizationAvatarUrl:
           type: string
     RetroFundingBallotMetricsAllocation:
       summary: A vote for a RetroFunding ballot
