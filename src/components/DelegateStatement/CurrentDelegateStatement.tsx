@@ -9,7 +9,6 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Tenant from "@/lib/tenant/tenant";
-import { useRouter } from "next/navigation";
 import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 
@@ -63,7 +62,6 @@ const formSchema = z.object({
 });
 
 export default function CurrentDelegateStatement() {
-  const router = useRouter();
   const { ui } = Tenant.current();
   const { address, isConnected, isConnecting } = useAccount();
   const [loading, setLoading] = useState<boolean>(true);
