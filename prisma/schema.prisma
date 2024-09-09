@@ -180,22 +180,44 @@ model ProjectAllocations {
   created_at    DateTime      @default(now()) @db.Timestamptz(6)
   updated_at    DateTime      @default(now()) @db.Timestamptz(6)
   ballots       Ballots       @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
-  projects_data MockProjects @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  projects_data ProjectApplicants @relation(fields: [project_id], references: [application_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([address, round, project_id])
   @@map("project_allocations")
   @@schema("retro_funding")
 }
 
-model Categories {
-  slug        String   @id
-  name        String   
-  description String?  
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+model ProjectApplicants {
+  application_id          String               @id
+  project_id              String?
+  round                   String?
+  farcaser_id             String?
+  name                    String?
+  category                String?
+  ipfs_data               Json?                @db.Json
+  org_id                  String?
+  org_name                String?
+  org_ipfs_data           Json?                @db.Json
+  application_category    String?              @db.VarChar(255)
+  application_subcategory Json?
+  impact_statement        Json?
+  team                    Json?
+  ProjectAllocations      ProjectAllocations[]
+  categories              Categories?          @relation(fields: [application_category], references: [slug], onDelete: NoAction, onUpdate: NoAction, map: "project_applicants_final_category_slug_fkey")
 
-  category_allocations CategoryAllocations[]
-  mock_projects        MockProjects[]
+  @@map("project_applicants_final")
+  @@schema("retro_funding")
+}
+
+model Categories {
+  slug                     String                @id
+  name                     String
+  description              String
+  created_at               DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime              @default(now()) @db.Timestamptz(6)
+  category_allocations     CategoryAllocations[]
+  impact_statments         ImpactStatements[]
+  project_applicants       ProjectApplicants[]
 
   @@map("categories")
   @@schema("retro_funding")
@@ -301,57 +323,24 @@ model projects_data {
   @@schema("retro_funding")
 }
 
-model MockProjects {
-  id                      String   @id
-  category_slug           String
-  name                    String
-  description             String?
-  profileAvatarUrl        String? @map("profile_avatar_url")
-  projectCoverImageUrl    String? @map("project_cover_image_url")
-  socialLinks             Json?   @map("social_links")
-  team                    Json
-  github                  Json
-  packages                Json
-  contracts               Json
-  grantsAndFunding        Json  @map("grants_and_funding")
-  organization            Json?
-  links                   String[]
-  impactStatement         Json @map("impact_statement")
-  pricingModel            Json @map("pricing_model")
+model ImpactStatements {
+  application_id   String     @id @db.VarChar(255)
+  round            Int
+  category         String     @db.VarChar(255)
+  subcategory      Json?
+  impact_statement Json?
+  categories       Categories @relation(fields: [category], references: [slug], onDelete: NoAction, onUpdate: NoAction)
 
-  category Categories @relation(fields: [category_slug], references: [slug], onDelete: NoAction, onUpdate: NoAction)
-  
-  ProjectAllocations ProjectAllocations[]
-
-  @@map("mock_projects")
+  @@map("impact_statements")
   @@schema("retro_funding")
 }
 
-view project_applicants {
-  project_id                         String  @unique
-  application_id                     String?
-  round                              String?
-  farcaster_id                       String?
-  name                               String?
-  category                           String?
-  description                        String?
-  project_avatar_url                 String?
-  project_cover_image_url            String?
-  oso_slug                           String?
-  team                               Json?   @db.Json
-  github                             Json?   @db.Json
-  packages                           Json?   @db.Json
-  contracts                          Json?   @db.Json
-  social_links_website               Json?   @db.Json
-  social_links_farcaster             Json?   @db.Json
-  social_links_twitter               String?
-  social_links_mirror                String?
-  grants_and_funding_venture_funding Json?   @db.Json
-  grants_and_funding_grants          Json?   @db.Json
-  grants_and_funding_revenue         Json?   @db.Json
-  status                             String?
-  reason                             String?
+model TeamMetadata {
+  application_id String @id @db.VarChar(255)
+  round          Int
+  team           Json?
 
+  @@map("team_metadata")
   @@schema("retro_funding")
 }
 

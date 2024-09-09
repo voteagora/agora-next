@@ -23,83 +23,62 @@ async function getProjectsApi({
   round?: string;
   category?: keyof typeof filterMap;
 }): Promise<PaginatedResult<Project[]>> {
-  if (round === "5") {
-    const projects = filterMap[category]
-      ? await prisma.mockProjects.findMany({
-          where: {
-            category_slug: filterMap[category] as string,
-          },
-        })
-      : await prisma.mockProjects.findMany();
-
-    return {
-      meta: {
-        has_next: false,
-        total_returned: projects.length,
-        next_offset: projects.length,
-      },
-      data: projects.map((project) => ({
-        ...project,
-        project_id: project.id,
-        category: project.category_slug,
-        organization: project.organization as any,
-        socialLinks: project.socialLinks as any,
-        team: project.team as any,
-        github: project.github as any,
-        packages: project.packages as any,
-        contracts: project.contracts as any,
-        grantsAndFunding: project.grantsAndFunding as any,
-      })),
-    };
-  }
-
   const projects = await paginateResult(async (skip, take) => {
     if (round) {
       return (
-        await prisma.project_applicants.findMany({
+        await prisma.projectApplicants.findMany({
           where: {
             round: round,
-            status: "Passed",
+            application_category: filterMap[category],
           },
           skip,
           take,
         })
       ).map((data) => {
+        const projectData = data.ipfs_data ?? ({} as any);
+
         return {
-          project_id: data.project_id,
+          id: data.application_id,
+          applicationId: data.application_id,
+          projectId: data.project_id || "",
           category: data.category,
+          applicationCategory: data.application_category,
+          organization: data.org_ipfs_data as any,
           name: data.name,
-          description: data.description,
-          project_avatar_url: data.project_avatar_url,
-          project_cover_image_url: data.project_cover_image_url,
-          social_links_twitter: data.social_links_twitter,
-          social_links_farcaster: data.social_links_farcaster,
-          social_links_mirror: data.social_links_mirror,
-          social_links_website: data.social_links_website,
+          description: projectData.description,
+          profileAvatarUrl: projectData.projectAvatarUrl,
+          projectCoverImageUrl:
+            projectData.proejctCoverImageUrl ||
+            projectData.projectCoverImageUrl,
+          socialLinks: projectData.socialLinks,
           team: data.team,
-          github: data.github,
-          packages: data.packages,
-          contracts: data.contracts,
-          grants_and_funding_venture_funding:
-            data.grants_and_funding_venture_funding,
-          grants_and_funding_grants: data.grants_and_funding_grants,
-          grants_and_funding_revenue: data.grants_and_funding_revenue,
+          github: projectData.github,
+          packages: projectData.packages,
+          links: projectData.links,
+          contracts: projectData.contracts,
+          grantsAndFunding: projectData.grantsAndFunding,
+          pricingModel: projectData.pricingModel,
+          impactStatement: {
+            category: data.application_category,
+            subcategory: data.application_subcategory,
+            statement: data.impact_statement,
+          },
         };
       });
     }
 
-    return prisma.projects.findMany({
-      skip,
-      take,
-    });
-  }, pagination);
-
-  return {
-    meta: projects.meta,
-    data: projects.data.map((project) => {
+    return (
+      await prisma.projects.findMany({
+        skip,
+        take,
+      })
+    ).map((project) => {
       return {
         id: project.project_id,
+        projectId: project.project_id,
+        applicationId: "",
         category: project.category,
+        applicationCategory: null,
         organization: null,
         name: project.name,
         description: project.description,
@@ -121,8 +100,19 @@ async function getProjectsApi({
           grants: project.grants_and_funding_grants,
           revenue: project.grants_and_funding_revenue,
         },
+        pricingModel: {},
+        impactStatement: {
+          category: null,
+          subcategory: null,
+          statement: null,
+        },
       };
-    }),
+    });
+  }, pagination);
+
+  return {
+    meta: projects.meta,
+    data: projects.data,
   };
 }
 
@@ -133,23 +123,9 @@ async function getProjectApi({
   round: string;
   projectId: string;
 }) {
-  if (round === "5") {
-    const project = await prisma.mockProjects.findUnique({
-      where: {
-        id: projectId,
-      },
-    });
-
-    if (!project) {
-      throw new Error("Project not found");
-    }
-
-    return project;
-  }
-
-  const project = await prisma.projects.findUnique({
+  const project = await prisma.projectApplicants.findUnique({
     where: {
-      project_id: projectId,
+      application_id: projectId,
     },
   });
 
@@ -157,29 +133,32 @@ async function getProjectApi({
     throw new Error("Project not found");
   }
 
+  const projectData = project.ipfs_data ?? ({} as any);
+
   return {
     id: project.project_id,
-    category_slug: project.category,
-    organization: null,
+    projectId: project.project_id,
+    applicationId: project.application_id,
+    category: project.category,
+    applicationCategory: project.application_category,
+    organization: project.org_ipfs_data as any,
     name: project.name,
-    description: project.description,
-    profileAvatarUrl: project.project_avatar_url,
-    projectCoverImageUrl: project.project_cover_image_url,
-    socialLinks: {
-      twitter: project.social_links_twitter,
-      farcaster: project.social_links_farcaster,
-      mirror: project.social_links_mirror,
-      website: project.social_links_website,
-    },
+    description: projectData.description,
+    profileAvatarUrl: projectData.projectAvatarUrl,
+    projectCoverImageUrl:
+      projectData.proejctCoverImageUrl || projectData.projectCoverImageUrl,
+    socialLinks: projectData.socialLinks,
     team: project.team,
-    github: project.github,
-    packages: project.packages,
-    links: [],
-    contracts: project.contracts,
-    grantsAndFunding: {
-      ventureFunding: project.grants_and_funding_venture_funding,
-      grants: project.grants_and_funding_grants,
-      revenue: project.grants_and_funding_revenue,
+    github: projectData.github,
+    packages: projectData.packages,
+    links: projectData.links,
+    contracts: projectData.contracts,
+    grantsAndFunding: projectData.grantsAndFunding,
+    pricingModel: projectData.pricingModel,
+    impactStatement: {
+      category: project.application_category,
+      subcategory: project.application_subcategory,
+      statement: project.impact_statement,
     },
   };
 }

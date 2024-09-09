@@ -1,7 +1,7 @@
 import { paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { Ballots, Prisma, MockProjects } from "@prisma/client";
+import { Ballots, Prisma, ProjectApplicants } from "@prisma/client";
 import { Ballot } from "./ballot";
 import prisma from "@/app/lib/prisma";
 import { calculateAllocations } from "./ballotAllocations";
@@ -118,12 +118,12 @@ async function getR5Ballot({
         },
       },
     }),
-    prisma.$queryRaw<MockProjects[]>`
+    prisma.$queryRaw<ProjectApplicants[]>`
       SELECT 
         *
       FROM 
-        retro_funding.mock_projects
-      WHERE category_slug = ${category}
+        retro_funding.project_applicants
+      WHERE application_category = ${category}
       ORDER BY RANDOM();
     `,
   ]);
@@ -135,7 +135,9 @@ async function getR5Ballot({
       status: "NOT STARTED",
       project_allocations: [],
       category_allocations: [],
-      projects_to_be_evaluated: projects.map((project) => project.id),
+      projects_to_be_evaluated: projects.map(
+        (project) => project.application_id
+      ),
       total_projects: projects.length,
       payload_for_signature: {},
     };
@@ -152,10 +154,10 @@ async function getR5Ballot({
         .filter(
           (project) =>
             !ballot.project_allocations.some(
-              (allocation) => allocation.project_id === project.id
+              (allocation) => allocation.project_id === project.application_id
             )
         )
-        .map((project) => project.id),
+        .map((project) => project.application_id),
       total_projects: projects.length,
       payload_for_signature: {},
     };
@@ -188,7 +190,7 @@ function parseProjectAllocations(
   return allocations.map((allocation, i) => ({
     project_id: allocation.project_id,
     name: allocation.projects_data.name,
-    image: allocation.projects_data.description,
+    image: (allocation.projects_data.ipfs_data ?? ({} as any)).projectAvatarUrl,
     position: i,
     allocation: allocation.allocation,
     impact: allocation.impact,

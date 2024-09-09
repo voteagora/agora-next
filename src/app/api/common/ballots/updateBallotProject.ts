@@ -339,9 +339,9 @@ async function updateAllProjectsInBallotForAddress({
   roundId: number;
   address: string;
 }) {
-  const categoryProjects = await prisma.mockProjects.findMany({
+  const categoryProjects = await prisma.projectApplicants.findMany({
     where: {
-      category_slug: category,
+      application_category: category,
     },
   });
 
@@ -349,7 +349,8 @@ async function updateAllProjectsInBallotForAddress({
   const isValid =
     projects.every((project) =>
       categoryProjects.some(
-        (categoryProject) => categoryProject.id === project.project_id
+        (categoryProject) =>
+          categoryProject.application_id === project.project_id
       )
     ) && projects.length === categoryProjects.length;
 

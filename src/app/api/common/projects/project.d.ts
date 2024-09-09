@@ -1,8 +1,10 @@
 import { Prisma } from "@prisma/client";
 
 export type Project = {
-  id: string;
+  applicationId: string | null;
+  projectId: string;
   category: string | null;
+  applicationCategory: string | null;
   organization: { name: string; profileAvatarUrl: string } | null;
   name: string | null;
   description: string | null;
