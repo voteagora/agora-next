@@ -53,6 +53,11 @@ export const cyberTenantUIConfig = new TenantUI({
       title: "Code of Conduct",
       url: "https://docs.cyber.co/governance/code-of-conduct",
     },
+    {
+      name: "changelog",
+      title: "Change log",
+      url: "/changelog",
+    },
   ],
 
   governanceIssues: [
