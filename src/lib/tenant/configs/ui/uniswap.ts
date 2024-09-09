@@ -26,6 +26,14 @@ export const uniswapTenantUIConfig = new TenantUI({
     title: "Uniswap Foundation",
   },
 
+  links: [
+    {
+      name: "changelog",
+      title: "Change log",
+      url: "/changelog",
+    },
+  ],
+
   governanceStakeholders: [
     { title: "Builder", key: "builder" },
     { title: "Community member", key: "communityMember" },
