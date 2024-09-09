@@ -135,6 +135,7 @@ const IssueInput = ({
       <div className="flex flex-col flex-1 relative">
         <div className="flex flex-col absolute right-0 top-0 bottom-0">
           <Button
+            type="button"
             variant="ghost"
             className="mt-[2px] mr-[3px]"
             onClick={() => removeIssue(index)}
