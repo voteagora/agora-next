@@ -29,17 +29,22 @@ NextJS has some peculiar data access patterns given the mix of server-side and c
 
 #### Data fetching
 
-When rendering the various components on the page on the server, it's commong that many different components need to access the same data for a single request. For example, a user's address or ENS name may need to be displayed both on a component on the page and in the page metdata. 
+When rendering the various components on the page on the server, it's common that many different components need to access the same data for a single request. For example, a user's proifile data in the wallet drop down and on the delgate's page.
 
-To avoid re-fetching the same data for a given request, Next.JS includes the `fetch('example.api/resource')` API, which retrieves and caches external resources ([see](https://nextjs.org/docs/app/building-your-application/data-fetching)). 
+To avoid re-fetching the same data for a given request, Next.JS includes the `fetch('example.api/resource')` API, which retrieves and caches external resources ([see](https://nextjs.org/docs/app/building-your-application/data-fetching)).
 
-When we're unable to use the `fetch()` (e.g. because we're accessing data via the Primsa ORM client, via the DynamoDB client, etc.) the pattern we have adopted to make sure that these resources are not being fetched and re-fetched needlessly in the single request is to use the react cache to manually wrap these accesses. 
+When we're unable to use the `fetch()` (e.g. because we're accessing data via the Primsa ORM client, via the DynamoDB client, etc.) the pattern we have adopted to make sure that these resources are not being fetched and re-fetched needlessly in the single request is to use the react cache to manually wrap these accesses.
 
-As mentioned above, all data access code under `/api` should 
-1) be wrapped in a `React.cache` invocation
-2) by default, _only_ export cache-wrapped data accesses, to prevent unintentional mutliple fetching
+As mentioned above, all data access code under `/api` should
+
+1. be wrapped in a `React.cache` invocation
+2. by default, _only_ export cache-wrapped data accesses, to prevent unintentional mutliple fetching
 
 See `/src/app/api/common/delegates/getDelegates.ts` for an example.
+
+#### Data fetching in client components
+
+When fetching data in the client, we should use the `useQuery` hook. This hook is provided by the `react-query` library, which is a powerful tool for managing data fetching and caching in React applications. It provides a simple and flexible API for fetching, caching, and updating data in your application.
 
 #### DB Access
 
@@ -181,8 +186,6 @@ This is where all of the images, fonts, and other assets will live.
 ## Instrumentation + Observability
 
 We have integrated [OpenTelemetry](https://opentelemetry.io/) (OTel) to aid in instrumenting the application. OTel is a vendor-agnostic observability providing a single set of APIs, libraries, agents, and instrumentation to capture distributed traces and metrics.
-
-
 
 ## Deploy on Vercel
 
