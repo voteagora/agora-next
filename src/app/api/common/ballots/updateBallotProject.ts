@@ -307,7 +307,7 @@ export const updateBallotProjectPosition = cache(
 const updateAllProjectsInBallotApi = async (
   projects: {
     project_id: string;
-    allocation: string;
+    allocation: string | null;
     impact: number;
   }[],
   category: string,
@@ -332,7 +332,7 @@ async function updateAllProjectsInBallotForAddress({
 }: {
   projects: {
     project_id: string;
-    allocation: string;
+    allocation: string | null;
     impact: number;
   }[];
   category: string;
@@ -398,7 +398,7 @@ async function updateAllProjectsInBallotForAddress({
           project_id: project.project_id,
           round: roundId,
           address,
-          allocation: project.allocation,
+          allocation: project.impact ? project.allocation : null,
           impact: project.impact,
           rank: (500_000 / projects.length) * (i + 1),
         },
