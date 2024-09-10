@@ -14,6 +14,7 @@ type BallotContent = {
 const updateBallotCategoryApi = async (
   data: BallotContent,
   roundId: number,
+  badgeholderCategory: string,
   ballotCasterAddressOrEns: string
 ) =>
   addressOrEnsNameWrap(
@@ -22,16 +23,19 @@ const updateBallotCategoryApi = async (
     {
       data,
       roundId,
+      badgeholderCategory,
     }
   );
 
 async function updateBallotCategoryForAddress({
   data,
   roundId,
+  badgeholderCategory,
   address,
 }: {
   data: BallotContent;
   roundId: number;
+  badgeholderCategory: string;
   address: string;
 }) {
   // Create ballot if it doesn't exist
@@ -77,7 +81,7 @@ async function updateBallotCategoryForAddress({
   await autobalanceCategories(address, roundId, data.category_slug);
 
   // Return full ballot
-  return fetchBallot(roundId, address);
+  return fetchBallot(roundId, address, badgeholderCategory);
 }
 
 async function autobalanceCategories(
