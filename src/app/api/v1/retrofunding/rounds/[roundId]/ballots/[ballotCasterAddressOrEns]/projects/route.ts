@@ -12,7 +12,7 @@ const ballotPayloadSchema = z.object({
   projects: z.array(
     z.object({
       project_id: z.string(),
-      allocation: z.string(z.number().min(0).max(100)),
+      allocation: z.string(z.number().min(0).max(100)).nullable(),
       impact: z.number(),
     })
   ),
