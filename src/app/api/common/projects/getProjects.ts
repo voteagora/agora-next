@@ -29,7 +29,9 @@ async function getProjectsApi({
         await prisma.projectApplicants.findMany({
           where: {
             round: round,
-            application_category: filterMap[category],
+            ...(filterMap[category] && {
+              application_category: filterMap[category],
+            }),
           },
           skip,
           take,
