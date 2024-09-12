@@ -2426,7 +2426,7 @@ paths:
                     - OP_STACK_RESEARCH_AND_DEVELOPMENT
                     - OP_STACK_TOOLING
                 allocation:
-                  type: string
+                  type: number
                 locked:
                   type: boolean
       responses:
