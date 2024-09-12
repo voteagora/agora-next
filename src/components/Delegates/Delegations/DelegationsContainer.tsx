@@ -83,12 +83,18 @@ function DelegationsContainer({
             <Table className="min-w-full">
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="h-10">Allowance</TableHead>
-                  <TableHead className="h-10">Delegated on</TableHead>
-                  <TableHead className="h-10">Type</TableHead>
-                  <TableHead className="h-10">Amount</TableHead>
-                  <TableHead className="h-10">From</TableHead>
-                  <TableHead className="h-10">Txn Hash</TableHead>
+                  <TableHead className="h-10 text-secondary">
+                    Allowance
+                  </TableHead>
+                  <TableHead className="h-10 text-secondary">
+                    Delegated on
+                  </TableHead>
+                  <TableHead className="h-10 text-secondary">Type</TableHead>
+                  <TableHead className="h-10 text-secondary">Amount</TableHead>
+                  <TableHead className="h-10 text-secondary">From</TableHead>
+                  <TableHead className="h-10 text-secondary">
+                    Txn Hash
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <InfiniteScroll
@@ -99,7 +105,7 @@ function DelegationsContainer({
                   <TableRow key={0}>
                     <TableCell
                       key="loader"
-                      className="gl_loader justify-center py-6 text-sm text-stone-500"
+                      className="gl_loader justify-center py-6 text-sm text-secondary"
                     >
                       Loading...
                     </TableCell>
@@ -112,7 +118,7 @@ function DelegationsContainer({
               >
                 {delegators.length === 0 ? (
                   <td
-                    className="w-full p-4 bg-neutral text-center text-tertiary text-sm"
+                    className="w-full p-4 bg-neutral text-center text-secondary text-sm"
                     colSpan={6}
                   >
                     None found
@@ -149,7 +155,7 @@ function DelegationsContainer({
               <TableBody className="">
                 {delegatees.length === 0 ? (
                   <td
-                    className="w-full p-4 bg-neutral text-center text-tertiary text-sm"
+                    className="w-full p-4 bg-neutral text-center text-secondary text-sm"
                     colSpan={6}
                   >
                     None found
