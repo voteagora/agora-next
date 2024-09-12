@@ -72,8 +72,8 @@ export default function IssuesFilter() {
                     <li
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         selected
-                          ? "text-black bg-white border-line"
-                          : "text-tertiary border-transparent"
+                          ? "text-primary bg-white border-line"
+                          : "text-secondary border-transparent"
                       }`}
                     >
                       {issuesFilterOptions[key].value}

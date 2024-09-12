@@ -29,7 +29,7 @@ const VotesContainer = ({
       <div className="flex flex-row justify-between items-center relative">
         <h2 className="text-black text-2xl font-bold">Past Votes</h2>
         <Listbox value={activeTab} onChange={setActiveTab}>
-          <Listbox.Button className="w-full sm:w-fit bg-[#F7F7F7] text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
+          <Listbox.Button className="w-full sm:w-fit bg-wash text-primary font-medium border-none rounded-full py-2 px-4 flex items-center">
             {activeTab === "onchain"
               ? filterOptions.onchain.label
               : filterOptions.snapshot.label}
@@ -44,14 +44,14 @@ const VotesContainer = ({
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Listbox.Options className="mt-3 absolute bg-[#F7F7F7] border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-10 w-max right-0 top-4">
+            <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-10 w-max right-0 top-4">
               {Object.values(filterOptions).map((option) => (
                 <Listbox.Option key={option.value} value={option.value}>
                   {({ selected }) => (
                     <div
                       className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
                         selected
-                          ? "text-black bg-white border-[#ebebeb]"
+                          ? "text-primary bg-white border-line"
                           : "text-secondary border-transparent"
                       }`}
                     >
