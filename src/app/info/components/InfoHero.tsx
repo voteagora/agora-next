@@ -31,19 +31,17 @@ export const InfoHero = () => {
         </p>
       </div>
 
-      {namespace !== TENANT_NAMESPACES.NEW_DAO && (
-        <div className="flex flex-row">
-          {page!.links!.map((link, idx) => (
-            <Card
-              className={rotationClasses[idx % rotationClasses.length]}
-              image={link.image || ""}
-              key={`card-${idx}`}
-              link={link.url}
-              linkText={link.title}
-            />
-          ))}
-        </div>
-      )}
+      <div className="flex flex-row">
+        {page!.links!.map((link, idx) => (
+          <Card
+            className={rotationClasses[idx % rotationClasses.length]}
+            image={link.image || ""}
+            key={`card-${idx}`}
+            link={link.url}
+            linkText={link.title}
+          />
+        ))}
+      </div>
     </div>
   );
 };
