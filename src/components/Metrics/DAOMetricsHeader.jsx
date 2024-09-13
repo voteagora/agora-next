@@ -1,6 +1,7 @@
 "use client";
 
 import discord from "@/icons/discord.svg";
+import logo from "@/assets/agora_logo.svg";
 import infoTransparent from "@/icons/info-transparent.svg";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -25,6 +26,7 @@ export default function DAOMetricsHeader({ metrics }) {
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
+  const agoraLink = ui.link("agora");
 
   useEffect(() => {
     setIsClient(true);
@@ -141,6 +143,19 @@ export default function DAOMetricsHeader({ metrics }) {
                   >
                     <Image src={discord} alt={discordLink.title} />
                   </a>
+                )}
+
+                {agoraLink && (
+                  <div className="flex flex-row">
+                    <a
+                      href={agoraLink.url}
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                      className="hidden sm:inline"
+                    >
+                      {agoraLink.title}
+                    </a>
+                  </div>
                 )}
               </div>
             </div>
