@@ -12,6 +12,7 @@ export enum DistributionStrategy {
 const applyDistributionStrategyApi = async (
   strategy: DistributionStrategy,
   roundId: number,
+  category: string,
   ballotCasterAddressOrEns: string
 ) =>
   addressOrEnsNameWrap(
@@ -20,16 +21,19 @@ const applyDistributionStrategyApi = async (
     {
       strategy,
       roundId,
+      category,
     }
   );
 
 async function applyDistributionStrategyForAddress({
   strategy,
   roundId,
+  category,
   address,
 }: {
   strategy: DistributionStrategy;
   roundId: number;
+  category: string;
   address: string;
 }) {
   // Get projects allocation
@@ -142,7 +146,7 @@ async function applyDistributionStrategyForAddress({
     )
   );
 
-  return fetchBallot(roundId, address);
+  return fetchBallot(roundId, address, category);
 }
 
 function topToBottom({
