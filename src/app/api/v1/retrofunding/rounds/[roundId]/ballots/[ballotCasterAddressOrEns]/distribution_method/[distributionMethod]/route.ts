@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import {
+  authenticateApiUser,
+  getCategoryScope,
+} from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import {
   applyDistributionStrategy,
@@ -32,11 +35,23 @@ export async function POST(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
+      const categoryScope = getCategoryScope(authResponse);
+
+      if (!categoryScope) {
+        return new Response(
+          "This user does not have a category scope. Regenerate the JWT token",
+          {
+            status: 401,
+          }
+        );
+      }
+
       const ballot = await applyDistributionStrategy(
         distributionMethodValidator.parse(
           distributionMethod
         ) as DistributionStrategy,
         Number(roundId),
+        categoryScope,
         ballotCasterAddressOrEns
       );
 
