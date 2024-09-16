@@ -400,7 +400,7 @@ async function updateAllProjectsInBallotForAddress({
           address,
           allocation: project.impact ? project.allocation : null,
           impact: project.impact,
-          rank: (500_000 / projects.length) * (i + 1),
+          rank: Math.floor((500_000 / projects.length) * (i + 1)),
         },
       })
     )
