@@ -215,7 +215,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: false,
+      enabled: true,
       config: {
         stages: [
           {
