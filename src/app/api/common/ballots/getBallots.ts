@@ -96,7 +96,7 @@ async function getR5Ballot({
   address: string;
   category: string;
 }) {
-  const [ballot, projects] = await Promise.all([
+  const [ballot, projects, ballotSubmission] = await Promise.all([
     prisma.ballots.findFirst({
       where: {
         round: roundId,
@@ -126,6 +126,12 @@ async function getR5Ballot({
       WHERE application_category = ${category}
       ORDER BY RANDOM();
     `,
+    prisma.ballotSubmittions.findFirst({
+      where: {
+        address,
+        round: roundId,
+      },
+    }),
   ]);
 
   if (!ballot) {
@@ -133,6 +139,7 @@ async function getR5Ballot({
       address,
       round_id: roundId,
       status: "NOT STARTED",
+      budget: null,
       project_allocations: [],
       category_allocations: [],
       projects_to_be_evaluated: projects.map(
@@ -140,14 +147,18 @@ async function getR5Ballot({
       ),
       total_projects: projects.length,
       payload_for_signature: {},
+      created_at: null,
+      updated_at: null,
+      submitted_at: ballotSubmission?.updated_at,
     };
   }
 
-  if (ballot.project_allocations.length < projects.length) {
+  if (ballot.project_allocations.length < projects.length || !ballot.budget) {
     return {
       address: ballot.address,
       round_id: ballot.round,
       status: "PROJECT RANKING",
+      budget: ballot.budget,
       project_allocations: parseProjectAllocations(ballot.project_allocations),
       category_allocations: ballot.category_allocations,
       projects_to_be_evaluated: projects
@@ -160,18 +171,23 @@ async function getR5Ballot({
         .map((project) => project.application_id),
       total_projects: projects.length,
       payload_for_signature: {},
+      created_at: ballot.created_at,
+      updated_at: ballot.updated_at,
+      submitted_at: ballotSubmission?.updated_at,
     };
   }
 
   return {
     address: ballot.address,
     round_id: ballot.round,
-    status: "PENDING SUBMISSION",
+    status: ballotSubmission ? "SUBMITTED" : "PENDING SUBMISSION",
+    budget: ballot.budget,
     project_allocations: parseProjectAllocations(ballot.project_allocations),
     category_allocations: ballot.category_allocations,
     projects_to_be_evaluated: [],
     total_projects: projects.length,
     payload_for_signature: {
+      budget: ballot.budget,
       project_allocations: ballot.project_allocations.map((allocation) => ({
         [allocation.project_id]: allocation.allocation,
       })),
@@ -179,6 +195,9 @@ async function getR5Ballot({
         [allocation.category_slug]: allocation.allocation,
       })),
     },
+    created_at: ballot.created_at,
+    updated_at: ballot.updated_at,
+    submitted_at: ballotSubmission?.updated_at,
   };
 }
 

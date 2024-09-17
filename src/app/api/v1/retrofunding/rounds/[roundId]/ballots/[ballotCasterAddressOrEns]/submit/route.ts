@@ -2,7 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
-import { fetchIsCitizen } from "@/app/api/common/citizens/isCitizen";
 
 const r4BallotContentSchema = z.object({
   allocations: z.array(z.record(z.string(), z.number())),
@@ -11,8 +10,13 @@ const r4BallotContentSchema = z.object({
 });
 
 const r5BallotContentSchema = z.object({
-  project_allocations: z.array(z.record(z.string(), z.number())),
-  category_allocations: z.array(z.record(z.string(), z.number())),
+  budget: z.number().min(2000000).max(8000000), // number between 2M and 8M
+  project_allocations: z.array(
+    z.record(z.string(), z.number().min(0).max(100))
+  ),
+  category_allocations: z.array(
+    z.record(z.string(), z.number().min(0).max(100))
+  ),
 });
 
 const r4BallotSubmissionSchema = z.object({
