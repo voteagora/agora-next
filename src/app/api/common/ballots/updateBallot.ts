@@ -233,7 +233,52 @@ async function updateBallotOsOnlyForAddress({
   return fetchBallot(roundId, address);
 }
 
+const updateBallotBudgetApi = async (
+  budget: number,
+  roundId: number,
+  category: string,
+  ballotCasterAddressOrEns: string
+) =>
+  addressOrEnsNameWrap(updateBallotBudgetForAddress, ballotCasterAddressOrEns, {
+    budget,
+    roundId,
+    category,
+  });
+
+async function updateBallotBudgetForAddress({
+  roundId,
+  address,
+  budget,
+  category,
+}: {
+  roundId: number;
+  address: string;
+  budget: number;
+  category: string;
+}) {
+  await prisma.ballots.upsert({
+    where: {
+      address_round: {
+        address,
+        round: roundId,
+      },
+    },
+    update: {
+      updated_at: new Date(),
+      budget,
+    },
+    create: {
+      round: roundId,
+      address,
+      budget,
+    },
+  });
+
+  return fetchBallot(roundId, address, category);
+}
+
 export const updateBallotMetric = cache(updateBallotMetricApi);
 export const deleteBallotMetric = cache(deleteBallotMetricApi);
 export const updateBallotOsMultiplier = cache(updateBallotOsMultiplierApi);
 export const updateBallotOsOnly = cache(updateBallotOsOnlyApi);
+export const updateBallotBudget = cache(updateBallotBudgetApi);
