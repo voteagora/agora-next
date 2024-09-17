@@ -1305,6 +1305,10 @@ components:
             - RANKED
             - PENDING SUBMISSION
             - SUBMITTED
+        budget:
+          description: >
+            Budget allocation selected by voter. This is a integer between 2,000,000 and 8,000,000.
+          type: integer
         created_at:
           type: string
           format: date-time
@@ -1332,8 +1336,8 @@ components:
           description: >
             Total number of projects that the voter has to evaluate. This is the length of the projects_to_be_evaluated array.
           type: integer
-        distribution_method:
-          type: string
+        payload_for_signature:
+          $ref: "#/components/schemas/RetroFunding5BallotSubmissionContent"
     RetroFunding4BallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -1362,6 +1366,24 @@ components:
             Badgeholder's signature of the contents of their ballot.
           type: string
           pattern: "^0x[a-fA-F0-9]{130}$"
+    RetroFunding5BallotSubmissionContent:
+      summary: Fields required for ballot submission
+      type: object
+      properties:
+        budget:
+          type: number
+        category_allocation:
+          type: array
+          items:
+            type: object
+            categoryId:
+              type: number
+        projects_allocation:
+          type: array
+          items:
+            type: object
+            projectId:
+              type: number
     RetroFunding5BallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -1372,20 +1394,7 @@ components:
           description: Address or ENS of the ballot caster.
           type: string
         ballot_content:
-          type: object
-          properties:
-            category_allocation:
-              type: array
-              items:
-                type: object
-                categoryId:
-                  type: string
-            projects_allocation:
-              type: array
-              items:
-                type: object
-                projectId:
-                  type: string
+          $ref: "#/components/schemas/RetroFunding5BallotSubmissionContent"
         signature:
           summary: Badgeholder signature of the ballot
           description: >
@@ -1516,6 +1525,15 @@ components:
         enum:
           - "IMPACT_GROUPS"
           - "TOP_TO_BOTTOM"
+    budgetParam:
+      name: budget
+      in: path
+      description: The budget to be set in OP tokens
+      required: true
+      schema:
+        type: number
+        minimum: 2000000
+        maximum: 8000000
 paths:
   /spec:
     get:
@@ -2408,7 +2426,6 @@ paths:
       operationId: updateRetroFundingRoundCategoryAllocation
       tags:
         - RetroFunding
-        - projects
         - Round 5
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
@@ -2429,6 +2446,34 @@ paths:
                   type: number
                 locked:
                   type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round5Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/budget/{budget}:
+    post:
+      summary: Updates a budget allocation for a specific RetroFunding ballot
+      description: >
+        Updates a category budget allocation for a RetroFunding round on Agora. Value is in OP tokens. Min 2M, Max 8M.
+      operationId: updateRetroFundingRoundBudgetAllocation
+      tags:
+        - RetroFunding
+        - Round 5
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+        - $ref: "#/components/parameters/budgetParam"
       responses:
         "200":
           description: OK
