@@ -86,6 +86,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "sponsoredVote",
+      enabled: true,
+    },
+    {
       name: "proposal-lifecycle",
       enabled: true,
       config: {
