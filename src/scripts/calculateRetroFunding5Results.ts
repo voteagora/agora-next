@@ -1,7 +1,7 @@
 import fs from "fs";
-const csv = require("csv-parser");
-const path = require("path");
-const iconv = require("iconv-lite");
+import csv from "csv-parser";
+import path from "path";
+import iconv from "iconv-lite";
 
 const MAX_CAP = 500_000;
 const MIN_CAP = 1000;
@@ -131,27 +131,6 @@ function applyMinCapAndNormalize(
 }
 
 // Helper functions
-
-function capAllocations<T extends { allocation: number }>(
-  allocations: T[],
-  cap: number = MAX_CAP / TOTAL_FUNDING,
-  totalFunding: number = TOTAL_FUNDING
-): T[] {
-  let total = 1;
-  let adjustedTotal = 1;
-  return allocations.map((a) => {
-    const cappedAllocation = Math.min(
-      (a.allocation * adjustedTotal) / total,
-      cap
-    );
-    total -= a.allocation;
-    adjustedTotal -= cappedAllocation;
-    return {
-      ...a,
-      allocation: cappedAllocation * totalFunding,
-    };
-  });
-}
 
 function normalizeAllocaitons<T extends { allocation: number }>(
   allocations: T[],

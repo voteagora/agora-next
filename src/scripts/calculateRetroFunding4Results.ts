@@ -1,7 +1,7 @@
-const fs = require("fs");
-const csv = require("csv-parser");
-const path = require("path");
-const iconv = require("iconv-lite");
+import fs from "fs";
+import csv from "csv-parser";
+import path from "path";
+import iconv from "iconv-lite";
 
 const TOTAL_FUNDING = 10_000_000;
 const MAX_CAP = 500_000;
