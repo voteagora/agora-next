@@ -141,6 +141,7 @@ async function updateBallotProjectImpactForAddress({
               retro_funding.project_allocations
           WHERE
               impact = ${impact}
+              AND address = $1 AND round = $2
       ),
       lower_group AS (
           SELECT
@@ -149,6 +150,7 @@ async function updateBallotProjectImpactForAddress({
               retro_funding.project_allocations
           WHERE
               impact = ${impact} - 1
+              AND address = $1 AND round = $2
       ),
       estimated_rank AS (
           SELECT
@@ -245,6 +247,7 @@ async function updateBallotProjectPositionForAddress({
               ROW_NUMBER() OVER (ORDER BY rank DESC) AS current_position
           FROM
               retro_funding.project_allocations
+          WHERE address = $1 AND round = $2
       ),
       position_bounds AS (
           SELECT
