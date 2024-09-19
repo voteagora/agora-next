@@ -154,8 +154,8 @@ export default async function Page({
                   />
                 </div>
               ) : (
-                <div className="text-secondary">
-                  <p>No past votes available.</p>
+                <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
+                  No past votes available.
                 </div>
               )}
             </>
@@ -174,8 +174,8 @@ export default async function Page({
                   }}
                 />
               ) : (
-                <div className="text-secondary">
-                  <p>No past votes available.</p>
+                <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
+                  No past votes available.
                 </div>
               )}
             </>

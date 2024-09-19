@@ -60,7 +60,7 @@ export default function DelegateCardList({
     <DialogProvider>
       {/* @ts-ignore */}
       <InfiniteScroll
-        className="grid grid-flow-row grid-cols-[repeat(auto-fit,_23rem)] sm:grid-cols-[repeat(3,_23rem)] justify-around sm:justify-between py-4 gap-4 sm:gap-8"
+        className="grid grid-flow-row grid-cols-1 sm:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8"
         hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}

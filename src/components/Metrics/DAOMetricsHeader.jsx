@@ -28,6 +28,11 @@ export default function DAOMetricsHeader({ metrics }) {
   const discordLink = ui.link("discord");
   const agoraLink = ui.link("agora");
 
+  // discord + agora are hidden on mobile
+  const hasLinksMobile =
+    !!governanceForumLink || !!bugsLink || !!changeLogLink || !!faqLink;
+  const hasLinksDesktop = hasLinksMobile || !!discordLink || !!agoraLink;
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -90,14 +95,24 @@ export default function DAOMetricsHeader({ metrics }) {
                     </HoverCardContent>
                   </HoverCard>
                 </div>
-                <Image
-                  src={infoTransparent}
-                  alt="Info"
-                  className="inline sm:hidden"
-                />
+                {hasLinksMobile && (
+                  <Image
+                    src={infoTransparent}
+                    alt="Info"
+                    className="inline sm:hidden"
+                  />
+                )}
               </div>
               <div className="block bg-line w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div className="w-full sm:w-2/5 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+              <div
+                className={`w-full sm:w-2/5 justify-end items-center px-6 sm:px-8 gap-4 h-10 ${
+                  hasLinksMobile
+                    ? "flex"
+                    : hasLinksDesktop
+                      ? "hidden sm:flex"
+                      : "hidden"
+                }`}
+              >
                 {governanceForumLink && (
                   <a
                     href={governanceForumLink.url}
@@ -146,16 +161,14 @@ export default function DAOMetricsHeader({ metrics }) {
                 )}
 
                 {agoraLink && (
-                  <div className="flex flex-row">
-                    <a
-                      href={agoraLink.url}
-                      rel="noreferrer nonopener"
-                      target="_blank"
-                      className="hidden sm:inline"
-                    >
-                      {agoraLink.title}
-                    </a>
-                  </div>
+                  <a
+                    href={agoraLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                    className="hidden sm:inline"
+                  >
+                    {agoraLink.title}
+                  </a>
                 )}
               </div>
             </div>
