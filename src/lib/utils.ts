@@ -122,6 +122,13 @@ export function formatNumberWithScientificNotation(x: number): string {
   return scientificNotation;
 }
 
+export function formatPercentageWithPrecision(
+  value: number,
+  precision: number
+) {
+  return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(precision);
+}
+
 export function humanizeNumber(
   n: number,
   options: { delimiter?: string; separator?: string } = {}

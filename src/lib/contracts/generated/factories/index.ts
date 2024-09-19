@@ -3,6 +3,7 @@
 /* eslint-disable */
 export { AgoraGovernor__factory } from "./AgoraGovernor__factory";
 export { AgoraTimelock__factory } from "./AgoraTimelock__factory";
+export { AgoraToken__factory } from "./AgoraToken__factory";
 export { AlligatorOPV5__factory } from "./AlligatorOPV5__factory";
 export { ApprovalVotingModule__factory } from "./ApprovalVotingModule__factory";
 export { CyberProposalTypes__factory } from "./CyberProposalTypes__factory";

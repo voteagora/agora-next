@@ -2,6 +2,7 @@
 
 import { DelegateButton } from "./DelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
+import { PartialDelegateButton } from "./PartialDelegateButton";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -36,6 +37,36 @@ export function DelegateActions({
     delegate.address.toLowerCase() as `0x${string}`
   );
 
+  const delegationButton = () => {
+    // TODO: Replace namespace lookup with governor-level switch in the tenant
+    switch (namespace) {
+      case TENANT_NAMESPACES.NEW_DAO:
+        return <PartialDelegateButton full={false} delegate={delegate} />;
+
+      // Optimism in the only tenant currently supporting advnaced delegation
+      case TENANT_NAMESPACES.OPTIMISM:
+        if (isAdvancedUser && hasAlligator) {
+          return (
+            <AdvancedDelegateButton
+              delegate={delegate}
+              delegators={delegators}
+            />
+          );
+        } else {
+          return (
+            <DelegateButton full={!twitter && !discord} delegate={delegate} />
+          );
+        }
+
+      //   The following tenants only support full token-based delegation:
+      //   ENS,Cyber,Ether.fi, Uniswap
+      default:
+        return (
+          <DelegateButton full={!twitter && !discord} delegate={delegate} />
+        );
+    }
+  };
+
   if (isRetired) {
     return (
       <div className="rounded-lg border border-line p-2 bg-line text-xs font-medium text-secondary">
@@ -52,35 +83,25 @@ export function DelegateActions({
         twitter={twitter}
         warpcast={warpcast}
       />
-      {namespace !== TENANT_NAMESPACES.NEW_DAO && (
-        <div>
-          {isConnected ? (
-            address &&
-            (isAdvancedUser && hasAlligator ? (
-              <AdvancedDelegateButton
-                delegate={delegate}
-                delegators={delegators}
-              />
-            ) : (
-              <DelegateButton full={!twitter && !discord} delegate={delegate} />
-            ))
-          ) : (
-            <ConnectKitButton.Custom>
-              {({ show }) => (
-                <Button
-                  onClick={(e: SyntheticEvent) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    show?.();
-                  }}
-                >
-                  Delegate
-                </Button>
-              )}
-            </ConnectKitButton.Custom>
-          )}
-        </div>
-      )}
+      <div>
+        {isConnected && address ? (
+          delegationButton()
+        ) : (
+          <ConnectKitButton.Custom>
+            {({ show }) => (
+              <Button
+                onClick={(e: SyntheticEvent) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  show?.();
+                }}
+              >
+                Delegate
+              </Button>
+            )}
+          </ConnectKitButton.Custom>
+        )}
+      </div>
     </div>
   );
 }

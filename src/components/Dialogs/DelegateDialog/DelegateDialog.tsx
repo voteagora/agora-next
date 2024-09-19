@@ -13,7 +13,6 @@ import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
-import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
@@ -140,17 +139,6 @@ export function DelegateDialog({
           prevVotingPowerDelegatee: delegate.votingPower.total,
         });
       }
-      // Track delegation event
-      // TODO: Andrei - verify that vercel analytics are still needed given that tenants now support Google Analytics
-      const trackingData = {
-        dao_slug: slug,
-        delegateAddress: delegate.address || "unknown",
-        address: accountAddress || "unknown",
-        delegateEnsName: delegateEnsName || "unknown",
-        votingPower: votingPower || "unknown",
-      };
-
-      track("Delegate", trackingData);
     }
   }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
 

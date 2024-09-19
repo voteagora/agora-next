@@ -17,6 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /*
  * Fetches a list of delegates
@@ -350,34 +351,45 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     fetchCurrentQuorum(),
   ]);
 
-  const numOfDelegatesQuery = contracts.alligator
-    ? prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
-        `
-        SELECT 
-          SUM(count) as num_of_delegators
-        FROM (
-          SELECT count(*)
-          FROM ${namespace + ".advanced_delegatees"}
-          WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0
-          UNION ALL
-          SELECT
-            SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-          FROM ${namespace + ".delegate_changed_events"}
-          WHERE to_delegate=$1 OR from_delegate=$1
-        ) t;
-        `,
-        address,
-        contracts.alligator?.address
-      )
-    : prisma.$queryRawUnsafe<{ num_of_delegators: BigInt }[]>(
-        `
-        SELECT
+  const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
+        FROM ${namespace + ".advanced_delegatees"}
+        WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0`;
+  const numOfDirectDelegationsQuery = `        SELECT
           SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
         FROM ${namespace + ".delegate_changed_events"}
-        WHERE to_delegate=$1 OR from_delegate=$1;
-        `,
-        address
-      );
+        WHERE to_delegate=$1 OR from_delegate=$1`;
+
+  var numOfDelegationsQuery;
+
+  const partialDelegationContract = contracts.alligator
+    ? contracts.alligator.address
+    : contracts.token.address;
+
+  if (contracts.alligator) {
+    numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      { num_of_delegators: BigInt }[]
+    >(
+      `
+      SELECT 
+        SUM(num_of_delegators) as num_of_delegators
+      FROM (
+        ${numOfAdvancedDelegationsQuery}
+        UNION ALL
+        ${numOfDirectDelegationsQuery}
+      ) t;
+      `,
+      address,
+      partialDelegationContract
+    );
+  } else if (namespace === TENANT_NAMESPACES.NEW_DAO) {
+    numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      { num_of_delegators: BigInt }[]
+    >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
+  } else {
+    numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      { num_of_delegators: BigInt }[]
+    >(numOfDirectDelegationsQuery, address, partialDelegationContract);
+  }
 
   const totalVotingPower =
     BigInt(delegate?.voting_power || 0) +
@@ -414,7 +426,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       // Use cached amount when recalculation is expensive
       cachedNumOfDelegators < 1000n
         ? BigInt(
-            (await numOfDelegatesQuery)?.[0]?.num_of_delegators?.toString() ||
+            (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
               "0"
           )
         : cachedNumOfDelegators,
