@@ -38,30 +38,30 @@ const GovernorSettingsParams = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-base font-semibold text-left text-gray-4f bg-gray-fa">
+          <TableHead className="text-base font-semibold text-left text-secondary bg-wash rounded-tl-xl">
             Parameter
           </TableHead>
-          <TableHead className="text-base font-semibold text-gray-4f text-right bg-gray-fa">
+          <TableHead className="text-base font-semibold text-secondary text-right bg-wash rounded-tr-xl">
             Value
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow>
-          <TableCell className="text-base font-semibold text-left text-gray-4f">
+          <TableCell className="text-base font-semibold text-left text-secondary">
             Voting Delay
           </TableCell>
-          <TableCell className="text-base font-semibold text-right text-black">
+          <TableCell className="text-base font-semibold text-right text-primary">
             {isDelayFetched && votingDelay
               ? secondsToHuman(blocksToSeconds(Number(votingDelay)))
               : "Loading..."}
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="text-base font-semibold text-left text-gray-4f">
+          <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-xl">
             Voting Period
           </TableCell>
-          <TableCell className="text-base font-semibold text-right text-black">
+          <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
             {isPeriodFetched && votingPeriod
               ? secondsToHuman(blocksToSeconds(Number(votingPeriod)))
               : "Loading..."}

@@ -4,8 +4,7 @@ import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
-const { ui, namespace } = Tenant.current();
-const page = ui!.page("info");
+const { ui } = Tenant.current();
 
 const tabs = [
   {
@@ -38,24 +37,28 @@ const InfoAbout = () => {
 
   return (
     <>
-      <h3 className="text-2xl font-black text-primary mt-10">
+      <h3 className="text-2xl font-black text-primary mt-12">
         Getting started
       </h3>
       <div className="mt-4 rounded-xl border border-line bg-neutral shadow-sm">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
-          <Image
-            src={page.hero!}
-            alt={page.title}
-            width={400}
-            className="rounded-lg"
-          />
-          <div>
+          <div className="w-1/2 relative">
+            <Image
+              src={page.hero!}
+              alt={page.title}
+              fill
+              className="rounded-lg object-cover object-center"
+            />
+          </div>
+          <div className="w-1/2">
             <h3 className="text-lg font-bold text-primary capitalize">
               About {namespace}
             </h3>
-            <p className="text-secondary font-medium mt-3">
-              {page.description}
-            </p>
+            <p className="text-secondary mt-3">{page.description}</p>
+            {/* So the image doesn't look smooshed for newdao :eye-roll: */}
+            {namespace === TENANT_NAMESPACES.NEW_DAO && (
+              <div className="h-10 block"></div>
+            )}
           </div>
         </div>
         {namespace === TENANT_NAMESPACES.NEW_DAO && (
@@ -63,11 +66,14 @@ const InfoAbout = () => {
             <div className="text-lg font-bold text-primary capitalize">
               Our approach to governance
             </div>
-            <p className="text-secondary font-medium mt-3">
-              “A complex system that works is invariably found to have evolved
-              from a simple system that worked.” - John Gall.
+            <p className="text-secondary mt-3">
+              <span className="italic">
+                “A complex system that works is invariably found to have evolved
+                from a simple system that worked.”
+              </span>{" "}
+              - John Gall.
             </p>
-            <p className="text-secondary font-medium mt-1">
+            <p className="text-secondary">
               With this in mind, our plan is first to set up a minimal
               governance structure, refine it, and iterate on first principles.
               Some governance system will accordingly start simple. This
@@ -86,7 +92,7 @@ const InfoAbout = () => {
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
               >
-                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line">
+                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10">
                   <Image
                     src={item.icon}
                     width={24}
@@ -95,10 +101,10 @@ const InfoAbout = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-primary">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm font-normal">{item.description}</p>
+                  <h3 className="font-semibold text-primary">{item.title}</h3>
+                  <p className="font-normal text-secondary">
+                    {item.description}
+                  </p>
                 </div>
               </div>
             ))}

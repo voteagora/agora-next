@@ -19,16 +19,16 @@ const GovernorSettings = () => {
         <AccordionTrigger className="text-base font-bold text-black hover:no-underline p-0">
           Governor settings
         </AccordionTrigger>
-        <AccordionContent className="mt-6 border-t pt-6">
+        <AccordionContent className="pt-6 px-0">
           <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-            <div className="w-full sm:w-[65%] border border-gray-300 rounded-lg">
+            <div className="w-full sm:w-[65%] border border-line rounded-lg">
               <ContractList />
             </div>
-            <div className="w-full sm:w-[35%] border border-gray-300 h-fit rounded-lg">
+            <div className="w-full sm:w-[35%] border border-line h-fit rounded-lg">
               <GovernorSettingsParams />
             </div>
           </div>
-          <div className="w-full border border-gray-300 rounded-lg mt-6">
+          <div className="w-full border border-line rounded-lg mt-6">
             <GovernorSettingsProposalTypes />
           </div>
         </AccordionContent>
