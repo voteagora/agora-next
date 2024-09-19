@@ -25,13 +25,18 @@ import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialo
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { StakedDeposit } from "@/lib/types";
-import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
+import {
+  fetchAllForAdvancedDelegation,
+  fetchCurrentDelegatees,
+} from "@/app/delegates/actions";
+import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 
 export type DialogType =
   | DelegateDialogType
   | CastProposalDialogType
   | CastVoteDialogType
   | AdvancedDelegateDialogType
+  | PartialDelegateDialogType
   | ApprovalCastVoteDialogType
   | RetroPGFShareCardDialog
   | SwithcNetworkDialogType
@@ -61,6 +66,14 @@ export type AdvancedDelegateDialogType = {
   params: {
     target: string;
     fetchAllForAdvancedDelegation: typeof fetchAllForAdvancedDelegation;
+  };
+};
+
+export type PartialDelegateDialogType = {
+  type: "PARTIAL_DELEGATE";
+  params: {
+    delegate: DelegateChunk;
+    fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
   };
 };
 
@@ -181,6 +194,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
         delegate={delegate}
         fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
         fetchDirectDelegatee={fetchDirectDelegatee}
+      />
+    );
+  },
+  PARTIAL_DELEGATE: ({ delegate, fetchCurrentDelegatees }, closeDialog) => {
+    return (
+      <PartialDelegationDialog
+        closeDialog={closeDialog}
+        delegate={delegate}
+        fetchCurrentDelegatees={fetchCurrentDelegatees}
       />
     );
   },

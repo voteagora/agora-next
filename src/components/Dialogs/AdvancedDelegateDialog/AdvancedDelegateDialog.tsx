@@ -14,7 +14,6 @@ import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
-import { track } from "@vercel/analytics";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransaction } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
@@ -101,6 +100,7 @@ export function AdvancedDelegateDialog({
           from: address,
           to: target,
           allowance: "0",
+          percentage: "0",
           timestamp: null,
           type: "ADVANCED",
           amount: "PARTIAL",
@@ -151,17 +151,6 @@ export function AdvancedDelegateDialog({
   };
   const writeWithTracking = async () => {
     setIsLoading(true);
-
-    const trackingData = {
-      dao_slug: slug,
-      userAddress: address || "unknown",
-      proxyAddress: proxyAddress || "unknown",
-      targetDelegation: target || "unknown",
-      totalDelegatees: delegatees.length || "unknown",
-      totalVotingPower: availableBalance,
-    };
-
-    track("Advanced Delegation", trackingData);
 
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });

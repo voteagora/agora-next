@@ -71,9 +71,6 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-secondary bg-wash sm:block">
-            Advanced delegation beta
-          </div>
         </HStack>
         <TabsContent value="delegatedFrom" className="max-w-full">
           <VStack
@@ -81,20 +78,12 @@ function DelegationsContainer({
             className="border shadow-sm rounded-xl border-gray-eb overflow-auto max-h-[500px]"
           >
             <Table className="min-w-full">
-              <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
+              <TableHeader className="text-xs text-secondary sticky top-0 bg-neutral z-10">
                 <TableRow>
-                  <TableHead className="h-10 text-secondary">
-                    Allowance
-                  </TableHead>
-                  <TableHead className="h-10 text-secondary">
-                    Delegated on
-                  </TableHead>
-                  <TableHead className="h-10 text-secondary">Type</TableHead>
-                  <TableHead className="h-10 text-secondary">Amount</TableHead>
-                  <TableHead className="h-10 text-secondary">From</TableHead>
-                  <TableHead className="h-10 text-secondary">
-                    Txn Hash
-                  </TableHead>
+                  <TableHead className="h-10">Allowance</TableHead>
+                  <TableHead className="h-10">Delegated on</TableHead>
+                  <TableHead className="h-10">From</TableHead>
+                  <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>
               </TableHeader>
               <InfiniteScroll
@@ -145,8 +134,6 @@ function DelegationsContainer({
                 <TableRow>
                   <TableHead className="h-10">Allowance</TableHead>
                   <TableHead className="h-10">Delegated on</TableHead>
-                  <TableHead className="h-10">Type</TableHead>
-                  <TableHead className="h-10">Amount</TableHead>
                   <TableHead className="h-10">To</TableHead>
                   <TableHead className="h-10">Txn Hash</TableHead>
                 </TableRow>

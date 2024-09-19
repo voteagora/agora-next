@@ -6,6 +6,7 @@ export type Delegation = {
   from: string;
   to: string;
   allowance: string;
+  percentage: string;
   timestamp: Date | null;
   type: "DIRECT" | "ADVANCED";
   amount: "FULL" | "PARTIAL";
