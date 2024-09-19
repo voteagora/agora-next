@@ -73,7 +73,7 @@ export function getHumanBlockTime(
     case 0:
       const blockSeconds = getSecondsPerBlock();
       const estNewDaoSecondsDiff =
-        Number(latestBlock.number) - Number(blockNumber) * blockSeconds;
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estNewDaoSecondsDiff) * 1000);
 
     //   Cyber Mainnet

@@ -35,16 +35,16 @@ export const cyberTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    primary: "#171717",
-    secondary: "#404040",
-    tertiary: "#737373",
-    neutral: "#FFFFFF",
-    wash: "#FAFAFA",
-    line: "#E5E5E5",
-    positive: "#00992B",
-    negative: "#C52F00",
-    brandPrimary: "#171717",
-    brandSecondary: "#F2F2F2",
+    primary: "23 23 23",
+    secondary: "64 64 64",
+    tertiary: "115 115 115",
+    neutral: "255 255 255",
+    wash: "250 250 250",
+    line: "229 229 229",
+    positive: "0 153 43",
+    negative: "197 47 0",
+    brandPrimary: "23 23 23",
+    brandSecondary: "242 242 242",
   },
 
   links: [

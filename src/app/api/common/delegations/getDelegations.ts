@@ -29,7 +29,10 @@ async function getCurrentDelegateesForAddress({
 
   const getDirectDelegatee = async () => {
     const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
-      where: { delegator: address.toLowerCase() },
+      where: {
+        delegator: address.toLowerCase(),
+        contract: contracts.token.address,
+      },
     });
 
     if (namespace === TENANT_NAMESPACES.OPTIMISM) {
@@ -41,16 +44,41 @@ async function getCurrentDelegateesForAddress({
     return delegatee;
   };
 
-  const [advancedDelegatees, directDelegatee] = await Promise.all([
-    prisma[`${namespace}AdvancedDelegatees`].findMany({
+  const getAdvancedDelegatee = async () => {
+    const delegatees = await prisma[`${namespace}AdvancedDelegatees`].findMany({
       where: {
         from: address.toLowerCase(),
         delegated_amount: { gt: 0 },
         contract: contracts.alligator?.address,
       },
-    }),
-    getDirectDelegatee(),
-  ]);
+    });
+    return delegatees;
+  };
+
+  const getPartialDelegatee = async () => {
+    const delegatees = await prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        from: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.token.address,
+      },
+    });
+    return delegatees;
+  };
+
+  let advancedDelegatees;
+  let directDelegatee;
+
+  // Should be if governor == Agora 1.0 w/ Partial Delegation On
+  if (namespace === TENANT_NAMESPACES.NEW_DAO) {
+    advancedDelegatees = await getPartialDelegatee();
+    directDelegatee = null;
+  } else {
+    [advancedDelegatees, directDelegatee] = await Promise.all([
+      getAdvancedDelegatee(),
+      getDirectDelegatee(),
+    ]);
+  }
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
@@ -59,6 +87,7 @@ async function getCurrentDelegateesForAddress({
       from: advancedDelegatee.from,
       to: advancedDelegatee.to,
       allowance: advancedDelegatee.delegated_amount.toFixed(0),
+      percentage: advancedDelegatee.delegated_share.toString(),
       timestamp: latestBlock
         ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
         : null,
@@ -75,6 +104,7 @@ async function getCurrentDelegateesForAddress({
     from: directDelegatee.delegator,
     to: directDelegatee.delegatee,
     allowance: directDelegatee.balance.toFixed(),
+    percentage: "0", // Only used in Agora token partial delegation
     timestamp: latestBlock
       ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
       : null,
@@ -113,36 +143,57 @@ async function getCurrentDelegatorsForAddress({
 }): Promise<PaginatedResult<Delegation[]>> {
   const { namespace, contracts } = Tenant.current();
 
-  const [delegators, latestBlock] = await Promise.all([
-    paginateResult(async (skip: number, take: number) => {
-      return prisma.$queryRawUnsafe<
-        {
-          from: string;
-          to: string;
-          allowance: Decimal;
-          type: "DIRECT" | "ADVANCED";
-          block_number: bigint;
-          amount: "FULL" | "PARTIAL";
-          transaction_hash: string;
-        }[]
-      >(
-        `
-        WITH advanced_delegatees AS (
-          SELECT 
-              "from",
-              "to",
-              delegated_amount as allowance,
-              'ADVANCED' AS type, 
-              block_number,
-              CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
-              transaction_hash
-            FROM 
-              optimism.advanced_delegatees ad
+  let advancedDelegatorsSubQry: string;
+  let directDelegatorsSubQry: string;
+  let contractAddress = contracts.alligator
+    ? contracts.alligator.address
+    : contracts.token.address;
+
+  if (contracts.alligator || namespace === TENANT_NAMESPACES.NEW_DAO) {
+    advancedDelegatorsSubQry = `SELECT 
+                                "from",
+                                "to",
+                                delegated_amount as allowance,
+                                'ADVANCED' AS type, 
+                                block_number,
+                                CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
+                                transaction_hash
+                              FROM 
+                                ${namespace}.advanced_delegatees ad
+                              WHERE 
+                                ad."to" = $1
+                                AND delegated_amount > 0 
+                                AND contract = $2`;
+  } else {
+    advancedDelegatorsSubQry = `WITH ghost as (SELECT 
+                                null::text as "from",
+                                null::text as "to",
+                                null::numeric as allowance,
+                                'ADVANCED' AS type, 
+                                null::numeric as block_number,
+                                'FULL' as amount,
+                                null::text as transaction_hash)
+                                select * from ghost
+                              WHERE 
+                                ghost."to" = $1
+                                AND ghost."from" = $2`;
+  }
+
+  if (namespace == TENANT_NAMESPACES.NEW_DAO) {
+    directDelegatorsSubQry = `WITH ghost as (SELECT 
+              null::text as "from",
+              null::text as "to",
+              null::numeric as allowance,
+              'DIRECT' AS type, 
+              null::numeric as block_number,
+              'FULL' as amount,
+              null::text as transaction_hash)
+              select * from ghost
             WHERE 
-              ad."to" = $1
-              AND delegated_amount > 0 
-              AND contract = $2
-        ), direct_delegatees AS (
+              ghost."to" = $3
+              AND ghost."from" = $3`;
+  } else {
+    directDelegatorsSubQry = `
           SELECT 
             "from",
             "to",
@@ -181,8 +232,26 @@ async function getCurrentDelegatorsForAddress({
           ORDER BY
             block_number DESC,
             log_index DESC,
-            transaction_index DESC
-        )
+            transaction_index DESC`;
+  }
+
+  const [delegators, latestBlock] = await Promise.all([
+    paginateResult(async (skip: number, take: number) => {
+      return prisma.$queryRawUnsafe<
+        {
+          from: string;
+          to: string;
+          allowance: Decimal;
+          type: "DIRECT" | "ADVANCED";
+          block_number: bigint;
+          amount: "FULL" | "PARTIAL";
+          transaction_hash: string;
+        }[]
+      >(
+        `
+        WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} )
+        
+        , direct_delegatees AS ( ${directDelegatorsSubQry} )
         SELECT * FROM advanced_delegatees
         UNION ALL
         SELECT * FROM direct_delegatees
@@ -190,8 +259,8 @@ async function getCurrentDelegatorsForAddress({
         LIMIT $5;
       `,
         address,
-        contracts.alligator?.address.toLowerCase(),
-        contracts.token.address.toLowerCase(),
+        contractAddress,
+        contracts.token.address,
         skip,
         take
       );
@@ -209,6 +278,7 @@ async function getCurrentDelegatorsForAddress({
           : (
               await contracts.token.contract.balanceOf(delegator.from)
             ).toString(),
+      percentage: "0", // Only used in Agora token partial delegation
       timestamp: latestBlock
         ? getHumanBlockTime(delegator.block_number, latestBlock)
         : null,
@@ -261,6 +331,7 @@ async function getCurrentAdvancedDelegatorsForAddress({
     from: advancedDelegator.from,
     to: advancedDelegator.to,
     allowance: advancedDelegator.delegated_amount.toFixed(0),
+    percentage: "0", // Only used in Agora token partial delegation
     timestamp: latestBlock
       ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
       : null,
