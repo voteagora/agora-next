@@ -30,7 +30,7 @@ export function TextInputWithTooltip({
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative" }} className="w-full">
       <TextInputTooltip
         className={className}
         placeholder={placeholder}

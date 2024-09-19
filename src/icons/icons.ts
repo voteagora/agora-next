@@ -1,5 +1,6 @@
 import anonNoun from "./anonNoun.svg";
 import badge from "./badge.svg";
+import scaleEmoji from "./emoji/balance-scale.png";
 import ballot from "./ballot.svg";
 import banknotes from "./banknotes.svg";
 import cardView from "./cardView.svg";
@@ -47,8 +48,23 @@ import codeBracketSquare from "./codeBracketSquare.svg";
 import beaker from "./beaker.svg";
 import shieldCheck from "./shieldCheck.svg";
 import lockClosed from "./lockClosed.svg";
+import hammerEmoji from "./emoji/hammer.png";
+import lockEmoji from "./emoji/lock.png";
+import peopleEmoji from "./emoji/people.png";
+import shieldEmoji from "./emoji/shield.png";
+import sproutEmoji from "./emoji/sprout.png";
+import testTubeEmoji from "./emoji/test-tube.png";
+import worldEmoji from "./emoji/world.png";
 
 export const icons = {
+  hammerEmoji,
+  lockEmoji,
+  peopleEmoji,
+  shieldEmoji,
+  sproutEmoji,
+  testTubeEmoji,
+  worldEmoji,
+  scaleEmoji,
   anonNoun,
   badge,
   ballot,
