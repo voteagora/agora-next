@@ -122,7 +122,7 @@ async function getR5Ballot({
       SELECT 
         *
       FROM 
-        retro_funding.project_applicants
+        retro_funding.project_applicants_final
       WHERE application_category = ${category}
       ORDER BY RANDOM();
     `,
