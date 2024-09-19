@@ -52,20 +52,42 @@ async function applyDistributionStrategyForAddress({
     0
   );
 
-  const max = 750_000;
-  const min = 1_000;
-  const totalFunding = 8_000_000;
+  const max = 9.375;
+  const min = 0.125;
+  const totalFunding = 100;
 
   // Apply distribution strategy
 
   const newProjectsAllocation: {
     project_id: string;
-    allocation: number;
+    allocation: number | null;
   }[] = [];
 
   if (strategy === DistributionStrategy.TOP_TO_BOTTOM) {
     const y = topToBottom({
-      max,
+      min,
+      total: totalFunding,
+      n,
+    });
+
+    projectsAllocation.reverse().forEach((project, i) => {
+      if (project.impact) {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: y(i),
+        });
+      } else {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: null,
+        });
+      }
+    });
+  }
+
+  if (strategy === DistributionStrategy.TOP_WEIGHTED) {
+    const y = topWeighted({
+      max: 6.25, // TODO: adjust this number
       total: totalFunding,
       n,
     });
@@ -76,22 +98,10 @@ async function applyDistributionStrategyForAddress({
           ...project,
           allocation: y(i),
         });
-      }
-    });
-  }
-
-  if (strategy === DistributionStrategy.TOP_WEIGHTED) {
-    const y = topWeighted({
-      max: 500_000, // TODO: adjust this number
-      total: totalFunding,
-      n,
-    });
-
-    projectsAllocation.forEach((project, i) => {
-      if (project.impact) {
+      } else {
         newProjectsAllocation.push({
           ...project,
-          allocation: y(i),
+          allocation: null,
         });
       }
     });
@@ -115,7 +125,7 @@ async function applyDistributionStrategyForAddress({
     );
 
     const y = impactGroups({
-      max: 750_000,
+      max,
       total: totalFunding,
       nk,
     });
@@ -125,6 +135,11 @@ async function applyDistributionStrategyForAddress({
         newProjectsAllocation.push({
           ...project,
           allocation: y(project.impact - 1),
+        });
+      } else {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: null,
         });
       }
     });
@@ -150,17 +165,17 @@ async function applyDistributionStrategyForAddress({
 }
 
 function topToBottom({
-  max,
+  min,
   total,
   n,
 }: {
-  max: number;
+  min: number;
   total: number;
   n: number;
 }) {
-  const a = (2 * (n * max - total)) / (n * (n - 1));
+  const a = (2 * (total - n * min)) / (n * (n - 1));
 
-  return (i: number) => max - a * i; // return the amount of funding for the i-th project
+  return (i: number) => min + a * i; // return the amount of funding for the i-th project
 }
 
 function topWeighted({
