@@ -131,7 +131,7 @@ export function PartialDelegationDialog({
             You can not delegate more than 100% of your voting power.
           </div>
         ) : (
-          <div className="flex flex-row justify-between text-sm p-2 bg-brandSecondary rounded-md text-secondary">
+          <div className="flex flex-row justify-between text-xs p-2 bg-brandSecondary rounded-md text-secondary">
             <div className="font-semibold">
               {formatPercentageWithPrecision(totalPercentage * 100, 2)}% of your
               votable supply is delegated
