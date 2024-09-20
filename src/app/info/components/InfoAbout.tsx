@@ -42,7 +42,7 @@ const InfoAbout = () => {
       </h3>
       <div className="mt-4 rounded-xl border border-line bg-neutral shadow-sm">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
-          <div className="w-1/2 relative">
+          <div className="w-full h-[200px] sm:h-auto sm:w-1/2 relative">
             <Image
               src={page.hero!}
               alt={page.title}
@@ -50,14 +50,14 @@ const InfoAbout = () => {
               className="rounded-lg object-cover object-center"
             />
           </div>
-          <div className="w-1/2">
+          <div className="sm:w-1/2">
             <h3 className="text-lg font-bold text-primary capitalize">
               About {namespace}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for newdao :eye-roll: */}
             {namespace === TENANT_NAMESPACES.NEW_DAO && (
-              <div className="h-10 block"></div>
+              <div className="sm:h-10 block"></div>
             )}
           </div>
         </div>
