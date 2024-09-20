@@ -65,6 +65,7 @@ async function getProjectsApi({
             subcategory: data.application_subcategory,
             statement: data.impact_statement,
           },
+          testimonials: `https://www.metricsgarden.xyz/projects/${encodeURIComponent(projectData.name)}`,
         };
       });
     }
@@ -108,6 +109,9 @@ async function getProjectsApi({
           subcategory: null,
           statement: null,
         },
+        testimonials: project.name
+          ? `https://www.metricsgarden.xyz/projects/${encodeURIComponent(project.name)}`
+          : "",
       };
     });
   }, pagination);
