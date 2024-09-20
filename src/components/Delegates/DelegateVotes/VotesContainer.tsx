@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
+import Tenant from "@/lib/tenant/tenant";
+import { DaoSlug } from "@prisma/client";
 
 const filterOptions = {
   onchain: {
@@ -23,6 +25,22 @@ const VotesContainer = ({
   onchainVotes: React.ReactElement;
 }) => {
   const [activeTab, setActiveTab] = useState<"snapshot" | "onchain">("onchain");
+
+  // right now, only ENS uses snapshot, so we want to show filter.
+  // Otherwise, just show the onchainVotes
+  const slug = Tenant.current().slug;
+  if (slug !== DaoSlug.ENS) {
+    return (
+      <div className="flex flex-col space-y-4">
+        <div className="flex flex-row justify-between items-center relative">
+          <h2 className="text-black text-2xl font-bold flex-grow">
+            Past Votes
+          </h2>
+        </div>
+        <div className="block">{onchainVotes}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col space-y-4">
