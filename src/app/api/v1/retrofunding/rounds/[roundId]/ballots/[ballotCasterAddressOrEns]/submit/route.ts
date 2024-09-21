@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
+import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 
 const r4BallotContentSchema = z.object({
   allocations: z.array(z.record(z.string(), z.number())),
@@ -36,7 +37,7 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  // const isBadgeholder = await fetchIsCitizen(
+  // const isBadgeholder = await fetchBadgeholder(
   //   route.params.ballotCasterAddressOrEns
   // );
 
