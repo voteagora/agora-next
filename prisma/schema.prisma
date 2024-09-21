@@ -63,6 +63,18 @@ view Citizens {
   @@schema("agora")
 }
 
+view Badgeholders {
+  address             String
+  dao_slug            DaoSlug
+  retro_funding_round String
+  time_created        BigInt
+  metadata            String
+
+  @@id([address, dao_slug, retro_funding_round])
+  @@map("badgeholders")
+  @@schema("agora")
+}
+
 model SnapshotProposal {
   id             String    @id
   dao_slug       DaoSlug
