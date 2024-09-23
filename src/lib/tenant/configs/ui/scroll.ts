@@ -131,7 +131,7 @@ export const scrollTenantUIConfig = new TenantUI({
         "Scroll delegates are the stewards of Scroll DAO. They are volunteers and members of the Scroll community who have been elected to represent other token holders and make governance decisions on their behalf.",
       hero: scrollHero,
       meta: {
-        title: "Voter on Agora",
+        title: "Voters of Scroll Governance",
         description: "Delegate your voting power to a trusted representative",
         imageTitle: "IN IMAGE",
         imageDescription: "IN IMAGE DESCRIPTION",
@@ -144,9 +144,9 @@ export const scrollTenantUIConfig = new TenantUI({
         "Scroll delegates are the stewards of Scroll DAO. They are volunteers and members of the Scroll community who have been elected to represent other token holders and make governance decisions on their behalf.",
       hero: scrollHero,
       meta: {
-        title: "Voter on Agora",
+        title: "Voters of Scroll Governance",
         description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        imageTitle: "Voters of Scroll Governance",
         imageDescription:
           "Delegate your voting power to a trusted representative",
       },
@@ -156,9 +156,9 @@ export const scrollTenantUIConfig = new TenantUI({
       title: "About Scroll",
       hero: infoPageHero,
       description:
-        "Scroll is the leading zero-knowledge rollup. As the homepage of the multichain world, Scroll leverages fast finality and interoperability to create a more accessible, scalable, and secure ecosystem for everyone. Our mission is to provide an easy-to-use, developer-friendly environment that embraces the inevitable multichain future. Scroll empowers builders to ascend beyond today’s limitations with a scalable, secure platform to serve billions of users and drive real-world impact.",
+        "Scroll is the leading zero-knowledge rollup. Leveraging fast finality and high throughput, Scroll is creating a more accessible, scalable, and secure onchain future for everyone. Our mission is to provide an easy-to-use, developer-friendly environment to scale Ethereum for good. Scroll empowers builders to ascend beyond today's limitations and drive real-world impact.",
       meta: {
-        title: "Info of Agora",
+        title: "Info of Scroll Governance",
         description: "Welcome to the Scroll DAO",
         imageTitle: "",
         imageDescription: "",
@@ -170,9 +170,9 @@ export const scrollTenantUIConfig = new TenantUI({
       description:
         "Delegates represent the Scroll ecosystem, guiding governance decisions on behalf of SCR token holders to ensure the platform evolves in line with community priorities.",
       meta: {
-        title: "Scroll Agora",
+        title: "Scroll Governance",
         description: "Home of Scroll governance",
-        imageTitle: "Scroll Agora",
+        imageTitle: "Scroll Governance",
         imageDescription: "Home of Scroll governance",
       },
       links: [

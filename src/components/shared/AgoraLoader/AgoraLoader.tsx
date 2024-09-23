@@ -22,7 +22,7 @@ export function LogoLoader() {
   const { ui } = Tenant.current();
   return (
     <div className="w-full h-full min-h-screen animate-pulse flex flex-col justify-center items-center">
-      <Image alt="loading" width={36} height={36} src={ui.logo} />
+      <Image alt="loading" width={44} height={44} src={ui.logo} />
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function DelegatesFilter() {
   const searchParams = useSearchParams();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
-  const orderByParam = searchParams?.get("orderBy");
+  const orderByParam = searchParams?.get("orderBy") || "weightedRandom";
   const { setIsDelegatesFiltering } = useAgoraContext();
 
   const handleChange = (value: string) => {

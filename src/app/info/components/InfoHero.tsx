@@ -20,7 +20,7 @@ export const InfoHero = () => {
   return (
     <div className="flex flex-col sm:flex-row mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap">
       <div className="flex flex-col w-full sm:w-2/5">
-        <h1 className="text-4xl leading-[36px] sm:text-[50px] sm:leading-[50px] font-black text-primary">
+        <h1 className="text-4xl leading-[36px] sm:text-[40px] sm:leading-[40px] font-black text-primary">
           {page!.title}
         </h1>
         <p className="text-base text-secondary mt-4">

@@ -76,7 +76,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
           >
             <Popover.Panel>
               {({ close }) => (
-                <div className="bg-neutral py-8 px-6 mt-2 rounded-xl w-[350px]">
+                <div className="bg-neutral py-8 px-6 mt-4 mr-[-16px] rounded-xl w-[350px]">
                   <VStack gap={3} className="min-h-[250px] justify-center">
                     <HStack className="items-center mb-1">
                       <div

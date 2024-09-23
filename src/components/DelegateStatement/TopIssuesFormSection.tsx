@@ -60,8 +60,8 @@ export default function TopIssuesFormSection({
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-baseline">
         <h3 className="font-bold">Views on top issues</h3>
         <DropdownMenu>
-          <DropdownMenuTrigger className="text-tertiary outline-none">
-            + Add a new issue
+          <DropdownMenuTrigger className="text-secondary outline-none flex items-center justify-between">
+            <span>+ Add a new issue</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             {ui.governanceIssues!.map((issue) => (

@@ -9,7 +9,10 @@ import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useCallback, useEffect, useState } from "react";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import {
+  AgoraLoaderSmall,
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
@@ -31,7 +34,8 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
-  const { ui, contracts, slug, token } = Tenant.current();
+  const { ui, contracts, token } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address: accountAddress } = useAccount();
 
@@ -145,7 +149,7 @@ export function DelegateDialog({
   if (!isReady) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-[318px]">
-        <AgoraLoaderSmall />
+        {shouldHideAgoraBranding ? <LogoLoader /> : <AgoraLoaderSmall />}
       </div>
     );
   }
