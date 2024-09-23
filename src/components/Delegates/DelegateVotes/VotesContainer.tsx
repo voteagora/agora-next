@@ -69,9 +69,9 @@ const VotesContainer = ({
                 <Listbox.Option key={option.value} value={option.value}>
                   {({ selected }) => (
                     <div
-                      className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
+                      className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:text-primary hover:bg-tertiary/20 ${
                         selected
-                          ? "text-primary bg-white border-line"
+                          ? "text-primary bg-tertiary/20"
                           : "text-secondary border-transparent"
                       }`}
                     >

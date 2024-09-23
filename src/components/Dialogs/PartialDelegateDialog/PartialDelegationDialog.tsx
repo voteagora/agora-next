@@ -5,7 +5,10 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { PartialDelegationEntry } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationEntry";
 import Tenant from "@/lib/tenant/tenant";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import {
+  AgoraLoaderSmall,
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import { PartialDelegationButton } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationButton";
 import { PartialDelegationSuccess } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationSuccess";
 import { formatPercentageWithPrecision } from "@/lib/utils";
@@ -21,7 +24,9 @@ export function PartialDelegationDialog({
   fetchCurrentDelegatees,
   closeDialog,
 }: Props) {
-  const { contracts } = Tenant.current();
+  const { contracts, ui } = Tenant.current();
+  console.log(contracts);
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
@@ -137,7 +142,7 @@ export function PartialDelegationDialog({
               votable supply is delegated
             </div>
             <div
-              className="hover:pointer hover:underline"
+              className="hover:underline cursor-pointer"
               onClick={() => delegateEvenly()}
             >
               Delegate Evenly
@@ -165,7 +170,7 @@ export function PartialDelegationDialog({
     <div className="flex flex-col gap-4">
       {isLoading ? (
         <div className="flex flex-col w-full h-[318px] items-center justify-center">
-          <AgoraLoaderSmall />
+          {shouldHideAgoraBranding ? <LogoLoader /> : <AgoraLoaderSmall />}
         </div>
       ) : (
         <div>

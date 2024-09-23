@@ -57,7 +57,7 @@ const InfoAbout = () => {
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for newdao :eye-roll: */}
             {namespace === TENANT_NAMESPACES.NEW_DAO && (
-              <div className="sm:h-10 block"></div>
+              <div className="sm:h-[105px] block"></div>
             )}
           </div>
         </div>
