@@ -1,5 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import ensLogo from "@/assets/tenant/ens_logo.svg";
+import ensHero from "@/assets/tenant/ens_hero.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
@@ -32,6 +33,7 @@ export const ensTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Agora is the home of ENS voters",
+      hero: ensHero,
       description:
         "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
       meta: {
@@ -134,23 +136,19 @@ export const ensTenantUIConfig = new TenantUI({
           helperText: `
 ## Proposal checklist
 
-**1. Select proposal type**
+**1. Post a temp check on Discourse**
 
-Proposal types set the quorum and approval thresholds for your proposal. You can view, edit, or create a new one via the [admin panel](https://vote.optimism.io/admin).
+The purpose of the Temperature Check is to determine if there is sufficient will to make changes to the status quo. To create a Temperature Check, ask a general, non-biased question to the community on discuss.ens.domains about a potential change.
 
-**2. Choose your vote type**
+**2. Create a draft proposal on Github**
 
-This determines if your proposal will be a simple yes/no or a multiple choice.
+This determines if your proposal will be a simple yes/no or a multiple choice. To create a Draft Proposal, create a new governance proposal in the governance-docs repository on GitHub. Start by copying the template for an executable proposal, social proposal, or constitutional amendment, as appropriate. Once you have written your proposal, create a Draft Pull Request for it. Start a new post in the DAO-wide -> Draft Proposals category with a link to the PR for discussion.
 
 **3. Create your proposal**
 
-Now that the vote and proposal type are set, you can use this form to create your proposal. Proposed transactions are optional, as the Token House governor is not executable for now.
+Now you're ready to use this form to create your proposal. Choose whether your proposal is a Social Proposal or Executable. If your proposal is a Social Proposal, that's it! If the vote passes, the proposal is passed and you are done. If it's the latter, once the propose() function has been called, a seven day voting period is started. Ongoing discussion can take place on your proposal post. If the proposal passes successfully, a two day timelock will follow before the proposed code is executed.
 
-**4. Get signatures for your SAFE**
-
-If you're using the OP Foundation multisig, you can queue several proposals at once so that your co-signers can sign all the transactions in one sitting. Proposals will appear in chronological order in the final UI, so the last proposal you put in will show up on top for voters. Note that the order is not guaranteed if you batch all the proposal creation transactions into a single block, as then there is no timing difference.
-
-**5. Learn more**
+**4. Learn more**
 
 For a full walkthrough of the proposal process, check out the [ENS DAO docs](https://docs.ens.domains/dao/proposals/submit)
 `.trim(),
