@@ -34,6 +34,7 @@ export default function SimulateTransaction({
       setIsLoading(true);
 
       try {
+        console.log("test");
         const response = await fetch("/api/simulate", {
           method: "POST",
           headers: {
@@ -44,7 +45,7 @@ export default function SimulateTransaction({
             value: value.toString(),
             calldata,
             networkId: tenant.contracts.governor.chain.id,
-            from: tenant.contracts.governor.address,
+            from: tenant.contracts.timelock!.address,
           }),
         });
 

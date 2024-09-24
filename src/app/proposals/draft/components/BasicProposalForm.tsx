@@ -203,7 +203,7 @@ const BasicProposalForm = () => {
         body: JSON.stringify({
           transactions,
           networkId: contracts.governor.chain.id,
-          from: contracts.governor.address,
+          from: contracts.timelock!.address,
         }),
       });
       const res = await response.json();

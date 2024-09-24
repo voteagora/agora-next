@@ -1,5 +1,6 @@
 import {
   ERC20__factory,
+  AgoraTimelock__factory,
   OptimismGovernor__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
@@ -26,6 +27,10 @@ export const ensTenantContractConfig = ({
     ? "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
     : "0xb65c031ac61128ae791d42ae43780f012e2f7f89";
 
+  const TIMELOCK = isProd
+    ? "0xFe89cc7aBB2C4183683ab71653C4cdc9B02D44b7"
+    : "0x1E9BE5E89AE5ccBf047477Ac01D3d4b0eBFB328e";
+
   const provider = isProd
     ? new AlchemyProvider("mainnet", alchemyId)
     : new AlchemyProvider("sepolia", alchemyId);
@@ -38,6 +43,14 @@ export const ensTenantContractConfig = ({
       address: TOKEN as `0x${string}`,
       chain: chain,
       contract: ERC20__factory.connect(TOKEN, provider),
+      provider,
+    }),
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
 
