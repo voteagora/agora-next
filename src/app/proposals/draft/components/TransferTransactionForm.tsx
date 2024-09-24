@@ -73,7 +73,7 @@ const TransferTransactionForm = ({
       setValue(`${name}.${index}.calldata`, calldata);
       setValue(
         `${name}.${index}.target`,
-        tenant.contracts.governor.address as EthereumAddress
+        tenant.contracts.token.address as EthereumAddress
       );
       setValue(`${name}.${index}.value`, "0");
     }
