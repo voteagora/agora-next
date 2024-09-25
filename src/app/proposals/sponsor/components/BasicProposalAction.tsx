@@ -1,3 +1,5 @@
+"use client";
+
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { BasicProposal } from "../../../proposals/draft/types";
