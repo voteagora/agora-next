@@ -13,7 +13,7 @@ export default function Hero() {
       </div>
       {hero && (
         <Image
-          className="h-[110px] w-auto"
+          className="h-auto sm:h-[110px] w-auto"
           alt={`${namespace} cover`}
           src={hero}
         />

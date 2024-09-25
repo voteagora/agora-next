@@ -9,7 +9,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Tenant from "@/lib/tenant/tenant";
-import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
+import AgoraLoader, {
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 
 const { slug: daoSlug } = Tenant.current();
@@ -63,6 +65,7 @@ const formSchema = z.object({
 
 export default function CurrentDelegateStatement() {
   const { ui } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
   const { address, isConnected, isConnecting } = useAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
@@ -172,5 +175,13 @@ export default function CurrentDelegateStatement() {
     return <ResourceNotFound message="Oops! Nothing's here" />;
   }
 
-  return loading ? <AgoraLoader /> : <DelegateStatementForm form={form} />;
+  return loading ? (
+    shouldHideAgoraBranding ? (
+      <LogoLoader />
+    ) : (
+      <AgoraLoader />
+    )
+  ) : (
+    <DelegateStatementForm form={form} />
+  );
 }

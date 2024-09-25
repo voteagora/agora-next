@@ -27,11 +27,18 @@ export const InfoHero = () => {
           {page!.description}
 
           {namespace === TENANT_NAMESPACES.NEW_DAO && (
-            <Link href={"https://www.somesite.com"}>
-              <Button className="bg-brandPrimary hover:bg-brandPrimary/90 mt-4 cursor-pointer block">
-                .
-              </Button>
-            </Link>
+            <div className="flex flex-row gap-2 mt-4">
+              <Link href={"https://www.somesite.com"}>
+                <Button className="bg-brandPrimary hover:bg-brandPrimary/90 cursor-pointer block">
+                  .
+                </Button>
+              </Link>
+              <Link href={"https://www.somesite.com/faq"}>
+                <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
+                  FAQ
+                </Button>
+              </Link>
+            </div>
           )}
         </p>
       </div>
