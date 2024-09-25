@@ -1,5 +1,5 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import scrollHero from "@/assets/tenant/scroll_hero.svg";
+import scrollHero from "@/assets/tenant/scroll_hero.png";
 import scrollLogo from "@/assets/tenant/scroll_logo.svg";
 import delegateImage from "@/assets/tenant/scroll_delegate.svg";
 import successImage from "@/assets/tenant/scroll_success.svg";

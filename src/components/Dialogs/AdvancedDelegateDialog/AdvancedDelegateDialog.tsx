@@ -11,7 +11,10 @@ import {
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import {
+  AgoraLoaderSmall,
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
@@ -56,7 +59,8 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { slug } = Tenant.current();
+  const { ui } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const fetchData = useCallback(async () => {
     try {
@@ -266,7 +270,11 @@ export function AdvancedDelegateDialog({
               </div>
             ) : (
               <div className="flex flex-col w-full h-[318px] items-center justify-center">
-                <AgoraLoaderSmall />
+                {shouldHideAgoraBranding ? (
+                  <LogoLoader />
+                ) : (
+                  <AgoraLoaderSmall />
+                )}
               </div>
             )}
           </div>
