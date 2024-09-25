@@ -10,6 +10,11 @@ const allowlist = [
   "0x2410d50ba4993c1fe13b3db0bcdae51b1c617d0a",
   "0x6aaa8733cfee3931d826c2d2ad4679db9accf6bb",
   "0xe3b4b326d34686ea3a44dfa1e19e5ffd0dff04f3",
+  "0xe21da99ccdede771d28178c976c0f30763dc043f",
+  "0x143c777f650ad8d00942d497ee66f4d774427195",
+  "0xe21da99ccdede771d28178c976c0f30763dc043f",
+  "0xa1179f64638adb613ddaac32d918eb6beb824104",
+  "0x6d97d65adff6771b31671443a6b9512104312d3d",
 ];
 
 const getBadgeholder = async (addressOrEnsName: string) =>
