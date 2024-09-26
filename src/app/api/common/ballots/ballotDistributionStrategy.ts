@@ -52,7 +52,7 @@ async function applyDistributionStrategyForAddress({
     0
   );
 
-  const max = 9.375;
+  const max = 12.5;
   const min = 0.125;
   const totalFunding = 100;
 
@@ -87,7 +87,7 @@ async function applyDistributionStrategyForAddress({
 
   if (strategy === DistributionStrategy.TOP_WEIGHTED) {
     const y = topWeighted({
-      max: 6.25, // TODO: adjust this number
+      max,
       total: totalFunding,
       n,
     });
@@ -207,7 +207,7 @@ function topWeighted({
 
 // recursively find c that results in max allocation < top
 function findC({
-  c = 0.9,
+  c = 3,
   max,
   total,
   n,
