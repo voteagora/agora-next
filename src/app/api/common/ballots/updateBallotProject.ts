@@ -61,7 +61,7 @@ async function updateBallotProjectAllocationForAddress({
         },
       },
       data: {
-        allocation,
+        allocation: Math.round(Number(allocation)) / 100,
         updated_at: new Date(),
       },
     });
@@ -394,7 +394,7 @@ async function updateAllProjectsInBallotForAddress({
           },
         },
         update: {
-          allocation: project.allocation,
+          allocation: Math.round(Number(project.allocation)) / 100,
           updated_at: new Date(),
         },
         create: {
