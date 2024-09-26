@@ -13,6 +13,9 @@ async function main() {
   ); // Replace 'your_file.csv' with the actual file name
 
   const applicants = await prisma.projectApplicants.findMany({
+    where: {
+      round: "5",
+    },
     select: {
       application_id: true,
       ipfs_data: true,
@@ -45,7 +48,7 @@ async function main() {
   }
 
   function processRow(row) {
-    const github = row["repo(s)"].split(",")[0];
+    const github = row["artifact_url"];
 
     for (const [metricName, value] of Object.entries(row)) {
       if (
@@ -58,7 +61,7 @@ async function main() {
           metrics.set(github, {});
         }
         if (metricName === "license(s)") {
-          metrics.get(github)["license"] = value.split(",")[0];
+          metrics.get(github)["license"] = value;
         } else {
           metrics.get(github)[metricName] = value;
         }
@@ -67,8 +70,8 @@ async function main() {
   }
 
   async function repairApplicationData() {
-    const repairedApplications = applications.map((application) => {
-      const githubs = application.github;
+    const repairedApplications = applications.flatMap((application) => {
+      const githubs = application.project.repos;
       for (const github of githubs) {
         if (metrics.has(github.url)) {
           const data = metrics.get(github.url);
@@ -76,16 +79,57 @@ async function main() {
         }
       }
       const currentApplication = applicants.find(
-        (applicant) => applicant.application_id === application.applicationId
+        (applicant) => applicant.application_id === application.attestationId
       );
-      return {
-        applicationId: application.applicationId,
-        ipfs_data: {
-          ...currentApplication.ipfs_data,
-          github: githubs,
-          grantsAndFunding: application.grantsAndFunding,
+
+      if (!currentApplication) {
+        return [];
+      }
+
+      const investments = application.project.funding
+        .filter((funding) => funding.type === "venture")
+        .map((funding) => ({
+          amount: funding.amount,
+          year: funding.receivedAt,
+          details: funding.details,
+        }));
+      const revenue = application.project.funding
+        .filter((funding) => funding.type === "revenue")
+        .map((funding) => ({
+          amount: funding.amount,
+          details: funding.details,
+        }));
+      const grants = application.project.funding
+        .filter(
+          (funding) => funding.type !== "venture" && funding.type !== "revenue"
+        )
+        .map((funding) => ({
+          grant: funding.grant || funding.type,
+          link: funding.grantUrl,
+          amount: funding.amount,
+          date: funding.receivedAt,
+          details: funding.details,
+        }));
+
+      return [
+        {
+          applicationId: application.attestationId,
+          ipfs_data: {
+            ...currentApplication.ipfs_data,
+            github: githubs,
+            grantsAndFunding: {
+              ventureFunding: investments,
+              revenue,
+              grants,
+            },
+            pricingModel: {
+              type: application.project.pricingModel,
+              details: application.project.pricingModelDetails,
+            },
+            team: application.project.team,
+          },
         },
-      };
+      ];
     });
 
     for (const repairedApplication of repairedApplications) {
