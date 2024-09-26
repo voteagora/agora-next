@@ -175,7 +175,7 @@ function topToBottom({
 }) {
   const a = (2 * (total - n * min)) / (n * (n - 1));
 
-  return (i: number) => min + a * i; // return the amount of funding for the i-th project
+  return (i: number) => Math.round(min + a * i * 100) / 100; // return the amount of funding for the i-th project
 }
 
 function topWeighted({
@@ -202,7 +202,7 @@ function topWeighted({
     0
   );
 
-  return (i: number) => (total * w(i, c)) / W; // return the amount of funding for the i-th project
+  return (i: number) => Math.round((total * w(i, c)) / W) / 100; // return the amount of funding for the i-th project
 }
 
 // recursively find c that results in max allocation < top
@@ -253,7 +253,7 @@ function impactGroups({
   // Distribution function
   const F = nk.map((_, i) => (total * (i + 1)) / W);
 
-  return (k: number) => F[k]; // return the amount of funding for the k-th impact group
+  return (k: number) => Math.round(F[k]) / 100; // return the amount of funding for the k-th impact group
 }
 
 export const applyDistributionStrategy = cache(applyDistributionStrategyApi);
