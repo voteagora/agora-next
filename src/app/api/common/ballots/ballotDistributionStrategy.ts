@@ -156,7 +156,7 @@ async function applyDistributionStrategyForAddress({
             address,
           },
         },
-        data: { allocation: p.allocation },
+        data: { allocation: p.allocation?.toFixed(2) },
       })
     )
   );
