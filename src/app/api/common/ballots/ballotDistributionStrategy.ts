@@ -256,12 +256,37 @@ function normalizeAllocation<T extends { allocation: number | null }>(
 ) {
   const total = allocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0);
 
-  return allocation.map((p) => ({
+  const normalizedRounded = allocation.map((p) => ({
     ...p,
     allocation: p.allocation
       ? Math.round((p.allocation / total) * 100 * 100) / 100
       : null,
   }));
+
+  // Calculate the difference to be adjusted
+  const roundedTotal = normalizedRounded.reduce(
+    (acc, p) => acc + (p.allocation ?? 0),
+    0
+  );
+  const difference = Math.round((100 - roundedTotal) * 100) / 100;
+
+  const maxAlloc = normalizedRounded.reduce(
+    (max, p) =>
+      p.allocation !== null && p.allocation > max.allocation! ? p : max,
+    { allocation: -Infinity } as T
+  );
+
+  const adjustedAllolcations = difference
+    ? normalizedRounded.map((p) =>
+        p === maxAlloc ? { ...p, allocation: p.allocation! + difference } : p
+      )
+    : normalizedRounded;
+
+  console.log(
+    adjustedAllolcations.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
+  );
+
+  return adjustedAllolcations;
 }
 
 export const applyDistributionStrategy = cache(applyDistributionStrategyApi);
