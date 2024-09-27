@@ -109,6 +109,7 @@ async function main() {
           amount: funding.amount,
           date: funding.receivedAt,
           details: funding.details,
+          fundingRound: funding.fundingRound,
         }));
 
       return [
@@ -118,7 +119,7 @@ async function main() {
             ...currentApplication.ipfs_data,
             github: githubs,
             grantsAndFunding: {
-              ventureFunding: investments,
+              investments,
               revenue,
               grants,
             },
