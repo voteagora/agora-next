@@ -73,8 +73,8 @@ async function main() {
     const repairedApplications = applications.flatMap((application) => {
       const githubs = application.project.repos;
       for (const github of githubs) {
-        if (metrics.has(github.url)) {
-          const data = metrics.get(github.url);
+        if (metrics.has(github.url.toLowerCase())) {
+          const data = metrics.get(github.url.toLowerCase());
           github.metrics = data;
         }
       }
