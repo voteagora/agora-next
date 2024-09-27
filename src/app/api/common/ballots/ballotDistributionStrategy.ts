@@ -53,7 +53,7 @@ async function applyDistributionStrategyForAddress({
   );
 
   const max = 12.5;
-  const min = 0.125;
+  const min = 0.2;
   const totalFunding = 100;
 
   // Apply distribution strategy
@@ -105,11 +105,6 @@ async function applyDistributionStrategyForAddress({
         });
       }
     });
-
-    console.log(
-      "total",
-      newProjectsAllocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
-    );
   }
 
   if (strategy === DistributionStrategy.IMPACT_GROUPS) {
@@ -147,7 +142,7 @@ async function applyDistributionStrategyForAddress({
 
   // Save projects allocations
   await Promise.all(
-    newProjectsAllocation.map((p) =>
+    normalizeAllocation(newProjectsAllocation).map((p) =>
       prisma.projectAllocations.update({
         where: {
           address_round_project_id: {
@@ -254,6 +249,19 @@ function impactGroups({
   const F = nk.map((_, i) => (total * (i + 1)) / W);
 
   return (k: number) => Math.round(F[k] * 100) / 100; // return the amount of funding for the k-th impact group
+}
+
+function normalizeAllocation<T extends { allocation: number | null }>(
+  allocation: T[]
+) {
+  const total = allocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0);
+
+  return allocation.map((p) => ({
+    ...p,
+    allocation: p.allocation
+      ? Math.round((p.allocation / total) * 100 * 100) / 100
+      : null,
+  }));
 }
 
 export const applyDistributionStrategy = cache(applyDistributionStrategyApi);
