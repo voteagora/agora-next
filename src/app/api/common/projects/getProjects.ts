@@ -142,7 +142,7 @@ async function getProjectApi({
   const projectData = project.ipfs_data ?? ({} as any);
 
   return {
-    id: project.project_id,
+    id: project.application_id,
     projectId: project.project_id,
     applicationId: project.application_id,
     category: project.category,
@@ -166,6 +166,9 @@ async function getProjectApi({
       subcategory: project.application_subcategory,
       statement: project.impact_statement,
     },
+    testimonials: project.name
+      ? `https://www.metricsgarden.xyz/projects/${encodeURIComponent(project.name)}`
+      : "",
   };
 }
 
