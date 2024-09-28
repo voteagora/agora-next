@@ -13,10 +13,10 @@ const r4BallotContentSchema = z.object({
 const r5BallotContentSchema = z.object({
   budget: z.number().min(2000000).max(8000000), // number between 2M and 8M
   project_allocations: z.array(
-    z.record(z.string(), z.number().min(0).max(100))
+    z.record(z.string(), z.string(z.number().min(0).max(100)))
   ),
   category_allocations: z.array(
-    z.record(z.string(), z.number().min(0).max(100))
+    z.record(z.string(), z.string(z.number().min(0).max(100)))
   ),
 });
 
