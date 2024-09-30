@@ -6,7 +6,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { ParsedProposalData } from "@/lib/proposalUtils";
+import { ParsedProposalData, proposalToCallArgs } from "@/lib/proposalUtils";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
 import { useEffect } from "react";
@@ -24,12 +24,8 @@ interface Props {
   proposal: Proposal;
 }
 
-export const ProposalExecuteButton = ({ proposal }: Props) => {
+export const AgoraGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const dynamicProposalType: keyof ParsedProposalData =
-    proposal.proposalType as keyof ParsedProposalData;
-  const proposalData =
-    proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
 
   const { data: executionDelayInBlocks } = useContractRead({
     address: contracts.timelock!.address as `0x${string}`,
@@ -54,12 +50,7 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "execute",
-    args: [
-      "options" in proposalData ? proposalData.options[0].targets : "",
-      "options" in proposalData ? proposalData.options[0].values : "",
-      "options" in proposalData ? proposalData.options[0].calldatas : "",
-      keccak256(toUtf8Bytes(proposal.description!)),
-    ],
+    args: proposalToCallArgs(proposal),
   });
 
   const { isLoading, isSuccess, isError, isFetched, error } =
