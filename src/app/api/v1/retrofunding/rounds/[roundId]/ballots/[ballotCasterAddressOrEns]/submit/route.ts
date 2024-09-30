@@ -37,15 +37,15 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  // const isBadgeholder = await fetchBadgeholder(
-  //   route.params.ballotCasterAddressOrEns
-  // );
+  const isBadgeholder = await fetchBadgeholder(
+    route.params.ballotCasterAddressOrEns
+  );
 
-  // if (!isBadgeholder) {
-  //   return new Response("Only badgeholder can submit a ballot", {
-  //     status: 401,
-  //   });
-  // }
+  if (!isBadgeholder) {
+    return new Response("Only badgeholder can submit a ballot", {
+      status: 401,
+    });
+  }
 
   if (route.params.roundId === "4") {
     return new Response("Ballot submission for Round 4 is closed", {
