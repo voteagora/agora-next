@@ -7,10 +7,15 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace, contracts } = Tenant.current();
 
-  // TODO: Andrei - Refactor this using tenant's governor contract type rather than namespace
   switch (namespace) {
     case TENANT_NAMESPACES.ENS:
-      return await contracts.governor.contract.quorum!(proposal.created_block!);
+      if (proposal.created_block) {
+        return await contracts.governor.contract.quorum!(
+          proposal.created_block
+        );
+      } else {
+        return null;
+      }
 
     case TENANT_NAMESPACES.UNISWAP:
       return await contracts.governor.contract.quorumVotes!();
