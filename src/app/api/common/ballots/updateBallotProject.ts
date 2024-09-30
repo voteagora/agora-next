@@ -167,9 +167,9 @@ async function updateBallotProjectImpactForAddress({
           FROM
               current_group, lower_group
       )
-      INSERT INTO retro_funding.project_allocations (address, round, project_id, impact, rank ${impact !== 0 ? "" : ", allocation"})
-      VALUES ($1, $2, $3, ${impact}, (SELECT computed_rank FROM estimated_rank) ${impact !== 0 ? "" : `, null`})
-      ON CONFLICT (address, round, project_id ${impact !== 0 ? "" : ", allocation"})
+      INSERT INTO retro_funding.project_allocations (address, round, project_id, impact, rank${impact !== 0 ? "" : ", allocation"})
+      VALUES ($1, $2, $3, ${impact}, (SELECT computed_rank FROM estimated_rank)${impact !== 0 ? "" : `, null`})
+      ON CONFLICT (address, round, project_id)
       DO UPDATE SET 
           impact = EXCLUDED.impact,
           rank = EXCLUDED.rank
