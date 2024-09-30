@@ -1,10 +1,10 @@
 import { ProposalType } from "@prisma/client";
-import { getHumanBlockTime } from "./blockTimes";
+import { blocksToSeconds, getHumanBlockTime } from "./blockTimes";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
-import { Abi, decodeFunctionData } from "viem";
+import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { Block, ethers } from "ethers";
+import { Block, ethers, toUtf8Bytes } from "ethers";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -716,6 +716,20 @@ export async function getProposalStatus(
 
   return "QUEUED";
 }
+
+export const proposalToCallArgs = (proposal: Proposal) => {
+  const dynamicProposalType: keyof ParsedProposalData =
+    proposal.proposalType as keyof ParsedProposalData;
+  const proposalData =
+    proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
+
+  return [
+    "options" in proposalData ? proposalData.options[0].targets : "",
+    "options" in proposalData ? proposalData.options[0].values : "",
+    "options" in proposalData ? proposalData.options[0].calldatas : "",
+    keccak256(toUtf8Bytes(proposal.description!)),
+  ];
+};
 
 type ProposalTypeData = {
   proposal_type_id: number;
