@@ -1,7 +1,7 @@
 import {
+  ENSGovernor__factory,
+  ENSTimelock__factory,
   ERC20__factory,
-  AgoraTimelock__factory,
-  OptimismGovernor__factory,
 } from "@/lib/contracts/generated";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -46,20 +46,19 @@ export const ensTenantContractConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
-      abi: AgoraTimelock__factory.abi,
-      address: TIMELOCK,
-      chain,
-      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
+    governor: new TenantContract<IGovernorContract>({
+      abi: ENSGovernor__factory.abi,
+      address: GOVERNOR,
+      chain: chain,
+      contract: ENSGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
 
-    // PLACEHOLDER CONTRACT
-    governor: new TenantContract<IGovernorContract>({
-      abi: OptimismGovernor__factory.abi,
-      address: GOVERNOR,
+    timelock: new TenantContract<IGovernorContract>({
+      abi: ENSTimelock__factory.abi,
+      address: TIMELOCK,
       chain: chain,
-      contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
+      contract: ENSTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
   };
