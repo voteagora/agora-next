@@ -97,9 +97,11 @@ export async function middleware(request: NextRequest) {
         );
       }
     }
+    return setCorsHeaders(request, NextResponse.next());
   }
 
-  return setCorsHeaders(request, NextResponse.next());
+  // For non-API routes, just call next() without setting CORS headers
+  return NextResponse.next();
 }
 
 export const config = {
