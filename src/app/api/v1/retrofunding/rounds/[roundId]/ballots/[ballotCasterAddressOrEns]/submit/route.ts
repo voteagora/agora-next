@@ -13,7 +13,7 @@ const r4BallotContentSchema = z.object({
 const r5BallotContentSchema = z.object({
   budget: z.number().min(2000000).max(8000000), // number between 2M and 8M
   project_allocations: z.array(
-    z.record(z.string(), z.string(z.number().min(0).max(100)))
+    z.record(z.string(), z.string(z.number().min(0).max(100)).nullable())
   ),
   category_allocations: z.array(
     z.record(z.string(), z.string(z.number().min(0).max(100)))
@@ -37,15 +37,15 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const isBadgeholder = await fetchBadgeholder(
-    route.params.ballotCasterAddressOrEns
-  );
+  // const isBadgeholder = await fetchBadgeholder(
+  //   route.params.ballotCasterAddressOrEns
+  // );
 
-  if (!isBadgeholder) {
-    return new Response("Only badgeholder can submit a ballot", {
-      status: 401,
-    });
-  }
+  // if (!isBadgeholder) {
+  //   return new Response("Only badgeholder can submit a ballot", {
+  //     status: 401,
+  //   });
+  // }
 
   if (route.params.roundId === "4") {
     return new Response("Ballot submission for Round 4 is closed", {

@@ -167,12 +167,13 @@ async function updateBallotProjectImpactForAddress({
           FROM
               current_group, lower_group
       )
-      INSERT INTO retro_funding.project_allocations (address, round, project_id, impact, rank)
-      VALUES ($1, $2, $3, ${impact}, (SELECT computed_rank FROM estimated_rank))
-      ON CONFLICT (address, round, project_id)
+      INSERT INTO retro_funding.project_allocations (address, round, project_id, impact, rank ${impact !== 0 ? "" : ", allocation"})
+      VALUES ($1, $2, $3, ${impact}, (SELECT computed_rank FROM estimated_rank) ${impact !== 0 ? "" : `, null`})
+      ON CONFLICT (address, round, project_id ${impact !== 0 ? "" : ", allocation"})
       DO UPDATE SET 
           impact = EXCLUDED.impact,
-          rank = EXCLUDED.rank;
+          rank = EXCLUDED.rank
+          ${impact !== 0 ? "" : `, allocation = EXCLUDED.allocation`};
     `,
     address,
     roundId,
@@ -272,7 +273,7 @@ async function updateBallotProjectPositionForAddress({
           SELECT
               COALESCE(ROUND((lower_bound + upper_bound) / 2), 
                   CASE
-                      WHEN lower_bound IS NULL THEN ROUND(upper_bound / 1.4)
+                      WHEN lower_bound IS NULL THEN ROUND(upper_bound + 1000)
                       WHEN upper_bound IS NULL THEN lower_bound + 1000
                       ELSE NULL
                   END
