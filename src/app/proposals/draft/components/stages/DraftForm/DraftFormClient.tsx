@@ -152,21 +152,30 @@ const DraftFormClient = ({
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
               </div>
-              <div className="relative">
-                <SelectInput
-                  control={control}
-                  label="Proposal type"
-                  required={true}
-                  options={validProposalTypes.map((typeConfig) => {
-                    return {
-                      label: typeConfig.name,
-                      value: typeConfig.proposal_type_id,
-                    };
-                  })}
+
+              {validProposalTypes.length > 1 ? (
+                <div className="relative">
+                  <SelectInput
+                    control={control}
+                    label="Proposal type"
+                    required={true}
+                    options={validProposalTypes.map((typeConfig) => {
+                      return {
+                        label: typeConfig.name,
+                        value: typeConfig.proposal_type_id,
+                      };
+                    })}
+                    name="proposalConfigType"
+                    emptyCopy="Default"
+                  />
+                </div>
+              ) : (
+                <input
+                  type="hidden"
                   name="proposalConfigType"
-                  emptyCopy="Default"
+                  value={validProposalTypes[0].proposal_type_id}
                 />
-              </div>
+              )}
 
               <TextInput
                 label="Title"
