@@ -17,7 +17,10 @@ export function Switch({ onSelectionChanged, selection, options }: Props) {
       {options.map((option, index) => (
         <div
           key={index}
-          onClick={() => onSelectionChanged(option)}
+          onClick={(e) => {
+            e.preventDefault();
+            onSelectionChanged(option);
+          }}
           className={`${optionStyle}  ${
             selection === option ? selectedStyle : ""
           }`}
