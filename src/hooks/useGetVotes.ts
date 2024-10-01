@@ -16,7 +16,7 @@ export const useGetVotes = ({
   const { contracts } = Tenant.current();
   const { data, isFetching, isFetched } = useQuery({
     enabled: !!address && !!blockNumber,
-    queryKey: [VOTES_QK],
+    queryKey: [VOTES_QK, address, blockNumber.toString()],
     queryFn: async () => {
       const votes = (await client.readContract({
         abi: contracts.governor.abi,
@@ -28,5 +28,6 @@ export const useGetVotes = ({
       return votes;
     },
   });
+
   return { data, isFetching, isFetched };
 };
