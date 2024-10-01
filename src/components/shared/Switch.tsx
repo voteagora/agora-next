@@ -9,7 +9,7 @@ type Props = {
 const optionStyle =
   "p-[5px] flex-1 text-center cursor-pointer rounded-md text-primary/30 font-medium hover:bg-line hover:font-semibold transition-all";
 
-const selectedStyle = "bg-line text-primary font-semibold";
+const selectedStyle = "bg-tertiary/20 text-secondary font-semibold";
 
 export function Switch({ onSelectionChanged, selection, options }: Props) {
   return (
