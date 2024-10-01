@@ -173,7 +173,7 @@ const DraftFormClient = ({
                 <input
                   type="hidden"
                   name="proposalConfigType"
-                  value={validProposalTypes[0].proposal_type_id}
+                  value={validProposalTypes[0]?.proposal_type_id || null}
                 />
               )}
 
