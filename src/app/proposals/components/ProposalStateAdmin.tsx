@@ -49,7 +49,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       case PROPOSAL_STATUS.SUCCEEDED:
         return "This proposal is now passed and can be queued for execution";
       case PROPOSAL_STATUS.QUEUED:
-        return "This proposal can be executed.";
+        return "This proposal can be executed after the timelock passes.";
     }
   };
 

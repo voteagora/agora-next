@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
   Tooltip,
@@ -30,7 +29,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
   const [executeTime, setExecuteTime] = useState(new Date());
 
   // Check whether user has the EXECUTOR_ROLE
-  const { data: hasExecuteRole } = useContractRead({
+  const { data: hasExecuteRole, isFetched: fetchedRole } = useContractRead({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "hasRole",
@@ -41,8 +40,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
   });
 
   // Check whether time has passed
-  const { data: delayInBlocks } = useContractRead({
-    enabled: Boolean(hasExecuteRole),
+  const { data: delayInBlocks, isFetched: fetchedDelay } = useContractRead({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
@@ -61,8 +59,8 @@ export const OZGovExecute = ({ proposal }: Props) => {
     });
 
   useEffect(() => {
-    if (hasExecuteRole && delayInBlocks) {
-      const delayInSeconds = blocksToSeconds(Number(delayInBlocks));
+    if (fetchedRole && fetchedDelay) {
+      const delayInSeconds = Number(delayInBlocks);
 
       if (proposal.queuedTime) {
         const queuedTimeInSeconds = Math.floor(
@@ -74,7 +72,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
         setExecuteTime(new Date(executeTimeInSeconds * 1000));
       }
     }
-  }, [hasExecuteRole, delayInBlocks]);
+  }, [fetchedRole, fetchedDelay]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -98,7 +96,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
             <>
               <TooltipTrigger>
                 <Button disabled={true} variant="outline">
-                  OZ Execute
+                  Execute
                 </Button>
               </TooltipTrigger>
             </>
@@ -115,7 +113,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
           <TooltipContent>
             <div className="flex flex-col gap-1 p-2">
               <div>
-                {hasExecuteRole
+                {!canExecute
                   ? `This proposal can be executed on ${executeTime.toLocaleString()}`
                   : `You don't have permission to execute this proposal.`}
               </div>
