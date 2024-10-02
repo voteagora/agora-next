@@ -636,6 +636,8 @@ export async function getProposalStatus(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
+  const { namespace } = Tenant.current();
+
   if (proposalResults.key === "SNAPSHOT") {
     return proposalResults.kind.status.toUpperCase() as ProposalStatus;
   }
@@ -668,9 +670,19 @@ export async function getProposalStatus(
         against: againstVotes,
         abstain: abstainVotes,
       } = proposalResults.kind;
-      const proposalQuorumVotes = forVotes + abstainVotes;
 
-      if ((quorum && proposalQuorumVotes < quorum) || forVotes < againstVotes) {
+      let quorumForGovernor = quorum;
+      switch (namespace) {
+        // Bravo governor
+        case TENANT_NAMESPACES.UNISWAP:
+          quorumForGovernor = forVotes;
+          break;
+
+        default:
+          quorumForGovernor = forVotes + abstainVotes;
+      }
+
+      if ((quorum && quorumForGovernor < quorum) || forVotes < againstVotes) {
         return "DEFEATED";
       }
 
