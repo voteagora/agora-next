@@ -13,6 +13,10 @@ import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
+import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposalDraftButton";
+import { DaoSlug } from "@prisma/client";
+
+const { slug } = Tenant.current();
 
 type Props = {
   ensName: string | undefined;
@@ -196,6 +200,13 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           >
                             View my profile
                           </Link>
+                        )}
+                        {/* little temporary hack for the manager to test secret links for users to create a draft */}
+                        {slug === DaoSlug.OP && address && (
+                          <CreateProposalDraftButton
+                            address={address}
+                            className="opacity-0 cursor-default hidden sm:block"
+                          />
                         )}
                       </>
                     )}
