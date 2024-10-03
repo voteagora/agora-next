@@ -3,8 +3,15 @@
 import { useState, useEffect } from "react";
 import { UpdatedButton } from "@/components/Button";
 import createProposalDraft from "./actions/createProposalDraft";
+import classNames from "classnames";
 
-const CreateProposalDraftButton = ({ address }: { address: `0x${string}` }) => {
+const CreateProposalDraftButton = ({
+  address,
+  className,
+}: {
+  address: `0x${string}`;
+  className?: string;
+}) => {
   const [isPending, setIsPending] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
@@ -20,6 +27,7 @@ const CreateProposalDraftButton = ({ address }: { address: `0x${string}` }) => {
       variant="rounded"
       type="primary"
       isLoading={isPending}
+      className={classNames(className)}
       onClick={async () => {
         setIsPending(true);
         const proposal = await createProposalDraft(address);
