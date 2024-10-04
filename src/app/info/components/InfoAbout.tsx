@@ -76,12 +76,12 @@ const InfoAbout = () => {
             <p className="text-secondary">
               With this in mind, our plan is first to set up a minimal
               governance structure, refine it, and iterate on first principles.
-              Some governance system will accordingly start simple. This
-              will leave plenty of room for experimentation in the future in
-              order to keep the door open for broader collaboration in building
-              our ecosystem. We aim to reach a place where the DAO is both
-              highly decentralized, but still engages in thoughtful discourse
-              and research, resulting in meaningful outcomes.
+              Some governance system will accordingly start simple. This will
+              leave plenty of room for experimentation in the future in order to
+              keep the door open for broader collaboration in building our
+              ecosystem. We aim to reach a place where the DAO is both highly
+              decentralized, but still engages in thoughtful discourse and
+              research, resulting in meaningful outcomes.
             </p>
           </div>
         )}
