@@ -753,7 +753,7 @@ type ProposalTypeData = {
 /**
  * Get proposal current quorum
  */
-export async function getProposalCurrentQuorum(
+export function getProposalCurrentQuorum(
   proposalResults:
     | ParsedProposalResults["APPROVAL"]["kind"]
     | ParsedProposalResults["STANDARD"]["kind"]
@@ -763,9 +763,9 @@ export async function getProposalCurrentQuorum(
 
   switch (namespace) {
     case TENANT_NAMESPACES.UNISWAP:
-      return proposalResults.for;
+      return BigInt(proposalResults.for);
 
     default:
-      return proposalResults.for + proposalResults.abstain;
+      return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
   }
 }
