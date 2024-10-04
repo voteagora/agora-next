@@ -149,6 +149,7 @@ async function getCurrentDelegatorsForAddress({
     ? contracts.alligator.address
     : contracts.token.address;
 
+  // Replace with Agora Governor flag
   // if (contracts.alligator || namespace === TENANT_NAMESPACES.NEW_DAO) {
   //   advancedDelegatorsSubQry = `SELECT
   //                               "from",
@@ -179,6 +180,7 @@ async function getCurrentDelegatorsForAddress({
                                 AND ghost."from" = $2`;
   // }
 
+  // Replace with Agora Governor flag
   // if (namespace == TENANT_NAMESPACES.NEW_DAO) {
   //   directDelegatorsSubQry = `WITH ghost as (SELECT
   //             null::text as "from",

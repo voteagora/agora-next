@@ -380,10 +380,14 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-    // } else if (namespace === TENANT_NAMESPACES.NEW_DAO) {
-    //   numOfDelegationsQuery = prisma.$queryRawUnsafe<
-    //     { num_of_delegators: BigInt }[]
-    //   >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
+
+    //  Replace with Agora Governor flag
+    /*
+    } else if (namespace === TENANT_NAMESPACES.NEW_DAO) {
+      numOfDelegationsQuery = prisma.$queryRawUnsafe<
+        { num_of_delegators: BigInt }[]
+      >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
+   **/
   } else {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]
