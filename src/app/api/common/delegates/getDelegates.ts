@@ -1,6 +1,6 @@
 import {
-  paginateResult,
   type PaginatedResult,
+  paginateResult,
   type PaginationParams,
 } from "@/app/lib/pagination";
 import prisma from "@/app/lib/prisma";
@@ -8,8 +8,8 @@ import { cache } from "react";
 import { isAddress } from "viem";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
-  DelegateChunk,
   type Delegate,
+  DelegateChunk,
   type DelegatesGetPayload,
   type DelegateStats,
 } from "./delegate";
@@ -17,7 +17,6 @@ import Tenant from "@/lib/tenant/tenant";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /*
  * Fetches a list of delegates
@@ -381,10 +380,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-  } else if (namespace === TENANT_NAMESPACES.NEW_DAO) {
-    numOfDelegationsQuery = prisma.$queryRawUnsafe<
-      { num_of_delegators: BigInt }[]
-    >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
+    // } else if (namespace === TENANT_NAMESPACES.NEW_DAO) {
+    //   numOfDelegationsQuery = prisma.$queryRawUnsafe<
+    //     { num_of_delegators: BigInt }[]
+    //   >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
   } else {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]

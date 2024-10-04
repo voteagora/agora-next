@@ -4,8 +4,6 @@ import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
-const { ui } = Tenant.current();
-
 const tabs = [
   {
     icon: icons.coins,
@@ -55,13 +53,14 @@ const InfoAbout = () => {
               About {namespace}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
-            {/* So the image doesn't look smooshed for newdao :eye-roll: */}
+            {/* So the image doesn't look smooshed for newdao :eye-roll:
             {namespace === TENANT_NAMESPACES.NEW_DAO && (
               <div className="sm:h-[105px] block"></div>
             )}
+            */}
           </div>
         </div>
-        {namespace === TENANT_NAMESPACES.NEW_DAO && (
+        {/*{namespace === TENANT_NAMESPACES.NEW_DAO && (
           <div className="p-6 border-t border-line">
             <div className="text-lg font-bold text-primary capitalize">
               Our approach to governance
@@ -85,6 +84,7 @@ const InfoAbout = () => {
             </p>
           </div>
         )}
+        */}
         <div className="p-6  rounded-b-xl bg-neutral border-t border-line">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
             {tabs.map((item, index) => (
