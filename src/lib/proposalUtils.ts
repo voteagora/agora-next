@@ -671,16 +671,7 @@ export async function getProposalStatus(
         abstain: abstainVotes,
       } = proposalResults.kind;
 
-      let quorumForGovernor = quorum;
-      switch (namespace) {
-        // Bravo governor
-        case TENANT_NAMESPACES.UNISWAP:
-          quorumForGovernor = forVotes;
-          break;
-
-        default:
-          quorumForGovernor = forVotes + abstainVotes;
-      }
+      const quorumForGovernor = getProposalCurrentQuorum(proposalResults.kind);
 
       if ((quorum && quorumForGovernor < quorum) || forVotes < againstVotes) {
         return "DEFEATED";
