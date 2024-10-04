@@ -749,3 +749,23 @@ type ProposalTypeData = {
   quorum: bigint;
   approval_threshold: bigint;
 };
+
+/**
+ * Get proposal current quorum
+ */
+export async function getProposalCurrentQuorum(
+  proposalResults:
+    | ParsedProposalResults["APPROVAL"]["kind"]
+    | ParsedProposalResults["STANDARD"]["kind"]
+    | ParsedProposalResults["OPTIMISTIC"]["kind"]
+) {
+  const { namespace } = Tenant.current();
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.UNISWAP:
+      return proposalResults.for;
+
+    default:
+      return proposalResults.for + proposalResults.abstain;
+  }
+}
