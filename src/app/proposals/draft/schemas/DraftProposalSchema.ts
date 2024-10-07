@@ -45,18 +45,18 @@ const socialOption = z.object({
 const socialProposal = z
   .object({
     type: z.nativeEnum(SocialProposalType),
-    start_date: z.coerce.date().optional(),
-    end_date: z.coerce.date().optional(),
+    start_date: z.coerce.date().min(new Date(), {
+      message: "Start date is required and must be in the future",
+    }),
+    end_date: z.coerce.date().min(new Date(), {
+      message: "End date is required and must be in the future",
+    }),
     options: z.array(socialOption),
   })
-  .refine(
-    (data) =>
-      !data.end_date || !data.start_date || data.end_date > data.start_date,
-    {
-      message: "End date cannot be earlier than start date.",
-      path: ["end_date"],
-    }
-  );
+  .refine((data) => data.end_date > data.start_date, {
+    message: "End date cannot be earlier than start date.",
+    path: ["end_date"],
+  });
 
 const approvalProposal = z
   .object({
@@ -83,6 +83,21 @@ const approvalProposal = z
       message:
         "Top choices must be less than or equal to the number of options",
       path: ["topChoices"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.maxOptions !== undefined) {
+        const maxOptions = parseInt(data.maxOptions);
+        return !isNaN(maxOptions) && maxOptions <= data.options.length;
+      }
+
+      return true;
+    },
+    {
+      message:
+        "Max options must be less than or equal to the number of options",
+      path: ["maxOptions"],
     }
   );
 

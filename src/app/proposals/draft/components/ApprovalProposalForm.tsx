@@ -22,7 +22,7 @@ import { useEffect } from "react";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
 const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
-  const { control, watch } = useFormContext<FormType>();
+  const { control } = useFormContext<FormType>();
 
   const {
     fields: transactions,
@@ -117,7 +117,7 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
 };
 
 /**
- * Dev note:
+ * Dev note (MG):
  * I am deciding to take out simulation for approval type transactions.
  * To be honest, it feels too complex to warrent time effort right now.
  * In order to properly simulate transactions we would need to look at
@@ -213,7 +213,6 @@ const ApprovalProposalForm = () => {
           control={control}
           tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
         />
-
         <NumberInput
           required={true}
           label="Max options"
