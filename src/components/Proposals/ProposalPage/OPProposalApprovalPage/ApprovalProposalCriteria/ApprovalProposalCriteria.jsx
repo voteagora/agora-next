@@ -1,10 +1,11 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
+import { getProposalCurrentQuorum } from "@/lib/proposalUtils";
 
 export default function ApprovalProposalCriteria({ proposal }) {
   const proposalData = proposal.proposalData;
-  const proposalResults = proposal.proposalResults;
+  const currentQuorum = getProposalCurrentQuorum(proposal.proposalResults);
   const proposalSettings = proposalData.proposalSettings;
 
   return (
@@ -18,7 +19,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
             Quorum <TokenAmountDisplay amount={proposal.quorum} />
           </div>
           <div>
-            Current <TokenAmountDisplay amount={proposalResults.for} />
+            Current <TokenAmountDisplay amount={currentQuorum} />
           </div>
         </HStack>
         <ProposalStatusDetail

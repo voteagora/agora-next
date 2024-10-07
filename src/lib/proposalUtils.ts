@@ -671,16 +671,7 @@ export async function getProposalStatus(
         abstain: abstainVotes,
       } = proposalResults.kind;
 
-      let quorumForGovernor = quorum;
-      switch (namespace) {
-        // Bravo governor
-        case TENANT_NAMESPACES.UNISWAP:
-          quorumForGovernor = forVotes;
-          break;
-
-        default:
-          quorumForGovernor = forVotes + abstainVotes;
-      }
+      const quorumForGovernor = getProposalCurrentQuorum(proposalResults.kind);
 
       if ((quorum && quorumForGovernor < quorum) || forVotes < againstVotes) {
         return "DEFEATED";
@@ -749,3 +740,23 @@ type ProposalTypeData = {
   quorum: bigint;
   approval_threshold: bigint;
 };
+
+/**
+ * Get proposal current quorum
+ */
+export function getProposalCurrentQuorum(
+  proposalResults:
+    | ParsedProposalResults["APPROVAL"]["kind"]
+    | ParsedProposalResults["STANDARD"]["kind"]
+    | ParsedProposalResults["OPTIMISTIC"]["kind"]
+) {
+  const { namespace } = Tenant.current();
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.UNISWAP:
+      return BigInt(proposalResults.for);
+
+    default:
+      return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
+  }
+}
