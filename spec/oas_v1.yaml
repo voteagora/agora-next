@@ -26,11 +26,13 @@ info:
     - **contracts**: Data for the current onchain contracts
     - **projects** Round 5 Projects with mock data
     - **RetroFundingBallots** Round 5 Ballots with mock data
-
-    Not Live.
     - **Round 5**: Data related to Retro Funding for Optimism Round 5
     - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
     - 0.2.3: Round 5 Production release with real data
+
+    Not Live.
+    - 0.3.0: Round 6 mock projects data
+    - 0.3.1: Round 6 production release with real data
 
     ### Release Schedule
 
@@ -45,6 +47,9 @@ info:
     | OP 0.2.1 | LIVE   | Aug 26th |
     | OP 0.2.2 | LIVE   | Sep 4th |
     | OP 0.2.3 | LIVE   | Sep 20th |
+    |----------|---------|---------------|
+    | OP 0.3.0 | ON TRACK   | Oct 11th |
+    | OP 0.3.1 | ON TRACK   | Oct 25th |
   version: 0.2.1
   license:
     name: MIT
