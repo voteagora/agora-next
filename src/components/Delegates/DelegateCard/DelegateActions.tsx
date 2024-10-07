@@ -40,8 +40,8 @@ export function DelegateActions({
   const delegationButton = () => {
     // TODO: Replace namespace lookup with governor-level switch in the tenant
     switch (namespace) {
-      case TENANT_NAMESPACES.NEW_DAO:
-        return <PartialDelegateButton full={false} delegate={delegate} />;
+      // case TENANT_NAMESPACES.NEW_DAO:
+      //   return <PartialDelegateButton full={false} delegate={delegate} />;
 
       // Optimism in the only tenant currently supporting advnaced delegation
       case TENANT_NAMESPACES.OPTIMISM:
