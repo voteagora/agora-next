@@ -10,35 +10,46 @@ import DateInput from "./form/DateInput";
 
 const SocialProposalForm = () => {
   type FormType = z.output<typeof SocialProposalSchema>;
-  const { control, watch, setValue } = useFormContext<FormType>();
+  const {
+    control,
+    watch,
+    formState: { defaultValues },
+  } = useFormContext<FormType>();
 
-  const { fields, replace } = useFieldArray({
+  const { fields, replace, append } = useFieldArray({
     control,
     name: "socialProposal.options",
   });
 
-  const proposalType = watch("socialProposal.type");
+  const localProposalType = watch("socialProposal.type");
+  const savedProposalType = defaultValues?.socialProposal?.type;
+  const localOptions = watch("socialProposal.options");
+  const savedOptions = defaultValues?.socialProposal?.options;
   const prevProposalTypeRef = useRef<SocialProposalType | null>(null);
 
   useEffect(() => {
     const updateOptions = () => {
-      if (proposalType === SocialProposalType.BASIC) {
-        replace([{ text: "FOR" }, { text: "AGAINST" }, { text: "ABSTAIN" }]);
-      } else {
-        replace([{ text: "" }]);
+      if (localProposalType === SocialProposalType.BASIC) {
+        if (savedProposalType === SocialProposalType.BASIC && savedOptions) {
+          replace(savedOptions as FormType["socialProposal"]["options"]);
+        } else {
+          replace([{ text: "FOR" }, { text: "AGAINST" }, { text: "ABSTAIN" }]);
+        }
+      } else if (localProposalType === SocialProposalType.APPROVAL) {
+        if (savedProposalType === SocialProposalType.APPROVAL && savedOptions) {
+          replace(savedOptions as FormType["socialProposal"]["options"]);
+        } else {
+          replace([{ text: "" }]);
+        }
       }
     };
 
-    if (!prevProposalTypeRef.current) {
-      // Initial render
-      updateOptions();
-    } else if (proposalType !== prevProposalTypeRef.current) {
-      // Proposal type has changed
+    if (localProposalType !== prevProposalTypeRef.current) {
       updateOptions();
     }
 
-    prevProposalTypeRef.current = proposalType;
-  }, [proposalType, replace]);
+    prevProposalTypeRef.current = localProposalType;
+  }, [localProposalType, replace, watch]);
 
   return (
     <div className="space-y-6">
@@ -82,10 +93,10 @@ const SocialProposalForm = () => {
                 name={`socialProposal.options.${index}.text`}
                 control={control}
                 placeholder="For, against, abstain, etc."
-                disabled={proposalType === SocialProposalType.BASIC}
+                disabled={localProposalType === SocialProposalType.BASIC}
               />
             </div>
-            {proposalType === SocialProposalType.APPROVAL &&
+            {localProposalType === SocialProposalType.APPROVAL &&
               fields.length > 1 && (
                 <UpdatedButton
                   className="self-end"
@@ -102,13 +113,13 @@ const SocialProposalForm = () => {
           </div>
         ))}
       </div>
-      {proposalType === SocialProposalType.APPROVAL && (
+      {localProposalType === SocialProposalType.APPROVAL && (
         <UpdatedButton
           type="secondary"
           fullWidth
           isSubmit={false}
           onClick={() => {
-            replace([...fields, { text: "" }]);
+            append({ text: "" });
           }}
         >
           Add option

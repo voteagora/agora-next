@@ -316,9 +316,12 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         type: ProposalType.SOCIAL,
         title: proposal.title,
         abstract: proposal.abstract,
-        start_date: proposal.start_date_social,
-        end_date: proposal.end_date_social,
-        options: proposal.social_options,
+        socialProposal: {
+          type: proposal.proposal_social_type,
+          start_date: proposal.start_date_social,
+          end_date: proposal.end_date_social,
+          options: proposal.social_options,
+        },
       };
     case ProposalType.APPROVAL:
       return {

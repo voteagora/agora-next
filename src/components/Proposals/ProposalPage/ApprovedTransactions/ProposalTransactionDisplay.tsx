@@ -34,6 +34,21 @@ const ProposalTransactionDisplay = ({
   };
 }) => {
   const [collapsed, setCollapsed] = useState(true);
+
+  if (!targets.length) {
+    return (
+      <div>
+        <div className="flex flex-col border rounded-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
+          <div className="w-full flex items-center justify-between">
+            <span className="text-xs text-tertiary">Proposed transactions</span>
+          </div>
+          <div className="text-xs text-tertiary mt-1">
+            This proposal does not execute any transactions.
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div>
       <div className="flex flex-col border border-b-0 rounded-t-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
