@@ -26,11 +26,13 @@ info:
     - **contracts**: Data for the current onchain contracts
     - **projects** Round 5 Projects with mock data
     - **RetroFundingBallots** Round 5 Ballots with mock data
-
-    Not Live.
     - **Round 5**: Data related to Retro Funding for Optimism Round 5
     - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
     - 0.2.3: Round 5 Production release with real data
+
+    Not Live.
+    - 0.3.0: Round 6 mock projects data
+    - 0.3.1: Round 6 production release with real data
 
     ### Release Schedule
 
@@ -45,6 +47,9 @@ info:
     | OP 0.2.1 | LIVE   | Aug 26th |
     | OP 0.2.2 | LIVE   | Sep 4th |
     | OP 0.2.3 | LIVE   | Sep 20th |
+    |----------|---------|---------------|
+    | OP 0.3.0 | ON TRACK   | Oct 11th |
+    | OP 0.3.1 | ON TRACK   | Oct 25th |
   version: 0.2.1
   license:
     name: MIT
@@ -55,6 +60,8 @@ servers:
 tags:
   - name: auth
     description: Authenticate with the Agora API
+  - name: Round 6
+    description: Data related to Retro Funding for Optimism Round 6
   - name: Round 5
     description: Data related to Retro Funding for Optimism Round 5
   - name: Round 4
@@ -1289,10 +1296,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallot4ProjectsAllocation"
-    Round5Ballot:
-      summary: A ballot for RetroFunding Round 5
+    Ballot:
+      summary: A ballot for RetroFunding Round 5 & 6
       description: >
-        A ballot for RetroFunding Round 5, including information about the ballot.
+        A ballot for RetroFunding Round 5 & 6, including information about the ballot.
       type: object
       properties:
         address:
@@ -2056,6 +2063,7 @@ paths:
         - RetroFundingBallots
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2066,7 +2074,7 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Round5Ballot"
+                  - $ref: "#/components/schemas/Ballot"
                   - $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
@@ -2121,6 +2129,7 @@ paths:
         - RetroFundingBallots
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2171,6 +2180,7 @@ paths:
         - projects
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/limitParam"
@@ -2219,6 +2229,7 @@ paths:
         - projects
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2287,6 +2298,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2313,7 +2325,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2333,6 +2345,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2344,7 +2357,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2370,6 +2383,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2381,7 +2395,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2401,6 +2415,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2412,7 +2427,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2430,6 +2445,7 @@ paths:
       tags:
         - RetroFunding
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2455,7 +2471,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2473,6 +2489,7 @@ paths:
       tags:
         - RetroFunding
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2483,7 +2500,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2502,6 +2519,7 @@ paths:
         - RetroFunding
         - projects
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2512,7 +2530,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
