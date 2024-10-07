@@ -74,6 +74,8 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
 
+  console.log(draftProposal);
+
   const router = useRouter();
   const { address } = useAccount();
   const tenant = Tenant.current();
@@ -217,7 +219,7 @@ const DraftFormClient = ({
                 className="w-[200px] flex items-center justify-center"
                 isLoading={isPending}
               >
-                Create draft
+                {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>
             </div>
           </FormCard.Section>
