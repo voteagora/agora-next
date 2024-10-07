@@ -244,7 +244,7 @@ export type SocialProposal = BaseProposal & {
 
 export type ApprovalProposal = BaseProposal & {
   voting_module_type: ProposalType.APPROVAL;
-  budget: string;
+  budget: number;
   criteria: ApprovalProposalType;
   max_options: number;
   threshold: number;
@@ -317,7 +317,6 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         socialProposal: {
-          type: proposal.proposal_social_type,
           start_date: proposal.start_date_social,
           end_date: proposal.end_date_social,
           options: proposal.social_options,
@@ -329,8 +328,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         approvalProposal: {
-          budget: proposal.budget,
           criteria: proposal.criteria,
+          budget: proposal.budget?.toString(),
           maxOptions: proposal.max_options?.toString(),
           threshold: proposal.threshold?.toString(),
           topChoices: proposal.top_choices?.toString(),
