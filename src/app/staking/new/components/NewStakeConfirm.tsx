@@ -4,8 +4,8 @@ import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
+  useWriteContract,
+  useSimulateContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -53,8 +53,12 @@ export const NewStakeConfirm = ({
     isSufficientSpendingAllowance && isAddress(delegate)
   );
 
-  const { config, status, error } = usePrepareContractWrite({
-    enabled: isSufficientSpendingAllowance,
+  const {
+    data: config,
+    status,
+    error,
+  } = useSimulateContract({
+    query: { enabled: isSufficientSpendingAllowance },
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
@@ -62,7 +66,7 @@ export const NewStakeConfirm = ({
     args: [amountToStake, delegate],
   });
 
-  const { data, write } = useContractWrite(config);
+  const { data, writeContract: write } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({ hash: data });
   const isTransactionConfirmed = Boolean(data && !isLoading);
 
@@ -100,9 +104,9 @@ export const NewStakeConfirm = ({
 
               <Button
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || !Boolean(config?.request)}
                 onClick={() => {
-                  write?.();
+                  write(config!.request);
                 }}
               >
                 {isLoading

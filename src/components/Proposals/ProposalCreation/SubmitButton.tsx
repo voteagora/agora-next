@@ -13,8 +13,8 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import {
   useAccount,
   useContractRead,
-  useContractWrite,
-  usePrepareContractWrite,
+  useWriteContract,
+  useSimulateContract,
 } from "wagmi";
 import { useModal } from "connectkit";
 import { disapprovalThreshold } from "@/lib/constants";
@@ -43,10 +43,10 @@ export default function SubmitButton({
   const [isClient, setIsClient] = useState(false);
 
   const {
-    config,
+    data: config,
     isError: onPrepareError,
     error,
-  } = usePrepareContractWrite({
+  } = useSimulateContract({
     address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: governorFunction,
@@ -58,38 +58,43 @@ export default function SubmitButton({
     abi: governorContract.abi,
     functionName: "manager",
   });
-  const { data, isLoading, isSuccess, isError, write } =
-    useContractWrite(config);
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    writeContract: write,
+  } = useWriteContract();
 
   const openDialog = useOpenDialog();
 
   function submitProposal() {
-    write?.();
+    write(config!.request);
     openDialog({
       type: "CAST_PROPOSAL",
       params: {
         isLoading,
         isError,
         isSuccess,
-        txHash: data?.hash,
+        txHash: data,
       },
     });
   }
 
   useEffect(() => {
-    if (isSuccess || isError || isLoading || data?.hash) {
+    if (isSuccess || isError || isLoading || data) {
       openDialog({
         type: "CAST_PROPOSAL",
         params: {
           isLoading,
           isError,
           isSuccess,
-          txHash: data?.hash,
+          txHash: data,
         },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isError, isSuccess, data?.hash]);
+  }, [isLoading, isError, isSuccess, data]);
 
   /* hack to suppress Suspense boundary error */
   useEffect(() => {

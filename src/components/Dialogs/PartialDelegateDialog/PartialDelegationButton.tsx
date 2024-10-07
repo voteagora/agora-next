@@ -1,7 +1,7 @@
 import {
   useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
+  useWriteContract,
+  useSimulateContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
@@ -43,21 +43,21 @@ export const PartialDelegationButton = ({
     Math.round(Number(delegation.percentage) * 10000),
   ]);
 
-  const { config } = usePrepareContractWrite({
-    enabled: !disabled,
+  const { data: config } = useSimulateContract({
+    query: { enabled: !disabled },
     address: contracts.token.address as `0x${string}`,
     abi: contracts.token.abi,
     functionName: "delegate",
     args: [cleanDelegations],
   });
 
-  const { data, write, status } = useContractWrite(config);
+  const { data, writeContract: write, status } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash: data });
 
   useEffect(() => {
-    if (isSuccess && data?.hash) {
+    if (isSuccess && data) {
       setRefetchDelegate({ address: address as `0x${string}` });
-      onSuccess(data.hash);
+      onSuccess(data);
     }
   }, [data, isSuccess]);
 
@@ -65,14 +65,14 @@ export const PartialDelegationButton = ({
     <div>
       <Button
         className="w-full"
-        onClick={write}
+        onClick={() => write(config!.request)}
         disabled={isLoading || disabled}
         loading={isLoading}
       >
         Delegate Voting Power
       </Button>
 
-      {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+      {data && <BlockScanUrls hash1={data} />}
     </div>
   );
 };

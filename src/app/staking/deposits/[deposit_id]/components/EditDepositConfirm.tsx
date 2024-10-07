@@ -8,8 +8,8 @@ import { StakedDeposit } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
+  useWriteContract,
+  useSimulateContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
@@ -51,8 +51,12 @@ export const EditDepositConfirm = ({
   const isSufficientSpendingAllowance =
     hasAllowance && allowance >= amountToAdd;
 
-  const { config, status, error } = usePrepareContractWrite({
-    enabled: isSufficientSpendingAllowance,
+  const {
+    data: config,
+    status,
+    error,
+  } = useSimulateContract({
+    query: { enabled: isSufficientSpendingAllowance },
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
@@ -60,7 +64,7 @@ export const EditDepositConfirm = ({
     args: [BigInt(deposit.id), amountToAdd],
   });
 
-  const { data, write } = useContractWrite(config);
+  const { data, writeContract: write } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({ hash: data });
   const isTransactionConfirmed = Boolean(data && !isLoading);
 
@@ -97,9 +101,9 @@ export const EditDepositConfirm = ({
               </div>
               <Button
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || !Boolean(config?.request)}
                 onClick={() => {
-                  write?.();
+                  write(config!.request);
                 }}
               >
                 {isLoading ? "Staking..." : `Update Stake`}
