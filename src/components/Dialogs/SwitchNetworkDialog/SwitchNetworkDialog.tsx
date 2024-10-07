@@ -1,7 +1,7 @@
-import { useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import { ChainConstants } from "viem/types/chain";
+import { Chain } from "viem/types/chain";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -9,12 +9,12 @@ export function SwitchNetwork({
   chain,
   closeDialog,
 }: {
-  chain: ChainConstants;
+  chain: Chain;
   closeDialog: () => void;
 }) {
   const { ui } = Tenant.current();
-  const { chain: connectedChain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { chain: connectedChain } = useAccount();
+  const { switchChain } = useSwitchChain();
 
   useEffect(() => {
     if (connectedChain?.id === chain.id) {
@@ -31,7 +31,7 @@ export function SwitchNetwork({
         variant="outline"
         className="font-bold"
         onClick={() => {
-          switchNetwork?.(chain.id);
+          switchChain?.({ chainId: chain.id });
           closeDialog();
         }}
       >

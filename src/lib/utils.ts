@@ -329,3 +329,26 @@ export const isURL = (value: string) => {
   const urlRegExp = /^(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+$/i;
   return value === "" || urlRegExp.test(value);
 };
+
+export const getAlchemyRpcUrl = (chainId: number) => {
+  switch (chainId) {
+    // mainnet
+    case 1:
+      return `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
+    // optimism
+    case 10:
+      return `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
+    // base
+    case 8453:
+      return `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
+    // sepolia
+    case 11155111:
+      return `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
+    // cyber
+    case 7560:
+      return "https://rpc.cyber.co";
+    // for each new dao with a new chainId add them here
+    default:
+      return null;
+  }
+};
