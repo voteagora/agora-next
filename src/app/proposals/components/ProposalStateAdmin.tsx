@@ -93,7 +93,6 @@ interface ActionProps {
 const successActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.CYBER:
-    case TENANT_NAMESPACES.NEW_DAO:
       return (
         <div className="flex flex-row gap-2">
           <AgoraGovCancel proposal={proposal} />
@@ -115,7 +114,6 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
 const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.CYBER:
-    case TENANT_NAMESPACES.NEW_DAO:
       return <AgoraGovExecute proposal={proposal} />;
 
     case TENANT_NAMESPACES.ENS:
@@ -132,7 +130,6 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
 const activeStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.CYBER:
-    case TENANT_NAMESPACES.NEW_DAO:
       return <AgoraGovCancel proposal={proposal} />;
 
     case TENANT_NAMESPACES.ENS:

@@ -25,7 +25,6 @@ import piggyBank from "./piggyBank.svg";
 import power from "./power.svg";
 import profile from "./profile.svg";
 import projectPlaceholder from "./projectPlaceholder.svg";
-import newdao from "./newdao.svg";
 import search from "./search.svg";
 import shareCard from "./shareCard.svg";
 import sparks from "./sparks.svg";
@@ -97,7 +96,6 @@ export const icons = {
   profile,
   projectPlaceholder,
   scale,
-  newdao,
   search,
   shareCard,
   shieldCheck,

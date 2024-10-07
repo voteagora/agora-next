@@ -90,7 +90,7 @@ const ContributionLink = ({
   const icon = (() => {
     switch (contributionLink.type) {
       case "CONTRACT_ADDRESS":
-        return "scroll";
+        return "codeBracketSquare";
       case "GITHUB_REPO":
         return "github";
       case "OTHER":

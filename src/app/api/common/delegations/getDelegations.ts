@@ -70,15 +70,15 @@ async function getCurrentDelegateesForAddress({
   let directDelegatee;
 
   // Should be if governor == Agora 1.0 w/ Partial Delegation On
-  if (namespace === TENANT_NAMESPACES.NEW_DAO) {
-    advancedDelegatees = await getPartialDelegatee();
-    directDelegatee = null;
-  } else {
-    [advancedDelegatees, directDelegatee] = await Promise.all([
-      getAdvancedDelegatee(),
-      getDirectDelegatee(),
-    ]);
-  }
+  // if (namespace === TENANT_NAMESPACES.NEW_DAO) {
+  //   advancedDelegatees = await getPartialDelegatee();
+  //   directDelegatee = null;
+  // } else {
+  [advancedDelegatees, directDelegatee] = await Promise.all([
+    getAdvancedDelegatee(),
+    getDirectDelegatee(),
+  ]);
+  // }
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
@@ -149,23 +149,24 @@ async function getCurrentDelegatorsForAddress({
     ? contracts.alligator.address
     : contracts.token.address;
 
-  if (contracts.alligator || namespace === TENANT_NAMESPACES.NEW_DAO) {
-    advancedDelegatorsSubQry = `SELECT 
-                                "from",
-                                "to",
-                                delegated_amount as allowance,
-                                'ADVANCED' AS type, 
-                                block_number,
-                                CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
-                                transaction_hash
-                              FROM 
-                                ${namespace}.advanced_delegatees ad
-                              WHERE 
-                                ad."to" = $1
-                                AND delegated_amount > 0 
-                                AND contract = $2`;
-  } else {
-    advancedDelegatorsSubQry = `WITH ghost as (SELECT 
+  // Replace with Agora Governor flag
+  // if (contracts.alligator || namespace === TENANT_NAMESPACES.NEW_DAO) {
+  //   advancedDelegatorsSubQry = `SELECT
+  //                               "from",
+  //                               "to",
+  //                               delegated_amount as allowance,
+  //                               'ADVANCED' AS type,
+  //                               block_number,
+  //                               CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
+  //                               transaction_hash
+  //                             FROM
+  //                               ${namespace}.advanced_delegatees ad
+  //                             WHERE
+  //                               ad."to" = $1
+  //                               AND delegated_amount > 0
+  //                               AND contract = $2`;
+  // } else {
+  advancedDelegatorsSubQry = `WITH ghost as (SELECT 
                                 null::text as "from",
                                 null::text as "to",
                                 null::numeric as allowance,
@@ -177,23 +178,24 @@ async function getCurrentDelegatorsForAddress({
                               WHERE 
                                 ghost."to" = $1
                                 AND ghost."from" = $2`;
-  }
+  // }
 
-  if (namespace == TENANT_NAMESPACES.NEW_DAO) {
-    directDelegatorsSubQry = `WITH ghost as (SELECT 
-              null::text as "from",
-              null::text as "to",
-              null::numeric as allowance,
-              'DIRECT' AS type, 
-              null::numeric as block_number,
-              'FULL' as amount,
-              null::text as transaction_hash)
-              select * from ghost
-            WHERE 
-              ghost."to" = $3
-              AND ghost."from" = $3`;
-  } else {
-    directDelegatorsSubQry = `
+  // Replace with Agora Governor flag
+  // if (namespace == TENANT_NAMESPACES.NEW_DAO) {
+  //   directDelegatorsSubQry = `WITH ghost as (SELECT
+  //             null::text as "from",
+  //             null::text as "to",
+  //             null::numeric as allowance,
+  //             'DIRECT' AS type,
+  //             null::numeric as block_number,
+  //             'FULL' as amount,
+  //             null::text as transaction_hash)
+  //             select * from ghost
+  //           WHERE
+  //             ghost."to" = $3
+  //             AND ghost."from" = $3`;
+  // } else {
+  directDelegatorsSubQry = `
           SELECT 
             "from",
             "to",
@@ -233,7 +235,7 @@ async function getCurrentDelegatorsForAddress({
             block_number DESC,
             log_index DESC,
             transaction_index DESC`;
-  }
+  // }
 
   const [delegators, latestBlock] = await Promise.all([
     paginateResult(async (skip: number, take: number) => {
