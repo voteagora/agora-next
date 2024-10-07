@@ -10,7 +10,7 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import {
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 import { useTokenAllowance } from "@/hooks/useTokenAllowance";
@@ -61,11 +61,8 @@ export const EditDepositConfirm = ({
   });
 
   const { data, write } = useContractWrite(config);
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-
-  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
+  const { isLoading } = useWaitForTransactionReceipt({ hash: data });
+  const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -109,7 +106,7 @@ export const EditDepositConfirm = ({
               </Button>
             </>
           )}
-          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+          {data && <BlockScanUrls hash1={data} />}
         </>
       )}
     </div>

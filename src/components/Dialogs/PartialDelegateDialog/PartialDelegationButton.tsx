@@ -2,7 +2,7 @@ import {
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
@@ -52,9 +52,7 @@ export const PartialDelegationButton = ({
   });
 
   const { data, write, status } = useContractWrite(config);
-  const { isLoading, isSuccess } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash: data });
 
   useEffect(() => {
     if (isSuccess && data?.hash) {

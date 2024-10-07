@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 import {
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,9 +28,10 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
   });
 
   const { data, write } = useContractWrite(config);
-  const { isLoading, isFetched: didUpdateAllowance } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  const { isLoading, isFetched: didUpdateAllowance } =
+    useWaitForTransactionReceipt({
+      hash: data,
+    });
 
   useEffect(() => {
     if (didUpdateAllowance) {

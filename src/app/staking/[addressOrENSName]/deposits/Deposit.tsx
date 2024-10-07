@@ -12,7 +12,7 @@ import {
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 
 import { useRouter } from "next/navigation";
@@ -55,9 +55,7 @@ export const Deposit = ({
     isConnected && address?.toLowerCase() === deposit.depositor.toLowerCase();
 
   const { isLoading: isProcessingWithdrawal, isFetched: didProcessWithdrawal } =
-    useWaitForTransaction({
-      hash: data?.hash,
-    });
+    useWaitForTransactionReceipt({ hash: data });
 
   const getDelegate = async () => {
     if (!isDelegateFetched.current) {

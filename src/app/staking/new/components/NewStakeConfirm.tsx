@@ -6,7 +6,7 @@ import { isAddress } from "viem";
 import {
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
@@ -63,11 +63,8 @@ export const NewStakeConfirm = ({
   });
 
   const { data, write } = useContractWrite(config);
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-
-  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
+  const { isLoading } = useWaitForTransactionReceipt({ hash: data });
+  const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -114,7 +111,7 @@ export const NewStakeConfirm = ({
               </Button>
             </>
           )}
-          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+          {data && <BlockScanUrls hash1={data} />}
         </>
       )}
     </div>

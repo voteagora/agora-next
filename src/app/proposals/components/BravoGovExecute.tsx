@@ -1,9 +1,9 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -27,22 +27,17 @@ export const BravoGovExecute = ({ proposal }: Props) => {
   const [executeTime, setExecuteTime] = useState<Date | undefined>();
 
   const { data: executionDelayInBlocks, isFetched: executionDelayFetched } =
-    useContractRead({
+    useReadContract({
       address: contracts.timelock!.address as `0x${string}`,
       abi: contracts.timelock!.abi,
       functionName: "delay",
     });
 
-  const { data, write } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: "execute",
-    args: [proposal.id],
-  });
+  const { data, writeContract: write } = useWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
-    useWaitForTransaction({
-      hash: data?.hash,
+    useWaitForTransactionReceipt({
+      hash: data,
     });
 
   useEffect(() => {
@@ -92,7 +87,17 @@ export const BravoGovExecute = ({ proposal }: Props) => {
           ) : (
             <>
               {!isFetched && (
-                <Button onClick={() => write?.()} loading={isLoading}>
+                <Button
+                  onClick={() =>
+                    write({
+                      address: contracts.governor.address as `0x${string}`,
+                      abi: contracts.governor.abi,
+                      functionName: "execute",
+                      args: [proposal.id],
+                    })
+                  }
+                  loading={isLoading}
+                >
                   Execute
                 </Button>
               )}

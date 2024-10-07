@@ -1,14 +1,12 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { ParsedProposalData, proposalToCallArgs } from "@/lib/proposalUtils";
-import { keccak256 } from "viem";
-import { toUtf8Bytes } from "ethers";
+import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { blocksToSeconds } from "@/lib/blockTimes";
@@ -27,7 +25,7 @@ interface Props {
 export const AgoraGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
-  const { data: executionDelayInBlocks } = useContractRead({
+  const { data: executionDelayInBlocks } = useReadContract({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
@@ -46,17 +44,10 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
     canExecute = currentTimeInSeconds >= executeTimeInSeconds;
   }
 
-  const { data, write } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: "execute",
-    args: proposalToCallArgs(proposal),
-  });
+  const { data, writeContract: write } = useWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
-    useWaitForTransaction({
-      hash: data?.hash,
-    });
+    useWaitForTransactionReceipt({ hash: data });
 
   useEffect(() => {
     if (isSuccess) {
@@ -87,7 +78,17 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
           ) : (
             <>
               {!isFetched && (
-                <Button onClick={() => write?.()} loading={isLoading}>
+                <Button
+                  onClick={() =>
+                    write({
+                      address: contracts.governor.address as `0x${string}`,
+                      abi: contracts.governor.abi,
+                      functionName: "execute",
+                      args: proposalToCallArgs(proposal),
+                    })
+                  }
+                  loading={isLoading}
+                >
                   Execute
                 </Button>
               )}

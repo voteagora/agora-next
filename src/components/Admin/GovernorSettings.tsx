@@ -9,7 +9,7 @@ import {
   useContractReads,
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
 import Tenant from "@/lib/tenant/tenant";
@@ -77,8 +77,8 @@ export default function GovernorSettings() {
     isLoading: isLoadingSetVotingPeriod,
   } = useContractWrite(setVotingPeriodConfig);
   const { isLoading: isLoadingSetVotingPeriodTransaction } =
-    useWaitForTransaction({
-      hash: resultSetVotingPeriod?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultSetVotingPeriod,
     });
   const isDisabledSetVotingPeriod =
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
@@ -99,8 +99,8 @@ export default function GovernorSettings() {
     isLoading: isLoadingSetVotingDelay,
   } = useContractWrite(setVotingDelayConfig);
   const { isLoading: isLoadingSetVotingDelayTransaction } =
-    useWaitForTransaction({
-      hash: resultSetVotingDelay?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultSetVotingDelay,
     });
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;

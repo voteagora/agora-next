@@ -18,7 +18,7 @@ import { formatNumber } from "@/lib/utils";
 import {
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -82,8 +82,8 @@ export default function ProposalType({
     isLoading: isLoadingDeleteProposalType,
   } = useContractWrite(deleteProposalTypeConfig);
   const { isLoading: isLoadingDeleteProposalTypeTransaction } =
-    useWaitForTransaction({
-      hash: resultDeleteProposalType?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultDeleteProposalType,
     });
 
   const formValues = form.watch();
@@ -114,8 +114,8 @@ export default function ProposalType({
     isLoading: isLoadingSetProposalType,
   } = useContractWrite(setProposalTypeConfig);
   const { isLoading: isLoadingSetProposalTypeTransaction } =
-    useWaitForTransaction({
-      hash: resultSetProposalType?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultSetProposalType,
     });
   const isLoading =
     isLoadingDeleteProposalType ||

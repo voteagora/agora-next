@@ -9,7 +9,7 @@ import Tenant from "@/lib/tenant/tenant";
 import {
   useContractWrite,
   usePrepareContractWrite,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 
@@ -36,11 +36,8 @@ export const EditDelegateConfirm = ({
   });
 
   const { data, write, status } = useContractWrite(config);
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-
-  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
+  const { isLoading } = useWaitForTransactionReceipt({ hash: data });
+  const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -79,7 +76,7 @@ export const EditDelegateConfirm = ({
           </Button>
         </>
       )}
-      {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+      {data && <BlockScanUrls hash1={data} />}
     </div>
   );
 };
