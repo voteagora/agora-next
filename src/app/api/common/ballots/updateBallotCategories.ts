@@ -58,7 +58,7 @@ async function updateBallotCategoryForAddress({
   // Add or update allocation
   await prisma.categoryAllocations.upsert({
     where: {
-      category_slug_address_round: {
+      address_round_category_slug: {
         category_slug: data.category_slug,
         round: roundId,
         address,
@@ -121,7 +121,7 @@ async function autobalanceCategories(
     autobalancedAllocations.map(async (allocation) => {
       await prisma.categoryAllocations.upsert({
         where: {
-          category_slug_address_round: {
+          address_round_category_slug: {
             category_slug: allocation.id,
             address,
             round: roundId,

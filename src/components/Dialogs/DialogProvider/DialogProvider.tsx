@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { dialogs, DialogType } from "./dialogs";
 import { motion, AnimatePresence } from "framer-motion";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 const DialogContext = createContext<(dialog: DialogType | null) => void>(
   () => {}
@@ -48,10 +49,14 @@ const Modal: FC<
             onClick={(e) => e.stopPropagation()}
             className={
               transparent
-                ? "bg-transparent p-6 rounded-xl m-0 w-full sm:w-auto"
-                : "bg-neutral p-6 rounded-xl m-0 z-[1100] shadow-newDefault w-full sm:w-[28rem]"
+                ? "bg-transparent p-6 rounded-xl m-0 w-full sm:w-auto relative"
+                : "bg-neutral p-6 rounded-xl m-0 z-[1100] shadow-newDefault w-full sm:w-[28rem] relative"
             }
           >
+            <XMarkIcon
+              className="h-5 w-5 text-secondary cursor-pointer absolute right-2 top-2"
+              onClick={onClose}
+            />
             {children}
           </motion.div>
         </motion.div>

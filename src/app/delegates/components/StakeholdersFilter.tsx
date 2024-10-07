@@ -60,10 +60,12 @@ export default function StakeholdersFilter() {
     >
       {() => (
         <>
-          <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
-            {stakeholderFilterOptions[filterParam]?.value ||
-              stakeholderFilterOptions.all.value}
-            <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
+          <Listbox.Button className="w-full sm:w-[200px] bg-wash text-base font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between">
+            <span>
+              {stakeholderFilterOptions[filterParam]?.value ||
+                stakeholderFilterOptions.all.value}
+            </span>
+            <ChevronDown className="h-4 w-4 ml-[6px] text-secondary/30" />
           </Listbox.Button>
           <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
             {Object.keys(stakeholderFilterOptions).map((key) => (
@@ -71,9 +73,9 @@ export default function StakeholdersFilter() {
                 {({ selected }) => {
                   return (
                     <li
-                      className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
+                      className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:bg-tertiary/30 hover:text-primary ${
                         selected
-                          ? "text-primary bg-white border-line"
+                          ? "text-primary bg-tertiary/30"
                           : "text-secondary border-transparent"
                       }`}
                     >

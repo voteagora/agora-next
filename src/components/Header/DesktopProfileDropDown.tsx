@@ -13,6 +13,10 @@ import Image from "next/image";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
+import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposalDraftButton";
+import { DaoSlug } from "@prisma/client";
+
+const { slug } = Tenant.current();
 
 type Props = {
   ensName: string | undefined;
@@ -76,7 +80,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
           >
             <Popover.Panel>
               {({ close }) => (
-                <div className="bg-neutral py-8 px-6 mt-2 rounded-xl w-[350px]">
+                <div className="bg-neutral py-8 px-6 mt-4 mr-[-16px] rounded-xl w-[350px]">
                   <VStack gap={3} className="min-h-[250px] justify-center">
                     <HStack className="items-center mb-1">
                       <div
@@ -196,6 +200,13 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           >
                             View my profile
                           </Link>
+                        )}
+                        {/* little temporary hack for the manager to test secret links for users to create a draft */}
+                        {slug === DaoSlug.OP && address && (
+                          <CreateProposalDraftButton
+                            address={address}
+                            className="opacity-0 cursor-default hidden sm:block"
+                          />
                         )}
                       </>
                     )}

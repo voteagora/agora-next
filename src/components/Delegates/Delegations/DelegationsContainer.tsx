@@ -2,7 +2,6 @@
 
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import DelegationToRow from "./DelegationToRow";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import DelegationFromRow from "./DelegationFromRow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -53,8 +52,8 @@ function DelegationsContainer({
 
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
-      <div className="p-8 text-center align-middle bg-gray-100 rounded-md">
-        No delegations found
+      <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
+        No delegations found.
       </div>
     );
   }
@@ -62,7 +61,7 @@ function DelegationsContainer({
   return (
     <div className="max-w-full">
       <Tabs className="max-w-full mb-8" defaultValue="delegatedFrom">
-        <HStack className="items-center justify-between">
+        <div className="flex flex-row items-center justify-between">
           <TabsList>
             <TabsTrigger className="text-2xl" value="delegatedFrom">
               Delegated from
@@ -71,16 +70,71 @@ function DelegationsContainer({
               Delegated to
             </TabsTrigger>
           </TabsList>
-          <div className="hidden px-3 py-1 text-xs font-medium rounded-full text-secondary bg-wash sm:block">
-            Advanced delegation beta
-          </div>
-        </HStack>
+        </div>
         <TabsContent value="delegatedFrom" className="max-w-full">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-gray-eb overflow-auto max-h-[500px]"
-          >
-            <Table className="min-w-full">
+          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px]">
+            <div className="w-full overflow-x-auto">
+              <div className="min-w-[600px]">
+                <Table className="min-w-full">
+                  <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
+                    <TableRow>
+                      <TableHead className="h-10 text-secondary">
+                        Allowance
+                      </TableHead>
+                      <TableHead className="h-10 text-secondary">
+                        Delegated on
+                      </TableHead>
+                      <TableHead className="h-10 text-secondary">
+                        From
+                      </TableHead>
+                      <TableHead className="h-10 text-secondary">
+                        Txn Hash
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <InfiniteScroll
+                    hasMore={meta.has_next}
+                    pageStart={1}
+                    loadMore={loadMore}
+                    loader={
+                      <TableRow key={0}>
+                        <TableCell
+                          key="loader"
+                          className="gl_loader justify-center py-6 text-sm text-secondary"
+                        >
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    }
+                    // References styles of TableBody
+                    className="[&_tr:last-child]:border-0"
+                    element="tbody"
+                    useWindow={false}
+                  >
+                    {delegators.length === 0 ? (
+                      <td
+                        className="w-full p-4 bg-neutral text-center text-secondary text-sm"
+                        colSpan={6}
+                      >
+                        None found
+                      </td>
+                    ) : (
+                      delegators.map((delegation) => (
+                        <DelegationFromRow
+                          key={delegation.from}
+                          delegation={delegation}
+                        />
+                      ))
+                    )}
+                  </InfiniteScroll>
+                </Table>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="delegatedTo">
+          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px]">
+            <Table>
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10 text-secondary">
@@ -89,70 +143,13 @@ function DelegationsContainer({
                   <TableHead className="h-10 text-secondary">
                     Delegated on
                   </TableHead>
-                  <TableHead className="h-10 text-secondary">Type</TableHead>
-                  <TableHead className="h-10 text-secondary">Amount</TableHead>
-                  <TableHead className="h-10 text-secondary">From</TableHead>
+                  <TableHead className="h-10 text-secondary">To</TableHead>
                   <TableHead className="h-10 text-secondary">
                     Txn Hash
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <InfiniteScroll
-                hasMore={meta.has_next}
-                pageStart={1}
-                loadMore={loadMore}
-                loader={
-                  <TableRow key={0}>
-                    <TableCell
-                      key="loader"
-                      className="gl_loader justify-center py-6 text-sm text-secondary"
-                    >
-                      Loading...
-                    </TableCell>
-                  </TableRow>
-                }
-                // References styles of TableBody
-                className="[&_tr:last-child]:border-0"
-                element="tbody"
-                useWindow={false}
-              >
-                {delegators.length === 0 ? (
-                  <td
-                    className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                    colSpan={6}
-                  >
-                    None found
-                  </td>
-                ) : (
-                  delegators.map((delegation) => (
-                    <DelegationFromRow
-                      key={delegation.from}
-                      delegation={delegation}
-                    />
-                  ))
-                )}
-              </InfiniteScroll>
-            </Table>
-          </VStack>
-        </TabsContent>
-        <TabsContent value="delegatedTo">
-          <VStack
-            gap={3}
-            className="border shadow-sm rounded-xl border-line overflow-auto max-h-[500px]"
-          >
-            <Table>
-              <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
-                <TableRow>
-                  <TableHead className="h-10">Allowance</TableHead>
-                  <TableHead className="h-10">Delegated on</TableHead>
-                  <TableHead className="h-10">Type</TableHead>
-                  <TableHead className="h-10">Amount</TableHead>
-                  <TableHead className="h-10">To</TableHead>
-                  <TableHead className="h-10">Txn Hash</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody className="">
+              <TableBody>
                 {delegatees.length === 0 ? (
                   <td
                     className="w-full p-4 bg-neutral text-center text-secondary text-sm"
@@ -170,7 +167,7 @@ function DelegationsContainer({
                 )}
               </TableBody>
             </Table>
-          </VStack>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

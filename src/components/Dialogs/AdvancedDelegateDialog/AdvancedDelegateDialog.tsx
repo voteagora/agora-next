@@ -11,10 +11,12 @@ import {
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import {
+  AgoraLoaderSmall,
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
-import { track } from "@vercel/analytics";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransaction } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
@@ -57,7 +59,8 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { slug } = Tenant.current();
+  const { ui } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const fetchData = useCallback(async () => {
     try {
@@ -101,6 +104,7 @@ export function AdvancedDelegateDialog({
           from: address,
           to: target,
           allowance: "0",
+          percentage: "0",
           timestamp: null,
           type: "ADVANCED",
           amount: "PARTIAL",
@@ -151,17 +155,6 @@ export function AdvancedDelegateDialog({
   };
   const writeWithTracking = async () => {
     setIsLoading(true);
-
-    const trackingData = {
-      dao_slug: slug,
-      userAddress: address || "unknown",
-      proxyAddress: proxyAddress || "unknown",
-      targetDelegation: target || "unknown",
-      totalDelegatees: delegatees.length || "unknown",
-      totalVotingPower: availableBalance,
-    };
-
-    track("Advanced Delegation", trackingData);
 
     const tx = await writeAsync();
     await waitForTransaction({ hash: tx.hash });
@@ -277,7 +270,11 @@ export function AdvancedDelegateDialog({
               </div>
             ) : (
               <div className="flex flex-col w-full h-[318px] items-center justify-center">
-                <AgoraLoaderSmall />
+                {shouldHideAgoraBranding ? (
+                  <LogoLoader />
+                ) : (
+                  <AgoraLoaderSmall />
+                )}
               </div>
             )}
           </div>

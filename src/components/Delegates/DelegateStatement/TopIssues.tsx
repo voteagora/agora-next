@@ -65,7 +65,7 @@ const Issue = ({ title, icon, value }: IssueProps) => {
       <div className="flex flex-row gap-4 items-start">
         <div className="flex flex-col justify-center shrink-0">
           <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-line">
-            <Image src={icons[icon]} alt={title} />
+            <Image src={icons[icon]} alt={title} height={16} width={16} />
           </div>
         </div>
 

@@ -83,9 +83,30 @@ const TransactionFormItem = ({
                 <span>No simulation</span>
               </span>
             ) : (
-              <span className="bg-green-100 text-green-500 px-2 py-1 rounded-lg text-xs font-semibold">
-                Valid
-              </span>
+              <a
+                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="bg-green-100 text-green-500 px-2 py-1 rounded-lg text-xs font-semibold flex flex-row items-center space-x-1"
+              >
+                <span>Valid</span>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="mb-[1px]"
+                >
+                  <path
+                    d="M9 6.5V9.5C9 9.76522 8.89464 10.0196 8.70711 10.2071C8.51957 10.3946 8.26522 10.5 8 10.5H2.5C2.23478 10.5 1.98043 10.3946 1.79289 10.2071C1.60536 10.0196 1.5 9.76522 1.5 9.5V4C1.5 3.73478 1.60536 3.48043 1.79289 3.29289C1.98043 3.10536 2.23478 3 2.5 3H5.5M7.5 1.5H10.5M10.5 1.5V4.5M10.5 1.5L5 7"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
             ))}
         </div>
         <span
@@ -203,7 +224,7 @@ const BasicProposalForm = () => {
         body: JSON.stringify({
           transactions,
           networkId: contracts.governor.chain.id,
-          from: contracts.governor.address,
+          from: contracts.timelock!.address,
         }),
       });
       const res = await response.json();

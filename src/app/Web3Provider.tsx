@@ -25,8 +25,8 @@ const metadata = {
 };
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
-
-const { contracts } = Tenant.current();
+const { contracts, ui } = Tenant.current();
+const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
 const config = createConfig(
   getDefaultConfig({
@@ -54,7 +54,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
                 <AgoraProvider>{children}</AgoraProvider>
               </PageContainer>
             </ConnectButtonProvider>
-            <Footer />
+            {!shouldHideAgoraBranding && <Footer />}
             <SpeedInsights />
           </body>
         </ConnectKitProvider>

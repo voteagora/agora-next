@@ -14,6 +14,7 @@ import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
+import { DaoSlug } from "@prisma/client";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -36,9 +37,15 @@ export default function ProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { ui } = Tenant.current();
-  const tenantSupportsProposalLifecycle =
+  const { ui, slug } = Tenant.current();
+  let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
+
+  if (slug === DaoSlug.OP) {
+    tenantSupportsProposalLifecycle =
+      address === "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8" || false;
+  }
+
   const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals] || []);

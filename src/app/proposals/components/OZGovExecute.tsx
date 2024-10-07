@@ -1,17 +1,15 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
+  useAccount,
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { ParsedProposalData } from "@/lib/proposalUtils";
-import { keccak256 } from "viem";
-import { toUtf8Bytes } from "ethers";
-import { useEffect } from "react";
+import { proposalToCallArgs } from "@/lib/proposalUtils";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
   Tooltip,
@@ -24,42 +22,35 @@ interface Props {
   proposal: Proposal;
 }
 
-export const ProposalExecuteButton = ({ proposal }: Props) => {
+export const OZGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const dynamicProposalType: keyof ParsedProposalData =
-    proposal.proposalType as keyof ParsedProposalData;
-  const proposalData =
-    proposal.proposalData as ParsedProposalData[typeof dynamicProposalType]["kind"];
+  const { address } = useAccount();
+  const [canExecute, setCanExecute] = useState(false);
+  const [executeTime, setExecuteTime] = useState(new Date());
 
-  const { data: executionDelayInBlocks } = useContractRead({
+  // Check whether user has the EXECUTOR_ROLE
+  const { data: hasExecuteRole, isFetched: fetchedRole } = useContractRead({
+    address: contracts.timelock!.address as `0x${string}`,
+    abi: contracts.timelock!.abi,
+    functionName: "hasRole",
+    args: [
+      "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63", // EXECUTOR_ROLE
+      address,
+    ],
+  });
+
+  // Check whether time has passed
+  const { data: delayInBlocks, isFetched: fetchedDelay } = useContractRead({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
   });
 
-  let canExecute = false;
-  const delayInSeconds = blocksToSeconds(Number(executionDelayInBlocks));
-  let executeTimeInSeconds = 0;
-
-  if (proposal.queuedTime) {
-    const queuedTimeInSeconds = Math.floor(
-      (proposal.queuedTime as Date).getTime() / 1000
-    );
-    executeTimeInSeconds = queuedTimeInSeconds + delayInSeconds;
-    const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-    canExecute = currentTimeInSeconds >= executeTimeInSeconds;
-  }
-
   const { data, write } = useContractWrite({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "execute",
-    args: [
-      "options" in proposalData ? proposalData.options[0].targets : "",
-      "options" in proposalData ? proposalData.options[0].values : "",
-      "options" in proposalData ? proposalData.options[0].calldatas : "",
-      keccak256(toUtf8Bytes(proposal.description!)),
-    ],
+    args: proposalToCallArgs(proposal),
   });
 
   const { isLoading, isSuccess, isError, isFetched, error } =
@@ -68,15 +59,31 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
     });
 
   useEffect(() => {
+    if (fetchedRole && fetchedDelay) {
+      const delayInSeconds = Number(delayInBlocks);
+
+      if (proposal.queuedTime) {
+        const queuedTimeInSeconds = Math.floor(
+          (proposal.queuedTime as Date).getTime() / 1000
+        );
+        const executeTimeInSeconds = queuedTimeInSeconds + delayInSeconds;
+        const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+        setCanExecute(currentTimeInSeconds >= executeTimeInSeconds);
+        setExecuteTime(new Date(executeTimeInSeconds * 1000));
+      }
+    }
+  }, [fetchedRole, fetchedDelay]);
+
+  useEffect(() => {
     if (isSuccess) {
       toast.success(
         "Proposal Executed. It might take a minute to see the updated status.",
-        { duration: 10000 }
+        { duration: 5000 }
       );
     }
     if (isError) {
       toast.error(`Error executing proposal ${error?.message}`, {
-        duration: 10000,
+        duration: 5000,
       });
     }
   }, [isSuccess, isError, error]);
@@ -102,11 +109,13 @@ export const ProposalExecuteButton = ({ proposal }: Props) => {
               )}
             </>
           )}
+
           <TooltipContent>
             <div className="flex flex-col gap-1 p-2">
               <div>
-                This proposal can be executed on{" "}
-                {new Date(executeTimeInSeconds * 1000).toLocaleString()}
+                {!canExecute
+                  ? `This proposal can be executed on ${executeTime.toLocaleString()}`
+                  : `You don't have permission to execute this proposal.`}
               </div>
             </div>
           </TooltipContent>

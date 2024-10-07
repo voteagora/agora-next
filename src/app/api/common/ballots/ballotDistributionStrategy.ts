@@ -12,6 +12,7 @@ export enum DistributionStrategy {
 const applyDistributionStrategyApi = async (
   strategy: DistributionStrategy,
   roundId: number,
+  category: string,
   ballotCasterAddressOrEns: string
 ) =>
   addressOrEnsNameWrap(
@@ -20,16 +21,19 @@ const applyDistributionStrategyApi = async (
     {
       strategy,
       roundId,
+      category,
     }
   );
 
 async function applyDistributionStrategyForAddress({
   strategy,
   roundId,
+  category,
   address,
 }: {
   strategy: DistributionStrategy;
   roundId: number;
+  category: string;
   address: string;
 }) {
   // Get projects allocation
@@ -48,19 +52,41 @@ async function applyDistributionStrategyForAddress({
     0
   );
 
-  const max = 750_000;
-  const min = 1_000;
-  const totalFunding = 8_000_000;
+  const max = 12.5;
+  const min = 0.2;
+  const totalFunding = 100;
 
   // Apply distribution strategy
 
   const newProjectsAllocation: {
     project_id: string;
-    allocation: number;
+    allocation: number | null;
   }[] = [];
 
   if (strategy === DistributionStrategy.TOP_TO_BOTTOM) {
     const y = topToBottom({
+      min,
+      total: totalFunding,
+      n,
+    });
+
+    projectsAllocation.reverse().forEach((project, i) => {
+      if (project.impact) {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: y(i),
+        });
+      } else {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: null,
+        });
+      }
+    });
+  }
+
+  if (strategy === DistributionStrategy.TOP_WEIGHTED) {
+    const y = topWeighted({
       max,
       total: totalFunding,
       n,
@@ -72,30 +98,13 @@ async function applyDistributionStrategyForAddress({
           ...project,
           allocation: y(i),
         });
-      }
-    });
-  }
-
-  if (strategy === DistributionStrategy.TOP_WEIGHTED) {
-    const y = topWeighted({
-      max: 500_000, // TODO: adjust this number
-      total: totalFunding,
-      n,
-    });
-
-    projectsAllocation.forEach((project, i) => {
-      if (project.impact) {
+      } else {
         newProjectsAllocation.push({
           ...project,
-          allocation: y(i),
+          allocation: null,
         });
       }
     });
-
-    console.log(
-      "total",
-      newProjectsAllocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
-    );
   }
 
   if (strategy === DistributionStrategy.IMPACT_GROUPS) {
@@ -111,7 +120,7 @@ async function applyDistributionStrategyForAddress({
     );
 
     const y = impactGroups({
-      max: 750_000,
+      max,
       total: totalFunding,
       nk,
     });
@@ -122,13 +131,18 @@ async function applyDistributionStrategyForAddress({
           ...project,
           allocation: y(project.impact - 1),
         });
+      } else {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: null,
+        });
       }
     });
   }
 
   // Save projects allocations
   await Promise.all(
-    newProjectsAllocation.map((p) =>
+    normalizeAllocation(newProjectsAllocation).map((p) =>
       prisma.projectAllocations.update({
         where: {
           address_round_project_id: {
@@ -137,26 +151,26 @@ async function applyDistributionStrategyForAddress({
             address,
           },
         },
-        data: { allocation: p.allocation },
+        data: { allocation: p.allocation?.toFixed(2) },
       })
     )
   );
 
-  return fetchBallot(roundId, address);
+  return fetchBallot(roundId, address, category);
 }
 
 function topToBottom({
-  max,
+  min,
   total,
   n,
 }: {
-  max: number;
+  min: number;
   total: number;
   n: number;
 }) {
-  const a = (2 * (n * max - total)) / (n * (n - 1));
+  const a = (2 * (total - n * min)) / (n * (n - 1));
 
-  return (i: number) => max - a * i; // return the amount of funding for the i-th project
+  return (i: number) => Math.round(min + a * i * 100) / 100; // return the amount of funding for the i-th project
 }
 
 function topWeighted({
@@ -183,12 +197,12 @@ function topWeighted({
     0
   );
 
-  return (i: number) => (total * w(i, c)) / W; // return the amount of funding for the i-th project
+  return (i: number) => Math.round(((total * w(i, c)) / W) * 100) / 100; // return the amount of funding for the i-th project
 }
 
 // recursively find c that results in max allocation < top
 function findC({
-  c = 0.9,
+  c = 3,
   max,
   total,
   n,
@@ -234,7 +248,45 @@ function impactGroups({
   // Distribution function
   const F = nk.map((_, i) => (total * (i + 1)) / W);
 
-  return (k: number) => F[k]; // return the amount of funding for the k-th impact group
+  return (k: number) => Math.round(F[k] * 100) / 100; // return the amount of funding for the k-th impact group
+}
+
+function normalizeAllocation<T extends { allocation: number | null }>(
+  allocation: T[]
+) {
+  const total = allocation.reduce((acc, p) => acc + (p.allocation ?? 0), 0);
+
+  const normalizedRounded = allocation.map((p) => ({
+    ...p,
+    allocation: p.allocation
+      ? Math.round((p.allocation / total) * 100 * 100) / 100
+      : null,
+  }));
+
+  // Calculate the difference to be adjusted
+  const roundedTotal = normalizedRounded.reduce(
+    (acc, p) => acc + (p.allocation ?? 0),
+    0
+  );
+  const difference = Math.round((100 - roundedTotal) * 100) / 100;
+
+  const maxAlloc = normalizedRounded.reduce(
+    (max, p) =>
+      p.allocation !== null && p.allocation > max.allocation! ? p : max,
+    { allocation: -Infinity } as T
+  );
+
+  const adjustedAllolcations = difference
+    ? normalizedRounded.map((p) =>
+        p === maxAlloc ? { ...p, allocation: p.allocation! + difference } : p
+      )
+    : normalizedRounded;
+
+  console.log(
+    adjustedAllolcations.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
+  );
+
+  return adjustedAllolcations;
 }
 
 export const applyDistributionStrategy = cache(applyDistributionStrategyApi);

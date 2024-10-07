@@ -28,4 +28,5 @@ export type Project = {
   };
   pricingModel?: Prisma.JsonValue;
   impactStatement?: Prisma.JsonValue;
+  testimonials?: stirng;
 };

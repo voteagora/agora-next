@@ -38,7 +38,7 @@ export const domain = {
 };
 
 const hub =
-  process.env.REACT_APP_DEPLOY_ENV === "prod"
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://hub.snapshot.org/api/msg"
     : "https://testnet.hub.snapshot.org/api/msg";
 

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
-import { fetchIsCitizen } from "@/app/api/common/citizens/isCitizen";
+import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 
 const r4BallotContentSchema = z.object({
   allocations: z.array(z.record(z.string(), z.number())),
@@ -11,8 +11,13 @@ const r4BallotContentSchema = z.object({
 });
 
 const r5BallotContentSchema = z.object({
-  project_allocations: z.array(z.record(z.string(), z.number())),
-  category_allocations: z.array(z.record(z.string(), z.number())),
+  budget: z.number().min(2000000).max(8000000), // number between 2M and 8M
+  project_allocations: z.array(
+    z.record(z.string(), z.string(z.number().min(0).max(100)).nullable())
+  ),
+  category_allocations: z.array(
+    z.record(z.string(), z.string(z.number().min(0).max(100)))
+  ),
 });
 
 const r4BallotSubmissionSchema = z.object({
@@ -32,15 +37,15 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  // const isBadgeholder = await fetchIsCitizen(
-  //   route.params.ballotCasterAddressOrEns
-  // );
+  const isBadgeholder = await fetchBadgeholder(
+    route.params.ballotCasterAddressOrEns
+  );
 
-  // if (!isBadgeholder) {
-  //   return new Response("Only badgeholder can submit a ballot", {
-  //     status: 401,
-  //   });
-  // }
+  if (!isBadgeholder) {
+    return new Response("Only badgeholder can submit a ballot", {
+      status: 401,
+    });
+  }
 
   if (route.params.roundId === "4") {
     return new Response("Ballot submission for Round 4 is closed", {

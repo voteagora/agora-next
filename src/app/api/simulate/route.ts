@@ -19,7 +19,7 @@ export async function POST(request: Request) {
           simulation_type: "quick", // full or quick (full is default)
           network_id: body?.networkId || "1", // network to simulate on
           /* Standard EVM Transaction object */
-          from: body?.from || "", // governor address
+          from: body?.from || "", // timelock address
           to: body?.target || "",
           input: body?.calldata || "0x",
           gas: 8000000,

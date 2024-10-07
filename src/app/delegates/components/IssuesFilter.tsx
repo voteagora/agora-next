@@ -59,10 +59,12 @@ export default function IssuesFilter() {
     >
       {() => (
         <>
-          <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
-            {issuesFilterOptions[filterParam]?.value ||
-              issuesFilterOptions.all.value}
-            <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
+          <Listbox.Button className="w-full sm:w-[200px] bg-wash text-base font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between">
+            <span>
+              {issuesFilterOptions[filterParam]?.value ||
+                issuesFilterOptions.all.value}
+            </span>
+            <ChevronDown className="h-4 w-4 ml-[6px] text-secondary/30" />
           </Listbox.Button>
           <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
             {Object.keys(issuesFilterOptions).map((key) => (
@@ -70,9 +72,9 @@ export default function IssuesFilter() {
                 {({ selected }) => {
                   return (
                     <li
-                      className={`cursor-pointer text-base py-2 px-3 border rounded-xl font-medium ${
+                      className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:text-primary hover:bg-tertiary/20 ${
                         selected
-                          ? "text-primary bg-white border-line"
+                          ? "text-primary bg-tertiary/20"
                           : "text-secondary border-transparent"
                       }`}
                     >

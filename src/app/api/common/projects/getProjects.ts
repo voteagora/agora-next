@@ -65,6 +65,7 @@ async function getProjectsApi({
             subcategory: data.application_subcategory,
             statement: data.impact_statement,
           },
+          testimonials: `https://www.metricsgarden.xyz/projects/${data.project_id}/contributions/${data.project_id}`,
         };
       });
     }
@@ -108,6 +109,7 @@ async function getProjectsApi({
           subcategory: null,
           statement: null,
         },
+        testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
       };
     });
   }, pagination);
@@ -138,7 +140,7 @@ async function getProjectApi({
   const projectData = project.ipfs_data ?? ({} as any);
 
   return {
-    id: project.project_id,
+    id: project.application_id,
     projectId: project.project_id,
     applicationId: project.application_id,
     category: project.category,
@@ -162,6 +164,7 @@ async function getProjectApi({
       subcategory: project.application_subcategory,
       statement: project.impact_statement,
     },
+    testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
   };
 }
 

@@ -23,8 +23,6 @@ export default function DelegationFromRow({
         })}
       </TableCell>
       <TableCell>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</TableCell>
-      <TableCell>{delegation.type}</TableCell>
-      <TableCell>{delegation.amount}</TableCell>
       <TableCell>
         <Link
           href={`/delegates/${delegation.from}`}

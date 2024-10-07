@@ -15,8 +15,6 @@ export default class TenantSlugFactory {
         return "UNI";
       case TENANT_NAMESPACES.CYBER:
         return "CYBER";
-      case TENANT_NAMESPACES.NEW_DAO:
-        return "NEWDAO";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
