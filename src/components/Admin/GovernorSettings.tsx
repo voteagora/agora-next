@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import {
-  useContractReads,
+  useReadContracts,
   useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
@@ -27,7 +27,7 @@ export default function GovernorSettings() {
     chainId: contracts.governor.chain.id,
   };
 
-  const { data, isLoading: isInitializing } = useContractReads({
+  const { data, isLoading: isInitializing } = useReadContracts({
     contracts: [
       {
         ...govContract,

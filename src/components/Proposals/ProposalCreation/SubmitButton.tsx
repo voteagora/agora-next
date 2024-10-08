@@ -12,7 +12,7 @@ import {
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   useAccount,
-  useContractRead,
+  useReadContract,
   useWriteContract,
   useSimulateContract,
 } from "wagmi";
@@ -53,7 +53,7 @@ export default function SubmitButton({
     args: inputData as any,
   });
 
-  const { data: manager } = useContractRead({
+  const { data: manager } = useReadContract({
     address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: "manager",

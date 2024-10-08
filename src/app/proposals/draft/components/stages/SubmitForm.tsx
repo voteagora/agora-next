@@ -1,7 +1,7 @@
 "use client";
 
 import DraftPreview from "../DraftPreview";
-import { useAccount, useBlockNumber, useContractRead } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
@@ -21,12 +21,15 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
 
-  const { data: accountVotes } = useContractRead({
+  const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
     address: tenant.contracts.governor.address as `0x${string}`,
     functionName: "getVotes",
-    args: [address, blockNumber ? blockNumber - BigInt(1) : BigInt(0)],
+    args: [
+      address as `0x${string}`,
+      blockNumber ? blockNumber - BigInt(1) : BigInt(0),
+    ],
   }) as { data: bigint };
 
   const canSponsor = () => {

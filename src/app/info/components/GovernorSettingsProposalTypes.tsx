@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractRead } from "wagmi";
+import { useReadContract } from "wagmi";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
@@ -20,19 +20,19 @@ const GovernorSettingsProposalTypes = () => {
   // TODO: Refactor this to use the governor types
   const isQuorumSupportedByGovernor = namespace !== TENANT_NAMESPACES.CYBER;
 
-  const { data: quorum, isFetched: isQuorumFetched } = useContractRead({
+  const { data: quorum, isFetched: isQuorumFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName:
       namespace === TENANT_NAMESPACES.UNISWAP ? "quorumVotes" : "quorum",
-    enabled: isQuorumSupportedByGovernor,
-  });
+    query: { enabled: isQuorumSupportedByGovernor },
+  }) as { data: bigint | undefined; isFetched: boolean };
 
-  const { data: threshold, isFetched: isThresholdFetched } = useContractRead({
+  const { data: threshold, isFetched: isThresholdFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "proposalThreshold",
-  });
+  }) as { data: bigint | undefined; isFetched: boolean };
 
   return (
     <Table>
