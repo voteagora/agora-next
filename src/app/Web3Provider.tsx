@@ -25,7 +25,6 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 const { contracts, ui } = Tenant.current();
 const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
@@ -34,8 +33,7 @@ export const config = createConfig(
     walletConnectProjectId: projectId,
     chains: [contracts.token.chain, mainnet],
     transports: {
-      // todo: need to add transport for tenant chain
-      [mainnet.id]: http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyId}`),
+      [mainnet.id]: getTransportForChain(mainnet.id)!,
       [contracts.token.chain.id]: getTransportForChain(
         contracts.token.chain.id
       )!,
