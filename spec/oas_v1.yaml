@@ -1158,27 +1158,29 @@ components:
                 answer:
                   type: string
         impactMetrics:
-          number_of_attestations:
-            type: number
-          number_of_attestations_by_citizens:
-            type: number
-          number_of_attestations_by_top_delegates:
-            type: number
-          average_nps_score_of_citizens_and_top_delegates:
-            type: number
-          most_positive_superlative:
-            type: string
-          cant_live_without_superlative:
-            type: string
-          percentage_distribution_of_different_ratings:
-            type: object
-            properties:
-              by_citizens:
-                type: object
-              by_top_delegates:
-                type: object
-          number_of_elected_governance_members_that_attested:
-            type: object
+          type: object
+          properties:
+            number_of_attestations:
+              type: number
+            number_of_attestations_by_citizens:
+              type: number
+            number_of_attestations_by_top_delegates:
+              type: number
+            average_nps_score_of_citizens_and_top_delegates:
+              type: number
+            most_positive_superlative:
+              type: string
+            cant_live_without_superlative:
+              type: string
+            percentage_distribution_of_different_ratings:
+              type: object
+              properties:
+                by_citizens:
+                  type: object
+                by_top_delegates:
+                  type: object
+            number_of_elected_governance_members_that_attested:
+              type: object
     SocialLinks:
       summary: Social media links for a project
       description: >
