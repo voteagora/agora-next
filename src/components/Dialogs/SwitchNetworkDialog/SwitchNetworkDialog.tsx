@@ -1,7 +1,7 @@
 import { useAccount, useSwitchChain } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import { Chain } from "viem/types/chain";
+import { Chain } from "viem/chains";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 

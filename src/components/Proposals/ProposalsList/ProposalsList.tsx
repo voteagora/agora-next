@@ -48,7 +48,7 @@ export default function ProposalsList({
 
   const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initRelevantProposals] || []);
+  const [pages, setPages] = useState([initRelevantProposals]);
   const [meta, setMeta] = useState(initRelevantProposals.meta);
 
   useEffect(() => {

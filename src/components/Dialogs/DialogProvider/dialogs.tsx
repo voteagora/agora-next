@@ -17,7 +17,7 @@ import {
   DelegateePayload,
   Delegation,
 } from "@/app/api/common/delegations/delegation";
-import { Chain } from "viem/types/chain";
+import { Chain } from "viem/chains";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";

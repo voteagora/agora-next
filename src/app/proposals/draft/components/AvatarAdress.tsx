@@ -9,7 +9,7 @@ const AvatarAddress = ({ address }: { address: `0x${string}` }) => {
 
   const { data: ensAvatar } = useEnsAvatar({
     chainId: 1,
-    name: ensName,
+    name: ensName as string,
   });
   return (
     <span className="flex flex-row space-x-2 items-center">
