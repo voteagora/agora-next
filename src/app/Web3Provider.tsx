@@ -14,7 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
-import { getAlchemyRpcUrl } from "@/lib/utils";
+import { getTransportForChain } from "@/lib/utils";
 
 const queryClient = new QueryClient();
 
@@ -36,9 +36,9 @@ export const config = createConfig(
     transports: {
       // todo: need to add transport for tenant chain
       [mainnet.id]: http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyId}`),
-      [contracts.token.chain.id]: http(
-        getAlchemyRpcUrl(contracts.token.chain.id)!
-      ),
+      [contracts.token.chain.id]: getTransportForChain(
+        contracts.token.chain.id
+      )!,
     },
     appName: metadata.name,
     appDescription: metadata.description,
