@@ -29,7 +29,7 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 const { contracts, ui } = Tenant.current();
 const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-const config = createConfig(
+export const config = createConfig(
   getDefaultConfig({
     walletConnectProjectId: projectId,
     chains: [contracts.token.chain, mainnet],

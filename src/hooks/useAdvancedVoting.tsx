@@ -3,7 +3,8 @@ import { useCallback, useState } from "react";
 import { useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransaction } from "wagmi/actions";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { config } from "@/app/Web3Provider";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -66,7 +67,7 @@ const useAdvancedVoting = ({
         chainId: contracts.governor.chain.id,
       });
       try {
-        const { status } = await waitForTransaction({
+        const { status } = await waitForTransactionReceipt(config, {
           hash: directTx,
         });
         if (status === "success") {
@@ -98,7 +99,7 @@ const useAdvancedVoting = ({
         chainId: contracts.alligator?.chain.id,
       });
       try {
-        const { status } = await waitForTransaction({
+        const { status } = await waitForTransactionReceipt(config, {
           hash: advancedTx,
         });
         if (status === "success") {
