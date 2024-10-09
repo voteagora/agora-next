@@ -244,11 +244,7 @@ export const optimismTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [
-          ProposalType?.BASIC,
-          ProposalType?.APPROVAL,
-          ProposalType?.OPTIMISTIC,
-        ],
+        proposalTypes: [ProposalType?.BASIC],
         copy: {
           helperText: `
 ## Proposal checklist
