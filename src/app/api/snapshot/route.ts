@@ -77,6 +77,8 @@ export async function GET(request: NextRequest) {
       const proposals = await fetchProposals(namespaces[slug]);
 
       for await (const proposal of proposals) {
+        proposal.snapshot = proposal.snapshot.toString();
+
         await prisma.snapshotProposal.upsert({
           where: { id: proposal.id },
           update: { ...proposal, dao_slug: slug },
