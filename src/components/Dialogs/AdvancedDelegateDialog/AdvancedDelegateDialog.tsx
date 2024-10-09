@@ -137,7 +137,7 @@ export function AdvancedDelegateDialog({
 
   const getVotingPowerPageDelegatee = async () => {
     const pageDelegateeAddress = await resolveENSName(
-      params?.addressOrENSName as string
+      params?.addressOrENSName || target
     );
     const pageDelegateeIndex = delegatees.findIndex(
       (delegatee) => delegatee.to === pageDelegateeAddress
