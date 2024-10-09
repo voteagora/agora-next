@@ -1,7 +1,6 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useContractWrite } from "wagmi";
-import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransaction } from "wagmi/actions";
 
@@ -79,7 +78,6 @@ const useStandardVoting = ({
 
       switch (missingVote) {
         case "DIRECT":
-          track("Standard Vote", trackingData);
           await _standardVote();
           break;
       }
