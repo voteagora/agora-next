@@ -1,7 +1,6 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useContractWrite } from "wagmi";
-import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransaction } from "wagmi/actions";
 
@@ -129,17 +128,14 @@ const useAdvancedVoting = ({
 
       switch (missingVote) {
         case "DIRECT":
-          track("Standard Vote", trackingData);
           await _standardVote();
           break;
 
         case "ADVANCED":
-          track("Advanced Vote", trackingData);
           await _advancedVote();
           break;
 
         case "BOTH":
-          track("Standard + Advanced Vote (single transaction)", trackingData);
           await _advancedVote();
           break;
       }

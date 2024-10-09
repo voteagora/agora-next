@@ -49,7 +49,6 @@
     "@tanstack/react-query": "^5.27.5",
     "@types/swagger-ui-react": "^4.18.3",
     "@uiw/react-markdown-preview": "^5.1.1",
-    "@vercel/analytics": "^1.1.1",
     "@vercel/otel": "^1.5.0",
     "@vercel/speed-insights": "^1.0.2",
     "autoprefixer": "10.4.14",
