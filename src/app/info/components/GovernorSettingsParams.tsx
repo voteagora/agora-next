@@ -52,7 +52,7 @@ const GovernorSettingsParams = () => {
             Voting Delay
           </TableCell>
           <TableCell className="text-base font-semibold text-right text-primary">
-            {isDelayFetched && votingDelay
+            {isDelayFetched && votingDelay !== undefined
               ? secondsToHuman(blocksToSeconds(Number(votingDelay)))
               : "Loading..."}
           </TableCell>
