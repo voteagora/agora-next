@@ -47,7 +47,7 @@ function AddressInput<
 
   const { data: ensAddress } = useEnsAddress({
     chainId: 1,
-    name: normalize(address?.trim()),
+    name: address?.trim(),
     query: { enabled: address?.trim()?.split(".")?.[1] === "eth" },
   });
 
