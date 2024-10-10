@@ -40,13 +40,13 @@ const transferABI = [
 
 type BasicInputData = [
   `0x${string}`[],
-  string[],
+  number[],
   `0x${string}`[],
   string,
-  Number,
+  number,
 ];
 
-type OZBasicInputData = [`0x${string}`[], string[], `0x${string}`[], string];
+type OZBasicInputData = [`0x${string}`[], number[], `0x${string}`[], string];
 type ApprovalInputData = [string, string, string, Number];
 type InputData = OZBasicInputData | BasicInputData | ApprovalInputData | null;
 
@@ -77,7 +77,7 @@ export function getInputData(proposal: DraftProposal): {
   switch (proposal.voting_module_type) {
     case ProposalType.BASIC:
       let targets: `0x${string}`[] = [];
-      let values: string[] = [];
+      let values: number[] = [];
       let calldatas: `0x${string}`[] = [];
       let inputData: BasicInputData | OZBasicInputData = [
         targets,
@@ -89,12 +89,12 @@ export function getInputData(proposal: DraftProposal): {
 
       if (proposal.transactions.length === 0) {
         targets.push(ethers.ZeroAddress as `0x${string}`);
-        values.push("0");
+        values.push(0);
         calldatas.push("0x");
       } else {
         proposal.transactions.forEach((t) => {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);
-          values.push(t.value.toString() || "0");
+          values.push(parseInt(t.value) || 0);
           calldatas.push(t.calldata as `0x${string}`);
         });
       }
