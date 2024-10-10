@@ -45,7 +45,7 @@ const DraftPreview = ({
     functionName: "getVotes",
     args: [
       address as `0x${string}`,
-      blockNumber ? blockNumber - BigInt(1) : BigInt(0),
+      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
     ],
   }) as { data: bigint };
 
