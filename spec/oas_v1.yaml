@@ -1707,7 +1707,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  metadata:
+                  meta:
                     $ref: "#/components/schemas/PageMetadata"
                   data:
                     type: array
