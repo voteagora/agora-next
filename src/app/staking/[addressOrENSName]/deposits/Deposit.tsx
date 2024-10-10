@@ -10,9 +10,9 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useWriteContract,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 
 import { useRouter } from "next/navigation";
@@ -42,7 +42,7 @@ export const Deposit = ({
   const isDelegateFetched = useRef(false);
 
   const { contracts } = Tenant.current();
-  const { config } = usePrepareContractWrite({
+  const { data: config } = useSimulateContract({
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
@@ -50,14 +50,12 @@ export const Deposit = ({
     args: [BigInt(deposit.id), BigInt(deposit.amount)],
   });
 
-  const { data, write } = useContractWrite(config);
+  const { data, writeContract: write } = useWriteContract();
   const isDepositOwner =
     isConnected && address?.toLowerCase() === deposit.depositor.toLowerCase();
 
   const { isLoading: isProcessingWithdrawal, isFetched: didProcessWithdrawal } =
-    useWaitForTransaction({
-      hash: data?.hash,
-    });
+    useWaitForTransactionReceipt({ hash: data });
 
   const getDelegate = async () => {
     if (!isDelegateFetched.current) {
@@ -169,7 +167,7 @@ export const Deposit = ({
                     </div>
                     <div
                       className="py-3 px-5 font-medium cursor-pointer hover:bg-gray-100"
-                      onClick={() => write?.()}
+                      onClick={() => write(config!.request)}
                     >
                       Withdraw stake
                     </div>

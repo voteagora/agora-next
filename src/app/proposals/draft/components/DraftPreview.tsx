@@ -2,7 +2,7 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber, useContractRead } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
@@ -38,12 +38,15 @@ const DraftPreview = ({
   const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
 
-  const { data: accountVotes } = useContractRead({
+  const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
     address: tenant.contracts.governor.address as `0x${string}`,
     functionName: "getVotes",
-    args: [address, blockNumber ? blockNumber - BigInt(1) : BigInt(0)],
+    args: [
+      address as `0x${string}`,
+      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
+    ],
   }) as { data: bigint };
 
   const canSponsor = () => {

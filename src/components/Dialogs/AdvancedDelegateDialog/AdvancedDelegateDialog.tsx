@@ -18,7 +18,7 @@ import {
 import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { waitForTransaction } from "wagmi/actions";
+import { waitForTransactionReceipt } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
@@ -29,6 +29,7 @@ import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
+import { config } from "@/app/Web3Provider";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -157,7 +158,7 @@ export function AdvancedDelegateDialog({
     setIsLoading(true);
 
     const tx = await writeAsync();
-    await waitForTransaction({ hash: tx.hash });
+    await waitForTransactionReceipt(config, { hash: tx });
 
     const { prevVotingPower, postVotingPower, pageDelegateeAddress } =
       await getVotingPowerPageDelegatee();

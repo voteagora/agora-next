@@ -24,7 +24,7 @@ export default function ApprovalProposalVotesList({
   proposalId,
 }: Props) {
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialProposalVotes] || []);
+  const [pages, setPages] = useState([initialProposalVotes]);
   const [meta, setMeta] = useState(initialProposalVotes.meta);
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
   const { address: connectedAddress } = useAccount();

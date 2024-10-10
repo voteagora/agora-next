@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
-import { createConfig, WagmiConfig } from "wagmi";
+import { createConfig, WagmiProvider, http } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet } from "wagmi/chains";
 import Footer from "@/components/Footer";
@@ -14,6 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
+import { getTransportForChain } from "@/lib/utils";
 
 const queryClient = new QueryClient();
 
@@ -24,15 +25,19 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
 const { contracts, ui } = Tenant.current();
 const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-const config = createConfig(
+export const config = createConfig(
   getDefaultConfig({
-    alchemyId: alchemyId,
     walletConnectProjectId: projectId,
     chains: [contracts.token.chain, mainnet],
+    transports: {
+      [mainnet.id]: getTransportForChain(mainnet.id)!,
+      [contracts.token.chain.id]: getTransportForChain(
+        contracts.token.chain.id
+      )!,
+    },
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
@@ -40,7 +45,7 @@ const config = createConfig(
 );
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiConfig config={config}>
+  <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
@@ -60,7 +65,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
         </ConnectKitProvider>
       </SIWEProvider>
     </QueryClientProvider>
-  </WagmiConfig>
+  </WagmiProvider>
 );
 
 export default Web3Provider;

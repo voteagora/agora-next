@@ -1,11 +1,11 @@
 import { Address } from "viem";
-import { ChainConstants } from "viem/types/chain";
+import { Chain } from "viem/chains";
 import { Provider } from "ethers";
 
 type TenantContractParams<ContractType> = {
   abi: any;
   address: Address;
-  chain: ChainConstants;
+  chain: Chain;
   contract: ContractType;
   optionBudgetChangeDate?: Date;
   provider: Provider;
@@ -15,7 +15,7 @@ type TenantContractParams<ContractType> = {
 export class TenantContract<ContractType> {
   private _address: Address;
   public abi: any;
-  public chain: ChainConstants;
+  public chain: Chain;
   public contract: ContractType;
   public optionBudgetChangeDate?: Date;
   public provider: Provider;

@@ -1,9 +1,10 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
-import { useContractWrite } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransaction } from "wagmi/actions";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { config } from "@/app/Web3Provider";
 
 const useStandardVoting = ({
   proposalId,
@@ -20,16 +21,8 @@ const useStandardVoting = ({
 }) => {
   const { contracts, slug } = Tenant.current();
 
-  const { writeAsync: standardVote, isError: _standardVoteError } =
-    useContractWrite({
-      address: contracts.governor.address as `0x${string}`,
-      abi: contracts.governor.abi,
-      functionName: !!reason ? "castVoteWithReason" : "castVote",
-      args: !!reason
-        ? [BigInt(proposalId), support, reason]
-        : [BigInt(proposalId), support],
-      chainId: contracts.governor.chain.id,
-    });
+  const { writeContractAsync: standardVote, isError: _standardVoteError } =
+    useWriteContract();
 
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
@@ -45,14 +38,22 @@ const useStandardVoting = ({
   const write = useCallback(() => {
     const _standardVote = async () => {
       setStandardVoteLoading(true);
-      const directTx = await standardVote();
+      const directTx = await standardVote({
+        address: contracts.governor.address as `0x${string}`,
+        abi: contracts.governor.abi,
+        functionName: !!reason ? "castVoteWithReason" : "castVote",
+        args: !!reason
+          ? [BigInt(proposalId), support, reason]
+          : [BigInt(proposalId), support],
+        chainId: contracts.governor.chain.id,
+      });
       try {
-        const { status } = await waitForTransaction({
-          hash: directTx.hash,
+        const { status } = await waitForTransactionReceipt(config, {
+          hash: directTx,
         });
 
         if (status === "success") {
-          setStandardTxHash(directTx.hash);
+          setStandardTxHash(directTx);
           setStandardVoteSuccess(true);
         }
       } catch (error) {

@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractRead } from "wagmi";
+import { useReadContract } from "wagmi";
 import { pluralize } from "@/lib/utils";
 import { SECONDS_IN_HOUR } from "@/lib/constants";
 import { blocksToSeconds } from "@/lib/blockTimes";
@@ -17,13 +17,13 @@ import { blocksToSeconds } from "@/lib/blockTimes";
 const GovernorSettingsParams = () => {
   const { contracts } = Tenant.current();
 
-  const { data: votingDelay, isFetched: isDelayFetched } = useContractRead({
+  const { data: votingDelay, isFetched: isDelayFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingDelay",
   });
 
-  const { data: votingPeriod, isFetched: isPeriodFetched } = useContractRead({
+  const { data: votingPeriod, isFetched: isPeriodFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingPeriod",

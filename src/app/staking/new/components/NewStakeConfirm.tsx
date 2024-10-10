@@ -4,9 +4,9 @@ import React from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useWriteContract,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
@@ -53,8 +53,12 @@ export const NewStakeConfirm = ({
     isSufficientSpendingAllowance && isAddress(delegate)
   );
 
-  const { config, status, error } = usePrepareContractWrite({
-    enabled: isSufficientSpendingAllowance,
+  const {
+    data: config,
+    status,
+    error,
+  } = useSimulateContract({
+    query: { enabled: isSufficientSpendingAllowance },
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
@@ -62,12 +66,9 @@ export const NewStakeConfirm = ({
     args: [amountToStake, delegate],
   });
 
-  const { data, write } = useContractWrite(config);
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-
-  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
+  const { data, writeContract: write } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash: data });
+  const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -103,9 +104,9 @@ export const NewStakeConfirm = ({
 
               <Button
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || !Boolean(config?.request)}
                 onClick={() => {
-                  write?.();
+                  write(config!.request);
                 }}
               >
                 {isLoading
@@ -114,7 +115,7 @@ export const NewStakeConfirm = ({
               </Button>
             </>
           )}
-          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+          {data && <BlockScanUrls hash1={data} />}
         </>
       )}
     </div>

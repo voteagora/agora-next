@@ -1,6 +1,6 @@
 import { VStack } from "@/components/Layout/Stack";
 import { useRouter } from "next/navigation";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import Image from "next/image";
 import Link from "next/link";
 import { icons } from "@/assets/icons/icons";
@@ -18,7 +18,7 @@ const SponsorOnchainProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const tenant = Tenant.current();
-  const { isLoading } = useWaitForTransaction({
+  const { isLoading } = useWaitForTransactionReceipt({
     hash: txHash,
   });
   const router = useRouter();

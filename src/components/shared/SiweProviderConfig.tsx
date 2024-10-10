@@ -62,7 +62,7 @@ export const siweProviderConfig: SIWEConfig = {
     const decoded = decodeJwt(jwt);
     const siweData = decoded.siwe as { address: string; chainId: string };
     return {
-      address: siweData.address as string,
+      address: siweData.address as `0x${string}`,
       chainId: Number(siweData.chainId),
     };
   },

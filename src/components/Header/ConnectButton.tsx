@@ -2,14 +2,14 @@
 
 import { MobileConnectButton } from "./MobileConnectButton";
 import { DesktopConnectButton } from "./DesktopConnectButton";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 export function ConnectButton() {
   const { contracts } = Tenant.current();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const openDialog = useOpenDialog();
 
   useEffect(() => {

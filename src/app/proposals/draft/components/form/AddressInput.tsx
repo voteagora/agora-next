@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { isAddress } from "viem";
+import { normalize } from "viem/ens";
 
 type AddressInputProps = {
   label: string;
@@ -47,13 +48,13 @@ function AddressInput<
   const { data: ensAddress } = useEnsAddress({
     chainId: 1,
     name: address?.trim(),
-    enabled: address?.trim()?.split(".")?.[1] === "eth",
+    query: { enabled: address?.trim()?.split(".")?.[1] === "eth" },
   });
 
   const { data: ensName } = useEnsName({
     chainId: 1,
     address: address?.trim(),
-    enabled: isAddress(address?.trim()),
+    query: { enabled: isAddress(address?.trim()) },
   });
 
   const buildHint = () => {

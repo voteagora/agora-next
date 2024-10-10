@@ -87,7 +87,7 @@ export async function createSnapshot({
     space:
       process.env.REACT_APP_DEPLOY_ENV === "prod"
         ? "ens.eth"
-        : process.env.TESTNET_SNAPSHOT_SPACE ?? "michaelagora.eth",
+        : (process.env.TESTNET_SNAPSHOT_SPACE ?? "michaelagora.eth"),
     timestamp,
     type:
       proposal.voting_module_type === "basic" ? "single-choice" : "approval",

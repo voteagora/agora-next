@@ -8,9 +8,9 @@ import { StakedDeposit } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useWriteContract,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 import { useTokenAllowance } from "@/hooks/useTokenAllowance";
@@ -51,8 +51,12 @@ export const EditDepositConfirm = ({
   const isSufficientSpendingAllowance =
     hasAllowance && allowance >= amountToAdd;
 
-  const { config, status, error } = usePrepareContractWrite({
-    enabled: isSufficientSpendingAllowance,
+  const {
+    data: config,
+    status,
+    error,
+  } = useSimulateContract({
+    query: { enabled: isSufficientSpendingAllowance },
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
     chainId: contracts.staker!.chain.id,
@@ -60,12 +64,9 @@ export const EditDepositConfirm = ({
     args: [BigInt(deposit.id), amountToAdd],
   });
 
-  const { data, write } = useContractWrite(config);
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-
-  const isTransactionConfirmed = Boolean(data?.hash && !isLoading);
+  const { data, writeContract: write } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash: data });
+  const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
     <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
@@ -100,16 +101,16 @@ export const EditDepositConfirm = ({
               </div>
               <Button
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || !Boolean(config?.request)}
                 onClick={() => {
-                  write?.();
+                  write(config!.request);
                 }}
               >
                 {isLoading ? "Staking..." : `Update Stake`}
               </Button>
             </>
           )}
-          {data?.hash && <BlockScanUrls hash1={data?.hash} />}
+          {data && <BlockScanUrls hash1={data} />}
         </>
       )}
     </div>

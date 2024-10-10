@@ -4,9 +4,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
 import React, { useEffect } from "react";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useWriteContract,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
   const queryClient = useQueryClient();
   const { contracts, token } = Tenant.current();
 
-  const { config } = usePrepareContractWrite({
+  const { data: config } = useSimulateContract({
     address: contracts.token.address as `0x${string}`,
     abi: contracts.token.abi,
     chainId: contracts.token.chain.id,
@@ -27,10 +27,11 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
     args: [contracts.staker!.address, amount],
   });
 
-  const { data, write } = useContractWrite(config);
-  const { isLoading, isFetched: didUpdateAllowance } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+  const { data, writeContract: write } = useWriteContract();
+  const { isLoading, isFetched: didUpdateAllowance } =
+    useWaitForTransactionReceipt({
+      hash: data,
+    });
 
   useEffect(() => {
     if (didUpdateAllowance) {
@@ -47,7 +48,11 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
         Please allow your {token.symbol} tokens to be used for staking.
       </div>
 
-      <Button className="w-full" disabled={isLoading} onClick={() => write?.()}>
+      <Button
+        className="w-full"
+        disabled={isLoading || !Boolean(config?.request)}
+        onClick={() => write(config!.request)}
+      >
         {isLoading ? "Updating..." : "Update Allowance"}
       </Button>
     </>

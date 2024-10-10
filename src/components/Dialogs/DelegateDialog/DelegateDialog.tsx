@@ -1,8 +1,8 @@
 import {
   useAccount,
-  useContractWrite,
+  useWriteContract,
   useEnsName,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
@@ -57,19 +57,14 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isError, writeAsync, write, data } = useContractWrite({
-    address: contracts.token.address as any,
-    abi: contracts.token.abi,
-    functionName: "delegate",
-    args: [delegate.address as any],
-  });
+  const { isError, writeContract: write, data } = useWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
-  } = useWaitForTransaction({
-    hash: data?.hash,
+  } = useWaitForTransactionReceipt({
+    hash: data,
   });
 
   const fetchData = useCallback(async () => {
@@ -106,7 +101,17 @@ export function DelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <Button disabled={false} onClick={() => write?.()}>
+        <Button
+          disabled={false}
+          onClick={() =>
+            write({
+              address: contracts.token.address as any,
+              abi: contracts.token.abi,
+              functionName: "delegate",
+              args: [delegate.address as any],
+            })
+          }
+        >
           Delegation failed - try again
         </Button>
       );
@@ -122,12 +127,25 @@ export function DelegateDialog({
           <Button className="w-full" disabled={false}>
             Delegation completed!
           </Button>
-          <BlockScanUrls hash1={data?.hash} />
+          <BlockScanUrls hash1={data} />
         </div>
       );
     }
 
-    return <ShadcnButton onClick={() => write?.()}>Delegate</ShadcnButton>;
+    return (
+      <ShadcnButton
+        onClick={() =>
+          write({
+            address: contracts.token.address as any,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as any],
+          })
+        }
+      >
+        Delegate
+      </ShadcnButton>
+    );
   };
 
   useEffect(() => {

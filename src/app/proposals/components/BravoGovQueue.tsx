@@ -1,8 +1,7 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractWrite, useWaitForTransaction } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -13,16 +12,11 @@ interface Props {
 export const BravoGovQueue = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
-  const { data, write } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: "queue",
-    args: [proposal.id],
-  });
+  const { data, writeContract: write } = useWriteContract();
 
   const { isLoading, isSuccess, isFetched, isError, error } =
-    useWaitForTransaction({
-      hash: data?.hash,
+    useWaitForTransactionReceipt({
+      hash: data,
     });
 
   useEffect(() => {
@@ -42,7 +36,17 @@ export const BravoGovQueue = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <Button loading={isLoading} onClick={() => write?.()}>
+        <Button
+          loading={isLoading}
+          onClick={() =>
+            write({
+              address: contracts.governor.address as `0x${string}`,
+              abi: contracts.governor.abi,
+              functionName: "queue",
+              args: [proposal.id],
+            })
+          }
+        >
           Queue
         </Button>
       )}

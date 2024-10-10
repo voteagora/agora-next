@@ -1,9 +1,9 @@
 "use client";
 
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { parseUnits } from "viem";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
 const useIsAdvancedUser = () => {
@@ -67,26 +67,30 @@ const useIsAdvancedUser = () => {
     "0x416a0343470ac6694D39e2fCd6C494eeEF39BeEB", // SAFE QA 3
   ] as `0x${string}`[];
 
-  useContractRead({
+  const { data: balance, isFetched: isBalanceFetched } = useReadContract({
     address: contracts.token.address as `0x${string}`,
     abi: contracts.token.abi,
     functionName: "balanceOf",
-    enabled: isConnected && !!address,
-    args: [address!],
-    /**
-     * @dev Checks if the user is an advanced user
-     * PROD: only allowlist
-     * TEST: more than 1 token or allowlist
-     */
-    onSuccess: (balance: bigint) => {
-      const allowedBalance = parseUnits("100000", 18);
-      setIsAdvancedUser(
-        isProd
-          ? allowList.includes(address!)
-          : balance >= allowedBalance || allowList.includes(address!)
-      );
+    query: {
+      enabled: isConnected && !!address /**
+       * @dev Checks if the user is an advanced user
+       * PROD: only allowlist
+       * TEST: more than 1 token or allowlist
+       */,
     },
-  });
+    args: [address!],
+  }) as { data: bigint | undefined; isFetched: boolean };
+
+  useEffect(() => {
+    if (!isBalanceFetched) return;
+    if (!balance) return;
+    const allowedBalance = parseUnits("100000", 18);
+    setIsAdvancedUser(
+      isProd
+        ? allowList.includes(address!)
+        : balance >= allowedBalance || allowList.includes(address!)
+    );
+  }, [balance, isBalanceFetched]);
 
   return { isAdvancedUser };
 };

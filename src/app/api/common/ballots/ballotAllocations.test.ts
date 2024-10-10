@@ -55,6 +55,7 @@ describe("ballotAllocations", () => {
         ...b,
         status: b.status as Ballot["status"],
         allocations: JSON.parse(b.allocations) as Ballot["allocations"],
+        published_at: new Date("2021-10-01"),
       };
     });
 

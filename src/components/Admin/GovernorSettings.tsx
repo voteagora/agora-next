@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import {
-  useContractReads,
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useReadContracts,
+  useWriteContract,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
 import Tenant from "@/lib/tenant/tenant";
@@ -27,7 +27,7 @@ export default function GovernorSettings() {
     chainId: contracts.governor.chain.id,
   };
 
-  const { data, isLoading: isInitializing } = useContractReads({
+  const { data, isLoading: isInitializing } = useReadContracts({
     contracts: [
       {
         ...govContract,
@@ -61,8 +61,8 @@ export default function GovernorSettings() {
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState<number>();
 
-  const { config: setVotingPeriodConfig, isError: setVotingPeriodError } =
-    usePrepareContractWrite({
+  const { data: setVotingPeriodConfig, isError: setVotingPeriodError } =
+    useSimulateContract({
       ...govContract,
       functionName: "setVotingPeriod",
       args: [
@@ -73,19 +73,19 @@ export default function GovernorSettings() {
     });
   const {
     data: resultSetVotingPeriod,
-    write: writeSetVotingPeriod,
-    isLoading: isLoadingSetVotingPeriod,
-  } = useContractWrite(setVotingPeriodConfig);
+    writeContract: writeSetVotingPeriod,
+    isPending: isLoadingSetVotingPeriod,
+  } = useWriteContract();
   const { isLoading: isLoadingSetVotingPeriodTransaction } =
-    useWaitForTransaction({
-      hash: resultSetVotingPeriod?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultSetVotingPeriod,
     });
   const isDisabledSetVotingPeriod =
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
   const [votingDelay, setVotingDelay] = useState<number>();
-  const { config: setVotingDelayConfig, isError: setVotingDelayError } =
-    usePrepareContractWrite({
+  const { data: setVotingDelayConfig, isError: setVotingDelayError } =
+    useSimulateContract({
       ...govContract,
       functionName: "setVotingDelay",
       args: [
@@ -95,12 +95,12 @@ export default function GovernorSettings() {
     });
   const {
     data: resultSetVotingDelay,
-    write: writeSetVotingDelay,
-    isLoading: isLoadingSetVotingDelay,
-  } = useContractWrite(setVotingDelayConfig);
+    writeContract: writeSetVotingDelay,
+    isPending: isLoadingSetVotingDelay,
+  } = useWriteContract();
   const { isLoading: isLoadingSetVotingDelayTransaction } =
-    useWaitForTransaction({
-      hash: resultSetVotingDelay?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultSetVotingDelay,
     });
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
@@ -138,7 +138,7 @@ export default function GovernorSettings() {
                   setVotingPeriodError
                 }
                 onClick={() => {
-                  writeSetVotingPeriod?.();
+                  writeSetVotingPeriod(setVotingPeriodConfig!.request);
                 }}
               >
                 Update
@@ -168,7 +168,7 @@ export default function GovernorSettings() {
                   setVotingDelayError
                 }
                 onClick={() => {
-                  writeSetVotingDelay?.();
+                  writeSetVotingDelay(setVotingDelayConfig!.request);
                 }}
               >
                 Update
