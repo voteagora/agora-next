@@ -1160,27 +1160,69 @@ components:
         impactMetrics:
           type: object
           properties:
-            number_of_attestations:
+            count_total_attestations:
               type: number
-            number_of_attestations_by_citizens:
+            count_citizen_attestations:
               type: number
-            number_of_attestations_by_top_delegates:
+            count_delegate_attestations:
               type: number
-            average_nps_score_of_citizens_and_top_delegates:
+            avg_nps_score:
               type: number
             most_positive_superlative:
               type: string
             cant_live_without_superlative:
               type: string
-            percentage_distribution_of_different_ratings:
+            percentage_distributions:
               type: object
               properties:
-                by_citizens:
+                citizens:
                   type: object
-                by_top_delegates:
+                  properties:
+                    extremely_upset:
+                      type: number
+                    somewhat_upset:
+                      type: number
+                    neutral:
+                      type: number
+                top_delegates:
                   type: object
-            number_of_elected_governance_members_that_attested:
+                  properties:
+                    extremely_upset:
+                      type: number
+                    somewhat_upset:
+                      type: number
+                    neutral:
+                      type: number
+            elected_governance_reviews:
               type: object
+              properties:
+                optimism_grants_council_member:
+                  type: object
+                  properties:
+                    count_attestations:
+                      type: number
+                    avg_pmf_score:
+                      type: number
+                    avg_nps_score:
+                      type: number
+                anticapture_commission_member:
+                  type: object
+                  properties:
+                    count_attestations:
+                      type: number
+                    avg_pmf_score:
+                      type: number
+                    avg_nps_score:
+                      type: number
+                code_of_conduct_council_member:
+                  type: object
+                  properties:
+                    count_attestations:
+                      type: number
+                    avg_pmf_score:
+                      type: number
+                    avg_nps_score:
+                      type: number
     SocialLinks:
       summary: Social media links for a project
       description: >
@@ -1665,7 +1707,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  metadata:
+                  meta:
                     $ref: "#/components/schemas/PageMetadata"
                   data:
                     type: array
