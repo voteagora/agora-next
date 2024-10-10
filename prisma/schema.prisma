@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "alltenant", "config", "cyber", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "uniswap", "scroll"]
+  schemas  = ["agora", "alltenant", "config", "cyber", "derive", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "scroll", "uniswap"]
 }
 
 model DelegateStatements {
@@ -2460,6 +2460,345 @@ view scrollVotingPowerSnaps {
 }
 
 
+ 
+// ##############################################
+//
+//    Derive
+//
+// ##############################################
+
+
+view deriveAdvancedDelegatees {
+  pair             String   @unique
+  from             String
+  to               String
+  delegated_amount Decimal  @db.Decimal
+  delegated_share  Decimal  @db.Decimal
+  block_number     BigInt
+  contract         String?  @db.VarChar
+  transaction_hash String?
+
+  @@schema("derive")
+  @@map("advanced_delegatees")
+}
+
+view deriveAdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String   @db.VarChar
+
+  @@schema("derive")
+  @@map("advanced_voting_power")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view derive_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("derive")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view derive_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("derive")
+}
+
+view deriveAuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json?
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String   @db.VarChar
+  balance_block_number BigInt?
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@schema("derive")
+  @@map("authority_chains_snaps")
+}
+
+view deriveDelegateChangedEvents {
+  chain_id          Int
+  address           String  @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String  @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String  @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@schema("derive")
+  @@map("delegate_changed_events")
+}
+
+view deriveDelegatees {
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@schema("derive")
+  @@map("delegatees")
+}
+
+view deriveDelegates {
+  delegate          String   @unique
+  contract          String?  @db.VarChar(42)
+  num_of_delegators Decimal  @db.Decimal
+  direct_vp         Decimal  @db.Decimal
+  advanced_vp       Decimal  @db.Decimal
+  voting_power      Decimal  @db.Decimal
+
+  @@schema("derive")
+  @@map("delegates")
+}
+
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+view derive_delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("derive")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view derive_direct_chains {
+  delegate  String?
+  rules     Json? // Uh oh, this is a Json[] for optimism, [] for uniswap
+  chain     String?
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("direct_chains")
+  @@ignore
+  @@schema("derive")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view derive_direct_chains_snaps {
+  delegate             String?
+  rules                Json?
+  chain                String?
+  proxy                String?
+  balance              Decimal? @db.Decimal
+  balance_block_number BigInt?
+  allowance            Decimal? @db.Decimal
+  contract             String?  @db.VarChar
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("direct_chains_snaps")
+  @@ignore
+  @@schema("derive")
+}
+
+view deriveProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@schema("derive")
+  @@map("proposal_types")
+}
+
+view deriveProposals {
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  queued_block               BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  queued_transaction_hash    String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
+
+  @@map("proposals")
+  @@schema("derive")
+}
+
+view deriveStakedDeposits {
+  deposit_id  BigInt   @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal  @db.Decimal
+
+  @@schema("derive")
+  @@map("staked_deposits")
+}
+
+view deriveVotableSupply {
+  votable_supply String @unique
+
+  @@schema("derive")
+  @@map("votable_supply")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view derive_vote_cast_events {
+  transaction_hash String?  @db.VarChar(66)
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("derive")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view derive_vote_cast_with_params_events {
+  transaction_hash String?
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("derive")
+}
+
+view deriveVoterStats {
+  voter              String  @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+  proposals_proposed BigInt?
+  contract           String?  @db.VarChar(42)
+
+  @@schema("derive")
+  @@map("voter_stats")
+}
+
+view deriveVotes {
+  transaction_hash String       @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal      @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    ProposalType
+  contract         String?       @db.VarChar(42)
+  chain_id         Int?
+
+  @@map("votes")
+  @@schema("derive")
+}
+
+view deriveVotingPower {
+  delegate     String  @unique
+  voting_power String?
+  contract     String  @db.VarChar(42)
+
+  @@schema("derive")
+  @@map("voting_power")
+}
+
+model changelog {
+  id             Int      @id @default(autoincrement())
+  dao_slug       DaoSlug
+  title          String   @db.VarChar(255)
+  body           String
+  author_address String   @db.VarChar(255)
+  created_at     DateTime @default(now()) @db.Timestamp(6)
+  updated_at     DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([dao_slug], map: "idx_changelog_dao_slug")
+  @@schema("alltenant")
+}
+
+view deriveVotingPowerSnaps {
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
+  contract          String?  @db.VarChar(42)
+
+  @@schema("derive")
+  @@map("voting_power_snaps")
+}
+ 
+
+
 
 enum DaoSlug {
   OP
@@ -2471,6 +2810,7 @@ enum DaoSlug {
   UNISWAP
   CYBER
   SCROLL
+  DERIVE
 
   @@map("dao_slug")
   @@schema("config")
