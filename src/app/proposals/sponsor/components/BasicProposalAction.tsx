@@ -71,7 +71,9 @@ const BasicProposalAction = ({
                 txHash: data,
               },
             });
-          } catch (error) {}
+          } catch (error) {
+            console.log(error);
+          }
         }}
       >
         Submit proposal
