@@ -2,11 +2,11 @@
 
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { ApprovalProposal } from "../../../proposals/draft/types";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
+import { ApprovalProposal } from "@/app/proposals/draft/types";
 
 const ApprovalProposalAction = ({
   draftProposal,
