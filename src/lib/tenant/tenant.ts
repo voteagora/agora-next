@@ -11,7 +11,7 @@ import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
 
 export default class Tenant {
-  private static instance: Tenant;
+  private static instance: Tenant | null;
 
   private readonly _contracts: TenantContracts;
   private readonly _isProd: boolean;
@@ -63,5 +63,14 @@ export default class Tenant {
       Tenant.instance = new Tenant();
     }
     return Tenant.instance;
+  }
+
+  public static load(): Tenant {
+    Tenant.instance = new Tenant();
+    return Tenant.instance;
+  }
+
+  public static reset(): void {
+    Tenant.instance = null;
   }
 }
