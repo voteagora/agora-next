@@ -12,6 +12,9 @@ const filterMap = {
   eth_core: "ETHEREUM_CORE_CONTRIBUTIONS",
   op_tooling: "OP_STACK_TOOLING",
   op_rnd: "OP_STACK_RESEARCH_AND_DEVELOPMENT",
+  gov_infra: "GOVERNANCE_INFRA_AND_TOOLING",
+  gov_analytics: "GOVERNANCE_ANALYTICS",
+  gov_leadership: "GOVERNANCE_LEADERSHIP",
 };
 
 async function getProjectsApi({

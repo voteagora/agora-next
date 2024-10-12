@@ -2264,6 +2264,9 @@ paths:
               - eth_core
               - op_tooling
               - op_rnd
+              - gov_infra
+              - gov_analytics
+              - gov_leadership
       responses:
         "200":
           description: OK
