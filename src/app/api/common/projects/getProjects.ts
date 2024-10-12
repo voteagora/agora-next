@@ -69,6 +69,7 @@ async function getProjectsApi({
             statement: data.impact_statement,
           },
           testimonials: `https://www.metricsgarden.xyz/projects/${data.project_id}/contributions/${data.project_id}`,
+          impactMetrics: projectData.impactMetrics || undefined,
         };
       });
     }
@@ -113,6 +114,7 @@ async function getProjectsApi({
           statement: null,
         },
         testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
+        impactMetrics: undefined,
       };
     });
   }, pagination);
@@ -168,6 +170,7 @@ async function getProjectApi({
       statement: project.impact_statement,
     },
     testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
+    impactMetrics: projectData.impactMetrics,
   };
 }
 
