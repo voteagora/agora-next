@@ -38,6 +38,13 @@ async function submitBallotForAddress({
     throw new Error("Invalid signature");
   }
 
+  // The signature column in the schema is VARCHAR(255). EIP-1271 signatures
+  // can be longer than that, so we truncate them to fit in the database.
+  let signature = data.signature;
+  if (signature.length > 255) {
+    signature = signature.substring(0, 252) + "...";
+  }
+
   const submission = await prisma.ballotSubmittions.upsert({
     where: {
       address_round: {
@@ -46,14 +53,14 @@ async function submitBallotForAddress({
       },
     },
     update: {
-      signature: data.signature,
+      signature: signature,
       payload,
       updated_at: new Date(),
     },
     create: {
       round: roundId,
       address,
-      signature: data.signature,
+      signature: signature,
       payload,
     },
   });
