@@ -233,6 +233,7 @@ model Categories {
   impact_statments     ImpactStatements[]
   project_applicants   ProjectApplicants[]
 
+  @@unique([slug, round], map: "unique_slug_round")
   @@map("categories")
   @@schema("retro_funding")
 }
@@ -246,7 +247,7 @@ model CategoryAllocations {
   created_at    DateTime   @default(now()) @db.Timestamptz(6)
   updated_at    DateTime   @default(now()) @db.Timestamptz(6)
   ballots       Ballots    @relation(fields: [address, round], references: [address, round], onDelete: Cascade, onUpdate: NoAction)
-  categories    Categories @relation(fields: [category_slug], references: [slug], onDelete: NoAction, onUpdate: NoAction)
+  categories    Categories @relation(fields: [category_slug, round], references: [slug, round], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([address, round, category_slug])
   @@map("category_allocations")
