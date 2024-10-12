@@ -12,6 +12,9 @@ const filterMap = {
   eth_core: "ETHEREUM_CORE_CONTRIBUTIONS",
   op_tooling: "OP_STACK_TOOLING",
   op_rnd: "OP_STACK_RESEARCH_AND_DEVELOPMENT",
+  gov_infra: "GOVERNANCE_INFRA_AND_TOOLING",
+  gov_analytics: "GOVERNANCE_ANALYTICS",
+  gov_leadership: "GOVERNANCE_LEADERSHIP",
 };
 
 async function getProjectsApi({
@@ -66,6 +69,7 @@ async function getProjectsApi({
             statement: data.impact_statement,
           },
           testimonials: `https://www.metricsgarden.xyz/projects/${data.project_id}/contributions/${data.project_id}`,
+          impactMetrics: projectData.impactMetrics || undefined,
         };
       });
     }
@@ -110,6 +114,7 @@ async function getProjectsApi({
           statement: null,
         },
         testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
+        impactMetrics: undefined,
       };
     });
   }, pagination);
@@ -165,6 +170,7 @@ async function getProjectApi({
       statement: project.impact_statement,
     },
     testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
+    impactMetrics: projectData.impactMetrics,
   };
 }
 

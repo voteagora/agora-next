@@ -1039,27 +1039,6 @@ components:
             oneOf:
               - type: string
               - type: object
-                properties:
-                  repo_rank:
-                    type: number
-                  star_count:
-                    type: number
-                  starred_events:
-                    type: number
-                  starred_by_top_devs:
-                    type: number
-                  fork_count:
-                    type: number
-                  forked_events:
-                    type: number
-                  forked_by_top_devs:
-                    type: number
-                  fulltime_developer_average_6_months:
-                    type: number
-                  new_contributor_count_6_months:
-                    type: number
-                  age_of_project_years:
-                    type: number
         packages:
           type: array
           items:
@@ -2264,6 +2243,9 @@ paths:
               - eth_core
               - op_tooling
               - op_rnd
+              - gov_infra
+              - gov_analytics
+              - gov_leadership
       responses:
         "200":
           description: OK

@@ -13,7 +13,15 @@ const DEFAULT_OFFSET = 0;
 const DEFAULT_FILTER = "all";
 
 const filterValidator = createOptionalStringValidator(
-  ["all", "eth_core", "op_tooling", "op_rnd"],
+  [
+    "all",
+    "eth_core",
+    "op_tooling",
+    "op_rnd",
+    "gov_infra",
+    "gov_analytics",
+    "gov_leadership",
+  ],
   DEFAULT_FILTER
 );
 
