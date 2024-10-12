@@ -37,7 +37,7 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const isBadgeholder = await fetchBadgeholder(
+  const { isBadgeholder } = await fetchBadgeholder(
     route.params.ballotCasterAddressOrEns
   );
 
