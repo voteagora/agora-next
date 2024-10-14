@@ -220,6 +220,54 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
           />
         </svg>
       );
+    case TENANT_NAMESPACES.DERIVE:
+      return (
+        <svg
+          width="38"
+          height="36"
+          viewBox="0 0 38 36"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g clip-path="url(#clip0_559_2)">
+            <path
+              d="M36.8876 21.3436L23.5398 0.645446C23.4737 0.545239 23.3214 0.5865 23.3156 0.707336C23.284 1.23194 22.8529 4.02881 19.7775 4.02881C17.2827 4.02881 16.1301 3.56907 13.5606 3.56907C12.6724 3.56907 11.6147 4.08482 11.06 4.94835L10.0109 6.57519L20.0534 22.1423H23.9825C25.1408 22.1423 26.2215 22.7376 26.8595 23.7279L29.2565 27.4502H37.4251V23.1709C37.4251 22.5225 37.2383 21.8859 36.8876 21.3436ZM25.934 12.4784C24.3216 11.8094 23.0656 8.87403 23.0656 8.87403C26.3249 8.87403 28.5208 12.8557 28.5208 12.8557C28.5208 12.8557 27.5494 13.1475 25.9369 12.4784H25.934Z"
+              fill="url(#paint0_linear_559_2)"
+            />
+            <path
+              d="M24.8074 35.4075H10.0569C8.9963 35.4075 8.01043 34.8654 7.42411 33.9577L1.14681 24.223C0.382275 23.0382 0.382275 21.5027 1.14681 20.318L8.13117 9.49881H8.13402L24.8074 35.4104V35.4075Z"
+              fill="url(#paint1_linear_559_2)"
+            />
+          </g>
+          <defs>
+            <linearGradient
+              id="paint0_linear_559_2"
+              x1="23.718"
+              y1="27.4502"
+              x2="23.718"
+              y2="0.589452"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#FCB124" />
+              <stop offset="1" stop-color="#F63E58" />
+            </linearGradient>
+            <linearGradient
+              id="paint1_linear_559_2"
+              x1="12.6926"
+              y1="35.4104"
+              x2="12.6926"
+              y2="9.49294"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#FCB124" />
+              <stop offset="1" stop-color="#F63E58" />
+            </linearGradient>
+            <clipPath id="clip0_559_2">
+              <rect width="38" height="36" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>
+      );
 
     case TENANT_NAMESPACES.OPTIMISM:
     default:

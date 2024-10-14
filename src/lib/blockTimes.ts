@@ -20,6 +20,10 @@ export function getSecondsPerBlock(): number {
     case 0: //
       return 3;
 
+    case 957: // Derive Mainnet
+      // TODO: Change this to the correct value
+      return 3;
+
     case 7560: // Cyber Mainnet
     case 111557560: // Cyber Testnet
       return 2;

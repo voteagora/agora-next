@@ -29,6 +29,7 @@ export const TENANT_NAMESPACES = {
   OPTIMISM: "optimism",
   UNISWAP: "uniswap",
   CYBER: "cyber",
+  DERIVE: "derive",
 } as const;
 
 export const proposalsFilterOptions = {
