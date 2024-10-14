@@ -33,7 +33,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
       functionName: "delay",
     });
 
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContract } = useWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({
@@ -41,9 +41,10 @@ export const BravoGovExecute = ({ proposal }: Props) => {
     });
 
   useEffect(() => {
-    const delayInSeconds = blocksToSeconds(Number(executionDelayInBlocks));
-
-    console.log(delayInSeconds);
+    const delayInSeconds =
+      Number(executionDelayInBlocks?.toString()) > 0
+        ? blocksToSeconds(Number(executionDelayInBlocks))
+        : 0;
 
     let executeTimeInSeconds = 0;
 
@@ -89,7 +90,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
               {!isFetched && (
                 <Button
                   onClick={() =>
-                    write({
+                    writeContract({
                       address: contracts.governor.address as `0x${string}`,
                       abi: contracts.governor.abi,
                       functionName: "execute",
