@@ -1,9 +1,9 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
+import deriveHero from "@/assets/tenant/derive_hero.svg";
 import deriveLogo from "@/assets/tenant/derive_logo.svg";
 import delegateImage from "@/assets/tenant/derive_delegate.svg";
-import successImage from "@/assets/tenant/etherfi_success.svg";
-import pendingImage from "@/assets/tenant/etherfi_pending.svg";
+import successImage from "@/assets/tenant/derive_success.svg";
+import pendingImage from "@/assets/tenant/derive_pending.svg";
 
 export const deriveTenantUIConfig = new TenantUI({
   title: "Derive Agora",
@@ -39,7 +39,7 @@ export const deriveTenantUIConfig = new TenantUI({
       title: "Agora is the home of Derive governance",
       description:
         "Derive governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
-      hero: etherfiHero,
+      hero: deriveHero,
       meta: {
         title: "Derive Agora",
         description: "Home of token governance",
@@ -52,7 +52,7 @@ export const deriveTenantUIConfig = new TenantUI({
       title: "Agora is the home of Derive governance",
       description:
         "Derive governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
-      hero: etherfiHero,
+      hero: deriveHero,
       meta: {
         title: "Derive Agora",
         description: "Home of token governance",
@@ -65,7 +65,7 @@ export const deriveTenantUIConfig = new TenantUI({
       title: "Agora is the home of Derive delegates",
       description:
         "Derive voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
-      hero: etherfiHero,
+      hero: deriveHero,
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -79,7 +79,7 @@ export const deriveTenantUIConfig = new TenantUI({
       title: "Agora is the home of Dervice delegates",
       description:
         "Dervie voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
-      hero: etherfiHero,
+      hero: deriveHero,
       meta: {
         title: "Derive Agora",
         description: "Home of token governance",

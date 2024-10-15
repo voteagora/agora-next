@@ -39,11 +39,13 @@ export const derive = /*#__PURE__*/ defineChain({
 });
 
 export const deriveTenantConfig = ({
-                                     isProd,
-                                     alchemyId,
-                                   }: Props): TenantContracts => {
+  isProd,
+  alchemyId,
+}: Props): TenantContracts => {
   const TOKEN = isProd ? "0x0" : "0xCDbD011A4852d173b7b2c3aa80606B230d4ce58A";
-  const GOVERNOR = isProd ? "0x0" : "0x6465AbAF0bF54c907109F7456079F467459587EB";
+  const GOVERNOR = isProd
+    ? "0x0"
+    : "0x6465AbAF0bF54c907109F7456079F467459587EB";
 
   const rpcURL = isProd
     ? `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`

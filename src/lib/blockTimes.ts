@@ -45,7 +45,7 @@ export function getSecondsPerBlock(): number {
  */
 export function getHumanBlockTime(
   blockNumber: number | string | bigint,
-  latestBlock: Block,
+  latestBlock: Block
 ) {
   switch (chainId) {
     // Optimism
@@ -56,11 +56,11 @@ export function getHumanBlockTime(
 
       const blocksBeforeBedrock = Math.max(
         bedrockBlockNumber - Number(blockNumber),
-        0,
+        0
       );
       const blocksAfterBedrock = Math.min(
         Number(latestBlock.number) - bedrockBlockNumber,
-        Number(latestBlock.number) - Number(blockNumber),
+        Number(latestBlock.number) - Number(blockNumber)
       );
 
       const timeBeforeBedrock =
@@ -68,10 +68,9 @@ export function getHumanBlockTime(
       const timeAfterBedrock = blocksAfterBedrock * blockSeconds;
 
       return new Date(
-        (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000,
+        (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
       );
     }
-
 
     case 0:
       const blockSeconds = getSecondsPerBlock();
