@@ -17,11 +17,10 @@ export function getSecondsPerBlock(): number {
     case 10: // Optimism
       return 2;
 
-    case 0: //
-      return 3;
+    case 957: // Derive
+      return 2;
 
-    case 957: // Derive Mainnet
-      // TODO: Change this to the correct value
+    case 0: //
       return 3;
 
     case 7560: // Cyber Mainnet
@@ -46,7 +45,7 @@ export function getSecondsPerBlock(): number {
  */
 export function getHumanBlockTime(
   blockNumber: number | string | bigint,
-  latestBlock: Block
+  latestBlock: Block,
 ) {
   switch (chainId) {
     // Optimism
@@ -57,11 +56,11 @@ export function getHumanBlockTime(
 
       const blocksBeforeBedrock = Math.max(
         bedrockBlockNumber - Number(blockNumber),
-        0
+        0,
       );
       const blocksAfterBedrock = Math.min(
         Number(latestBlock.number) - bedrockBlockNumber,
-        Number(latestBlock.number) - Number(blockNumber)
+        Number(latestBlock.number) - Number(blockNumber),
       );
 
       const timeBeforeBedrock =
@@ -69,16 +68,24 @@ export function getHumanBlockTime(
       const timeAfterBedrock = blocksAfterBedrock * blockSeconds;
 
       return new Date(
-        (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
+        (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000,
       );
     }
 
-    //
+
     case 0:
       const blockSeconds = getSecondsPerBlock();
       const estNewDaoSecondsDiff =
         (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estNewDaoSecondsDiff) * 1000);
+
+    // Derive Mainnet
+    case 957: {
+      const blockSeconds = getSecondsPerBlock();
+      const estNewDaoSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estNewDaoSecondsDiff) * 1000);
+    }
 
     //   Cyber Mainnet
     //   Cyber Testnet
