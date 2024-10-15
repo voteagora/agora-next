@@ -7,36 +7,12 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { JsonRpcProvider } from "ethers";
-import { defineChain } from "viem";
+import { lyra } from "viem/chains";
 
 interface Props {
   isProd: boolean;
   alchemyId: string;
 }
-
-export const derive = /*#__PURE__*/ defineChain({
-  id: 957,
-  name: "Derive",
-  network: "dervie",
-  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-  rpcUrls: {
-    default: {
-      http: ["rpc.lyra.finance"],
-      webSocket: ["wss://rpc.lyra.finance"],
-    },
-    public: {
-      http: ["rpc.lyra.finance"],
-      webSocket: ["wss://rpc.lyra.finance"],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Explorer",
-      url: "https://explorer.lyra.finance",
-    },
-  },
-  testnet: false,
-});
 
 export const deriveTenantConfig = ({
   isProd,
@@ -52,7 +28,7 @@ export const deriveTenantConfig = ({
     : `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
 
   const provider = new JsonRpcProvider(rpcURL);
-  const chain = derive;
+  const chain = lyra;
 
   return {
     token: new TenantContract<ITokenContract>({

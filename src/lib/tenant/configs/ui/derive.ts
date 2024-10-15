@@ -33,6 +33,13 @@ export const deriveTenantUIConfig = new TenantUI({
     },
   ],
 
+  smartAccountConfig: {
+    factoryAddress: "0x0000000000400CdFef5E2714E63d8040b700BC24",
+    version: "v2.0.0",
+    type: "LightAccount",
+    salt: BigInt(0),
+  },
+
   pages: [
     {
       route: "/",

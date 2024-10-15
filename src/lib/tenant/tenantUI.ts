@@ -15,10 +15,11 @@ type UIConfig = PLMConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
-export type UISmartAccount = {
-  factoryAddress: string;
+export type UISmartAccountConfig = {
+  factoryAddress: `0x${string}`;
   version: "v1.1.0" | "v2.0.0";
   type: "LightAccount";
+  salt: bigint;
 };
 
 export type UILink = {
@@ -82,7 +83,7 @@ type TenantUIParams = {
   logo: string;
   organization?: UIOrganization;
   pages?: UIPage[];
-  smartAccount?: UISmartAccount;
+  smartAccountConfig?: UISmartAccountConfig;
   title: string;
   toggles?: UIToggle[];
   customization?: {
@@ -142,7 +143,7 @@ export class TenantUI {
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
-  private _smartAccount?: UISmartAccount;
+  private _smartAccountConfig?: UISmartAccountConfig;
 
   constructor({
     assets,
@@ -157,7 +158,7 @@ export class TenantUI {
     logo,
     organization,
     pages,
-    smartAccount,
+    smartAccountConfig,
     title,
     toggles,
   }: TenantUIParams) {
@@ -173,7 +174,7 @@ export class TenantUI {
     this._logo = logo;
     this._organization = organization;
     this._pages = pages;
-    this._smartAccount = smartAccount;
+    this._smartAccountConfig = smartAccountConfig;
     this._title = title;
     this._toggles = toggles;
   }
@@ -273,9 +274,7 @@ export class TenantUI {
     return result;
   }
 
-  public smartAccount(): UISmartAccount | undefined {
-    return this._smartAccount;
-
-    // TODO: This tenant needs to return both wallet and a signer
+  public get smartAccountConfig(): UISmartAccountConfig | undefined {
+    return this._smartAccountConfig;
   }
 }
