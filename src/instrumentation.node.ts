@@ -28,6 +28,7 @@ const sdk = new NodeSDK({
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),
   }),
+  // @ts-ignore
   spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
 });
 sdk.start();

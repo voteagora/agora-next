@@ -2,9 +2,9 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 
@@ -26,7 +26,7 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
-  const { data: adminAddress, isFetched: isAdminFetched } = useContractRead({
+  const { data: adminAddress, isFetched: isAdminFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "admin",
@@ -36,16 +36,10 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
     isAdminFetched &&
     adminAddress?.toString().toLowerCase() === address?.toLowerCase();
 
-  const { data, write } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: "cancel",
-    args: proposalToCallArgs(proposal),
-  });
-
+  const { writeContract: write, data } = useWriteContract();
   const { isLoading, isSuccess, isError, isFetched, error } =
-    useWaitForTransaction({
-      hash: data?.hash,
+    useWaitForTransactionReceipt({
+      hash: data,
     });
 
   useEffect(() => {
@@ -76,7 +70,14 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
             <>
               {!isFetched && (
                 <Button
-                  onClick={() => write?.()}
+                  onClick={() =>
+                    write({
+                      address: contracts.governor.address as `0x${string}`,
+                      abi: contracts.governor.abi,
+                      functionName: "cancel",
+                      args: proposalToCallArgs(proposal),
+                    })
+                  }
                   variant="outline"
                   loading={isLoading}
                 >

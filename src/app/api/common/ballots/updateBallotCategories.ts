@@ -96,7 +96,11 @@ async function autobalanceCategories(
         round: roundId,
       },
     }),
-    prisma.categories.findMany({}),
+    prisma.categories.findMany({
+      where: {
+        round: roundId,
+      },
+    }),
   ]);
 
   const allocations = categories.map((category) => {

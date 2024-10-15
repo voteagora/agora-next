@@ -263,7 +263,8 @@ export function getProposalTotalValue(
   proposalData: ParsedProposalData[ProposalType]
 ) {
   switch (proposalData.key) {
-    case "STANDARD" || "OPTIMISTIC": {
+    case "STANDARD":
+    case "OPTIMISTIC": {
       return proposalData.kind.options.reduce((acc, option) => {
         return (
           option.values.reduce((sum, val) => {

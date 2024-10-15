@@ -14,7 +14,7 @@ export const DelegateProfileImage = ({
   votingPower,
 }: DelegateProfileImageProps) => {
   const { data } = useEnsName({
-    cacheTime: 23 * 60 * 60,
+    query: { staleTime: 23 * 60 * 60 },
     chainId: 1,
     address: address as `0x${string}`,
   });

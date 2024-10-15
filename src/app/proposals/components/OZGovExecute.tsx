@@ -2,9 +2,9 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
@@ -29,33 +29,28 @@ export const OZGovExecute = ({ proposal }: Props) => {
   const [executeTime, setExecuteTime] = useState(new Date());
 
   // Check whether user has the EXECUTOR_ROLE
-  const { data: hasExecuteRole, isFetched: fetchedRole } = useContractRead({
+  const { data: hasExecuteRole, isFetched: fetchedRole } = useReadContract({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "hasRole",
     args: [
       "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63", // EXECUTOR_ROLE
-      address,
+      address as `0x${string}`,
     ],
   });
 
   // Check whether time has passed
-  const { data: delayInBlocks, isFetched: fetchedDelay } = useContractRead({
+  const { data: delayInBlocks, isFetched: fetchedDelay } = useReadContract({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
   });
 
-  const { data, write } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: "execute",
-    args: proposalToCallArgs(proposal),
-  });
+  const { data, writeContract: write } = useWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
-    useWaitForTransaction({
-      hash: data?.hash,
+    useWaitForTransactionReceipt({
+      hash: data,
     });
 
   useEffect(() => {
@@ -103,7 +98,17 @@ export const OZGovExecute = ({ proposal }: Props) => {
           ) : (
             <>
               {!isFetched && (
-                <Button onClick={() => write?.()} loading={isLoading}>
+                <Button
+                  onClick={() =>
+                    write({
+                      address: contracts.governor!.address as `0x${string}`,
+                      abi: contracts.governor!.abi,
+                      functionName: "execute",
+                      args: proposalToCallArgs(proposal),
+                    })
+                  }
+                  loading={isLoading}
+                >
                   Execute
                 </Button>
               )}
