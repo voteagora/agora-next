@@ -16,9 +16,9 @@ import { Input } from "@/components/ui/input";
 import { XCircle } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useWriteContract,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -70,7 +70,7 @@ export default function ProposalType({
     deleteProposalTypeArgs.push("0x" + "0".repeat(40));
   }
 
-  const { config: deleteProposalTypeConfig } = usePrepareContractWrite({
+  const { data: deleteProposalTypeConfig } = useSimulateContract({
     address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
     abi: contracts.proposalTypesConfigurator!.abi,
     functionName: "setProposalType",
@@ -78,12 +78,12 @@ export default function ProposalType({
   });
   const {
     data: resultDeleteProposalType,
-    write: writeDeleteProposalType,
-    isLoading: isLoadingDeleteProposalType,
-  } = useContractWrite(deleteProposalTypeConfig);
+    writeContract: writeDeleteProposalType,
+    isPending: isLoadingDeleteProposalType,
+  } = useWriteContract();
   const { isLoading: isLoadingDeleteProposalTypeTransaction } =
-    useWaitForTransaction({
-      hash: resultDeleteProposalType?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultDeleteProposalType,
     });
 
   const formValues = form.watch();
@@ -100,8 +100,8 @@ export default function ProposalType({
     setProposalTypeArgs.push("0x" + "0".repeat(40));
   }
 
-  const { config: setProposalTypeConfig, isError: setProposalTypeError } =
-    usePrepareContractWrite({
+  const { data: setProposalTypeConfig, isError: setProposalTypeError } =
+    useSimulateContract({
       address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
       abi: contracts.proposalTypesConfigurator!.abi,
       functionName: "setProposalType",
@@ -110,12 +110,12 @@ export default function ProposalType({
 
   const {
     data: resultSetProposalType,
-    write: writeSetProposalType,
-    isLoading: isLoadingSetProposalType,
-  } = useContractWrite(setProposalTypeConfig);
+    writeContract: writeSetProposalType,
+    isPending: isLoadingSetProposalType,
+  } = useWriteContract();
   const { isLoading: isLoadingSetProposalTypeTransaction } =
-    useWaitForTransaction({
-      hash: resultSetProposalType?.hash,
+    useWaitForTransactionReceipt({
+      hash: resultSetProposalType,
     });
   const isLoading =
     isLoadingDeleteProposalType ||
@@ -125,7 +125,7 @@ export default function ProposalType({
   const isDisabled = isLoading || name == "Optimistic";
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
-    writeSetProposalType?.();
+    writeSetProposalType(setProposalTypeConfig!.request);
   }
 
   return (
@@ -140,7 +140,7 @@ export default function ProposalType({
               className="hover:bg-destructive/10 group w-9 h-9"
               disabled={isDisabled || setProposalTypeError}
               onClick={() => {
-                writeDeleteProposalType?.();
+                writeDeleteProposalType(deleteProposalTypeConfig!.request);
               }}
               type="button"
             >

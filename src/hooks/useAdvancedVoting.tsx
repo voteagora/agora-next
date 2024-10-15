@@ -1,9 +1,10 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
-import { useContractWrite } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransaction } from "wagmi/actions";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { config } from "@/app/Web3Provider";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -23,42 +24,11 @@ const useAdvancedVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { writeAsync: advancedVote, isError: _advancedVoteError } =
-    useContractWrite({
-      address: contracts.alligator!.address as `0x${string}`,
-      abi: contracts.alligator!.abi,
-      functionName: "limitedCastVoteWithReasonAndParamsBatched",
-      args: [
-        advancedVP,
-        authorityChains as any,
-        BigInt(proposalId),
-        support,
-        reason,
-        params ?? "0x",
-      ],
-      chainId: contracts.alligator?.chain.id,
-    });
+  const { writeContractAsync: advancedVote, isError: _advancedVoteError } =
+    useWriteContract();
 
-  const { writeAsync: standardVote, isError: _standardVoteError } =
-    useContractWrite({
-      address: contracts.governor.address as `0x${string}`,
-      abi: contracts.governor.abi,
-      functionName: reason
-        ? params
-          ? "castVoteWithReasonAndParams"
-          : "castVoteWithReason"
-        : params
-          ? "castVoteWithReasonAndParams"
-          : "castVote",
-      args: reason
-        ? params
-          ? [BigInt(proposalId), support, reason, params]
-          : [BigInt(proposalId), support, reason]
-        : params
-          ? [BigInt(proposalId), support, reason, params]
-          : ([BigInt(proposalId), support] as any),
-      chainId: contracts.governor.chain.id,
-    });
+  const { writeContractAsync: standardVote, isError: _standardVoteError } =
+    useWriteContract();
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
   const [advancedVoteError, setAdvancedVoteError] =
@@ -77,13 +47,31 @@ const useAdvancedVoting = ({
   const write = useCallback(() => {
     const _standardVote = async () => {
       setStandardVoteLoading(true);
-      const directTx = await standardVote();
+      const directTx = await standardVote({
+        address: contracts.governor.address as `0x${string}`,
+        abi: contracts.governor.abi,
+        functionName: reason
+          ? params
+            ? "castVoteWithReasonAndParams"
+            : "castVoteWithReason"
+          : params
+            ? "castVoteWithReasonAndParams"
+            : "castVote",
+        args: reason
+          ? params
+            ? [BigInt(proposalId), support, reason, params]
+            : [BigInt(proposalId), support, reason]
+          : params
+            ? [BigInt(proposalId), support, reason, params]
+            : ([BigInt(proposalId), support] as any),
+        chainId: contracts.governor.chain.id,
+      });
       try {
-        const { status } = await waitForTransaction({
-          hash: directTx.hash,
+        const { status } = await waitForTransactionReceipt(config, {
+          hash: directTx,
         });
         if (status === "success") {
-          setStandardTxHash(directTx.hash);
+          setStandardTxHash(directTx);
           setStandardVoteSuccess(true);
         }
       } catch (error) {
@@ -96,13 +84,26 @@ const useAdvancedVoting = ({
 
     const _advancedVote = async () => {
       setAdvancedVoteLoading(true);
-      const advancedTx = await advancedVote();
+      const advancedTx = await advancedVote({
+        address: contracts.alligator!.address as `0x${string}`,
+        abi: contracts.alligator!.abi,
+        functionName: "limitedCastVoteWithReasonAndParamsBatched",
+        args: [
+          advancedVP,
+          authorityChains as any,
+          BigInt(proposalId),
+          support,
+          reason,
+          params ?? "0x",
+        ],
+        chainId: contracts.alligator?.chain.id,
+      });
       try {
-        const { status } = await waitForTransaction({
-          hash: advancedTx.hash,
+        const { status } = await waitForTransactionReceipt(config, {
+          hash: advancedTx,
         });
         if (status === "success") {
-          setAdvancedTxHash(advancedTx.hash);
+          setAdvancedTxHash(advancedTx);
           setAdvancedVoteSuccess(true);
         }
       } catch (error) {

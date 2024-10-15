@@ -23,7 +23,7 @@ export default function ProposalVotesList({
   const { address: connectedAddress } = useAccount();
   const { advancedDelegators } = useConnectedDelegate();
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialProposalVotes] || []);
+  const [pages, setPages] = useState([initialProposalVotes]);
   const [meta, setMeta] = useState(initialProposalVotes.meta);
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
 
