@@ -74,6 +74,8 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
 
+  console.log(draftProposal);
+
   const router = useRouter();
   const { address } = useAccount();
   const tenant = Tenant.current();
@@ -152,21 +154,30 @@ const DraftFormClient = ({
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
               </div>
-              <div className="relative">
-                <SelectInput
-                  control={control}
-                  label="Proposal type"
-                  required={true}
-                  options={validProposalTypes.map((typeConfig) => {
-                    return {
-                      label: typeConfig.name,
-                      value: typeConfig.proposal_type_id,
-                    };
-                  })}
+
+              {validProposalTypes.length > 1 ? (
+                <div className="relative">
+                  <SelectInput
+                    control={control}
+                    label="Proposal type"
+                    required={true}
+                    options={validProposalTypes.map((typeConfig) => {
+                      return {
+                        label: typeConfig.name,
+                        value: typeConfig.proposal_type_id,
+                      };
+                    })}
+                    name="proposalConfigType"
+                    emptyCopy="Default"
+                  />
+                </div>
+              ) : (
+                <input
+                  type="hidden"
                   name="proposalConfigType"
-                  emptyCopy="Default"
+                  value={validProposalTypes[0]?.proposal_type_id || null}
                 />
-              </div>
+              )}
 
               <TextInput
                 label="Title"
@@ -208,7 +219,7 @@ const DraftFormClient = ({
                 className="w-[200px] flex items-center justify-center"
                 isLoading={isPending}
               >
-                Create draft
+                {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>
             </div>
           </FormCard.Section>
