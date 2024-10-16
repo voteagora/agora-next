@@ -257,7 +257,7 @@ model CategoryAllocations {
 model BallotSubmittions {
   address    String   @db.VarChar(255)
   round      Int
-  signature  String   @db.VarChar(255)
+  signature  String
   payload    String
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @db.Timestamptz(6)
