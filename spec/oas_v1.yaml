@@ -1113,6 +1113,17 @@ components:
                     type: string
                   details:
                     type: string
+            investments:
+              type: array
+              items:
+                type: object
+                properties:
+                  amount:
+                    type: string
+                  year:
+                    type: string
+                  details:
+                    type: string
         pricingModel:
           type: object
           properties:
