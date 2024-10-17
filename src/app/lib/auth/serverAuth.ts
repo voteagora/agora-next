@@ -9,6 +9,7 @@ import {
   ROLE_PUBLIC_READER,
   ROLE_BADGEHOLDER,
   ROLE_RF_DEMO_USER,
+  ROLE_CITIZEN,
 } from "@/app/lib/auth/constants";
 import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
@@ -94,6 +95,7 @@ export async function generateJwt(
     sub: userId,
     scope: scope,
     isBadgeholder: scope.includes(ROLE_BADGEHOLDER),
+    isCitizen: scope.includes(ROLE_CITIZEN),
     category: suppliedRoles
       .find((role) => role.startsWith("category:"))
       ?.substring("category:".length)
@@ -133,12 +135,15 @@ export async function getRolesForUser(
   if (siweData) {
     roles.push(ROLE_RF_DEMO_USER); // All Siwe users are RF voters
 
-    const { isBadgeholder, votingCategory } = await fetchBadgeholder(
+    const { isBadgeholder, votingCategory, isCitizen } = await fetchBadgeholder(
       siweData.address
     );
     roles.push(votingCategory);
     if (isBadgeholder) {
       roles.push(ROLE_BADGEHOLDER);
+    }
+    if (isCitizen) {
+      roles.push(ROLE_CITIZEN);
     }
   }
 
