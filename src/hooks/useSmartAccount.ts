@@ -54,7 +54,7 @@ export const useSmartAccount = () => {
           }
         })
         .catch((error) => {
-          console.log("Error creating smart account client", error);
+          console.log("Error creating Alchemy smart account client", error);
           setIsError(true);
         })
         .finally(() => {

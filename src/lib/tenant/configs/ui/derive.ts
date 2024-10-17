@@ -105,5 +105,9 @@ export const deriveTenantUIConfig = new TenantUI({
       name: "proposals",
       enabled: true,
     },
+    {
+      name: "delegates/edit",
+      enabled: true,
+    },
   ],
 });

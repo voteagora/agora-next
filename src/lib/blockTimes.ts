@@ -79,7 +79,9 @@ export function getHumanBlockTime(
       return new Date((latestBlock.timestamp - estNewDaoSecondsDiff) * 1000);
 
     // Derive Mainnet
-    case 957: {
+    // Derive Testnet
+    case 957: // Testnet
+    case 901: {
       const blockSeconds = getSecondsPerBlock();
       const estNewDaoSecondsDiff =
         (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
