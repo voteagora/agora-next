@@ -5,15 +5,18 @@ import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/Appr
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
-import { formatFullDate } from "@/lib/utils";
+import { cn, formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { DraftProposal, ProposalGatingType } from "@/app/proposals/draft/types";
+import {
+  DraftProposal,
+  PLMConfig,
+  ProposalGatingType,
+  ProposalType,
+} from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalType } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import styles from "@/components/Proposals/ProposalPage/ProposalDescription/proposalDescription.module.scss";
-import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 
 const PreText = ({ text }: { text: string }) => {
@@ -32,7 +35,7 @@ const DraftPreview = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();

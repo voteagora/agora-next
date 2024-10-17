@@ -4,10 +4,10 @@ import { useState } from "react";
 import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
 import { createSnapshot } from "../../draft/utils/createSnapshot";
-import { SocialProposal } from "../../../proposals/draft/types";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
+import { PLMConfig, SocialProposal } from "@/app/proposals/draft/types";
 
 const SocialProposalAction = ({
   draftProposal,
@@ -36,7 +36,7 @@ const SocialProposalAction = ({
 
           // TODO: make snapshot pull from config
           const snapshotLink = isProd
-            ? `https://snapshot.org/#/${plmToggle?.config?.snapshotConfig?.domain}/proposal/${proposalId}`
+            ? `https://snapshot.org/#/${(plmToggle?.config as PLMConfig)?.snapshotConfig?.domain}/proposal/${proposalId}`
             : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
 
           await sponsorDraftProposal({

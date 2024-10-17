@@ -12,7 +12,7 @@ import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
-import { DraftProposal, ProposalGatingType } from "../types";
+import { DraftProposal, PLMConfig, ProposalGatingType } from "../types";
 import Tenant from "@/lib/tenant/tenant";
 
 const RequestSponsorshipForm = ({
@@ -22,7 +22,7 @@ const RequestSponsorshipForm = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
 

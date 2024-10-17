@@ -6,33 +6,48 @@ import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
+import Tenant from "@/lib/tenant/tenant";
+import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 
 const FILTER_PARAM = "endorsedFilter";
-const DEFAULT_FILTER = "true";
 
 export default function EndorsedFilter() {
+  const { ui } = Tenant.current();
   const router = useRouter();
   const searchParams = useSearchParams();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
-  const filterParam = searchParams?.get(FILTER_PARAM) || "true";
   const { setIsDelegatesFiltering } = useAgoraContext();
 
-  let endorsedFilterOptions: any = {
-    true: {
-      value: "Endorsed Delegates",
-      sort: "true",
-    },
-    false: {
-      value: "All Delegates",
-      sort: "false",
-    },
-  };
+  const toggle = ui.toggle("delegates/endorsed-filter");
+  const hasEndorsedFilter = Boolean(
+    toggle?.enabled && toggle?.config !== undefined
+  );
+
+  if (!hasEndorsedFilter || !toggle) {
+    return null;
+  }
+
+  const filterParam =
+    searchParams?.get(FILTER_PARAM) ||
+    (toggle.config as UIEndorsedConfig).defaultFilter.toString();
+
+  const endorsedFilterOptions: Record<string, { value: string; sort: string }> =
+    {
+      true: {
+        value: (toggle.config as UIEndorsedConfig).showFilterLabel,
+        sort: "true",
+      },
+      false: {
+        value: (toggle.config as UIEndorsedConfig).hideFilterLabel,
+        sort: "false",
+      },
+    };
 
   const handleChange = (value: string) => {
     setIsDelegatesFiltering(true);
     router.push(
-      value === DEFAULT_FILTER
+      value === (toggle.config as UIEndorsedConfig).defaultFilter.toString()
         ? deleteSearchParam({ name: FILTER_PARAM })
         : addSearchParam({ name: FILTER_PARAM, value }),
       { scroll: false }
@@ -57,19 +72,17 @@ export default function EndorsedFilter() {
           <Listbox.Options className="mt-3 absolute bg-wash border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
             {Object.keys(endorsedFilterOptions).map((key) => (
               <Listbox.Option key={key} value={key} as={Fragment}>
-                {({ selected }) => {
-                  return (
-                    <li
-                      className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:text-primary hover:bg-tertiary/20 ${
-                        selected
-                          ? "text-primary bg-tertiary/20"
-                          : "text-secondary border-transparent"
-                      }`}
-                    >
-                      {endorsedFilterOptions[key].value}
-                    </li>
-                  );
-                }}
+                {({ selected }) => (
+                  <li
+                    className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:text-primary hover:bg-tertiary/20 ${
+                      selected
+                        ? "text-primary bg-tertiary/20"
+                        : "text-secondary border-transparent"
+                    }`}
+                  >
+                    {endorsedFilterOptions[key].value}
+                  </li>
+                )}
               </Listbox.Option>
             ))}
           </Listbox.Options>
