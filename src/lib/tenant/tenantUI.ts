@@ -13,6 +13,15 @@ type UIToggle = {
 // their proposal lifecycle feature
 type UIConfig = PLMConfig;
 
+// Note: Modular accounts are not yet supported
+// https://accountkit.alchemy.com/smart-contracts/light-account
+export type UISmartAccountConfig = {
+  factoryAddress: `0x${string}`;
+  version: "v1.1.0" | "v2.0.0";
+  type: "LightAccount";
+  salt: bigint;
+};
+
 export type UILink = {
   name: string;
   title: string;
@@ -74,6 +83,7 @@ type TenantUIParams = {
   logo: string;
   organization?: UIOrganization;
   pages?: UIPage[];
+  smartAccountConfig?: UISmartAccountConfig;
   title: string;
   toggles?: UIToggle[];
   customization?: {
@@ -104,7 +114,6 @@ export class TenantUI {
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hideAgoraBranding?: boolean;
-  private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
   private _organization?: UIOrganization;
@@ -134,11 +143,13 @@ export class TenantUI {
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
+  private _smartAccountConfig?: UISmartAccountConfig;
+
   constructor({
     assets,
     customization,
-    favicon,
     delegates,
+    favicon,
     googleAnalytics,
     governanceIssues,
     governanceStakeholders,
@@ -147,13 +158,14 @@ export class TenantUI {
     logo,
     organization,
     pages,
+    smartAccountConfig,
     title,
     toggles,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
-    this._favicon = favicon;
     this._delegates = delegates;
+    this._favicon = favicon;
     this._googleAnalytics = googleAnalytics;
     this._governanceIssues = governanceIssues;
     this._governanceStakeholders = governanceStakeholders;
@@ -162,6 +174,7 @@ export class TenantUI {
     this._logo = logo;
     this._organization = organization;
     this._pages = pages;
+    this._smartAccountConfig = smartAccountConfig;
     this._title = title;
     this._toggles = toggles;
   }
@@ -259,5 +272,9 @@ export class TenantUI {
     const result = this._pages?.find((t) => t.route === route);
     this._pagesCache[route] = result;
     return result;
+  }
+
+  public get smartAccountConfig(): UISmartAccountConfig | undefined {
+    return this._smartAccountConfig;
   }
 }

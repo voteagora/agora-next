@@ -37,6 +37,13 @@ export default class TenantTokenFactory {
           symbol: "cCYBER",
           decimals: 18,
         };
+
+      case TENANT_NAMESPACES.DERIVE:
+        return {
+          name: "CHANGEME - Derive",
+          symbol: "DERIVE",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
