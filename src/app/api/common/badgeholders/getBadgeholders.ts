@@ -17,6 +17,8 @@ const allowlist = [
   "0x6d97d65adff6771b31671443a6b9512104312d3d",
 ];
 
+const citizenAllowlist = ["0xe3b4b326d34686ea3a44dfa1e19e5ffd0dff04f3"];
+
 const getBadgeholder = async (addressOrEnsName: string) =>
   addressOrEnsNameWrap(getBadgeholderForAddress, addressOrEnsName);
 
@@ -33,9 +35,10 @@ async function getBadgeholderForAddress({ address }: { address: string }) {
 
   return {
     isBadgeholder: !!badgehodler || allowlist.includes(address),
-    isCitizen: badgehodler?.metadata
-      ? JSON.parse(badgehodler.metadata).voterType === "Citizen"
-      : false,
+    isCitizen:
+      (badgehodler?.metadata
+        ? JSON.parse(badgehodler.metadata).voterType === "Citizen"
+        : false) || citizenAllowlist.includes(address),
     votingCategory: badgehodler
       ? parseVotingCategory(JSON.parse(badgehodler.metadata).votingGroup)
       : randomVotingCategory(address),
