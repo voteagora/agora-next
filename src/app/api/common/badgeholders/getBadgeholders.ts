@@ -33,6 +33,9 @@ async function getBadgeholderForAddress({ address }: { address: string }) {
 
   return {
     isBadgeholder: !!badgehodler || allowlist.includes(address),
+    isCitizen: badgehodler?.metadata
+      ? JSON.parse(badgehodler.metadata).voterType === "Citizen"
+      : false,
     votingCategory: badgehodler
       ? parseVotingCategory(JSON.parse(badgehodler.metadata).votingGroup)
       : randomVotingCategory(address),
