@@ -1314,6 +1314,9 @@ components:
             - ETHEREUM_CORE_CONTRIBUTIONS
             - OP_STACK_RESEARCH_AND_DEVELOPMENT
             - OP_STACK_TOOLING
+            - GOVERNANCE_INFRA_AND_TOOLING
+            - GOVERNANCE_ANALYTICS
+            - GOVERNANCE_LEADERSHIP
         allocation:
           type: string
         locked:
@@ -2520,6 +2523,9 @@ paths:
                     - ETHEREUM_CORE_CONTRIBUTIONS
                     - OP_STACK_RESEARCH_AND_DEVELOPMENT
                     - OP_STACK_TOOLING
+                    - GOVERNANCE_INFRA_AND_TOOLING
+                    - GOVERNANCE_ANALYTICS
+                    - GOVERNANCE_LEADERSHIP
                 allocation:
                   type: number
                 locked:
