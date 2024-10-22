@@ -150,7 +150,7 @@ export default function SubmitButton({
   );
 }
 
-type BasicInputData = [string[], number[], string[], string, Number];
+type BasicInputData = [string[], bigint[], string[], string, Number];
 type ApprovalInputData = [string, string, string, Number];
 type InputData = BasicInputData | ApprovalInputData;
 
@@ -165,7 +165,7 @@ function getInputData(form: Form): {
 
   // provide default values for basic proposal
   let targets: string[] = [];
-  let values: number[] = [];
+  let values: bigint[] = [];
   let calldatas: string[] = [];
 
   let proposalSettings = Number(form.state.proposalSettings); // index as uint8 as last argument on propose and proposeWithModule
@@ -184,17 +184,17 @@ function getInputData(form: Form): {
 
       if (form.state.options[0].transactions.length === 0) {
         targets.push(ethers.ZeroAddress);
-        values.push(0);
+        values.push(BigInt(0));
         calldatas.push("0x");
       } else {
         form.state.options[0].transactions.forEach((t) => {
           if (t.type === "Transfer") {
             targets.push(governanceTokenContract.address);
-            values.push(0);
+            values.push(BigInt(0));
             calldatas.push(encodeTransfer(t.transferTo, t.transferAmount));
           } else {
             targets.push(ethers.getAddress(t.target));
-            values.push(Number(ethers.parseEther(t.value.toString() || "0")));
+            values.push(ethers.parseEther(t.value.toString() || "0"));
             calldatas.push(t.calldata);
           }
         });
