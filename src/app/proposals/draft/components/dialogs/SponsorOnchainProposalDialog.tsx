@@ -2,11 +2,9 @@ import { VStack } from "@/components/Layout/Stack";
 import { useRouter } from "next/navigation";
 import { useWaitForTransactionReceipt } from "wagmi";
 import Image from "next/image";
-import Link from "next/link";
-import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
-import { getBlockScanUrl } from "@/lib/utils";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -64,23 +62,7 @@ const SponsorOnchainProposalDialog = ({
                   : "View Proposals"}
               </UpdatedButton>
             </div>
-            {!isLoading && (
-              <div className="flex flex-row justify-between items-center mt-4">
-                <span className="text-secondary">
-                  View transaction on block explorer
-                </span>
-                <div className="flex flex-row items-center space-x-2">
-                  <Link href={`${getBlockScanUrl(txHash)}`}>
-                    <Image
-                      src={icons.link}
-                      height="16"
-                      width="16"
-                      alt="link icon"
-                    />
-                  </Link>
-                </div>
-              </div>
-            )}
+            {!isLoading && <BlockScanUrls hash1={txHash} />}
           </VStack>
         </VStack>
       </VStack>
