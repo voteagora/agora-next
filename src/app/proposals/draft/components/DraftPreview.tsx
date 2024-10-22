@@ -10,7 +10,7 @@ import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { DraftProposal, ProposalGatingType } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalType } from "@/app/proposals/draft/types";
+import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import styles from "@/components/Proposals/ProposalPage/ProposalDescription/proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
@@ -84,8 +84,8 @@ const DraftPreview = ({
           <p className="text-agora-stone-700 mt-2">
             This is an <PreText text="approval" /> proposal. The maximum number
             of tokens that can be transferred from all the options in this
-            proposal is <PreText text={proposal.budget} />. The number of
-            options each voter may select is{" "}
+            proposal is <PreText text={proposal.budget.toString()} />. The
+            number of options each voter may select is{" "}
             <PreText text={proposal.max_options.toString()} />.{" "}
             {proposal.criteria === "Threshold" &&
               `All options with more than ${proposal.threshold} votes will be considered approved.`}
@@ -114,6 +114,8 @@ const DraftPreview = ({
     }
   };
 
+  console.log(proposalDraft);
+
   return (
     <FormCard>
       <FormCard.Section>
@@ -122,25 +124,30 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {"transactions" in proposalDraft &&
-            proposalDraft.transactions.length > 0 && (
-              <ProposalTransactionDisplay
-                descriptions={proposalDraft.transactions.map(
-                  (t) => t.description
-                )}
-                targets={proposalDraft.transactions.map((t) => t.target)}
-                calldatas={
-                  proposalDraft.transactions.map(
-                    (t) => t.calldata
-                  ) as `0x${string}`[]
-                }
-                values={proposalDraft.transactions.map((t) => t.value)}
-                simulationDetails={{
-                  id: proposalDraft.transactions[0].simulation_id,
-                  state: proposalDraft.transactions[0].simulation_state,
-                }}
-              />
-            )}
+          {proposalDraft.voting_module_type === ProposalType.BASIC && (
+            <ProposalTransactionDisplay
+              descriptions={(proposalDraft as BasicProposal).transactions.map(
+                (t) => t.description
+              )}
+              targets={(proposalDraft as BasicProposal).transactions.map(
+                (t) => t.target
+              )}
+              calldatas={
+                (proposalDraft as BasicProposal).transactions.map(
+                  (t) => t.calldata
+                ) as `0x${string}`[]
+              }
+              values={(proposalDraft as BasicProposal).transactions.map(
+                (t) => t.value
+              )}
+              simulationDetails={{
+                id: (proposalDraft as BasicProposal).transactions[0]
+                  ?.simulation_id,
+                state: (proposalDraft as BasicProposal).transactions[0]
+                  ?.simulation_state,
+              }}
+            />
+          )}
         </div>
         {proposalDraft.voting_module_type === "social" && (
           <div>
