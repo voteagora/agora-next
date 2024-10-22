@@ -16,10 +16,9 @@ import {
   ProposalType,
   SocialProposalType,
   ProposalTypeMetadata,
-  parseProposalToForm,
   DraftProposal,
-  ApprovalProposal,
 } from "../../../types";
+import { parseProposalToForm } from "../../../utils/parseTransaction";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
 import ApprovalProposalForm from "../../ApprovalProposalForm";
@@ -73,8 +72,6 @@ const DraftFormClient = ({
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
-
-  console.log(draftProposal);
 
   const router = useRouter();
   const { address } = useAccount();
