@@ -4,6 +4,7 @@ import {
   ProposalDraftTransaction,
   ProposalSocialOption,
   ProposalChecklist,
+  ProposalDraftApprovedSponsors,
 } from "@prisma/client";
 
 // prisma schema spits out strings so I can't match against `0x{string}`
@@ -193,6 +194,7 @@ export type PLMConfig = {
 
 export type BaseProposal = ProposalDraft & {
   checklist_items: ProposalChecklist[];
+  approved_sponsors?: ProposalDraftApprovedSponsors[];
 };
 
 export type BasicProposal = BaseProposal & {

@@ -17,10 +17,8 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
-
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-
   const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
@@ -66,7 +64,13 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 };
 
 const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
-  const methods = useForm({});
+  const methods = useForm({
+    defaultValues: {
+      visibility: "Public",
+      sponsors: [{ address: "" }],
+    },
+  });
+
   return (
     <FormProvider {...methods}>
       <form>

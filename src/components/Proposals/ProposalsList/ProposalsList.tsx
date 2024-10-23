@@ -15,6 +15,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import ProposalListContainer from "./ProposalListContainer";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -76,59 +77,61 @@ export default function ProposalsList({
   const proposals = pages.flatMap((page) => page.data);
 
   return (
-    <VStack className="max-w-[76rem]">
-      {/* {address && <NonVotedProposalsList address={address} />} */}
-      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
-        <PageHeader headerText="All Proposals" />
-        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
-          <ProposalsFilter />
-          {tenantSupportsProposalLifecycle && address && (
-            <CreateProposalDraftButton address={address} />
-          )}
+    <>
+      <VStack className="max-w-[76rem]">
+        {/* {address && <NonVotedProposalsList address={address} />} */}
+        <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
+          <PageHeader headerText="All Proposals" />
+          <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
+            <ProposalsFilter />
+            {tenantSupportsProposalLifecycle && address && (
+              <CreateProposalDraftButton address={address} />
+            )}
+          </div>
         </div>
-      </div>
 
-      {governanceCalendar && (
-        <CurrentGovernanceStage
-          title={governanceCalendar.title}
-          endDate={governanceCalendar.endDate}
-          reviewPeriod={governanceCalendar.reviewPeriod}
-        />
-      )}
-      <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-        <div>
-          {proposals.length === 0 ? (
-            <div className="flex flex-row justify-center py-8 text-secondary">
-              No proposals currently
-            </div>
-          ) : (
-            <InfiniteScroll
-              hasMore={meta.has_next}
-              pageStart={0}
-              loadMore={loadMore}
-              loader={
-                <div key={0}>
-                  <HStack
-                    key="loader"
-                    className="gl_loader justify-center py-6 text-sm text-secondary"
-                  >
-                    Loading...
-                  </HStack>
-                </div>
-              }
-              element="main"
-            >
-              {proposals.map((proposal) => (
-                <Proposal
-                  key={`${proposal.id}_${proposal.status}`}
-                  proposal={proposal}
-                  votableSupply={votableSupply}
-                />
-              ))}
-            </InfiniteScroll>
-          )}
-        </div>
+        {governanceCalendar && (
+          <CurrentGovernanceStage
+            title={governanceCalendar.title}
+            endDate={governanceCalendar.endDate}
+            reviewPeriod={governanceCalendar.reviewPeriod}
+          />
+        )}
+        <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+          <div>
+            {proposals.length === 0 ? (
+              <div className="flex flex-row justify-center py-8 text-secondary">
+                No proposals currently
+              </div>
+            ) : (
+              <InfiniteScroll
+                hasMore={meta.has_next}
+                pageStart={0}
+                loadMore={loadMore}
+                loader={
+                  <div key={0}>
+                    <HStack
+                      key="loader"
+                      className="gl_loader justify-center py-6 text-sm text-secondary"
+                    >
+                      Loading...
+                    </HStack>
+                  </div>
+                }
+                element="main"
+              >
+                {proposals.map((proposal) => (
+                  <Proposal
+                    key={`${proposal.id}_${proposal.status}`}
+                    proposal={proposal}
+                    votableSupply={votableSupply}
+                  />
+                ))}
+              </InfiniteScroll>
+            )}
+          </div>
+        </VStack>
       </VStack>
-    </VStack>
+    </>
   );
 }

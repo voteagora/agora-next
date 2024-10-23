@@ -15,6 +15,10 @@ import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftPropo
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 import Image from "next/image";
 import { PaginationParams } from "./lib/pagination";
+import ProposalListContainer from "@/components/Proposals/ProposalsList/ProposalListContainer";
+import DraftProposalList from "@/components/Proposals/ProposalsList/DraftProposalList";
+import AllProposalList from "@/components/Proposals/ProposalsList/AllProposalList";
+import { Suspense } from "react";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -79,20 +83,26 @@ async function Home() {
     return <div>Route not supported for namespace</div>;
   }
 
-  const governanceCalendar = await fetchGovernanceCalendar();
-  const relevalntProposals = await fetchProposals(
-    proposalsFilterOptions.relevant.filter
-  );
-  const allProposals = await fetchProposals(
-    proposalsFilterOptions.everything.filter
-  );
+  //   const governanceCalendar = await fetchGovernanceCalendar();
+  //   const relevalntProposals = await fetchProposals(
+  //     proposalsFilterOptions.relevant.filter
+  //   );
+  //   const allProposals = await fetchProposals(
+  //     proposalsFilterOptions.everything.filter
+  //   );
 
-  const votableSupply = await fetchVotableSupply();
+  //   const votableSupply = await fetchVotableSupply();
 
   return (
     <div className="flex flex-col">
       <Hero />
-      <MyDraftProposals
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProposalListContainer
+          allProposalsListElement={<AllProposalList />}
+          draftProposalsListElement={<DraftProposalList />}
+        />
+      </Suspense>
+      {/* <MyDraftProposals
         fetchDraftProposals={async (address) => {
           "use server";
           return apiFetchDraftProposals(address);
@@ -120,7 +130,7 @@ async function Home() {
         }}
         governanceCalendar={governanceCalendar}
         votableSupply={votableSupply}
-      />
+      /> */}
     </div>
   );
 }
