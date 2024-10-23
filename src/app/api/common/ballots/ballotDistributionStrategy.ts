@@ -170,7 +170,7 @@ function topToBottom({
 }) {
   const a = (2 * (total - n * min)) / (n * (n - 1));
 
-  return (i: number) => Math.round(min + a * i * 100) / 100; // return the amount of funding for the i-th project
+  return (i: number) => Math.round((min + a * i) * 100) / 100; // return the amount of funding for the i-th project
 }
 
 function topWeighted({
