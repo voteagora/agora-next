@@ -58,7 +58,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     switch (proposal.status) {
       case PROPOSAL_STATUS.ACTIVE:
       case PROPOSAL_STATUS.PENDING:
-        return "This proposal still can be cancelled by the admin.";
+        return "This proposal can still be cancelled by the admin";
       case PROPOSAL_STATUS.SUCCEEDED:
         return "This proposal is now passed and can be queued for execution.";
       case PROPOSAL_STATUS.QUEUED:
