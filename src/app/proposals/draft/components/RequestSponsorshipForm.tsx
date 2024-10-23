@@ -12,7 +12,7 @@ import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
-import { DraftProposal, ProposalGatingType } from "../types";
+import { DraftProposal, ProposalGatingType, ProposalType } from "../types";
 import Tenant from "@/lib/tenant/tenant";
 
 const RequestSponsorshipForm = ({
@@ -27,6 +27,7 @@ const RequestSponsorshipForm = ({
   const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
+  const votingModuleType = draftProposal.voting_module_type;
 
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
@@ -37,6 +38,15 @@ const RequestSponsorshipForm = ({
   });
 
   const canSponsor = () => {
+    if (votingModuleType === ProposalType.SOCIAL) {
+      const requiredTokensForSnapshot =
+        plmToggle?.config?.snapshotConfig?.requiredTokens;
+      return (
+        accountVotesData !== undefined &&
+        requiredTokensForSnapshot !== undefined &&
+        accountVotesData >= requiredTokensForSnapshot
+      );
+    }
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;

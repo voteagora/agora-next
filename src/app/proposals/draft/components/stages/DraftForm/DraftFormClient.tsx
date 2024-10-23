@@ -12,13 +12,13 @@ import MarkdownTextareaInput from "../../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
 import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
+import { invalidatePath } from "../../../actions/revalidatePath";
 import {
   ProposalType,
   SocialProposalType,
   ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
-  ApprovalProposal,
 } from "../../../types";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
@@ -123,6 +123,7 @@ const DraftFormClient = ({
         setIsPending(false);
         toast("Something went wrong...");
       } else {
+        invalidatePath(draftProposal.id);
         router.push(
           `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
         );

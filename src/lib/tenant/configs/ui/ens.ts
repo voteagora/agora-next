@@ -135,6 +135,7 @@ export const ensTenantUIConfig = new TenantUI({
         proposalTypes: [ProposalType?.BASIC, ProposalType?.SOCIAL],
         snapshotConfig: {
           domain: "ens.eth",
+          requiredTokens: 10000,
         },
         copy: {
           helperText: `

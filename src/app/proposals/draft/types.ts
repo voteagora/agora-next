@@ -215,6 +215,7 @@ export type PLMConfig = {
   // optional config for including snapshot as a proposal type
   snapshotConfig?: {
     domain: string;
+    requiredTokens: number;
   };
   // The method for gating who can create a proposal
   // Manager -- only the manager can create proposals
@@ -317,6 +318,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         socialProposal: {
+          type: proposal.proposal_social_type,
           start_date: proposal.start_date_social,
           end_date: proposal.end_date_social,
           options: proposal.social_options,
