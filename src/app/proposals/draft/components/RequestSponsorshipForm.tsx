@@ -27,6 +27,7 @@ const RequestSponsorshipForm = ({
   const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
+  const votingModuleType = watch("votingModuleType");
 
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
@@ -37,6 +38,15 @@ const RequestSponsorshipForm = ({
   });
 
   const canSponsor = () => {
+    if (votingModuleType === "snapshot") {
+      const requiredTokensForSnapshot =
+        plmToggle?.config?.snapshotConfig?.requiredTokens;
+      return (
+        accountVotesData !== undefined &&
+        requiredTokensForSnapshot !== undefined &&
+        accountVotesData >= requiredTokensForSnapshot
+      );
+    }
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;

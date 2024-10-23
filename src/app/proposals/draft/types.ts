@@ -215,6 +215,7 @@ export type PLMConfig = {
   // optional config for including snapshot as a proposal type
   snapshotConfig?: {
     domain: string;
+    requiredTokens: number;
   };
   // The method for gating who can create a proposal
   // Manager -- only the manager can create proposals
