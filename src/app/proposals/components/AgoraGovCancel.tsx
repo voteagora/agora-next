@@ -2,21 +2,14 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
-  useReadContract,
-  useWriteContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 
 interface Props {
   proposal: Proposal;
@@ -26,14 +19,8 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
-  const { data: adminAddress, isFetched: isAdminFetched } = useReadContract({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: "admin",
-  });
-
+  const { data: adminAddress } = useGovernorAdmin({ enabled: true });
   const canCancel =
-    isAdminFetched &&
     adminAddress?.toString().toLowerCase() === address?.toLowerCase();
 
   const { writeContract: write, data } = useWriteContract();
@@ -56,44 +43,28 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
     }
   }, [isSuccess, isError, error]);
 
-  return (
-    <div>
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          {!canCancel ? (
-            <TooltipTrigger>
-              <Button disabled={true} variant="outline">
-                Cancel
-              </Button>
-            </TooltipTrigger>
-          ) : (
-            <>
-              {!isFetched && (
-                <Button
-                  onClick={() =>
-                    write({
-                      address: contracts.governor.address as `0x${string}`,
-                      abi: contracts.governor.abi,
-                      functionName: "cancel",
-                      args: proposalToCallArgs(proposal),
-                    })
-                  }
-                  variant="outline"
-                  loading={isLoading}
-                >
-                  Cancel
-                </Button>
-              )}
-            </>
-          )}
+  if (!canCancel) {
+    return null;
+  }
 
-          <TooltipContent>
-            <div className="flex flex-col p-2">
-              <div>{"You don't have permission to cancel this proposal."}</div>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+  return (
+    <>
+      {!isFetched && (
+        <Button
+          onClick={() =>
+            write({
+              address: contracts.governor.address as `0x${string}`,
+              abi: contracts.governor.abi,
+              functionName: "cancel",
+              args: proposalToCallArgs(proposal),
+            })
+          }
+          variant="outline"
+          loading={isLoading}
+        >
+          Cancel
+        </Button>
+      )}
+    </>
   );
 };
