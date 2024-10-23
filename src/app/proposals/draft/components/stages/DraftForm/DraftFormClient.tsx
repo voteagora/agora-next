@@ -19,6 +19,7 @@ import {
   ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
+  PLMConfig,
 } from "../../../types";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
@@ -146,7 +147,7 @@ const DraftFormClient = ({
                   label="Voting module"
                   required={true}
                   options={Object.values([
-                    ...(plmToggle?.config?.proposalTypes || []),
+                    ...((plmToggle?.config as PLMConfig)?.proposalTypes || []),
                   ])}
                   name="type"
                 />

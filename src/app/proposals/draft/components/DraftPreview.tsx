@@ -8,7 +8,11 @@ import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { DraftProposal, ProposalGatingType } from "@/app/proposals/draft/types";
+import {
+  DraftProposal,
+  PLMConfig,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
@@ -32,7 +36,7 @@ const DraftPreview = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const votingModuleType = proposalDraft.voting_module_type;
 
   const { address } = useAccount();
@@ -122,7 +126,7 @@ const DraftPreview = ({
           <p className="flex-grow">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
-            {plmToggle?.config?.snapshotConfig?.requiredTokens}
+            {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
             {" tokens"}
           </span>
         </div>
