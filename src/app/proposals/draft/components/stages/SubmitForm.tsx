@@ -60,7 +60,13 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 };
 
 const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
-  const methods = useForm({});
+  const methods = useForm({
+    defaultValues: {
+      visibility: "Public",
+      sponsors: [{ address: "" }],
+    },
+  });
+
   return (
     <FormProvider {...methods}>
       <form>
