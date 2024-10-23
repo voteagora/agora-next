@@ -125,6 +125,7 @@ async function getProposalTypes() {
 }
 
 async function getDraftProposals(address: `0x${string}`) {
+  console.log("are we in here?????");
   const { contracts } = Tenant.current();
   return await prisma.proposalDraft.findMany({
     where: {

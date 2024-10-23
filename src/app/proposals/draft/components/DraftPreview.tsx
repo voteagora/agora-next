@@ -292,8 +292,10 @@ const DraftPreview = ({
             {!canAddressSponsor && (
               <p className="text-secondary mt-2">
                 You do not meet the requirement to submit this proposal.
-                However, you can ask someone who does to help you by sharing
-                this link with them.
+                However, you can ask someone who does meet the requirement to
+                sponsor this proposal on your behalf. You can make this proposal
+                private and send it to a select few people, or you can make it
+                public for anyone in the community to sponsor.
               </p>
             )}
             <div className="mt-6">{renderProposalRequirements()}</div>

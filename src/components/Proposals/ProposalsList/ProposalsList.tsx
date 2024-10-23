@@ -86,48 +86,48 @@ export default function ProposalsList({
             <CreateProposalDraftButton address={address} />
           )}
         </div>
-      </div>
 
-      {governanceCalendar && (
-        <CurrentGovernanceStage
-          title={governanceCalendar.title}
-          endDate={governanceCalendar.endDate}
-          reviewPeriod={governanceCalendar.reviewPeriod}
-          votingPeriod={governanceCalendar.votingPeriod}
-        />
-      )}
-      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-        <div>
-          {proposals.length === 0 ? (
-            <div className="flex flex-row justify-center py-8 text-secondary">
-              No proposals currently
-            </div>
-          ) : (
-            <InfiniteScroll
-              hasMore={meta.has_next}
-              pageStart={0}
-              loadMore={loadMore}
-              loader={
-                <div key={0}>
-                  <div
-                    className="flex flex-row gl_loader justify-center py-6 text-sm text-secondary"
-                    key="loader"
-                  >
-                    Loading...
+        {governanceCalendar && (
+          <CurrentGovernanceStage
+            title={governanceCalendar.title}
+            endDate={governanceCalendar.endDate}
+            reviewPeriod={governanceCalendar.reviewPeriod}
+            votingPeriod={governanceCalendar.votingPeriod}
+          />
+        )}
+        <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+          <div>
+            {proposals.length === 0 ? (
+              <div className="flex flex-row justify-center py-8 text-secondary">
+                No proposals currently
+              </div>
+            ) : (
+              <InfiniteScroll
+                hasMore={meta.has_next}
+                pageStart={0}
+                loadMore={loadMore}
+                loader={
+                  <div key={0}>
+                    <div
+                      className="flex flex-row gl_loader justify-center py-6 text-sm text-secondary"
+                      key="loader"
+                    >
+                      Loading...
+                    </div>
                   </div>
-                </div>
-              }
-              element="main"
-            >
-              {proposals.map((proposal) => (
-                <Proposal
-                  key={`${proposal.id}_${proposal.status}`}
-                  proposal={proposal}
-                  votableSupply={votableSupply}
-                />
-              ))}
-            </InfiniteScroll>
-          )}
+                }
+                element="main"
+              >
+                {proposals.map((proposal) => (
+                  <Proposal
+                    key={`${proposal.id}_${proposal.status}`}
+                    proposal={proposal}
+                    votableSupply={votableSupply}
+                  />
+                ))}
+              </InfiniteScroll>
+            )}
+          </div>
         </div>
       </div>
     </div>
