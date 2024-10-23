@@ -52,8 +52,8 @@ async function applyDistributionStrategyForAddress({
     0
   );
 
-  const max = 12.5;
-  const min = 0.2;
+  const max = 15;
+  const min = 0;
   const totalFunding = 100;
 
   // Apply distribution strategy
