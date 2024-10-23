@@ -6,6 +6,8 @@ export interface IGovernorContract extends BaseContract {
   quorumVotes?: TypedContractMethod<[], [bigint], "view">;
 
   // -------
+  // AGORA, BRAVO
+  admin?: TypedContractMethod<[], [string], "view">;
 
   quorum?: TypedContractMethod<[proposalId: BigNumberish], [bigint], "view">;
 
