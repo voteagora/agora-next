@@ -16,6 +16,8 @@ const SocialProposalForm = () => {
     formState: { defaultValues },
   } = useFormContext<FormType>();
 
+  console.log(defaultValues);
+
   const { fields, replace, append } = useFieldArray({
     control,
     name: "socialProposal.options",
@@ -23,7 +25,6 @@ const SocialProposalForm = () => {
 
   const localProposalType = watch("socialProposal.type");
   const savedProposalType = defaultValues?.socialProposal?.type;
-  const localOptions = watch("socialProposal.options");
   const savedOptions = defaultValues?.socialProposal?.options;
   const prevProposalTypeRef = useRef<SocialProposalType | null>(null);
 
