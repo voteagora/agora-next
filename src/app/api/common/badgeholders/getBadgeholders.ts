@@ -18,6 +18,9 @@ const allowlist = [
   "0xc0f2a154aba3f12d71af25e87ca4f225b9c52203",
   "0xfd01c2e8229e564e11fe8510d698b2b4e91bfa64",
   "0xe406938368062cc09f00c65278d209de5ac6dc4c",
+  "0x31f87f1475f81ccfff6a33a064cae812baeebcc6",
+  "0x1feef51299adadfad45d19f905b43b37a327c553",
+  "0x1971164d5f94d904f41430348579daa93aaced38",
 ];
 
 const citizenAllowlist = [
