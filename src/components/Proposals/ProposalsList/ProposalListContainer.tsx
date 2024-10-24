@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
@@ -9,6 +9,9 @@ import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFil
 import DraftProposalsFilter from "@/components/Proposals/ProposalsFilter/DraftProposalsFilter";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useAddSearchParam } from "@/hooks/useAddSearchParam";
+import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
 
 enum ProposalListTab {
   ALL = "all",
@@ -22,6 +25,10 @@ const ProposalListContainer = ({
   allProposalsListElement: React.ReactNode;
   draftProposalsListElement: React.ReactNode;
 }) => {
+  const router = useRouter();
+  const addSearchParam = useAddSearchParam();
+  const deleteSearchParams = useDeleteSearchParams();
+
   const { address } = useAccount();
   const { ui, slug } = Tenant.current();
   let tenantSupportsProposalLifecycle =
@@ -32,9 +39,17 @@ const ProposalListContainer = ({
       address === "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8" || false;
   }
 
-  const [activeTab, setActiveTab] = useState<ProposalListTab>(
-    ProposalListTab.ALL
-  );
+  const searchParams = useSearchParams();
+  const activeTab = searchParams?.get("tab") ?? ProposalListTab.ALL;
+  const clearFiltersAndSetTab = (tab: ProposalListTab) => {
+    if (tab === ProposalListTab.ALL) {
+      router.push(deleteSearchParams(["tab", "filter"]));
+    } else {
+      router.push(addSearchParam({ name: "tab", value: tab }), {
+        scroll: false,
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col max-w-[76rem]">
@@ -49,7 +64,7 @@ const ProposalListContainer = ({
                   ? "text-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
               )}
-              onClick={() => setActiveTab(ProposalListTab.ALL)}
+              onClick={() => clearFiltersAndSetTab(ProposalListTab.ALL)}
             >
               All proposals
             </button>
@@ -61,7 +76,7 @@ const ProposalListContainer = ({
                   ? "text-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
               )}
-              onClick={() => setActiveTab(ProposalListTab.DRAFT)}
+              onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
             >
               Draft proposals
             </button>
