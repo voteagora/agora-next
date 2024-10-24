@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 
 interface Props {
   address: string;
@@ -39,6 +40,11 @@ export function DelegateProfileImage({
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
+
+  const endorsedToggle = ui.toggle("delegates/endorsed-filter");
+  const hasEndorsedFilter = Boolean(
+    endorsedToggle?.enabled && endorsedToggle?.config !== undefined
+  );
 
   const { data } = useEnsName({
     chainId: 1,
@@ -93,20 +99,20 @@ export function DelegateProfileImage({
           ) : (
             <HumanAddress address={address} />
           )}
-          {endorsed && (
+          {endorsed && hasEndorsedFilter && endorsedToggle && (
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger>
                   <Image
                     src={icons.endorsed}
-                    alt={`Endorsed by ${ui.organization?.title} team`}
+                    alt={(endorsedToggle.config as UIEndorsedConfig).tooltip}
                     className="w-4 h-4"
                   />
                 </TooltipTrigger>
 
                 <TooltipContent>
                   <div className="text-xs">
-                    Endorsed by {ui.organization?.title} team
+                    {(endorsedToggle.config as UIEndorsedConfig).tooltip}
                   </div>
                 </TooltipContent>
               </Tooltip>

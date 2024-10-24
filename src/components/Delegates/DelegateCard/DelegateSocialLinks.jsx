@@ -8,6 +8,7 @@ const ICON_HEIGHT = 24;
 const ICON_WIDTH = 24;
 
 export function DelegateSocialLinks({ discord, twitter, warpcast }) {
+  const warpcastUsername = warpcast?.replace(/@/g, "");
   return (
     <div className="flex flex-row gap-4 h-auto items-center justify-center">
       {twitter && (
@@ -32,7 +33,8 @@ export function DelegateSocialLinks({ discord, twitter, warpcast }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            window && window.open(`https://warpcast.com/${warpcast}`, "_blank");
+            window &&
+              window.open(`https://warpcast.com/${warpcastUsername}`, "_blank");
           }}
         >
           <Image

@@ -198,6 +198,12 @@ export const cyberTenantUIConfig = new TenantUI({
     {
       name: "delegates/endorsed-filter",
       enabled: true,
+      config: {
+        tooltip: "Endorsed by Cyber team",
+        showFilterLabel: "Endorsed Delegates",
+        hideFilterLabel: "All Delegates",
+        defaultFilter: true,
+      },
     },
     {
       name: "delegates/edit",
