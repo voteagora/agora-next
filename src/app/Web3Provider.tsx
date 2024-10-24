@@ -16,6 +16,7 @@ import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,7 @@ export const config = createConfig(
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
           <body className={inter.variable}>

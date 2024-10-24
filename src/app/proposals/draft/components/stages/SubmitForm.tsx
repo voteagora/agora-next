@@ -9,6 +9,13 @@ import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useManager } from "@/hooks/useManager";
 import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
+import {
+  parseToForm,
+  DEFAULT_FORM,
+  schema as requestSponsorshipSchema,
+} from "../../schemas/requestSponsorshipSchema";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
@@ -64,11 +71,14 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 };
 
 const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
-  const methods = useForm({
-    defaultValues: {
-      visibility: "Public",
-      sponsors: [{ address: "" }],
-    },
+  // const methods = useForm<z.output<typeof DraftProposalSchema>>({
+  //     resolver: zodResolver(DraftProposalSchema),
+  //     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
+  //   });
+
+  const methods = useForm<z.output<typeof requestSponsorshipSchema>>({
+    resolver: zodResolver(requestSponsorshipSchema),
+    defaultValues: parseToForm(draftProposal) || DEFAULT_FORM,
   });
 
   return (

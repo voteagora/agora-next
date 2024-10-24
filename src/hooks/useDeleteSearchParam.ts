@@ -18,3 +18,17 @@ export const useDeleteSearchParam = () => {
     [searchParams, pathname]
   );
 };
+
+export const useDeleteSearchParams = () => {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  return useCallback(
+    (names: string[]) => {
+      const params = new URLSearchParams(searchParams?.toString());
+      names.forEach((name) => params.delete(name));
+      return pathname + "?" + params.toString();
+    },
+    [searchParams, pathname]
+  );
+};
