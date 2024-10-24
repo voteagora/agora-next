@@ -260,7 +260,7 @@ function impactGroupsPowerLaw({
   total: number;
   nk: [number, number, number, number, number]; // number of projects in each impact group
 }) {
-  const scalingFactors = [1, 0.5, 0.1, 0.02, 0.01];
+  const scalingFactors = [1, 0.5, 0.1, 0.02, 0.004];
 
   const F2 = nk.map((_, i) => total * scalingFactors[4 - i]);
 
