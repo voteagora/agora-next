@@ -1,8 +1,13 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { isAddress } from "viem";
-import { useMemo, useState } from "react";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useState } from "react";
+import {
+  useFormContext,
+  useFieldArray,
+  UseFieldArrayRemove,
+} from "react-hook-form";
 import AddressInput from "./form/AddressInput";
 import { useBlockNumber } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
@@ -20,6 +25,15 @@ import {
 } from "../types";
 import Tenant from "@/lib/tenant/tenant";
 import SwitchInput from "./form/SwitchInput";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { ProposalStage } from "@prisma/client";
+import { useRouter } from "next/navigation";
+
+enum Visibility {
+  PUBLIC = "Public",
+  PRIVATE = "Private",
+}
 
 const canSponsor = (
   gatingType: ProposalGatingType | undefined,
@@ -47,32 +61,59 @@ const canSponsor = (
   }
 };
 
-const SponsorInput = ({ index }: { index: number }) => {
+const SponsorInput = ({
+  index,
+  remove,
+}: {
+  index: number;
+  remove: UseFieldArrayRemove;
+}) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = plmToggle?.config?.gatingType;
   const { control, watch } = useFormContext();
   const address = watch(`sponsors.${index}.address`);
 
-  const { data: threshold } = useProposalThreshold();
-  const { data: manager } = useManager();
-  const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useGetVotes({
-    address: address as `0x${string}`,
-    blockNumber: blockNumber || BigInt(0),
-  });
+  const { data: threshold, isFetched: isThresholdFetched } =
+    useProposalThreshold();
+  const { data: manager, isFetched: isManagerFetched } = useManager();
+  const { data: blockNumber, isFetched: isBlockNumberFetched } =
+    useBlockNumber();
+  const { data: accountVotesData, isFetched: isAccountVotesFetched } =
+    useGetVotes({
+      address: address as `0x${string}`,
+      blockNumber: blockNumber || BigInt(0),
+    });
 
-  const canAddressSponsor = useMemo(
-    () =>
-      canSponsor(
+  const {
+    data: canAddressSponsor,
+    isError,
+    isFetching,
+    isSuccess,
+  } = useQuery({
+    queryKey: [
+      "can-sponsor",
+      address,
+      gatingType,
+      manager,
+      accountVotesData,
+      threshold,
+    ],
+    queryFn: () => {
+      return canSponsor(
         gatingType,
         manager as `0x${string}`,
         address as `0x${string}`,
         accountVotesData,
         threshold
-      ),
-    [gatingType, manager, address, accountVotesData, threshold]
-  );
+      );
+    },
+    enabled:
+      isThresholdFetched &&
+      isManagerFetched &&
+      isBlockNumberFetched &&
+      isAccountVotesFetched,
+  });
 
   return (
     <>
@@ -85,13 +126,32 @@ const SponsorInput = ({ index }: { index: number }) => {
         <label className="text-xs font-semibold text-secondary block">
           Sponsor verification
         </label>
-        <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
-          {isAddress(address) && <AvatarAddress address={address} />}
-          <div
-            className={`absolute right-2 top-2.5 text-sm ${canAddressSponsor ? "text-positive" : "text-negative"}`}
-          >
-            {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
+        <div className="flex items-center justify-between gap-2">
+          <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
+            {isAddress(address) && <AvatarAddress address={address} />}
+            <div className="absolute right-2 top-2.5 text-sm">
+              {isFetching ? (
+                <LoadingSpinner className="w-5 h-5 text-tertiary" />
+              ) : isError ? (
+                <span className="text-negative">Error checking status</span>
+              ) : isSuccess ? (
+                <span
+                  className={
+                    canAddressSponsor ? "text-positive" : "text-negative"
+                  }
+                >
+                  {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
+                </span>
+              ) : null}
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="border border-line rounded-lg h-[42px] w-[42px] flex items-center justify-center hover:bg-tertiary/5 transition-colors cursor-pointer"
+          >
+            <XMarkIcon className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </>
@@ -103,16 +163,17 @@ const RequestSponsorshipForm = ({
 }: {
   draftProposal: DraftProposal;
 }) => {
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const { watch, control } = useFormContext();
+  const { watch, control, formState } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "sponsors",
   });
 
-  const address = watch("sponsorAddress");
-  const visibility = watch("visibility");
   const formValid = true;
+  const visibility = watch("visibility");
+  const sponsors = watch("sponsors");
 
   return (
     <>
@@ -120,13 +181,17 @@ const RequestSponsorshipForm = ({
         control={control}
         label="Draft proposal visibility"
         required={true}
-        options={["Public", "Private"]}
+        options={Object.values(Visibility)}
         name="visibility"
       />
-      {visibility === "Private" && (
+      {visibility === Visibility.PRIVATE && (
         <div className="grid grid-cols-2 gap-4 mt-4">
           {fields.map((_field, index) => (
-            <SponsorInput key={`sponsor-${index}`} index={index} />
+            <SponsorInput
+              key={`sponsor-${index}`}
+              index={index}
+              remove={remove}
+            />
           ))}
           <button
             type="button"
@@ -148,16 +213,24 @@ const RequestSponsorshipForm = ({
             setIsPending(true);
             const res = await requestSponsorshipAction({
               draftProposalId: draftProposal.id,
-              sponsor_address: address,
+              is_public: visibility === Visibility.PUBLIC,
+              sponsors: sponsors.filter((sponsor: { address: `0x${string}` }) =>
+                isAddress(sponsor.address)
+              ),
             });
-            setIsPending(false);
             if (res.ok) {
               invalidatePath(draftProposal.id);
+              router.push(`/proposals/sponsor/${draftProposal.id}`);
+            } else {
+              console.error(res.message);
             }
+            setIsPending(false);
           }
         }}
       >
-        Create draft
+        {draftProposal.stage === ProposalStage.AWAITING_SPONSORSHIP
+          ? "Update draft"
+          : "Create draft"}
       </UpdatedButton>
     </>
   );

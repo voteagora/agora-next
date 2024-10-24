@@ -47,13 +47,13 @@ export const proposalsFilterOptions = {
 };
 
 export const draftProposalsFilterOptions = {
-  myDrafts: {
-    value: "My drafts",
-    filter: "my_drafts",
-  },
   allDrafts: {
     value: "All drafts",
     filter: "all_drafts",
+  },
+  myDrafts: {
+    value: "My drafts",
+    filter: "my_drafts",
   },
 };
 

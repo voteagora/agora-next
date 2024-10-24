@@ -117,18 +117,23 @@ export const ensTenantUIConfig = new TenantUI({
             isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.PENDING,
+            stage: PrismaProposalStage.AWAITING_SPONSORSHIP,
             order: 4,
             isPreSubmission: false,
           },
           {
-            stage: PrismaProposalStage.QUEUED,
+            stage: PrismaProposalStage.PENDING,
             order: 5,
             isPreSubmission: false,
           },
           {
-            stage: PrismaProposalStage.EXECUTED,
+            stage: PrismaProposalStage.QUEUED,
             order: 6,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 7,
             isPreSubmission: false,
           },
         ],

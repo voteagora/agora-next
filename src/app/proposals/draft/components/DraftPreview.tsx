@@ -4,7 +4,6 @@ import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
-import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
@@ -15,7 +14,6 @@ import {
 } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
-import toast from "react-hot-toast";
 import styles from "@/components/Proposals/ProposalPage/ProposalDescription/proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -43,7 +41,6 @@ const DraftPreview = ({
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
-
   const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
@@ -251,58 +248,31 @@ const DraftPreview = ({
         </div>
       </FormCard.Section>
       <FormCard.Section className="z-0">
-        {proposalDraft.sponsor_address &&
-        address != proposalDraft.sponsor_address ? (
-          <>
-            <p className="text-agora-stone-700">
-              Your proposal is awaiting{" "}
-              <span className="font-mono text-xs border border-yellow-500 text-yellow-700 bg-yellow-100 p-1 rounded">
-                {proposalDraft.sponsor_address}
-              </span>
-              &apos;s sponsorship. Once your sponsor approves, your proposal
-              will be automatically submitted, without needing your input. In
-              the meantime, you can contact your sponsor by copying the link
-              below.
+        <>
+          <h3 className="font-semibold">Requirements</h3>
+          {!canAddressSponsor && (
+            <p className="text-agora-stone-700 mt-2">
+              You do not meet the requirement to submit this proposal. However,
+              you can ask someone who does meet the requirement to sponsor this
+              proposal on your behalf. You can make this proposal private and
+              send it to a select few people, or you can make it public for
+              anyone in the community to sponsor.
             </p>
-            <div className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg p-2 relative mt-6">
-              <div className="flex flex-row items-center space-x-2">
-                <AvatarAddress
-                  address={proposalDraft.sponsor_address as `0x${string}`}
-                />
-                <span className="text-xs font-bold text-agora-stone-700">
-                  Awaiting sponsorship
+          )}
+          <div className="mt-6">
+            {(gatingType === ProposalGatingType.MANAGER ||
+              gatingType === ProposalGatingType.GOVERNOR_V1) && (
+              <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+                <p className="flex-grow">Manager address</p>
+                <span className="text-secondary font-mono text-xs">
+                  {manager?.toString()}
                 </span>
               </div>
-              <button
-                type="button"
-                className="absolute right-[-1px] top-[-1px] rounded-lg box-border border bg-white border-agora-stone-100 p-2"
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `${window.location.origin}/proposals/sponsor/${proposalDraft.id}`
-                  );
-                  toast("Proposal link copied to clipboard!");
-                }}
-              >
-                Copy sponsor link
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <h3 className="font-semibold">Requirements</h3>
-            {!canAddressSponsor && (
-              <p className="text-agora-stone-700 mt-2">
-                You do not meet the requirement to submit this proposal.
-                However, you can ask someone who does meet the requirement to
-                sponsor this proposal on your behalf. You can make this proposal
-                private and send it to a select few people, or you can make it
-                public for anyone in the community to sponsor.
-              </p>
             )}
             <div className="mt-6">{renderProposalRequirements()}</div>
             {actions}
-          </>
-        )}
+          </div>
+        </>
       </FormCard.Section>
     </FormCard>
   );
