@@ -158,7 +158,7 @@ export function getInputData(proposal: DraftProposal): {
       const settings = {
         maxApprovals: proposal.max_options,
         criteria: proposal.criteria === "Threshold" ? 0 : 1,
-        budgetToken: (parseInt(proposal.budget) > 0
+        budgetToken: (proposal.budget > 0
           ? tenant.contracts.governor.address
           : ethers.ZeroAddress) as `0x${string}`,
         criteriaValue:

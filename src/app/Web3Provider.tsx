@@ -15,8 +15,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
+import { hashFn } from "@wagmi/core/query";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryKeyHashFn: hashFn,
+    },
+  },
+});
 
 const metadata = {
   name: "Agora Next",

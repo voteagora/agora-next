@@ -5,7 +5,14 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 type UIToggle = {
   name: string;
   enabled: boolean;
-  config?: UIConfig;
+  config?: UIConfig | UIEndorsedConfig;
+};
+
+export type UIEndorsedConfig = {
+  tooltip: string;
+  showFilterLabel: string;
+  hideFilterLabel: string;
+  defaultFilter: boolean;
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle

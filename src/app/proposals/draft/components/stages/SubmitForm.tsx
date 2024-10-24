@@ -7,13 +7,13 @@ import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useManager } from "@/hooks/useManager";
-import { DraftProposal, ProposalGatingType } from "../../types";
+import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();

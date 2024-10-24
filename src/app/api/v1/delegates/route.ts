@@ -9,13 +9,13 @@ import {
 } from "@/app/api/common/utils/validators";
 import { traceWithUserId } from "../apiUtils";
 
-const DEFAULT_SORT = "most_delegators";
+const DEFAULT_SORT = "voting_power";
 const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
 const sortValidator = createOptionalStringValidator(
-  ["most_delegators", "weighted_random"],
+  ["most_delegators", "weighted_random", "voting_power"],
   DEFAULT_SORT
 );
 const limitValidator = createOptionalNumberValidator(

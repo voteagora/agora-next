@@ -12,7 +12,12 @@ import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
-import { DraftProposal, ProposalGatingType } from "../types";
+import {
+  DraftProposal,
+  PLMConfig,
+  ProposalGatingType,
+  ProposalType,
+} from "../types";
 import Tenant from "@/lib/tenant/tenant";
 
 const RequestSponsorshipForm = ({
@@ -22,11 +27,12 @@ const RequestSponsorshipForm = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
+  const votingModuleType = draftProposal.voting_module_type;
 
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
@@ -37,6 +43,15 @@ const RequestSponsorshipForm = ({
   });
 
   const canSponsor = () => {
+    if (votingModuleType === ProposalType.SOCIAL) {
+      const requiredTokensForSnapshot = (plmToggle?.config as PLMConfig)
+        ?.snapshotConfig?.requiredTokens;
+      return (
+        accountVotesData !== undefined &&
+        requiredTokensForSnapshot !== undefined &&
+        accountVotesData >= requiredTokensForSnapshot
+      );
+    }
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;

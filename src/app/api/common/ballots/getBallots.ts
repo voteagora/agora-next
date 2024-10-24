@@ -79,12 +79,10 @@ async function getBallotForAddress({
     return getR4Ballot({ roundId, address });
   }
 
-  if (roundId === 5) {
-    if (!category) {
-      throw new Error("Category scope is required for round 5");
-    }
-    return getR5Ballot({ roundId, address, category });
+  if (!category) {
+    throw new Error("Category scope is required");
   }
+  return getR5Ballot({ roundId, address, category });
 }
 
 async function getR5Ballot({

@@ -55,8 +55,10 @@ function DateInput<
   //make sure default value is set
   useEffect(() => {
     const date = getValues(name);
-    const formattedDate = formatDate(new Date(date));
-    setValue(formattedDate);
+    if (date) {
+      const formattedDate = formatDate(new Date(date));
+      setValue(formattedDate);
+    }
   }, []);
 
   return (

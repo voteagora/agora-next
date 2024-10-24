@@ -13,6 +13,7 @@ export function ConnectButton() {
   const openDialog = useOpenDialog();
 
   useEffect(() => {
+    if (!address) return;
     if (!chain || (chain?.id && chain.id !== contracts.token.chain.id)) {
       openDialog({
         type: "SWITCH_NETWORK",

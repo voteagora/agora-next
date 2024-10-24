@@ -22,12 +22,12 @@ const r5BallotContentSchema = z.object({
 
 const r4BallotSubmissionSchema = z.object({
   ballot_content: r4BallotContentSchema,
-  signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
+  signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
 });
 
 const r5BallotSubmissionSchema = z.object({
   ballot_content: r5BallotContentSchema,
-  signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
+  signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
 });
 
 export type R4BallotSubmission = z.infer<typeof r4BallotSubmissionSchema>;
@@ -37,7 +37,7 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const isBadgeholder = await fetchBadgeholder(
+  const { isBadgeholder } = await fetchBadgeholder(
     route.params.ballotCasterAddressOrEns
   );
 
