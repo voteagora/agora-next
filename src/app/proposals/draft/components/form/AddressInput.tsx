@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -41,7 +42,6 @@ function AddressInput<
   tooltip,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & AddressInputProps) {
   const { watch, setValue } = useFormContext();
-
   const address = watch(name);
 
   const { data: ensAddress } = useEnsAddress({

@@ -13,21 +13,18 @@ export default function DraftProposalsFilter() {
   const addSearchParam = useAddSearchParam();
   const filterParam = searchParams?.get("filter");
   const [selected, setSelected] = useState(
-    filterParam || draftProposalsFilterOptions.myDrafts.filter
+    filterParam || draftProposalsFilterOptions.allDrafts.filter
   );
-
-  const isMyDraftsFilter =
-    selected === draftProposalsFilterOptions.myDrafts.filter;
+  const isAllDraftsFilter =
+    selected === draftProposalsFilterOptions.allDrafts.filter;
 
   useEffect(() => {
     const handleChanges = (value: string) => {
-      isMyDraftsFilter
-        ? addSearchParam({ name: "filter", value: "", clean: true })
-        : addSearchParam({ name: "filter", value });
+      router.push(addSearchParam({ name: "filter", value }), { scroll: false });
     };
 
     handleChanges(selected);
-  }, [router, selected, isMyDraftsFilter]);
+  }, [router, selected, isAllDraftsFilter]);
 
   return (
     <div className="relative">

@@ -81,6 +81,19 @@ export const getStageByIndex = (index: number) => {
   return (plmToggle.config as PLMConfig).stages[index];
 };
 
+export const getIndexForStage = (stage: ProposalStage) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle || !plmToggle.config) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  return plmToggle.config.stages.find((s) => s.stage === stage)?.order;
+};
+
 export const isPostSubmission = (stage: ProposalStage) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");

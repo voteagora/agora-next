@@ -1,11 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
 import BackButton from "../components/BackButton";
-import {
-  GET_DRAFT_STAGES,
-  getStageMetadata,
-  isPostSubmission,
-} from "../utils/stages";
+import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
 import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
@@ -29,12 +25,13 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await fetchDraftProposal(parseInt(params.id));
-  const proposalTypes = await fetchProposalTypes();
+  const [draftProposal, proposalTypes] = await Promise.all([
+    fetchDraftProposal(parseInt(params.id)),
+    fetchProposalTypes(),
+  ]);
 
-  const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
-
-  if (isPostSubmissionStage) {
+  // implies that the proposal has been sponsored, and the sponsor view is archived
+  if (!!draftProposal.sponsor_address) {
     return <ArchivedDraftProposal draftProposal={draftProposal} />;
   }
 

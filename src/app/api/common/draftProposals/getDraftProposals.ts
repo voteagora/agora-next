@@ -11,6 +11,7 @@ const getDraftProposal = async (id: number) => {
       transactions: true,
       social_options: true,
       checklist_items: true,
+      approved_sponsors: true,
       approval_options: {
         include: {
           transactions: true,
