@@ -119,7 +119,7 @@ async function applyDistributionStrategyForAddress({
       [0, 0, 0, 0, 0]
     );
 
-    const y = impactGroups({
+    const y = impactGroupsPowerLaw({
       max,
       total: totalFunding,
       nk,
@@ -249,6 +249,22 @@ function impactGroups({
   const F = nk.map((_, i) => (total * (i + 1)) / W);
 
   return (k: number) => Math.round(F[k] * 100) / 100; // return the amount of funding for the k-th impact group
+}
+
+function impactGroupsPowerLaw({
+  max,
+  total,
+  nk,
+}: {
+  max: number;
+  total: number;
+  nk: [number, number, number, number, number]; // number of projects in each impact group
+}) {
+  const scalingFactors = [1, 0.5, 0.1, 0.02, 0.01];
+
+  const F2 = nk.map((_, i) => total * scalingFactors[4 - i]);
+
+  return (k: number) => Math.round(F2[k] * 100) / 100; // return the amount of funding for the k-th impact group
 }
 
 function normalizeAllocation<T extends { allocation: number | null }>(
