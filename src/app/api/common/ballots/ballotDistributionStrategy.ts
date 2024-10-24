@@ -184,12 +184,13 @@ function topWeighted({
 }) {
   const w = (i: number, c: number) => 1 / (i * c + 1); // weight function
 
-  const c = findC({
-    max,
-    total,
-    n,
-    w,
-  });
+  const c = 0.8;
+  // const c = findC({
+  //   max,
+  //   total,
+  //   n,
+  //   w,
+  // });
 
   // Total weight
   const W = Array.from({ length: n }).reduce(
