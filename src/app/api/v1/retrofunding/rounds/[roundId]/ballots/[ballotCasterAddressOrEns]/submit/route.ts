@@ -4,13 +4,16 @@ import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
 import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 
-const r4BallotContentSchema = z.object({
+const METRICS_BASED_ROUNDS = ["4"];
+const PROJECTS_BASED_ROUNDS = ["5", "6"];
+
+const metricsBallotContentSchema = z.object({
   allocations: z.array(z.record(z.string(), z.number())),
   os_only: z.boolean(),
   os_multiplier: z.number(),
 });
 
-const r5BallotContentSchema = z.object({
+const projectsBallotContentSchema = z.object({
   budget: z.number().min(2000000).max(8000000), // number between 2M and 8M
   project_allocations: z.array(
     z.record(z.string(), z.string(z.number().min(0).max(100)).nullable())
@@ -20,34 +23,28 @@ const r5BallotContentSchema = z.object({
   ),
 });
 
-const r4BallotSubmissionSchema = z.object({
-  ballot_content: r4BallotContentSchema,
+const metricsBallotSubmissionSchema = z.object({
+  ballot_content: metricsBallotContentSchema,
   signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
 });
 
-const r5BallotSubmissionSchema = z.object({
-  ballot_content: r5BallotContentSchema,
+const projectsBallotSubmissionSchema = z.object({
+  ballot_content: projectsBallotContentSchema,
   signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
 });
 
-export type R4BallotSubmission = z.infer<typeof r4BallotSubmissionSchema>;
-export type R5BallotSubmission = z.infer<typeof r5BallotSubmissionSchema>;
+export type MetricsBallotSubmission = z.infer<
+  typeof metricsBallotSubmissionSchema
+>;
+export type ProjectsBallotSubmission = z.infer<
+  typeof projectsBallotSubmissionSchema
+>;
 
 export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  const { isBadgeholder } = await fetchBadgeholder(
-    route.params.ballotCasterAddressOrEns
-  );
-
-  if (!isBadgeholder) {
-    return new Response("Only badgeholder can submit a ballot", {
-      status: 401,
-    });
-  }
-
-  if (route.params.roundId === "4") {
+  if (route.params.roundId === "4" || route.params.roundId === "5") {
     return new Response("Ballot submission for Round 4 is closed", {
       status: 403,
     });
@@ -60,10 +57,9 @@ export async function POST(
       try {
         const payload = await request.json();
 
-        const parsedPayload =
-          roundId === "5"
-            ? r5BallotSubmissionSchema.parse(payload)
-            : r4BallotSubmissionSchema.parse(payload);
+        const parsedPayload = METRICS_BASED_ROUNDS.includes(roundId)
+          ? metricsBallotSubmissionSchema.parse(payload)
+          : projectsBallotSubmissionSchema.parse(payload);
         const ballot = await submitBallot(
           parsedPayload,
           Number(roundId),
