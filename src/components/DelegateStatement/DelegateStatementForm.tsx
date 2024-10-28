@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
+import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 
 export default function DelegateStatementForm({
   form,
@@ -26,11 +27,17 @@ export default function DelegateStatementForm({
 }) {
   const router = useRouter();
   const { address } = useAccount();
+  const { data: smartAccountAddress } = useSmartAccountAddress({
+    owner: address,
+    salt: 0,
+  });
   const { ui } = Tenant.current();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
+
+  console.log("Smart account address", smartAccountAddress);
 
   const hasTopIssues = Boolean(
     ui.governanceIssues && ui.governanceIssues.length > 0

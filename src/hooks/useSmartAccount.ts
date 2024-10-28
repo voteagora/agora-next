@@ -1,12 +1,32 @@
 "use client";
 
-import { createWalletClient, custom } from "viem";
+import { Address, createWalletClient, custom } from "viem";
 import { useEffect, useState } from "react";
 import { alchemy, AlchemySmartAccountClient } from "@account-kit/infra";
 import { WalletClientSigner } from "@aa-sdk/core";
 import { createLightAccountAlchemyClient } from "@account-kit/smart-contracts";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { getPublicClient } from "@/lib/viem";
+import LightAccountFactory from "@/lib/contracts/abis/LightAccountFactory";
+
+export const useSmartAccountAddress = async (ownerAddress: Address) => {
+  const { ui, contracts } = Tenant.current();
+  const scwConfig = ui.smartAccountConfig;
+
+  if (!scwConfig) {
+    throw new Error("Smart Account config is not defined");
+  }
+
+  const client = getPublicClient(contracts.governor.chain.id);
+  const address = await client.readContract({
+    abi: LightAccountFactory,
+    address: scwConfig.factoryAddress,
+    functionName: "getAddress",
+    args: [ownerAddress, 0],
+  });
+  return address as Address;
+};
 
 export const useSmartAccount = () => {
   const { ui, contracts } = Tenant.current();
