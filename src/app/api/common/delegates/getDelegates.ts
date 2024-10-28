@@ -116,8 +116,6 @@ async function getDelegates({
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
-    console.log(sort);
-
     const allowListString = allowList.map((value) => `'${value}'`).join(", ");
 
     switch (sort) {
