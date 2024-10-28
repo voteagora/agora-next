@@ -72,7 +72,7 @@ const useAdvancedDelegation = ({
       ],
       chainId: optimism.id,
     });
-  }, [isDelegatingToProxy, delegateToProxy, subdelegate]);
+  }, [isDelegatingToProxy, delegateToProxy, subdelegate, target, allocation]);
 
   useEffect(() => {
     if (delegateToProxyIsLoading || subdelegateIsLoading) {
