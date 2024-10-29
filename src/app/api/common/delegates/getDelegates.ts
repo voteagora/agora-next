@@ -35,7 +35,7 @@ async function getDelegates({
   seed,
   filters,
 }: {
-  pagination: PaginationParams;
+  pagination?: PaginationParams;
   sort: string;
   seed?: number;
   filters?: {
