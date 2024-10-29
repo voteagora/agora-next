@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 interface Props {
   address: string;
@@ -36,7 +37,6 @@ export function DelegateProfileImage({
 }: Props) {
   const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
-  const { token } = Tenant.current();
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
@@ -119,9 +119,11 @@ export function DelegateProfileImage({
             </TooltipProvider>
           )}
         </div>
-        <div className="text-secondary text-xs font-semibold">
-          {formattedNumber} {token.symbol}
-        </div>
+        {data && (
+          <div className="text-secondary text-xs font-semibold">
+            {truncateAddress(address)}
+          </div>
+        )}
       </div>
     </div>
   );

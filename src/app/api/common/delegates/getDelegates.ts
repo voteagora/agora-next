@@ -112,16 +112,19 @@ async function getDelegates({
       where dao_slug='${slug}'
     ),
     filtered_delegates as (
-      select d.*
+      select d.*, vs.participation_rate
       from ${namespace}.delegates d
-      where contract = '${tokenAddress}'
+      left join ${namespace}.voter_stats vs
+        on vs.voter = d.delegate
+        and vs.contract = '${contracts.governor.address}'
+      where d.contract = '${tokenAddress}'
       ${
         filters?.delegatee
           ? `
         AND d.delegate IN (
           SELECT delegatee
           FROM ${namespace}.delegatees
-          WHERE delegator = '${filters.delegatee.toLowerCase()}'
+          WHERE delegator = '${filters.delegatee}'
         )
       `
           : ""
@@ -133,7 +136,8 @@ async function getDelegates({
         d.num_of_delegators as num_of_delegators,
         d.direct_vp as direct_vp,
         d.advanced_vp as advanced_vp,
-        d.voting_power as voting_power
+        d.voting_power as voting_power,
+        d.participation_rate as participation_rate
       from filtered_delegates d
     )`;
 
@@ -289,6 +293,7 @@ async function getDelegates({
         direct: delegate.direct_vp?.toFixed(0) || "0",
         advanced: delegate.advanced_vp?.toFixed(0) || "0",
       },
+      votingParticipation: Number(delegate.participation_rate) || 0, // Convert to number and handle null/undefined
       citizen: delegate.citizen,
       statement: delegate.statement,
     })),

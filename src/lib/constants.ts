@@ -57,10 +57,6 @@ export const delegatesFilterOptions = {
     sort: "most_delegators",
     value: "Most delegators",
   },
-  myDelegates: {
-    sort: "my_delegates",
-    value: "My delegates",
-  },
 };
 
 export const citizensFilterOptions = {

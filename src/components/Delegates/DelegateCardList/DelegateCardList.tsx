@@ -10,9 +10,11 @@ import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { cn } from "@/lib/utils";
+import { bpsToString, cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { formatNumber } from "@/lib/tokenUtils";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
@@ -29,6 +31,7 @@ export default function DelegateCardList({
   fetchDelegates,
   isDelegatesCitizensFetching,
 }: Props) {
+  const { token } = Tenant.current();
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
@@ -95,19 +98,31 @@ export default function DelegateCardList({
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>
-                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
-                  <div className="flex flex-col gap-4 justify-center">
-                    <DelegateProfileImage
-                      endorsed={delegate.statement?.endorsed}
-                      address={delegate.address}
-                      votingPower={delegate.votingPower.total}
-                      citizen={delegate.citizen}
-                    />
-                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
+                <div className="flex flex-col gap-4 h-full rounded-xl bg-white border border-line shadow-newDefault">
+                  <div className="flex flex-col gap-4 justify-center pt-4">
+                    <div className="border-b border-line px-4 pb-4">
+                      <DelegateProfileImage
+                        endorsed={delegate.statement?.endorsed}
+                        address={delegate.address}
+                        votingPower={delegate.votingPower.total}
+                        citizen={delegate.citizen}
+                      />
+                    </div>
+                    <div className="px-4 flex flex-row gap-4">
+                      <span className="text-primary font-bold">
+                        {formatNumber(delegate.votingPower.total)}{" "}
+                        {token.symbol}
+                      </span>
+                      <span className="text-primary font-bold">
+                        {bpsToString(delegate.votingParticipation * 100)}{" "}
+                        Participation
+                      </span>
+                    </div>
+                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
                       {truncatedStatement}
                     </p>
                   </div>
-                  <div className="min-h-[24px]">
+                  <div className="min-h-[24px] px-4 pb-4">
                     <DelegateActions
                       delegate={delegate}
                       isAdvancedUser={isAdvancedUser}
