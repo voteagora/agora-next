@@ -157,8 +157,6 @@ async function applyDistributionStrategyForAddress({
         });
       }
     });
-
-    console.log("newProjectsAllocation", newProjectsAllocation);
   }
 
   // Save projects allocations
