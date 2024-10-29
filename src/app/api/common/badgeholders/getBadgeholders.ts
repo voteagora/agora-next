@@ -40,7 +40,7 @@ async function getBadgeholderForAddress({ address }: { address: string }) {
     where: {
       dao_slug: slug,
       address: address,
-      retro_funding_round: "5",
+      retro_funding_round: "6",
     },
   });
 
