@@ -9,7 +9,7 @@ export default function TokenAmountDisplay({
   currency = token.symbol,
   maximumSignificantDigits = 2,
 }: {
-  amount: bigint;
+  amount: string | bigint;
   decimals?: number;
   currency?: string;
   maximumSignificantDigits?: number;
