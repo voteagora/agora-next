@@ -7,6 +7,7 @@ export enum DistributionStrategy {
   IMPACT_GROUPS = "IMPACT_GROUPS",
   TOP_TO_BOTTOM = "TOP_TO_BOTTOM",
   TOP_WEIGHTED = "TOP_WEIGHTED",
+  PARETO = "PARETO",
 }
 
 const applyDistributionStrategyApi = async (
@@ -140,6 +141,26 @@ async function applyDistributionStrategyForAddress({
     });
   }
 
+  if (strategy === DistributionStrategy.PARETO) {
+    const y = pareto();
+
+    projectsAllocation.forEach((project, i) => {
+      if (project.impact) {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: y(i),
+        });
+      } else {
+        newProjectsAllocation.push({
+          ...project,
+          allocation: null,
+        });
+      }
+    });
+
+    console.log("newProjectsAllocation", newProjectsAllocation);
+  }
+
   // Save projects allocations
   await Promise.all(
     normalizeAllocation(newProjectsAllocation).map((p) =>
@@ -232,6 +253,18 @@ function findC({
     });
   }
   return c;
+}
+
+function pareto() {
+  const scaleParam = 1;
+  const shapeParam = 0.4;
+
+  return (i: number) =>
+    Math.round(
+      ((shapeParam * Math.pow(scaleParam, shapeParam)) /
+        Math.pow(i + 1, shapeParam + 1)) *
+        100
+    ) / 100; // return the amount of funding for the i-th project
 }
 
 function impactGroups({
