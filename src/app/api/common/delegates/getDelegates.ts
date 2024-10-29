@@ -124,7 +124,7 @@ async function getDelegates({
         AND d.delegate IN (
           SELECT delegatee
           FROM ${namespace}.delegatees
-          WHERE delegator = '${filters.delegatee}'
+          WHERE delegator = '${filters.delegatee.toLowerCase()}'
         )
       `
           : ""

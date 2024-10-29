@@ -1,4 +1,4 @@
-import { Button } from "@/components/Button";
+import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import {
@@ -16,7 +16,8 @@ export function DelegateButton({
   const openDialog = useOpenDialog();
 
   return (
-    <Button
+    <UpdatedButton
+      type="secondary"
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({
@@ -31,6 +32,6 @@ export function DelegateButton({
       className={full ? "w-full" : undefined}
     >
       Delegate
-    </Button>
+    </UpdatedButton>
   );
 }
