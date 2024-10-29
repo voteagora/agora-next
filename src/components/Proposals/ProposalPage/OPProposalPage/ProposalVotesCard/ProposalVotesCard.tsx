@@ -8,15 +8,20 @@ import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
+import ProposalVotesFilter from "./ProposalVotesFilter";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 
 const ProposalVotesCard = ({
   proposal,
   proposalVotes,
+  nonVoters,
 }: {
   proposal: Proposal;
   proposalVotes: PaginatedResult<Vote[]>;
+  nonVoters: PaginatedResult<any[]>; // TODO: add better types
 }) => {
   const [isClicked, setIsClicked] = useState(false);
+  const [showVoters, setShowVoters] = useState(true);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -38,19 +43,33 @@ const ProposalVotesCard = ({
             <img className="opacity-60" src={icons.expand.src} alt="expand" />
           </div>
         </button>
-        <div>
-          <div className="px-4 font-semibold mb-2">Proposal votes</div>
-
+        <div className="flex flex-col gap-4">
+          <div className="font-semibold px-4">Proposal votes</div>
           <ProposalVotesSummary
             votes={proposalVotes.data}
             proposal={proposal}
           />
+          <div className="px-4">
+            <ProposalVotesFilter
+              initialSelection={showVoters ? "Voters" : "Non voters"}
+              onSelectionChange={(value) => {
+                setShowVoters(value === "Voters");
+              }}
+            />
+          </div>
         </div>
 
-        <ProposalVotesList
-          initialProposalVotes={proposalVotes}
-          proposalId={proposal.id}
-        />
+        {showVoters ? (
+          <ProposalVotesList
+            initialProposalVotes={proposalVotes}
+            proposalId={proposal.id}
+          />
+        ) : (
+          <ProposalNonVoterList
+            proposalId={proposal.id}
+            initialNonVoters={nonVoters}
+          />
+        )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} />
       </div>
