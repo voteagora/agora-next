@@ -30,7 +30,8 @@
     "**/*.tsx",
     "**/*.jsx",
     "**/*.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/components/Dialogs/UndelegateDialog"
   ],
   "exclude": ["node_modules"]
 }

@@ -6,6 +6,7 @@ import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
+import { useAccount } from "wagmi";
 
 const FILTER_PARAM = "delegateeFilter";
 const DEFAULT_FILTER = "all_delegates";
@@ -16,6 +17,7 @@ export default function DelegateeFilter() {
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
+  const { address } = useAccount();
 
   const filterParam = searchParams?.get(FILTER_PARAM) || DEFAULT_FILTER;
   const delegateeFilterOptions: { value: string; sort: string }[] = [
@@ -34,10 +36,12 @@ export default function DelegateeFilter() {
     router.push(
       value === DEFAULT_FILTER
         ? deleteSearchParam({ name: FILTER_PARAM })
-        : addSearchParam({ name: FILTER_PARAM, value }),
+        : addSearchParam({ name: FILTER_PARAM, value: address || "" }),
       { scroll: false }
     );
   };
+
+  if (!address) return null;
 
   return (
     <Listbox
@@ -49,26 +53,31 @@ export default function DelegateeFilter() {
         <>
           <Listbox.Button className="w-full sm:w-[200px] bg-wash text-base font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between">
             <span>
-              {delegateeFilterOptions.find(
-                (option) => option.sort === filterParam
-              )?.value || delegateeFilterOptions[0].value}
+              {filterParam === DEFAULT_FILTER
+                ? "All delegates"
+                : "My delegates"}
             </span>
             <ChevronDown className="h-4 w-4 ml-[6px] text-secondary/30" />
           </Listbox.Button>
           <Listbox.Options className="mt-3 absolute bg-wash border border-[#ebebeb] p-2 rounded-2xl flex flex-col gap-1 z-20 w-max">
             {delegateeFilterOptions.map((key) => (
               <Listbox.Option key={key.sort} value={key.sort} as={Fragment}>
-                {({ selected }) => (
-                  <li
-                    className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:text-primary hover:bg-tertiary/20 ${
-                      selected
-                        ? "text-primary bg-tertiary/20"
-                        : "text-secondary border-transparent"
-                    }`}
-                  >
-                    {key.value}
-                  </li>
-                )}
+                {(selected) => {
+                  return (
+                    <li
+                      className={`cursor-pointer text-base py-2 px-3 rounded-xl font-medium hover:text-primary hover:bg-tertiary/20 ${
+                        (key.sort === DEFAULT_FILTER &&
+                          filterParam === DEFAULT_FILTER) ||
+                        (key.sort === "my_delegates" &&
+                          filterParam !== DEFAULT_FILTER)
+                          ? "text-primary bg-tertiary/20"
+                          : "text-secondary border-transparent"
+                      }`}
+                    >
+                      {key.value}
+                    </li>
+                  );
+                }}
               </Listbox.Option>
             ))}
           </Listbox.Options>

@@ -68,6 +68,9 @@ export default async function Page({ searchParams }) {
     citizensFilterOptions.shuffle.sort;
 
   const filters = {
+    ...(searchParams.delegateeFilter && {
+      delegatee: searchParams.delegateeFilter,
+    }),
     ...(searchParams.issueFilter && { issues: searchParams.issueFilter }),
     ...(searchParams.stakeholderFilter && {
       stakeholders: searchParams.stakeholderFilter,

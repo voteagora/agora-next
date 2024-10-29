@@ -35,6 +35,8 @@ async function getCurrentDelegateesForAddress({
       },
     });
 
+    console.log("delegatee", delegatee);
+
     if (namespace === TENANT_NAMESPACES.OPTIMISM) {
       const proxyAddress = await getProxyAddress(address);
       if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
@@ -151,51 +153,51 @@ async function getCurrentDelegatorsForAddress({
 
   // Replace with the Agora Governor flag
   if (contracts.alligator || namespace === TENANT_NAMESPACES.SCROLL) {
-    advancedDelegatorsSubQry = `SELECT 
+    advancedDelegatorsSubQry = `SELECT
                                 "from",
                                 "to",
                                 delegated_amount as allowance,
-                                'ADVANCED' AS type, 
+                                'ADVANCED' AS type,
                                 block_number,
                                 CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
                                 transaction_hash
-                              FROM 
+                              FROM
                                 ${namespace}.advanced_delegatees ad
-                              WHERE 
+                              WHERE
                                 ad."to" = $1
-                                AND delegated_amount > 0 
+                                AND delegated_amount > 0
                                 AND contract = $2`;
   } else {
-    advancedDelegatorsSubQry = `WITH ghost as (SELECT 
+    advancedDelegatorsSubQry = `WITH ghost as (SELECT
                                 null::text as "from",
                                 null::text as "to",
                                 null::numeric as allowance,
-                                'ADVANCED' AS type, 
+                                'ADVANCED' AS type,
                                 null::numeric as block_number,
                                 'FULL' as amount,
                                 null::text as transaction_hash)
                                 select * from ghost
-                              WHERE 
+                              WHERE
                                 ghost."to" = $1
                                 AND ghost."from" = $2`;
   }
 
   if (namespace == TENANT_NAMESPACES.SCROLL) {
-    directDelegatorsSubQry = `WITH ghost as (SELECT 
+    directDelegatorsSubQry = `WITH ghost as (SELECT
               null::text as "from",
               null::text as "to",
               null::numeric as allowance,
-              'DIRECT' AS type, 
+              'DIRECT' AS type,
               null::numeric as block_number,
               'FULL' as amount,
               null::text as transaction_hash)
               select * from ghost
-            WHERE 
+            WHERE
               ghost."to" = $3
               AND ghost."from" = $3`;
   } else {
     directDelegatorsSubQry = `
-          SELECT 
+          SELECT
             "from",
             "to",
             null::numeric as allowance,
@@ -251,7 +253,7 @@ async function getCurrentDelegatorsForAddress({
       >(
         `
         WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} )
-        
+
         , direct_delegatees AS ( ${directDelegatorsSubQry} )
         SELECT * FROM advanced_delegatees
         UNION ALL
@@ -357,10 +359,13 @@ const getDirectDelegateeForAddress = async ({
 }: {
   address: string;
 }) => {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
 
   const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
-    where: { delegator: address.toLowerCase() },
+    where: {
+      delegator: address.toLowerCase(),
+      contract: contracts.token.address.toLowerCase(),
+    },
   });
 
   if (namespace === TENANT_NAMESPACES.OPTIMISM) {

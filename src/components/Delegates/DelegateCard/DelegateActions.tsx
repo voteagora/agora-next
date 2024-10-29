@@ -1,8 +1,8 @@
 "use client";
 
 import { DelegateButton } from "./DelegateButton";
+import { UndelegateButton } from "./UndelegateButton";
 import { DelegateSocialLinks } from "./DelegateSocialLinks";
-import { PartialDelegateButton } from "./PartialDelegateButton";
 import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -12,6 +12,7 @@ import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useGetDelegatee } from "@/hooks/useGetDelegatee";
 
 export function DelegateActions({
   delegate,
@@ -37,6 +38,14 @@ export function DelegateActions({
     delegate.address.toLowerCase() as `0x${string}`
   );
 
+  // gets the delegatee for the connected account
+  const { data: delegatee } = useGetDelegatee({ address });
+  const isConnectedAccountDelegate = delegatee?.delegatee === delegate.address;
+
+  const ButtonToShow = isConnectedAccountDelegate
+    ? UndelegateButton
+    : DelegateButton;
+
   const delegationButton = () => {
     switch (namespace) {
       case TENANT_NAMESPACES.SCROLL:
@@ -53,16 +62,14 @@ export function DelegateActions({
           );
         } else {
           return (
-            <DelegateButton full={!twitter && !discord} delegate={delegate} />
+            <ButtonToShow full={!twitter && !discord} delegate={delegate} />
           );
         }
 
       //   The following tenants only support full token-based delegation:
       //   ENS,Cyber,Ether.fi, Uniswap
       default:
-        return (
-          <DelegateButton full={!twitter && !discord} delegate={delegate} />
-        );
+        return <ButtonToShow full={!twitter && !discord} delegate={delegate} />;
     }
   };
 
@@ -95,7 +102,7 @@ export function DelegateActions({
                   show?.();
                 }}
               >
-                Delegate
+                {isConnectedAccountDelegate ? "Undelegate" : "Delegate"}
               </Button>
             )}
           </ConnectKitButton.Custom>

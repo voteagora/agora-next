@@ -39,6 +39,7 @@ async function getDelegates({
   sort: string;
   seed?: number;
   filters?: {
+    delegatee?: `0x${string}`;
     issues?: string;
     stakeholders?: string;
     endorsed?: boolean;
@@ -102,17 +103,39 @@ async function getDelegates({
       : "";
 
   let delegateUniverseCTE: string;
-
   const tokenAddress = contracts.token.address;
 
-  delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
-                              del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
-                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate,
-                                      coalesce(d.num_of_delegators, 0) as num_of_delegators,
-                                      coalesce(d.direct_vp, 0) as direct_vp,
-                                      coalesce(d.advanced_vp, 0) as advanced_vp,
-                                      coalesce(d.voting_power, 0) as voting_power
-                                      from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
+  delegateUniverseCTE = `
+    with del_statements as (
+      select address
+      from agora.delegate_statements
+      where dao_slug='${slug}'
+    ),
+    filtered_delegates as (
+      select d.*
+      from ${namespace}.delegates d
+      where contract = '${tokenAddress}'
+      ${
+        filters?.delegatee
+          ? `
+        AND d.delegate IN (
+          SELECT delegatee
+          FROM ${namespace}.delegatees
+          WHERE delegator = '${filters.delegatee.toLowerCase()}'
+        )
+      `
+          : ""
+      }
+    ),
+    del_card_universe as (
+      select
+        d.delegate as delegate,
+        d.num_of_delegators as num_of_delegators,
+        d.direct_vp as direct_vp,
+        d.advanced_vp as advanced_vp,
+        d.voting_power as voting_power
+      from filtered_delegates d
+    )`;
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
@@ -152,12 +175,12 @@ async function getDelegates({
             ) AS statement
           FROM del_card_universe d
           WHERE num_of_delegators IS NOT NULL
-          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
           ${delegateStatementFiler}
           ORDER BY num_of_delegators DESC
           OFFSET $1
           LIMIT $2;
-          `;
+        `;
         // console.log(QRY1);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1, skip, take);
 
