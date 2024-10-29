@@ -330,10 +330,6 @@ function normalizeAllocation<T extends { allocation: number | null }>(
       )
     : normalizedRounded;
 
-  console.log(
-    adjustedAllolcations.reduce((acc, p) => acc + (p.allocation ?? 0), 0)
-  );
-
   return adjustedAllolcations;
 }
 
