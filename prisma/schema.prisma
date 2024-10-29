@@ -22,6 +22,7 @@ model DelegateStatements {
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
   warpcast  String?
   endorsed  Boolean   @default(false)
+  scw_address  String?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")

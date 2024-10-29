@@ -1,4 +1,4 @@
-const abi = [
+export const LightAccountFactoryABI = [
   {
     inputs: [
       {
@@ -72,5 +72,3 @@ const abi = [
     type: "function",
   },
 ];
-
-export default abi;

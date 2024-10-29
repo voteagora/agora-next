@@ -16,6 +16,15 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
             copyable={true}
           />
         </div>
+        <div className="flex flex-col items-stretch p-6 border-b border-line">
+          <DelegateProfileImage
+            endorsed={false}
+            address={delegate.statement?.swcAddress}
+            citizen={false}
+            votingPower={"0"}
+            copyable={true}
+          />
+        </div>
 
         <div className="flex flex-col p-6">
           <div className="flex flex-col gap-4">

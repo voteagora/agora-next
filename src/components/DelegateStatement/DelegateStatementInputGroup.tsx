@@ -23,6 +23,7 @@ export default function DelegateStatementInputGroup({
         <Label variant="black">
           <h4 className="font-bold text-xs mb-2">{title}</h4>
           <Input
+            hidden={true}
             variant="bgGray100"
             inputSize="md"
             placeholder={placeholder}
