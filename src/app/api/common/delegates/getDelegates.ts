@@ -112,11 +112,8 @@ async function getDelegates({
       where dao_slug='${slug}'
     ),
     filtered_delegates as (
-      select d.*, vs.participation_rate
+      select d.*
       from ${namespace}.delegates d
-      left join ${namespace}.voter_stats vs
-        on vs.voter = d.delegate
-        and vs.contract = '${contracts.governor.address}'
       where d.contract = '${tokenAddress}'
       ${
         filters?.delegatee
@@ -124,7 +121,7 @@ async function getDelegates({
         AND d.delegate IN (
           SELECT delegatee
           FROM ${namespace}.delegatees
-          WHERE delegator = '${filters.delegatee.toLowerCase()}'
+          WHERE delegator = '${filters.delegatee}'
         )
       `
           : ""
@@ -136,8 +133,7 @@ async function getDelegates({
         d.num_of_delegators as num_of_delegators,
         d.direct_vp as direct_vp,
         d.advanced_vp as advanced_vp,
-        d.voting_power as voting_power,
-        d.participation_rate as participation_rate
+        d.voting_power as voting_power
       from filtered_delegates d
     )`;
 
@@ -293,7 +289,6 @@ async function getDelegates({
         direct: delegate.direct_vp?.toFixed(0) || "0",
         advanced: delegate.advanced_vp?.toFixed(0) || "0",
       },
-      votingParticipation: Number(delegate.participation_rate) || 0, // Convert to number and handle null/undefined
       citizen: delegate.citizen,
       statement: delegate.statement,
     })),
@@ -462,5 +457,30 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
+async function getVoterStats(addressOrENSName: string): Promise<any> {
+  const { namespace, contracts } = Tenant.current();
+  const address = isAddress(addressOrENSName)
+    ? addressOrENSName.toLowerCase()
+    : await resolveENSName(addressOrENSName);
+
+  const statsQuery = await prisma.$queryRawUnsafe<
+    Pick<DelegateStats, "voter" | "participation_rate" | "last_10_props">[]
+  >(
+    `
+        SELECT
+          voter,
+          participation_rate,
+          last_10_props
+        FROM ${namespace + ".voter_stats"}
+        WHERE voter = $1 AND contract = $2
+        `,
+    address,
+    contracts.governor.address
+  );
+
+  return statsQuery?.[0] || undefined;
+}
+
 export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
+export const fetchVoterStats = cache(getVoterStats);
