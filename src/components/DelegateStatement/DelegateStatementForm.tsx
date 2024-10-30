@@ -92,7 +92,7 @@ export default function DelegateStatementForm({
       warpcast,
       topIssues,
       topStakeholders,
-      scwAddress: scwAddress,
+      scwAddress,
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
@@ -112,7 +112,7 @@ export default function DelegateStatementForm({
       delegateStatement: values,
       signature,
       message: serializedBody,
-      scwAddress: scwAddress,
+      scwAddress,
     }).catch((error) => console.error(error));
 
     if (!response) {
