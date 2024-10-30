@@ -308,7 +308,7 @@ function normalizeAllocation<T extends { allocation: number | null }>(
     ...p,
     allocation: p.allocation
       ? Math.round((p.allocation / total) * 100 * 100) / 100
-      : null,
+      : p.allocation,
   }));
 
   // Calculate the difference to be adjusted
