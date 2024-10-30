@@ -20,6 +20,8 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
+import { DelegateButton } from "@/components/Dialogs/DelegateDialog/DelegateButton";
+import { useDelegate } from "@/hooks/useDelegate";
 
 export function DelegateDialog({
   delegate,
@@ -35,11 +37,14 @@ export function DelegateDialog({
   ) => Promise<DelegateePayload | null>;
 }) {
   const { ui, contracts, token } = Tenant.current();
+
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { address: accountAddress } = useAccount();
+  const { address } = useAccount();
+  const { data: delegator } = useDelegate({ address: address });
 
   const [votingPower, setVotingPower] = useState<string>("");
+  const [accountAddress, setAccountAddress] = useState("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
   const { setRefetchDelegate } = useConnectButtonContext();
@@ -133,18 +138,7 @@ export function DelegateDialog({
     }
 
     return (
-      <ShadcnButton
-        onClick={() =>
-          write({
-            address: contracts.token.address as any,
-            abi: contracts.token.abi,
-            functionName: "delegate",
-            args: [delegate.address as any],
-          })
-        }
-      >
-        Delegate
-      </ShadcnButton>
+      <DelegateButton delegate={delegate} delegator={delegator} write={write} />
     );
   };
 
@@ -163,6 +157,12 @@ export function DelegateDialog({
       }
     }
   }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+
+  useEffect(() => {
+    if (delegator && !accountAddress) {
+      setAccountAddress(delegator.statement?.scw_address || address);
+    }
+  }, [delegator, address, accountAddress]);
 
   if (!isReady) {
     return (
