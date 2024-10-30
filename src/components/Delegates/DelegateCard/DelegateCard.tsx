@@ -2,8 +2,11 @@ import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import DelegateCardClient from "./DelegateCardClient";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
 
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
+  const hasSCWAddress = Boolean(delegate.statement?.scw_address);
+
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">
@@ -16,15 +19,14 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
             copyable={true}
           />
         </div>
-        <div className="flex flex-col items-stretch p-6 border-b border-line">
-          <DelegateProfileImage
-            endorsed={false}
-            address={delegate.statement?.swcAddress}
-            citizen={false}
-            votingPower={"0"}
-            copyable={true}
-          />
-        </div>
+        {hasSCWAddress && (
+          <div className="flex flex-col items-stretch p-6 border-b border-line">
+            <SCWProfileImage
+              address={delegate.statement?.scw_address}
+              copyable={true}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col p-6">
           <div className="flex flex-col gap-4">

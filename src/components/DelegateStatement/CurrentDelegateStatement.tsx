@@ -97,7 +97,7 @@ export default function CurrentDelegateStatement() {
       email: delegateStatement?.email || "",
       twitter: delegateStatement?.twitter || "",
       warpcast: delegateStatement?.warpcast || "",
-
+      scwAddress: delegateStatement?.scw_address || "",
       topIssues:
         (
           delegateStatement?.payload as {
