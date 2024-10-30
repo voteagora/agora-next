@@ -2008,7 +2008,7 @@ view cyberProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("cyber")
 }
 
