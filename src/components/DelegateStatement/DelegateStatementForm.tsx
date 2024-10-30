@@ -9,36 +9,39 @@ import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useAccount, useSignMessage, useWalletClient } from "wagmi";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { fetchDelegate, submitDelegateStatement } from "@/app/delegates/actions";
+import {
+  fetchDelegate,
+  submitDelegateStatement,
+} from "@/app/delegates/actions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
-import { ScwSection } from "@/components/DelegateStatement/ScwSection";
+import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 
 export default function DelegateStatementForm({
-                                                form,
-                                              }: {
+  form,
+}: {
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const router = useRouter();
   const { ui } = Tenant.current();
 
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
 
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
 
-  const hasSCW = Boolean(ui.smartAccountConfig && isConnected);
+  const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
   const hasTopIssues = Boolean(
-    ui.governanceIssues && ui.governanceIssues.length > 0,
+    ui.governanceIssues && ui.governanceIssues.length > 0
   );
   const hasStakeholders = Boolean(
-    ui.governanceStakeholders && ui.governanceStakeholders.length > 0,
+    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
   );
 
   const agreeCodeConduct = useWatch({
@@ -89,6 +92,7 @@ export default function DelegateStatementForm({
       warpcast,
       topIssues,
       topStakeholders,
+      scwAddress: scwAddress,
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
@@ -108,12 +112,12 @@ export default function DelegateStatementForm({
       delegateStatement: values,
       signature,
       message: serializedBody,
-      scwAddress: "0x111",
+      scwAddress: scwAddress,
     }).catch((error) => console.error(error));
 
     if (!response) {
       setSubmissionError(
-        "There was an error submitting your form, please try again",
+        "There was an error submitting your form, please try again"
       );
       return;
     }
@@ -128,8 +132,7 @@ export default function DelegateStatementForm({
     !!agreeCodeConduct;
 
   return (
-    <div
-      className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
           <DelegateCard delegate={delegate} />
@@ -139,15 +142,12 @@ export default function DelegateStatementForm({
         <div className="flex flex-col bg-neutral border rounded-xl border-line shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-
               <DelegateStatementFormSection form={form} />
               {hasTopIssues && <TopIssuesFormSection form={form} />}
               {hasStakeholders && <TopStakeholdersFormSection form={form} />}
-              {hasSCW && <ScwSection form={form}/>}
               <OtherInfoFormSection form={form} />
 
-              <div
-                className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
+              <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
                 <span className="text-sm text-primary">
                   Tip: you can always come back and edit your profile at any
                   time.
