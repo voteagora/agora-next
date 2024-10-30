@@ -28,6 +28,7 @@ const citizenAllowlist = [
   "0x143c777f650ad8d00942d497ee66f4d774427195",
   "0xa1179f64638adb613ddaac32d918eb6beb824104",
   "0xc0f2a154aba3f12d71af25e87ca4f225b9c52203",
+  "0x1feef51299adadfad45d19f905b43b37a327c553",
 ];
 
 const getBadgeholder = async (addressOrEnsName: string) =>
