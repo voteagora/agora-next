@@ -38,7 +38,7 @@ export async function paginateResult<T>(
   return {
     meta: {
       has_next: has_next,
-      total_returned: data.length - 1,
+      total_returned: data.length,
       next_offset: has_next ? params.offset + params.limit : 0,
     },
     data: theData,
