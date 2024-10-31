@@ -14,7 +14,7 @@ const metricsBallotContentSchema = z.object({
 });
 
 const projectsBallotContentSchema = z.object({
-  budget: z.number().min(2000000).max(8000000), // number between 2M and 8M
+  budget: z.number().min(1100000).max(3500000), // number between 1.1M and 3.5M
   project_allocations: z.array(
     z.record(z.string(), z.string(z.number().min(0).max(100)).nullable())
   ),
