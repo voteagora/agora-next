@@ -122,6 +122,8 @@ async function getDelegates({
           SELECT delegatee
           FROM ${namespace}.delegatees
           WHERE delegator = '${filters.delegatee.toLowerCase()}'
+          AND contract = '${tokenAddress}'
+          ORDER BY block_number DESC
         )
       `
           : ""

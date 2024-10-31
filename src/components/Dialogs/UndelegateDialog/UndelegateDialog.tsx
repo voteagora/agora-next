@@ -179,15 +179,19 @@ export function UndelegateDialog({
     <div className="flex flex-col items-center w-full bg-neutral max-w-[28rem]">
       <div className="flex flex-col gap-6 justify-center min-h-[318px] w-full">
         {delegatee ? (
-          <div className="flex flex-col gap-3 items-center py-3 w-full text-tertiary text-xs">
-            <div className="flex flex-col text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
-              <div className="flex flex-row items-center gap-1 mb-1">
-                Your total delegatable votes
-              </div>
-              <AdvancedDelegationDisplayAmount amount={votingPower} />
+          <div className="flex flex-col gap-3 items-center w-full text-tertiary text-xs">
+            <div>
+              <h2 className="text-xl font-bold text-primary">
+                Remove <ENSName address={delegatee.delegatee} /> as your
+                delegate
+              </h2>
+              <p className="text-sm text-secondary mt-1">
+                This delegate will no longer be able to vote on your behalf.
+                Your votes will be returned to you.
+              </p>
             </div>
-            <div className="flex flex-col relative w-full">
-              <div className="flex flex-row items-center gap-3 p-2 pb-4 pl-0 border-b border-line">
+            <div className="flex flex-col relative w-full border border-line rounded-lg">
+              <div className="flex flex-row items-center gap-3 p-4 border-b border-line">
                 <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
@@ -198,10 +202,10 @@ export function UndelegateDialog({
                   </div>
                 </div>
               </div>
-              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-1/2 -translate-y-1/2 bg-neutral border border-line rounded-full right-1/2 top-1/2">
+              <div className="absolute flex items-center justify-center w-10 h-10 translate-x-3/4 -translate-y-1/2 bg-neutral border border-line rounded-full right-[50px] top-1/2">
                 <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
-              <div className="flex flex-row items-center gap-3 p-2 pt-6 pl-0">
+              <div className="flex flex-row items-center gap-3 p-4">
                 <ENSAvatar ensName={accountEnsName} className="h-10 w-10" />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
