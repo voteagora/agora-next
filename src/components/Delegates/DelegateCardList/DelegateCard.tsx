@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { bpsToString, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DelegateActions } from "../DelegateCard/DelegateActions";

@@ -80,7 +80,7 @@ export function DelegateProfileImage({
   }, [address, formattedNumber, refetchDelegate, setRefetchDelegate]);
 
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-4 items-center">
       <div className="relative aspect-square">
         {citizen && (
           <Image
@@ -119,11 +119,6 @@ export function DelegateProfileImage({
             </TooltipProvider>
           )}
         </div>
-        {data && (
-          <div className="text-secondary text-xs font-semibold">
-            {truncateAddress(address)}
-          </div>
-        )}
       </div>
     </div>
   );

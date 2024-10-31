@@ -13,7 +13,7 @@ const CardHeader = ({
   subtitle: string;
 }) => {
   return (
-    <div className="px-6 pt-4 pb-6 border border-line bg-tertiary/5 rounded-md mb-[-16px]">
+    <div className="px-4 pt-4 pb-8 border border-line bg-tertiary/5 rounded-lg mb-[-16px]">
       <div className="flex flex-col gap-0.5">
         <div className="flex flex-row justify-between">
           <h3 className="text-primary font-bold">{title}</h3>
@@ -54,7 +54,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
         <InactiveHeader outOfTen={delegate.lastTenProps} />
       )}
       <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">
-        <div className="flex flex-col items-stretch p-6 border-b border-line">
+        <div className="flex flex-col items-stretch p-4 border-b border-line">
           <DelegateProfileImage
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
@@ -64,7 +64,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
           />
         </div>
 
-        <div className="flex flex-col p-6">
+        <div className="flex flex-col p-4">
           <div className="flex flex-col gap-4">
             <PanelRow
               title="Voting power"
@@ -89,12 +89,12 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
               }
             /> */}
             <PanelRow
-              title="Proposals created"
-              detail={`${delegate.proposalsCreated}`}
-            />
-            <PanelRow
               title="Delegated addresses"
               detail={delegate.numOfDelegators.toString()}
+            />
+            <PanelRow
+              title="Proposals created"
+              detail={`${delegate.proposalsCreated}`}
             />
             <PanelRow
               title="For/Against/Abstain"
