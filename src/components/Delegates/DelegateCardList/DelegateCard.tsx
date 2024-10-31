@@ -54,11 +54,9 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              {isVotingStatsLoading ? (
-                <span className="h-[24px] w-[100px] bg-tertiary/10 rounded-md animate-pulse" />
-              ) : (
+              {votingStats && (
                 <span className="text-primary font-bold">
-                  {votingStats?.last_10_props || 0 * 1000}% Participation
+                  {votingStats?.last_10_props || 0 * 10}% Participation
                 </span>
               )}
             </div>
