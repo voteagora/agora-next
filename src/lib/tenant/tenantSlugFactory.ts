@@ -15,6 +15,8 @@ export default class TenantSlugFactory {
         return "UNI";
       case TENANT_NAMESPACES.CYBER:
         return "CYBER";
+      case TENANT_NAMESPACES.SCROLL:
+        return "SCROLL";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
