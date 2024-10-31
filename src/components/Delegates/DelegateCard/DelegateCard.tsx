@@ -1,8 +1,8 @@
-import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import DelegateCardClient from "./DelegateCardClient";
-import { Delegate } from "@/app/api/common/delegates/delegate";
 import { formatNumber } from "@/lib/tokenUtils";
+import { resolveENSName } from "@/app/lib/ENSUtils";
+import { fetchDelegate } from "@/app/delegates/actions";
 
 const CardHeader = ({
   title,
@@ -46,7 +46,14 @@ const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
   );
 };
 
-export default function DelegateCard({ delegate }: { delegate: Delegate }) {
+export default async function DelegateCard({
+  addressOrENSName,
+}: {
+  addressOrENSName: string;
+}) {
+  const address = await resolveENSName(addressOrENSName);
+  const delegate = await fetchDelegate(address);
+
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       {delegate.votingParticipation > 0.5 ? (
@@ -136,5 +143,11 @@ export const PanelRow = ({
         {detail}
       </span>
     </div>
+  );
+};
+
+export const DelegateCardSkeleton = () => {
+  return (
+    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem] h-[300px] bg-tertiary/10 animate-pulse rounded-lg"></div>
   );
 };

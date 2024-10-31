@@ -29,7 +29,6 @@ const DelegateCard = ({
     }
   );
 
-  console.log(votingStats);
   return (
     <div
       key={delegate.address}
