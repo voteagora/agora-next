@@ -39,8 +39,7 @@ const DelegateCard = ({
           : ""
       )}
     >
-      {/* no pre-fetch because there are so many links on the screen at once */}
-      <Link href={`/delegates/${delegate.address}`} prefetch={false}>
+      <Link href={`/delegates/${delegate.address}`}>
         <div className="flex flex-col gap-4 h-full rounded-xl bg-white border border-line shadow-newDefault">
           <div className="flex flex-col gap-4 justify-center pt-4">
             <div className="border-b border-line px-4 pb-4">
