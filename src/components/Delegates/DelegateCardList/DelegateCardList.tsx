@@ -73,7 +73,7 @@ export default function DelegateCardList({
         }
         element="div"
       >
-        {delegates?.map((delegate) => {
+        {delegates?.map((delegate, idx) => {
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {
@@ -85,6 +85,7 @@ export default function DelegateCardList({
 
           return (
             <DelegateCard
+              key={idx}
               delegate={delegate}
               truncatedStatement={truncatedStatement}
               isDelegatesCitizensFetching={isDelegatesCitizensFetching}
