@@ -1,8 +1,7 @@
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import DelegateCardClient from "./DelegateCardClient";
 import { formatNumber } from "@/lib/tokenUtils";
-import { resolveENSName } from "@/app/lib/ENSUtils";
-import { fetchDelegate } from "@/app/delegates/actions";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 const CardHeader = ({
   title,
@@ -46,14 +45,7 @@ const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
   );
 };
 
-export default async function DelegateCard({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}) {
-  const address = await resolveENSName(addressOrENSName);
-  const delegate = await fetchDelegate(address);
-
+export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       {delegate.votingParticipation > 0.5 ? (
@@ -88,6 +80,22 @@ export default async function DelegateCard({
                     )})`
               }
             /> */}
+            {/* <PanelRow
+              title="Recent activity"
+              detail={
+                delegate.lastTenProps
+                  ? `${delegate.lastTenProps} of 10 last props`
+                  : "N/A"
+              }
+            /> */}
+            <PanelRow
+              title="Proposals created"
+              detail={`${delegate.proposalsCreated}`}
+            />
+            <PanelRow
+              title="Delegated addresses"
+              detail={delegate.numOfDelegators.toString()}
+            />
             <PanelRow
               title="For/Against/Abstain"
               //   detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
@@ -104,22 +112,6 @@ export default async function DelegateCard({
                   </span>
                 </div>
               }
-            />
-            {/* <PanelRow
-              title="Recent activity"
-              detail={
-                delegate.lastTenProps
-                  ? `${delegate.lastTenProps} of 10 last props`
-                  : "N/A"
-              }
-            /> */}
-            <PanelRow
-              title="Proposals created"
-              detail={`${delegate.proposalsCreated}`}
-            />
-            <PanelRow
-              title="Delegated addresses"
-              detail={delegate.numOfDelegators.toString()}
             />
             <DelegateCardClient delegate={delegate} />
           </div>

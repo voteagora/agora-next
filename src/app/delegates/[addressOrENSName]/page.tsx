@@ -1,11 +1,5 @@
-/*
- * Show page for a single delegate
- * Takes in the delegate address as a parameter
- */
 import { Metadata, ResolvingMetadata } from "next";
-import DelegateCard, {
-  DelegateCardSkeleton,
-} from "@/components/Delegates/DelegateCard/DelegateCard";
+import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -99,11 +93,8 @@ export default async function Page({
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-        <Suspense fallback={<DelegateCardSkeleton />}>
-          <DelegateCard addressOrENSName={addressOrENSName} />
-        </Suspense>
+        <DelegateCard delegate={delegate} />
       </div>
-
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <Suspense fallback={<DelegateStatementSkeleton />}>
           <DelegateStatementWrapper addressOrENSName={addressOrENSName} />
