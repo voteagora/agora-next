@@ -7,7 +7,7 @@ const voteFilterOptions = {
   ["Voters"]: {
     sortKey: "voters",
   },
-  ["Non voters"]: {
+  ["Hasn't voted"]: {
     sortKey: "nonVoters",
   },
 };

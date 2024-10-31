@@ -41,7 +41,7 @@ const ProposalNonVoterList = ({
         useWindow={false}
         loader={
           <div className="flex text-xs font-medium text-secondary" key={0}>
-            Loading more votes...
+            Loading more voters...
           </div>
         }
         element="main"

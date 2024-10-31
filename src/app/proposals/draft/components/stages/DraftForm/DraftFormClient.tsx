@@ -89,13 +89,13 @@ const DraftFormClient = ({
 
   const { watch, handleSubmit, control } = methods;
 
-  const proposalType = watch("type");
+  const votingModuleType = watch("type");
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
 
   useEffect(() => {
     const newValidProposalTypes = getValidProposalTypesForVotingType(
       proposalTypes,
-      proposalType
+      votingModuleType
     );
 
     setValidProposalTypes(newValidProposalTypes);
@@ -106,7 +106,7 @@ const DraftFormClient = ({
         newValidProposalTypes[0].proposal_type_id
       );
     }
-  }, [proposalType, proposalTypes, methods]);
+  }, [votingModuleType, proposalTypes, methods]);
 
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
     setIsPending(true);
@@ -153,7 +153,7 @@ const DraftFormClient = ({
                 />
 
                 <p className="text-sm self-center text-agora-stone-700 mt-6">
-                  {ProposalTypeMetadata[proposalType].description}
+                  {ProposalTypeMetadata[votingModuleType].description}
                 </p>
               </div>
 
@@ -197,7 +197,7 @@ const DraftFormClient = ({
           </FormCard.Section>
           <FormCard.Section>
             {(() => {
-              switch (proposalType) {
+              switch (votingModuleType) {
                 case ProposalType.BASIC:
                   return <BasicProposalForm />;
                 case ProposalType.SOCIAL:
@@ -207,7 +207,7 @@ const DraftFormClient = ({
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:
-                  const exhaustiveCheck: never = proposalType;
+                  const exhaustiveCheck: never = votingModuleType;
                   return exhaustiveCheck;
               }
             })()}

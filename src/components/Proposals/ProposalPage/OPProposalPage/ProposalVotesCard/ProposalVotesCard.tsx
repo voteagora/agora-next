@@ -51,7 +51,7 @@ const ProposalVotesCard = ({
           />
           <div className="px-4">
             <ProposalVotesFilter
-              initialSelection={showVoters ? "Voters" : "Non voters"}
+              initialSelection={showVoters ? "Voters" : "Hasn't voted"}
               onSelectionChange={(value) => {
                 setShowVoters(value === "Voters");
               }}

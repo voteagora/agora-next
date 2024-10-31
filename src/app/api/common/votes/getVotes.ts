@@ -200,17 +200,24 @@ async function getVotersWhoHaveNotVotedForProposal({
   proposalId: string;
   pagination?: PaginationParams;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, slug } = Tenant.current();
 
   const queryFunction = (skip: number, take: number) => {
     const notVotedQuery = `
     SELECT
-      *
-    FROM ${namespace + ".delegates"} vp
-    WHERE vp.delegate NOT IN (
+      del.*,
+      ds.twitter,
+      ds.discord,
+      ds.warpcast
+    FROM ${namespace + ".delegates"} del
+    LEFT JOIN agora.delegate_statements ds
+      ON del.delegate = ds.address
+      AND ds.dao_slug = '${slug}'
+    WHERE del.delegate NOT IN (
       SELECT voter FROM ${namespace + ".vote_cast_events"} WHERE proposal_id = $1
     )
-      AND vp.contract = $2
+      AND del.contract = $2
+      ORDER BY del.voting_power DESC
   `;
 
     return prisma.$queryRawUnsafe<VotePayload[]>(
