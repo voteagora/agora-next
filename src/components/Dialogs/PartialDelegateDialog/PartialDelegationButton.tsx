@@ -1,8 +1,8 @@
 import {
   useAccount,
-  useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,11 @@ export const PartialDelegationButton = ({
     Math.round(Number(delegation.percentage) * 10000),
   ]);
 
-  const { data: config } = useSimulateContract({
+  const {
+    data: simulateData,
+    isError: isSimulateError,
+    error,
+  } = useSimulateContract({
     query: { enabled: !disabled },
     address: contracts.token.address as `0x${string}`,
     abi: contracts.token.abi,
@@ -51,7 +55,7 @@ export const PartialDelegationButton = ({
     args: [cleanDelegations],
   });
 
-  const { data, writeContract: write, status } = useWriteContract();
+  const { data, writeContract: write } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash: data });
 
   useEffect(() => {
@@ -61,12 +65,29 @@ export const PartialDelegationButton = ({
     }
   }, [data, isSuccess]);
 
+  if (isSimulateError) {
+    return (
+      <div>
+        <Button
+          className="w-full"
+          onClick={() => {}}
+          disabled={true}
+          loading={false}
+        >
+          Error simulating transaction
+        </Button>
+
+        {error && <div className="text-xs text-red">{error.toString()}</div>}
+      </div>
+    );
+  }
+
   return (
     <div>
       <Button
         className="w-full"
-        onClick={() => write(config!.request)}
-        disabled={isLoading || disabled}
+        onClick={() => write(simulateData!.request)}
+        disabled={isLoading || disabled || !simulateData?.request}
         loading={isLoading}
       >
         Delegate Voting Power

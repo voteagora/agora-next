@@ -45,24 +45,22 @@ export const scrollTenantContractConfig = ({
         `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
       ),
       priority: 1,
-      stallTimeout: 1500,
+      stallTimeout: 10,
       weight: 1,
     },
     {
       provider: new JsonRpcProvider(`https://rpc.scroll.io/`),
       priority: 2,
-      stallTimeout: 1500,
+      stallTimeout: 10,
       weight: 1,
     },
   ]);
-
-  const chain = scroll;
 
   return {
     token: new TenantContract<ITokenContract>({
       abi: AgoraToken__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain,
+      chain: scroll,
       contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
     }),
@@ -71,7 +69,7 @@ export const scrollTenantContractConfig = ({
     governor: new TenantContract<IGovernorContract>({
       abi: AgoraGovernor__factory.abi,
       address: GOVERNOR,
-      chain,
+      chain: scroll,
       contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
