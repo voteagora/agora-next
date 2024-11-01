@@ -63,6 +63,7 @@ async function getProjectsApi({
           contracts: projectData.contracts,
           grantsAndFunding: projectData.grantsAndFunding,
           pricingModel: projectData.pricingModel,
+          pricingModelDetails: projectData.pricingModelDetails,
           impactStatement: {
             category: data.application_category,
             subcategory: data.application_subcategory,
@@ -107,7 +108,8 @@ async function getProjectsApi({
           grants: project.grants_and_funding_grants,
           revenue: project.grants_and_funding_revenue,
         },
-        pricingModel: {},
+        pricingModel: "",
+        pricingModelDetails: "",
         impactStatement: {
           category: null,
           subcategory: null,
@@ -164,6 +166,7 @@ async function getProjectApi({
     contracts: projectData.contracts,
     grantsAndFunding: projectData.grantsAndFunding,
     pricingModel: projectData.pricingModel,
+    pricingModelDetails: projectData.pricingModelDetails,
     impactStatement: {
       category: project.application_category,
       subcategory: project.application_subcategory,
