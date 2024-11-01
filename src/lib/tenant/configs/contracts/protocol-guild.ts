@@ -4,7 +4,6 @@ import {
   ProposalTypesConfigurator__factory,
   Membership__factory,
 } from "@/lib/contracts/generated";
-import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
