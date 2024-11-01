@@ -2473,6 +2473,7 @@ enum DaoSlug {
   UNISWAP
   CYBER
   DERIVE
+  PGUILD
 
   @@map("dao_slug")
   @@schema("config")
