@@ -12,13 +12,13 @@ const DelegationsContainerWrapper = async ({
   addressOrENSName: string;
 }) => {
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const [delegates, delegators] = await Promise.all([
+  const [delegatees, delegators] = await Promise.all([
     fetchCurrentDelegatees(address),
     fetchCurrentDelegators(address),
   ]);
   return (
     <DelegationsContainer
-      delegatees={delegates}
+      delegatees={delegatees}
       initialDelegators={delegators}
       fetchDelegators={async (pagination: PaginationParams) => {
         "use server";

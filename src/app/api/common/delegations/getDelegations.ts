@@ -35,8 +35,6 @@ async function getCurrentDelegateesForAddress({
       },
     });
 
-    console.log("delegatee", delegatee);
-
     if (namespace === TENANT_NAMESPACES.OPTIMISM) {
       const proxyAddress = await getProxyAddress(address);
       if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {

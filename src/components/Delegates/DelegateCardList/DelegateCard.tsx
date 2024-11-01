@@ -56,7 +56,7 @@ const DelegateCard = ({
               </span>
               {votingStats && (
                 <span className="text-primary font-bold">
-                  {votingStats?.last_10_props || 0 * 10}% Participation
+                  {(votingStats?.last_10_props || 0) * 10}% Participation
                 </span>
               )}
             </div>

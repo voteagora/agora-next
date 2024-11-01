@@ -18,6 +18,7 @@ import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getProxyAddress } from "@/lib/alligatorUtils";
 
 /*
  * Fetches a list of delegates
@@ -104,6 +105,9 @@ async function getDelegates({
 
   let delegateUniverseCTE: string;
   const tokenAddress = contracts.token.address;
+  const proxyAddress = filters?.delegatee
+    ? await getProxyAddress(filters?.delegatee?.toLowerCase())
+    : null;
 
   delegateUniverseCTE = `
     with del_statements as (
@@ -120,9 +124,19 @@ async function getDelegates({
           ? `
         AND d.delegate IN (
           SELECT delegatee
-          FROM ${namespace}.delegatees
-          WHERE delegator = '${filters.delegatee.toLowerCase()}'
-          AND contract = '${tokenAddress}'
+          FROM (
+            SELECT delegatee, block_number
+            FROM ${namespace}.delegatees
+            WHERE delegator = '${filters.delegatee.toLowerCase()}'
+            ${proxyAddress ? `AND delegatee <> '${proxyAddress.toLowerCase()}'` : ""}
+            AND contract = '${tokenAddress}'
+            UNION ALL
+            SELECT "to" as delegatee, block_number
+            FROM ${namespace}.advanced_delegatees
+            WHERE "from" = '${filters.delegatee.toLowerCase()}'
+            AND delegated_amount > 0
+            AND contract = '${contracts.alligator?.address || tokenAddress}'
+          ) combined_delegations
           ORDER BY block_number DESC
         )
       `
