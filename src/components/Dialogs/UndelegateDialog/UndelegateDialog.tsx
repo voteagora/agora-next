@@ -15,12 +15,12 @@ import {
 } from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
-import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { revalidateData } from "./revalidateAction";
+import { zeroAddress } from "viem";
 
 export function UndelegateDialog({
   delegate,
@@ -108,7 +108,7 @@ export function UndelegateDialog({
               address: contracts.token.address as any,
               abi: contracts.token.abi,
               functionName: "delegate",
-              args: [accountAddress as `0x${string}`],
+              args: [zeroAddress],
             })
           }
         >
@@ -141,7 +141,7 @@ export function UndelegateDialog({
             address: contracts.token.address as any,
             abi: contracts.token.abi,
             functionName: "delegate",
-            args: [accountAddress as `0x${string}`],
+            args: [zeroAddress],
           })
         }
       >
@@ -206,13 +206,12 @@ export function UndelegateDialog({
                 <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <div className="flex flex-row items-center gap-3 p-4">
-                <ENSAvatar ensName={accountEnsName} className="h-10 w-10" />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Delegate back to self (undelegate)
+                    Remove your delegate votes
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
-                    <ENSName address={accountAddress!} />
+                    <ENSName address={zeroAddress} />
                   </div>
                 </div>
               </div>
