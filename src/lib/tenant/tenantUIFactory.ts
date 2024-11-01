@@ -7,6 +7,7 @@ import { optimismTenantUIConfig } from "@/lib/tenant/configs/ui/optimism";
 import { cyberTenantUIConfig } from "@/lib/tenant/configs/ui/cyber";
 import { deriveTenantUIConfig } from "@/lib/tenant/configs/ui/derive";
 import { scrollTenantUIConfig } from "@/lib/tenant/configs/ui/scroll";
+import { protocolGuildTenantUIConfig } from "@/lib/tenant/configs/ui/protocol-guild";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -31,6 +32,9 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.SCROLL:
         return scrollTenantUIConfig;
+
+      case TENANT_NAMESPACES.PROTOCOL_GUILD:
+        return protocolGuildTenantUIConfig;
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

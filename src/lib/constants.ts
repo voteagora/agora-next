@@ -31,6 +31,7 @@ export const TENANT_NAMESPACES = {
   CYBER: "cyber",
   SCROLL: "scroll",
   DERIVE: "derive",
+  PROTOCOL_GUILD: "protocol-guild",
 } as const;
 
 export const proposalsFilterOptions = {

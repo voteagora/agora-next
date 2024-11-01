@@ -10,6 +10,7 @@ export type { CyberProposalTypes } from "./CyberProposalTypes";
 export type { ENSGovernor } from "./ENSGovernor";
 export type { ENSTimelock } from "./ENSTimelock";
 export type { ERC20 } from "./ERC20";
+export type { Membership } from "./Membership";
 export type { NounsGovernor } from "./NounsGovernor";
 export type { OptimismGovernor } from "./OptimismGovernor";
 export type { ProposalTypesConfigurator } from "./ProposalTypesConfigurator";
@@ -27,6 +28,7 @@ export { CyberProposalTypes__factory } from "./factories/CyberProposalTypes__fac
 export { ENSGovernor__factory } from "./factories/ENSGovernor__factory";
 export { ENSTimelock__factory } from "./factories/ENSTimelock__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
+export { Membership__factory } from "./factories/Membership__factory";
 export { NounsGovernor__factory } from "./factories/NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./factories/OptimismGovernor__factory";
 export { ProposalTypesConfigurator__factory } from "./factories/ProposalTypesConfigurator__factory";

@@ -3,6 +3,7 @@ import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligator
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
+import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";

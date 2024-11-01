@@ -19,6 +19,8 @@ export default class TenantSlugFactory {
         return "DERIVE";
       case TENANT_NAMESPACES.SCROLL:
         return "SCROLL";
+      case TENANT_NAMESPACES.PROTOCOL_GUILD:
+        return "PROTOCOL_GUILD";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

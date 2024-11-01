@@ -10,6 +10,7 @@ export { CyberProposalTypes__factory } from "./CyberProposalTypes__factory";
 export { ENSGovernor__factory } from "./ENSGovernor__factory";
 export { ENSTimelock__factory } from "./ENSTimelock__factory";
 export { ERC20__factory } from "./ERC20__factory";
+export { Membership__factory } from "./Membership__factory";
 export { NounsGovernor__factory } from "./NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./OptimismGovernor__factory";
 export { ProposalTypesConfigurator__factory } from "./ProposalTypesConfigurator__factory";
