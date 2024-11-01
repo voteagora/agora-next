@@ -51,8 +51,8 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
     ]?.value || citizensFilterOptions.shuffle.sort;
 
   const filters = {
-    ...(searchParams.delegateeFilter && {
-      delegatee: searchParams.delegateeFilter,
+    ...(searchParams.delegatorFilter && {
+      delegator: searchParams.delegatorFilter,
     }),
     ...(searchParams.issueFilter && { issues: searchParams.issueFilter }),
     ...(searchParams.stakeholderFilter && {

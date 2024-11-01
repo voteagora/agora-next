@@ -40,7 +40,7 @@ async function getDelegates({
   sort: string;
   seed?: number;
   filters?: {
-    delegatee?: `0x${string}`;
+    delegator?: `0x${string}`;
     issues?: string;
     stakeholders?: string;
     endorsed?: boolean;
@@ -105,8 +105,8 @@ async function getDelegates({
 
   let delegateUniverseCTE: string;
   const tokenAddress = contracts.token.address;
-  const proxyAddress = filters?.delegatee
-    ? await getProxyAddress(filters?.delegatee?.toLowerCase())
+  const proxyAddress = filters?.delegator
+    ? await getProxyAddress(filters?.delegator?.toLowerCase())
     : null;
 
   delegateUniverseCTE = `
@@ -120,20 +120,20 @@ async function getDelegates({
       from ${namespace}.delegates d
       where d.contract = '${tokenAddress}'
       ${
-        filters?.delegatee
+        filters?.delegator
           ? `
         AND d.delegate IN (
           SELECT delegatee
           FROM (
             SELECT delegatee, block_number
             FROM ${namespace}.delegatees
-            WHERE delegator = '${filters.delegatee.toLowerCase()}'
+            WHERE delegator = '${filters.delegator.toLowerCase()}'
             ${proxyAddress ? `AND delegatee <> '${proxyAddress.toLowerCase()}'` : ""}
             AND contract = '${tokenAddress}'
             UNION ALL
             SELECT "to" as delegatee, block_number
             FROM ${namespace}.advanced_delegatees
-            WHERE "from" = '${filters.delegatee.toLowerCase()}'
+            WHERE "from" = '${filters.delegator.toLowerCase()}'
             AND delegated_amount > 0
             AND contract = '${contracts.alligator?.address || tokenAddress}'
           ) combined_delegations
@@ -197,7 +197,6 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
         `;
-        // console.log(QRY1);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1, skip, take);
 
       case "weighted_random":
@@ -239,7 +238,6 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `;
-        // console.log(QRY2);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2, skip, take);
 
       default:
@@ -280,7 +278,6 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `;
-        // console.log(QRY3);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3, skip, take);
     }
   };

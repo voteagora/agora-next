@@ -39,7 +39,6 @@ export type DelegatesGetPayload = {
   direct_vp: Decimal;
   advanced_vp: Decimal;
   voting_power: Decimal;
-  participation_rate: Decimal;
   citizen: boolean;
   statement: DelegateStatement;
 };

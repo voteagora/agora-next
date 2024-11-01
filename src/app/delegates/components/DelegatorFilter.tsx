@@ -8,10 +8,10 @@ import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 
-const FILTER_PARAM = "delegateeFilter";
+const FILTER_PARAM = "delegatorFilter";
 const DEFAULT_FILTER = "all_delegates";
 
-export default function DelegateeFilter() {
+export default function DelegatorFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const addSearchParam = useAddSearchParam();
