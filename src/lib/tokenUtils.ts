@@ -1,6 +1,10 @@
 import { ethers } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
+import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
+import { TenantContract } from "@/lib/tenant/tenantContract";
+import { TenantContracts } from "./types";
 
 // TODO: This file seems messy -- consider refactoring
 
@@ -90,4 +94,53 @@ export function formatNumberForAdvancedDelegation(amount: string) {
     .filter((part) => part.type !== "currency" && part.type !== "literal")
     .map((part) => part.value)
     .join("");
+}
+
+export function createTokenContract({
+  abi,
+  address,
+  chain,
+  contract,
+  provider,
+  type,
+}: {
+  abi: any;
+  address: string;
+  chain: any;
+  contract: any;
+  provider: any;
+  type: "erc20" | "erc721";
+}): TenantContracts["token"] {
+  const tenantContract = (
+    type === "erc20"
+      ? new TenantContract<ITokenContract>({
+          abi,
+          address: address as `0x${string}`,
+          chain,
+          contract,
+          provider,
+        })
+      : new TenantContract<IMembershipContract>({
+          abi,
+          address: address as `0x${string}`,
+          chain,
+          contract,
+          provider,
+        })
+  ) as TenantContracts["token"];
+
+  Object.assign(tenantContract, {
+    isERC20: function (
+      this: TenantContracts["token"]
+    ): this is TenantContract<ITokenContract> {
+      return type === "erc20";
+    },
+    isERC721: function (
+      this: TenantContracts["token"]
+    ): this is TenantContract<IMembershipContract> {
+      return type === "erc721";
+    },
+  });
+
+  return tenantContract;
 }

@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export { AgoraGovernor__factory } from "./AgoraGovernor__factory";
+export { AgoraGovernor_11__factory } from "./AgoraGovernor_11__factory";
 export { AgoraTimelock__factory } from "./AgoraTimelock__factory";
 export { AgoraToken__factory } from "./AgoraToken__factory";
 export { AlligatorOPV5__factory } from "./AlligatorOPV5__factory";

@@ -1,28 +1,34 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
-import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 
 async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
 
-  if (contracts)
-    try {
-      const totalSupply = await contracts.token.contract.totalSupply();
-      const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
-        {}
-      );
-      return {
-        votableSupply: votableSupply?.votable_supply || "0",
-        totalSupply: totalSupply.toString(),
-      };
-    } catch (e) {
-      // Handle prisma errors for new tenants
-      return {
-        votableSupply: "0",
-        totalSupply: "0",
-      };
+  try {
+    let totalSupply;
+    if (contracts.token.isERC20()) {
+      totalSupply = await contracts.token.contract.totalSupply();
+    } else if (contracts.token.isERC721()) {
+      totalSupply = 0;
+    } else {
+      totalSupply = 0;
     }
+
+    const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
+      {}
+    );
+    return {
+      votableSupply: votableSupply?.votable_supply || "0",
+      totalSupply: totalSupply.toString(),
+    };
+  } catch (e) {
+    // Handle prisma errors for new tenants
+    return {
+      votableSupply: "0",
+      totalSupply: "0",
+    };
+  }
 }
 
 export const fetchMetrics = cache(getMetrics);

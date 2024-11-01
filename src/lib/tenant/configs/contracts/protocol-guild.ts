@@ -1,5 +1,5 @@
 import {
-  AgoraGovernor__factory,
+  AgoraGovernor_11__factory,
   AgoraTimelock__factory,
   ProposalTypesConfigurator__factory,
   Membership__factory,
@@ -10,7 +10,7 @@ import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider, BaseContract } from "ethers";
 import { zeroAddress } from "viem";
-import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
+import { createTokenContract } from "@/lib/tokenUtils";
 
 interface Props {
   isProd: boolean;
@@ -44,19 +44,20 @@ export const protocolGuildTenantContractConfig = ({
   const chain = isProd ? mainnet : sepolia;
 
   return {
-    token: new TenantContract<IMembershipContract>({
+    token: createTokenContract({
       abi: Membership__factory.abi,
       address: TOKEN as `0x${string}`,
       chain: chain,
       contract: Membership__factory.connect(TOKEN, provider),
       provider,
+      type: "erc721",
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: AgoraGovernor__factory.abi,
+      abi: AgoraGovernor_11__factory.abi,
       address: GOVERNOR,
       chain,
-      contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
+      contract: AgoraGovernor_11__factory.connect(GOVERNOR, provider),
       provider,
     }),
 

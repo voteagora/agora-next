@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { AgoraGovernor } from "./AgoraGovernor";
+export type { AgoraGovernor_11 } from "./AgoraGovernor_11";
 export type { AgoraTimelock } from "./AgoraTimelock";
 export type { AgoraToken } from "./AgoraToken";
 export type { AlligatorOPV5 } from "./AlligatorOPV5";
@@ -20,6 +21,7 @@ export type { UniswapTimelock } from "./UniswapTimelock";
 export type { VotableSupplyOracle } from "./VotableSupplyOracle";
 export * as factories from "./factories";
 export { AgoraGovernor__factory } from "./factories/AgoraGovernor__factory";
+export { AgoraGovernor_11__factory } from "./factories/AgoraGovernor_11__factory";
 export { AgoraTimelock__factory } from "./factories/AgoraTimelock__factory";
 export { AgoraToken__factory } from "./factories/AgoraToken__factory";
 export { AlligatorOPV5__factory } from "./factories/AlligatorOPV5__factory";

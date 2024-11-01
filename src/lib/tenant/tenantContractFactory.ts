@@ -30,7 +30,7 @@ export default class TenantContractFactory {
         return deriveTenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.SCROLL:
         return scrollTenantContractConfig({ isProd, alchemyId });
-      case TENANT_NAMESPACES.PROTOCOL_GUILD:
+      case TENANT_NAMESPACES.PGUILD:
         return protocolGuildTenantContractConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

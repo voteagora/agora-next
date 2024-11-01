@@ -33,7 +33,7 @@ export default class TenantUIFactory {
       case TENANT_NAMESPACES.SCROLL:
         return scrollTenantUIConfig;
 
-      case TENANT_NAMESPACES.PROTOCOL_GUILD:
+      case TENANT_NAMESPACES.PGUILD:
         return protocolGuildTenantUIConfig;
 
       default:
