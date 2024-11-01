@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "alltenant", "config", "cyber", "derive", "ens", "etherfi", "optimism", "retro_funding", "snapshot", "scroll", "uniswap"]
+  schemas  = ["agora", "alltenant", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap"]
 }
 
 model DelegateStatements {
