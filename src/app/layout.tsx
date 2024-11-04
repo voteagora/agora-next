@@ -85,7 +85,7 @@ export default async function RootLayout({
     "--negative": negative,
     "--brand-primary": brandPrimary,
     "--brand-secondary": brandSecondary,
-    "font-family": font,
+    fontFamily: font,
   } as React.CSSProperties;
 
   return (
