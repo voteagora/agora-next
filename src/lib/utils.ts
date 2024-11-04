@@ -359,6 +359,16 @@ export const getTransportForChain = (chainId: number) => {
         http("https://rpc.cyber.co"),
         http("https://cyber.alt.technology"),
       ]);
+
+    // scroll
+    case 534_352:
+      return fallback([
+        http(
+          `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        ),
+        http("https://rpc.scroll.io"),
+      ]);
+
     // for each new dao with a new chainId add them here
     default:
       return null;

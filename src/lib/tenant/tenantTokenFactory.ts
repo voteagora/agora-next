@@ -37,6 +37,13 @@ export default class TenantTokenFactory {
           symbol: "cCYBER",
           decimals: 18,
         };
+
+      case TENANT_NAMESPACES.SCROLL:
+        return {
+          name: "Scroll",
+          symbol: "SCR",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

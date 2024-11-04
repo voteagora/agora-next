@@ -17,6 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 /*
  * Fetches a list of delegates
@@ -380,14 +381,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-
-    //  Replace with Agora Governor flag
-    /*
-    } else if (namespace === TENANT_NAMESPACES.NEW_DAO) {
-      numOfDelegationsQuery = prisma.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
-   **/
+  } else if (namespace === TENANT_NAMESPACES.SCROLL) {
+    numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      { num_of_delegators: BigInt }[]
+    >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
   } else {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]

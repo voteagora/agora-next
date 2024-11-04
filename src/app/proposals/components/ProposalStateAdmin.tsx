@@ -111,6 +111,7 @@ interface ActionProps {
 
 const successActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
+    case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return (
         <div className="flex flex-row gap-2">
@@ -132,6 +133,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
 
 const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
+    case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return <AgoraGovExecute proposal={proposal} />;
 
@@ -148,6 +150,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
 
 const activeStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
+    case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return <AgoraGovCancel proposal={proposal} />;
 

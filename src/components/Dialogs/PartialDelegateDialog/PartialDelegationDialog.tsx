@@ -25,7 +25,6 @@ export function PartialDelegationDialog({
   closeDialog,
 }: Props) {
   const { contracts, ui } = Tenant.current();
-  console.log(contracts);
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address } = useAccount();

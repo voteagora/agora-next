@@ -53,14 +53,13 @@ const InfoAbout = () => {
               About {namespace}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
-            {/* So the image doesn't look smooshed for newdao :eye-roll:
-            {namespace === TENANT_NAMESPACES.NEW_DAO && (
+            {/* So the image doesn't look smooshed for scroll :eye-roll: */}
+            {namespace === TENANT_NAMESPACES.SCROLL && (
               <div className="sm:h-[105px] block"></div>
             )}
-            */}
           </div>
         </div>
-        {/*{namespace === TENANT_NAMESPACES.NEW_DAO && (
+        {namespace === TENANT_NAMESPACES.SCROLL && (
           <div className="p-6 border-t border-line">
             <div className="text-lg font-bold text-primary capitalize">
               Our approach to governance
@@ -75,16 +74,15 @@ const InfoAbout = () => {
             <p className="text-secondary">
               With this in mind, our plan is first to set up a minimal
               governance structure, refine it, and iterate on first principles.
-              Some governance system will accordingly start simple. This will
-              leave plenty of room for experimentation in the future in order to
-              keep the door open for broader collaboration in building our
-              ecosystem. We aim to reach a place where the DAO is both highly
-              decentralized, but still engages in thoughtful discourse and
-              research, resulting in meaningful outcomes.
+              Scroll’s governance system will accordingly start simple. This
+              will leave plenty of room for experimentation in the future in
+              order to keep the door open for broader collaboration in building
+              our ecosystem. We aim to reach a place where the DAO is both
+              highly decentralized, but still engages in thoughtful discourse
+              and research, resulting in meaningful outcomes.
             </p>
           </div>
         )}
-        */}
         <div className="p-6  rounded-b-xl bg-neutral border-t border-line">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
             {tabs.map((item, index) => (
