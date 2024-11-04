@@ -79,4 +79,5 @@ async function prepareVoteBySignature({
   return request;
 }
 
+export const prepareVoteBySignatureApi = cache(prepareVoteBySignature);
 export const voteBySiganatureApi = cache(voteBySignature);
