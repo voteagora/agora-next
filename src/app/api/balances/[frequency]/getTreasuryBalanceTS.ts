@@ -16,7 +16,9 @@ async function getTreasuryBalanceTS(
   const { contracts } = Tenant.current();
   const chainId = contracts.token?.chain?.id;
   const { lookback } = frequencyToLookbackDayCount(frequency);
-  const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ")})`;
+  const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ") ?? ""})`;
+  console.log("testing here");
+  console.log(chainId, crit);
 
   const QRY = `SELECT day,
                 TO_CHAR(day, 'YYYY-MM-DD') date,
@@ -25,7 +27,7 @@ async function getTreasuryBalanceTS(
               WHERE  chain_id = ${chainId}
                 AND day >= (CURRENT_DATE - INTERVAL '${lookback} day')
                 AND address IN ${crit}
-              GROUP BY 1 
+              GROUP BY 1
               ORDER BY day`;
 
   const result = await prisma.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);

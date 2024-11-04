@@ -107,9 +107,9 @@ async function getDelegates({
 
   delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
                               del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
-                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate, 
-                                      coalesce(d.num_of_delegators, 0) as num_of_delegators, 
-                                      coalesce(d.direct_vp, 0) as direct_vp, 
+                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate,
+                                      coalesce(d.num_of_delegators, 0) as num_of_delegators,
+                                      coalesce(d.direct_vp, 0) as direct_vp,
                                       coalesce(d.advanced_vp, 0) as advanced_vp,
                                       coalesce(d.voting_power, 0) as voting_power
                                       from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
@@ -142,7 +142,7 @@ async function getDelegates({
                   discord,
                   created_at,
                   updated_at,
-                  warpcast, 
+                  warpcast,
                   endorsed
                 FROM agora.delegate_statements s
                 WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
@@ -333,7 +333,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             warpcast,
             endorsed,
             scw_address
-          FROM agora.delegate_statements s 
+          FROM agora.delegate_statements s
           WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
           LIMIT 1
         ) sub
@@ -371,7 +371,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       { num_of_delegators: BigInt }[]
     >(
       `
-      SELECT 
+      SELECT
         SUM(num_of_delegators) as num_of_delegators
       FROM (
         ${numOfAdvancedDelegationsQuery}
@@ -409,9 +409,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       direct: delegate?.voting_power?.toString() || "0",
       advanced: delegate?.advanced_vp?.toFixed(0) || "0",
     },
-    votingPowerRelativeToVotableSupply: Number(
-      totalVotingPower / BigInt(votableSupply || 0)
-    ),
+    votingPowerRelativeToVotableSupply:
+      votableSupply && votableSupply > 0n
+        ? Number(totalVotingPower / BigInt(votableSupply || 0))
+        : 0,
     votingPowerRelativeToQuorum:
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000

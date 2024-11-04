@@ -1,6 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import ensLogo from "@/assets/tenant/ens_logo.svg";
-import ensHero from "@/assets/tenant/ens_hero.svg";
+import pguildLogo from "@/assets/tenant/pguild_logo.svg";
+import pguildHero from "@/assets/tenant/pguild_hero.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
@@ -13,7 +13,7 @@ import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const protocolGuildTenantUIConfig = new TenantUI({
   title: "Protocol Guild",
-  logo: ensLogo,
+  logo: pguildLogo,
 
   assets: {
     // TODO: Replace success and pending images
@@ -36,8 +36,8 @@ export const protocolGuildTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Agora is the home of Protocol Guide Governance",
-      hero: ensHero,
+      title: "Protocol Guide Governance",
+      hero: pguildHero,
       description:
         "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
       meta: {
@@ -49,7 +49,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Agora is the home of Protocol Guild Governance",
+      title: "Protocol Guild Governance",
       description:
         "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
       meta: {
@@ -61,7 +61,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       route: "delegates",
-      title: "Agora is the home of Protocol Guild Governance",
+      title: "Protocol Guild Governance",
       description:
         "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
       meta: {
@@ -74,10 +74,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "Welcome to the Optimism Collective",
+      title: "Protocol Guild Governance",
       description:
-        "The Protocol Guild is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the Protocol Guild Pledge, the Protocol Guild’s mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
-      hero: ensHero,
+        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
+      hero: pguildHero,
       meta: {
         title: "Info of Agora",
         description: "Welcome to Protocol Guild",
@@ -89,33 +89,52 @@ export const protocolGuildTenantUIConfig = new TenantUI({
           name: "Community Discord",
           title: "Community Discord",
           url: "",
-          image: infoPageCard01,
+          image: pguildLogo,
         },
         {
           name: "Governance Forums",
           title: "Governance Forums",
           url: "",
-          image: infoPageCard02,
+          image: pguildLogo,
         },
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
           url: "",
-          image: infoPageCard03,
+          image: pguildLogo,
         },
         {
           name: "Optimistic Vision",
           title: "Optimistic Vision",
           url: "",
-          image: infoPageCard04,
+          image: pguildLogo,
         },
       ],
+    },
+    {
+      route: "info/about",
+      title: "About Protocol Guild",
+      hero: pguildHero,
+      description:
+        "The Protocol Guild is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the Protocol Guild Pledge, the Protocol Guild’s mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+      meta: {
+        title: "About Protocol Guild",
+        description:
+          "The Protocol Guild is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the Protocol Guild Pledge, the Protocol Guild’s mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+        imageTitle: "About Protocol Guild",
+        imageDescription:
+          "The Protocol Guild is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the Protocol Guild Pledge, the Protocol Guild’s mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+      },
     },
   ],
 
   toggles: [
     {
       name: "proposals",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
     {
