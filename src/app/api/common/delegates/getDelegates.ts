@@ -410,7 +410,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       advanced: delegate?.advanced_vp?.toFixed(0) || "0",
     },
     votingPowerRelativeToVotableSupply:
-      votableSupply && votableSupply > 0n
+      votableSupply && BigInt(votableSupply) > 0n
         ? Number(totalVotingPower / BigInt(votableSupply || 0))
         : 0,
     votingPowerRelativeToQuorum:
