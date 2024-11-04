@@ -3,6 +3,10 @@ import ensLogo from "@/assets/tenant/ens_logo.svg";
 import ensHero from "@/assets/tenant/ens_hero.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
+import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
+import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
+import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
+import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
@@ -32,34 +36,34 @@ export const protocolGuildTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Agora is the home of ENS voters",
+      title: "Agora is the home of Protocol Guide Governance",
       hero: ensHero,
       description:
-        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
       meta: {
-        title: "ENS Agora",
-        description: "Home of token governance",
-        imageTitle: "ENS Agora",
-        imageDescription: "Home of token governance",
+        title: "Protocol Guild Agora",
+        description: "Home of Ethereum L1 R&D governance",
+        imageTitle: "Protocol Guild Agora",
+        imageDescription: "Home of Ethereum L1 R&D governance",
       },
     },
     {
       route: "proposals",
-      title: "Agora is the home of ENS voters",
+      title: "Agora is the home of Protocol Guild Governance",
       description:
-        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
       meta: {
-        title: "ENS Agora",
-        description: "Home of token governance",
-        imageTitle: "ENS Agora",
-        imageDescription: "Home of token governance",
+        title: "Protocol Guild Agora",
+        description: "Home of Ethereum L1 R&D governance",
+        imageTitle: "Protocol Guild Agora",
+        imageDescription: "Home of Ethereum L1 R&D governance",
       },
     },
     {
       route: "delegates",
-      title: "Agora is the home of ENS voters",
+      title: "Agora is the home of Protocol Guild Governance",
       description:
-        "Tokenholders of $ENS delegate votes to Delegates, who participate in the governance of the ENS protocol by voting on DAO proposals. You can see all of the Delegates below, delegate your votes to them, or contact them about your ideas.",
+        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -67,6 +71,45 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         imageDescription:
           "Delegate your voting power to a trusted representative",
       },
+    },
+    {
+      route: "info",
+      title: "Welcome to the Optimism Collective",
+      description:
+        "The Protocol Guild is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the Protocol Guild Pledge, the Protocol Guild’s mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+      hero: ensHero,
+      meta: {
+        title: "Info of Agora",
+        description: "Welcome to Protocol Guild",
+        imageTitle: "Info of Agora",
+        imageDescription: "Welcome to Protocol Guild",
+      },
+      links: [
+        {
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "",
+          image: infoPageCard01,
+        },
+        {
+          name: "Governance Forums",
+          title: "Governance Forums",
+          url: "",
+          image: infoPageCard02,
+        },
+        {
+          name: "Protocol Docs",
+          title: "Protocol Docs",
+          url: "",
+          image: infoPageCard03,
+        },
+        {
+          name: "Optimistic Vision",
+          title: "Optimistic Vision",
+          url: "",
+          image: infoPageCard04,
+        },
+      ],
     },
   ],
 
@@ -85,7 +128,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       name: "snapshotVotes",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "proposal-execute",
@@ -107,36 +150,27 @@ export const protocolGuildTenantUIConfig = new TenantUI({
             isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.ADDING_GITHUB_PR,
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
             order: 2,
             isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.AWAITING_SUBMISSION,
-            order: 3,
-            isPreSubmission: true,
-          },
-          {
             stage: PrismaProposalStage.PENDING,
-            order: 4,
+            order: 3,
             isPreSubmission: false,
           },
           {
             stage: PrismaProposalStage.QUEUED,
-            order: 5,
+            order: 4,
             isPreSubmission: false,
           },
           {
             stage: PrismaProposalStage.EXECUTED,
-            order: 6,
+            order: 5,
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [ProposalType?.BASIC, ProposalType?.SOCIAL],
-        snapshotConfig: {
-          domain: "ens.eth",
-          requiredTokens: 10000,
-        },
+        proposalTypes: [ProposalType?.BASIC],
         copy: {
           helperText: `
 ## Proposal checklist
