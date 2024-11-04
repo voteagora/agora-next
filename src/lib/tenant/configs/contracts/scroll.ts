@@ -2,13 +2,13 @@ import {
   AgoraGovernor__factory,
   AgoraToken__factory,
 } from "@/lib/contracts/generated";
-import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { scroll } from "viem/chains";
 
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { FallbackProvider, JsonRpcProvider } from "ethers";
+import { createTokenContract } from "@/lib/tokenUtils";
 
 interface Props {
   isProd: boolean;
@@ -57,12 +57,13 @@ export const scrollTenantContractConfig = ({
   ]);
 
   return {
-    token: new TenantContract<ITokenContract>({
+    token: createTokenContract({
       abi: AgoraToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain: scroll,
       contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
+      type: "erc20",
     }),
 
     // PLACEHOLDER CONTRACT
