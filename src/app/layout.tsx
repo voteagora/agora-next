@@ -23,7 +23,7 @@ async function fetchDaoMetrics() {
   return fetchMetrics();
 }
 
-const standard = {
+const defaults = {
   primary: "23 23 23",
   secondary: "64 64 64",
   tertiary: "115 115 115",
@@ -37,7 +37,12 @@ const standard = {
   font: "TransSansPremium",
 };
 
-const defaults = standard;
+const defaultFavicons = {
+  "apple-touch-icon": "/favicon/apple-touch-icon.png",
+  icon32x32: "/favicon/favicon-32x32.png",
+  icon16x16: "/favicon/favicon-16x16.png",
+  "shortcut-icon": "/favicon/favicon.ico",
+};
 
 export default async function RootLayout({
   children,
@@ -60,6 +65,15 @@ export default async function RootLayout({
     ui?.customization?.brandSecondary || defaults.brandSecondary;
   const font = ui?.customization?.font || inter.style.fontFamily;
 
+  const favicons = {
+    appleTouchIcon:
+      ui?.favicon?.["apple-touch-icon"] || defaultFavicons["apple-touch-icon"],
+    icon32x32: ui?.favicon?.icon32x32 || defaultFavicons["icon32x32"],
+    icon16x16: ui?.favicon?.icon16x16 || defaultFavicons["icon16x16"],
+    shortcutIcon:
+      ui?.favicon?.["shortcut-icon"] || defaultFavicons["shortcut-icon"],
+  };
+
   const style = {
     "--primary": primary,
     "--secondary": secondary,
@@ -81,19 +95,19 @@ export default async function RootLayout({
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/favicon/apple-touch-icon.png"
+          href={favicons.appleTouchIcon}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href="/favicon/favicon-32x32.png"
+          href={favicons.icon32x32}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href="/favicon/favicon-16x16.png"
+          href={favicons.icon16x16}
         />
         <link rel="manifest" href="/favicon/site.webmanifest" />
         <link
@@ -101,7 +115,7 @@ export default async function RootLayout({
           href="/favicon/safari-pinned-tab.svg"
           color="#000000"
         />
-        <link rel="shortcut icon" href="/favicon/favicon.ico" />
+        <link rel="shortcut icon" href={favicons.shortcutIcon} />
         <meta name="msapplication-TileColor" content="#000000" />
         <meta
           name="msapplication-config"

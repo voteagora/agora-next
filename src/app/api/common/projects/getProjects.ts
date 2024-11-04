@@ -12,6 +12,9 @@ const filterMap = {
   eth_core: "ETHEREUM_CORE_CONTRIBUTIONS",
   op_tooling: "OP_STACK_TOOLING",
   op_rnd: "OP_STACK_RESEARCH_AND_DEVELOPMENT",
+  gov_infra: "GOVERNANCE_INFRA_AND_TOOLING",
+  gov_analytics: "GOVERNANCE_ANALYTICS",
+  gov_leadership: "GOVERNANCE_LEADERSHIP",
 };
 
 async function getProjectsApi({
@@ -60,11 +63,14 @@ async function getProjectsApi({
           contracts: projectData.contracts,
           grantsAndFunding: projectData.grantsAndFunding,
           pricingModel: projectData.pricingModel,
+          pricingModelDetails: projectData.pricingModelDetails,
           impactStatement: {
             category: data.application_category,
             subcategory: data.application_subcategory,
             statement: data.impact_statement,
           },
+          testimonials: `https://www.metricsgarden.xyz/projects/${data.project_id}/contributions/${data.project_id}`,
+          impactMetrics: projectData.impactMetrics || undefined,
         };
       });
     }
@@ -102,12 +108,15 @@ async function getProjectsApi({
           grants: project.grants_and_funding_grants,
           revenue: project.grants_and_funding_revenue,
         },
-        pricingModel: {},
+        pricingModel: "",
+        pricingModelDetails: "",
         impactStatement: {
           category: null,
           subcategory: null,
           statement: null,
         },
+        testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
+        impactMetrics: undefined,
       };
     });
   }, pagination);
@@ -138,7 +147,7 @@ async function getProjectApi({
   const projectData = project.ipfs_data ?? ({} as any);
 
   return {
-    id: project.project_id,
+    id: project.application_id,
     projectId: project.project_id,
     applicationId: project.application_id,
     category: project.category,
@@ -157,11 +166,14 @@ async function getProjectApi({
     contracts: projectData.contracts,
     grantsAndFunding: projectData.grantsAndFunding,
     pricingModel: projectData.pricingModel,
+    pricingModelDetails: projectData.pricingModelDetails,
     impactStatement: {
       category: project.application_category,
       subcategory: project.application_subcategory,
       statement: project.impact_statement,
     },
+    testimonials: `https://www.metricsgarden.xyz/projects/${project.project_id}/contributions/${project.project_id}`,
+    impactMetrics: projectData.impactMetrics,
   };
 }
 

@@ -12,8 +12,8 @@ export function SuccessView({
 }: {
   closeDialog: () => void;
   data: {
-    delegateToProxyData: { hash: string } | undefined;
-    subdelegateData: { hash: string } | undefined;
+    delegateToProxyData: `0x${string}` | undefined;
+    subdelegateData: `0x${string}` | undefined;
   };
 }) {
   const { ui } = Tenant.current();
@@ -56,8 +56,8 @@ export function SuccessView({
         Got it
       </Button>
       <BlockScanUrls
-        hash1={data.delegateToProxyData?.hash}
-        hash2={data.subdelegateData?.hash}
+        hash1={data.delegateToProxyData}
+        hash2={data.subdelegateData}
       />
     </div>
   );

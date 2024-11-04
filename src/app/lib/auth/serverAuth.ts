@@ -9,15 +9,12 @@ import {
   ROLE_PUBLIC_READER,
   ROLE_BADGEHOLDER,
   ROLE_RF_DEMO_USER,
+  ROLE_CITIZEN,
 } from "@/app/lib/auth/constants";
-import {
-  isBadgeholder,
-  votingCategory,
-} from "@/app/api/common/badgeholders/getBadgeholders";
+import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
 import { resolveENSName } from "../ENSUtils";
-import { fetchIsCitizen } from "@/app/api/common/citizens/isCitizen";
 import { SiweMessage } from "siwe";
 import { fetchProjectApi } from "@/app/api/common/projects/getProjects";
 
@@ -98,6 +95,7 @@ export async function generateJwt(
     sub: userId,
     scope: scope,
     isBadgeholder: scope.includes(ROLE_BADGEHOLDER),
+    isCitizen: scope.includes(ROLE_CITIZEN),
     category: suppliedRoles
       .find((role) => role.startsWith("category:"))
       ?.substring("category:".length)
@@ -136,13 +134,16 @@ export async function getRolesForUser(
   const roles = [ROLE_PUBLIC_READER];
   if (siweData) {
     roles.push(ROLE_RF_DEMO_USER); // All Siwe users are RF voters
-    // TODO: fetch category based on badgeholder data
-    const categoryRole = votingCategory(siweData.address);
-    roles.push(categoryRole);
 
-    const isBadge = await fetchIsCitizen(siweData.address);
-    if (isBadge) {
+    const { isBadgeholder, votingCategory, isCitizen } = await fetchBadgeholder(
+      siweData.address
+    );
+    roles.push(votingCategory);
+    if (isBadgeholder) {
       roles.push(ROLE_BADGEHOLDER);
+    }
+    if (isCitizen) {
+      roles.push(ROLE_CITIZEN);
     }
   }
 

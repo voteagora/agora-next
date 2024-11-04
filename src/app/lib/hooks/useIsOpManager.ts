@@ -2,7 +2,7 @@
 
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useEffect, useState } from "react";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
 const useIsOpManager = () => {
@@ -17,10 +17,10 @@ const useIsOpManager = () => {
     chainId: contracts.governor.chain.id,
   };
 
-  const { data } = useContractRead({
+  const { data } = useReadContract({
     ...governorContract,
     functionName: "manager",
-    enabled: isConnected && !!address,
+    query: { enabled: isConnected && !!address },
   });
 
   useEffect(() => {

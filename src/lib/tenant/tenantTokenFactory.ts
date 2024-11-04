@@ -37,10 +37,11 @@ export default class TenantTokenFactory {
           symbol: "cCYBER",
           decimals: 18,
         };
-      case TENANT_NAMESPACES.NEW_DAO:
+
+      case TENANT_NAMESPACES.SCROLL:
         return {
-          name: "NewDAO",
-          symbol: "NEWDAO",
+          name: "Scroll",
+          symbol: "SCR",
           decimals: 18,
         };
       default:

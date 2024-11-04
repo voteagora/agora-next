@@ -3,12 +3,12 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import prisma from "@/app/lib/prisma";
 import {
-  R4BallotSubmission,
-  R5BallotSubmission,
+  MetricsBallotSubmission,
+  ProjectsBallotSubmission,
 } from "../../v1/retrofunding/rounds/[roundId]/ballots/[ballotCasterAddressOrEns]/submit/route";
 
 const submitBallotApi = async (
-  data: R4BallotSubmission | R5BallotSubmission,
+  data: MetricsBallotSubmission | ProjectsBallotSubmission,
   roundId: number,
   ballotCasterAddressOrEns: string
 ) =>
@@ -22,7 +22,7 @@ async function submitBallotForAddress({
   roundId,
   address,
 }: {
-  data: R4BallotSubmission | R5BallotSubmission;
+  data: MetricsBallotSubmission | ProjectsBallotSubmission;
   roundId: number;
   address: string;
 }) {

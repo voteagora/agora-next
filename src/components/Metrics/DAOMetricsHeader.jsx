@@ -1,7 +1,6 @@
 "use client";
 
 import discord from "@/icons/discord.svg";
-import logo from "@/assets/agora_logo.svg";
 import infoTransparent from "@/icons/info-transparent.svg";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -19,7 +18,6 @@ import {
 export default function DAOMetricsHeader({ metrics }) {
   const { token, ui } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
-  const [visible, setVisible] = useState(false);
 
   const governanceForumLink = ui.link("governance-forum");
   const bugsLink = ui.link("bugs");
@@ -27,6 +25,11 @@ export default function DAOMetricsHeader({ metrics }) {
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
   const agoraLink = ui.link("agora");
+
+  // discord + agora are hidden on mobile
+  const hasLinksMobile =
+    !!governanceForumLink || !!bugsLink || !!changeLogLink || !!faqLink;
+  const hasLinksDesktop = hasLinksMobile || !!discordLink || !!agoraLink;
 
   useEffect(() => {
     setIsClient(true);
@@ -49,15 +52,10 @@ export default function DAOMetricsHeader({ metrics }) {
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
                 "border-t border-r border-l border-line rounded-tl-2xl rounded-tr-2xl",
                 "text-xs text-secondary font-inter font-medium",
-                `transition-all duration-200 ease-in-out transform ${
-                  visible ? "translate-y-0" : "translate-y-10"
-                } sm:transition-none sm:translate-y-0`
+                `transition-all duration-200 ease-in-out transform sm:transition-none sm:translate-y-0`
               )}
             >
-              <div
-                className="w-full sm:w-3/5 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10"
-                onClick={() => setVisible(!visible)}
-              >
+              <div className="w-full sm:w-3/5 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10">
                 <div className="flex gap-6 sm:gap-8">
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger>
@@ -90,14 +88,17 @@ export default function DAOMetricsHeader({ metrics }) {
                     </HoverCardContent>
                   </HoverCard>
                 </div>
-                <Image
-                  src={infoTransparent}
-                  alt="Info"
-                  className="inline sm:hidden"
-                />
               </div>
               <div className="block bg-line w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div className="w-full sm:w-2/5 flex justify-start sm:justify-center items-center px-6 sm:px-8 gap-4 h-10">
+              <div
+                className={`w-full sm:w-2/5 justify-end items-center px-6 sm:px-8 gap-4 h-10 ${
+                  hasLinksMobile
+                    ? "flex"
+                    : hasLinksDesktop
+                      ? "hidden sm:flex"
+                      : "hidden"
+                }`}
+              >
                 {governanceForumLink && (
                   <a
                     href={governanceForumLink.url}
@@ -146,16 +147,14 @@ export default function DAOMetricsHeader({ metrics }) {
                 )}
 
                 {agoraLink && (
-                  <div className="flex flex-row">
-                    <a
-                      href={agoraLink.url}
-                      rel="noreferrer nonopener"
-                      target="_blank"
-                      className="hidden sm:inline"
-                    >
-                      {agoraLink.title}
-                    </a>
-                  </div>
+                  <a
+                    href={agoraLink.url}
+                    rel="noreferrer nonopener"
+                    target="_blank"
+                    className="hidden sm:inline"
+                  >
+                    {agoraLink.title}
+                  </a>
                 )}
               </div>
             </div>

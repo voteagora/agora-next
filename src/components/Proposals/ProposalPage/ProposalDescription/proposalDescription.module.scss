@@ -71,15 +71,12 @@
   }
 
   a {
-    text-decoration: none;
+    text-decoration: underline;
+    color: var(--secondary);
     font-weight: inherit;
     padding-bottom: 1px;
     border-bottom: 1px solid var(--line);
     transition: 200ms all;
-  }
-
-  a:hover {
-    border-bottom: 1px solid var(--secondary);
   }
 
   p {

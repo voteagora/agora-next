@@ -1,19 +1,19 @@
 "use client";
 
 import DraftPreview from "../DraftPreview";
-import { useAccount, useBlockNumber, useContractRead } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useManager } from "@/hooks/useManager";
-import { DraftProposal, ProposalGatingType } from "../../types";
+import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
@@ -21,12 +21,15 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
 
-  const { data: accountVotes } = useContractRead({
+  const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
     address: tenant.contracts.governor.address as `0x${string}`,
     functionName: "getVotes",
-    args: [address, blockNumber ? blockNumber - BigInt(1) : BigInt(0)],
+    args: [
+      address as `0x${string}`,
+      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
+    ],
   }) as { data: bigint };
 
   const canSponsor = () => {

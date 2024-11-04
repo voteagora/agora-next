@@ -2,16 +2,23 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber, useContractRead } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { DraftProposal, ProposalGatingType } from "@/app/proposals/draft/types";
+import {
+  DraftProposal,
+  PLMConfig,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalType } from "@/app/proposals/draft/types";
+import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
+import styles from "@/components/Proposals/ProposalPage/ProposalDescription/proposalDescription.module.scss";
+import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -29,18 +36,22 @@ const DraftPreview = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
+  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
+  const votingModuleType = proposalDraft.voting_module_type;
+
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
-
-  const { data: accountVotes } = useContractRead({
+  const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
     address: tenant.contracts.governor.address as `0x${string}`,
     functionName: "getVotes",
-    args: [address, blockNumber ? blockNumber - BigInt(1) : BigInt(0)],
+    args: [
+      address as `0x${string}`,
+      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
+    ],
   }) as { data: bigint };
 
   const canSponsor = () => {
@@ -78,8 +89,8 @@ const DraftPreview = ({
           <p className="text-agora-stone-700 mt-2">
             This is an <PreText text="approval" /> proposal. The maximum number
             of tokens that can be transferred from all the options in this
-            proposal is <PreText text={proposal.budget} />. The number of
-            options each voter may select is{" "}
+            proposal is <PreText text={proposal.budget.toString()} />. The
+            number of options each voter may select is{" "}
             <PreText text={proposal.max_options.toString()} />.{" "}
             {proposal.criteria === "Threshold" &&
               `All options with more than ${proposal.threshold} votes will be considered approved.`}
@@ -108,6 +119,59 @@ const DraftPreview = ({
     }
   };
 
+  const renderProposalRequirements = () => {
+    if (votingModuleType === ProposalType.SOCIAL) {
+      return (
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+          <p className="flex-grow">Token balance</p>
+          <span className="text-secondary font-mono text-xs">
+            {"> "}
+            {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
+            {" tokens"}
+          </span>
+        </div>
+      );
+    }
+
+    if (
+      gatingType === ProposalGatingType.MANAGER ||
+      gatingType === ProposalGatingType.GOVERNOR_V1
+    ) {
+      return (
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+          <p className="flex-grow">Manager address</p>
+          <span className="text-secondary font-mono text-xs">
+            {manager?.toString()}
+          </span>
+        </div>
+      );
+    }
+
+    if (
+      gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
+      gatingType === ProposalGatingType.GOVERNOR_V1
+    ) {
+      return (
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+          <p className="flex-grow">Token balance</p>
+          <span className="text-secondary font-mono text-xs">
+            {"> "}
+            {threshold
+              ? Math.round(
+                  parseFloat(
+                    formatUnits(BigInt(threshold), tenant.token.decimals)
+                  )
+                )
+              : "0"}{" "}
+            tokens
+          </span>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <FormCard>
       <FormCard.Section>
@@ -116,21 +180,30 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {"transactions" in proposalDraft &&
-            proposalDraft.transactions.length > 0 && (
-              <ProposalTransactionDisplay
-                descriptions={proposalDraft.transactions.map(
-                  (t) => t.description
-                )}
-                targets={proposalDraft.transactions.map((t) => t.target)}
-                calldatas={
-                  proposalDraft.transactions.map(
-                    (t) => t.calldata
-                  ) as `0x${string}`[]
-                }
-                values={proposalDraft.transactions.map((t) => t.value)}
-              />
-            )}
+          {proposalDraft.voting_module_type === ProposalType.BASIC && (
+            <ProposalTransactionDisplay
+              descriptions={(proposalDraft as BasicProposal).transactions.map(
+                (t) => t.description
+              )}
+              targets={(proposalDraft as BasicProposal).transactions.map(
+                (t) => t.target
+              )}
+              calldatas={
+                (proposalDraft as BasicProposal).transactions.map(
+                  (t) => t.calldata
+                ) as `0x${string}`[]
+              }
+              values={(proposalDraft as BasicProposal).transactions.map(
+                (t) => t.value
+              )}
+              simulationDetails={{
+                id: (proposalDraft as BasicProposal).transactions[0]
+                  ?.simulation_id,
+                state: (proposalDraft as BasicProposal).transactions[0]
+                  ?.simulation_state,
+              }}
+            />
+          )}
         </div>
         {proposalDraft.voting_module_type === "social" && (
           <div>
@@ -164,7 +237,17 @@ const DraftPreview = ({
         )}
 
         <h3 className="font-semibold mt-6">Description</h3>
-        <p className="text-agora-stone-700 mt-2">{proposalDraft.abstract}</p>
+        <div className="mt-2 p-4 bg-wash border border-line rounded-lg">
+          <ReactMarkdown
+            className={cn(
+              styles.proposal_description_md,
+              "max-w-none",
+              "prose"
+            )}
+          >
+            {proposalDraft.abstract}
+          </ReactMarkdown>
+        </div>
       </FormCard.Section>
       <FormCard.Section className="z-0">
         {proposalDraft.sponsor_address &&
@@ -213,44 +296,7 @@ const DraftPreview = ({
                 this link with them.
               </p>
             )}
-            <div className="mt-6">
-              {(gatingType === ProposalGatingType.MANAGER ||
-                gatingType === ProposalGatingType.GOVERNOR_V1) && (
-                <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                  <p className="flex-grow">Manager address</p>
-                  <span className="text-secondary font-mono text-xs">
-                    {manager?.toString()}
-                  </span>
-                </div>
-              )}
-              {(gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
-                gatingType === ProposalGatingType.GOVERNOR_V1) && (
-                <div className="relative">
-                  {gatingType === ProposalGatingType.GOVERNOR_V1 && (
-                    <div className="absolute top-[-15px] left-[calc(48%)] bg-neutral border border-line py-1 px-2 text-xs font-semibold rounded">
-                      OR
-                    </div>
-                  )}
-                  <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                    <p className="flex-grow">Token balance</p>
-                    <span className="text-secondary font-mono text-xs">
-                      {"> "}
-                      {threshold
-                        ? Math.round(
-                            parseFloat(
-                              formatUnits(
-                                BigInt(threshold),
-                                tenant.token.decimals
-                              )
-                            )
-                          )
-                        : "0"}{" "}
-                      tokens
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+            <div className="mt-6">{renderProposalRequirements()}</div>
             {actions}
           </>
         )}

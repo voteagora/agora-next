@@ -21,14 +21,34 @@ const ProposalTransactionDisplay = ({
   values,
   descriptions,
   executedTransactionHash,
+  simulationDetails,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
   values: string[];
   descriptions?: string[];
   executedTransactionHash?: string | null;
+  simulationDetails?: {
+    id?: string | null;
+    state?: string | null;
+  };
 }) => {
   const [collapsed, setCollapsed] = useState(true);
+
+  if (!targets.length) {
+    return (
+      <div>
+        <div className="flex flex-col border rounded-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
+          <div className="w-full flex items-center justify-between">
+            <span className="text-xs text-tertiary">Proposed transactions</span>
+          </div>
+          <div className="text-xs text-tertiary mt-1">
+            This proposal does not execute any transactions.
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div>
       <div className="flex flex-col border border-b-0 rounded-t-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
@@ -42,6 +62,27 @@ const ProposalTransactionDisplay = ({
             >
               <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
             </a>
+          )}
+          {simulationDetails?.id && simulationDetails?.state && (
+            <>
+              {simulationDetails.state === "UNCONFIRMED" ? (
+                <div className="bg-tertiary/20 text-secondary rounded-lg px-2 py-1 text-xs flex items-center gap-x-1">
+                  <span>Simulation {simulationDetails.state}</span>
+                </div>
+              ) : (
+                <a
+                  href={`https://dashboard.tenderly.co/shared/simulation/${simulationDetails.id}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className={`
+                ${simulationDetails.state === "VALID" ? "bg-positive/20 hover:bg-positive/30 text-positive" : simulationDetails.state === "INVALID" ? "bg-negative/20 hover:bg-negative/30 text-negative" : "bg-wash text-secondary"}
+                transition-colors cursor-pointer rounded-lg px-2 py-1 text-xs flex items-center gap-x-1`}
+                >
+                  <span>Simulation {simulationDetails.state}</span>
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                </a>
+              )}
+            </>
           )}
         </div>
 

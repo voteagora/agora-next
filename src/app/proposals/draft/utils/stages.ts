@@ -1,4 +1,4 @@
-import { ProposalLifecycleStageMetadata } from "../types";
+import { PLMConfig, ProposalLifecycleStageMetadata } from "../types";
 import { ProposalStage } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -6,26 +6,30 @@ export const GET_DRAFT_STAGES = () => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-  if (!plmToggle) {
+  if (!plmToggle || !plmToggle.config) {
     throw new Error(
       `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
     );
   }
 
-  return plmToggle.config?.stages.filter((stage) => stage.isPreSubmission);
+  return (plmToggle.config as PLMConfig).stages.filter(
+    (stage) => stage.isPreSubmission
+  );
 };
 
 export const GET_POST_DRAFT_STAGES = () => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-  if (!plmToggle) {
+  if (!plmToggle || !plmToggle.config) {
     throw new Error(
       `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
     );
   }
 
-  return plmToggle.config?.stages.filter((stage) => !stage.isPreSubmission);
+  return (plmToggle.config as PLMConfig).stages.filter(
+    (stage) => !stage.isPreSubmission
+  );
 };
 
 /**
@@ -44,31 +48,32 @@ export const getStageIndexForTenant = (stage: ProposalStage) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-  if (!plmToggle) {
+  if (!plmToggle || !plmToggle.config) {
     throw new Error(
       `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
     );
   }
 
-  return plmToggle.config?.stages.find((s) => s.stage === stage)?.order;
+  return (plmToggle.config as PLMConfig).stages.find((s) => s.stage === stage)
+    ?.order;
 };
 
 export const getStageByIndex = (index: number) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
-  if (!plmToggle) {
+  if (!plmToggle || !plmToggle.config) {
     throw new Error(
       `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
     );
   }
 
-  const stages = plmToggle.config?.stages;
+  const stages = (plmToggle.config as PLMConfig).stages;
   if (!stages || stages.length - 1 < index) {
     throw new Error("Index out of bounds.");
   }
 
-  return plmToggle.config?.stages[index];
+  return (plmToggle.config as PLMConfig).stages[index];
 };
 
 export const isPostSubmission = (stage: ProposalStage) => {

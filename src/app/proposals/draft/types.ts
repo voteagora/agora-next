@@ -215,6 +215,7 @@ export type PLMConfig = {
   // optional config for including snapshot as a proposal type
   snapshotConfig?: {
     domain: string;
+    requiredTokens: number;
   };
   // The method for gating who can create a proposal
   // Manager -- only the manager can create proposals
@@ -244,7 +245,7 @@ export type SocialProposal = BaseProposal & {
 
 export type ApprovalProposal = BaseProposal & {
   voting_module_type: ProposalType.APPROVAL;
-  budget: string;
+  budget: number;
   criteria: ApprovalProposalType;
   max_options: number;
   threshold: number;
@@ -316,9 +317,12 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         type: ProposalType.SOCIAL,
         title: proposal.title,
         abstract: proposal.abstract,
-        start_date: proposal.start_date_social,
-        end_date: proposal.end_date_social,
-        options: proposal.social_options,
+        socialProposal: {
+          type: proposal.proposal_social_type,
+          start_date: proposal.start_date_social,
+          end_date: proposal.end_date_social,
+          options: proposal.social_options,
+        },
       };
     case ProposalType.APPROVAL:
       return {
@@ -326,8 +330,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         approvalProposal: {
-          budget: proposal.budget,
           criteria: proposal.criteria,
+          budget: proposal.budget?.toString(),
           maxOptions: proposal.max_options?.toString(),
           threshold: proposal.threshold?.toString(),
           topChoices: proposal.top_choices?.toString(),

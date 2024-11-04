@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { z } from "zod";
-import FormItem from "./form/FormItem";
 import TextInput from "./form/TextInput";
 import { SocialProposalType } from "./../types";
 import { SocialProposalSchema } from "./../schemas/DraftProposalSchema";
@@ -17,31 +16,41 @@ const SocialProposalForm = () => {
     formState: { defaultValues },
   } = useFormContext<FormType>();
 
-  const { fields, append, remove } = useFieldArray({
+  console.log(defaultValues);
+
+  const { fields, replace, append } = useFieldArray({
     control,
     name: "socialProposal.options",
   });
 
-  const proposalType = watch("socialProposal.type");
+  const localProposalType = watch("socialProposal.type");
+  const savedProposalType = defaultValues?.socialProposal?.type;
+  const savedOptions = defaultValues?.socialProposal?.options;
+  const prevProposalTypeRef = useRef<SocialProposalType | null>(null);
 
   useEffect(() => {
-    // removes all array fields
-    remove();
-    if (proposalType === SocialProposalType.BASIC) {
-      append({ text: "FOR" });
-      append({ text: "AGAINST" });
-      append({ text: "ABSTAIN" });
-    } else {
-      const defaultOptions = defaultValues?.socialProposal?.options;
-      if (defaultOptions && defaultOptions.length > 0) {
-        defaultOptions.forEach((option) => {
-          append({ text: option?.text || "" });
-        });
-      } else {
-        append({ text: "" });
+    const updateOptions = () => {
+      if (localProposalType === SocialProposalType.BASIC) {
+        if (savedProposalType === SocialProposalType.BASIC && savedOptions) {
+          replace(savedOptions as FormType["socialProposal"]["options"]);
+        } else {
+          replace([{ text: "FOR" }, { text: "AGAINST" }, { text: "ABSTAIN" }]);
+        }
+      } else if (localProposalType === SocialProposalType.APPROVAL) {
+        if (savedProposalType === SocialProposalType.APPROVAL && savedOptions) {
+          replace(savedOptions as FormType["socialProposal"]["options"]);
+        } else {
+          replace([{ text: "" }]);
+        }
       }
+    };
+
+    if (localProposalType !== prevProposalTypeRef.current) {
+      updateOptions();
     }
-  }, [proposalType]);
+
+    prevProposalTypeRef.current = localProposalType;
+  }, [localProposalType, replace, watch]);
 
   return (
     <div className="space-y-6">
@@ -59,7 +68,7 @@ const SocialProposalForm = () => {
         name="socialProposal.type"
         control={control}
         options={Object.values(SocialProposalType).map((value) => {
-          return { label: value, value: value } as any;
+          return { label: value, value: value };
         })}
       />
       <div className="grid grid-cols-2 gap-4">
@@ -77,34 +86,35 @@ const SocialProposalForm = () => {
         />
       </div>
       <div className="space-y-6">
-        {fields.map((field, index) => {
-          return (
-            <div className="flex flex-row space-x-4" key={`option-${index}`}>
-              <div className="flex-1">
-                <TextInput
-                  label={`Option ${index + 1} text`}
-                  name={`socialProposal.options.${index}.text`}
-                  control={control}
-                  placeholder="For, against, abstain, etc."
-                  disabled={proposalType === SocialProposalType.BASIC}
-                />
-              </div>
-              {proposalType === SocialProposalType.APPROVAL && (
+        {fields.map((field, index) => (
+          <div className="flex flex-row space-x-4" key={field.id}>
+            <div className="flex-1">
+              <TextInput
+                label={`Option ${index + 1} text`}
+                name={`socialProposal.options.${index}.text`}
+                control={control}
+                placeholder="For, against, abstain, etc."
+                disabled={localProposalType === SocialProposalType.BASIC}
+              />
+            </div>
+            {localProposalType === SocialProposalType.APPROVAL &&
+              fields.length > 1 && (
                 <UpdatedButton
-                  className="self-start"
+                  className="self-end"
                   type="secondary"
                   onClick={() => {
-                    remove(index);
+                    const newFields = [...fields];
+                    newFields.splice(index, 1);
+                    replace(newFields);
                   }}
                 >
                   Remove option
                 </UpdatedButton>
               )}
-            </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
-      {proposalType === SocialProposalType.APPROVAL && (
+      {localProposalType === SocialProposalType.APPROVAL && (
         <UpdatedButton
           type="secondary"
           fullWidth

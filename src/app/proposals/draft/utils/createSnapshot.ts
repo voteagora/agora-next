@@ -38,7 +38,7 @@ export const domain = {
 };
 
 const hub =
-  process.env.REACT_APP_DEPLOY_ENV === "prod"
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://hub.snapshot.org/api/msg"
     : "https://testnet.hub.snapshot.org/api/msg";
 
@@ -87,7 +87,7 @@ export async function createSnapshot({
     space:
       process.env.REACT_APP_DEPLOY_ENV === "prod"
         ? "ens.eth"
-        : process.env.TESTNET_SNAPSHOT_SPACE ?? "michaelagora.eth",
+        : (process.env.TESTNET_SNAPSHOT_SPACE ?? "michaelagora.eth"),
     timestamp,
     type:
       proposal.voting_module_type === "basic" ? "single-choice" : "approval",

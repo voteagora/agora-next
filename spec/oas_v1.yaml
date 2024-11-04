@@ -26,11 +26,11 @@ info:
     - **contracts**: Data for the current onchain contracts
     - **projects** Round 5 Projects with mock data
     - **RetroFundingBallots** Round 5 Ballots with mock data
-
-    Not Live.
     - **Round 5**: Data related to Retro Funding for Optimism Round 5
     - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
     - 0.2.3: Round 5 Production release with real data
+    - 0.3.0: Round 6 mock projects data
+    - 0.3.1: Round 6 production release with real data
 
     ### Release Schedule
 
@@ -44,8 +44,11 @@ info:
     | OP 0.2.0 | LIVE   | Aug 10th |
     | OP 0.2.1 | LIVE   | Aug 26th |
     | OP 0.2.2 | LIVE   | Sep 4th |
-    | OP 0.2.3 | ON TRACK   | Sep 20th |
-  version: 0.2.1
+    | OP 0.2.3 | LIVE   | Sep 20th |
+    |----------|---------|---------------|
+    | OP 0.3.0 | LIVE   | Oct 11th |
+    | OP 0.3.1 | LIVE   | Oct 25th |
+  version: 0.3.1
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -55,6 +58,8 @@ servers:
 tags:
   - name: auth
     description: Authenticate with the Agora API
+  - name: Round 6
+    description: Data related to Retro Funding for Optimism Round 6
   - name: Round 5
     description: Data related to Retro Funding for Optimism Round 5
   - name: Round 4
@@ -1025,34 +1030,13 @@ components:
         team:
           type: array
           items:
-            type: string
+            type: object
         github:
           type: array
           items:
             oneOf:
               - type: string
               - type: object
-                properties:
-                  repo_rank:
-                    type: number
-                  star_count:
-                    type: number
-                  starred_events:
-                    type: number
-                  starred_by_top_devs:
-                    type: number
-                  fork_count:
-                    type: number
-                  forked_events:
-                    type: number
-                  forked_by_top_devs:
-                    type: number
-                  fulltime_developer_average_6_months:
-                    type: number
-                  new_contributor_count_6_months:
-                    type: number
-                  age_of_project_years:
-                    type: number
         packages:
           type: array
           items:
@@ -1127,6 +1111,17 @@ components:
                     type: string
                   details:
                     type: string
+            investments:
+              type: array
+              items:
+                type: object
+                properties:
+                  amount:
+                    type: string
+                  year:
+                    type: string
+                  details:
+                    type: string
         pricingModel:
           type: string
         pricingModelDetails:
@@ -1147,6 +1142,72 @@ components:
                   type: string
                 answer:
                   type: string
+        impactMetrics:
+          type: object
+          properties:
+            count_total_attestations:
+              type: number
+            count_citizen_attestations:
+              type: number
+            count_delegate_attestations:
+              type: number
+            avg_nps_score:
+              type: number
+            most_positive_superlative:
+              type: string
+            cant_live_without_superlative:
+              type: string
+            percentage_distributions:
+              type: object
+              properties:
+                citizens:
+                  type: object
+                  properties:
+                    extremely_upset:
+                      type: number
+                    somewhat_upset:
+                      type: number
+                    neutral:
+                      type: number
+                top_delegates:
+                  type: object
+                  properties:
+                    extremely_upset:
+                      type: number
+                    somewhat_upset:
+                      type: number
+                    neutral:
+                      type: number
+            elected_governance_reviews:
+              type: object
+              properties:
+                optimism_grants_council_member:
+                  type: object
+                  properties:
+                    count_attestations:
+                      type: number
+                    avg_pmf_score:
+                      type: number
+                    avg_nps_score:
+                      type: number
+                anticapture_commission_member:
+                  type: object
+                  properties:
+                    count_attestations:
+                      type: number
+                    avg_pmf_score:
+                      type: number
+                    avg_nps_score:
+                      type: number
+                code_of_conduct_council_member:
+                  type: object
+                  properties:
+                    count_attestations:
+                      type: number
+                    avg_pmf_score:
+                      type: number
+                    avg_nps_score:
+                      type: number
     SocialLinks:
       summary: Social media links for a project
       description: >
@@ -1248,6 +1309,9 @@ components:
             - ETHEREUM_CORE_CONTRIBUTIONS
             - OP_STACK_RESEARCH_AND_DEVELOPMENT
             - OP_STACK_TOOLING
+            - GOVERNANCE_INFRA_AND_TOOLING
+            - GOVERNANCE_ANALYTICS
+            - GOVERNANCE_LEADERSHIP
         allocation:
           type: string
         locked:
@@ -1286,10 +1350,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RetroFundingBallot4ProjectsAllocation"
-    Round5Ballot:
-      summary: A ballot for RetroFunding Round 5
+    Ballot:
+      summary: A ballot for RetroFunding Round 5 & 6
       description: >
-        A ballot for RetroFunding Round 5, including information about the ballot.
+        A ballot for RetroFunding Round 5 & 6, including information about the ballot.
       type: object
       properties:
         address:
@@ -1305,6 +1369,10 @@ components:
             - RANKED
             - PENDING SUBMISSION
             - SUBMITTED
+        budget:
+          description: >
+            Budget allocation selected by voter. This is a integer between 2,000,000 and 8,000,000.
+          type: integer
         created_at:
           type: string
           format: date-time
@@ -1332,8 +1400,8 @@ components:
           description: >
             Total number of projects that the voter has to evaluate. This is the length of the projects_to_be_evaluated array.
           type: integer
-        distribution_method:
-          type: string
+        payload_for_signature:
+          $ref: "#/components/schemas/RetroFunding5BallotSubmissionContent"
     RetroFunding4BallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -1362,6 +1430,24 @@ components:
             Badgeholder's signature of the contents of their ballot.
           type: string
           pattern: "^0x[a-fA-F0-9]{130}$"
+    RetroFunding5BallotSubmissionContent:
+      summary: Fields required for ballot submission
+      type: object
+      properties:
+        budget:
+          type: number
+        category_allocation:
+          type: array
+          items:
+            type: object
+            categoryId:
+              type: number
+        projects_allocation:
+          type: array
+          items:
+            type: object
+            projectId:
+              type: number
     RetroFunding5BallotSubmission:
       summary: Fields required for ballot submission
       description: An object containing the information required to submit a ballot.
@@ -1372,20 +1458,7 @@ components:
           description: Address or ENS of the ballot caster.
           type: string
         ballot_content:
-          type: object
-          properties:
-            category_allocation:
-              type: array
-              items:
-                type: object
-                categoryId:
-                  type: string
-            projects_allocation:
-              type: array
-              items:
-                type: object
-                projectId:
-                  type: string
+          $ref: "#/components/schemas/RetroFunding5BallotSubmissionContent"
         signature:
           summary: Badgeholder signature of the ballot
           description: >
@@ -1516,6 +1589,17 @@ components:
         enum:
           - "IMPACT_GROUPS"
           - "TOP_TO_BOTTOM"
+          - "TOP_WEIGHTED"
+          - "PARETO"
+    budgetParam:
+      name: budget
+      in: path
+      description: The budget to be set in OP tokens
+      required: true
+      schema:
+        type: number
+        minimum: 2000000
+        maximum: 8000000
 paths:
   /spec:
     get:
@@ -1613,7 +1697,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  metadata:
+                  meta:
                     $ref: "#/components/schemas/PageMetadata"
                   data:
                     type: array
@@ -2035,6 +2119,7 @@ paths:
         - RetroFundingBallots
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2045,7 +2130,7 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Round5Ballot"
+                  - $ref: "#/components/schemas/Ballot"
                   - $ref: "#/components/schemas/Round4Ballot"
         "400":
           description: Bad Request
@@ -2100,6 +2185,7 @@ paths:
         - RetroFundingBallots
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2150,6 +2236,7 @@ paths:
         - projects
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/limitParam"
@@ -2167,6 +2254,9 @@ paths:
               - eth_core
               - op_tooling
               - op_rnd
+              - gov_infra
+              - gov_analytics
+              - gov_leadership
       responses:
         "200":
           description: OK
@@ -2198,6 +2288,7 @@ paths:
         - projects
         - Round 4
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2266,6 +2357,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2292,7 +2384,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2312,6 +2404,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2323,7 +2416,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2349,6 +2442,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2360,7 +2454,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2380,6 +2474,7 @@ paths:
         - RetroFunding
         - ballots
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/projectIdParam"
@@ -2391,7 +2486,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2408,8 +2503,8 @@ paths:
       operationId: updateRetroFundingRoundCategoryAllocation
       tags:
         - RetroFunding
-        - projects
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2425,6 +2520,9 @@ paths:
                     - ETHEREUM_CORE_CONTRIBUTIONS
                     - OP_STACK_RESEARCH_AND_DEVELOPMENT
                     - OP_STACK_TOOLING
+                    - GOVERNANCE_INFRA_AND_TOOLING
+                    - GOVERNANCE_ANALYTICS
+                    - GOVERNANCE_LEADERSHIP
                 allocation:
                   type: number
                 locked:
@@ -2435,7 +2533,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /retrofunding/rounds/{roundId}/ballots/{addressOrEnsName}/budget/{budget}:
+    post:
+      summary: Updates a budget allocation for a specific RetroFunding ballot
+      description: >
+        Updates a category budget allocation for a RetroFunding round on Agora. Value is in OP tokens. Min 2M, Max 8M.
+      operationId: updateRetroFundingRoundBudgetAllocation
+      tags:
+        - RetroFunding
+        - Round 5
+        - Round 6
+      parameters:
+        - $ref: "#/components/parameters/roundIdParam"
+        - $ref: "#/components/parameters/addressOrEnsName"
+        - $ref: "#/components/parameters/budgetParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":
@@ -2454,6 +2581,7 @@ paths:
         - RetroFunding
         - projects
         - Round 5
+        - Round 6
       parameters:
         - $ref: "#/components/parameters/roundIdParam"
         - $ref: "#/components/parameters/addressOrEnsName"
@@ -2464,7 +2592,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Round5Ballot"
+                $ref: "#/components/schemas/Ballot"
         "400":
           description: Bad Request
         "401":

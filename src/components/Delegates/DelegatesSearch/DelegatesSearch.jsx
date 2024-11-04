@@ -1,7 +1,6 @@
 "use client";
 
 import { TextInputWithTooltip } from "@/components/shared/Form/TextInputWithTooltip";
-import { VStack } from "@/components/Layout/Stack";
 import { useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
@@ -22,17 +21,18 @@ export default function DelegatesSearch() {
         }
       }}
     >
-      <VStack className="relative">
-        <VStack className="justify-center absolute left-0 top-0 bottom-0 p-2">
+      <div className="w-full sm:w-auto flex flex-row items-center relative">
+        <div className="absolute z-10 top-3 left-3">
           <MagnifyingGlassIcon className="text-secondary w-4 h-4" />
-        </VStack>
+        </div>
+
         <TextInputWithTooltip
           onChange={(value) => setEnteredName(value)}
           placeholder="Exact ENS or address"
           tooltipMessage="Please input exact ENS or address. Partial and fuzzy search is not supported yet."
-          className="py-2 px-4 pl-8 rounded-full bg-wash border border-line w-full sm:w-auto placeholder-tertiary text-secondary"
+          className="py-2 px-4 pl-8 rounded-full bg-wash border border-line w-full sm:w-auto placeholder-tertiary/50 text-secondary"
         />
-      </VStack>
+      </div>
     </form>
   );
 }

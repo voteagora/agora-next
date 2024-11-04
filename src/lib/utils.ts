@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
+import { http, fallback } from "wagmi";
 
 const { token } = Tenant.current();
 
@@ -120,6 +121,13 @@ export function formatNumberWithScientificNotation(x: number): string {
   }
 
   return scientificNotation;
+}
+
+export function formatPercentageWithPrecision(
+  value: number,
+  precision: number
+) {
+  return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(precision);
 }
 
 export function humanizeNumber(
@@ -321,4 +329,48 @@ export const isURL = (value: string) => {
   // Regular expression for URL validation
   const urlRegExp = /^(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+$/i;
   return value === "" || urlRegExp.test(value);
+};
+
+export const getTransportForChain = (chainId: number) => {
+  switch (chainId) {
+    // mainnet
+    case 1:
+      return http(
+        `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+    // optimism
+    case 10:
+      return http(
+        `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+    // base
+    case 8453:
+      return http(
+        `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+    // sepolia
+    case 11155111:
+      return http(
+        `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+    // cyber
+    case 7560:
+      return fallback([
+        http("https://rpc.cyber.co"),
+        http("https://cyber.alt.technology"),
+      ]);
+
+    // scroll
+    case 534_352:
+      return fallback([
+        http(
+          `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        ),
+        http("https://rpc.scroll.io"),
+      ]);
+
+    // for each new dao with a new chainId add them here
+    default:
+      return null;
+  }
 };

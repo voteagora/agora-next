@@ -11,12 +11,14 @@ import {
 import { useAccount } from "wagmi";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import {
+  AgoraLoaderSmall,
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import { formatEther, formatUnits } from "viem";
 import { SuccessView } from "./SuccessView";
-import { track } from "@vercel/analytics";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { waitForTransaction } from "wagmi/actions";
+import { waitForTransactionReceipt } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
@@ -27,6 +29,7 @@ import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
+import { config } from "@/app/Web3Provider";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -57,7 +60,8 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { slug } = Tenant.current();
+  const { ui } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const fetchData = useCallback(async () => {
     try {
@@ -101,6 +105,7 @@ export function AdvancedDelegateDialog({
           from: address,
           to: target,
           allowance: "0",
+          percentage: "0",
           timestamp: null,
           type: "ADVANCED",
           amount: "PARTIAL",
@@ -133,7 +138,7 @@ export function AdvancedDelegateDialog({
 
   const getVotingPowerPageDelegatee = async () => {
     const pageDelegateeAddress = await resolveENSName(
-      params?.addressOrENSName as string
+      params?.addressOrENSName || target
     );
     const pageDelegateeIndex = delegatees.findIndex(
       (delegatee) => delegatee.to === pageDelegateeAddress
@@ -152,19 +157,8 @@ export function AdvancedDelegateDialog({
   const writeWithTracking = async () => {
     setIsLoading(true);
 
-    const trackingData = {
-      dao_slug: slug,
-      userAddress: address || "unknown",
-      proxyAddress: proxyAddress || "unknown",
-      targetDelegation: target || "unknown",
-      totalDelegatees: delegatees.length || "unknown",
-      totalVotingPower: availableBalance,
-    };
-
-    track("Advanced Delegation", trackingData);
-
     const tx = await writeAsync();
-    await waitForTransaction({ hash: tx.hash });
+    await waitForTransactionReceipt(config, { hash: tx });
 
     const { prevVotingPower, postVotingPower, pageDelegateeAddress } =
       await getVotingPowerPageDelegatee();
@@ -277,7 +271,11 @@ export function AdvancedDelegateDialog({
               </div>
             ) : (
               <div className="flex flex-col w-full h-[318px] items-center justify-center">
-                <AgoraLoaderSmall />
+                {shouldHideAgoraBranding ? (
+                  <LogoLoader />
+                ) : (
+                  <AgoraLoaderSmall />
+                )}
               </div>
             )}
           </div>

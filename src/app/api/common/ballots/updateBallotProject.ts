@@ -61,7 +61,7 @@ async function updateBallotProjectAllocationForAddress({
         },
       },
       data: {
-        allocation,
+        allocation: Math.round(Number(allocation) * 100) / 100,
         updated_at: new Date(),
       },
     });
@@ -141,6 +141,7 @@ async function updateBallotProjectImpactForAddress({
               retro_funding.project_allocations
           WHERE
               impact = ${impact}
+              AND address = $1 AND round = $2
       ),
       lower_group AS (
           SELECT
@@ -149,6 +150,7 @@ async function updateBallotProjectImpactForAddress({
               retro_funding.project_allocations
           WHERE
               impact = ${impact} - 1
+              AND address = $1 AND round = $2
       ),
       estimated_rank AS (
           SELECT
@@ -165,12 +167,13 @@ async function updateBallotProjectImpactForAddress({
           FROM
               current_group, lower_group
       )
-      INSERT INTO retro_funding.project_allocations (address, round, project_id, impact, rank)
-      VALUES ($1, $2, $3, ${impact}, (SELECT computed_rank FROM estimated_rank))
+      INSERT INTO retro_funding.project_allocations (address, round, project_id, impact, rank${impact !== 0 ? "" : ", allocation"})
+      VALUES ($1, $2, $3, ${impact}, (SELECT computed_rank FROM estimated_rank)${impact !== 0 ? "" : `, null`})
       ON CONFLICT (address, round, project_id)
       DO UPDATE SET 
           impact = EXCLUDED.impact,
-          rank = EXCLUDED.rank;
+          rank = EXCLUDED.rank
+          ${impact !== 0 ? "" : `, allocation = EXCLUDED.allocation`};
     `,
     address,
     roundId,
@@ -242,44 +245,77 @@ async function updateBallotProjectPositionForAddress({
               project_id,
               rank,
               impact,
-              ROW_NUMBER() OVER (ORDER BY rank DESC) AS current_position
-          FROM
-              retro_funding.project_allocations
-      ),
-      position_bounds AS (
-          SELECT
-              (SELECT rank FROM ranked_projects WHERE current_position = ${position}) AS lower_bound,
-              (SELECT rank FROM ranked_projects WHERE current_position = ${position} + 1) AS upper_bound
-      ),
-      project_impact AS (
-          SELECT
-              impact
+              ROW_NUMBER() OVER (ORDER BY rank DESC) - 1 AS current_position
           FROM
               retro_funding.project_allocations
           WHERE
-              address = $1 AND round = $2 AND project_id = $3
+              address = $1 AND round = $2 AND impact > 0
+      ),
+      current_project_position AS (
+          SELECT current_position
+          FROM ranked_projects
+          WHERE project_id = $3
+      ),
+      project_count AS (
+          SELECT MAX(current_position) AS max_position
+          FROM ranked_projects
+      ),
+      position_bounds AS (
+          SELECT
+              CASE
+                  WHEN ${position} < (SELECT current_position FROM current_project_position)
+                  THEN (SELECT rank FROM ranked_projects WHERE current_position = ${position} - 1)
+                  WHEN ${position} > (SELECT max_position FROM project_count)
+                  THEN (SELECT rank FROM ranked_projects WHERE current_position = (SELECT max_position FROM project_count))
+                  ELSE (SELECT rank FROM ranked_projects WHERE current_position = ${position})
+              END AS lower_bound,
+              CASE
+                  WHEN ${position} < (SELECT current_position FROM current_project_position)
+                  THEN (SELECT rank FROM ranked_projects WHERE current_position = ${position})
+                  WHEN ${position} > (SELECT max_position FROM project_count)
+                  THEN NULL
+                  ELSE (SELECT rank FROM ranked_projects WHERE current_position = ${position} + 1)
+              END AS upper_bound
       ),
       impact_bounds AS (
           SELECT
-              (SELECT impact FROM ranked_projects WHERE current_position = ${position}) AS lower_impact,
-              (SELECT impact FROM ranked_projects WHERE current_position = ${position} + 1) AS upper_impact,
-              (SELECT impact FROM project_impact) AS project_impact
+              CASE
+                  WHEN ${position} < (SELECT current_position FROM current_project_position)
+                  THEN (SELECT impact FROM ranked_projects WHERE current_position = ${position} - 1)
+                  WHEN ${position} > (SELECT max_position FROM project_count)
+                  THEN (SELECT impact FROM ranked_projects WHERE current_position = (SELECT max_position FROM project_count))
+                  ELSE (SELECT impact FROM ranked_projects WHERE current_position = ${position})
+              END AS lower_impact,
+              CASE
+                  WHEN ${position} < (SELECT current_position FROM current_project_position)
+                  THEN (SELECT impact FROM ranked_projects WHERE current_position = ${position})
+                  WHEN ${position} > (SELECT max_position FROM project_count)
+                  THEN NULL
+                  ELSE (SELECT impact FROM ranked_projects WHERE current_position = ${position} + 1)
+              END AS upper_impact,
+              (SELECT impact FROM retro_funding.project_allocations WHERE address = $1 AND round = $2 AND project_id = $3) AS project_impact
       ),
       new_rank_value AS (
           SELECT
-              COALESCE(ROUND((lower_bound + upper_bound) / 2), 
+              GREATEST(1, COALESCE(ROUND((lower_bound + upper_bound) / 2),
                   CASE
-                      WHEN lower_bound IS NULL THEN ROUND(upper_bound / 1.4)
-                      WHEN upper_bound IS NULL THEN lower_bound + 1000
+                      WHEN lower_bound IS NULL AND upper_bound IS NULL THEN 1000
+                      WHEN lower_bound IS NULL THEN upper_bound + 1000
+                      WHEN upper_bound IS NULL THEN lower_bound - 1000
                       ELSE NULL
                   END
-              ) AS new_rank
+              )) AS new_rank
           FROM
               position_bounds
       ),
       new_impact_value AS (
           SELECT
-              LEAST(COALESCE(upper_impact, 5), GREATEST(project_impact, COALESCE(lower_impact, 1))) as new_impact
+              CASE
+                  WHEN upper_impact IS NULL AND lower_impact IS NULL THEN project_impact
+                  WHEN upper_impact IS NULL THEN GREATEST(1, lower_impact - 1)
+                  WHEN lower_impact IS NULL THEN LEAST(5, upper_impact + 1)
+                  ELSE ROUND((lower_impact + upper_impact) / 2.0)
+              END AS new_impact
           FROM
               impact_bounds
       )
@@ -391,16 +427,22 @@ async function updateAllProjectsInBallotForAddress({
           },
         },
         update: {
-          allocation: project.allocation,
+          allocation: project.impact
+            ? Number(project.allocation)?.toFixed(2)
+            : null,
+          impact: project.impact,
+          rank: Math.floor((500_000 / projects.length) * (i + 1)),
           updated_at: new Date(),
         },
         create: {
           project_id: project.project_id,
           round: roundId,
           address,
-          allocation: project.impact ? project.allocation : null,
+          allocation: project.impact
+            ? Number(project.allocation)?.toFixed(2)
+            : null,
           impact: project.impact,
-          rank: (500_000 / projects.length) * (i + 1),
+          rank: Math.floor((500_000 / projects.length) * (i + 1)),
         },
       })
     )

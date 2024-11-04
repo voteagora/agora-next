@@ -5,7 +5,14 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 type UIToggle = {
   name: string;
   enabled: boolean;
-  config?: UIConfig;
+  config?: UIConfig | UIEndorsedConfig;
+};
+
+export type UIEndorsedConfig = {
+  tooltip: string;
+  showFilterLabel: string;
+  hideFilterLabel: string;
+  defaultFilter: boolean;
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle
@@ -69,6 +76,7 @@ type TenantUIParams = {
   googleAnalytics?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
+  hideAgoraBranding?: boolean;
   links?: UILink[];
   logo: string;
   organization?: UIOrganization;
@@ -88,6 +96,12 @@ type TenantUIParams = {
     brandSecondary?: string;
     font?: string;
   };
+  favicon?: {
+    "apple-touch-icon"?: string;
+    icon32x32?: string;
+    icon16x16?: string;
+    "shortcut-icon"?: string;
+  };
 };
 
 export class TenantUI {
@@ -96,6 +110,7 @@ export class TenantUI {
   private _googleAnalytics?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
+  private _hideAgoraBranding?: boolean;
   private _hero?: string;
   private _links?: UILink[];
   private _logo: string;
@@ -116,6 +131,12 @@ export class TenantUI {
     brandSecondary?: string;
     font?: string;
   };
+  private _favicon?: {
+    "apple-touch-icon"?: string;
+    icon32x32?: string;
+    icon16x16?: string;
+    "shortcut-icon"?: string;
+  };
   private _linksCache: { [key: string]: UILink | undefined } = {};
   private _pagesCache: { [key: string]: UIPage | undefined } = {};
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
@@ -123,10 +144,12 @@ export class TenantUI {
   constructor({
     assets,
     customization,
+    favicon,
     delegates,
     googleAnalytics,
     governanceIssues,
     governanceStakeholders,
+    hideAgoraBranding,
     links,
     logo,
     organization,
@@ -136,10 +159,12 @@ export class TenantUI {
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
+    this._favicon = favicon;
     this._delegates = delegates;
     this._googleAnalytics = googleAnalytics;
     this._governanceIssues = governanceIssues;
     this._governanceStakeholders = governanceStakeholders;
+    this._hideAgoraBranding = hideAgoraBranding;
     this._links = links;
     this._logo = logo;
     this._organization = organization;
@@ -162,6 +187,10 @@ export class TenantUI {
 
   public get governanceStakeholders(): UIGovernanceStakeholder[] | undefined {
     return this._governanceStakeholders;
+  }
+
+  public get hideAgoraBranding(): boolean {
+    return this._hideAgoraBranding || false;
   }
 
   public get googleAnalytics(): string | undefined {
@@ -196,6 +225,17 @@ export class TenantUI {
       }
     | undefined {
     return this._customization;
+  }
+
+  public get favicon():
+    | {
+        "apple-touch-icon"?: string;
+        icon32x32?: string;
+        icon16x16?: string;
+        "shortcut-icon"?: string;
+      }
+    | undefined {
+    return this._favicon;
   }
 
   public link(name: string): UILink | undefined {

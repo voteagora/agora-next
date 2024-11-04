@@ -40,13 +40,13 @@ const transferABI = [
 
 type BasicInputData = [
   `0x${string}`[],
-  bigint[],
+  number[],
   `0x${string}`[],
   string,
-  Number,
+  number,
 ];
 
-type OZBasicInputData = [`0x${string}`[], bigint[], `0x${string}`[], string];
+type OZBasicInputData = [`0x${string}`[], number[], `0x${string}`[], string];
 type ApprovalInputData = [string, string, string, Number];
 type InputData = OZBasicInputData | BasicInputData | ApprovalInputData | null;
 
@@ -77,7 +77,7 @@ export function getInputData(proposal: DraftProposal): {
   switch (proposal.voting_module_type) {
     case ProposalType.BASIC:
       let targets: `0x${string}`[] = [];
-      let values: bigint[] = [];
+      let values: number[] = [];
       let calldatas: `0x${string}`[] = [];
       let inputData: BasicInputData | OZBasicInputData = [
         targets,
@@ -89,12 +89,12 @@ export function getInputData(proposal: DraftProposal): {
 
       if (proposal.transactions.length === 0) {
         targets.push(ethers.ZeroAddress as `0x${string}`);
-        values.push(0n);
+        values.push(0);
         calldatas.push("0x");
       } else {
         proposal.transactions.forEach((t) => {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);
-          values.push(parseEther(t.value.toString() || "0"));
+          values.push(parseInt(t.value) || 0);
           calldatas.push(t.calldata as `0x${string}`);
         });
       }
@@ -102,7 +102,7 @@ export function getInputData(proposal: DraftProposal): {
       // OZ governor does not have proposal types
       // need a better way to read which governor a particular tenant is on
       // would be great if we could read this from the contract, or the tenant
-      if (tenant.namespace === "ens") {
+      if (tenant.namespace === TENANT_NAMESPACES.ENS) {
         inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
@@ -158,7 +158,7 @@ export function getInputData(proposal: DraftProposal): {
       const settings = {
         maxApprovals: proposal.max_options,
         criteria: proposal.criteria === "Threshold" ? 0 : 1,
-        budgetToken: (parseInt(proposal.budget) > 0
+        budgetToken: (proposal.budget > 0
           ? tenant.contracts.governor.address
           : ethers.ZeroAddress) as `0x${string}`,
         criteriaValue:

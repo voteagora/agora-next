@@ -1,19 +1,21 @@
 import {
   useAccount,
-  useContractWrite,
+  useWriteContract,
   useEnsName,
-  useWaitForTransaction,
+  useWaitForTransactionReceipt,
 } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useCallback, useEffect, useState } from "react";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import {
+  AgoraLoaderSmall,
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
-import { track } from "@vercel/analytics";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
@@ -32,7 +34,8 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
-  const { ui, contracts, slug, token } = Tenant.current();
+  const { ui, contracts, token } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address: accountAddress } = useAccount();
 
@@ -54,19 +57,14 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isError, writeAsync, write, data } = useContractWrite({
-    address: contracts.token.address as any,
-    abi: contracts.token.abi,
-    functionName: "delegate",
-    args: [delegate.address as any],
-  });
+  const { isError, writeContract: write, data } = useWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
-  } = useWaitForTransaction({
-    hash: data?.hash,
+  } = useWaitForTransactionReceipt({
+    hash: data,
   });
 
   const fetchData = useCallback(async () => {
@@ -103,7 +101,17 @@ export function DelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <Button disabled={false} onClick={() => write?.()}>
+        <Button
+          disabled={false}
+          onClick={() =>
+            write({
+              address: contracts.token.address as any,
+              abi: contracts.token.abi,
+              functionName: "delegate",
+              args: [delegate.address as any],
+            })
+          }
+        >
           Delegation failed - try again
         </Button>
       );
@@ -119,12 +127,25 @@ export function DelegateDialog({
           <Button className="w-full" disabled={false}>
             Delegation completed!
           </Button>
-          <BlockScanUrls hash1={data?.hash} />
+          <BlockScanUrls hash1={data} />
         </div>
       );
     }
 
-    return <ShadcnButton onClick={() => write?.()}>Delegate</ShadcnButton>;
+    return (
+      <ShadcnButton
+        onClick={() =>
+          write({
+            address: contracts.token.address as any,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as any],
+          })
+        }
+      >
+        Delegate
+      </ShadcnButton>
+    );
   };
 
   useEffect(() => {
@@ -140,24 +161,13 @@ export function DelegateDialog({
           prevVotingPowerDelegatee: delegate.votingPower.total,
         });
       }
-      // Track delegation event
-      // TODO: Andrei - verify that vercel analytics are still needed given that tenants now support Google Analytics
-      const trackingData = {
-        dao_slug: slug,
-        delegateAddress: delegate.address || "unknown",
-        address: accountAddress || "unknown",
-        delegateEnsName: delegateEnsName || "unknown",
-        votingPower: votingPower || "unknown",
-      };
-
-      track("Delegate", trackingData);
     }
   }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
 
   if (!isReady) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-[318px]">
-        <AgoraLoaderSmall />
+        {shouldHideAgoraBranding ? <LogoLoader /> : <AgoraLoaderSmall />}
       </div>
     );
   }

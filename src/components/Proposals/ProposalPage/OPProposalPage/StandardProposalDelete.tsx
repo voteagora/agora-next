@@ -8,7 +8,7 @@ import {
   optimisticModuleAddress,
 } from "@/lib/contracts/contracts";
 import { keccak256, toHex } from "viem";
-import { useContractWrite } from "wagmi";
+import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
@@ -44,13 +44,11 @@ export default function StandardProposalDelete({
     }
   };
 
-  const { write, isLoading, isSuccess } = useContractWrite({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
-    functionName: proposalType === "STANDARD" ? "cancel" : "cancelWithModule",
-    // @ts-ignore
-    args: getArgs(),
-  });
+  const {
+    writeContract: write,
+    isPending: isLoading,
+    isSuccess,
+  } = useWriteContract();
 
   if (!isOpManager) {
     return null;
@@ -66,7 +64,16 @@ export default function StandardProposalDelete({
       <Button
         variant="destructive"
         className="w-1/2 mb-4"
-        onClick={() => write()}
+        onClick={() =>
+          write({
+            address: contracts.governor.address as `0x${string}`,
+            abi: contracts.governor.abi,
+            functionName:
+              proposalType === "STANDARD" ? "cancel" : "cancelWithModule",
+            // @ts-ignore
+            args: getArgs(),
+          })
+        }
         disabled={isLoading || isSuccess}
       >
         {isLoading

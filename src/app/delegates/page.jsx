@@ -74,12 +74,13 @@ export default async function Page({ searchParams }) {
     }),
   };
 
-  const endorsedFilterEnabled = ui.toggle("delegates/endorsed-filter")?.enabled;
-
-  if (endorsedFilterEnabled) {
-    filters.endorsed = !Boolean(
-      searchParams?.endorsedFilter && searchParams?.endorsedFilter
-    );
+  const endorsedToggle = ui.toggle("delegates/endorsed-filter");
+  if (endorsedToggle?.enabled) {
+    const defaultFilter = endorsedToggle.config.defaultFilter;
+    filters.endorsed =
+      searchParams?.endorsedFilter === undefined
+        ? defaultFilter
+        : searchParams.endorsedFilter === "true";
   }
 
   const tab = searchParams.tab;

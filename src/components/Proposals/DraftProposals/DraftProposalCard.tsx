@@ -1,5 +1,8 @@
 import { ProposalDraft } from "@prisma/client";
-import { ProposalLifecycleStageMetadata } from "@/app/proposals/draft/types";
+import {
+  PLMConfig,
+  ProposalLifecycleStageMetadata,
+} from "@/app/proposals/draft/types";
 import { getStageMetadata } from "@/app/proposals/draft/utils/stages";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -13,8 +16,8 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
     );
   }
 
-  const ALL_STAGES_FOR_TENANT = plmToggle.config?.stages || [];
-  const currentStageObject = plmToggle.config?.stages.find(
+  const ALL_STAGES_FOR_TENANT = (plmToggle.config as PLMConfig)?.stages || [];
+  const currentStageObject = (plmToggle.config as PLMConfig)?.stages.find(
     (stage) => stage.stage === proposal.stage
   )!;
 

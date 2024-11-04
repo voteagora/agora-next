@@ -51,7 +51,7 @@ export default function RetroPGFApplicationBanner({
             backgroundImage: `url(${
               profile?.bannerImageUrl
                 ? profile.bannerImageUrl
-                : profile?.profileImageUrl ?? ""
+                : (profile?.profileImageUrl ?? "")
             })`,
             filter: `blur(${profile?.bannerImageUrl ? "0px" : "40px"})`,
           }}

@@ -46,11 +46,13 @@ async function getVotingPowerForProposalByAddress({
     FROM ${namespace + ".voting_power_snaps"}
     WHERE delegate = $1
       AND block_number <= $2
+      AND contract = $3
     ORDER BY block_number DESC, transaction_index DESC, log_index DESC
     LIMIT 1;
     `,
     address,
-    blockNumber
+    blockNumber,
+    contracts.token.address
   );
 
   // This query pulls only partially delegated voting power
@@ -142,6 +144,7 @@ async function getCurrentVotingPowerForAddress({
   const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
     where: {
       delegate: address,
+      contract: contracts.token.address,
     },
   });
 

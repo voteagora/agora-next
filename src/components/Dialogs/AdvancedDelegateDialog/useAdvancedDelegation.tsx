@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { formatUnits } from "viem";
 import { optimism } from "viem/chains";
-import { useContractWrite } from "wagmi";
+import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
 const allowanceType = 1; // 1 - relative; 0 - absolute
@@ -31,35 +31,20 @@ const useAdvancedDelegation = ({
   );
 
   const {
-    writeAsync: subdelegate,
-    isLoading: subdelegateIsLoading,
+    writeContractAsync: subdelegate,
+    isPending: subdelegateIsLoading,
     isError: subdelegateIsError,
     isSuccess: subdelegateIsSuccess,
     data: subdelegateData,
-  } = useContractWrite({
-    address: contracts.alligator!.address as `0x${string}`,
-    abi: contracts.alligator!.abi,
-    functionName: Array.isArray(target) ? "subdelegateBatched" : "subdelegate",
-    args: [
-      target as any,
-      buildRules(allocation, availableBalanceNumber) as any,
-    ],
-    chainId: optimism.id,
-  });
+  } = useWriteContract();
 
   const {
-    writeAsync: delegateToProxy,
-    isLoading: delegateToProxyIsLoading,
+    writeContractAsync: delegateToProxy,
+    isPending: delegateToProxyIsLoading,
     isError: delegateToProxyIsError,
     isSuccess: delegateToProxyIsSuccess,
     data: delegateToProxyData,
-  } = useContractWrite({
-    address: contracts.token.address as `0x${string}`,
-    abi: contracts.token.abi,
-    functionName: "delegate",
-    args: [proxyAddress as any],
-    chainId: optimism.id,
-  });
+  } = useWriteContract();
 
   const writeAsync = useCallback(async () => {
     setIsLoading(true);
@@ -67,10 +52,27 @@ const useAdvancedDelegation = ({
     setIsSuccess(false);
 
     if (!isDelegatingToProxy) {
-      await delegateToProxy();
+      await delegateToProxy({
+        address: contracts.token.address as `0x${string}`,
+        abi: contracts.token.abi,
+        functionName: "delegate",
+        args: [proxyAddress as any],
+        chainId: optimism.id,
+      });
     }
-    return await subdelegate();
-  }, [isDelegatingToProxy, delegateToProxy, subdelegate]);
+    return await subdelegate({
+      address: contracts.alligator!.address as `0x${string}`,
+      abi: contracts.alligator!.abi,
+      functionName: Array.isArray(target)
+        ? "subdelegateBatched"
+        : "subdelegate",
+      args: [
+        target as any,
+        buildRules(allocation, availableBalanceNumber) as any,
+      ],
+      chainId: optimism.id,
+    });
+  }, [isDelegatingToProxy, delegateToProxy, subdelegate, target, allocation]);
 
   useEffect(() => {
     if (delegateToProxyIsLoading || subdelegateIsLoading) {

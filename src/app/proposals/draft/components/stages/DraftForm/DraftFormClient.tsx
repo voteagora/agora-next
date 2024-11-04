@@ -12,13 +12,14 @@ import MarkdownTextareaInput from "../../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
 import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
+import { invalidatePath } from "../../../actions/revalidatePath";
 import {
   ProposalType,
   SocialProposalType,
   ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
-  ApprovalProposal,
+  PLMConfig,
 } from "../../../types";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
@@ -74,6 +75,8 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
 
+  console.log(draftProposal);
+
   const router = useRouter();
   const { address } = useAccount();
   const tenant = Tenant.current();
@@ -121,6 +124,7 @@ const DraftFormClient = ({
         setIsPending(false);
         toast("Something went wrong...");
       } else {
+        invalidatePath(draftProposal.id);
         router.push(
           `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
         );
@@ -143,7 +147,7 @@ const DraftFormClient = ({
                   label="Voting module"
                   required={true}
                   options={Object.values([
-                    ...(plmToggle?.config?.proposalTypes || []),
+                    ...((plmToggle?.config as PLMConfig)?.proposalTypes || []),
                   ])}
                   name="type"
                 />
@@ -152,21 +156,30 @@ const DraftFormClient = ({
                   {ProposalTypeMetadata[proposalType].description}
                 </p>
               </div>
-              <div className="relative">
-                <SelectInput
-                  control={control}
-                  label="Proposal type"
-                  required={true}
-                  options={validProposalTypes.map((typeConfig) => {
-                    return {
-                      label: typeConfig.name,
-                      value: typeConfig.proposal_type_id,
-                    };
-                  })}
+
+              {validProposalTypes.length > 1 ? (
+                <div className="relative">
+                  <SelectInput
+                    control={control}
+                    label="Proposal type"
+                    required={true}
+                    options={validProposalTypes.map((typeConfig) => {
+                      return {
+                        label: typeConfig.name,
+                        value: typeConfig.proposal_type_id,
+                      };
+                    })}
+                    name="proposalConfigType"
+                    emptyCopy="Default"
+                  />
+                </div>
+              ) : (
+                <input
+                  type="hidden"
                   name="proposalConfigType"
-                  emptyCopy="Default"
+                  value={validProposalTypes[0]?.proposal_type_id || null}
                 />
-              </div>
+              )}
 
               <TextInput
                 label="Title"
@@ -208,7 +221,7 @@ const DraftFormClient = ({
                 className="w-[200px] flex items-center justify-center"
                 isLoading={isPending}
               >
-                Create draft
+                {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>
             </div>
           </FormCard.Section>

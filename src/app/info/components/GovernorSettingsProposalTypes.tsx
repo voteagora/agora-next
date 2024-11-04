@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Tenant from "@/lib/tenant/tenant";
-import { useContractRead } from "wagmi";
+import { useReadContract } from "wagmi";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
@@ -20,35 +20,49 @@ const GovernorSettingsProposalTypes = () => {
   // TODO: Refactor this to use the governor types
   const isQuorumSupportedByGovernor = namespace !== TENANT_NAMESPACES.CYBER;
 
-  const { data: quorum, isFetched: isQuorumFetched } = useContractRead({
+  const { data: quorum, isFetched: isQuorumFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName:
       namespace === TENANT_NAMESPACES.UNISWAP ? "quorumVotes" : "quorum",
-    enabled: isQuorumSupportedByGovernor,
-  });
+    query: { enabled: isQuorumSupportedByGovernor },
+  }) as { data: bigint | undefined; isFetched: boolean };
 
-  const { data: threshold, isFetched: isThresholdFetched } = useContractRead({
+  const { data: threshold, isFetched: isThresholdFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "proposalThreshold",
-  });
+  }) as { data: bigint | undefined; isFetched: boolean };
 
   return (
     <Table>
       <TableHeader>
-        <TableRow className="text-base font-semibold text-left text-gray-4f bg-gray-fa">
-          <TableHead colSpan={3}>Proposal type</TableHead>
-          <TableHead colSpan={4}>Proposal threshold</TableHead>
+        <TableRow className="text-base font-semibold text-left text-secondary bg-wash">
+          <TableHead colSpan={3} className="rounded-tl-xl text-secondary">
+            Proposal type
+          </TableHead>
+          <TableHead
+            colSpan={4}
+            className={`text-secondary ${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-tr-xl"}`}
+          >
+            Proposal threshold
+          </TableHead>
           {isQuorumSupportedByGovernor && (
-            <TableHead colSpan={4}>Quorum</TableHead>
+            <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
+              Quorum
+            </TableHead>
           )}
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow className="text-base font-semibold text-gray-4f">
-          <TableCell colSpan={3}>Default</TableCell>
-          <TableCell colSpan={4}>
+        <TableRow className="text-base font-semibold text-secondary">
+          <TableCell colSpan={3} className="rounded-bl-xl">
+            Default
+          </TableCell>
+          <TableCell
+            colSpan={4}
+            className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
+          >
             {isThresholdFetched && threshold !== undefined && (
               <TokenAmountDisplay
                 amount={BigInt(threshold.toString())}
@@ -58,7 +72,7 @@ const GovernorSettingsProposalTypes = () => {
             )}
           </TableCell>
           {isQuorumSupportedByGovernor && (
-            <TableCell colSpan={4}>
+            <TableCell colSpan={4} className="rounded-br-xl">
               {isQuorumFetched && quorum && (
                 <TokenAmountDisplay
                   amount={BigInt(quorum.toString())}

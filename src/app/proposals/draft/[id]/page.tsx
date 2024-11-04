@@ -12,6 +12,7 @@ import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
 import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 export default async function DraftProposalPage({
   params,
@@ -75,7 +76,10 @@ export default async function DraftProposalPage({
             <div className="bg-wash border border-line rounded-2xl p-4">
               <p className="mt-2">
                 <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2">
-                  {proposalLifecycleToggle.config?.copy.helperText}
+                  {
+                    (proposalLifecycleToggle.config as PLMConfig)?.copy
+                      .helperText
+                  }
                 </ReactMarkdown>
               </p>
             </div>
