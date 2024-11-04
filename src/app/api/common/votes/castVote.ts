@@ -5,6 +5,7 @@ import {
   parseSignature,
   http,
   createPublicClient,
+  isHex,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -42,8 +43,8 @@ async function prepareVoteBySignature({
   proposalId: string;
   support: number;
 }) {
-  if (!SPONSOR_PRIVATE_KEY) {
-    throw new Error("SPONSOR_PRIVATE_KEY is not defined");
+  if (!SPONSOR_PRIVATE_KEY || !isHex(SPONSOR_PRIVATE_KEY)) {
+    throw new Error("incorrect or missing SPONSOR_PRIVATE_KEY");
   }
 
   const { governor } = Tenant.current().contracts;
@@ -65,7 +66,7 @@ async function prepareVoteBySignature({
     throw new Error("Unsupported signature type");
   }
 
-  const account = privateKeyToAccount(SPONSOR_PRIVATE_KEY as `0x${string}`);
+  const account = privateKeyToAccount(SPONSOR_PRIVATE_KEY);
 
   const { request } = await publicClient.simulateContract({
     address: governor.address as `0x${string}`,
