@@ -38,8 +38,16 @@ export const protocolGuildTenantContractConfig = ({
     : "0x966daa9da3c7ef86c0f9fd678bd5d8cb1b856577";
 
   const TREASURY = isProd
-    ? [TIMELOCK, "0x14c7dd468a86c4bd722927a815e923e60565c1b2"]
-    : [TIMELOCK, "0x14c7dd468a86c4bd722927a815e923e60565c1b2"];
+    ? [
+        TIMELOCK,
+        "0x14c7dd468a86c4bd722927a815e923e60565c1b2",
+        "0x25941dc771bb64514fc8abbce970307fb9d477e9",
+      ]
+    : [
+        TIMELOCK,
+        "0x14c7dd468a86c4bd722927a815e923e60565c1b2",
+        "0x25941dc771bb64514fc8abbce970307fb9d477e9",
+      ];
 
   const provider = isProd
     ? new AlchemyProvider("mainnet", alchemyId)
