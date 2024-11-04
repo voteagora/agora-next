@@ -1,11 +1,13 @@
-import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
-import { useContractWrite } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransaction } from "wagmi/actions";
 import { useSignTypedData } from "wagmi";
-import { voteBySiganatureApi } from "@/app/api/common/votes/castVote";
+import {
+  prepareVoteBySignatureApi,
+  voteBySiganatureApi,
+} from "@/app/api/common/votes/castVote";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { config } from "@/app/Web3Provider";
 
 const types = {
   Ballot: [
@@ -59,25 +61,25 @@ const useSponsoredVoting = ({
       setSignatureLoading(false);
       setSponsoredVoteLoading(true);
 
-      // TODO: Simulate the vote
-
-      // Wait for the transaction
-
-      console.log("Voting");
-
-      const voteTxHash = await voteBySiganatureApi({
+      const request = await prepareVoteBySignatureApi({
         signature,
         proposalId,
         support,
       });
+
+      const voteTxHash = await voteBySiganatureApi({ request });
       try {
-        const { status } = await waitForTransaction({
+        const { status } = await waitForTransactionReceipt(config, {
           hash: voteTxHash,
+          chainId: contracts.governor.chain.id,
         });
 
         if (status === "success") {
           setSponsoredVoteTxHash(voteTxHash);
           setSponsoredVoteSuccess(true);
+        } else {
+          setSponsoredVoteLoading(false);
+          setSponsoredVoteError(true);
         }
       } catch (error) {
         setSponsoredVoteError(true);
