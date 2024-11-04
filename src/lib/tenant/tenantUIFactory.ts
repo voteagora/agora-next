@@ -6,6 +6,7 @@ import { ensTenantUIConfig } from "@/lib/tenant/configs/ui/ens";
 import { optimismTenantUIConfig } from "@/lib/tenant/configs/ui/optimism";
 import { cyberTenantUIConfig } from "@/lib/tenant/configs/ui/cyber";
 import { deriveTenantUIConfig } from "@/lib/tenant/configs/ui/derive";
+import { scrollTenantUIConfig } from "@/lib/tenant/configs/ui/scroll";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -27,6 +28,9 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.DERIVE:
         return deriveTenantUIConfig;
+
+      case TENANT_NAMESPACES.SCROLL:
+        return scrollTenantUIConfig;
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

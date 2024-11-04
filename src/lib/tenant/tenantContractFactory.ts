@@ -6,6 +6,7 @@ import { optimismTenantContractConfig } from "@/lib/tenant/configs/contracts/opt
 import { uniswapTenantContractConfig } from "@/lib/tenant/configs/contracts/uniswap";
 import { cyberTenantConfig } from "@/lib/tenant/configs/contracts/cyber";
 import { deriveTenantConfig } from "@/lib/tenant/configs/contracts/derive";
+import { scrollTenantContractConfig } from "@/lib/tenant/configs/contracts/scroll";
 
 export default class TenantContractFactory {
   public static create(
@@ -27,6 +28,8 @@ export default class TenantContractFactory {
       case TENANT_NAMESPACES.DERIVE:
         return deriveTenantConfig({ isProd, alchemyId });
 
+      case TENANT_NAMESPACES.SCROLL:
+        return scrollTenantContractConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

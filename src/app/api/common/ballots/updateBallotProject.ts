@@ -427,7 +427,11 @@ async function updateAllProjectsInBallotForAddress({
           },
         },
         update: {
-          allocation: Number(project.allocation)?.toFixed(2),
+          allocation: project.impact
+            ? Number(project.allocation)?.toFixed(2)
+            : null,
+          impact: project.impact,
+          rank: Math.floor((500_000 / projects.length) * (i + 1)),
           updated_at: new Date(),
         },
         create: {

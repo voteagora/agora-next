@@ -1,12 +1,12 @@
 import {
-  createWalletClient,
   createPublicClient,
+  createWalletClient,
   custom,
-  http,
   defineChain,
+  http,
 } from "viem";
-import { mainnet, sepolia, optimism, lyra } from "viem/chains";
-import { cyber } from "@/lib/tenant/configs/contracts/cyber";
+import { cyber, lyra, mainnet, optimism, scroll, sepolia } from "viem/chains";
+
 import "viem/window";
 
 export const lyraTestnet = /*#__PURE__*/ defineChain({
@@ -69,6 +69,13 @@ export const getWalletClient = (chainId: number) => {
         chain: lyraTestnet,
         transport: custom(window.ethereum!),
       });
+
+    case scroll.id:
+      return createWalletClient({
+        chain: scroll,
+        transport: custom(window.ethereum!),
+      });
+
     default:
       throw new Error("Invalid chainId");
   }
@@ -94,6 +101,11 @@ export const getPublicClient = (chainId: number) => {
     case cyber.id:
       return createPublicClient({
         chain: cyber,
+        transport: http(),
+      });
+    case scroll.id:
+      return createPublicClient({
+        chain: scroll,
         transport: http(),
       });
 

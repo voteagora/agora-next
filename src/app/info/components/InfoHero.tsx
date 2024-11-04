@@ -3,6 +3,8 @@ import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
 
 export const InfoHero = () => {
   const { ui, namespace } = Tenant.current();
@@ -23,22 +25,20 @@ export const InfoHero = () => {
         </h1>
         <p className="text-base text-secondary mt-4">
           {page!.description}
-
-          {/*{namespace === TENANT_NAMESPACES.NEW_DAO && (
+          {namespace === TENANT_NAMESPACES.SCROLL && (
             <div className="flex flex-row gap-2 mt-4">
-              <Link href={"https://www.somesite.com"}>
+              <Link href={"https://claim.scroll.io"}>
                 <Button className="bg-brandPrimary hover:bg-brandPrimary/90 cursor-pointer block">
-                  .
+                  Claim your tokens to get started
                 </Button>
               </Link>
-              <Link href={"https://www.somesite.com/faq"}>
+              <Link href={"https://claim.scroll.io/faq"}>
                 <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
                   FAQ
                 </Button>
               </Link>
             </div>
           )}
-          */}
         </p>
       </div>
 
