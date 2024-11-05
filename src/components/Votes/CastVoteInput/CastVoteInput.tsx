@@ -20,6 +20,8 @@ import CastVoteContextProvider, {
   SupportTextProps,
   useCastVoteContext,
 } from "./CastVoteContext";
+import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   proposal: Proposal;
@@ -86,9 +88,13 @@ function CastVoteInputContent({
   const { reason, setReason, support, isLoading, isSuccess } =
     useCastVoteContext();
 
+  const { ui } = Tenant.current();
+
   return (
     <>
-      <VStack className="bg-neutral border-t border-b border-line rounded-b-lg flex-shrink shadow-md">
+      <VStack
+        className={`bg-neutral border-t border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && "shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]"}`}
+      >
         <VStack
           justifyContent="justify-between"
           alignItems="items-stretch"
@@ -121,10 +127,27 @@ function CastVoteInputContent({
           )}
         </VStack>
       </VStack>
-      <div className="text-sm text-secondary mt-2 px-4">
-        Voting on Agora is free!
-      </div>
+      {ui.toggle("sponsoredVote") && <VotingBanner />}
     </>
+  );
+}
+
+function VotingBanner() {
+  const { reason } = useCastVoteContext();
+
+  if (reason) {
+    return (
+      <div className="flex items-center text-sm text-secondary font-medium m-1 px-4 pb-2">
+        Voter statements require gas fees.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center text-sm text-secondary font-medium m-1 px-4 pb-2">
+      <img src={freeGasMegaphon.src} alt="Free gas" className="w-6 h-6 mr-2" />
+      Voting on Agora is free!
+    </div>
   );
 }
 

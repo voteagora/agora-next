@@ -54,6 +54,7 @@ import shieldEmoji from "./emoji/shield.png";
 import sproutEmoji from "./emoji/sprout.png";
 import testTubeEmoji from "./emoji/test-tube.png";
 import worldEmoji from "./emoji/world.png";
+import freeGasMegaphon from "./freeGasMegaphon.gif";
 
 export const icons = {
   hammerEmoji,
@@ -112,4 +113,5 @@ export const icons = {
   world,
   wrenchScrewdriverIcon,
   x,
+  freeGasMegaphon,
 };
