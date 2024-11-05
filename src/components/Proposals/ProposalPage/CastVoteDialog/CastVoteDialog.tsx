@@ -219,7 +219,6 @@ export function SuccessMessage({
   data: {
     standardTxHash?: string;
     advancedTxHash?: string;
-    sponsoredVoteTxHash?: string;
   };
 }) {
   const { ui } = Tenant.current();
@@ -249,7 +248,7 @@ export function SuccessMessage({
         </div>
       </div>
       <BlockScanUrls
-        hash1={data?.sponsoredVoteTxHash || data?.standardTxHash}
+        hash1={data?.standardTxHash}
         hash2={data?.advancedTxHash}
       />
     </VStack>
