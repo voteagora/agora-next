@@ -85,7 +85,7 @@ async function getVotesForDelegateForAddress({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM
-              ${namespace + ".proposals"} proposals
+              ${namespace + ".proposals_v2"} proposals
             WHERE
               proposals.proposal_id = av.proposal_id AND proposals.contract = av.contract) p ON TRUE
         ) q
@@ -168,7 +168,7 @@ async function getSnapshotVotesForDelegateForAddress({
              "vote".choice_labels,
              "proposal".title
       FROM "snapshot".votes as "vote"
-      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
+      INNER JOIN "snapshot".proposals_v2 AS "proposal" ON "vote".proposal_id = "proposal".id
       WHERE "vote".dao_slug = '${slug}'
       AND "vote".voter = '${address}'
       ORDER BY "vote".created DESC
@@ -250,7 +250,7 @@ async function getVotesForProposal({
             proposals.description,
             proposals.proposal_data,
             proposals.proposal_type::config.proposal_type AS proposal_type
-          FROM ${namespace + ".proposals"} proposals
+          FROM ${namespace + ".proposals_v2"} proposals
           WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
       ) q
       ORDER BY ${sort} DESC
