@@ -7,10 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
-import {
-  LoadingVote,
-  SupportTextProps,
-} from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import {
   MissingVote,
@@ -18,14 +14,12 @@ import {
   getVpToDisplay,
 } from "@/lib/voteUtils";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
-import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import { TokenAmountDisplay } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
-import Image from "next/image";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
-import useStandardVoting from "@/hooks/useStandardVoting";
-import useAdvancedVoting from "@/hooks/useAdvancedVoting";
-import CastVoteContextProvider, { useCastVoteContext } from "./CastVoteContext";
+import CastVoteContextProvider, {
+  SupportTextProps,
+  useCastVoteContext,
+} from "./CastVoteContext";
 
 type Props = {
   proposal: Proposal;
@@ -68,53 +62,57 @@ export default function CastVoteInput({
       chains={chains}
       votingPower={votingPower}
     >
-      <CastVoteInputContext
+      <CastVoteInputContent
         proposal={proposal}
         votes={votes}
         votingPower={votingPower}
-        chains={chains}
         isOptimistic={isOptimistic}
       />
     </CastVoteContextProvider>
   );
 }
 
-function CastVoteInputContext({
+function CastVoteInputContent({
   proposal,
   votes,
   votingPower,
-  chains,
   isOptimistic,
 }: {
   proposal: Proposal;
   votes: Vote[];
   votingPower: VotingPowerData;
-  chains: string[][];
   isOptimistic: boolean;
 }) {
-  const { reason, setReason, support } = useCastVoteContext();
+  const { reason, setReason, support, isLoading, isSuccess } =
+    useCastVoteContext();
 
   return (
     <>
       <VStack className="bg-neutral border-t border-b border-line rounded-b-lg flex-shrink shadow-md">
-        <textarea
-          placeholder="I believe..."
-          value={reason || undefined}
-          onChange={(e) => setReason(e.target.value)}
-          className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 m-3"
-        />
         <VStack
           justifyContent="justify-between"
           alignItems="items-stretch"
           className="px-3 pb-3 pt-1"
         >
-          <VoteButtons
-            proposalStatus={proposal.status}
-            delegateVotes={votes}
-            isOptimistic={isOptimistic}
-            votingPower={votingPower}
-          />
-          {support && (
+          {!isLoading && !isSuccess && (
+            <VStack gap={2}>
+              <textarea
+                placeholder="I believe..."
+                value={reason || undefined}
+                onChange={(e) => setReason(e.target.value)}
+                className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+              />
+              <VoteButtons
+                proposalStatus={proposal.status}
+                delegateVotes={votes}
+                isOptimistic={isOptimistic}
+                votingPower={votingPower}
+              />
+            </VStack>
+          )}
+          {isLoading && <LoadingVote />}
+          {isSuccess && <SuccessMessage />}
+          {support && !isSuccess && !isLoading && (
             <VoteSubmitButton
               supportType={support}
               votingPower={votingPower}
@@ -139,26 +137,18 @@ function VoteSubmitButton({
   votingPower: VotingPowerData;
   missingVote: MissingVote;
 }) {
-  const { isLoading, isSuccess, write } = useCastVoteContext();
+  const { write } = useCastVoteContext();
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
-  if (isLoading) {
-    return <LoadingVote />;
-  }
-
   return (
     <div className="pt-3">
-      {!isSuccess && (
-        <SubmitButton onClick={write}>
-          <>
-            Vote {supportType.toLowerCase()} with{"\u00A0"}
-            <TokenAmountDisplay amount={vpToDisplay} />
-          </>
-        </SubmitButton>
-      )}
-      {isSuccess && <SuccessMessage />}
-      {isLoading && <LoadingVote />}
+      <SubmitButton onClick={write}>
+        <>
+          Vote {supportType.toLowerCase()} with{"\u00A0"}
+          <TokenAmountDisplay amount={vpToDisplay} />
+        </>
+      </SubmitButton>
     </div>
   );
 }
@@ -177,20 +167,31 @@ const SubmitButton = ({
   );
 };
 
-function SuccessMessage() {
-  const { ui } = Tenant.current();
+function LoadingVote() {
+  return (
+    <VStack className="w-full">
+      <div className="mb-2 text-2xl font-black">Casting your vote</div>
+      <div className="mb-5 text-sm text-secondary">
+        It might take up to a minute for the changes to be reflected.
+      </div>
+      <div>
+        <div
+          className={`flex flex-row justify-center w-full py-3 bg-line rounded-lg`}
+        >
+          <div className="font-medium text-secondary">
+            Writing your vote to the chain...
+          </div>
+        </div>
+      </div>
+    </VStack>
+  );
+}
 
+function SuccessMessage() {
   const { data } = useCastVoteContext();
 
   return (
     <VStack className="w-full">
-      <Image
-        width="457"
-        height="155"
-        src={ui.assets.success}
-        className="w-full mb-3"
-        alt="agora loading"
-      />
       <div className="mb-2 text-2xl font-black">
         Your vote has been submitted!
       </div>
