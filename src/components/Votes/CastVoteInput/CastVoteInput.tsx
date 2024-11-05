@@ -111,7 +111,7 @@ function CastVoteInputContent({
             </VStack>
           )}
           {isLoading && <LoadingVote />}
-          {isSuccess && <SuccessMessage />}
+          {true && <SuccessMessage />}
           {support && !isSuccess && !isLoading && (
             <VoteSubmitButton
               supportType={support}
@@ -188,21 +188,23 @@ function LoadingVote() {
 }
 
 function SuccessMessage() {
-  const { data } = useCastVoteContext();
+  const { data, support } = useCastVoteContext();
+
+  const supportColor =
+    support?.toLowerCase() === "for"
+      ? "text-positive"
+      : support?.toLowerCase() === "against"
+        ? "text-negative"
+        : "text-secondary";
 
   return (
     <VStack className="w-full">
-      <div className="mb-2 text-2xl font-black">
-        Your vote has been submitted!
-      </div>
-      <div className="mb-5 text-sm text-secondary">
-        It might take up to a minute for the changes to be reflected. Thank you
-        for your active participation in governance.
-      </div>
-      <div>
-        <div className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary">
-          Got it
-        </div>
+      <div className="text-sm text-secondary">
+        You{" "}
+        <span className={supportColor}>
+          voted {support?.toLowerCase() + (support === "ABSTAIN" ? " in" : "")}
+        </span>{" "}
+        this proposal
       </div>
       <BlockScanUrls
         hash1={data?.sponsoredVoteTxHash || data?.standardTxHash}
