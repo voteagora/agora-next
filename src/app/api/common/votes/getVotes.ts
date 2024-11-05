@@ -168,7 +168,7 @@ async function getSnapshotVotesForDelegateForAddress({
              "vote".choice_labels,
              "proposal".title
       FROM "snapshot".votes as "vote"
-      INNER JOIN "snapshot".proposals_v2 AS "proposal" ON "vote".proposal_id = "proposal".id
+      INNER JOIN "snapshot".proposals AS "proposal" ON "vote".proposal_id = "proposal".id
       WHERE "vote".dao_slug = '${slug}'
       AND "vote".voter = '${address}'
       ORDER BY "vote".created DESC
