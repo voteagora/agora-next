@@ -62,7 +62,12 @@ export default function CastVoteInput({
   }
 
   return (
-    <CastVoteContextProvider>
+    <CastVoteContextProvider
+      proposal={proposal}
+      missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+      chains={chains}
+      votingPower={votingPower}
+    >
       <CastVoteInputContext
         proposal={proposal}
         votes={votes}
@@ -111,11 +116,9 @@ function CastVoteInputContext({
           />
           {support && (
             <VoteSubmitButton
-              proposalId={proposal.id}
               supportType={support}
               votingPower={votingPower}
               missingVote={checkMissingVoteForDelegate(votes, votingPower)}
-              chains={chains}
             />
           )}
         </VStack>
@@ -128,73 +131,15 @@ function CastVoteInputContext({
 }
 
 function VoteSubmitButton({
-  proposalId,
   supportType,
   votingPower,
   missingVote,
-  chains,
 }: {
-  proposalId: string;
   supportType: SupportTextProps["supportType"];
   votingPower: VotingPowerData;
   missingVote: MissingVote;
-  chains: string[][];
 }) {
-  const { contracts, ui } = Tenant.current();
-  const sponsoredVoteToggle = ui.toggle("sponsoredVote");
-
-  const { reason } = useCastVoteContext();
-
-  if (sponsoredVoteToggle && !reason) {
-    return (
-      <SponsoredVoteSubmitButton
-        proposalId={proposalId}
-        supportType={supportType}
-        votingPower={votingPower}
-        missingVote={missingVote}
-      />
-    );
-  }
-
-  return contracts?.alligator ? (
-    <AdvancedVoteSubmitButton
-      proposalId={proposalId}
-      reason={reason || ""}
-      supportType={supportType}
-      votingPower={votingPower}
-      authorityChains={chains}
-      missingVote={missingVote}
-    />
-  ) : (
-    <StandardVoteSubmitButton
-      proposalId={proposalId}
-      supportType={supportType}
-      votingPower={votingPower}
-      missingVote={missingVote}
-      reason={reason || ""}
-    />
-  );
-}
-
-function StandardVoteSubmitButton({
-  proposalId,
-  supportType,
-  votingPower,
-  missingVote,
-  reason,
-}: {
-  proposalId: string;
-  supportType: SupportTextProps["supportType"];
-  votingPower: VotingPowerData;
-  missingVote: MissingVote;
-  reason: string;
-}) {
-  const { write, isLoading, isSuccess, data } = useStandardVoting({
-    proposalId,
-    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-    reason,
-    missingVote,
-  });
+  const { isLoading, isSuccess, write } = useCastVoteContext();
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
@@ -212,89 +157,8 @@ function StandardVoteSubmitButton({
           </>
         </SubmitButton>
       )}
-      {isSuccess && <SuccessMessage data={data} />}
-    </div>
-  );
-}
-
-function AdvancedVoteSubmitButton({
-  proposalId,
-  reason,
-  supportType,
-  votingPower,
-  authorityChains,
-  missingVote,
-}: {
-  proposalId: string;
-  reason: string;
-  supportType: SupportTextProps["supportType"];
-  votingPower: VotingPowerData;
-  authorityChains: string[][];
-  missingVote: MissingVote;
-}) {
-  const { write, isLoading, isSuccess, data } = useAdvancedVoting({
-    proposalId,
-    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-    advancedVP: BigInt(votingPower.advancedVP),
-    authorityChains,
-    reason,
-    missingVote,
-  });
-
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
-
-  if (isLoading) {
-    return <LoadingVote />;
-  }
-
-  return (
-    <div className="pt-3">
-      {!isSuccess && (
-        <SubmitButton onClick={write}>
-          <>
-            Vote {supportType.toLowerCase()} with{"\u00A0"}
-            <TokenAmountDisplay amount={vpToDisplay} />
-          </>
-        </SubmitButton>
-      )}
-      {isSuccess && <SuccessMessage data={data} />}
-    </div>
-  );
-}
-
-function SponsoredVoteSubmitButton({
-  proposalId,
-  supportType,
-  votingPower,
-  missingVote,
-}: {
-  proposalId: string;
-  supportType: SupportTextProps["supportType"];
-  votingPower: VotingPowerData;
-  missingVote: MissingVote;
-}) {
-  const { write, isLoading, isSuccess, data } = useSponsoredVoting({
-    proposalId,
-    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-  });
-
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
-
-  if (isLoading) {
-    return <LoadingVote />;
-  }
-
-  return (
-    <div className="pt-3">
-      {!isSuccess && (
-        <SubmitButton onClick={write}>
-          <>
-            Sign & vote {supportType.toLowerCase()} with{"\u00A0"}
-            <TokenAmountDisplay amount={vpToDisplay} />
-          </>
-        </SubmitButton>
-      )}
-      {isSuccess && <SuccessMessage data={data} />}
+      {isSuccess && <SuccessMessage />}
+      {isLoading && <LoadingVote />}
     </div>
   );
 }
@@ -313,16 +177,10 @@ const SubmitButton = ({
   );
 };
 
-function SuccessMessage({
-  data,
-}: {
-  data: {
-    standardTxHash?: string;
-    advancedTxHash?: string;
-    sponsoredVoteTxHash?: string;
-  };
-}) {
+function SuccessMessage() {
   const { ui } = Tenant.current();
+
+  const { data } = useCastVoteContext();
 
   return (
     <VStack className="w-full">

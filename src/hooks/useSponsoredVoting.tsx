@@ -2,12 +2,12 @@ import { useCallback, useState } from "react";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { useSignTypedData } from "wagmi";
-import {
-  prepareVoteBySignatureApi,
-  voteBySiganatureApi,
-} from "@/app/api/common/votes/castVote";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
+import {
+  prepareVoteBySignature,
+  voteBySignature,
+} from "@/app/proposals/actions";
 
 const types = {
   Ballot: [
@@ -61,13 +61,13 @@ const useSponsoredVoting = ({
       setSignatureLoading(false);
       setSponsoredVoteLoading(true);
 
-      const request = await prepareVoteBySignatureApi({
+      const request = await prepareVoteBySignature(
         signature,
         proposalId,
-        support,
-      });
+        support
+      );
 
-      const voteTxHash = await voteBySiganatureApi({ request });
+      const voteTxHash = await voteBySignature(request);
       try {
         const { status } = await waitForTransactionReceipt(config, {
           hash: voteTxHash,
