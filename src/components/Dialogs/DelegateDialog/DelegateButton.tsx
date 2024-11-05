@@ -1,34 +1,39 @@
 import { Button as ShadcnButton } from "@/components/ui/button";
 import Tenant from "@/lib/tenant/tenant";
 import { Delegate, DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { WriteContractMutate } from "@wagmi/core/query";
-import { Contract } from "ethers";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 interface Props {
   delegate: DelegateChunk;
   delegator: Delegate;
-  write: WriteContractMutate<any>;
+  onChange: (status: "error" | "success" | "loading" | undefined) => void;
 }
 
-export const DelegateButton = ({ delegate, delegator, write }: Props) => {
+export const DelegateButton = ({ delegate, delegator, onChange }: Props) => {
   const { contracts } = Tenant.current();
 
   const hasSCWAddress = Boolean(delegator.statement?.scw_address);
 
-  const label = hasSCWAddress ? "Delegate SCW" : "Delegate EOA";
+  const { data, writeContract, isError: isCancelled } = useWriteContract();
+  const { isLoading, isSuccess, isError } = useWaitForTransactionReceipt({});
+
+  console.log(isLoading, isSuccess, isError);
+  console.log(isCancelled);
 
   return (
     <ShadcnButton
-      onClick={() =>
-        write({
+      onClick={() => {
+        onChange("loading");
+
+        writeContract({
           address: contracts.token.address as any,
           abi: contracts.token.abi,
           functionName: "delegate",
           args: [delegate.address as any],
-        })
-      }
+        });
+      }}
     >
-      {label}
+      Delegate
     </ShadcnButton>
   );
 };

@@ -2,7 +2,11 @@
 
 import { createWalletClient, custom } from "viem";
 import { useEffect, useState } from "react";
-import { alchemy, AlchemySmartAccountClient } from "@account-kit/infra";
+import {
+  alchemy,
+  AlchemySmartAccountClient,
+  sepolia,
+} from "@account-kit/infra";
 import { WalletClientSigner } from "@aa-sdk/core";
 import { createLightAccountAlchemyClient } from "@account-kit/smart-contracts";
 import { useAccount } from "wagmi";
@@ -11,7 +15,7 @@ import Tenant from "@/lib/tenant/tenant";
 export const useSmartAccount = () => {
   const { ui, contracts } = Tenant.current();
   const scwConfig = ui.smartAccountConfig;
-  const chain = contracts.token.chain;
+  const chain = sepolia;
 
   const [client, setClient] = useState<AlchemySmartAccountClient | undefined>(
     undefined
@@ -22,7 +26,7 @@ export const useSmartAccount = () => {
   const { isConnected } = useAccount();
 
   const walletClient = createWalletClient({
-    chain: contracts.token.chain,
+    chain: sepolia,
     transport: custom(window.ethereum!),
   });
 

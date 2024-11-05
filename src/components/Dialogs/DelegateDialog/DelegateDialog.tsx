@@ -1,9 +1,4 @@
-import {
-  useAccount,
-  useWriteContract,
-  useEnsName,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
@@ -16,12 +11,13 @@ import {
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
-import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateButton } from "@/components/Dialogs/DelegateDialog/DelegateButton";
 import { useDelegate } from "@/hooks/useDelegate";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import { SCWDelegateButton } from "@/components/Dialogs/DelegateDialog/SCWDelegateButton";
 
 export function DelegateDialog({
   delegate,
@@ -45,6 +41,10 @@ export function DelegateDialog({
 
   const [votingPower, setVotingPower] = useState<string>("");
   const [accountAddress, setAccountAddress] = useState("");
+
+  const [status, setStatus] = useState<"error" | "loading" | undefined>();
+  const [txnHash, setTxnHash] = useState<string | undefined>();
+
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
   const { setRefetchDelegate } = useConnectButtonContext();
@@ -60,16 +60,6 @@ export function DelegateDialog({
   const { data: delegateeEnsName } = useEnsName({
     chainId: 1,
     address: delegatee?.delegatee as `0x${string}`,
-  });
-
-  const { isError, writeContract: write, data } = useWriteContract();
-
-  const {
-    isLoading: isProcessingDelegation,
-    isSuccess: didProcessDelegation,
-    isError: didFailDelegation,
-  } = useWaitForTransactionReceipt({
-    hash: data,
   });
 
   const fetchData = useCallback(async () => {
@@ -104,42 +94,48 @@ export function DelegateDialog({
       );
     }
 
-    if (isError || didFailDelegation) {
-      return (
-        <Button
-          disabled={false}
-          onClick={() =>
-            write({
-              address: contracts.token.address as any,
-              abi: contracts.token.abi,
-              functionName: "delegate",
-              args: [delegate.address as any],
-            })
-          }
-        >
-          Delegation failed - try again
-        </Button>
-      );
-    }
+    // TODO: Fix this
+    // if (status === "error" && delegator) {
+    //   return (
+    //     <DelegateButton
+    //       delegate={delegate}
+    //       delegator={delegator}
+    //       onChange={(status) => setStatus(status)}
+    //     />
+    //   );
+    // }
 
-    if (isProcessingDelegation) {
+    if (status === "loading") {
       return <Button disabled={true}>Submitting your delegation...</Button>;
     }
 
-    if (didProcessDelegation) {
+    if (txnHash) {
       return (
         <div>
           <Button className="w-full" disabled={false}>
             Delegation completed!
           </Button>
-          <BlockScanUrls hash1={data} />
+          {/*TODO: Fix data */}
+          <BlockScanUrls hash1={txnHash} />
         </div>
       );
     }
 
-    return (
-      <DelegateButton delegate={delegate} delegator={delegator} write={write} />
-    );
+    if (delegator) {
+      return (
+        <SCWDelegateButton
+          delegate={delegate}
+          delegator={delegator}
+          onSuccess={(txn) => setTxnHash(txn)}
+          onChange={(status) => setStatus(status)}
+        />
+        // <DelegateButton
+        //   delegate={delegate}
+        //   delegator={delegator}
+        //   onChange={(status) => setStatus(status)}
+        // />
+      );
+    }
   };
 
   useEffect(() => {
@@ -147,7 +143,7 @@ export function DelegateDialog({
       fetchData();
     }
 
-    if (didProcessDelegation) {
+    if (txnHash) {
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
@@ -156,7 +152,7 @@ export function DelegateDialog({
         });
       }
     }
-  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+  }, [isReady, fetchData, status, delegate, votingPower]);
 
   useEffect(() => {
     if (delegator && !accountAddress) {
