@@ -405,7 +405,7 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
   return (
     <button
       className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selectedStyle} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
-      onClick={() => setSupport(action)}
+      onClick={() => setSupport(support === action ? null : action)}
     >
       {action.toLowerCase()}
     </button>
