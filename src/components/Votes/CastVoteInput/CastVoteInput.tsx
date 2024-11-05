@@ -1,7 +1,7 @@
 "use client";
 
 import { VStack, HStack } from "@/components/Layout/Stack";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
@@ -25,6 +25,7 @@ import Image from "next/image";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
+import CastVoteContextProvider, { useCastVoteContext } from "./CastVoteContext";
 
 type Props = {
   proposal: Proposal;
@@ -37,10 +38,6 @@ export default function CastVoteInput({
 }: Props) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
-  const [reason, setReason] = useState("");
-  const [support, setSupport] = useState<
-    SupportTextProps["supportType"] | null
-  >(null);
   const { chains, delegate, isSuccess, votes, votingPower } =
     useFetchAllForVoting({
       proposal,
@@ -65,11 +62,39 @@ export default function CastVoteInput({
   }
 
   return (
+    <CastVoteContextProvider>
+      <CastVoteInputContext
+        proposal={proposal}
+        votes={votes}
+        votingPower={votingPower}
+        chains={chains}
+        isOptimistic={isOptimistic}
+      />
+    </CastVoteContextProvider>
+  );
+}
+
+function CastVoteInputContext({
+  proposal,
+  votes,
+  votingPower,
+  chains,
+  isOptimistic,
+}: {
+  proposal: Proposal;
+  votes: Vote[];
+  votingPower: VotingPowerData;
+  chains: string[][];
+  isOptimistic: boolean;
+}) {
+  const { reason, setReason, support } = useCastVoteContext();
+
+  return (
     <>
       <VStack className="bg-neutral border-t border-b border-line rounded-b-lg flex-shrink shadow-md">
         <textarea
           placeholder="I believe..."
-          value={reason}
+          value={reason || undefined}
           onChange={(e) => setReason(e.target.value)}
           className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 m-3"
         />
@@ -79,14 +104,10 @@ export default function CastVoteInput({
           className="px-3 pb-3 pt-1"
         >
           <VoteButtons
-            onClick={(supportType: SupportTextProps["supportType"]) => {
-              setSupport(supportType);
-            }}
             proposalStatus={proposal.status}
             delegateVotes={votes}
             isOptimistic={isOptimistic}
             votingPower={votingPower}
-            selectedSupport={support}
           />
           {support && (
             <VoteSubmitButton
@@ -94,7 +115,6 @@ export default function CastVoteInput({
               supportType={support}
               votingPower={votingPower}
               missingVote={checkMissingVoteForDelegate(votes, votingPower)}
-              reason={reason}
               chains={chains}
             />
           )}
@@ -112,18 +132,18 @@ function VoteSubmitButton({
   supportType,
   votingPower,
   missingVote,
-  reason,
   chains,
 }: {
   proposalId: string;
   supportType: SupportTextProps["supportType"];
   votingPower: VotingPowerData;
   missingVote: MissingVote;
-  reason: string;
   chains: string[][];
 }) {
   const { contracts, ui } = Tenant.current();
   const sponsoredVoteToggle = ui.toggle("sponsoredVote");
+
+  const { reason } = useCastVoteContext();
 
   if (sponsoredVoteToggle && !reason) {
     return (
@@ -139,7 +159,7 @@ function VoteSubmitButton({
   return contracts?.alligator ? (
     <AdvancedVoteSubmitButton
       proposalId={proposalId}
-      reason={reason}
+      reason={reason || ""}
       supportType={supportType}
       votingPower={votingPower}
       authorityChains={chains}
@@ -151,7 +171,7 @@ function VoteSubmitButton({
       supportType={supportType}
       votingPower={votingPower}
       missingVote={missingVote}
-      reason={reason}
+      reason={reason || ""}
     />
   );
 }
@@ -253,14 +273,7 @@ function SponsoredVoteSubmitButton({
   votingPower: VotingPowerData;
   missingVote: MissingVote;
 }) {
-  const {
-    write,
-    isLoading,
-    isSuccess,
-    data,
-    isSignatureSuccess,
-    isWaitingForSignature,
-  } = useSponsoredVoting({
+  const { write, isLoading, isSuccess, data } = useSponsoredVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
   });
@@ -341,19 +354,15 @@ function SuccessMessage({
 }
 
 function VoteButtons({
-  onClick,
   proposalStatus,
   delegateVotes,
   isOptimistic,
   votingPower,
-  selectedSupport,
 }: {
-  onClick: (supportType: SupportTextProps["supportType"]) => void;
   proposalStatus: Proposal["status"];
   delegateVotes: Vote[];
   isOptimistic: boolean;
   votingPower: VotingPowerData;
-  selectedSupport: SupportTextProps["supportType"] | null;
 }) {
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
@@ -365,8 +374,6 @@ function VoteButtons({
     return <DisabledVoteButton reason="Already voted" />;
   }
 
-  console.log("selectedSupport", selectedSupport);
-
   return (
     <HStack gap={2} className="pt-1">
       {(isOptimistic ? ["AGAINST"] : ["FOR", "AGAINST", "ABSTAIN"]).map(
@@ -374,10 +381,6 @@ function VoteButtons({
           <VoteButton
             key={supportType}
             action={supportType as SupportTextProps["supportType"]}
-            onClick={() => {
-              onClick(supportType as SupportTextProps["supportType"]);
-            }}
-            selected={selectedSupport === supportType}
           />
         )
       )}
@@ -385,21 +388,24 @@ function VoteButtons({
   );
 }
 
-function VoteButton({
-  action,
-  onClick,
-  selected,
-}: {
-  action: SupportTextProps["supportType"];
-  onClick: () => void;
-  selected: boolean;
-}) {
+function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
   const actionString = action.toLowerCase();
+
+  const { support, setSupport } = useCastVoteContext();
+
+  const selectedStyle =
+    support === action
+      ? actionString === "for"
+        ? "border-positive bg-positive/10"
+        : actionString === "against"
+          ? "border-negative bg-negative/10"
+          : "border-secondary bg-secondary/10"
+      : "bg-neutral";
 
   return (
     <button
-      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selected ? "bg-positive" : "bg-neutral"} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
-      onClick={onClick}
+      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selectedStyle} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+      onClick={() => setSupport(action)}
     >
       {action.toLowerCase()}
     </button>
