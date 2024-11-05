@@ -21,115 +21,12 @@ export type SupportTextProps = {
 
 // TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: CastVoteDialogProps) {
-  const { contracts, ui } = Tenant.current();
-  const sponsoredVoteToggle = ui.toggle("sponsoredVote");
-
-  if (sponsoredVoteToggle) {
-    return <SponsoredVoteDialog {...props} />;
-  }
+  const { contracts } = Tenant.current();
 
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
   ) : (
     <BasicVoteDialog {...props} />
-  );
-}
-
-function SponsoredVoteDialog({
-  proposalId,
-  reason,
-  supportType,
-  closeDialog,
-  votingPower,
-  delegate,
-  missingVote,
-}: CastVoteDialogProps) {
-  const { ui } = Tenant.current();
-
-  const {
-    write,
-    isLoading,
-    isSuccess,
-    data,
-    isSignatureSuccess,
-    isWaitingForSignature,
-  } = useSponsoredVoting({
-    proposalId,
-    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
-  });
-
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
-
-  if (!delegate) {
-    // todo: log
-    return null;
-  }
-
-  if (isLoading) {
-    return <LoadingVote />;
-  }
-
-  return (
-    <>
-      {!isSuccess && (
-        <div
-          className="flex flex-col gap-4 w-full relative"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          <HStack justifyContent="justify-between">
-            <VStack>
-              {delegate.address ? (
-                <div className="text-xs text-tertiary font-medium">
-                  <HumanAddress address={delegate.address} />
-                </div>
-              ) : (
-                <div className="text-xs text-tertiary font-medium">
-                  Anonymous
-                </div>
-              )}
-              <div className="text-lg text-primary font-extrabold">
-                Casting vote&nbsp;{supportType.toLowerCase()}
-              </div>
-            </VStack>
-            <VStack alignItems="items-end">
-              <div className="text-xs text-tertiary font-medium">with</div>
-              <TokenAmountDisplay amount={vpToDisplay} />
-            </VStack>
-          </HStack>
-          <div>
-            {reason ? (
-              <div className="max-h-[40vh] overflow-y-scroll text-secondary">
-                {reason}
-              </div>
-            ) : (
-              <div className="w-full py-6 px-4 rounded-lg border border-line text-center text-secondary">
-                No voting reason provided
-              </div>
-            )}
-          </div>
-          <div>
-            {delegate.statement ? (
-              <VoteButton onClick={write}>
-                {!isSignatureSuccess ? (
-                  <>
-                    Sign vote {supportType.toLowerCase()} with{"\u00A0"}
-                    <TokenAmountDisplay amount={vpToDisplay} />
-                  </>
-                ) : (
-                  <>
-                    Vote {supportType.toLowerCase()} with{"\u00A0"}
-                    <TokenAmountDisplay amount={vpToDisplay} />
-                  </>
-                )}
-              </VoteButton>
-            ) : (
-              <NoStatementView closeDialog={closeDialog} />
-            )}
-          </div>
-        </div>
-      )}
-      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
-    </>
   );
 }
 
