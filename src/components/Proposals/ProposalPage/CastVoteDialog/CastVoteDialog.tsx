@@ -13,7 +13,6 @@ import { getVpToDisplay } from "@/lib/voteUtils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
-import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
