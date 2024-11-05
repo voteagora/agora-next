@@ -69,7 +69,7 @@ export default function CastVoteInput({
           placeholder="I believe..."
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className="text-sm p-4 resize-none rounded-lg border-0 focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0"
+          className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 m-3"
         />
         <VStack
           justifyContent="justify-between"
