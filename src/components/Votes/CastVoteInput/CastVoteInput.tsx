@@ -111,7 +111,7 @@ function CastVoteInputContent({
             </VStack>
           )}
           {isLoading && <LoadingVote />}
-          {true && <SuccessMessage />}
+          {isSuccess && <SuccessMessage />}
           {support && !isSuccess && !isLoading && (
             <VoteSubmitButton
               supportType={support}
