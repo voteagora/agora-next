@@ -14,11 +14,18 @@ import { useReadContract } from "wagmi";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
-const GovernorSettingsProposalTypes = () => {
+const GovernorSettingsProposalTypes = ({
+  proposalTypes,
+}: {
+  proposalTypes: any[];
+}) => {
+  console.log("proposalTypes", proposalTypes);
   const { contracts, namespace, token } = Tenant.current();
 
   // TODO: Refactor this to use the governor types
-  const isQuorumSupportedByGovernor = namespace !== TENANT_NAMESPACES.CYBER;
+  const isQuorumSupportedByGovernor =
+    namespace !== TENANT_NAMESPACES.CYBER &&
+    namespace !== TENANT_NAMESPACES.PGUILD;
 
   const { data: quorum, isFetched: isQuorumFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -47,11 +54,12 @@ const GovernorSettingsProposalTypes = () => {
           >
             Proposal threshold
           </TableHead>
-          {isQuorumSupportedByGovernor && (
-            <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
-              Quorum
-            </TableHead>
-          )}
+          {isQuorumSupportedByGovernor ||
+            (proposalTypes.length > 0 && (
+              <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
+                Quorum
+              </TableHead>
+            ))}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -83,6 +91,22 @@ const GovernorSettingsProposalTypes = () => {
             </TableCell>
           )}
         </TableRow>
+        {proposalTypes.map((proposalType) => (
+          <TableRow className="text-base font-semibold text-secondary">
+            <TableCell colSpan={3} className="rounded-bl-xl">
+              {proposalType.name}
+            </TableCell>
+            <TableCell
+              colSpan={4}
+              className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
+            >
+              {Number(proposalType.approval_threshold) / 100} %
+            </TableCell>
+            <TableCell colSpan={4} className="rounded-br-xl">
+              {Number(proposalType.quorum) / 100} %
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

@@ -1,7 +1,8 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
-
+import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
+import { getPublicClient } from "@/lib/viem";
 async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
 
@@ -10,7 +11,10 @@ async function getMetrics() {
     if (contracts.token.isERC20()) {
       totalSupply = await contracts.token.contract.totalSupply();
     } else if (contracts.token.isERC721()) {
-      totalSupply = 0;
+      const token = contracts.token.contract as IMembershipContract;
+      const publicClient = getPublicClient(contracts.token.chain.id);
+      const blockNumber = await publicClient.getBlockNumber();
+      totalSupply = await token.getPastTotalSupply(Number(blockNumber) - 1);
     } else {
       totalSupply = 0;
     }

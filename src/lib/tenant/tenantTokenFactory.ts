@@ -56,7 +56,7 @@ export default class TenantTokenFactory {
         return {
           name: "Protocol Guild",
           symbol: "PGUILD",
-          decimals: 1,
+          decimals: 0,
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

@@ -75,8 +75,6 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
 
-  console.log(draftProposal);
-
   const router = useRouter();
   const { address } = useAccount();
   const tenant = Tenant.current();

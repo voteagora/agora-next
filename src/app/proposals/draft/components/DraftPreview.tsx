@@ -43,6 +43,7 @@ const DraftPreview = ({
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
+
   const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,

@@ -15,4 +15,10 @@ export interface IMembershipContract extends BaseContract {
     [void],
     "nonpayable"
   >;
+
+  getPastTotalSupply: TypedContractMethod<
+    [blockNumber: number],
+    [bigint],
+    "view"
+  >;
 }

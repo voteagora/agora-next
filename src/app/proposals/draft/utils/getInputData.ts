@@ -88,9 +88,11 @@ export function getInputData(proposal: DraftProposal): {
       ];
 
       if (proposal.transactions.length === 0) {
-        targets.push(ethers.ZeroAddress as `0x${string}`);
+        // empty eth transfer from governor
+        const governorAddress = tenant.contracts.governor.address;
+        targets.push(governorAddress as `0x${string}`);
         values.push(0);
-        calldatas.push("0x");
+        calldatas.push("0x" as `0x${string}`);
       } else {
         proposal.transactions.forEach((t) => {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);

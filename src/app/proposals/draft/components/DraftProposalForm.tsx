@@ -38,10 +38,10 @@ export default function DraftProposalForm({
     }
   };
   return (
-    <CreatorAuthCheck
-      creatorAddress={draftProposal.author_address as `0x${string}`}
-    >
-      {renderStage(stage)}
-    </CreatorAuthCheck>
+    // <CreatorAuthCheck
+    //   creatorAddress={draftProposal.author_address as `0x${string}`}
+    // >
+    <>{renderStage(stage)}</>
+    // </CreatorAuthCheck>
   );
 }
