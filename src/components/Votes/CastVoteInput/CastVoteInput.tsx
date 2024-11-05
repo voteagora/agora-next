@@ -170,7 +170,7 @@ const SubmitButton = ({
 function LoadingVote() {
   return (
     <VStack className="w-full">
-      <div className="mb-2 text-2xl font-black">Casting your vote</div>
+      <div className="mb-2 text-sm font-black">Casting your vote</div>
       <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>
