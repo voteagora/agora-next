@@ -92,7 +92,10 @@ const GovernorSettingsProposalTypes = ({
           )}
         </TableRow>
         {proposalTypes.map((proposalType) => (
-          <TableRow className="text-base font-semibold text-secondary">
+          <TableRow
+            key={`proposal-type-${proposalType.id}`}
+            className="text-base font-semibold text-secondary"
+          >
             <TableCell colSpan={3} className="rounded-bl-xl">
               {proposalType.name}
             </TableCell>
