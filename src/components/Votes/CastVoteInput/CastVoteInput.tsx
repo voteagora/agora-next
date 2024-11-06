@@ -110,6 +110,7 @@ function CastVoteInputContent({
                 placeholder="I believe..."
                 value={reason || undefined}
                 onChange={(e) => setReason(e.target.value)}
+                rows={reason ? undefined : 1}
                 className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
               />
               <VoteButtons
