@@ -2,13 +2,13 @@ import {
   AgoraGovernor__factory,
   ERC20__factory,
 } from "@/lib/contracts/generated";
-import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { JsonRpcProvider } from "ethers";
 import { lyra } from "viem/chains";
 import { defineChain } from "viem";
+import { createTokenContract } from "@/lib/tokenUtils";
 
 export const lyraTestnet = /*#__PURE__*/ defineChain({
   id: 901,
@@ -66,12 +66,13 @@ export const deriveTenantConfig = ({
   const chain = lyraTestnet;
 
   return {
-    token: new TenantContract<ITokenContract>({
+    token: createTokenContract({
       abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
       contract: ERC20__factory.connect(TOKEN, provider),
       provider,
+      type: "erc20",
     }),
 
     // PLACEHOLDER CONTRACT
