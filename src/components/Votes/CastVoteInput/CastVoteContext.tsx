@@ -89,7 +89,7 @@ const CastVoteContextProvider = ({
   });
 
   const { write, isLoading, isSuccess, data } = (() => {
-    if (ui.toggle("sponsoredVote")) {
+    if (ui.toggle("sponsoredVote") && !reason) {
       return sponsoredVotingValues;
     }
     if (contracts?.alligator) {
