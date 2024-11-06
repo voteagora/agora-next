@@ -44,8 +44,7 @@ export const deriveTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Agora is the home of Derive governance",
-      description:
-        "Derive governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      description: "Derive governance is launching now. ",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
@@ -57,8 +56,7 @@ export const deriveTenantUIConfig = new TenantUI({
     {
       route: "info",
       title: "Agora is the home of Derive governance",
-      description:
-        "Derive governance is launching now. Start by claiming your token and joining Discourse to engage in the discussion. Delegation and voting are coming soon.",
+      description: "Derive governance is launching now.",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
@@ -83,9 +81,9 @@ export const deriveTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Agora is the home of Dervice delegates",
+      title: "Agora is the home of Derive delegates",
       description:
-        "Dervie voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "Derive voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
