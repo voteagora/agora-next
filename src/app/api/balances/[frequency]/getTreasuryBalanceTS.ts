@@ -17,8 +17,6 @@ async function getTreasuryBalanceTS(
   const chainId = contracts.token?.chain?.id;
   const { lookback } = frequencyToLookbackDayCount(frequency);
   const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ") ?? ""})`;
-  console.log("testing here");
-  console.log(chainId, crit);
 
   const QRY = `SELECT day,
                 TO_CHAR(day, 'YYYY-MM-DD') date,

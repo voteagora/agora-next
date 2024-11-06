@@ -5,7 +5,6 @@ import DraftFormClient from "./stages/DraftForm/DraftFormClient";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
-import CreatorAuthCheck from "./CreatorAuthCheck";
 
 export default function DraftProposalForm({
   stage,
@@ -37,11 +36,5 @@ export default function DraftProposalForm({
         return null;
     }
   };
-  return (
-    // <CreatorAuthCheck
-    //   creatorAddress={draftProposal.author_address as `0x${string}`}
-    // >
-    <>{renderStage(stage)}</>
-    // </CreatorAuthCheck>
-  );
+  return <>{renderStage(stage)}</>;
 }

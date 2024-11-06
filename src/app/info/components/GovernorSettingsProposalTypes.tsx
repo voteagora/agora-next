@@ -73,8 +73,7 @@ const GovernorSettingsProposalTypes = ({
                   <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
                 </TooltipTrigger>
                 <TooltipContent className="text-sm max-w-[200px]">
-                  For votes as a percentage of (For + Against) required for a
-                  vote to be approved ("pass").
+                  {`For votes as a percentage of (For + Against) required for a vote to be approved ("pass").`}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
