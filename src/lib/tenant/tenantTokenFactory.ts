@@ -51,6 +51,13 @@ export default class TenantTokenFactory {
           symbol: "SCR",
           decimals: 18,
         };
+
+      case TENANT_NAMESPACES.PGUILD:
+        return {
+          name: "Protocol Guild",
+          symbol: "PGUILD",
+          decimals: 0,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

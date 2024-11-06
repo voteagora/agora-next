@@ -3,12 +3,12 @@ import {
   ENSTimelock__factory,
   ERC20__factory,
 } from "@/lib/contracts/generated";
-import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider } from "ethers";
+import { createTokenContract } from "@/lib/tokenUtils";
 
 interface Props {
   isProd: boolean;
@@ -38,12 +38,13 @@ export const ensTenantContractConfig = ({
   const chain = isProd ? mainnet : sepolia;
 
   return {
-    token: new TenantContract<ITokenContract>({
+    token: createTokenContract({
       abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
-      chain: chain,
+      chain,
       contract: ERC20__factory.connect(TOKEN, provider),
       provider,
+      type: "erc20",
     }),
 
     governor: new TenantContract<IGovernorContract>({

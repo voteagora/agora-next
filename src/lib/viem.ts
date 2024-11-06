@@ -8,6 +8,7 @@ import {
 import { cyber, lyra, mainnet, optimism, scroll, sepolia } from "viem/chains";
 
 import "viem/window";
+import { getTransportForChain } from "./utils";
 
 export const lyraTestnet = /*#__PURE__*/ defineChain({
   id: 901,
@@ -82,31 +83,37 @@ export const getWalletClient = (chainId: number) => {
 };
 
 export const getPublicClient = (chainId: number) => {
+  const transport = getTransportForChain(chainId);
+
+  if (!transport) {
+    throw new Error("Invalid chainId");
+  }
+
   switch (chainId) {
     case mainnet.id:
       return createPublicClient({
         chain: mainnet,
-        transport: http(),
+        transport,
       });
     case sepolia.id:
       return createPublicClient({
         chain: sepolia,
-        transport: http(),
+        transport,
       });
     case optimism.id:
       return createPublicClient({
         chain: optimism,
-        transport: http(),
+        transport,
       });
     case cyber.id:
       return createPublicClient({
         chain: cyber,
-        transport: http(),
+        transport,
       });
     case scroll.id:
       return createPublicClient({
         chain: scroll,
-        transport: http(),
+        transport,
       });
 
     case lyra.id:

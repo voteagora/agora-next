@@ -47,7 +47,7 @@ export const SCWDelegateButton = ({
               data: data,
             },
           })
-          .then((tx) => {
+          .then((tx: any) => {
             onSuccess(tx.hash);
             console.log(tx);
             onChange(undefined);

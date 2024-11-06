@@ -7,8 +7,11 @@ import {
 import GovernorSettingsParams from "@/app/info/components/GovernorSettingsParams";
 import ContractList from "@/app/info/components/ContractList";
 import GovernorSettingsProposalTypes from "@/app/info/components/GovernorSettingsProposalTypes";
+import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 
-const GovernorSettings = () => {
+const GovernorSettings = async () => {
+  const proposalTypes = await fetchProposalTypes();
+
   return (
     <Accordion
       type="single"
@@ -29,7 +32,7 @@ const GovernorSettings = () => {
             </div>
           </div>
           <div className="w-full border border-line rounded-lg mt-6">
-            <GovernorSettingsProposalTypes />
+            <GovernorSettingsProposalTypes proposalTypes={proposalTypes} />
           </div>
         </AccordionContent>
       </AccordionItem>
