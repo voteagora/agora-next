@@ -5,6 +5,7 @@ import { etherfiTenantContractConfig } from "@/lib/tenant/configs/contracts/ethe
 import { optimismTenantContractConfig } from "@/lib/tenant/configs/contracts/optimism";
 import { uniswapTenantContractConfig } from "@/lib/tenant/configs/contracts/uniswap";
 import { cyberTenantConfig } from "@/lib/tenant/configs/contracts/cyber";
+import { deriveTenantConfig } from "@/lib/tenant/configs/contracts/derive";
 import { scrollTenantContractConfig } from "@/lib/tenant/configs/contracts/scroll";
 
 export default class TenantContractFactory {
@@ -24,6 +25,9 @@ export default class TenantContractFactory {
         return uniswapTenantContractConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.CYBER:
         return cyberTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.DERIVE:
+        return deriveTenantConfig({ isProd, alchemyId });
+
       case TENANT_NAMESPACES.SCROLL:
         return scrollTenantContractConfig({ isProd, alchemyId });
       default:

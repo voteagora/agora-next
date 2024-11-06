@@ -30,6 +30,7 @@ export const TENANT_NAMESPACES = {
   UNISWAP: "uniswap",
   CYBER: "cyber",
   SCROLL: "scroll",
+  DERIVE: "derive",
 } as const;
 
 export const proposalsFilterOptions = {

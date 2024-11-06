@@ -38,6 +38,13 @@ export default class TenantTokenFactory {
           decimals: 18,
         };
 
+      case TENANT_NAMESPACES.DERIVE:
+        return {
+          name: "CHANGEME - Derive",
+          symbol: "DERIVE",
+          decimals: 18,
+        };
+
       case TENANT_NAMESPACES.SCROLL:
         return {
           name: "Scroll",

@@ -20,6 +20,9 @@ export function getSecondsPerBlock(): number {
     case 534352: // Scroll
       return 3;
 
+    case 957: // Derive
+      return 2;
+
     case 7560: // Cyber Mainnet
     case 111557560: // Cyber Testnet
       return 2;
@@ -75,6 +78,16 @@ export function getHumanBlockTime(
       const estScrollSecondsDiff =
         (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estScrollSecondsDiff) * 1000);
+
+    // Derive Mainnet
+    // Derive Testnet
+    case 957: // Testnet
+    case 901: {
+      const blockSeconds = getSecondsPerBlock();
+      const estNewDaoSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estNewDaoSecondsDiff) * 1000);
+    }
 
     //   Cyber Mainnet
     //   Cyber Testnet

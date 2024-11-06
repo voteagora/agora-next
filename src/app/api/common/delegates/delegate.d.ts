@@ -52,6 +52,7 @@ type DelegateStatement = {
   twitter: string | null;
   updated_at: Date;
   warpcast: string | null;
+  scw_address: string | null;
 };
 
 export type DelegateStats = {

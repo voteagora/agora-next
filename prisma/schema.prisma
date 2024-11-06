@@ -22,6 +22,7 @@ model DelegateStatements {
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
   warpcast  String?
   endorsed  Boolean   @default(false)
+  scw_address  String?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -2136,6 +2137,7 @@ view cyberVotingPowerSnaps {
   @@map("voting_power_snaps")
 }
 
+
 // ##############################################
 //
 //    Scroll
@@ -2460,7 +2462,7 @@ view scrollVotingPowerSnaps {
 }
 
 
- 
+
 // ##############################################
 //
 //    Derive
@@ -2784,7 +2786,7 @@ view deriveVotingPowerSnaps {
   @@schema("derive")
   @@map("voting_power_snaps")
 }
- 
+
 
 // ##############################################
 //
