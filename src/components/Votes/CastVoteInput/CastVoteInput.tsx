@@ -60,7 +60,7 @@ export default function CastVoteInput({
   return (
     <CastVoteContextProvider
       proposal={proposal}
-      missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+      votes={votes}
       chains={chains}
       votingPower={votingPower}
     >
@@ -90,17 +90,21 @@ function CastVoteInputContent({
 
   const { ui } = Tenant.current();
 
+  const missingVote = checkMissingVoteForDelegate(votes, votingPower);
+
+  const showSuccessMessage = isSuccess || missingVote === "NONE";
+
   return (
-    <>
+    <VStack>
       <VStack
-        className={`bg-neutral border-t border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && "shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]"}`}
+        className={`bg-neutral border-t border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
         <VStack
           justifyContent="justify-between"
           alignItems="items-stretch"
           className="px-3 pb-3 pt-1"
         >
-          {!isLoading && !isSuccess && (
+          {!showSuccessMessage && !isLoading && (
             <VStack gap={2}>
               <textarea
                 placeholder="I believe..."
@@ -110,15 +114,13 @@ function CastVoteInputContent({
               />
               <VoteButtons
                 proposalStatus={proposal.status}
-                delegateVotes={votes}
                 isOptimistic={isOptimistic}
-                votingPower={votingPower}
               />
             </VStack>
           )}
           {isLoading && <LoadingVote />}
-          {isSuccess && <SuccessMessage />}
-          {support && !isSuccess && !isLoading && (
+          {showSuccessMessage && <SuccessMessage />}
+          {support && !showSuccessMessage && !isLoading && (
             <VoteSubmitButton
               supportType={support}
               votingPower={votingPower}
@@ -127,8 +129,8 @@ function CastVoteInputContent({
           )}
         </VStack>
       </VStack>
-      {ui.toggle("sponsoredVote") && <VotingBanner />}
-    </>
+      {ui.toggle("sponsoredVote") && !showSuccessMessage && <VotingBanner />}
+    </VStack>
   );
 }
 
@@ -137,14 +139,14 @@ function VotingBanner() {
 
   if (reason) {
     return (
-      <div className="flex items-center text-sm text-secondary font-medium m-1 px-4 pb-2">
+      <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
         Voter statements require gas fees.
       </div>
     );
   }
 
   return (
-    <div className="flex items-center text-sm text-secondary font-medium m-1 px-4 pb-2">
+    <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
       <img src={freeGasMegaphon.src} alt="Free gas" className="w-6 h-6 mr-2" />
       Voting on Agora is free!
     </div>
@@ -219,7 +221,7 @@ function SuccessMessage() {
         : "text-secondary";
 
   return (
-    <VStack className="w-full">
+    <VStack className="w-full pt-3">
       <div className="text-sm text-secondary">
         You{" "}
         <span className={supportColor}>
@@ -237,23 +239,13 @@ function SuccessMessage() {
 
 function VoteButtons({
   proposalStatus,
-  delegateVotes,
   isOptimistic,
-  votingPower,
 }: {
   proposalStatus: Proposal["status"];
-  delegateVotes: Vote[];
   isOptimistic: boolean;
-  votingPower: VotingPowerData;
 }) {
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
-  }
-
-  const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
-
-  if (missingVote === "NONE") {
-    return <DisabledVoteButton reason="Already voted" />;
   }
 
   return (

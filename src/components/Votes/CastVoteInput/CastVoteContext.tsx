@@ -1,10 +1,11 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
-import { MissingVote } from "@/lib/voteUtils";
+import { checkMissingVoteForDelegate, MissingVote } from "@/lib/voteUtils";
 import {
   createContext,
   useContext,
@@ -49,13 +50,13 @@ export function useCastVoteContext() {
 
 const CastVoteContextProvider = ({
   proposal,
-  missingVote,
+  votes,
   chains,
   votingPower,
   children,
 }: {
   proposal: Proposal;
-  missingVote: MissingVote;
+  votes: Vote[];
   chains: string[][];
   votingPower: VotingPowerData;
   children: React.ReactNode;
@@ -66,6 +67,8 @@ const CastVoteContextProvider = ({
   >(null);
 
   const { ui, contracts } = Tenant.current();
+
+  const missingVote = checkMissingVoteForDelegate(votes, votingPower);
 
   const sponsoredVotingValues = useSponsoredVoting({
     proposalId: proposal.id,
@@ -103,12 +106,18 @@ const CastVoteContextProvider = ({
       value={{
         reason,
         setReason,
-        support,
+        support: missingVote === "NONE" ? votes[0].support : support,
         setSupport,
         write,
         isLoading,
         isSuccess,
-        data,
+        data:
+          missingVote === "NONE"
+            ? {
+                standardTxHash: votes[0]?.transactionHash,
+                advancedTxHash: votes[1]?.transactionHash,
+              }
+            : data,
       }}
     >
       {children}
