@@ -13,6 +13,7 @@ interface Props {
   onSuccess: (txn: string) => void;
 }
 
+// NOT USED IN PRODUCTION TENANT
 export const SCWDelegateButton = ({
   delegate,
   delegator,
