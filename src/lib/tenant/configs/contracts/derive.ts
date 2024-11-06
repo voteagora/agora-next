@@ -46,17 +46,24 @@ export const deriveTenantConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd ? "0x0" : "0xCDbD011A4852d173b7b2c3aa80606B230d4ce58A";
-  const GOVERNOR = isProd
-    ? "0x0"
-    : "0x6465AbAF0bF54c907109F7456079F467459587EB";
+  // TODO: FYI _ DEV CONTRACTS IN BOTH PRODUCTION AND DEV
+  // const TOKEN = isProd ? "0x0" : "0xCDbD011A4852d173b7b2c3aa80606B230d4ce58A";
+  // const GOVERNOR = isProd
+  //   ? "0x0"
+  //   : "0x6465AbAF0bF54c907109F7456079F467459587EB";
 
-  const rpcURL = isProd
-    ? `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
-    : `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
+  // const rpcURL = isProd
+  //   ? `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
+  //   : `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
+  //
+
+  const TOKEN = "0xCDbD011A4852d173b7b2c3aa80606B230d4ce58A";
+  const GOVERNOR = "0x6465AbAF0bF54c907109F7456079F467459587EB";
+  const rpcURL = `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
 
   const provider = new JsonRpcProvider(rpcURL);
-  const chain = isProd ? lyra : lyraTestnet;
+  // const chain = isProd ? lyra : lyraTestnet;
+  const chain = lyraTestnet;
 
   return {
     token: new TenantContract<ITokenContract>({
