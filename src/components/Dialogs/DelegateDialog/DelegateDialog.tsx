@@ -93,8 +93,7 @@ export function DelegateDialog({
         </ShadcnButton>
       );
     }
-
-    // TODO: Fix this
+    
     // if (status === "error" && delegator) {
     //   return (
     //     <DelegateButton
