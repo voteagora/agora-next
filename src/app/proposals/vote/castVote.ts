@@ -11,7 +11,7 @@ import { privateKeyToAccount } from "viem/accounts";
 
 const SPONSOR_PRIVATE_KEY = process.env.NEXT_PUBLIC_SPONSOR_PRIVATE_KEY;
 
-async function voteBySignature({
+export async function voteBySignature({
   request,
 }: {
   request: ReturnType<typeof prepareVoteBySignature> extends Promise<infer T>
@@ -34,7 +34,7 @@ async function voteBySignature({
   return walletClient.writeContract(request);
 }
 
-async function prepareVoteBySignature({
+export async function prepareVoteBySignature({
   signature,
   proposalId,
   support,
@@ -78,6 +78,3 @@ async function prepareVoteBySignature({
 
   return request;
 }
-
-export const prepareVoteBySignatureApi = cache(prepareVoteBySignature);
-export const voteBySiganatureApi = cache(voteBySignature);

@@ -7,7 +7,7 @@ import { config } from "@/app/Web3Provider";
 import {
   prepareVoteBySignature,
   voteBySignature,
-} from "@/app/proposals/actions";
+} from "@/app/proposals/vote/castVote";
 
 const types = {
   Ballot: [
@@ -25,9 +25,11 @@ const useSponsoredVoting = ({
 }) => {
   const { slug, contracts } = Tenant.current();
 
-  const { signTypedData, data: signature, error } = useSignTypedData();
+  const { signTypedDataAsync } = useSignTypedData();
 
-  const [signatureLoading, setSignatureLoading] = useState(false);
+  const [signature, setSignature] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<any | undefined>(undefined);
+  const [waitingForSignature, setWaitingForSignature] = useState(false);
   const [sponsoredVoteError, setSponsoredVoteError] = useState(false);
   const [sponsoredVoteLoading, setSponsoredVoteLoading] = useState(false);
   const [sponsoredVoteSuccess, setSponsoredVoteSuccess] = useState(false);
@@ -37,11 +39,10 @@ const useSponsoredVoting = ({
 
   const write = useCallback(() => {
     const _sponsoredVote = async () => {
-      setSignatureLoading(true);
-
       // Sign the vote
-      if (!signature) {
-        await signTypedData({
+      setWaitingForSignature(true);
+      try {
+        const signature = await signTypedDataAsync({
           domain: {
             name: "ENS Governor",
             version: "1",
@@ -55,20 +56,18 @@ const useSponsoredVoting = ({
             support,
           },
         });
-        return;
-      }
 
-      setSignatureLoading(false);
-      setSponsoredVoteLoading(true);
+        setSignature(signature);
+        setWaitingForSignature(false);
+        setSponsoredVoteLoading(true);
 
-      const request = await prepareVoteBySignature(
-        signature,
-        proposalId,
-        support
-      );
+        const request = await prepareVoteBySignature({
+          signature,
+          proposalId,
+          support,
+        });
 
-      const voteTxHash = await voteBySignature(request);
-      try {
+        const voteTxHash = await voteBySignature({ request });
         const { status } = await waitForTransactionReceipt(config, {
           hash: voteTxHash,
           chainId: contracts.governor.chain.id,
@@ -82,7 +81,10 @@ const useSponsoredVoting = ({
           setSponsoredVoteError(true);
         }
       } catch (error) {
+        setError(error);
         setSponsoredVoteError(true);
+        setWaitingForSignature(false);
+        setSponsoredVoteLoading(false);
       } finally {
         setSponsoredVoteLoading(false);
       }
@@ -103,15 +105,17 @@ const useSponsoredVoting = ({
     };
 
     vote();
-  }, [signTypedData, contracts, proposalId, support, signature, slug]);
+  }, [signTypedDataAsync, contracts, proposalId, support, slug]);
 
   return {
-    isWaitingForSignature: signatureLoading,
+    isWaitingForSignature: waitingForSignature,
     isSignatureSuccess: !!signature,
     isSignatureError: !!error,
-    isLoading: sponsoredVoteLoading,
-    isError: sponsoredVoteError,
+    isLoading: sponsoredVoteLoading || waitingForSignature,
+    isError: sponsoredVoteError || !!error,
     isSuccess: sponsoredVoteSuccess,
+    error,
+    signature,
     write,
     data: { sponsoredVoteTxHash },
   };
