@@ -29,7 +29,7 @@ export const lyraTestnet = /*#__PURE__*/ defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Testnet Scan",
+      name: "Derive Testnet Scan",
       url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz/",
     },
   },
@@ -121,6 +121,7 @@ export const getPublicClient = (chainId: number) => {
         chain: lyra,
         transport: http(),
       });
+
     case lyraTestnet.id:
       return createPublicClient({
         chain: lyraTestnet,
