@@ -192,19 +192,17 @@ const SubmitButton = ({
 
 function LoadingVote() {
   return (
-    <VStack className="w-full">
-      <div className="mb-2 text-sm font-black">Casting your vote</div>
+    <VStack className="w-full pt-3">
+      <div className="mb-2 text-sm text-secondary font-medium">
+        Casting your vote
+      </div>
       <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
-        <div
-          className={`flex flex-row justify-center w-full py-3 bg-line rounded-lg`}
-        >
-          <div className="font-medium text-secondary">
-            Writing your vote to the chain...
-          </div>
-        </div>
+        <Button className="w-full" disabled={true}>
+          Writing your vote to the chain...
+        </Button>
       </div>
     </VStack>
   );
