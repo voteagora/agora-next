@@ -36,7 +36,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Protocol Guide Governance",
+      title: "Protocol Guild Governance",
       hero: pguildHero,
       description:
         "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",

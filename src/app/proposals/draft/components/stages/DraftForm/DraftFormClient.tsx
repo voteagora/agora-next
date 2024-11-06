@@ -82,6 +82,8 @@ const DraftFormClient = ({
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 
