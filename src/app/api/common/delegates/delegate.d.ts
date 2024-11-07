@@ -1,6 +1,6 @@
 import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
-import type { Decimal } from "@prisma/client/runtime/library";
+import type { Decimal as DecimalType } from "@prisma/client/runtime/library";
 
 export type Delegate = {
   address: string;
@@ -36,9 +36,9 @@ export type DelegatePayload = Delegate & {
 export type DelegatesGetPayload = {
   delegate: string;
   num_of_delegators: number;
-  direct_vp: Decimal;
-  advanced_vp: Decimal;
-  voting_power: Decimal;
+  direct_vp: DecimalType;
+  advanced_vp: DecimalType;
+  voting_power: DecimalType;
   citizen: boolean;
   statement: DelegateStatement;
 };
