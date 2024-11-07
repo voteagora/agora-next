@@ -7,10 +7,8 @@ import Tenant from "@/lib/tenant/tenant";
 import {
   approvalModuleAddress,
   optimisticModuleAddress,
-  cyberApprovalModuleAddress,
 } from "@/lib/contracts/contracts";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { disapprovalThreshold } from "@/lib/constants";
+import { disapprovalThreshold, TENANT_NAMESPACES } from "@/lib/constants";
 
 const transferABI = [
   {
@@ -59,7 +57,7 @@ const isTransfer = (calldata: string) => {
 export function getInputData(proposal: DraftProposal): {
   inputData: InputData;
 } {
-  const tenant = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const description =
     "# " +
     proposal.title +
@@ -89,7 +87,7 @@ export function getInputData(proposal: DraftProposal): {
 
       if (proposal.transactions.length === 0) {
         // empty eth transfer from governor
-        const governorAddress = tenant.contracts.governor.address;
+        const governorAddress = contracts.governor.address;
         targets.push(governorAddress as `0x${string}`);
         values.push(0);
         calldatas.push("0x" as `0x${string}`);
@@ -104,7 +102,7 @@ export function getInputData(proposal: DraftProposal): {
       // OZ governor does not have proposal types
       // need a better way to read which governor a particular tenant is on
       // would be great if we could read this from the contract, or the tenant
-      if (tenant.namespace === TENANT_NAMESPACES.ENS) {
+      if (namespace === TENANT_NAMESPACES.ENS) {
         inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
@@ -161,7 +159,7 @@ export function getInputData(proposal: DraftProposal): {
         maxApprovals: proposal.max_options,
         criteria: proposal.criteria === "Threshold" ? 0 : 1,
         budgetToken: (proposal.budget > 0
-          ? tenant.contracts.governor.address
+          ? contracts.governor.address
           : ethers.ZeroAddress) as `0x${string}`,
         criteriaValue:
           proposal.criteria === "Threshold"
@@ -201,9 +199,7 @@ export function getInputData(proposal: DraftProposal): {
       // TODO: change this so the module addresses are set via the tenant
       // moving quickly atm
       const finalApprovalModuleAddress =
-        tenant.namespace === TENANT_NAMESPACES.CYBER
-          ? cyberApprovalModuleAddress
-          : approvalModuleAddress;
+        contracts.governorApprovalModule || approvalModuleAddress;
 
       const approvalInputData: ApprovalInputData = [
         finalApprovalModuleAddress,

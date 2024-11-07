@@ -31,10 +31,12 @@ export type TenantContracts = {
     isERC20: () => this is TenantContract<ITokenContract>;
     isERC721: () => this is TenantContract<IMembershipContract>;
   };
+
   staker?: TenantContract<IStaker>;
   timelock?: TenantContract<BaseContract>;
   alligator?: TenantContract<IAlligatorContract>;
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
+  governorApprovalModule?: string;
 };
 
 export type TenantToken = {
