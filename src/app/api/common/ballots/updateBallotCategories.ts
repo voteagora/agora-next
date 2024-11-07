@@ -3,7 +3,7 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import prisma from "@/app/lib/prisma";
 import { fetchBallot } from "./getBallots";
 import { autobalanceAllocations } from "./autobalance";
-import { Prisma } from "@prisma/client";
+import { Decimal } from "decimal.js";
 
 type BallotContent = {
   category_slug: string;
@@ -109,7 +109,7 @@ async function autobalanceCategories(
     );
     return {
       id: category.slug,
-      allocation: curAllocation?.allocation || new Prisma.Decimal(0),
+      allocation: curAllocation?.allocation || new Decimal(0),
       locked: curAllocation?.locked || false,
     };
   });
