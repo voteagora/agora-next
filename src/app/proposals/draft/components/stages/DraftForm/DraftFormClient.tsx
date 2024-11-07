@@ -75,8 +75,6 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
 
-  console.log(draftProposal);
-
   const router = useRouter();
   const { address } = useAccount();
   const tenant = Tenant.current();
@@ -84,6 +82,8 @@ const DraftFormClient = ({
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 

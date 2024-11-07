@@ -28,7 +28,7 @@ async function getProposalVoteCounts() {
                 relevant_proposals AS
                 (
                       SELECT *
-                      FROM   uniswap.proposals
+                      FROM   uniswap.proposals_v2
                       WHERE  contract = '${govContract}')
 
                 SELECT    ROW_NUMBER() OVER (ORDER BY p.start_block) AS position,

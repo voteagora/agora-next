@@ -78,7 +78,7 @@ function TextInput<
               )}
             </div>
           </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
+          {description && <FormDescription>{description}!</FormDescription>}
           <FormMessage />
         </FormItem>
       )}
