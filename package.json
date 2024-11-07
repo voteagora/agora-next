@@ -62,6 +62,7 @@
     "connectkit": "^1.8.2",
     "csstype": "^3.0.10",
     "date-fns": "^2.30.0",
+    "decimal.js": "^10.4.3",
     "encoding": "^0.1.13",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
