@@ -6,7 +6,6 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { JsonRpcProvider } from "ethers";
-import { lyra } from "viem/chains";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
 
@@ -33,7 +32,6 @@ export const lyraTestnet = /*#__PURE__*/ defineChain({
       url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz/",
     },
   },
-
   testnet: true,
 });
 

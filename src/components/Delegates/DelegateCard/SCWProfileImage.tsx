@@ -3,11 +3,10 @@
 import ENSAvatar from "../../shared/ENSAvatar";
 import HumanAddress from "@/components/shared/HumanAddress";
 import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
-import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
-import React, { useMemo } from "react";
+import React from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { useDelegate } from "@/hooks/useDelegate";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 interface Props {
   address: string;
@@ -17,26 +16,16 @@ interface Props {
 export function SCWProfileImage({ address, copyable = false }: Props) {
   const { token } = Tenant.current();
 
-  const { data: delegate, isFetched } = useDelegate({
-    address: address as `0x${string}`,
-  });
-
-  const votingPower = delegate?.votingPower.total || "";
-
-  const formattedNumber = useMemo(() => {
-    if (!isFetched) return "";
-    return formatNumber(votingPower);
-  }, [votingPower, isFetched]);
-
-  const { data } = useEnsName({
-    chainId: 1,
-    address: address as `0x${string}`,
-  });
+  // Note, we are displaying total token balance and not voting power
+  const { data: tokenBalance } = useTokenBalance(address);
 
   return (
     <div className="flex flex-row gap-4">
       <div className="relative aspect-square">
-        <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
+        <ENSAvatar
+          className="rounded-full w-[44px] h-[44px]"
+          ensName={undefined}
+        />
       </div>
 
       <div className="flex flex-col">
@@ -47,9 +36,11 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
             <HumanAddress address={address} />
           )}
         </div>
-        <div className="text-secondary text-xs font-semibold">
-          {formattedNumber} {token.symbol}
-        </div>
+        {tokenBalance && (
+          <div className="text-secondary text-xs font-semibold">
+            {formatNumber(tokenBalance)} {token.symbol}
+          </div>
+        )}
       </div>
     </div>
   );

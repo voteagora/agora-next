@@ -28,23 +28,26 @@ import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithu
 import { StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
+import { SCWDelegateDialog } from "@/components/Dialogs/SCWDelegateDialog/SCWDelegateDialog";
 
 export type DialogType =
   | DelegateDialogType
   | UndelegateDialogType
+  | AdvancedDelegateDialogType
+  | ApprovalCastVoteDialogType
   | CastProposalDialogType
   | CastVoteDialogType
-  | AdvancedDelegateDialogType
-  | PartialDelegateDialogType
-  | ApprovalCastVoteDialogType
-  | RetroPGFShareCardDialog
-  | SwithcNetworkDialogType
-  | DeleteDraftProposalDialog
   | CreateDraftProposalDialog
-  | UpdateDraftProposalDialog
-  | SponsorSnapshotDraftProposalDialog
+  | DelegateDialogType
+  | DeleteDraftProposalDialog
+  | OpenGithubPRDialog
+  | PartialDelegateDialogType
+  | RetroPGFShareCardDialog
+  | SCWDelegateDialogType
   | SponsorOnchainDraftProposalDialog
-  | OpenGithubPRDialog;
+  | SponsorSnapshotDraftProposalDialog
+  | SwithcNetworkDialogType
+  | UpdateDraftProposalDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -67,6 +70,16 @@ export type UndelegateDialogType = {
     fetchBalanceForDirectDelegation: (
       addressOrENSName: string
     ) => Promise<bigint>;
+    fetchDirectDelegatee: (
+      addressOrENSName: string
+    ) => Promise<DelegateePayload | null>;
+  };
+};
+
+export type SCWDelegateDialogType = {
+  type: "SWC_DELEGATE";
+  params: {
+    delegate: DelegateChunk;
     fetchDirectDelegatee: (
       addressOrENSName: string
     ) => Promise<DelegateePayload | null>;
@@ -217,6 +230,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
       <UndelegateDialog
         delegate={delegate}
         fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+        fetchDirectDelegatee={fetchDirectDelegatee}
+      />
+    );
+  },
+
+  SWC_DELEGATE: ({ delegate, fetchDirectDelegatee }, closeDialog) => {
+    return (
+      <SCWDelegateDialog
+        delegate={delegate}
         fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );

@@ -14,6 +14,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useGetDelegatee } from "@/hooks/useGetDelegatee";
 import { PartialDelegateButton } from "./PartialDelegateButton";
+import { DelegateSCWButton } from "@/components/Delegates/DelegateCard/DelegateSCWButton";
 
 export function DelegateActions({
   delegate,
@@ -49,10 +50,13 @@ export function DelegateActions({
 
   const delegationButton = () => {
     switch (namespace) {
+      case TENANT_NAMESPACES.DERIVE:
+        return <DelegateSCWButton full={false} delegate={delegate} />;
+
       case TENANT_NAMESPACES.SCROLL:
         return <PartialDelegateButton full={false} delegate={delegate} />;
 
-      // Optimism in the only tenant currently supporting advnaced delegation
+      // Optimism in the only tenant currently supporting advanced delegation
       case TENANT_NAMESPACES.OPTIMISM:
         if (isAdvancedUser && hasAlligator) {
           return (
