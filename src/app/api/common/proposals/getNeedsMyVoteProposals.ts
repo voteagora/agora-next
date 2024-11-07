@@ -25,7 +25,7 @@ async function getNeedsMyVoteProposals(address: string) {
       SELECT p.*
       FROM (
         SELECT *
-        FROM ${namespace + ".proposals"}
+        FROM ${namespace + ".proposals_v2"}
         WHERE CAST(start_block AS INTEGER) < $1
           AND CAST(end_block AS INTEGER) > $1
           AND cancelled_block IS NULL
