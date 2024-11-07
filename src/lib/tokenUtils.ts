@@ -76,7 +76,8 @@ export function formatNumberForAdvancedDelegation(amount: string) {
   // Advanced delegation needs a precision up to 3 decimal places,
   // which is bit different from the formatNumber function used everywhere else and requires for max 4 significant digits
 
-  const { token } = Tenant.current();
+  const { token, contracts } = Tenant.current();
+  const isERC721 = contracts.token.isERC721();
 
   const number = Number(ethers.formatUnits(amount.toString(), token.decimals));
 
@@ -86,7 +87,7 @@ export function formatNumberForAdvancedDelegation(amount: string) {
     currencyDisplay: "code",
     compactDisplay: "short",
     notation: "compact",
-    maximumFractionDigits: 3,
+    maximumFractionDigits: isERC721 ? 0 : 3,
   });
 
   const parts = numberFormat.formatToParts(number);
