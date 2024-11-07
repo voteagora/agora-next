@@ -48,7 +48,7 @@ const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
 export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
-      {delegate.votingParticipation > 0.5 ? (
+      {parseInt(delegate.lastTenProps) > 5 ? (
         <ActiveHeader outOfTen={delegate.lastTenProps} />
       ) : (
         <InactiveHeader outOfTen={delegate.lastTenProps} />
