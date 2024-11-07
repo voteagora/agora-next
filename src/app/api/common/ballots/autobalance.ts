@@ -1,4 +1,4 @@
-import type { Decimal } from '@prisma/client/runtime/library';
+import type { Decimal } from "@prisma/client/runtime/library";
 
 export function autobalanceAllocations<
   T extends { allocation: Decimal; locked: boolean; id: string },

@@ -3,7 +3,7 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import prisma from "@/app/lib/prisma";
 import { fetchBallot } from "./getBallots";
 import { autobalanceAllocations } from "./autobalance";
-import type { Decimal } from '@prisma/client/runtime/library';
+import type { Decimal } from "@prisma/client/runtime/library";
 
 type BallotContent = {
   category_slug: string;
