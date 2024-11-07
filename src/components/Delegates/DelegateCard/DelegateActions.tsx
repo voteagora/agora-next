@@ -13,6 +13,7 @@ import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useGetDelegatee } from "@/hooks/useGetDelegatee";
+import { PartialDelegateButton } from "./PartialDelegateButton";
 
 export function DelegateActions({
   delegate,
