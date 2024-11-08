@@ -105,7 +105,7 @@ function CastVoteInputContent({
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
   return (
-    <VStack>
+    <VStack className="flex-shrink bg-wash">
       <VStack
         className={`bg-neutral border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
