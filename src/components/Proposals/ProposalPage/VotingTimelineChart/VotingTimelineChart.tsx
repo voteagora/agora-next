@@ -54,9 +54,12 @@ const tickFormatter = (timeStr: string, index: number) => {
 };
 
 const yTickFormatter = (value: any) => {
-  const isSciNotation = isScientificNotation(value);
+  const roundedValue = Math.round(value);
+  const isSciNotation = isScientificNotation(roundedValue.toString());
   return formatNumber(
-    isSciNotation ? formatNumberWithScientificNotation(value) : BigInt(value),
+    isSciNotation
+      ? formatNumberWithScientificNotation(roundedValue)
+      : BigInt(roundedValue),
     token.decimals,
     4
   );
@@ -114,6 +117,8 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
       total: chartData[chartData.length - 1]?.total,
     },
   ];
+
+  console.log(modifiedChartData);
 
   return (
     <ResponsiveContainer width="100%" height={230}>
