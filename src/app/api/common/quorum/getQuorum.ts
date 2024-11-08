@@ -8,6 +8,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace, contracts } = Tenant.current();
 
   var votableSupply;
+  var quorum;
 
   switch (namespace) {
     case TENANT_NAMESPACES.ENS:
@@ -23,13 +24,13 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       return await contracts.governor.contract.quorumVotes!();
 
     case TENANT_NAMESPACES.OPTIMISM:
-      const quorum = await contracts.governor.contract.quorum!(
+      quorum = await contracts.governor.contract.quorum!(
         proposal.proposal_id
       );
 
       // If no quorum is set, calculate it based on votable supply
       if (!quorum) {
-        const votableSupply = await prisma[
+        votableSupply = await prisma[
           `${namespace}VotableSupply`
         ].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
@@ -50,10 +51,11 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
     
     case TENANT_NAMESPACES.PGUILD:
 
-      votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
-        {}
+      quorum = await contracts.governor.contract.quorum!(
+        proposal.proposal_id
       );
-      return BigInt(Number(votableSupply?.votable_supply))
+
+      return BigInt(Number(quorum))
   }
 }
 
