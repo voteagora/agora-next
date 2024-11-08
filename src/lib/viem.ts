@@ -1,4 +1,10 @@
-import { createWalletClient, createPublicClient, custom, http } from "viem";
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  http,
+  Chain,
+} from "viem";
 import { mainnet, sepolia, optimism, scroll } from "viem/chains";
 import { cyber } from "@/lib/tenant/configs/contracts/cyber";
 import "viem/window";
@@ -38,17 +44,17 @@ export const getWalletClient = (chainId: number) => {
   }
 };
 
-export const getPublicClient = () => {
+export const getPublicClient = (chain?: Chain) => {
   const { contracts } = Tenant.current();
 
   const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
   const hasAlchemy = contracts.governor.chain.rpcUrls?.alchemy;
   const transport = hasAlchemy
-    ? `${contracts.governor.chain.rpcUrls.alchemy.http[0]}/${alchemyId}`
-    : `${contracts.governor.chain.rpcUrls.default.http[0]}`;
+    ? `${chain?.rpcUrls.alchemy.http[0] ?? contracts.governor.chain.rpcUrls.alchemy.http[0]}/${alchemyId}`
+    : `${chain?.rpcUrls.default.http[0] ?? contracts.governor.chain.rpcUrls.default.http[0]}`;
 
   return createPublicClient({
-    chain: contracts.governor.chain,
+    chain: chain ?? contracts.governor.chain,
     transport: http(transport),
   });
 };
