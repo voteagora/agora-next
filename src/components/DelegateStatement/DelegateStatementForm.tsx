@@ -39,8 +39,6 @@ export default function DelegateStatementForm({
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
-  console.log(scwAddress);
-
   const hasTopIssues = Boolean(
     ui.governanceIssues && ui.governanceIssues.length > 0
   );
