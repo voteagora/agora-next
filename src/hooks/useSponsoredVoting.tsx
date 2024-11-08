@@ -115,6 +115,10 @@ const useSponsoredVoting = ({
     isError: sponsoredVoteError || !!error,
     isSuccess: sponsoredVoteSuccess,
     error,
+    resetError: () => {
+      setError(undefined);
+      setSponsoredVoteError(false);
+    },
     signature,
     write,
     data: { sponsoredVoteTxHash },

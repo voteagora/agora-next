@@ -22,7 +22,7 @@ import CastVoteContextProvider, {
 } from "./CastVoteContext";
 import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
-import { icons } from "@/assets/icons/icons";
+import { icons } from "@/icons/icons";
 import Image from "next/image";
 
 type Props = {
@@ -95,7 +95,7 @@ function CastVoteInputContent({
   votingPower: VotingPowerData;
   isOptimistic: boolean;
 }) {
-  const { reason, setReason, support, isLoading, isSuccess } =
+  const { reason, setReason, support, isLoading, isSuccess, isError } =
     useCastVoteContext();
 
   const { ui } = Tenant.current();
@@ -114,7 +114,7 @@ function CastVoteInputContent({
           alignItems="items-stretch"
           className="pb-3 pt-1"
         >
-          {!showSuccessMessage && (
+          {!isError && !showSuccessMessage && (
             <VStack className="border-t border-line px-3 ">
               {!isLoading && (
                 <VStack gap={2}>
@@ -141,6 +141,7 @@ function CastVoteInputContent({
               )}
             </VStack>
           )}
+          {isError && <ErrorState message="Error submitting vote" />}
         </VStack>
       </VStack>
       {ui.toggle("sponsoredVote") && !showSuccessMessage && <VotingBanner />}
@@ -325,6 +326,37 @@ function NoStatementView() {
       >
         Set up statement
       </Button>
+    </VStack>
+  );
+}
+
+function ErrorState({ message }: { message: string }) {
+  const { write, resetError } = useCastVoteContext();
+
+  return (
+    <VStack gap={3} className="p-3 border-t border-line">
+      <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
+        <Image
+          src={icons.infoRed}
+          alt="Info"
+          width={24}
+          height={24}
+          className="text-red-700"
+        />
+        {message}
+      </div>
+      <HStack gap={2}>
+        <Button
+          className="w-full"
+          variant="elevatedOutline"
+          onClick={resetError}
+        >
+          Cancel
+        </Button>
+        <Button className="w-full" onClick={write}>
+          Try again
+        </Button>
+      </HStack>
     </VStack>
   );
 }

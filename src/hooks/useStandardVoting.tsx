@@ -92,6 +92,7 @@ const useStandardVoting = ({
   return {
     isLoading: standardVoteLoading,
     isError: standardVoteError,
+    resetError: () => setStandardVoteError(false),
     isSuccess: standardVoteSuccess,
     write,
     data: { advancedTxHash, standardTxHash },

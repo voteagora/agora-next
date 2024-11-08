@@ -26,6 +26,8 @@ type CastVoteContextType = {
   write: () => void;
   isLoading: boolean;
   isSuccess: boolean;
+  isError: boolean;
+  resetError: () => void;
   data: Partial<{
     standardTxHash: string;
     advancedTxHash: string;
@@ -41,6 +43,8 @@ const CastVoteContext = createContext<CastVoteContextType>({
   write: () => {},
   isLoading: false,
   isSuccess: false,
+  isError: false,
+  resetError: () => {},
   data: {},
 });
 
@@ -91,7 +95,7 @@ const CastVoteContextProvider = ({
     missingVote,
   });
 
-  const { write, isLoading, isSuccess, data } = (() => {
+  const { write, isLoading, isSuccess, data, isError, resetError } = (() => {
     if (ui.toggle("sponsoredVote") && !reason) {
       return sponsoredVotingValues;
     }
@@ -111,6 +115,8 @@ const CastVoteContextProvider = ({
         write,
         isLoading,
         isSuccess,
+        isError,
+        resetError,
         data:
           missingVote === "NONE"
             ? {

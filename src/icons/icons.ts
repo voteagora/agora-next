@@ -55,6 +55,7 @@ import sproutEmoji from "./emoji/sprout.png";
 import testTubeEmoji from "./emoji/test-tube.png";
 import worldEmoji from "./emoji/world.png";
 import freeGasMegaphon from "./freeGasMegaphon.gif";
+import infoRed from "./infoRed.svg";
 
 export const icons = {
   hammerEmoji,
@@ -86,6 +87,7 @@ export const icons = {
   globe,
   globeAlt,
   info,
+  infoRed,
   link,
   liquid,
   lockClosed,
