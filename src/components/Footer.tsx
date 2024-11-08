@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <p>
         {new Date().getFullYear()} Agora
         <span className="hidden sm:inline">
-          , the onchain governance company
+          , made with love in Canada and the US
         </span>
       </p>
       <div className="text-primary/30">/</div>
