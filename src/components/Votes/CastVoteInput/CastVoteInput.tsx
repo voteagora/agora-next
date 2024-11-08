@@ -1,17 +1,27 @@
 "use client";
 
 import { VStack, HStack } from "@/components/Layout/Stack";
-import { useState } from "react";
+import { ReactNode } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
-import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import {
+  MissingVote,
+  checkMissingVoteForDelegate,
+  getVpToDisplay,
+} from "@/lib/voteUtils";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
+import { TokenAmountDisplay } from "@/lib/utils";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
+import CastVoteContextProvider, {
+  SupportTextProps,
+  useCastVoteContext,
+} from "./CastVoteContext";
+import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   proposal: Proposal;
@@ -24,8 +34,6 @@ export default function CastVoteInput({
 }: Props) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
-  const [reason, setReason] = useState("");
-  const openDialog = useOpenDialog();
   const { chains, delegate, isSuccess, votes, votingPower } =
     useFetchAllForVoting({
       proposal,
@@ -50,70 +58,195 @@ export default function CastVoteInput({
   }
 
   return (
-    <VStack className="bg-neutral border border-line rounded-lg flex-shrink mx-4">
-      <textarea
-        placeholder="I believe..."
-        value={reason}
-        onChange={(e) => setReason(e.target.value)}
-        className="text-sm p-4 resize-none rounded-lg border-0 focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0"
+    <CastVoteContextProvider
+      proposal={proposal}
+      votes={votes}
+      chains={chains}
+      votingPower={votingPower}
+    >
+      <CastVoteInputContent
+        proposal={proposal}
+        votes={votes}
+        votingPower={votingPower}
+        isOptimistic={isOptimistic}
       />
+    </CastVoteContextProvider>
+  );
+}
+
+function CastVoteInputContent({
+  proposal,
+  votes,
+  votingPower,
+  isOptimistic,
+}: {
+  proposal: Proposal;
+  votes: Vote[];
+  votingPower: VotingPowerData;
+  isOptimistic: boolean;
+}) {
+  const { reason, setReason, support, isLoading, isSuccess } =
+    useCastVoteContext();
+
+  const { ui } = Tenant.current();
+
+  const missingVote = checkMissingVoteForDelegate(votes, votingPower);
+
+  const showSuccessMessage = isSuccess || missingVote === "NONE";
+
+  return (
+    <VStack>
       <VStack
-        justifyContent="justify-between"
-        alignItems="items-stretch"
-        className="px-3 pb-3 pt-1"
+        className={`bg-neutral border-t border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
-        <VoteButtons
-          onClick={(
-            supportType: SupportTextProps["supportType"],
-            missingVote: MissingVote
-          ) =>
-            openDialog({
-              type: "CAST_VOTE",
-              params: {
-                reason,
-                supportType,
-                proposalId: proposal.id,
-                delegate,
-                votingPower,
-                authorityChains: chains,
-                missingVote,
-              },
-            })
-          }
-          proposalStatus={proposal.status}
-          delegateVotes={votes}
-          isOptimistic={isOptimistic}
-          votingPower={votingPower}
-        />
+        <VStack
+          justifyContent="justify-between"
+          alignItems="items-stretch"
+          className="px-3 pb-3 pt-1"
+        >
+          {!showSuccessMessage && !isLoading && (
+            <VStack gap={2}>
+              <textarea
+                placeholder="I believe..."
+                value={reason || undefined}
+                onChange={(e) => setReason(e.target.value)}
+                rows={reason ? undefined : 1}
+                className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+              />
+              <VoteButtons
+                proposalStatus={proposal.status}
+                isOptimistic={isOptimistic}
+              />
+            </VStack>
+          )}
+          {isLoading && <LoadingVote />}
+          {showSuccessMessage && <SuccessMessage />}
+          {support && !showSuccessMessage && !isLoading && (
+            <VoteSubmitButton
+              supportType={support}
+              votingPower={votingPower}
+              missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+            />
+          )}
+        </VStack>
       </VStack>
+      {ui.toggle("sponsoredVote") && !showSuccessMessage && <VotingBanner />}
+    </VStack>
+  );
+}
+
+function VotingBanner() {
+  const { reason } = useCastVoteContext();
+
+  if (reason) {
+    return (
+      <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
+        Voter statements require gas fees.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
+      <img src={freeGasMegaphon.src} alt="Free gas" className="w-6 h-6 mr-2" />
+      Voting on Agora is free!
+    </div>
+  );
+}
+
+function VoteSubmitButton({
+  supportType,
+  votingPower,
+  missingVote,
+}: {
+  supportType: SupportTextProps["supportType"];
+  votingPower: VotingPowerData;
+  missingVote: MissingVote;
+}) {
+  const { write } = useCastVoteContext();
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  return (
+    <div className="pt-3">
+      <SubmitButton onClick={write}>
+        <>
+          Vote {supportType.toLowerCase()} with{"\u00A0"}
+          <TokenAmountDisplay amount={vpToDisplay} />
+        </>
+      </SubmitButton>
+    </div>
+  );
+}
+
+const SubmitButton = ({
+  children,
+  onClick,
+}: {
+  children: ReactNode;
+  onClick?: () => void;
+}) => {
+  return (
+    <Button onClick={onClick} className="w-full">
+      {children}
+    </Button>
+  );
+};
+
+function LoadingVote() {
+  return (
+    <VStack className="w-full pt-3">
+      <div className="mb-2 text-sm text-secondary font-medium">
+        Casting your vote
+      </div>
+      <div className="mb-5 text-sm text-secondary">
+        It might take up to a minute for the changes to be reflected.
+      </div>
+      <div>
+        <Button className="w-full" disabled={true}>
+          Writing your vote to the chain...
+        </Button>
+      </div>
+    </VStack>
+  );
+}
+
+function SuccessMessage() {
+  const { data, support } = useCastVoteContext();
+
+  const supportColor =
+    support?.toLowerCase() === "for"
+      ? "text-positive"
+      : support?.toLowerCase() === "against"
+        ? "text-negative"
+        : "text-secondary";
+
+  return (
+    <VStack className="w-full pt-3">
+      <div className="text-sm text-secondary">
+        You{" "}
+        <span className={supportColor}>
+          voted {support?.toLowerCase() + (support === "ABSTAIN" ? " in" : "")}
+        </span>{" "}
+        this proposal
+      </div>
+      <BlockScanUrls
+        hash1={data?.sponsoredVoteTxHash || data?.standardTxHash}
+        hash2={data?.advancedTxHash}
+      />
     </VStack>
   );
 }
 
 function VoteButtons({
-  onClick,
   proposalStatus,
-  delegateVotes,
   isOptimistic,
-  votingPower,
 }: {
-  onClick: (
-    supportType: SupportTextProps["supportType"],
-    missingVote: MissingVote
-  ) => void;
   proposalStatus: Proposal["status"];
-  delegateVotes: Vote[];
   isOptimistic: boolean;
-  votingPower: VotingPowerData;
 }) {
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
-  }
-
-  const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
-
-  if (missingVote === "NONE") {
-    return <DisabledVoteButton reason="Already voted" />;
   }
 
   return (
@@ -123,12 +256,6 @@ function VoteButtons({
           <VoteButton
             key={supportType}
             action={supportType as SupportTextProps["supportType"]}
-            onClick={() => {
-              onClick(
-                supportType as SupportTextProps["supportType"],
-                missingVote
-              );
-            }}
           />
         )
       )}
@@ -136,19 +263,24 @@ function VoteButtons({
   );
 }
 
-function VoteButton({
-  action,
-  onClick,
-}: {
-  action: SupportTextProps["supportType"];
-  onClick: () => void;
-}) {
+function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
   const actionString = action.toLowerCase();
+
+  const { support, setSupport } = useCastVoteContext();
+
+  const selectedStyle =
+    support === action
+      ? actionString === "for"
+        ? "border-positive bg-positive/10"
+        : actionString === "against"
+          ? "border-negative bg-negative/10"
+          : "border-secondary bg-secondary/10"
+      : "bg-neutral";
 
   return (
     <button
-      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
-      onClick={onClick}
+      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selectedStyle} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+      onClick={() => setSupport(support === action ? null : action)}
     >
       {action.toLowerCase()}
     </button>
