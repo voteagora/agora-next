@@ -24,15 +24,11 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       return await contracts.governor.contract.quorumVotes!();
 
     case TENANT_NAMESPACES.OPTIMISM:
-      quorum = await contracts.governor.contract.quorum!(
-        proposal.proposal_id
-      );
+      quorum = await contracts.governor.contract.quorum!(proposal.proposal_id);
 
       // If no quorum is set, calculate it based on votable supply
       if (!quorum) {
-        votableSupply = await prisma[
-          `${namespace}VotableSupply`
-        ].findFirst({});
+        votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
       }
       return quorum;
@@ -44,18 +40,13 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657375357649?thread_ts=1723579392.179389&cid=C07ATDL9P8F
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657834565499
 
-      votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
-        {}
-      );
+      votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
-    
+
     case TENANT_NAMESPACES.PGUILD:
+      quorum = await contracts.governor.contract.quorum!(proposal.proposal_id);
 
-      quorum = await contracts.governor.contract.quorum!(
-        proposal.proposal_id
-      );
-
-      return BigInt(Number(quorum))
+      return BigInt(Number(quorum));
   }
 }
 
