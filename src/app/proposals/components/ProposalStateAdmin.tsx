@@ -4,11 +4,11 @@ import Tenant from "@/lib/tenant/tenant";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { PROPOSAL_STATUS, TENANT_NAMESPACES } from "@/lib/constants";
 import { AgoraGovExecute } from "@/app/proposals/components/AgoraGovExecute";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
 import { AgoraGovCancel } from "@/app/proposals/components/AgoraGovCancel";
 import { AgoraGovQueue } from "@/app/proposals/components/AgoraGovQueue";
 import { BravoGovCancel } from "@/app/proposals/components/BravoGovCancel";
-import { TenantNamespace } from "@/lib/types";
+import { type TenantNamespace } from "@/lib/types";
 import { OZGovQueue } from "@/app/proposals/components/OZGovQueue";
 import { OZGovExecute } from "@/app/proposals/components/OZGovExecute";
 import { BravoGovExecute } from "@/app/proposals/components/BravoGovExecute";
@@ -20,9 +20,8 @@ interface Props {
 }
 
 export const ProposalStateAdmin = ({ proposal }: Props) => {
-  const { ui, contracts } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const { isConnected, address } = useAccount();
-  const { namespace } = Tenant.current();
 
   const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
 
@@ -30,8 +29,12 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   // This check is used to hide the entire admin bar, not just the Cancel button.
   const isCancellable =
     proposal.status === PROPOSAL_STATUS.ACTIVE &&
-    (namespace === TENANT_NAMESPACES.CYBER ||
-      namespace === TENANT_NAMESPACES.UNISWAP);
+    [
+      TENANT_NAMESPACES.CYBER,
+      TENANT_NAMESPACES.DERIVE,
+      TENANT_NAMESPACES.SCROLL,
+      TENANT_NAMESPACES.UNISWAP,
+    ].includes(namespace as any);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
@@ -113,6 +116,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
+    case TENANT_NAMESPACES.DERIVE:
       return (
         <div className="flex flex-row gap-2">
           <AgoraGovCancel proposal={proposal} />
@@ -133,6 +137,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
 
 const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
+    case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return <AgoraGovExecute proposal={proposal} />;
@@ -150,6 +155,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
 
 const activeStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
+    case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return <AgoraGovCancel proposal={proposal} />;
