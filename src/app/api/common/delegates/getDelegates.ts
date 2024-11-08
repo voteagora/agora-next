@@ -18,6 +18,7 @@ import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getProxyAddress } from "@/lib/alligatorUtils";
 
 /*
  * Fetches a list of delegates
@@ -35,10 +36,11 @@ async function getDelegates({
   seed,
   filters,
 }: {
-  pagination: PaginationParams;
+  pagination?: PaginationParams;
   sort: string;
   seed?: number;
   filters?: {
+    delegator?: `0x${string}`;
     issues?: string;
     stakeholders?: string;
     endorsed?: boolean;
@@ -102,22 +104,57 @@ async function getDelegates({
       : "";
 
   let delegateUniverseCTE: string;
-
   const tokenAddress = contracts.token.address;
+  const proxyAddress = filters?.delegator
+    ? await getProxyAddress(filters?.delegator?.toLowerCase())
+    : null;
 
-  delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
-                              del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
-                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate,
-                                      coalesce(d.num_of_delegators, 0) as num_of_delegators,
-                                      coalesce(d.direct_vp, 0) as direct_vp,
-                                      coalesce(d.advanced_vp, 0) as advanced_vp,
-                                      coalesce(d.voting_power, 0) as voting_power
-                                      from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
+  delegateUniverseCTE = `
+    with del_statements as (
+      select address
+      from agora.delegate_statements
+      where dao_slug='${slug}'
+    ),
+    filtered_delegates as (
+      select d.*
+      from ${namespace}.delegates d
+      where d.contract = '${tokenAddress}'
+      ${
+        filters?.delegator
+          ? `
+        AND d.delegate IN (
+          SELECT delegatee
+          FROM (
+            SELECT delegatee, block_number
+            FROM ${namespace}.delegatees
+            WHERE delegator = '${filters.delegator.toLowerCase()}'
+            ${proxyAddress ? `AND delegatee <> '${proxyAddress.toLowerCase()}'` : ""}
+            AND contract = '${tokenAddress}'
+            UNION ALL
+            SELECT "to" as delegatee, block_number
+            FROM ${namespace}.advanced_delegatees
+            WHERE "from" = '${filters.delegator.toLowerCase()}'
+            AND delegated_amount > 0
+            AND contract = '${contracts.alligator?.address || tokenAddress}'
+          ) combined_delegations
+          ORDER BY block_number DESC
+        )
+      `
+          : ""
+      }
+    ),
+    del_card_universe as (
+      select
+        d.delegate as delegate,
+        d.num_of_delegators as num_of_delegators,
+        d.direct_vp as direct_vp,
+        d.advanced_vp as advanced_vp,
+        d.voting_power as voting_power
+      from filtered_delegates d
+    )`;
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
-    console.log(sort);
-
     const allowListString = allowList.map((value) => `'${value}'`).join(", ");
 
     switch (sort) {
@@ -154,13 +191,12 @@ async function getDelegates({
             ) AS statement
           FROM del_card_universe d
           WHERE num_of_delegators IS NOT NULL
-          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
           ${delegateStatementFiler}
           ORDER BY num_of_delegators DESC
           OFFSET $1
           LIMIT $2;
-          `;
-        // console.log(QRY1);
+        `;
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1, skip, take);
 
       case "weighted_random":
@@ -202,7 +238,6 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `;
-        // console.log(QRY2);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2, skip, take);
 
       default:
@@ -243,7 +278,6 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `;
-        // console.log(QRY3);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3, skip, take);
     }
   };
@@ -436,5 +470,30 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
+async function getVoterStats(addressOrENSName: string): Promise<any> {
+  const { namespace, contracts } = Tenant.current();
+  const address = isAddress(addressOrENSName)
+    ? addressOrENSName.toLowerCase()
+    : await resolveENSName(addressOrENSName);
+
+  const statsQuery = await prisma.$queryRawUnsafe<
+    Pick<DelegateStats, "voter" | "participation_rate" | "last_10_props">[]
+  >(
+    `
+        SELECT
+          voter,
+          participation_rate,
+          last_10_props
+        FROM ${namespace + ".voter_stats"}
+        WHERE voter = $1 AND contract = $2
+        `,
+    address,
+    contracts.governor.address
+  );
+
+  return statsQuery?.[0] || undefined;
+}
+
 export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
+export const fetchVoterStats = cache(getVoterStats);

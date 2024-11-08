@@ -20,8 +20,8 @@ export type Proposal = {
   queuedTime: Date | null;
   markdowntitle: string;
   description: string | null;
-  quorum: BigNumberish | null;
-  approvalThreshold: BigNumberish | null;
+  quorum: bigint | null;
+  approvalThreshold: bigint | null;
   proposalData: ParsedProposalData[ProposalType]["kind"];
   unformattedProposalData: `0x${string}` | null | any;
   proposalResults: ParsedProposalResults[ProposalType]["kind"];

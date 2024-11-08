@@ -12,10 +12,13 @@ import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 
 type Props = {
   proposal: Proposal;
   initialProposalVotes: PaginatedResult<Vote[]>;
+  nonVoters: any;
   fetchVotesForProposal: (
     proposalId: string,
     pagination?: PaginationParams
@@ -39,10 +42,12 @@ type Props = {
 export default function ApprovalVotesPanel({
   proposal,
   initialProposalVotes,
+  nonVoters,
   fetchVotesForProposal,
   fetchAllForVoting,
   fetchUserVotesForProposal,
 }: Props) {
+  const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
   function handleTabsChange(index: number) {
@@ -79,12 +84,29 @@ export default function ApprovalVotesPanel({
         {activeTab === 1 ? (
           <OptionsResultsPanel proposal={proposal} />
         ) : (
-          <ApprovalProposalVotesList
-            initialProposalVotes={initialProposalVotes}
-            fetchVotesForProposal={fetchVotesForProposal}
-            fetchUserVotes={fetchUserVotesForProposal}
-            proposalId={proposal.id}
-          />
+          <>
+            <div className="px-4">
+              <ProposalVotesFilter
+                initialSelection={showVoters ? "Voters" : "Hasn't voted"}
+                onSelectionChange={(value) => {
+                  setShowVoters(value === "Voters");
+                }}
+              />
+            </div>
+            {showVoters ? (
+              <ApprovalProposalVotesList
+                initialProposalVotes={initialProposalVotes}
+                fetchVotesForProposal={fetchVotesForProposal}
+                fetchUserVotes={fetchUserVotesForProposal}
+                proposalId={proposal.id}
+              />
+            ) : (
+              <ProposalNonVoterList
+                proposalId={proposal.id}
+                initialNonVoters={nonVoters}
+              />
+            )}
+          </>
         )}
         <ApprovalProposalCriteria proposal={proposal} />
         <div className="px-4 pb-6">

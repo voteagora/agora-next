@@ -1,5 +1,6 @@
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
+import { UndelegateDialog } from "../UndelegateDialog/UndelegateDialog";
 import { SwitchNetwork } from "../SwitchNetworkDialog/SwitchNetworkDialog";
 import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
 import {
@@ -25,14 +26,12 @@ import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialo
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { StakedDeposit } from "@/lib/types";
-import {
-  fetchAllForAdvancedDelegation,
-  fetchCurrentDelegatees,
-} from "@/app/delegates/actions";
+import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 
 export type DialogType =
   | DelegateDialogType
+  | UndelegateDialogType
   | CastProposalDialogType
   | CastVoteDialogType
   | AdvancedDelegateDialogType
@@ -50,6 +49,19 @@ export type DialogType =
 
 export type DelegateDialogType = {
   type: "DELEGATE";
+  params: {
+    delegate: DelegateChunk;
+    fetchBalanceForDirectDelegation: (
+      addressOrENSName: string
+    ) => Promise<bigint>;
+    fetchDirectDelegatee: (
+      addressOrENSName: string
+    ) => Promise<DelegateePayload | null>;
+  };
+};
+
+export type UndelegateDialogType = {
+  type: "UNDELEGATE";
   params: {
     delegate: DelegateChunk;
     fetchBalanceForDirectDelegation: (
@@ -191,6 +203,18 @@ export const dialogs: DialogDefinitions<DialogType> = {
   ) => {
     return (
       <DelegateDialog
+        delegate={delegate}
+        fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
+        fetchDirectDelegatee={fetchDirectDelegatee}
+      />
+    );
+  },
+  UNDELEGATE: (
+    { delegate, fetchBalanceForDirectDelegation, fetchDirectDelegatee },
+    closeDialog
+  ) => {
+    return (
+      <UndelegateDialog
         delegate={delegate}
         fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
         fetchDirectDelegatee={fetchDirectDelegatee}

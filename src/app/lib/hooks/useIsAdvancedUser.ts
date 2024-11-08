@@ -66,6 +66,7 @@ const useIsAdvancedUser = () => {
     "0x30b6e0b4f29FA72E8C7D014B6309668024ceB881", // QA 10
     "0x9b3d738C07Cd0E45eE98a792bA48ba67Bb5dAbca", // QA 11
     "0x416a0343470ac6694D39e2fCd6C494eeEF39BeEB", // SAFE QA 3
+    "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Michael test
   ] as `0x${string}`[];
 
   const { data: balance, isFetched: isBalanceFetched } = useReadContract({

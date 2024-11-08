@@ -6,6 +6,7 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
+import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
 import { HStack } from "@/components/Layout/Stack";
 import { disapprovalThreshold } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
@@ -56,6 +57,7 @@ async function fetchCurrentDelegators(addressOrENSName) {
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
   const proposalVotes = await fetchProposalVotes(proposal.id);
+  const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
 
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
@@ -89,6 +91,7 @@ export default async function OPProposalPage({ proposal }) {
         <OptimisticProposalVotesCard
           proposal={proposal}
           proposalVotes={proposalVotes}
+          nonVoters={nonVoters}
           againstRelativeAmount={againstRelativeAmount}
           againstLengthString={againstLengthString}
           disapprovalThreshold={disapprovalThreshold}

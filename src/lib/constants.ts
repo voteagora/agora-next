@@ -58,6 +58,7 @@ export const delegatesFilterOptions = {
     value: "Most delegators",
   },
 };
+
 export const citizensFilterOptions = {
   mostVotingPower: {
     value: "Most voting power",

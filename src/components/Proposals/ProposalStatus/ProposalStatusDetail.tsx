@@ -1,4 +1,3 @@
-import { HStack } from "@/components/Layout/Stack";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import { type ProposalStatus } from "@/lib/proposalUtils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
@@ -18,11 +17,7 @@ export default function ProposalStatusDetail({
   cancelledTransactionHash: string | null;
 }) {
   return (
-    <HStack
-      justifyContent="justify-between"
-      alignItems="items-center"
-      className="bg-wash border-t -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs"
-    >
+    <div className="flex flex-row justify-between items-center gap-4 bg-wash border-t -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs">
       <div>
         {proposalStatus === "ACTIVE" && (
           <p className="text-blue-600 bg-sky-200 rounded-sm px-1 py-0.5 font-semibold">
@@ -75,6 +70,6 @@ export default function ProposalStatusDetail({
           proposalCancelledTime={proposalCancelledTime}
         />
       </div>
-    </HStack>
+    </div>
   );
 }

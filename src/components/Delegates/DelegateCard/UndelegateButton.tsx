@@ -6,7 +6,7 @@ import {
   fetchBalanceForDirectDelegation,
 } from "@/app/delegates/actions";
 
-export function DelegateButton({
+export function UndelegateButton({
   full,
   delegate,
 }: {
@@ -17,11 +17,11 @@ export function DelegateButton({
 
   return (
     <UpdatedButton
-      type="secondary"
+      type="primary"
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({
-          type: "DELEGATE",
+          type: "UNDELEGATE",
           params: {
             delegate,
             fetchBalanceForDirectDelegation,
@@ -31,7 +31,7 @@ export function DelegateButton({
       }}
       className={full ? "w-full" : undefined}
     >
-      Delegate
+      Undelegate
     </UpdatedButton>
   );
 }

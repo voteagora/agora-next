@@ -1,32 +1,9 @@
-import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
-import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
-import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
-import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
-import CitizenCardList from "@/components/Delegates/DelegateCardList/CitzenCardList";
-import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
-import Hero from "@/components/Hero/Hero";
-import { TabsContent } from "@/components/ui/tabs";
-import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-import React from "react";
-
-async function fetchCitizens(sort, seed, pagination) {
-  "use server";
-
-  return apiFetchCitizens({ pagination, seed, sort });
-}
-
-async function fetchDelegates(sort, seed, filters, pagination) {
-  "use server";
-
-  return apiFetchDelegates({ pagination, seed, sort, filters });
-}
-
-async function fetchDelegators(address) {
-  "use server";
-
-  return apiFetchCurrentDelegators(address);
-}
+import React, { Suspense } from "react";
+import DelegateCardWrapper, {
+  DelegateCardLoadingState,
+} from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
+import Hero from "@/components/Hero/Hero";
 
 export async function generateMetadata({}, parent) {
   const { ui } = Tenant.current();
@@ -58,66 +35,12 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
-  const { ui } = Tenant.current();
-
-  const sort =
-    delegatesFilterOptions[searchParams.orderBy]?.sort ||
-    delegatesFilterOptions.weightedRandom.sort;
-  const citizensSort =
-    citizensFilterOptions[searchParams.citizensOrderBy]?.value ||
-    citizensFilterOptions.shuffle.sort;
-
-  const filters = {
-    ...(searchParams.issueFilter && { issues: searchParams.issueFilter }),
-    ...(searchParams.stakeholderFilter && {
-      stakeholders: searchParams.stakeholderFilter,
-    }),
-  };
-
-  const endorsedToggle = ui.toggle("delegates/endorsed-filter");
-  if (endorsedToggle?.enabled) {
-    const defaultFilter = endorsedToggle.config.defaultFilter;
-    filters.endorsed =
-      searchParams?.endorsedFilter === undefined
-        ? defaultFilter
-        : searchParams.endorsedFilter === "true";
-  }
-
-  const tab = searchParams.tab;
-  const seed = Math.random();
-  const delegates =
-    tab === "citizens"
-      ? await fetchCitizens(citizensSort, seed)
-      : await fetchDelegates(sort, seed, filters);
-
   return (
     <section>
       <Hero />
-      <DelegateTabs>
-        <TabsContent value="delegates">
-          <DelegateCardList
-            isDelegatesCitizensFetching={tab === "citizens"}
-            initialDelegates={delegates}
-            fetchDelegates={async (pagination, seed) => {
-              "use server";
-              return apiFetchDelegates({ pagination, seed, sort, filters });
-            }}
-            fetchDelegators={fetchDelegators}
-          />
-        </TabsContent>
-        <TabsContent value="citizens">
-          <CitizenCardList
-            isDelegatesCitizensFetching={tab !== "citizens"}
-            initialDelegates={delegates}
-            fetchDelegates={async (pagination, seed) => {
-              "use server";
-
-              return apiFetchCitizens({ pagination, seed, sort: citizensSort });
-            }}
-            fetchDelegators={fetchDelegators}
-          />{" "}
-        </TabsContent>
-      </DelegateTabs>
+      <Suspense fallback={<DelegateCardLoadingState />}>
+        <DelegateCardWrapper searchParams={searchParams} />
+      </Suspense>
     </section>
   );
 }

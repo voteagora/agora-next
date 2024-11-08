@@ -196,7 +196,7 @@ export default function ProposalType({
                         {formatNumber(
                           Math.floor(
                             (formattedVotableSupply * formValues.quorum) / 100
-                          ),
+                          ).toString(),
                           0,
                           1
                         )}{" "}

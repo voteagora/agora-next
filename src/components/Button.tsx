@@ -51,7 +51,7 @@ export function UpdatedButton({
           className={cn(
             className,
             type === "primary" &&
-              "bg-agora-stone-900 hover:bg-agora-stone-900/90 text-white transition-colors",
+              "bg-primary hover:bg-primary/90 text-white transition-colors",
             type === "secondary" && "",
             type === "link" && "",
             variant === "rounded" && "rounded-full",
@@ -67,10 +67,11 @@ export function UpdatedButton({
         <button
           className={cn(
             className,
-            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer",
+            "font-semibold py-2 px-4 border border-line cursor-pointer",
             type === "primary" &&
-              "bg-agora-stone-900 hover:shadow text-white transition-shadow",
-            type === "secondary" && "",
+              "bg-primary hover:bg-primary/90 text-neutral transition-shadow",
+            type === "secondary" &&
+              "bg-neutral text-primary hover:bg-tertiary/5",
             type === "link" && "",
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",

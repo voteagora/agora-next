@@ -193,6 +193,64 @@ async function getSnapshotVotesForDelegateForAddress({
   }
 }
 
+async function getVotersWhoHaveNotVotedForProposal({
+  proposalId,
+  pagination = { offset: 0, limit: 20 },
+}: {
+  proposalId: string;
+  pagination?: PaginationParams;
+}) {
+  const { namespace, contracts, slug } = Tenant.current();
+
+  const queryFunction = (skip: number, take: number) => {
+    const notVotedQuery = `
+    SELECT
+      del.*,
+      ds.twitter,
+      ds.discord,
+      ds.warpcast
+    FROM ${namespace + ".delegates"} del
+    LEFT JOIN agora.delegate_statements ds
+      ON del.delegate = ds.address
+      AND ds.dao_slug = '${slug}'
+    WHERE del.delegate NOT IN (
+      SELECT voter FROM ${namespace + ".vote_cast_events"} WHERE proposal_id = $1
+    )
+      AND del.contract = $2
+      ORDER BY del.voting_power DESC
+  `;
+
+    return prisma.$queryRawUnsafe<VotePayload[]>(
+      `${notVotedQuery}
+        OFFSET $3
+        LIMIT $4;`,
+      proposalId,
+      contracts.token.address.toLowerCase(),
+      skip,
+      take
+    );
+  };
+
+  const [{ meta, data: nonVoters }, latestBlock] = await Promise.all([
+    doInSpan({ name: "getVotersWhoHaveNotVotedForProposal" }, async () =>
+      paginateResult(queryFunction, pagination)
+    ),
+    contracts.token.provider.getBlock("latest"),
+  ]);
+
+  if (!nonVoters || nonVoters.length === 0) {
+    return {
+      meta,
+      data: [],
+    };
+  }
+
+  return {
+    meta,
+    data: nonVoters,
+  };
+}
+
 async function getVotesForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
@@ -255,8 +313,8 @@ async function getVotesForProposal({
       ) q
       ORDER BY ${sort} DESC
       OFFSET $3
-      LIMIT $4;
-    `;
+      LIMIT $4;`;
+
     return prisma.$queryRawUnsafe<VotePayload[]>(
       query,
       proposalId,
@@ -371,4 +429,7 @@ export const fetchVotesForProposal = cache(getVotesForProposal);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
 export const fetchVotesForProposalAndDelegate = cache(
   getVotesForProposalAndDelegate
+);
+export const fetchVotersWhoHaveNotVotedForProposal = cache(
+  getVotersWhoHaveNotVotedForProposal
 );
