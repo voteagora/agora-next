@@ -132,7 +132,7 @@ function CastVoteInputContent({
                 </VStack>
               )}
               {isLoading && <LoadingVote />}
-              {support && !showSuccessMessage && !isLoading && (
+              {!isLoading && (
                 <VoteSubmitButton
                   supportType={support}
                   votingPower={votingPower}
@@ -173,7 +173,7 @@ function VoteSubmitButton({
   votingPower,
   missingVote,
 }: {
-  supportType: SupportTextProps["supportType"];
+  supportType: SupportTextProps["supportType"] | null;
   votingPower: VotingPowerData;
   missingVote: MissingVote;
 }) {
@@ -183,9 +183,9 @@ function VoteSubmitButton({
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write}>
+      <SubmitButton onClick={write} disabled={!supportType}>
         <>
-          Vote {supportType.toLowerCase()} with{"\u00A0"}
+          Submit vote with{"\u00A0"}
           <TokenAmountDisplay amount={vpToDisplay} />
         </>
       </SubmitButton>
@@ -196,12 +196,14 @@ function VoteSubmitButton({
 const SubmitButton = ({
   children,
   onClick,
+  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
+  disabled?: boolean;
 }) => {
   return (
-    <Button onClick={onClick} className="w-full">
+    <Button onClick={onClick} className="w-full" disabled={disabled}>
       {children}
     </Button>
   );
