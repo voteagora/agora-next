@@ -67,7 +67,8 @@ export default function GovernorSettings() {
       functionName: "setVotingPeriod",
       args: [
         (votingPeriod
-          ? BigInt(Math.floor(votingPeriod) * SECONDS_IN_HOUR)
+          ? BigInt(Math.floor((votingPeriod || 0) * SECONDS_IN_HOUR)) /
+            BigInt(secondsPerBlock)
           : BigInt(secondsPerBlock)) / BigInt(secondsPerBlock),
       ],
     });
@@ -121,8 +122,9 @@ export default function GovernorSettings() {
               <Input
                 min={0}
                 value={votingPeriod}
-                onChange={(e) => setVotingPeriod(parseInt(e.target.value))}
+                onChange={(e) => setVotingPeriod(Number(e.target.value))}
                 disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
+                step={0.01}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -151,8 +153,9 @@ export default function GovernorSettings() {
               <Input
                 min={0}
                 value={votingDelay}
-                onChange={(e) => setVotingDelay(parseInt(e.target.value))}
+                onChange={(e) => setVotingDelay(Number(e.target.value))}
                 disabled={/* isInitializing || */ isDisabledSetVotingDelay}
+                step={0.01}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
