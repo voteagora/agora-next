@@ -22,6 +22,8 @@ import CastVoteContextProvider, {
 } from "./CastVoteContext";
 import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
+import { icons } from "@/assets/icons/icons";
+import Image from "next/image";
 
 type Props = {
   proposal: Proposal;
@@ -53,6 +55,14 @@ export default function CastVoteInput({
     return (
       <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
         <DisabledVoteButton reason="Loading..." />
+      </div>
+    );
+  }
+
+  if (!delegate.statement) {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+        <NoStatementView />
       </div>
     );
   }
@@ -295,5 +305,22 @@ function DisabledVoteButton({ reason }: { reason: string }) {
     >
       {reason}
     </button>
+  );
+}
+
+function NoStatementView() {
+  return (
+    <VStack gap={3}>
+      <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
+        <Image src={icons.info} alt="Info" width={24} height={24} />
+        Voting requires a delegate statement. Set yours one now to participate.
+      </div>
+      <Button
+        className="w-full"
+        onClick={() => (window.location.href = "/delegates/create")}
+      >
+        Please set one up to vote.
+      </Button>
+    </VStack>
   );
 }
