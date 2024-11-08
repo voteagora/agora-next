@@ -53,7 +53,7 @@ export default function CastVoteInput({
 
   if (!isSuccess || !chains || !delegate || !votes || !votingPower) {
     return (
-      <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
+      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
         <DisabledVoteButton reason="Loading..." />
       </div>
     );
@@ -299,12 +299,9 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <button
-      disabled
-      className="bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
-    >
+    <Button className="w-full" disabled={true}>
       {reason}
-    </button>
+    </Button>
   );
 }
 
