@@ -319,7 +319,7 @@ function NoStatementView() {
         className="w-full"
         onClick={() => (window.location.href = "/delegates/create")}
       >
-        Please set one up to vote.
+        Set up statement
       </Button>
     </VStack>
   );
