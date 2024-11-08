@@ -48,7 +48,8 @@ export const getPublicClient = (chain?: Chain) => {
   const { contracts } = Tenant.current();
 
   const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
-  const hasAlchemy = contracts.governor.chain.rpcUrls?.alchemy;
+  const hasAlchemy =
+    chain?.rpcUrls.alchemy || contracts.governor.chain.rpcUrls?.alchemy;
   const transport = hasAlchemy
     ? `${chain?.rpcUrls.alchemy.http[0] ?? contracts.governor.chain.rpcUrls.alchemy.http[0]}/${alchemyId}`
     : `${chain?.rpcUrls.default.http[0] ?? contracts.governor.chain.rpcUrls.default.http[0]}`;
