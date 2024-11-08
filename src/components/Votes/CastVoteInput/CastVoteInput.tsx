@@ -107,40 +107,44 @@ function CastVoteInputContent({
   return (
     <VStack>
       <VStack
-        className={`bg-neutral border-t border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
+        className={`bg-neutral border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
         <VStack
           justifyContent="justify-between"
           alignItems="items-stretch"
-          className="px-3 pb-3 pt-1"
+          className="pb-3 pt-1"
         >
-          {!showSuccessMessage && !isLoading && (
-            <VStack gap={2}>
-              <textarea
-                placeholder="I believe..."
-                value={reason || undefined}
-                onChange={(e) => setReason(e.target.value)}
-                rows={reason ? undefined : 1}
-                className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
-              />
-              <VoteButtons
-                proposalStatus={proposal.status}
-                isOptimistic={isOptimistic}
-              />
+          {!showSuccessMessage && (
+            <VStack className="border-t border-line px-3 ">
+              {!isLoading && (
+                <VStack gap={2}>
+                  <textarea
+                    placeholder="I believe..."
+                    value={reason || undefined}
+                    onChange={(e) => setReason(e.target.value)}
+                    rows={reason ? undefined : 1}
+                    className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+                  />
+                  <VoteButtons
+                    proposalStatus={proposal.status}
+                    isOptimistic={isOptimistic}
+                  />
+                </VStack>
+              )}
+              {isLoading && <LoadingVote />}
+              {support && !showSuccessMessage && !isLoading && (
+                <VoteSubmitButton
+                  supportType={support}
+                  votingPower={votingPower}
+                  missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+                />
+              )}
             </VStack>
-          )}
-          {isLoading && <LoadingVote />}
-          {showSuccessMessage && <SuccessMessage />}
-          {support && !showSuccessMessage && !isLoading && (
-            <VoteSubmitButton
-              supportType={support}
-              votingPower={votingPower}
-              missingVote={checkMissingVoteForDelegate(votes, votingPower)}
-            />
           )}
         </VStack>
       </VStack>
       {ui.toggle("sponsoredVote") && !showSuccessMessage && <VotingBanner />}
+      {showSuccessMessage && <SuccessMessage />}
     </VStack>
   );
 }
@@ -232,7 +236,7 @@ function SuccessMessage() {
         : "text-secondary";
 
   return (
-    <VStack className="w-full pt-3">
+    <VStack className="w-full text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
       <div className="text-sm text-secondary">
         You{" "}
         <span className={supportColor}>
@@ -241,6 +245,7 @@ function SuccessMessage() {
         this proposal
       </div>
       <BlockScanUrls
+        className="pt-2"
         hash1={data?.sponsoredVoteTxHash || data?.standardTxHash}
         hash2={data?.advancedTxHash}
       />
