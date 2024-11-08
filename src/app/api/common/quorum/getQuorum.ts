@@ -7,8 +7,6 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace, contracts } = Tenant.current();
 
-  var votableSupply;
-
   switch (namespace) {
     case TENANT_NAMESPACES.ENS:
       if (proposal.created_block) {
@@ -43,17 +41,10 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657375357649?thread_ts=1723579392.179389&cid=C07ATDL9P8F
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657834565499
 
-      votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
+      const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
         {}
       );
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
-    
-    case TENANT_NAMESPACES.PGUILD:
-
-      votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
-        {}
-      );
-      return BigInt(Number(votableSupply?.votable_supply))
   }
 }
 
