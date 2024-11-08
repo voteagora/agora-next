@@ -632,6 +632,7 @@ export type ProposalStatus =
   | "SUCCEEDED"
   | "DEFEATED"
   | "ACTIVE"
+  | "FAILED"
   | "PENDING"
   | "QUEUED"
   | "EXECUTED"
@@ -644,8 +645,6 @@ export async function getProposalStatus(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
-  const { namespace } = Tenant.current();
-
   if (proposalResults.key === "SNAPSHOT") {
     return proposalResults.kind.status.toUpperCase() as ProposalStatus;
   }
@@ -689,7 +688,7 @@ export async function getProposalStatus(
         return "SUCCEEDED";
       }
 
-      break;
+      return "FAILED";
     }
     case "OPTIMISTIC": {
       const {
