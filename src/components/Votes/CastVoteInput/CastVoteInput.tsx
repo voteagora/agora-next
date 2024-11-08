@@ -41,8 +41,8 @@ export default function CastVoteInput({
 
   if (!isConnected) {
     return (
-      <div className="flex flex-col justify-between pt-1 pb-3 px-3 mx-4">
-        <Button variant={"outline"} onClick={() => setOpen(true)}>
+      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+        <Button className="w-full" onClick={() => setOpen(true)}>
           Connect wallet to vote
         </Button>
       </div>
