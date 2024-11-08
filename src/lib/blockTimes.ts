@@ -29,7 +29,7 @@ export function getSecondsPerBlock(): number {
 
     case 1: // Eth Mainnet
     case 11155111: // Sepolia Testnet
-      return 12.05;
+      return 12;
 
     default:
       throw new Error(`Block time for chain:${chainId} not specified`);
