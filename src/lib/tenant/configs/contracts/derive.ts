@@ -1,5 +1,6 @@
 import {
   AgoraGovernor__factory,
+  AgoraTimelock__factory,
   ERC20__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -60,8 +61,9 @@ export const deriveTenantConfig = ({
   //
 
   const TOKEN = "0x47b4Ad50177b8e88F774B4E1D09e590d9cb9e386";
-  const GOVERNOR = "0x6465AbAF0bF54c907109F7456079F467459587EB";
+  const GOVERNOR = "0x79CA2f1450Ba61Daa13a56a679E3148eEf96b1Ee";
   const APPROVAL_MODULE = "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
+  const TIMELOCK = "0x53767D56c782D0479Fa7283E2A1A38B1aaEd2DCE";
   const rpcURL = `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
 
   const provider = new JsonRpcProvider(rpcURL);
@@ -86,6 +88,15 @@ export const deriveTenantConfig = ({
       contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
+      provider,
+    }),
+
     governorApprovalModule: APPROVAL_MODULE,
   };
 };
