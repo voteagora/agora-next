@@ -43,7 +43,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       votableSupply = await prisma[`${namespace}VotableSupply`].findFirst({});
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
 
-    case TENANT_NAMESPACES.PGUILD:
+    default: // TENANT_NAMESPACES.PGUILD - yes, TENANT_NAMESPACES.SCROLL?
       quorum = await contracts.governor.contract.quorum!(proposal.proposal_id);
 
       return BigInt(Number(quorum));
