@@ -1,4 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
+import { getPublicClient } from "@/lib/viem";
 import { cache } from "react";
 import {
   createWalletClient,
@@ -49,16 +50,7 @@ export async function prepareVoteBySignature({
 
   const { governor } = Tenant.current().contracts;
 
-  const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID!;
-  const hasAlchemy = governor.chain.rpcUrls?.alchemy;
-  const transport = hasAlchemy
-    ? `${governor.chain.rpcUrls.alchemy.http[0]}/${alchemyId}`
-    : `${governor.chain.rpcUrls.default.http[0]}`;
-
-  const publicClient = createPublicClient({
-    chain: governor.chain,
-    transport: http(transport),
-  });
+  const publicClient = getPublicClient();
 
   const { r, s, v } = parseSignature(signature);
 

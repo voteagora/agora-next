@@ -11,10 +11,7 @@ async function getRelayStatus() {
   if (!SPONSOR_PRIVATE_KEY) {
     throw new Error("SPONSOR_PRIVATE_KEY is not set");
   }
-
-  const { contracts } = Tenant.current();
-
-  const publicClient = getPublicClient(contracts.governor.chain.id);
+  const publicClient = getPublicClient();
   const account = privateKeyToAccount(SPONSOR_PRIVATE_KEY as `0x${string}`);
 
   const balance = await publicClient.getBalance({
