@@ -103,6 +103,10 @@ function CastVoteInputContent({
     isSuccess,
     isError,
     fallbackToStandardVote,
+    setFallbackToStandardVote,
+    reset,
+    resetError,
+    write,
   } = useCastVoteContext();
 
   const { ui } = Tenant.current();
@@ -110,6 +114,10 @@ function CastVoteInputContent({
   const missingVote = checkMissingVoteForDelegate(votes, votingPower);
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
+
+  const canUseRelay = ui.toggle("sponsoredVote") && !reason;
+
+  console.log(canUseRelay, fallbackToStandardVote, isError);
 
   return (
     <VStack className="flex-shrink bg-wash">
@@ -148,7 +156,29 @@ function CastVoteInputContent({
               )}
             </VStack>
           )}
-          {isError && <ErrorState message="Error submitting vote" />}
+          {isError && (!canUseRelay || fallbackToStandardVote) && (
+            <ErrorState
+              message="Error submitting vote"
+              button1={{ message: "Cancel", action: reset }}
+              button2={{
+                message: "Try again",
+                action: write,
+              }}
+            />
+          )}
+          {isError && canUseRelay && !fallbackToStandardVote && (
+            <ErrorState
+              message="Error submitting vote"
+              button1={{
+                message: "Try regular vote",
+                action: () => {
+                  resetError();
+                  setFallbackToStandardVote(true);
+                },
+              }}
+              button2={{ message: "Try again", action: write }}
+            />
+          )}
         </VStack>
       </VStack>
       {ui.toggle("sponsoredVote") &&
@@ -339,7 +369,15 @@ function NoStatementView() {
   );
 }
 
-function ErrorState({ message }: { message: string }) {
+function ErrorState({
+  message,
+  button1,
+  button2,
+}: {
+  message: string;
+  button1: { message: string; action: () => void };
+  button2: { message: string; action: () => void };
+}) {
   const { reset, setFallbackToStandardVote, resetError } = useCastVoteContext();
 
   return (
@@ -355,17 +393,15 @@ function ErrorState({ message }: { message: string }) {
         {message}
       </div>
       <HStack gap={2}>
-        <Button className="w-full" variant="elevatedOutline" onClick={reset}>
-          Cancel
-        </Button>
         <Button
           className="w-full"
-          onClick={() => {
-            setFallbackToStandardVote(true);
-            resetError();
-          }}
+          variant="elevatedOutline"
+          onClick={button1.action}
         >
-          Try regular vote
+          {button1.message}
+        </Button>
+        <Button className="w-full" onClick={button2.action}>
+          {button2.message}
         </Button>
       </HStack>
     </VStack>
