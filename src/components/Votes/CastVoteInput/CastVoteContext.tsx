@@ -27,7 +27,10 @@ type CastVoteContextType = {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  reset: () => void;
   resetError: () => void;
+  fallbackToStandardVote: boolean;
+  setFallbackToStandardVote: Dispatch<SetStateAction<boolean>>;
   data: Partial<{
     standardTxHash: string;
     advancedTxHash: string;
@@ -44,7 +47,10 @@ const CastVoteContext = createContext<CastVoteContextType>({
   isLoading: false,
   isSuccess: false,
   isError: false,
+  reset: () => {},
   resetError: () => {},
+  fallbackToStandardVote: false,
+  setFallbackToStandardVote: (fallbackToStandardVote) => {},
   data: {},
 });
 
@@ -69,6 +75,7 @@ const CastVoteContextProvider = ({
   const [support, setSupport] = useState<
     SupportTextProps["supportType"] | null
   >(null);
+  const [fallbackToStandardVote, setFallbackToStandardVote] = useState(false);
 
   const { ui, contracts } = Tenant.current();
 
@@ -96,7 +103,7 @@ const CastVoteContextProvider = ({
   });
 
   const { write, isLoading, isSuccess, data, isError, resetError } = (() => {
-    if (ui.toggle("sponsoredVote") && !reason) {
+    if (ui.toggle("sponsoredVote") && !reason && !fallbackToStandardVote) {
       return sponsoredVotingValues;
     }
     if (contracts?.alligator) {
@@ -116,7 +123,13 @@ const CastVoteContextProvider = ({
         isLoading,
         isSuccess,
         isError,
+        reset: () => {
+          setFallbackToStandardVote(false);
+          resetError();
+        },
         resetError,
+        fallbackToStandardVote,
+        setFallbackToStandardVote,
         data:
           missingVote === "NONE"
             ? {

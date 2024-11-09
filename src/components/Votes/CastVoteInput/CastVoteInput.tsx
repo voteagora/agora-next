@@ -95,8 +95,15 @@ function CastVoteInputContent({
   votingPower: VotingPowerData;
   isOptimistic: boolean;
 }) {
-  const { reason, setReason, support, isLoading, isSuccess, isError } =
-    useCastVoteContext();
+  const {
+    reason,
+    setReason,
+    support,
+    isLoading,
+    isSuccess,
+    isError,
+    fallbackToStandardVote,
+  } = useCastVoteContext();
 
   const { ui } = Tenant.current();
 
@@ -144,7 +151,9 @@ function CastVoteInputContent({
           {isError && <ErrorState message="Error submitting vote" />}
         </VStack>
       </VStack>
-      {ui.toggle("sponsoredVote") && !showSuccessMessage && <VotingBanner />}
+      {ui.toggle("sponsoredVote") &&
+        !showSuccessMessage &&
+        !fallbackToStandardVote && <VotingBanner />}
       {showSuccessMessage && <SuccessMessage />}
     </VStack>
   );
@@ -331,7 +340,7 @@ function NoStatementView() {
 }
 
 function ErrorState({ message }: { message: string }) {
-  const { write, resetError } = useCastVoteContext();
+  const { reset, setFallbackToStandardVote, resetError } = useCastVoteContext();
 
   return (
     <VStack gap={3} className="p-3 border-t border-line">
@@ -346,15 +355,17 @@ function ErrorState({ message }: { message: string }) {
         {message}
       </div>
       <HStack gap={2}>
-        <Button
-          className="w-full"
-          variant="elevatedOutline"
-          onClick={resetError}
-        >
+        <Button className="w-full" variant="elevatedOutline" onClick={reset}>
           Cancel
         </Button>
-        <Button className="w-full" onClick={write}>
-          Try again
+        <Button
+          className="w-full"
+          onClick={() => {
+            setFallbackToStandardVote(true);
+            resetError();
+          }}
+        >
+          Try regular vote
         </Button>
       </HStack>
     </VStack>
