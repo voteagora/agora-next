@@ -1,7 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
-import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { StakedDeposit } from "@/lib/types";
+import { findStakedDeposit } from "@/lib/prismaUtils";
 
 interface IFetchDepositProps {
   id: number;
@@ -12,10 +12,9 @@ export async function fetchDeposit({
 }: IFetchDepositProps): Promise<StakedDeposit> {
   const { namespace, token } = Tenant.current();
 
-  const deposit = await prisma[`${namespace}StakedDeposits`].findFirst({
-    where: {
-      deposit_id: id,
-    },
+  const deposit = await findStakedDeposit({
+    namespace,
+    depositId: id,
   });
 
   if (!deposit) {
