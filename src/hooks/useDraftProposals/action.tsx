@@ -25,6 +25,7 @@ const action = async (
     include: {
       transactions: true,
       approved_sponsors: true,
+      votes: true,
     },
   });
 };
