@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
@@ -16,14 +15,17 @@ import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
 enum ProposalListTab {
   ALL = "all",
   DRAFT = "draft",
+  MY_DRAFTS = "my-drafts",
 }
 
 const ProposalListContainer = ({
   allProposalsListElement,
   draftProposalsListElement,
+  myDraftProposalsListElement,
 }: {
   allProposalsListElement: React.ReactNode;
   draftProposalsListElement: React.ReactNode;
+  myDraftProposalsListElement: React.ReactNode;
 }) => {
   const router = useRouter();
   const addSearchParam = useAddSearchParam();
@@ -78,7 +80,19 @@ const ProposalListContainer = ({
               )}
               onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
             >
-              Draft proposals
+              Unsponsored
+            </button>
+            <button
+              type="button"
+              className={cn(
+                "text-2xl font-extrabold mb-0",
+                activeTab === ProposalListTab.MY_DRAFTS
+                  ? "text-primary"
+                  : "text-primary/40 hover:text-primary/80 transition-colors"
+              )}
+              onClick={() => clearFiltersAndSetTab(ProposalListTab.MY_DRAFTS)}
+            >
+              My drafts
             </button>
           </div>
           <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
@@ -100,6 +114,7 @@ const ProposalListContainer = ({
       >
         {activeTab === ProposalListTab.ALL && allProposalsListElement}
         {activeTab === ProposalListTab.DRAFT && draftProposalsListElement}
+        {activeTab === ProposalListTab.MY_DRAFTS && myDraftProposalsListElement}
       </motion.section>
     </div>
   );
