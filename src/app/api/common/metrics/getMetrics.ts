@@ -1,8 +1,9 @@
-import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { getPublicClient } from "@/lib/viem";
+import { findVotableSupply } from "@/lib/prismaUtils";
+
 async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
 
@@ -19,9 +20,8 @@ async function getMetrics() {
       totalSupply = 0;
     }
 
-    const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
-      {}
-    );
+    const votableSupply = await findVotableSupply({ namespace });
+
     return {
       votableSupply: votableSupply?.votable_supply || "0",
       totalSupply: totalSupply.toString(),

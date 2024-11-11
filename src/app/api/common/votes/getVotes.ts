@@ -17,6 +17,7 @@ import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
+import { findVotes } from "@/lib/prismaUtils";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -405,8 +406,10 @@ async function getVotesForProposalAndDelegate({
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
-  const votes = await prisma[`${namespace}Votes`].findMany({
-    where: { proposal_id: proposalId, voter: address?.toLowerCase() },
+  const votes = await findVotes({
+    namespace,
+    proposalId,
+    voter: address.toLowerCase(),
   });
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
