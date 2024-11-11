@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client";
 
 export function autobalanceAllocations<
   T extends { allocation: Prisma.Decimal; locked: boolean; id: string },
