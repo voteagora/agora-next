@@ -19,7 +19,7 @@ const useDraftProposals = ({
     setHasMounted(true);
   }, []);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["draftProposals", filter, address],
     queryFn: () => {
       const ownerOnly = filter === draftProposalsFilterOptions.myDrafts.filter;
@@ -28,7 +28,7 @@ const useDraftProposals = ({
     enabled: hasMounted,
   });
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch };
 };
 
 export default useDraftProposals;
