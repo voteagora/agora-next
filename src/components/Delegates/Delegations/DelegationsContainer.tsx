@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
 function DelegationsContainer({
@@ -28,7 +28,7 @@ function DelegationsContainer({
     limit: number;
   }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
-  const fetching = useRef(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
 
@@ -38,15 +38,15 @@ function DelegationsContainer({
   }, [initialDelegators]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
-      fetching.current = true;
+    if (!isFetching && meta.has_next) {
+      setIsFetching(true);
       const data = await fetchDelegators({
         offset: meta.next_offset,
         limit: meta.total_returned,
       });
       setDelegators(delegators.concat(data.data));
       setMeta(data.meta);
-      fetching.current = false;
+      setIsFetching(false);
     }
   };
 
