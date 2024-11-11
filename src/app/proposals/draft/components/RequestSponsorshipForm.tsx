@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { isAddress } from "viem";
 import { useState } from "react";
 import {
@@ -9,57 +8,23 @@ import {
   UseFieldArrayRemove,
 } from "react-hook-form";
 import AddressInput from "./form/AddressInput";
-import { useBlockNumber } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
-import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { useGetVotes } from "@/hooks/useGetVotes";
-import { useManager } from "@/hooks/useManager";
-import {
-  DraftProposal,
-  PLMConfig,
-  ProposalGatingType,
-  ProposalType,
-} from "../types";
-import Tenant from "@/lib/tenant/tenant";
+import { DraftProposal } from "../types";
 import SwitchInput from "./form/SwitchInput";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { ProposalStage } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { useCanSponsor } from "../hooks/useCanSponsor";
+import { useAccount } from "wagmi";
 
 enum Visibility {
   PUBLIC = "Public",
   PRIVATE = "Private",
 }
-
-const canSponsor = (
-  gatingType: ProposalGatingType | undefined,
-  manager: `0x${string}` | undefined,
-  address: `0x${string}` | undefined,
-  accountVotesData: bigint | undefined,
-  threshold: bigint | undefined
-) => {
-  switch (gatingType) {
-    case ProposalGatingType.MANAGER:
-      return manager === address;
-    case ProposalGatingType.TOKEN_THRESHOLD:
-      return accountVotesData !== undefined && threshold !== undefined
-        ? accountVotesData >= threshold
-        : false;
-    case ProposalGatingType.GOVERNOR_V1:
-      return (
-        manager === address ||
-        (accountVotesData !== undefined && threshold !== undefined
-          ? accountVotesData >= threshold
-          : false)
-      );
-    default:
-      return false;
-  }
-};
 
 const SponsorInput = ({
   index,
@@ -68,52 +33,15 @@ const SponsorInput = ({
   index: number;
   remove: UseFieldArrayRemove;
 }) => {
-  const tenant = Tenant.current();
-  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = plmToggle?.config?.gatingType;
   const { control, watch } = useFormContext();
   const address = watch(`sponsors.${index}.address`);
-
-  const { data: threshold, isFetched: isThresholdFetched } =
-    useProposalThreshold();
-  const { data: manager, isFetched: isManagerFetched } = useManager();
-  const { data: blockNumber, isFetched: isBlockNumberFetched } =
-    useBlockNumber();
-  const { data: accountVotesData, isFetched: isAccountVotesFetched } =
-    useGetVotes({
-      address: address as `0x${string}`,
-      blockNumber: blockNumber || BigInt(0),
-    });
 
   const {
     data: canAddressSponsor,
     isError,
     isFetching,
     isSuccess,
-  } = useQuery({
-    queryKey: [
-      "can-sponsor",
-      address,
-      gatingType,
-      manager,
-      accountVotesData,
-      threshold,
-    ],
-    queryFn: () => {
-      return canSponsor(
-        gatingType,
-        manager as `0x${string}`,
-        address as `0x${string}`,
-        accountVotesData,
-        threshold
-      );
-    },
-    enabled:
-      isThresholdFetched &&
-      isManagerFetched &&
-      isBlockNumberFetched &&
-      isAccountVotesFetched,
-  });
+  } = useCanSponsor(address);
 
   return (
     <>
@@ -163,6 +91,7 @@ const RequestSponsorshipForm = ({
 }: {
   draftProposal: DraftProposal;
 }) => {
+  const { address } = useAccount();
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const { watch, control, formState } = useFormContext();
@@ -174,6 +103,8 @@ const RequestSponsorshipForm = ({
   const formValid = true;
   const visibility = watch("visibility");
   const sponsors = watch("sponsors");
+
+  const { data: canUserSponsor } = useCanSponsor(address);
 
   return (
     <>
@@ -232,6 +163,49 @@ const RequestSponsorshipForm = ({
           ? "Update draft"
           : "Create draft"}
       </UpdatedButton>
+      {canUserSponsor && (
+        <>
+          <div className="flex flex-row items-center justify-center mt-4 gap-2">
+            <span className="h-[1px] w-full border-b border-line block"></span>
+            <span className="text-xs">OR</span>
+            <span className="h-[1px] w-full border-b border-line block"></span>
+          </div>
+          <UpdatedButton
+            fullWidth={true}
+            isSubmit={false}
+            isLoading={isPending}
+            type={formValid ? "primary" : "disabled"}
+            className="mt-4"
+            onClick={async () => {
+              if (formValid) {
+                setIsPending(true);
+                const res = await requestSponsorshipAction({
+                  draftProposalId: draftProposal.id,
+                  is_public: visibility === Visibility.PUBLIC,
+                  sponsors: sponsors.filter(
+                    (sponsor: { address: `0x${string}` }) =>
+                      isAddress(sponsor.address)
+                  ),
+                });
+                if (res.ok) {
+                  invalidatePath(draftProposal.id);
+                  router.push(`/proposals/sponsor/${draftProposal.id}`);
+                } else {
+                  console.error(res.message);
+                }
+                setIsPending(false);
+              }
+            }}
+          >
+            Publish onchain
+          </UpdatedButton>
+          <p className="text-xs text-secondary mt-2">
+            You meet the criteria for publishing a proposal onchain. If you
+            would like, you can publish it now. Or, create a draft to create a
+            sharable offchain proposal for early feedback.
+          </p>
+        </>
+      )}
     </>
   );
 };

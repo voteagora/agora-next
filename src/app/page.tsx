@@ -17,6 +17,7 @@ import Image from "next/image";
 import { PaginationParams } from "./lib/pagination";
 import ProposalListContainer from "@/components/Proposals/ProposalsList/ProposalListContainer";
 import DraftProposalList from "@/components/Proposals/ProposalsList/DraftProposalList";
+import MyDraftProposalList from "@/components/Proposals/ProposalsList/MyDraftProposalList";
 import AllProposalList from "@/components/Proposals/ProposalsList/AllProposalList";
 import { Suspense } from "react";
 
@@ -100,6 +101,7 @@ async function Home() {
         <ProposalListContainer
           allProposalsListElement={<AllProposalList />}
           draftProposalsListElement={<DraftProposalList />}
+          myDraftProposalsListElement={<MyDraftProposalList />}
         />
       </Suspense>
       {/* <MyDraftProposals
