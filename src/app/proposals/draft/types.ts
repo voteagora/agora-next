@@ -53,6 +53,13 @@ export const ProposalLifecycleStageMetadata = {
     waitingFor: "Voting",
     checklistItems: [],
   },
+  [PrismaProposalStage.AWAITING_SPONSORSHIP]: {
+    title: "Awaiting sponsorship",
+    shortTitle: "Awaiting sponsorship",
+    description: "The proposal is awaiting sponsorship",
+    waitingFor: "Sponsor approval",
+    checklistItems: [],
+  },
   [PrismaProposalStage.QUEUED]: {
     title: "Queue",
     shortTitle: "Queue",

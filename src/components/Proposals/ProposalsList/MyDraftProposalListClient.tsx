@@ -1,17 +1,15 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import useDraftProposals from "@/hooks/useDraftProposals";
-import { useSearchParams } from "next/navigation";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { ProposalDraft } from "@prisma/client";
 import Link from "next/link";
-import { draftProposalsFilterOptions } from "@/lib/constants";
 import {
   getStageIndexForTenant,
   isPostSubmission,
 } from "@/app/proposals/draft/utils/stages";
 import { animate, AnimatePresence, motion } from "framer-motion";
+import useMyDraftProposals from "@/hooks/useMyDraftProposals";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   const isDrafting = !isPostSubmission(proposal.stage);
@@ -48,17 +46,14 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   );
 };
 
-const DraftProposalListClient = () => {
+const MyDraftProposalListClient = () => {
   const { address } = useAccount();
-  const filter =
-    useSearchParams()?.get("filter") ||
-    draftProposalsFilterOptions.allDrafts.value;
 
   const {
     data: draftProposals,
     isLoading,
     error,
-  } = useDraftProposals({ address, filter });
+  } = useMyDraftProposals({ address });
 
   return (
     <>
@@ -70,13 +65,13 @@ const DraftProposalListClient = () => {
         </motion.div>
       ) : (
         <motion.div
-          key={filter}
+          key="my-drafts"
           className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden"
         >
           <div>
             {!draftProposals || draftProposals?.length === 0 ? (
               <div className="flex flex-row justify-center py-8 text-tertiary">
-                No draft proposals found
+                No drafts found
               </div>
             ) : (
               <div>
@@ -92,4 +87,4 @@ const DraftProposalListClient = () => {
   );
 };
 
-export default DraftProposalListClient;
+export default MyDraftProposalListClient;
