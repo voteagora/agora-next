@@ -1,31 +1,102 @@
 "use client";
 
+import { useOptimistic } from "react";
 import { useAccount } from "wagmi";
 import useDraftProposals from "@/hooks/useDraftProposals";
 import { useSearchParams } from "next/navigation";
 import HumanAddress from "@/components/shared/HumanAddress";
-import { ProposalDraft } from "@prisma/client";
+import { ProposalDraft, ProposalDraftVote } from "@prisma/client";
 import Link from "next/link";
 import { draftProposalsFilterOptions } from "@/lib/constants";
-import {
-  getStageIndexForTenant,
-  isPostSubmission,
-} from "@/app/proposals/draft/utils/stages";
 import { animate, AnimatePresence, motion } from "framer-motion";
+import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import voteForProposalDraft from "./actions/voteForProposalDraft";
 
-const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
-  const isDrafting = !isPostSubmission(proposal.stage);
+const DraftProposalCard = ({
+  proposal,
+  refetch,
+}: {
+  proposal: ProposalDraft & { votes: ProposalDraftVote[] };
+  refetch: () => void;
+}) => {
+  const { address } = useAccount();
+
+  const voterInVotes = proposal.votes.find((v) => v.voter === address);
+
+  const [optimisticState, addOptimistic] = useOptimistic(
+    proposal,
+    (
+      currentState: ProposalDraft & { votes: ProposalDraftVote[] },
+      vote: any
+    ) => {
+      const newVotes = voterInVotes
+        ? currentState.votes.map((v) => (v.voter === vote.voter ? vote : v))
+        : [...currentState.votes, vote];
+      return { ...currentState, votes: newVotes };
+    }
+  );
+
+  const handleVote = async (direction: 1 | -1) => {
+    if (!address) return;
+    addOptimistic({
+      voter: address,
+      weight: 1,
+      direction,
+    });
+    await voteForProposalDraft({
+      address,
+      proposalId: proposal.id.toString(),
+      direction,
+    });
+    refetch();
+  };
+
+  // TODO: how inefficient is doing this client side vs db side?
+  const score = optimisticState.votes.reduce(
+    (acc, vote) => acc + Number(vote.weight) * vote.direction,
+    0
+  );
+
   return (
     <Link
-      href={
-        isDrafting
-          ? `/proposals/draft/${proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`
-          : `/proposals/sponsor/${proposal.id}`
-      }
+      href={`/proposals/sponsor/${proposal.id}`}
       className="block cursor-pointer border-b border-line last:border-b-0 hover:bg-tertiary/5 transition-colors"
     >
       <div className="py-4 px-6 flex flex-row gap-4 items-center">
-        <div className="flex flex-col justify-between gap-1">
+        <div className="flex flex-col gap-2 items-center">
+          <div
+            className={`w-5 h-5 bg-neutral border border-line rounded flex items-center justify-center hover:bg-tertiary/5 transition-colors ${
+              voterInVotes && voterInVotes.direction === 1
+                ? "bg-tertiary/5"
+                : ""
+            }`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!address) return;
+              handleVote(1);
+            }}
+          >
+            <ChevronUpIcon className="w-4 h-4 text-secondary" />
+          </div>
+          <div className="text-xs text-secondary font-bold">{score}</div>
+          <div
+            className={`w-5 h-5 bg-neutral border border-line rounded flex items-center justify-center hover:bg-tertiary/5 transition-colors ${
+              voterInVotes && voterInVotes.direction === -1
+                ? "bg-tertiary/5"
+                : ""
+            }`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!address) return;
+              handleVote(-1);
+            }}
+          >
+            <ChevronDownIcon className="w-4 h-4 text-secondary" />
+          </div>
+        </div>
+        <div className="flex flex-col justify-between">
           <div className="flex flex-row gap-1 text-xs text-secondary">
             <div>
               Draft Proposal{" "}
@@ -35,11 +106,6 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
             </div>
           </div>
           <div className="flex flex-row gap-1">
-            {isDrafting && (
-              <span className="bg-blue-100 text-blue-500 self-start text-xs font-bold rounded-lg px-1.5 py-1 uppercase tracking-wider">
-                Draft
-              </span>
-            )}
             <span className="text-primary">{proposal.title || "Untitled"}</span>
           </div>
         </div>
@@ -58,6 +124,7 @@ const DraftProposalListClient = () => {
     data: draftProposals,
     isLoading,
     error,
+    refetch,
   } = useDraftProposals({ address, filter });
 
   return (
@@ -81,7 +148,11 @@ const DraftProposalListClient = () => {
             ) : (
               <div>
                 {draftProposals?.map((proposal) => (
-                  <DraftProposalCard key={proposal.id} proposal={proposal} />
+                  <DraftProposalCard
+                    key={proposal.id}
+                    proposal={proposal}
+                    refetch={refetch}
+                  />
                 ))}
               </div>
             )}
