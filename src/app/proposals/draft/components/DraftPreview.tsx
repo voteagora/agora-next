@@ -2,22 +2,18 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { formatUnits } from "viem";
+import { useAccount } from "wagmi";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
-import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import {
-  DraftProposal,
-  PLMConfig,
-  ProposalGatingType,
-} from "@/app/proposals/draft/types";
+import { DraftProposal, PLMConfig } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import ProposalRequirements from "./ProposalRequirements";
+import { useCanSponsor } from "../hooks/useCanSponsor";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -36,45 +32,10 @@ const DraftPreview = ({
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
-  const votingModuleType = proposalDraft.voting_module_type;
 
   const { address } = useAccount();
-  const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-
-  const { data: blockNumber } = useBlockNumber({
-    chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
-      ? tenant.contracts.chainForTime?.id
-      : undefined,
-  });
-
-  const { data: accountVotes } = useGetVotes({
-    address: address as `0x${string}`,
-    blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    enabled: !!address && !!blockNumber,
-  });
-
-  const canSponsor = () => {
-    switch (gatingType) {
-      case ProposalGatingType.MANAGER:
-        return manager === address;
-      case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotes !== undefined && threshold !== undefined
-          ? accountVotes >= threshold
-          : false;
-      case ProposalGatingType.GOVERNOR_V1:
-        return (
-          manager === address ||
-          (accountVotes !== undefined && threshold !== undefined
-            ? accountVotes >= threshold
-            : false)
-        );
-      default:
-        return false;
-    }
-  };
-
-  const canAddressSponsor = canSponsor();
+  const { data: canAddressSponsor } = useCanSponsor(address as `0x${string}`);
 
   const renderProposalDescription = (proposal: DraftProposal) => {
     switch (proposal.voting_module_type) {
@@ -117,67 +78,6 @@ const DraftPreview = ({
       default:
         return null;
     }
-  };
-
-  const renderProposalRequirements = () => {
-    const requirements = [];
-
-    if (votingModuleType === ProposalType.SOCIAL) {
-      return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow text-primary">Voting power</p>
-          <span className="text-secondary font-mono text-xs">
-            {"> "}
-            {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
-            {" tokens"}
-          </span>
-        </div>
-      );
-    }
-
-    if (
-      gatingType === ProposalGatingType.MANAGER ||
-      gatingType === ProposalGatingType.GOVERNOR_V1
-    ) {
-      requirements.push(
-        <div
-          key="manager"
-          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
-        >
-          <p className="flex-grow text-primary">Manager address</p>
-          <span className="text-secondary font-mono text-xs">
-            {manager?.toString()}
-          </span>
-        </div>
-      );
-    }
-
-    if (
-      gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
-      gatingType === ProposalGatingType.GOVERNOR_V1
-    ) {
-      requirements.push(
-        <div
-          key="threshold"
-          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
-        >
-          <p className="flex-grow text-primary">Voting power</p>
-          <span className="text-secondary font-mono text-xs">
-            {"> "}
-            {threshold
-              ? Math.round(
-                  parseFloat(
-                    formatUnits(BigInt(threshold), tenant.token.decimals)
-                  )
-                )
-              : "0"}{" "}
-            tokens
-          </span>
-        </div>
-      );
-    }
-
-    return requirements.length > 0 ? requirements : null;
   };
 
   return (
@@ -260,7 +160,7 @@ const DraftPreview = ({
             the community to sponsor.
           </p>
         )}
-        <div className="mt-6">{renderProposalRequirements()}</div>
+        <ProposalRequirements proposalDraft={proposalDraft} />
         {actions}
       </FormCard.Section>
     </FormCard>

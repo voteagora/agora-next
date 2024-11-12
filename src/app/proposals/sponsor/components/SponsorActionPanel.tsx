@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { getIndexForStage } from "@/app/proposals/draft/utils/stages";
 import { ProposalStage } from "@prisma/client";
+import ProposalRequirements from "../../draft/components/ProposalRequirements";
 
 const SponsorActionPanel = ({
   draftProposal,
@@ -111,11 +112,8 @@ const SponsorActionPanel = ({
       </div>
       <div className="bg-tertiary/5 p-6 pt-10 absolute z-10 mt-[-24px] w-full rounded-lg border border-line">
         <h2 className="text-primary font-semibold">Sponsorship requirements</h2>
-        <div className="flex flex-row justify-between bg-neutral px-4 py-2 rounded-lg border border-line mt-4 items-center">
-          <span className="text-primary">Balance</span>
-          <span className="font-mono text-xs text-tertiary">
-            {"> "} 1000 tokens
-          </span>
+        <div className="mt-4 bg-neutral">
+          <ProposalRequirements proposalDraft={draftProposal} />
         </div>
         <Button variant="default" className="w-full mt-6">
           Sponsor proposal
