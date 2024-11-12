@@ -57,6 +57,25 @@ export const draftProposalsFilterOptions = {
   },
 };
 
+export const draftProposalsSortOptions = {
+  newest: {
+    value: "Newest",
+    sort: "newest",
+  },
+  oldest: {
+    value: "Oldest",
+    sort: "oldest",
+  },
+  mostVotes: {
+    value: "Most Votes",
+    sort: "most_votes",
+  },
+  leastVotes: {
+    value: "Least Votes",
+    sort: "least_votes",
+  },
+};
+
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",

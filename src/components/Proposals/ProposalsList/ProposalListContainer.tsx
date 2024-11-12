@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAddSearchParam } from "@/hooks/useAddSearchParam";
 import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
+import DraftProposalsSort from "../ProposalsFilter/DraftProposalsSort";
 
 enum ProposalListTab {
   ALL = "all",
@@ -97,7 +98,12 @@ const ProposalListContainer = ({
           </div>
           <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
             {activeTab === ProposalListTab.ALL && <ProposalsFilter />}
-            {activeTab === ProposalListTab.DRAFT && <DraftProposalsFilter />}
+            {activeTab === ProposalListTab.DRAFT && (
+              <>
+                <DraftProposalsFilter />
+                <DraftProposalsSort />
+              </>
+            )}
             {tenantSupportsProposalLifecycle && address && (
               <CreateProposalDraftButton address={address} />
             )}
