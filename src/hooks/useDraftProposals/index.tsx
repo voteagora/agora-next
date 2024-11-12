@@ -8,9 +8,11 @@ import action from "./action";
 const useDraftProposals = ({
   address,
   filter,
+  sort,
 }: {
   address?: `0x${string}`;
   filter: string;
+  sort: string;
 }) => {
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -20,10 +22,10 @@ const useDraftProposals = ({
   }, []);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["draftProposals", filter, address],
+    queryKey: ["draftProposals", filter, sort, address],
     queryFn: () => {
       const ownerOnly = filter === draftProposalsFilterOptions.myDrafts.filter;
-      return action(address, ownerOnly);
+      return action(address, ownerOnly, sort);
     },
     enabled: hasMounted,
   });

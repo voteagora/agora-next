@@ -7,7 +7,10 @@ import { useSearchParams } from "next/navigation";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { ProposalDraft, ProposalDraftVote } from "@prisma/client";
 import Link from "next/link";
-import { draftProposalsFilterOptions } from "@/lib/constants";
+import {
+  draftProposalsFilterOptions,
+  draftProposalsSortOptions,
+} from "@/lib/constants";
 import { animate, AnimatePresence, motion } from "framer-motion";
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import voteForProposalDraft from "./actions/voteForProposalDraft";
@@ -120,12 +123,17 @@ const DraftProposalListClient = () => {
     useSearchParams()?.get("filter") ||
     draftProposalsFilterOptions.allDrafts.value;
 
+  const sort =
+    useSearchParams()?.get("sort") || draftProposalsSortOptions.newest.sort;
+
   const {
     data: draftProposals,
     isLoading,
     error,
     refetch,
-  } = useDraftProposals({ address, filter });
+  } = useDraftProposals({ address, filter, sort });
+
+  console.log(draftProposals);
 
   return (
     <>
