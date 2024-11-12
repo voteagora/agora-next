@@ -7,7 +7,7 @@ import { config } from "@/app/Web3Provider";
 import {
   prepareVoteBySignature,
   voteBySignature,
-} from "@/app/proposals/vote/castVote";
+} from "@/app/proposals/actions";
 
 const types = {
   Ballot: [
