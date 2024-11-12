@@ -3,7 +3,6 @@
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { formatUnits } from "viem";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
@@ -17,6 +16,7 @@ import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import styles from "@/components/Proposals/ProposalPage/ProposalDescription/proposalDescription.module.scss";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import ProposalRequirements from "./ProposalRequirements";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -35,7 +35,6 @@ const DraftPreview = ({
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
-  const votingModuleType = proposalDraft.voting_module_type;
 
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
@@ -115,59 +114,6 @@ const DraftPreview = ({
       default:
         return null;
     }
-  };
-
-  const renderProposalRequirements = () => {
-    if (votingModuleType === ProposalType.SOCIAL) {
-      return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Token balance</p>
-          <span className="text-secondary font-mono text-xs">
-            {"> "}
-            {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
-            {" tokens"}
-          </span>
-        </div>
-      );
-    }
-
-    if (
-      gatingType === ProposalGatingType.MANAGER ||
-      gatingType === ProposalGatingType.GOVERNOR_V1
-    ) {
-      return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Manager address</p>
-          <span className="text-secondary font-mono text-xs">
-            {manager?.toString()}
-          </span>
-        </div>
-      );
-    }
-
-    if (
-      gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
-      gatingType === ProposalGatingType.GOVERNOR_V1
-    ) {
-      return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Token balance</p>
-          <span className="text-secondary font-mono text-xs">
-            {"> "}
-            {threshold
-              ? Math.round(
-                  parseFloat(
-                    formatUnits(BigInt(threshold), tenant.token.decimals)
-                  )
-                )
-              : "0"}{" "}
-            tokens
-          </span>
-        </div>
-      );
-    }
-
-    return null;
   };
 
   return (
@@ -269,7 +215,9 @@ const DraftPreview = ({
                 </span>
               </div>
             )}
-            <div className="mt-6">{renderProposalRequirements()}</div>
+            <div className="mt-6">
+              <ProposalRequirements proposalDraft={proposalDraft} />
+            </div>
             {actions}
           </div>
         </>
