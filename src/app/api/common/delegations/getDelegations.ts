@@ -11,8 +11,7 @@ import {
   PaginationParams,
 } from "@/app/lib/pagination";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { Prisma } from "@prisma/client";
-import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
+import { Decimal } from "@prisma/client/runtime";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -29,10 +28,11 @@ async function getCurrentDelegateesForAddress({
   const { namespace, contracts } = Tenant.current();
 
   const getDirectDelegatee = async () => {
-    const delegatee = await findDelagatee({
-      namespace,
-      address,
-      contract: contracts.token.address,
+    const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
+      where: {
+        delegator: address.toLowerCase(),
+        contract: contracts.token.address,
+      },
     });
 
     if (namespace === TENANT_NAMESPACES.OPTIMISM) {
@@ -44,25 +44,38 @@ async function getCurrentDelegateesForAddress({
     return delegatee;
   };
 
+  const getAdvancedDelegatee = async () => {
+    const delegatees = await prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        from: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator?.address,
+      },
+    });
+    return delegatees;
+  };
+
+  const getPartialDelegatee = async () => {
+    const delegatees = await prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        from: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.token.address,
+      },
+    });
+    return delegatees;
+  };
+
   let advancedDelegatees;
   let directDelegatee;
 
   // Should be if governor == Agora 1.0 w/ Partial Delegation On
   if (namespace === TENANT_NAMESPACES.SCROLL) {
-    advancedDelegatees = await findAdvancedDelegatee({
-      namespace,
-      address,
-      contract: contracts.token.address,
-      partial: true,
-    });
+    advancedDelegatees = await getPartialDelegatee();
     directDelegatee = null;
   } else {
     [advancedDelegatees, directDelegatee] = await Promise.all([
-      findAdvancedDelegatee({
-        namespace,
-        address,
-        contract: contracts.token.address,
-      }),
+      getAdvancedDelegatee(),
       getDirectDelegatee(),
     ]);
   }
@@ -229,7 +242,7 @@ async function getCurrentDelegatorsForAddress({
         {
           from: string;
           to: string;
-          allowance: Prisma.Decimal;
+          allowance: Decimal;
           type: "DIRECT" | "ADVANCED";
           block_number: bigint;
           amount: "FULL" | "PARTIAL";
@@ -305,10 +318,12 @@ async function getCurrentAdvancedDelegatorsForAddress({
   const { namespace, contracts } = Tenant.current();
 
   const [advancedDelegators, latestBlock] = await Promise.all([
-    findAdvancedDelegatee({
-      namespace,
-      address,
-      contract: contracts.alligator?.address,
+    prisma[`${namespace}AdvancedDelegatees`].findMany({
+      where: {
+        to: address.toLowerCase(),
+        delegated_amount: { gt: 0 },
+        contract: contracts.alligator?.address,
+      },
     }),
     contracts.token.provider.getBlock("latest"),
   ]);
@@ -344,10 +359,11 @@ const getDirectDelegateeForAddress = async ({
 }) => {
   const { namespace, contracts } = Tenant.current();
 
-  const delegatee = await findDelagatee({
-    namespace,
-    address,
-    contract: contracts.token.address.toLowerCase(),
+  const delegatee = await prisma[`${namespace}Delegatees`].findFirst({
+    where: {
+      delegator: address.toLowerCase(),
+      contract: contracts.token.address.toLowerCase(),
+    },
   });
 
   if (namespace === TENANT_NAMESPACES.OPTIMISM) {
