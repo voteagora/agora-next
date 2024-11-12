@@ -3,7 +3,6 @@
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { formatUnits } from "viem";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
@@ -15,6 +14,7 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import ProposalRequirements from "./ProposalRequirements";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -33,7 +33,6 @@ const DraftPreview = ({
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
-  const votingModuleType = proposalDraft.voting_module_type;
 
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
@@ -115,6 +114,7 @@ const DraftPreview = ({
     }
   };
 
+<<<<<<< HEAD
   const renderProposalRequirements = () => {
     const requirements = [];
 
@@ -176,6 +176,8 @@ const DraftPreview = ({
     return requirements.length > 0 ? requirements : null;
   };
 
+=======
+>>>>>>> eb19ca97 (Stashes updates)
   return (
     <FormCard>
       <FormCard.Section>
