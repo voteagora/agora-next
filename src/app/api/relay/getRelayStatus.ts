@@ -1,10 +1,9 @@
-import Tenant from "@/lib/tenant/tenant";
 import { getPublicClient } from "@/lib/viem";
 import { cache } from "react";
 import { formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-const SPONSOR_PRIVATE_KEY = process.env.NEXT_PUBLIC_SPONSOR_PRIVATE_KEY;
+const SPONSOR_PRIVATE_KEY = process.env.SPONSOR_PRIVATE_KEY;
 const GAS_COST = 0.001108297;
 
 async function getRelayStatus() {

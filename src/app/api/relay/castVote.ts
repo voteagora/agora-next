@@ -11,7 +11,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-const SPONSOR_PRIVATE_KEY = process.env.NEXT_PUBLIC_SPONSOR_PRIVATE_KEY;
+const SPONSOR_PRIVATE_KEY = process.env.SPONSOR_PRIVATE_KEY;
 
 export async function voteBySignatureApi({
   request,
