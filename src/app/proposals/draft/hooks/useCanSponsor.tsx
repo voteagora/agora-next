@@ -56,14 +56,7 @@ export const useCanSponsor = (address: `0x${string}` | undefined) => {
     isFetching,
     isSuccess,
   } = useQuery({
-    queryKey: [
-      "can-sponsor",
-      address,
-      gatingType,
-      manager,
-      accountVotesData,
-      threshold,
-    ],
+    queryKey: ["can-sponsor", address, gatingType],
     queryFn: () => {
       return canSponsor(
         gatingType,
@@ -78,6 +71,7 @@ export const useCanSponsor = (address: `0x${string}` | undefined) => {
       isManagerFetched &&
       isBlockNumberFetched &&
       isAccountVotesFetched,
+    staleTime: Infinity,
   });
 
   return { data: canAddressSponsor, isError, isFetching, isSuccess };

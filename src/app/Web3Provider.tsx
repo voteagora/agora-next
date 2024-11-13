@@ -55,7 +55,7 @@ export const config = createConfig(
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
           <body className={inter.variable}>
