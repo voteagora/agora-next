@@ -6,10 +6,6 @@ import {
   fetchVotesForProposal as apiFetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "../lib/pagination";
-import {
-  prepareVoteBySignatureApi,
-  voteBySignatureApi,
-} from "../api/relay/castVote";
 
 export const fetchProposalVotes = (
   proposalId: string,
@@ -34,21 +30,3 @@ export const fetchAllForVoting = (
   blockNumber: number,
   proposalId: string
 ) => apiFetchAllForVoting(address, blockNumber, proposalId);
-
-export const voteBySignature = ({
-  request,
-}: {
-  request: ReturnType<typeof prepareVoteBySignature> extends Promise<infer T>
-    ? T
-    : never;
-}) => voteBySignatureApi({ request });
-
-export const prepareVoteBySignature = ({
-  signature,
-  proposalId,
-  support,
-}: {
-  signature: `0x${string}`;
-  proposalId: string;
-  support: number;
-}) => prepareVoteBySignatureApi({ signature, proposalId, support });

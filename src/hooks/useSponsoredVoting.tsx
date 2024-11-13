@@ -4,10 +4,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useSignTypedData } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
-import {
-  prepareVoteBySignature,
-  voteBySignature,
-} from "@/app/proposals/actions";
+import AgoraAPI from "@/app/lib/agoraAPI";
 
 const types = {
   Ballot: [
@@ -61,13 +58,13 @@ const useSponsoredVoting = ({
         setWaitingForSignature(false);
         setSponsoredVoteLoading(true);
 
-        const request = await prepareVoteBySignature({
+        const agoraAPI = new AgoraAPI();
+        const response = await agoraAPI.post("/relay/vote", "v1", {
           signature,
           proposalId,
           support,
         });
-
-        const voteTxHash = await voteBySignature({ request });
+        const voteTxHash = await response.json();
         const { status } = await waitForTransactionReceipt(config, {
           hash: voteTxHash,
           chainId: contracts.governor.chain.id,

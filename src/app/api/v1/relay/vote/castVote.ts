@@ -1,25 +1,26 @@
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { getPublicClient } from "@/lib/viem";
-import { cache } from "react";
-import {
-  createWalletClient,
-  parseSignature,
-  http,
-  createPublicClient,
-  isHex,
-} from "viem";
+import { createWalletClient, parseSignature, isHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 const SPONSOR_PRIVATE_KEY = process.env.SPONSOR_PRIVATE_KEY;
 
 export async function voteBySignatureApi({
-  request,
+  signature,
+  proposalId,
+  support,
 }: {
-  request: ReturnType<typeof prepareVoteBySignatureApi> extends Promise<infer T>
-    ? T
-    : never;
+  signature: `0x${string}`;
+  proposalId: string;
+  support: number;
 }): Promise<`0x${string}`> {
+  const request = await prepareVoteBySignatureApi({
+    signature,
+    proposalId,
+    support,
+  });
+
   const { governor } = Tenant.current().contracts;
   const transport = getTransportForChain(governor.chain.id)!;
 
@@ -31,7 +32,7 @@ export async function voteBySignatureApi({
   return walletClient.writeContract(request);
 }
 
-export async function prepareVoteBySignatureApi({
+async function prepareVoteBySignatureApi({
   signature,
   proposalId,
   support,
