@@ -9,6 +9,7 @@ import { DraftProposal } from "../../../proposals/draft/types";
 import SponsorActionPanel from "../components/SponsorActionPanel";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
+import { ProposalDraftApprovedSponsors } from "@prisma/client";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -19,6 +20,7 @@ const getDraftProposal = async (id: number) => {
       transactions: true,
       social_options: true,
       checklist_items: true,
+      approved_sponsors: true,
       approval_options: {
         include: {
           transactions: true,
@@ -27,7 +29,9 @@ const getDraftProposal = async (id: number) => {
     },
   });
 
-  return draftProposal as DraftProposal;
+  return draftProposal as DraftProposal & {
+    approved_sponsors: ProposalDraftApprovedSponsors[];
+  };
 };
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
@@ -39,51 +43,51 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <main className="max-w-screen-xl mx-auto mt-12">
-      {!draftProposal.is_public && (
-        <div className="w-full p-2 border mb-6 rounded-lg flex flex-row bg-yellow-100 text-yellow-700 border-yellow-400">
-          This is a private draft proposal.
-        </div>
+    <SponsorAuthCheck
+      sponsorAddresses={draftProposal.approved_sponsors.map(
+        (s) => s.sponsor_address as `0x${string}`
       )}
-      <div className="grid grid-cols-3 gap-12">
-        <div className="col-span-2">
-          <h1 className="font-black text-2xl text-primary mt-6">
-            {draftProposal.title}
-          </h1>
-          <div className="mt-6">
-            {draftProposal.voting_module_type === ProposalType.BASIC && (
-              <ProposalTransactionDisplay
-                descriptions={(draftProposal as BasicProposal).transactions.map(
-                  (t) => t.description
-                )}
-                targets={(draftProposal as BasicProposal).transactions.map(
-                  (t) => t.target
-                )}
-                calldatas={
-                  (draftProposal as BasicProposal).transactions.map(
-                    (t) => t.calldata
-                  ) as `0x${string}`[]
-                }
-                values={(draftProposal as BasicProposal).transactions.map(
-                  (t) => t.value
-                )}
-                simulationDetails={{
-                  id: (draftProposal as BasicProposal).transactions[0]
-                    ?.simulation_id,
-                  state: (draftProposal as BasicProposal).transactions[0]
-                    ?.simulation_state,
-                }}
-              />
-            )}
+    >
+      <main className="max-w-screen-xl mx-auto mt-12">
+        <div className="grid grid-cols-3 gap-12">
+          <div className="col-span-2">
+            <h1 className="font-black text-2xl text-primary mt-6">
+              {draftProposal.title}
+            </h1>
+            <div className="mt-6">
+              {draftProposal.voting_module_type === ProposalType.BASIC && (
+                <ProposalTransactionDisplay
+                  descriptions={(
+                    draftProposal as BasicProposal
+                  ).transactions.map((t) => t.description)}
+                  targets={(draftProposal as BasicProposal).transactions.map(
+                    (t) => t.target
+                  )}
+                  calldatas={
+                    (draftProposal as BasicProposal).transactions.map(
+                      (t) => t.calldata
+                    ) as `0x${string}`[]
+                  }
+                  values={(draftProposal as BasicProposal).transactions.map(
+                    (t) => t.value
+                  )}
+                  simulationDetails={{
+                    id: (draftProposal as BasicProposal).transactions[0]
+                      ?.simulation_id,
+                    state: (draftProposal as BasicProposal).transactions[0]
+                      ?.simulation_state,
+                  }}
+                />
+              )}
+            </div>
+            <p className="prose mt-6">{draftProposal.abstract}</p>
           </div>
-          <p className="prose mt-6">{draftProposal.abstract}</p>
-          {/* <SponsorForm draftProposal={draftProposal} /> */}
+          <div className="self-start">
+            <SponsorActionPanel draftProposal={draftProposal} />
+          </div>
         </div>
-        <div className="self-start">
-          <SponsorActionPanel draftProposal={draftProposal} />
-        </div>
-      </div>
-    </main>
+      </main>
+    </SponsorAuthCheck>
   );
 
   //   return (

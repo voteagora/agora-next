@@ -2,10 +2,9 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
-import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import {
   DraftProposal,
   PLMConfig,
@@ -15,6 +14,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import ProposalRequirements from "./ProposalRequirements";
+import { useCanSponsor } from "../hooks/useCanSponsor";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -35,41 +35,8 @@ const DraftPreview = ({
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
   const { address } = useAccount();
-  const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-  const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotes } = useReadContract({
-    chainId: tenant.contracts.governor.chain.id,
-    abi: tenant.contracts.governor.abi,
-    address: tenant.contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    args: [
-      address as `0x${string}`,
-      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
-    ],
-  }) as { data: bigint };
-
-  const canSponsor = () => {
-    switch (gatingType) {
-      case ProposalGatingType.MANAGER:
-        return manager === address;
-      case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotes !== undefined && threshold !== undefined
-          ? accountVotes >= threshold
-          : false;
-      case ProposalGatingType.GOVERNOR_V1:
-        return (
-          manager === address ||
-          (accountVotes !== undefined && threshold !== undefined
-            ? accountVotes >= threshold
-            : false)
-        );
-      default:
-        return false;
-    }
-  };
-
-  const canAddressSponsor = canSponsor();
+  const { data: canAddressSponsor } = useCanSponsor(address as `0x${string}`);
 
   const renderProposalDescription = (proposal: DraftProposal) => {
     switch (proposal.voting_module_type) {

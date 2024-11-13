@@ -43,6 +43,8 @@ const SponsorInput = ({
     isSuccess,
   } = useCanSponsor(address);
 
+  console.log("isFetching", isFetching);
+
   return (
     <>
       <AddressInput
@@ -104,10 +106,10 @@ const RequestSponsorshipForm = ({
   const visibility = watch("visibility");
   const sponsors = watch("sponsors");
 
-  const { data: canUserSponsor } = useCanSponsor(address);
+  const { data: canUserSponsor } = useCanSponsor(address as `0x${string}`);
 
   return (
-    <>
+    <div className="mt-4">
       <SwitchInput
         control={control}
         label="Draft proposal visibility"
@@ -206,7 +208,7 @@ const RequestSponsorshipForm = ({
           </p>
         </>
       )}
-    </>
+    </div>
   );
 };
 
