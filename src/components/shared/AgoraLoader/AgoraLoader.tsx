@@ -4,7 +4,7 @@ import Tenant from "@/lib/tenant/tenant";
 
 export default function AgoraLoader() {
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen animate-pulse">
+    <div className="flex flex-col justify-center items-center min-h-screen sm:min-h-[calc(100vh-240px)] animate-pulse">
       <Image alt="loading" width={24} height={24} src={logo} />
     </div>
   );
