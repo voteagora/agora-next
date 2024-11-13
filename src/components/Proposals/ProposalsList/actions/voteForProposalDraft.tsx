@@ -11,7 +11,7 @@ async function voteForProposalDraft({
   proposalId: string;
   direction: 1 | -1;
 }) {
-  await prisma.proposalDraftVote.upsert({
+  return await prisma.proposalDraftVote.upsert({
     where: {
       voter_proposal_id: {
         voter: address,
@@ -29,17 +29,6 @@ async function voteForProposalDraft({
       direction,
     },
   });
-
-  const updatedProposal = await prisma.proposalDraft.findUnique({
-    where: {
-      id: parseInt(proposalId),
-    },
-    include: {
-      votes: true,
-    },
-  });
-
-  return "GABAGOOL";
 }
 
 export default voteForProposalDraft;

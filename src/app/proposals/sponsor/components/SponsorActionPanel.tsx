@@ -1,20 +1,30 @@
 "use client";
 
+import { getIndexForStage } from "@/app/proposals/draft/utils/stages";
 import { UpdatedButton } from "@/components/Button";
-import { useAccount } from "wagmi";
-import { DraftProposal, ProposalType } from "../../draft/types";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import {
   ArrowUturnRightIcon,
   PencilSquareIcon,
 } from "@heroicons/react/20/solid";
-import { getIndexForStage } from "@/app/proposals/draft/utils/stages";
 import { ProposalDraftApprovedSponsors, ProposalStage } from "@prisma/client";
-import ProposalRequirements from "../../draft/components/ProposalRequirements";
+import { useRouter } from "next/navigation";
+import { useOptimistic, useTransition } from "react";
+import toast from "react-hot-toast";
 import { isAddress } from "viem";
+import { useAccount } from "wagmi";
 import AvatarAddress from "../../draft/components/AvatarAdress";
+import ProposalRequirements from "../../draft/components/ProposalRequirements";
 import { useCanSponsor } from "../../draft/hooks/useCanSponsor";
+import { DraftProposal, ProposalType } from "../../draft/types";
+import { rejectSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
+import { motion, AnimatePresence } from "framer-motion";
+
+const proposalTypeDescriptionMap = {
+  [ProposalType.SOCIAL]:
+    "Social proposals are offchain proposals that are submitted to snapshot and used to gauge support for a proposal.",
+  [ProposalType.BASIC]:
+    "Basic proposals are onchain proposals with for/against/abstain vote types.",
+} as Record<ProposalType, string>;
 
 const SponsorActionPanel = ({
   draftProposal,
@@ -25,14 +35,21 @@ const SponsorActionPanel = ({
 }) => {
   const { address } = useAccount();
   const router = useRouter();
-  const { data: canSponsor } = useCanSponsor(address);
-
-  const proposalTypeDescriptionMap = {
-    [ProposalType.SOCIAL]:
-      "Social proposals are offchain proposals that are submitted to snapshot and used to gauge support for a proposal.",
-    [ProposalType.BASIC]:
-      "Basic proposals are onchain proposals with for/against/abstain vote types.",
-  } as Record<ProposalType, string>;
+  const { data: canSponsor, status } = useCanSponsor(address);
+  const [_, startTransition] = useTransition();
+  const [optimisticDraftProposal, setOptimisticDraftProposal] = useOptimistic<
+    DraftProposal & { approved_sponsors: ProposalDraftApprovedSponsors[] },
+    ProposalDraftApprovedSponsors
+  >(draftProposal, (state, updatedSponsor) => {
+    return {
+      ...state,
+      approved_sponsors: state.approved_sponsors.map((sponsor) =>
+        sponsor.sponsor_address === updatedSponsor.sponsor_address
+          ? updatedSponsor
+          : sponsor
+      ),
+    };
+  });
 
   const renderDetails = () => {
     switch (draftProposal.voting_module_type) {
@@ -80,19 +97,48 @@ const SponsorActionPanel = ({
           </p>
         </section>
         {renderDetails()}
-        {draftProposal.approved_sponsors.length > 0 && (
+        {optimisticDraftProposal.approved_sponsors.length > 0 && (
           <section className="border-b border-line pt-4 pb-4">
             <h3 className="font-bold text-primary capitalize">Sponsors</h3>
             <p className="text-secondary mt-2">
               This is a private draft viewable by the following users:
             </p>
             <div className="flex flex-col gap-2 mt-3">
-              {draftProposal.approved_sponsors.map((sponsor) => (
-                <div className="flex flex-row justify-between items-center">
-                  {isAddress(sponsor.sponsor_address) && (
-                    <AvatarAddress address={sponsor.sponsor_address} />
-                  )}
-                </div>
+              {optimisticDraftProposal.approved_sponsors.map((sponsor) => (
+                <>
+                  <div className="flex flex-row items-center space-x-2 relative">
+                    {isAddress(sponsor.sponsor_address) && (
+                      <AvatarAddress address={sponsor.sponsor_address} />
+                    )}
+                    <AnimatePresence initial={false}>
+                      {sponsor.status === "REJECTED" && (
+                        <motion.div
+                          key={`${sponsor.sponsor_address}-rejected`}
+                          className="absolute left-[-10px] w-[calc(100%+5px)] flex flex-row items-center"
+                          initial={false}
+                        >
+                          <motion.div
+                            className="h-1 bg-negative rounded-full mr-1 flex-1"
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            exit={{ scaleX: 0 }}
+                            transition={{ duration: 0.3 }}
+                            style={{ transformOrigin: "left" }}
+                          />
+                          <motion.span
+                            className="text-negative/80 text-xs italic"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ delay: 0.3, duration: 0.3 }}
+                          >
+                            Declined
+                          </motion.span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </>
               ))}
             </div>
           </section>
@@ -138,15 +184,43 @@ const SponsorActionPanel = ({
         <div className="mt-4 bg-neutral rounded-xl">
           <ProposalRequirements proposalDraft={draftProposal} />
         </div>
-        {canSponsor && (
+        {status === "pending" ? (
+          <span className="w-full bg-tertiary/5 animate-pulse italic block mt-4 rounded-lg p-2 text-tertiary text-sm text-center">
+            Loading actions...
+          </span>
+        ) : canSponsor ? (
           <div className="flex flex-col gap-2 mt-6">
             <UpdatedButton type="primary" className="w-full">
               Sponsor proposal
             </UpdatedButton>
-            <UpdatedButton type="secondary" className="w-full">
+            <UpdatedButton
+              type="secondary"
+              className="w-full"
+              onClick={() => {
+                startTransition(async () => {
+                  const sponsor = draftProposal.approved_sponsors.find(
+                    (sponsor) => sponsor.sponsor_address === address
+                  ) as ProposalDraftApprovedSponsors;
+
+                  setOptimisticDraftProposal({
+                    ...sponsor,
+                    status: "REJECTED",
+                  });
+
+                  await rejectSponsorshipRequest({
+                    address: address as `0x${string}`,
+                    proposalId: draftProposal.id.toString(),
+                  });
+                });
+              }}
+            >
               Decline sponsorship
             </UpdatedButton>
           </div>
+        ) : (
+          <p className="text-secondary text-xs mt-2">
+            You are not eligible to sponsor this proposal.
+          </p>
         )}
       </div>
     </div>
