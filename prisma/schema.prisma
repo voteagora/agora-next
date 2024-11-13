@@ -1218,13 +1218,15 @@ model ProposalDraft {
 }
 
 model ProposalDraftApprovedSponsors {
-  id          Int           @id @default(autoincrement())
-  proposal_id Int
-  sponsor_address String
-  created_at  DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
-  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id               Int          @id @default(autoincrement())
+  proposal_id      Int
+  sponsor_address  String
+  status           String       @default("PENDING")
+  created_at       DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal        ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  @@unique([sponsor_address, proposal_id])
   @@map("proposal_approved_sponsors")
   @@schema("alltenant")
 }
