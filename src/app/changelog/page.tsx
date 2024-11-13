@@ -10,6 +10,8 @@ export async function generateMetadata() {
   };
 }
 
+export const revalidate = 300;
+
 export default async function Page() {
   const { slug } = Tenant.current();
   const initChangelog = await fetchChangelogForDAO({
