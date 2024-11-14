@@ -47,7 +47,7 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
       <main className="max-w-screen-xl mx-auto mt-12">
         <div className="grid grid-cols-3 gap-12">
           <div className="col-span-2">
-            <h1 className="font-black text-2xl text-primary mt-6">
+            <h1 className="font-black text-2xl text-primary">
               {draftProposal.title}
             </h1>
             <div className="mt-6">
