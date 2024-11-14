@@ -193,10 +193,12 @@ const SponsorActionPanel = ({
             <UpdatedButton type="primary" className="w-full">
               Sponsor proposal
             </UpdatedButton>
+
             <UpdatedButton
               type="secondary"
               className="w-full"
-              onClick={() => {
+              onClick={(event: any) => {
+                event.preventDefault();
                 startTransition(async () => {
                   const sponsor = draftProposal.approved_sponsors.find(
                     (sponsor) => sponsor.sponsor_address === address
