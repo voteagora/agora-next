@@ -3,12 +3,14 @@ import ChangelogList from "@/components/Changelog/ChangelogList";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata() {
+  const { brandName } = Tenant.current();
   return {
-    title: "Optimism Gov Client Changelog - Agora",
-    description:
-      "Stay up to date with the latest changes with Agora's development for the Optimism community.",
+    title: `${brandName} Gov Client Changelog - Agora`,
+    description: `Stay up to date with the latest changes with Agora's development for the ${brandName} community.`,
   };
 }
+
+export const revalidate = 300;
 
 export default async function Page() {
   const { slug } = Tenant.current();
