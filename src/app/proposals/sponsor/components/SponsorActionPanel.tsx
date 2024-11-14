@@ -118,7 +118,7 @@ const SponsorActionPanel = ({
                           initial={false}
                         >
                           <motion.div
-                            className="h-1 bg-negative rounded-full mr-1 flex-1"
+                            className="h-[3px] bg-negative/50 rounded-full mr-1 flex-1"
                             initial={{ scaleX: 0 }}
                             animate={{ scaleX: 1 }}
                             exit={{ scaleX: 0 }}
@@ -126,7 +126,7 @@ const SponsorActionPanel = ({
                             style={{ transformOrigin: "left" }}
                           />
                           <motion.span
-                            className="text-negative/80 text-xs italic"
+                            className="text-negative text-xs italic"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

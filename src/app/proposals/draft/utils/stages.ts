@@ -91,7 +91,8 @@ export const getIndexForStage = (stage: ProposalStage) => {
     );
   }
 
-  return plmToggle.config.stages.find((s) => s.stage === stage)?.order;
+  return (plmToggle.config as PLMConfig).stages.find((s) => s.stage === stage)
+    ?.order;
 };
 
 export const isPostSubmission = (stage: ProposalStage) => {
