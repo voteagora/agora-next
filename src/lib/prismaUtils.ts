@@ -1,12 +1,13 @@
 import prisma from "@/app/lib/prisma";
 import { TENANT_NAMESPACES } from "./constants";
+import { TenantNamespace } from "./types";
 
 export function findDelagatee({
   namespace,
   address,
   contract,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   address: string;
   contract?: string;
 }) {
@@ -45,7 +46,7 @@ export function findAdvancedDelegatee({
   contract,
   partial,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   address: string;
   contract?: string;
   partial?: boolean;
@@ -96,7 +97,11 @@ export function findAdvancedDelegatee({
   }
 }
 
-export function findVotableSupply({ namespace }: { namespace: string }) {
+export function findVotableSupply({
+  namespace,
+}: {
+  namespace: TenantNamespace;
+}) {
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
       return prisma.optimismVotableSupply.findFirst({});
@@ -126,7 +131,7 @@ export function findProposalsQuery({
   filter,
   contract,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   skip: number;
   take: number;
   filter: string;
@@ -171,7 +176,7 @@ export function findProposal({
   proposalId,
   contract,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   proposalId: string;
   contract: string;
 }) {
@@ -205,7 +210,7 @@ export function findProposalType({
   namespace,
   contract,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   contract: string;
 }) {
   const condition = {
@@ -244,7 +249,7 @@ export function findVotes({
   proposalId,
   voter,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   proposalId: string;
   voter: string;
 }) {
@@ -279,7 +284,7 @@ export function findVotingPower({
   address,
   contract,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   address: string;
   contract: string;
 }) {
@@ -317,7 +322,7 @@ export function findAdvancedVotingPower({
   address,
   contract,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   address: string;
   contract: string;
 }) {
@@ -354,7 +359,7 @@ export async function findStakedDeposit({
   namespace,
   depositId,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   depositId: number;
 }) {
   const condition = {
@@ -389,7 +394,7 @@ export function findStakedDeposits({
   namespace,
   address,
 }: {
-  namespace: string;
+  namespace: TenantNamespace;
   address: string;
 }) {
   const condition = {
