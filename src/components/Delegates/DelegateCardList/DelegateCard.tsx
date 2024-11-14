@@ -23,7 +23,6 @@ const DelegateCard = ({
 }) => {
   const { token } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
-
   const { data: votingStats, isPending: isVotingStatsPending } = useVotingStats(
     {
       address: delegate.address as `0x${string}`,
