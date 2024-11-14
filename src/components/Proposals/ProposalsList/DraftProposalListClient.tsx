@@ -133,8 +133,6 @@ const DraftProposalListClient = () => {
     refetch,
   } = useDraftProposals({ address, filter, sort });
 
-  console.log(draftProposals);
-
   return (
     <>
       {isLoading ? (
