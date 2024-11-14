@@ -1,5 +1,10 @@
 "use server";
 
+import {
+  ProposalDraftTransaction,
+  ProposalDraftApprovedSponsors,
+  ProposalDraftVote,
+} from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import { draftProposalsSortOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
@@ -60,13 +65,13 @@ const action = async (
     ORDER BY ${sortFilter}
 `;
 
-  return prisma.$queryRawUnsafe<ProposalDraft[]>(
-    query,
-    String(stage),
-    chainId,
-    contract,
-    address
-  );
+  return prisma.$queryRawUnsafe<
+    (ProposalDraft & {
+      transactions: ProposalDraftTransaction[];
+      approved_sponsors: ProposalDraftApprovedSponsors[];
+      votes: ProposalDraftVote[];
+    })[]
+  >(query, String(stage), chainId, contract, address);
 };
 
 export default action;
