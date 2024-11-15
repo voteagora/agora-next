@@ -6,6 +6,7 @@ import SponsorActionPanel from "../components/SponsorActionPanel";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
 import { ProposalDraftApprovedSponsors } from "@prisma/client";
+import MobileSponsorActionPanel from "./MobileSponsorActionPanel";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -40,8 +41,8 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <main className="max-w-screen-xl mx-auto mt-12">
-      <div className="grid grid-cols-3 gap-12">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
+        <div className="col-span-1 sm:col-span-2">
           <h1 className="font-black text-2xl text-primary">
             {draftProposal.title}
           </h1>
@@ -73,9 +74,10 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
           </div>
           <p className="prose mt-6">{draftProposal.abstract}</p>
         </div>
-        <div className="self-start">
+        <div className="self-start hidden sm:block">
           <SponsorActionPanel draftProposal={draftProposal} />
         </div>
+        <MobileSponsorActionPanel draftProposal={draftProposal} />
       </div>
     </main>
   );

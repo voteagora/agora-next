@@ -45,7 +45,7 @@ export default function DAOMetricsHeader({ metrics }) {
     return (
       <>
         {createPortal(
-          <div className="sm:min-w-desktop sticky z-50 bottom-0 sm:bottom-0 left-0 flex justify-center">
+          <div className="sm:min-w-desktop fixed z-50 bottom-0 left-0 flex justify-center w-full shadow-newDefault">
             <div
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
