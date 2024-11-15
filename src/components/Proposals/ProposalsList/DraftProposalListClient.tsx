@@ -11,9 +11,9 @@ import {
   draftProposalsSortOptions,
 } from "@/lib/constants";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import DraftProposalCard from "./DraftProposalCard";
+import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 
 const DraftProposalListClient = () => {
   const queryClient = useQueryClient();
@@ -97,8 +97,13 @@ const DraftProposalListClient = () => {
 
   return (
     <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-      {draftProposals.length === 0 ? (
-        <div className="flex flex-row justify-center py-8 text-secondary">
+      {infiniteIsLoading ? (
+        <div className="flex flex-col justify-center py-8 text-center space-y-2">
+          <AgoraLoaderSmall />
+          <span className="text-tertiary">Loading draft proposals</span>
+        </div>
+      ) : draftProposals.length === 0 ? (
+        <div className="flex flex-row justify-center py-8 text-tertiary">
           No draft proposals found
         </div>
       ) : (
