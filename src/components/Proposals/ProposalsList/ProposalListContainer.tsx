@@ -7,7 +7,6 @@ import { DaoSlug } from "@prisma/client";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import DraftProposalsFilter from "@/components/Proposals/ProposalsFilter/DraftProposalsFilter";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
-import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAddSearchParam } from "@/hooks/useAddSearchParam";
 import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
@@ -56,13 +55,13 @@ const ProposalListContainer = ({
 
   return (
     <div className="flex flex-col max-w-[76rem]">
-      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
-        <div className="flex flex-row justify-between gap-4 w-full items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-2 sm:mb-auto">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full items-center mt-6 sm:mt-0">
           <div className="flex flex-row space-x-4">
             <button
               type="button"
               className={cn(
-                "text-2xl font-extrabold mb-0",
+                "sm:text-2xl font-extrabold mb-0",
                 activeTab === ProposalListTab.ALL
                   ? "text-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
@@ -74,7 +73,7 @@ const ProposalListContainer = ({
             <button
               type="button"
               className={cn(
-                "text-2xl font-extrabold mb-0",
+                "sm:text-2xl font-extrabold mb-0",
                 activeTab === ProposalListTab.DRAFT
                   ? "text-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
@@ -86,7 +85,7 @@ const ProposalListContainer = ({
             <button
               type="button"
               className={cn(
-                "text-2xl font-extrabold mb-0",
+                "sm:text-2xl font-extrabold mb-0",
                 activeTab === ProposalListTab.MY_DRAFTS
                   ? "text-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
@@ -96,7 +95,7 @@ const ProposalListContainer = ({
               My drafts
             </button>
           </div>
-          <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 items-center flex-1 w-full sm:w-fit">
             {activeTab === ProposalListTab.ALL && <ProposalsFilter />}
             {activeTab === ProposalListTab.DRAFT && (
               <>
@@ -105,23 +104,19 @@ const ProposalListContainer = ({
               </>
             )}
             {tenantSupportsProposalLifecycle && address && (
-              <CreateProposalDraftButton address={address} />
+              <CreateProposalDraftButton
+                address={address}
+                className="w-full sm:w-fit"
+              />
             )}
           </div>
         </div>
       </div>
-      <motion.section
-        className="mt-4"
-        key={activeTab}
-        // initial={{ opacity: 0, y: -10 }}
-        // animate={{ opacity: 1, y: 0 }}
-        // exit={{ opacity: 0, y: 10 }}
-        // transition={{ duration: 0.3, bounce: 0.2 }}
-      >
+      <section className="mt-4" key={activeTab}>
         {activeTab === ProposalListTab.ALL && allProposalsListElement}
         {activeTab === ProposalListTab.DRAFT && draftProposalsListElement}
         {activeTab === ProposalListTab.MY_DRAFTS && myDraftProposalsListElement}
-      </motion.section>
+      </section>
     </div>
   );
 };
