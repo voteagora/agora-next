@@ -39,51 +39,45 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <SponsorAuthCheck
-      sponsorAddresses={draftProposal.approved_sponsors.map(
-        (s) => s.sponsor_address as `0x${string}`
-      )}
-    >
-      <main className="max-w-screen-xl mx-auto mt-12">
-        <div className="grid grid-cols-3 gap-12">
-          <div className="col-span-2">
-            <h1 className="font-black text-2xl text-primary">
-              {draftProposal.title}
-            </h1>
-            <div className="mt-6">
-              {draftProposal.voting_module_type === ProposalType.BASIC && (
-                <ProposalTransactionDisplay
-                  descriptions={(
-                    draftProposal as BasicProposal
-                  ).transactions.map((t) => t.description)}
-                  targets={(draftProposal as BasicProposal).transactions.map(
-                    (t) => t.target
-                  )}
-                  calldatas={
-                    (draftProposal as BasicProposal).transactions.map(
-                      (t) => t.calldata
-                    ) as `0x${string}`[]
-                  }
-                  values={(draftProposal as BasicProposal).transactions.map(
-                    (t) => t.value
-                  )}
-                  simulationDetails={{
-                    id: (draftProposal as BasicProposal).transactions[0]
-                      ?.simulation_id,
-                    state: (draftProposal as BasicProposal).transactions[0]
-                      ?.simulation_state,
-                  }}
-                />
-              )}
-            </div>
-            <p className="prose mt-6">{draftProposal.abstract}</p>
+    <main className="max-w-screen-xl mx-auto mt-12">
+      <div className="grid grid-cols-3 gap-12">
+        <div className="col-span-2">
+          <h1 className="font-black text-2xl text-primary">
+            {draftProposal.title}
+          </h1>
+          <div className="mt-6">
+            {draftProposal.voting_module_type === ProposalType.BASIC && (
+              <ProposalTransactionDisplay
+                descriptions={(draftProposal as BasicProposal).transactions.map(
+                  (t) => t.description
+                )}
+                targets={(draftProposal as BasicProposal).transactions.map(
+                  (t) => t.target
+                )}
+                calldatas={
+                  (draftProposal as BasicProposal).transactions.map(
+                    (t) => t.calldata
+                  ) as `0x${string}`[]
+                }
+                values={(draftProposal as BasicProposal).transactions.map(
+                  (t) => t.value
+                )}
+                simulationDetails={{
+                  id: (draftProposal as BasicProposal).transactions[0]
+                    ?.simulation_id,
+                  state: (draftProposal as BasicProposal).transactions[0]
+                    ?.simulation_state,
+                }}
+              />
+            )}
           </div>
-          <div className="self-start">
-            <SponsorActionPanel draftProposal={draftProposal} />
-          </div>
+          <p className="prose mt-6">{draftProposal.abstract}</p>
         </div>
-      </main>
-    </SponsorAuthCheck>
+        <div className="self-start">
+          <SponsorActionPanel draftProposal={draftProposal} />
+        </div>
+      </div>
+    </main>
   );
 };
 
