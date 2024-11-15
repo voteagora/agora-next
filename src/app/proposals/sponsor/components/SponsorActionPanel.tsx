@@ -16,7 +16,7 @@ import AvatarAddress from "../../draft/components/AvatarAdress";
 import ProposalRequirements from "../../draft/components/ProposalRequirements";
 import { useCanSponsor } from "../../draft/hooks/useCanSponsor";
 import { DraftProposal, ProposalType } from "../../draft/types";
-import { rejectSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
+import { ackSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
 import { motion, AnimatePresence } from "framer-motion";
 
 const proposalTypeDescriptionMap = {
@@ -121,16 +121,17 @@ const SponsorActionPanel = ({
                             className="h-[3px] bg-negative/50 rounded-full mr-1 flex-1"
                             initial={{ scaleX: 0 }}
                             animate={{ scaleX: 1 }}
-                            exit={{ scaleX: 0 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{
+                              duration: 0.2,
+                              ease: [0.32, 0, 0.67, 0],
+                            }}
                             style={{ transformOrigin: "left" }}
                           />
                           <motion.span
                             className="text-negative text-xs italic"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ delay: 0.3, duration: 0.3 }}
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
                           >
                             Declined
                           </motion.span>
@@ -204,19 +205,27 @@ const SponsorActionPanel = ({
                     (sponsor) => sponsor.sponsor_address === address
                   ) as ProposalDraftApprovedSponsors;
 
+                  const newStatus =
+                    sponsor.status === "REJECTED" ? "PENDING" : "REJECTED";
+
                   setOptimisticDraftProposal({
                     ...sponsor,
-                    status: "REJECTED",
+                    status: newStatus,
                   });
 
-                  await rejectSponsorshipRequest({
+                  await ackSponsorshipRequest({
                     address: address as `0x${string}`,
                     proposalId: draftProposal.id.toString(),
+                    status: newStatus,
                   });
                 });
               }}
             >
-              Decline sponsorship
+              {optimisticDraftProposal.approved_sponsors.find(
+                (sponsor) => sponsor.sponsor_address === address
+              )?.status === "REJECTED"
+                ? "Un-decline sponsorship"
+                : "Decline sponsorship"}
             </UpdatedButton>
           </div>
         ) : (
