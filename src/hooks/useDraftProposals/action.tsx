@@ -32,13 +32,26 @@ const action = async (
 
   const { contracts } = Tenant.current();
 
-  const onlyOwnerQuery = `
+  // All drafts shows:
+  // 1. Public drafts
+  // 2. Drafts that the user has been approved as a sponsor for
+  // 3. Drafts that the user is the author of
+  // ---
+  // My drafts shows:
+  // 1. Drafts that the user is the author of
+  const anyAuthorQuery = `
     AND (p.is_public = true
     OR EXISTS (
-    SELECT 1 FROM "ApprovedSponsor"
-    WHERE proposal_id = p.id
-    AND sponsor_address = $4
-    ))
+      SELECT 1 FROM alltenant.proposal_approved_sponsors
+      WHERE proposal_id = p.id
+      AND sponsor_address = $4
+    )
+    OR p.author_address = $4
+    )
+  `;
+
+  const onlyOwnerQuery = `
+    AND p.author_address = $4
   `;
 
   const stage = PrismaProposalStage.AWAITING_SPONSORSHIP;
@@ -111,14 +124,14 @@ SELECT
     COALESCE(v.votes, '[]') as votes,
     COALESCE(s.approved_sponsors, '[]') as approved_sponsors,
     COALESCE(t.transactions, '[]') as transactions
-FROM alltenant.proposals p
-LEFT JOIN vote_weights v ON p.id = v.proposal_id
-LEFT JOIN sponsors s ON p.id = s.proposal_id
-LEFT JOIN transactions t ON p.id = t.proposal_id
-WHERE p.stage = $1::alltenant.proposal_stage
+    FROM alltenant.proposals p
+    LEFT JOIN vote_weights v ON p.id = v.proposal_id
+    LEFT JOIN sponsors s ON p.id = s.proposal_id
+    LEFT JOIN transactions t ON p.id = t.proposal_id
+    WHERE p.stage = $1::alltenant.proposal_stage
       AND p.chain_id = $2
       AND p.contract = $3
-      ${ownerOnly ? onlyOwnerQuery : ""}
+      ${ownerOnly ? onlyOwnerQuery : anyAuthorQuery}
     ORDER BY ${sortFilter}
     OFFSET $5
     LIMIT $6
