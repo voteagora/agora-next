@@ -60,7 +60,7 @@ export default function DAOMetricsHeader({ metrics }) {
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger>
                       <span className="cursor-default">
-                        {formattedMetrics.totalSupply} {token.symbol} total
+                        {formattedMetrics.totalSupply} Network NFT total
                         <span className="hidden sm:inline">&nbsp;supply</span>
                       </span>
                     </HoverCardTrigger>
@@ -69,15 +69,14 @@ export default function DAOMetricsHeader({ metrics }) {
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>Total amount of {token.symbol} in existence</span>
+                      <span>Total amount of Network NFT in existence</span>
                     </HoverCardContent>
                   </HoverCard>
                   {contracts.token.isERC20() && (
                     <HoverCard openDelay={100} closeDelay={100}>
                       <HoverCardTrigger>
                         <span className="cursor-default">
-                          {formattedMetrics.votableSupply} {token.symbol}{" "}
-                          votable
+                          {formattedMetrics.votableSupply} Network NFT votable
                           <span className="hidden sm:inline">&nbsp;supply</span>
                         </span>
                       </HoverCardTrigger>
@@ -86,9 +85,7 @@ export default function DAOMetricsHeader({ metrics }) {
                         side="bottom"
                         sideOffset={3}
                       >
-                        <span>
-                          {token.symbol} currently delegated to a voter
-                        </span>
+                        <span>Network NFT currently delegated to a voter</span>
                       </HoverCardContent>
                     </HoverCard>
                   )}

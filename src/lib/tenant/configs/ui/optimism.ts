@@ -1,6 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import optimismLogo from "@/assets/tenant/optimism_logo.svg";
-import optimismHero from "@/assets/tenant/optimism_hero.svg";
+import nsLogo from "@/assets/tenant/ns_logo.svg";
+import optimismHero from "@/assets/tenant/ns_hero.png";
 import successImage from "@/assets/tenant/optimism_success.svg";
 import pendingImage from "@/assets/tenant/optimism_pending.svg";
 import delegateImage from "@/assets/tenant/optimism_delegate.svg";
@@ -12,8 +12,8 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const optimismTenantUIConfig = new TenantUI({
-  title: "Optimism Agora",
-  logo: optimismLogo,
+  title: "Network State Agora",
+  logo: nsLogo,
 
   assets: {
     success: successImage,
@@ -32,23 +32,23 @@ export const optimismTenantUIConfig = new TenantUI({
   governanceIssues: [
     {
       icon: "banknotes",
-      title: "Treasury management",
+      title: "Cryptocurrency",
       key: "treasury",
     },
     {
       icon: "piggyBank",
-      title: "Grant funding",
+      title: "Biology",
       key: "funding",
     },
     {
       icon: "sparks",
-      title: "Public goods",
+      title: "Artificial intelligence",
       key: "publicGoods",
     },
   ],
 
   organization: {
-    title: "Optimism Foundation",
+    title: "Network State",
   },
 
   links: [
@@ -63,43 +63,27 @@ export const optimismTenantUIConfig = new TenantUI({
       url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
     },
     {
-      name: "changelog",
-      title: "Change log",
-      url: "/changelog",
-    },
-    {
-      name: "discord",
-      title: "Discord",
+      name: "Network School",
+      title: "Network School",
       url: "https://discord.gg/vBJkUYBuwX",
     },
     {
-      name: "bugs",
-      title: "Report bugs & feedback",
+      name: "Conference",
+      title: "Conference",
       url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
-    },
-    {
-      name: "governance-forum",
-      title: "Governance Forum",
-      url: "https://gov.optimism.io/",
     },
     {
       name: "code-of-conduct",
       title: "Delegate Code of Conduct",
       url: "https://gov.optimism.io/t/code-of-conduct/5751",
     },
-    {
-      name: "delegate-statement-template",
-      title: "View Template",
-      url: "https://gov.optimism.io/t/delegate-commitments/235",
-    },
   ],
 
   pages: [
     {
       route: "/",
-      title: "Agora is the home of Optimism voters",
-      description:
-        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+      title: "Agora is the home of Technodemocracy",
+      description: "From magic Internet money to magic internet votes.",
       hero: optimismHero,
       meta: {
         title: "Optimism Agora",
@@ -199,7 +183,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "retropgf",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "citizens",
