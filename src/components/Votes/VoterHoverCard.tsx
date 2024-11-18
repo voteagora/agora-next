@@ -51,7 +51,7 @@ export default function VoterHoverCard({
   }
 
   if (delegate.statement === null) {
-    return <p className="text-center italic">No statement</p>;
+    return <p className="text-center">No statement</p>;
   }
 
   const truncatedStatement =
