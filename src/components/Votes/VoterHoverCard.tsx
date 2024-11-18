@@ -33,8 +33,6 @@ export default function VoterHoverCard({
     fetchDelegate(address).then(setDelegate);
   }, [address]);
 
-  console.log("delegate", delegate);
-
   if (delegate === undefined) {
     return (
       <VStack gap={4} className="h-full w-[300px] p-2">
@@ -53,7 +51,7 @@ export default function VoterHoverCard({
   }
 
   if (delegate.statement === null) {
-    return null;
+    return <p className="text-center italic">No statement</p>;
   }
 
   const truncatedStatement =
