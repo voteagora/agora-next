@@ -5,8 +5,12 @@ import { DraftProposal } from "../../../proposals/draft/types";
 import SponsorActionPanel from "../components/SponsorActionPanel";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { ProposalDraftApprovedSponsors } from "@prisma/client";
+import {
+  ProposalDraftApprovedSponsors,
+  ProposalDraftComment,
+} from "@prisma/client";
 import MobileSponsorActionPanel from "./MobileSponsorActionPanel";
+import CommentPanel from "./CommentPanel";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -18,6 +22,7 @@ const getDraftProposal = async (id: number) => {
       social_options: true,
       checklist_items: true,
       approved_sponsors: true,
+      comments: true,
       approval_options: {
         include: {
           transactions: true,
@@ -28,6 +33,7 @@ const getDraftProposal = async (id: number) => {
 
   return draftProposal as DraftProposal & {
     approved_sponsors: ProposalDraftApprovedSponsors[];
+    comments: ProposalDraftComment[];
   };
 };
 
@@ -73,6 +79,10 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
             )}
           </div>
           <p className="prose mt-6">{draftProposal.abstract}</p>
+          <CommentPanel
+            comments={draftProposal.comments}
+            params={{ id: params.id }}
+          />
         </div>
         <div className="self-start hidden sm:block">
           <SponsorActionPanel draftProposal={draftProposal} />
