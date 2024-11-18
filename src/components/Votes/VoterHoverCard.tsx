@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "../Delegates/DelegateCard/DelegateProfileImage";
 import Link from "next/link";
@@ -29,26 +29,21 @@ export default function VoterHoverCard({
   const { isConnected } = useAgoraContext();
   const { address: connectedAddress } = useAccount();
 
-  const fetchDelegateAndSet = useCallback(async (addressOrENSName: string) => {
-    const delegate = await fetchDelegate(addressOrENSName);
-    setDelegate(delegate);
-  }, []);
-
   useEffect(() => {
-    fetchDelegateAndSet(address);
-  }, [fetchDelegateAndSet, address]);
+    fetchDelegate(address).then(setDelegate);
+  }, [address]);
 
-  let truncatedStatement = "";
-  if (delegate?.statement?.payload) {
-    const delegateStatement = (
-      delegate?.statement?.payload as { delegateStatement: string }
-    ).delegateStatement;
-    truncatedStatement = delegateStatement.slice(0, 120);
+  let truncatedStatement: string | undefined;
+  if (delegate !== undefined) {
+    truncatedStatement =
+      delegate?.statement?.payload?.delegateStatement?.slice(0, 120) || "";
   }
+
+  console.log("delegate", delegate);
 
   return (
     <>
-      {!delegate?.statement ? (
+      {truncatedStatement === undefined ? (
         <VStack gap={4} className="h-full w-[300px] p-2">
           <VStack gap={4} justifyContent="justify-center">
             <HStack gap={4} justifyContent="justify-start">
