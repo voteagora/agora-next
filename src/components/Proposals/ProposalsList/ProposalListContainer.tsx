@@ -80,7 +80,7 @@ const ProposalListContainer = ({
               )}
               onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
             >
-              Unsponsored
+              Submissions
             </button>
             <button
               type="button"

@@ -9,6 +9,7 @@ import { useAccount } from "wagmi";
 import { ProposalDraftComment } from "@prisma/client";
 import { ReplyIcon } from "lucide-react";
 import AvatarAddress from "../../draft/components/AvatarAdress";
+import { formatFullDate } from "@/lib/utils";
 
 type ProposalDraftCommentWithChildren = ProposalDraftComment & {
   children: ProposalDraftCommentWithChildren[];
@@ -54,7 +55,12 @@ const CommentItem = ({
   const [showReply, setShowReply] = useState(false);
   return (
     <div key={comment.id} className="flex flex-col gap-2">
-      <AvatarAddress address={comment.author as `0x${string}`} />
+      <div className="flex flex-row gap-2 items-center">
+        <AvatarAddress address={comment.author as `0x${string}`} />
+        <p className="text-tertiary text-xs">
+          {formatFullDate(comment.created_at)}
+        </p>
+      </div>
       <div className="border-l border-line pl-2 ml-2.5">
         <p className="text-primary">{comment.comment}</p>
         <span
@@ -158,7 +164,7 @@ const CommentPanel = ({
   return (
     <>
       <h3 className="font-black text-primary mt-6">Discussion</h3>
-      <div className="space-y-2 mt-4">
+      <div className="space-y-6 mt-4">
         {nestedComments.map((comment) => (
           <CommentItem
             comment={comment}

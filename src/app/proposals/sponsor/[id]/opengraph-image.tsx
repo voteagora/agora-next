@@ -49,7 +49,7 @@ export default async function OGImage({ params }: { params: { id: string } }) {
           <div tw="flex flex-col justify-between h-full w-full">
             <LogoPill />
             <div tw="flex flex-col">
-              <div tw="font-bold text-5xl w-full">Sponsor proposal request</div>
+              <div tw="font-bold text-5xl w-full">Proposal submission</div>
               <div tw="font-normal mt-[30px] text-4xl text-secondary">
                 {title}
               </div>
