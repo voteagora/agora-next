@@ -1,49 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
 
-const emailCSS = `
-/* Base styles */
-.email-container {
-  max-width: 600px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
-}
-
-/* Typography */
-.header {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333333;
-}
-
-.body-text {
-  font-size: 16px;
-  line-height: 1.5;
-  color: #666666;
-}
-
-/* Buttons */
-.button {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: #007bff;
-  color: #ffffff;
-  text-decoration: none;
-  border-radius: 4px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .email-container {
-    width: 100%;
-    padding: 0 20px;
-  }
-
-  .header {
-    font-size: 20px;
-  }
-}
-`;
-
 export async function GET() {
   const { ui } = Tenant.current();
 
