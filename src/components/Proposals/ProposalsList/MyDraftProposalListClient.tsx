@@ -10,6 +10,7 @@ import {
 } from "@/app/proposals/draft/utils/stages";
 import { animate, AnimatePresence, motion } from "framer-motion";
 import useMyDraftProposals from "@/hooks/useMyDraftProposals";
+import { formatFullDate } from "@/lib/utils";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   const isDrafting = !isPostSubmission(proposal.stage);
@@ -23,22 +24,28 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
       className="block cursor-pointer border-b border-line last:border-b-0 hover:bg-tertiary/5 transition-colors"
     >
       <div className="py-4 px-6 flex flex-row gap-4 items-center">
-        <div className="flex flex-col justify-between gap-1">
-          <div className="flex flex-row gap-1 text-xs text-secondary">
+        <div className="w-full sm:w-[60%] flex flex-col justify-between gap-1">
+          <div className="flex flex-row gap-1 text-xs text-tertiary">
             <div>
-              Draft Proposal{" "}
-              <span className="hidden sm:inline">
-                by <HumanAddress address={proposal.author_address} />
-              </span>
+              Created by <HumanAddress address={proposal.author_address} />
             </div>
           </div>
           <div className="flex flex-row gap-1">
-            {isDrafting && (
-              <span className="bg-blue-100 text-blue-500 self-start text-xs font-bold rounded-lg px-1.5 py-1 uppercase tracking-wider">
-                Draft
-              </span>
-            )}
             <span className="text-primary">{proposal.title || "Untitled"}</span>
+          </div>
+        </div>
+        <div className="flex flex-row gap-24">
+          <div className="w-[180px] flex flex-col justify-between gap-y-1">
+            <span className="text-xs text-tertiary">Last updated</span>
+            <span className="">{formatFullDate(proposal.updated_at)}</span>
+          </div>
+          <div className="flex flex-col justify-between gap-y-1">
+            <div className="flex flex-row gap-1 text-xs text-tertiary">
+              <div>Status</div>
+            </div>
+            <div className="bg-wash text-secondary border border-line text-xs font-medium px-1 py-0.5 rounded">
+              Draft
+            </div>
           </div>
         </div>
       </div>

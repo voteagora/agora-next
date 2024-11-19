@@ -4,6 +4,7 @@ import HumanAddress from "@/components/shared/HumanAddress";
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useAccount } from "wagmi";
 import voteForProposalDraft from "./actions/voteForProposalDraft";
+import { formatFullDate } from "@/lib/utils";
 
 const DraftProposalCard = ({
   proposal,
@@ -43,13 +44,13 @@ const DraftProposalCard = ({
       href={`/proposals/sponsor/${proposal.id}`}
       className="block cursor-pointer border-b border-line last:border-b-0 hover:bg-tertiary/5 transition-colors"
     >
-      <div className="py-4 px-6 flex flex-row gap-4 items-center">
-        <div className="flex flex-col gap-2 items-center">
+      <div className="py-2 px-2.5 flex flex-row gap-8 items-center">
+        <div className="flex flex-col items-center bg-neutral rounded-full p-1">
           <div
-            className={`w-5 h-5 bg-neutral border border-line rounded flex items-center justify-center hover:bg-tertiary/5 transition-colors ${
+            className={`w-6 h-6 bg-neutral rounded flex items-center justify-center ${
               voterInVotes && voterInVotes.direction === 1
-                ? "bg-tertiary/5"
-                : ""
+                ? "text-tertiary/70"
+                : "text-tertiary/50"
             }`}
             onClick={(e) => {
               e.preventDefault();
@@ -58,16 +59,16 @@ const DraftProposalCard = ({
               handleVote(1);
             }}
           >
-            <ChevronUpIcon className="w-4 h-4 text-secondary" />
+            <ChevronUpIcon className="w-6 h-6" />
           </div>
-          <div className="text-xs text-secondary font-bold">
+          <div className="text-secondary font-medium">
             {proposal.vote_weight}
           </div>
           <div
-            className={`w-5 h-5 bg-neutral border border-line rounded flex items-center justify-center hover:bg-tertiary/5 transition-colors ${
+            className={`w-6 h-6 bg-neutral rounded flex items-center justify-center ${
               voterInVotes && voterInVotes.direction === -1
-                ? "bg-tertiary/5"
-                : ""
+                ? "text-tertiary/70"
+                : "text-tertiary/50"
             }`}
             onClick={(e) => {
               e.preventDefault();
@@ -76,20 +77,33 @@ const DraftProposalCard = ({
               handleVote(-1);
             }}
           >
-            <ChevronDownIcon className="w-4 h-4 text-secondary" />
+            <ChevronDownIcon className="w-6 h-6" />
           </div>
         </div>
-        <div className="flex flex-col justify-between">
-          <div className="flex flex-row gap-1 text-xs text-secondary">
+        <div className="w-full sm:w-[60%] flex flex-col justify-between gap-y-1">
+          <div className="flex flex-row gap-1 text-xs text-tertiary">
             <div>
-              Draft Proposal{" "}
-              <span className="hidden sm:inline">
-                by <HumanAddress address={proposal.author_address} />
-              </span>
+              Submitted by <HumanAddress address={proposal.author_address} />
             </div>
           </div>
           <div className="flex flex-row gap-1">
             <span className="text-primary">{proposal.title || "Untitled"}</span>
+          </div>
+        </div>
+        <div className="flex-row gap-24 hidden sm:flex">
+          <div className="w-[180px] flex flex-col justify-between gap-y-1">
+            <div className="flex flex-row gap-1 text-xs text-tertiary">
+              <div>Submitted on</div>
+            </div>
+            <div>{formatFullDate(proposal.created_at)}</div>
+          </div>
+          <div className="flex flex-col justify-between gap-y-1">
+            <div className="flex flex-row gap-1 text-xs text-tertiary">
+              <div>Status</div>
+            </div>
+            <div className="bg-wash text-secondary border border-line text-xs font-medium px-1 py-0.5 rounded">
+              Pill title
+            </div>
           </div>
         </div>
       </div>
