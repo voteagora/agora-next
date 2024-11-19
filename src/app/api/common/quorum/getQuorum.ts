@@ -25,7 +25,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       return await contracts.governor.contract.quorumVotes!();
 
     case TENANT_NAMESPACES.OPTIMISM:
-      quorum = await contracts.governor.contract.quorum!(proposal.proposal_id);
+      quorum = null;
 
       // If no quorum is set, calculate it based on votable supply
       if (!quorum) {
