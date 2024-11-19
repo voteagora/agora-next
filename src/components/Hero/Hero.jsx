@@ -13,7 +13,7 @@ export default function Hero() {
         alt={`${namespace} cover`}
         src={hero}
       />
-      <div className="absolute top-36 left-12 flex flex-col sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
+      <div className="absolute top-20 left-12 flex flex-col sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
         <div className="flex flex-col mt-0 mb-8 sm:mb-0">
           <h1 className=" text-4xl text-white drop-shadow-lg font-serif">
             {title}

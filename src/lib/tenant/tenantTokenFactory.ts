@@ -7,7 +7,7 @@ export default class TenantTokenFactory {
       case TENANT_NAMESPACES.OPTIMISM:
         return {
           name: "Optimism",
-          symbol: "OP",
+          symbol: "NS Passport",
           decimals: 18,
         };
       case TENANT_NAMESPACES.ENS:

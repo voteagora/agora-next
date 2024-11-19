@@ -3,7 +3,7 @@ import nsLogo from "@/assets/tenant/ns_logo.svg";
 import optimismHero from "@/assets/tenant/ns_hero.png";
 import successImage from "@/assets/tenant/optimism_success.svg";
 import pendingImage from "@/assets/tenant/optimism_pending.svg";
-import delegateImage from "@/assets/tenant/optimism_delegate.svg";
+import delegateImage from "@/assets/tenant/ns_delegate.svg";
 import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
 import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
 import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
@@ -195,7 +195,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "proposal-lifecycle",
