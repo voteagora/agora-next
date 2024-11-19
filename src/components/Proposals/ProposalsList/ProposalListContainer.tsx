@@ -61,38 +61,41 @@ const ProposalListContainer = ({
             <button
               type="button"
               className={cn(
-                "sm:text-2xl font-extrabold mb-0",
+                "sm:text-xl mb-0",
                 activeTab === ProposalListTab.ALL
-                  ? "text-primary"
+                  ? "text-primary border-b-2 border-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
               )}
               onClick={() => clearFiltersAndSetTab(ProposalListTab.ALL)}
             >
-              All proposals
+              Proposals
             </button>
             <button
               type="button"
               className={cn(
-                "sm:text-2xl font-extrabold mb-0",
+                "sm:text-xl mb-0 flex flex-row gap-2 items-center",
                 activeTab === ProposalListTab.DRAFT
-                  ? "text-primary"
+                  ? "text-primary border-b-2 border-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
               )}
               onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
             >
-              Submissions
+              <span>Submissions</span>
+              <span className="text-xs text-secondary font-medium border border-line rounded px-1">
+                2
+              </span>
             </button>
             <button
               type="button"
               className={cn(
-                "sm:text-2xl font-extrabold mb-0",
+                "sm:text-xl mb-0",
                 activeTab === ProposalListTab.MY_DRAFTS
-                  ? "text-primary"
+                  ? "text-primary border-b-2 border-primary"
                   : "text-primary/40 hover:text-primary/80 transition-colors"
               )}
               onClick={() => clearFiltersAndSetTab(ProposalListTab.MY_DRAFTS)}
             >
-              My drafts
+              Drafts
             </button>
           </div>
           <div className="flex flex-col sm:flex-row justify-end gap-4 items-center flex-1 w-full sm:w-fit">
