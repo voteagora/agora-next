@@ -13,6 +13,7 @@ import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
 import DraftProposalsSort from "../ProposalsFilter/DraftProposalsSort";
 import MyDraftsSort from "../ProposalsFilter/MyDraftsSort";
 import useUnreadDraftCount from "@/hooks/useUnreadDraftCount";
+import CurrentGovernanceStage from "../CurrentGovernanceStage/CurrentGovernanceStage";
 
 enum ProposalListTab {
   ALL = "all",
@@ -24,10 +25,12 @@ const ProposalListContainer = ({
   allProposalsListElement,
   draftProposalsListElement,
   myDraftProposalsListElement,
+  governanceCalendar,
 }: {
   allProposalsListElement: React.ReactNode;
   draftProposalsListElement: React.ReactNode;
   myDraftProposalsListElement: React.ReactNode;
+  governanceCalendar: any;
 }) => {
   const router = useRouter();
   const addSearchParam = useAddSearchParam();
@@ -125,7 +128,19 @@ const ProposalListContainer = ({
           </div>
         </div>
       </div>
-      <section className="mt-4" key={activeTab}>
+      {governanceCalendar && (
+        <div className="mt-4">
+          <CurrentGovernanceStage
+            title={governanceCalendar.title}
+            endDate={governanceCalendar.endDate}
+            reviewPeriod={governanceCalendar.reviewPeriod}
+          />
+        </div>
+      )}
+      <section
+        className={cn("mt-4", governanceCalendar && "mt-0")}
+        key={activeTab}
+      >
         {activeTab === ProposalListTab.ALL && allProposalsListElement}
         {activeTab === ProposalListTab.DRAFT && draftProposalsListElement}
         {activeTab === ProposalListTab.MY_DRAFTS && myDraftProposalsListElement}

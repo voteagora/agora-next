@@ -34,6 +34,34 @@ export async function generateMetadata() {
   };
 }
 
+<<<<<<< HEAD
 export default async function Home() {
   return <ProposalsHome />;
+=======
+async function Home() {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("proposals")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
+  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
+  const governanceCalendar = await fetchGovernanceCalendar();
+
+  return (
+    <div className="flex flex-col">
+      {supportsNotifications && <SubscribeDialogLauncher />}
+      <Hero />
+      <Suspense fallback={<div>Loading...</div>}>
+        {/* TODO: needs my vote as filter to all proposals table? */}
+        <ProposalListContainer
+          allProposalsListElement={<AllProposalList />}
+          draftProposalsListElement={<DraftProposalList />}
+          myDraftProposalsListElement={<MyDraftProposalList />}
+          governanceCalendar={governanceCalendar}
+        />
+      </Suspense>
+    </div>
+  );
+>>>>>>> 7bde5615 (Fixes cal issue)
 }
