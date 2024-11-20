@@ -8,6 +8,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { headers } from "next/headers";
+import { cookieToInitialState } from "wagmi";
+import { config } from "./config";
 
 declare global {
   interface BigInt {
@@ -89,6 +92,11 @@ export default async function RootLayout({
     fontFamily: font,
   } as React.CSSProperties;
 
+  const initialWAGMIState = cookieToInitialState(
+    config,
+    headers().get("cookie")
+  );
+
   return (
     <html lang="en" style={style}>
       <head>
@@ -124,9 +132,8 @@ export default async function RootLayout({
         />
         <meta name="theme-color" content="#000" />
       </head>
-
       <NuqsAdapter>
-        <ClientLayout>
+        <ClientLayout initialWAGMIState={initialWAGMIState}>
           <Header />
           {children}
           <DAOMetricsHeader metrics={metrics} />
