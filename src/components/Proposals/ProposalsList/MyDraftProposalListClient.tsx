@@ -8,9 +8,12 @@ import {
   getStageIndexForTenant,
   isPostSubmission,
 } from "@/app/proposals/draft/utils/stages";
-import { animate, AnimatePresence, motion } from "framer-motion";
-import useMyDraftProposals from "@/hooks/useMyDraftProposals";
+import { motion } from "framer-motion";
+import { useMyDraftProposalsInfinite } from "@/hooks/useMyDraftProposals";
 import { formatFullDate } from "@/lib/utils";
+import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import { myDraftsSortOptions } from "@/lib/constants";
+import { useSearchParams } from "next/navigation";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   const isDrafting = !isPostSubmission(proposal.stage);
@@ -34,7 +37,7 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
             <span className="text-primary">{proposal.title || "Untitled"}</span>
           </div>
         </div>
-        <div className="flex flex-row gap-24">
+        <div className="hidden sm:flex flex-row gap-24">
           <div className="w-[180px] flex flex-col justify-between gap-y-1">
             <span className="text-xs text-tertiary">Last updated</span>
             <span className="">{formatFullDate(proposal.updated_at)}</span>
@@ -56,39 +59,54 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
 const MyDraftProposalListClient = () => {
   const { address } = useAccount();
 
+  const sort =
+    useSearchParams()?.get("sort") || myDraftsSortOptions.newest.sort;
+
   const {
-    data: draftProposals,
-    isLoading,
-    error,
-  } = useMyDraftProposals({ address });
+    data: myDraftProposals,
+    isLoading: infiniteIsLoading,
+    fetchNextPage: infiniteFetchNextPage,
+    hasNextPage: infiniteHasNextPage,
+    isFetchingNextPage: infiniteIsFetchingNextPage,
+  } = useMyDraftProposalsInfinite({
+    address,
+    sort,
+    pagination: {
+      limit: 10,
+      offset: 0,
+    },
+  });
 
   return (
     <>
-      {isLoading ? (
-        <motion.div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-          <div className="flex flex-row justify-center py-8 text-tertiary">
-            Loading...
-          </div>
-        </motion.div>
+      {infiniteIsLoading ? (
+        <div className="flex flex-col justify-center py-8 text-center space-y-2">
+          <AgoraLoaderSmall />
+          <span className="text-tertiary">Loading draft proposals</span>
+        </div>
+      ) : myDraftProposals.length === 0 ? (
+        <div className="flex flex-row justify-center py-8 text-tertiary">
+          No draft proposals found
+        </div>
       ) : (
-        <motion.div
+        <div
           key="my-drafts"
           className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden"
         >
           <div>
-            {!draftProposals || draftProposals?.length === 0 ? (
+            {!myDraftProposals || myDraftProposals?.length === 0 ? (
               <div className="flex flex-row justify-center py-8 text-tertiary">
                 No drafts found
               </div>
             ) : (
               <div>
-                {draftProposals?.map((proposal) => (
+                {myDraftProposals?.map((proposal) => (
                   <DraftProposalCard key={proposal.id} proposal={proposal} />
                 ))}
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       )}
     </>
   );

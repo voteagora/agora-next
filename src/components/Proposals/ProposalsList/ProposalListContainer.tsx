@@ -11,7 +11,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useAddSearchParam } from "@/hooks/useAddSearchParam";
 import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
 import DraftProposalsSort from "../ProposalsFilter/DraftProposalsSort";
-
+import MyDraftsSort from "../ProposalsFilter/MyDraftsSort";
+import useUnreadDraftCount from "@/hooks/useUnreadDraftCount";
 enum ProposalListTab {
   ALL = "all",
   DRAFT = "draft",
@@ -40,6 +41,9 @@ const ProposalListContainer = ({
     tenantSupportsProposalLifecycle =
       address === "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8" || false;
   }
+
+  const { data: unreadDraftCount } = useUnreadDraftCount(address);
+  console.log(unreadDraftCount);
 
   const searchParams = useSearchParams();
   const activeTab = searchParams?.get("tab") ?? ProposalListTab.ALL;
@@ -81,9 +85,11 @@ const ProposalListContainer = ({
               onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
             >
               <span>Submissions</span>
-              <span className="text-xs text-secondary font-medium border border-line rounded px-1">
-                2
-              </span>
+              {!!unreadDraftCount && (
+                <span className="text-xs text-secondary font-medium border border-line rounded px-1">
+                  {unreadDraftCount.toString()}
+                </span>
+              )}
             </button>
             <button
               type="button"
@@ -104,6 +110,11 @@ const ProposalListContainer = ({
               <>
                 <DraftProposalsFilter />
                 <DraftProposalsSort />
+              </>
+            )}
+            {activeTab === ProposalListTab.MY_DRAFTS && (
+              <>
+                <MyDraftsSort />
               </>
             )}
             {tenantSupportsProposalLifecycle && address && (

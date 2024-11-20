@@ -61,6 +61,10 @@ export const draftProposalsFilterOptions = {
     value: "My drafts",
     filter: "my_drafts",
   },
+  requestsYou: {
+    value: "Requests you",
+    filter: "requests_you",
+  },
 };
 
 export const draftProposalsSortOptions = {
@@ -79,6 +83,17 @@ export const draftProposalsSortOptions = {
   leastVotes: {
     value: "Least Votes",
     sort: "least_votes",
+  },
+};
+
+export const myDraftsSortOptions = {
+  newest: {
+    value: "Newest",
+    sort: "newest",
+  },
+  oldest: {
+    value: "Oldest",
+    sort: "oldest",
   },
 };
 
