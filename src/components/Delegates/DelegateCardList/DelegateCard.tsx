@@ -23,7 +23,8 @@ const DelegateCard = ({
 }) => {
   const { token } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
-  const { data: votingStats, isLoading: isVotingStatsLoading } = useVotingStats(
+
+  const { data: votingStats, isPending: isVotingStatsPending } = useVotingStats(
     {
       address: delegate.address as `0x${string}`,
     }
@@ -54,7 +55,7 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              {votingStats && (
+              {!isVotingStatsPending && (
                 <span className="text-primary font-bold">
                   {(votingStats?.last_10_props || 0) * 10}% Participation
                 </span>
