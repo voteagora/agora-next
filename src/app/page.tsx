@@ -59,18 +59,12 @@ async function Home() {
     <div className="flex flex-col">
       <Hero />
       <Suspense fallback={<div>Loading...</div>}>
-        {governanceCalendar && (
-          <CurrentGovernanceStage
-            title={governanceCalendar.title}
-            endDate={governanceCalendar.endDate}
-            reviewPeriod={governanceCalendar.reviewPeriod}
-          />
-        )}
         {/* TODO: needs my vote as filter to all proposals table? */}
         <ProposalListContainer
           allProposalsListElement={<AllProposalList />}
           draftProposalsListElement={<DraftProposalList />}
           myDraftProposalsListElement={<MyDraftProposalList />}
+          governanceCalendar={governanceCalendar}
         />
       </Suspense>
     </div>
