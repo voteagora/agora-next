@@ -1,5 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import nsLogo from "@/assets/tenant/ns_logo.svg";
+import nsPassport from "@/assets/tenant/ns_passport.png";
 import optimismHero from "@/assets/tenant/ns_hero.png";
 import successImage from "@/assets/tenant/optimism_success.svg";
 import pendingImage from "@/assets/tenant/optimism_pending.svg";
@@ -195,7 +196,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "info",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "proposal-lifecycle",
