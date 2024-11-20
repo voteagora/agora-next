@@ -3,10 +3,10 @@ import { useCallback, useState } from "react";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
-import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { config } from "@/app/config";
 
 const useStandardVoting = ({
   proposalId,
