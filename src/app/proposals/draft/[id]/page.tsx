@@ -50,7 +50,14 @@ export default async function DraftProposalPage({
   const stageMetadata = getStageMetadata(stageObject.stage);
 
   if (draftProposal.author_address !== connectedAccount) {
-    return <div>Only the creator of this proposal can edit.</div>;
+    return (
+      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-10 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
+        <h1 className="text-primary text-2xl font-bold">Unauthorized</h1>
+        <p className="text-secondary mt-2">
+          Only the creator of this draft submission can edit.
+        </p>
+      </div>
+    );
   }
 
   return (
