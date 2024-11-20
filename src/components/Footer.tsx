@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="text-secondary pt-4 pb-8 gap-1 flex w-full justify-center text-sm px-4">
+    <footer className="text-secondary gap-1 flex w-full justify-center text-sm pt-4 pb-16 px-4">
       <div className="text-primary/30">&copy;</div>
       <p>
         {new Date().getFullYear()} Agora
