@@ -82,8 +82,8 @@ const DraftProposalCard = ({
           <div
             className={`w-6 h-6 bg-neutral rounded flex items-center justify-center ${
               voterInVotes && voterInVotes.direction === 1
-                ? "text-tertiary/70"
-                : "text-tertiary/50"
+                ? "text-green-500"
+                : "text-tertiary/50 hover:text-green-500"
             }`}
             onClick={(e) => {
               e.preventDefault();
@@ -100,8 +100,8 @@ const DraftProposalCard = ({
           <div
             className={`w-6 h-6 bg-neutral rounded flex items-center justify-center ${
               voterInVotes && voterInVotes.direction === -1
-                ? "text-tertiary/70"
-                : "text-tertiary/50"
+                ? "text-red-500"
+                : "text-tertiary/50 hover:text-red-500"
             }`}
             onClick={(e) => {
               e.preventDefault();
