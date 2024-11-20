@@ -10,12 +10,14 @@ import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 const AllProposalListClient = ({
   initProposals,
   fetchProposals,
+  votableSupply,
 }: {
   initProposals: PaginatedResult<ProposalType[]>;
   fetchProposals: (
     filter: string,
     pagination?: PaginationParams
   ) => Promise<PaginatedResult<ProposalType[]>>;
+  votableSupply: string;
 }) => {
   const [pages, setPages] = useState([initProposals]);
   const [meta, setMeta] = useState(initProposals.meta);
@@ -64,8 +66,7 @@ const AllProposalListClient = ({
               <Proposal
                 key={`${proposal.id}_${proposal.status}`}
                 proposal={proposal}
-                // todo replace with real data
-                votableSupply={"10000"}
+                votableSupply={votableSupply}
               />
             ))}
           </InfiniteScroll>
