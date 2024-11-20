@@ -1,4 +1,8 @@
-import { ProposalDraft, ProposalDraftVote } from "@prisma/client";
+import {
+  ProposalDraft,
+  ProposalDraftVote,
+  ProposalDraftApprovedSponsors,
+} from "@prisma/client";
 import Link from "next/link";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
@@ -6,11 +10,39 @@ import { useAccount } from "wagmi";
 import voteForProposalDraft from "./actions/voteForProposalDraft";
 import { formatFullDate } from "@/lib/utils";
 
+const getDraftProposalStatus = (
+  proposal: ProposalDraft & {
+    approved_sponsors: ProposalDraftApprovedSponsors[];
+  },
+  loggedInAddress: string | undefined
+) => {
+  if (!loggedInAddress) {
+    return "Needs Sponsor";
+  }
+
+  const userInSponsors = proposal.approved_sponsors.find(
+    (sponsor) => sponsor.sponsor_address === loggedInAddress
+  );
+
+  if (!userInSponsors) {
+    return "Needs Sponsor";
+  }
+
+  const userDeclinedSponsor = userInSponsors.status === "REJECTED";
+
+  if (userDeclinedSponsor) {
+    return "You declined";
+  }
+
+  return "Requests you";
+};
+
 const DraftProposalCard = ({
   proposal,
   updateProposalVote,
 }: {
   proposal: ProposalDraft & {
+    approved_sponsors: ProposalDraftApprovedSponsors[];
     votes: ProposalDraftVote[];
     vote_weight: number;
   };
@@ -41,6 +73,7 @@ const DraftProposalCard = ({
 
   return (
     <Link
+      prefetch={true}
       href={`/proposals/sponsor/${proposal.id}`}
       className="block cursor-pointer border-b border-line last:border-b-0 hover:bg-tertiary/5 transition-colors"
     >
@@ -80,7 +113,7 @@ const DraftProposalCard = ({
             <ChevronDownIcon className="w-6 h-6" />
           </div>
         </div>
-        <div className="w-full sm:w-[60%] flex flex-col justify-between gap-y-1">
+        <div className="w-full sm:w-[55%] flex flex-col justify-between gap-y-1">
           <div className="flex flex-row gap-1 text-xs text-tertiary">
             <div>
               Submitted by <HumanAddress address={proposal.author_address} />
@@ -102,7 +135,7 @@ const DraftProposalCard = ({
               <div>Status</div>
             </div>
             <div className="bg-wash text-secondary border border-line text-xs font-medium px-1 py-0.5 rounded">
-              Pill title
+              {getDraftProposalStatus(proposal, address)}
             </div>
           </div>
         </div>
