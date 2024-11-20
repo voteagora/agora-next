@@ -25,6 +25,7 @@ const action = async (
   pagination: PaginationParams
 ) => {
   const ownerOnly = filter === draftProposalsFilterOptions.myDrafts.filter;
+  const requestsYou = filter === draftProposalsFilterOptions.requestsYou.filter;
   const isNewestSort = sort === draftProposalsSortOptions.newest.sort;
   const isOldestSort = sort === draftProposalsSortOptions.oldest.sort;
   const isMostVotesSort = sort === draftProposalsSortOptions.mostVotes.sort;
@@ -52,6 +53,14 @@ const action = async (
 
   const onlyOwnerQuery = `
     AND p.author_address = $4
+  `;
+
+  const requestsYouQuery = `
+    AND EXISTS (
+      SELECT 1 FROM alltenant.proposal_approved_sponsors
+      WHERE proposal_id = p.id
+      AND sponsor_address = $4
+    )
   `;
 
   const stage = PrismaProposalStage.AWAITING_SPONSORSHIP;
@@ -132,6 +141,7 @@ SELECT
       AND p.chain_id = $2
       AND p.contract = $3
       ${ownerOnly ? onlyOwnerQuery : anyAuthorQuery}
+      ${requestsYou ? requestsYouQuery : ""}
     ORDER BY ${sortFilter}
     OFFSET $5
     LIMIT $6
@@ -153,7 +163,6 @@ SELECT
   );
 
   const draftProposals = await getDraftProposalsExecution;
-  console.log("draftProposals", draftProposals);
 
   return {
     meta: draftProposals.meta,
