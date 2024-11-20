@@ -13,6 +13,7 @@ import { useDeleteSearchParams } from "@/hooks/useDeleteSearchParam";
 import DraftProposalsSort from "../ProposalsFilter/DraftProposalsSort";
 import MyDraftsSort from "../ProposalsFilter/MyDraftsSort";
 import useUnreadDraftCount from "@/hooks/useUnreadDraftCount";
+
 enum ProposalListTab {
   ALL = "all",
   DRAFT = "draft",
@@ -43,8 +44,6 @@ const ProposalListContainer = ({
   }
 
   const { data: unreadDraftCount } = useUnreadDraftCount(address);
-  console.log(unreadDraftCount);
-
   const searchParams = useSearchParams();
   const activeTab = searchParams?.get("tab") ?? ProposalListTab.ALL;
   const clearFiltersAndSetTab = (tab: ProposalListTab) => {
