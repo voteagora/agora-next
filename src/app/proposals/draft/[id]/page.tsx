@@ -2,7 +2,6 @@ import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
 import BackButton from "../components/BackButton";
 import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
-import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
