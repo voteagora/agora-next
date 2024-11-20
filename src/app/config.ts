@@ -14,7 +14,7 @@ const { contracts } = Tenant.current();
 //   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 // };
 
-export const config = createConfig({
+export const configItems = {
   chains: [contracts.token.chain, mainnet],
   transports: {
     [mainnet.id]: getTransportForChain(mainnet.id)!,
@@ -24,4 +24,7 @@ export const config = createConfig({
   storage: createStorage({
     storage: cookieStorage,
   }),
-});
+} as const;
+
+// used for wagmi SSR in layout.tsx
+export const config = createConfig(configItems);
