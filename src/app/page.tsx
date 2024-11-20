@@ -1,46 +1,15 @@
-import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
-import {
-  fetchDraftProposalForSponsor as apiFetchDraftProposalsForSponsorship,
-  fetchDraftProposals as apiFetchDraftProposals,
-  fetchProposals as apiFetchProposals,
-} from "@/app/api/common/proposals/getProposals";
-import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
-import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
-import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
-import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import Image from "next/image";
-import { PaginationParams } from "./lib/pagination";
 import ProposalListContainer from "@/components/Proposals/ProposalsList/ProposalListContainer";
 import DraftProposalList from "@/components/Proposals/ProposalsList/DraftProposalList";
 import MyDraftProposalList from "@/components/Proposals/ProposalsList/MyDraftProposalList";
 import AllProposalList from "@/components/Proposals/ProposalsList/AllProposalList";
 import { Suspense } from "react";
+import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
-
-async function fetchProposals(
-  filter: string,
-  pagination = { limit: 10, offset: 0 }
-) {
-  "use server";
-  return apiFetchProposals({ filter, pagination });
-}
-
-async function fetchNeedsMyVoteProposals(address: string) {
-  "use server";
-  return apiFetchNeedsMyVoteProposals(address);
-}
-
-async function fetchVotableSupply() {
-  "use server";
-  return apiFetchVotableSupply();
-}
 
 async function fetchGovernanceCalendar() {
   "use server";
@@ -48,7 +17,7 @@ async function fetchGovernanceCalendar() {
 }
 
 export async function generateMetadata() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   const page = ui.page("proposals");
   const { title, description, imageTitle, imageDescription } = page!.meta;
@@ -78,61 +47,32 @@ export async function generateMetadata() {
 }
 
 async function Home() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
     return <div>Route not supported for namespace</div>;
   }
 
-  //   const governanceCalendar = await fetchGovernanceCalendar();
-  //   const relevalntProposals = await fetchProposals(
-  //     proposalsFilterOptions.relevant.filter
-  //   );
-  //   const allProposals = await fetchProposals(
-  //     proposalsFilterOptions.everything.filter
-  //   );
-
-  //   const votableSupply = await fetchVotableSupply();
+  const governanceCalendar = await fetchGovernanceCalendar();
 
   return (
     <div className="flex flex-col">
       <Hero />
       <Suspense fallback={<div>Loading...</div>}>
+        {governanceCalendar && (
+          <CurrentGovernanceStage
+            title={governanceCalendar.title}
+            endDate={governanceCalendar.endDate}
+            reviewPeriod={governanceCalendar.reviewPeriod}
+          />
+        )}
+        {/* TODO: needs my vote as filter to all proposals table? */}
         <ProposalListContainer
           allProposalsListElement={<AllProposalList />}
           draftProposalsListElement={<DraftProposalList />}
           myDraftProposalsListElement={<MyDraftProposalList />}
         />
       </Suspense>
-      {/* <MyDraftProposals
-        fetchDraftProposals={async (address) => {
-          "use server";
-          return apiFetchDraftProposals(address);
-        }}
-      />
-      <MySponsorshipRequests
-        fetchDraftProposals={async (address) => {
-          "use server";
-          return apiFetchDraftProposalsForSponsorship(address);
-        }}
-      />
-      <NeedsMyVoteProposalsList
-        fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
-        votableSupply={votableSupply}
-      />
-      <ProposalsList
-        initRelevantProposals={relevalntProposals}
-        initAllProposals={allProposals}
-        fetchProposals={async (
-          pagination: PaginationParams,
-          filter: string
-        ) => {
-          "use server";
-          return fetchProposals(filter, pagination);
-        }}
-        governanceCalendar={governanceCalendar}
-        votableSupply={votableSupply}
-      /> */}
     </div>
   );
 }
