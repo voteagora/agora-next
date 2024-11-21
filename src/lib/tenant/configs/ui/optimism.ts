@@ -247,17 +247,18 @@ export const optimismTenantUIConfig = new TenantUI({
         proposalTypes: [
           {
             type: ProposalType.BASIC,
-            address: null,
+            prodAddress: null,
+            testnetAddress: null,
           },
           {
             type: ProposalType.APPROVAL,
             prodAddress: "0xdd0229D72a414DC821DEc66f3Cc4eF6dB2C7b7df",
-            testnetAddress: null,
+            testnetAddress: "0xdd0229D72a414DC821DEc66f3Cc4eF6dB2C7b7df",
           },
           {
             type: ProposalType.OPTIMISTIC,
             prodAddress: "0x27964c5f4F389B8399036e1076d84c6984576C33",
-            testnetAddress: null,
+            testnetAddress: "0x27964c5f4F389B8399036e1076d84c6984576C33",
           },
         ],
         copy: {

@@ -108,7 +108,7 @@ export const getProposalTypeAddress = (
   }
 
   const proposalTypes = (plmToggle.config as PLMConfig).proposalTypes;
-  const proposalType = proposalTypes.find((pt) => pt.type === type);
+  const proposalType = proposalTypes.find((pt) => pt?.type === type);
 
   if (!proposalType) {
     throw new Error(`Proposal type ${type} for tenant ${tenant.ui.title}`);
