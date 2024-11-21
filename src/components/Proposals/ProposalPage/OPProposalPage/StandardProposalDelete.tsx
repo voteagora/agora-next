@@ -3,14 +3,12 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import useIsOpManager from "@/app/lib/hooks/useIsOpManager";
 import { Button } from "@/components/ui/button";
-import {
-  approvalModuleAddress,
-  optimisticModuleAddress,
-} from "@/lib/contracts/contracts";
 import { keccak256, toHex } from "viem";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { ProposalType } from "@/app/proposals/draft/types";
 
 export default function StandardProposalDelete({
   proposal,
@@ -33,10 +31,23 @@ export default function StandardProposalDelete({
 
       return [targets, values, calldata, descriptionHash];
     } else {
+      const approvalModuleAddress = getProposalTypeAddress(
+        ProposalType.APPROVAL
+      );
+      const optimisticModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTIMISTIC
+      );
+
       const moduleAddress =
         proposalType === "APPROVAL"
           ? approvalModuleAddress
           : optimisticModuleAddress;
+
+      if (!moduleAddress) {
+        throw new Error(
+          `Module address not found for tenant ${Tenant.current().namespace}`
+        );
+      }
 
       const proposalData = proposal.unformattedProposalData;
 
