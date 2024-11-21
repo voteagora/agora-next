@@ -380,11 +380,7 @@ export const getTransportForChain = (chainId: number) => {
 
     //   lyra testnet
     case 901:
-      return fallback([
-        http(
-          `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
-        ),
-      ]);
+      return http(`https://rpc-prod-testnet-0eakp60405.t.conduit.xyz`);
 
     // for each new dao with a new chainId add them here
     default:

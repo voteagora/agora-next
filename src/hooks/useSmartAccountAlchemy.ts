@@ -2,20 +2,20 @@
 
 import { createWalletClient, custom } from "viem";
 import { useEffect, useState } from "react";
-import {
-  alchemy,
-  AlchemySmartAccountClient,
-  sepolia,
-} from "@account-kit/infra";
+import { alchemy, AlchemySmartAccountClient } from "@account-kit/infra";
 import { WalletClientSigner } from "@aa-sdk/core";
-import { createLightAccountAlchemyClient } from "@account-kit/smart-contracts";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { createLightAccountAlchemyClient } from "@account-kit/smart-contracts";
 
-export const useSmartAccount = () => {
+/**
+ * Use this hook whenever working with an Alchemy-supported chain.
+ * Alchemy manages all the Smart Account infrastructure, including entry points, bundler, and paymaster contracts.
+ */
+export const useSmartAccountAlchemy = () => {
   const { ui, contracts } = Tenant.current();
   const scwConfig = ui.smartAccountConfig;
-  const chain = sepolia;
+  const chain = contracts.token.chain;
 
   const [client, setClient] = useState<AlchemySmartAccountClient | undefined>(
     undefined
@@ -26,7 +26,7 @@ export const useSmartAccount = () => {
   const { isConnected } = useAccount();
 
   const walletClient = createWalletClient({
-    chain: sepolia,
+    chain: chain,
     transport: custom(window.ethereum!),
   });
 

@@ -9,28 +9,38 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { Chain } from "viem/chains";
 
-export const lyraTestnet = /*#__PURE__*/ defineChain({
+const LYRA_TESTNET_RPC = "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
+
+const lyraTestnet: Chain = defineChain({
   id: 901,
-  name: "Derive Testnet",
-  network: "derive testnet",
-  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+  name: "Derive",
+  network: "derive",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ethers",
+    symbol: "ETH",
+  },
   rpcUrls: {
     default: {
-      http: [
-        `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`,
-      ],
+      http: [LYRA_TESTNET_RPC],
+      webSocket: [LYRA_TESTNET_RPC.replace("http", "ws")],
     },
     public: {
-      http: [
-        `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`,
-      ],
+      http: [LYRA_TESTNET_RPC],
+      webSocket: [LYRA_TESTNET_RPC.replace("http", "ws")],
     },
   },
   blockExplorers: {
     default: {
-      name: "Testnet Scan",
-      url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz/",
+      name: "Blockscout",
+      url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
     },
   },
   testnet: true,
@@ -64,7 +74,9 @@ export const deriveTenantConfig = ({
   const GOVERNOR = "0x79CA2f1450Ba61Daa13a56a679E3148eEf96b1Ee";
   const APPROVAL_MODULE = "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
   const TIMELOCK = "0x53767D56c782D0479Fa7283E2A1A38B1aaEd2DCE";
-  const rpcURL = `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
+  const rpcURL = isProd
+    ? `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
+    : LYRA_TESTNET_RPC;
 
   const provider = new JsonRpcProvider(rpcURL);
   // const chain = isProd ? lyra : lyraTestnet;
