@@ -30,7 +30,7 @@ export const optimismTenantContractConfig = ({
     : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6";
   const TYPES = isProd
     ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
-    : "0x54c943f19c2E983926E2d8c060eF3a956a653aA7";
+    : "0x2e0C197f1fca7628ADfa2bdaabd1df4670186C06";
 
   const provider = new AlchemyProvider("optimism", alchemyId);
   const chain = optimism;

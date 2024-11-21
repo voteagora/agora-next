@@ -146,9 +146,11 @@ const DraftFormClient = ({
                   control={control}
                   label="Voting module"
                   required={true}
-                  options={Object.values([
-                    ...((plmToggle?.config as PLMConfig)?.proposalTypes || []),
-                  ])}
+                  options={[
+                    ...(
+                      (plmToggle?.config as PLMConfig)?.proposalTypes || []
+                    ).map((pt) => pt.type),
+                  ]}
                   name="type"
                 />
 

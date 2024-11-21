@@ -182,7 +182,13 @@ export const protocolGuildTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [ProposalType?.BASIC],
+        proposalTypes: [
+          {
+            type: ProposalType.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
         copy: {
           helperText: `
                 ## Proposal checklist

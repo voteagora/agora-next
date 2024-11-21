@@ -1,4 +1,9 @@
-import { PLMConfig, ProposalLifecycleStageMetadata } from "../types";
+import {
+  PLMConfig,
+  ProposalLifecycleStageMetadata,
+  ProposalType,
+} from "../types";
+
 import { ProposalStage } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -88,4 +93,26 @@ export const isPostSubmission = (stage: ProposalStage) => {
 
   const postDraftStages = GET_POST_DRAFT_STAGES()!;
   return postDraftStages.some((s) => s.stage === stage);
+};
+
+export const getProposalTypeAddress = (
+  type: ProposalType
+): `0x${string}` | null | undefined => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  if (!plmToggle) {
+    throw new Error(
+      `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
+    );
+  }
+
+  const proposalTypes = (plmToggle.config as PLMConfig).proposalTypes;
+  const proposalType = proposalTypes.find((pt) => pt.type === type);
+
+  if (!proposalType) {
+    throw new Error(`Proposal type ${type} for tenant ${tenant.ui.title}`);
+  }
+
+  return tenant.isProd ? proposalType.prodAddress : proposalType.testnetAddress;
 };
