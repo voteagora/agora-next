@@ -25,7 +25,7 @@ export type Delegate = {
 
 export type DelegateChunk = Pick<
   Delegate,
-  "address" | "votingPower" | "statement" | "citizen"
+  "address" | "votingPower" | "statement" | "citizen" | "numOfDelegators"
 >;
 
 export type DelegatePayload = Delegate & {
