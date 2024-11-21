@@ -51,4 +51,5 @@ next-env.d.ts
 
 dist
 
+# version manager
 .tool-versions

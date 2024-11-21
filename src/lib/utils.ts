@@ -1,5 +1,4 @@
 import { type ClassValue, clsx } from "clsx";
-import { BigNumberish, formatUnits } from "ethers";
 import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
@@ -159,11 +158,31 @@ export function numberToToken(number: number) {
 }
 
 export function formatNumber(
-  amount: string | BigNumberish,
+  amount: string | bigint,
   decimals: number,
   maximumSignificantDigits = 4
 ) {
-  const standardUnitAmount = Number(formatUnits(amount, decimals));
+  let bigIntAmount: bigint;
+
+  if (typeof amount === "string") {
+    // Handle potential scientific notation
+    if (amount.includes("e")) {
+      bigIntAmount = scientificNotationToPrecision(amount);
+    } else {
+      bigIntAmount = BigInt(amount);
+    }
+  } else {
+    bigIntAmount = amount;
+  }
+
+  // Convert to standard unit
+  const divisor = BigInt(10) ** BigInt(decimals);
+  const wholePart = bigIntAmount / divisor;
+  const fractionalPart = bigIntAmount % divisor;
+
+  // Convert to number for formatting
+  const standardUnitAmount =
+    Number(wholePart) + Number(fractionalPart) / Number(divisor);
 
   const numberFormat = new Intl.NumberFormat("en", {
     notation: "compact",
@@ -179,7 +198,7 @@ export function TokenAmountDisplay({
   currency = token.symbol,
   maximumSignificantDigits = 2,
 }: {
-  amount: string | BigNumberish;
+  amount: string | bigint;
   decimals?: number;
   currency?: string;
   maximumSignificantDigits?: number;

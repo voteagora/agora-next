@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 interface Props {
   address: string;
@@ -36,7 +37,6 @@ export function DelegateProfileImage({
 }: Props) {
   const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
-  const { token } = Tenant.current();
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
@@ -80,7 +80,7 @@ export function DelegateProfileImage({
   }, [address, formattedNumber, refetchDelegate, setRefetchDelegate]);
 
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-4 items-center">
       <div className="relative aspect-square">
         {citizen && (
           <Image
@@ -118,9 +118,6 @@ export function DelegateProfileImage({
               </Tooltip>
             </TooltipProvider>
           )}
-        </div>
-        <div className="text-secondary text-xs font-semibold">
-          {formattedNumber} {token.symbol}
         </div>
       </div>
     </div>

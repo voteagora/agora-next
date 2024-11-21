@@ -1,7 +1,7 @@
-import { Decimal } from "@prisma/client/runtime";
+import { Prisma } from "@prisma/client";
 
 export function autobalanceAllocations<
-  T extends { allocation: Decimal; locked: boolean; id: string },
+  T extends { allocation: Prisma.Decimal; locked: boolean; id: string },
 >({ allocations, idToSkip }: { allocations: T[]; idToSkip: string }) {
   const [amountToBalance, totalUnlocked, unlockedEntities] = allocations.reduce(
     (acc, allocation) => {

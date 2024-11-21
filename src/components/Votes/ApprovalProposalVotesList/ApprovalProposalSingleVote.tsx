@@ -54,7 +54,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
             className="mb-2 text-xs leading-4"
           >
             <div className="text-primary font-semibold flex items-center">
-              <ENSAvatar ensName={voterAddress} className="w-5 h-5" />
+              <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
               <HumanAddress address={voterAddress} />
               {address?.toLowerCase() === voterAddress && (
                 <span>&nbsp;(you)</span>

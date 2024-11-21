@@ -9,7 +9,10 @@ import {
   fetchVotingPowerAvailableForDirectDelegation,
   fetchVotingPowerAvailableForSubdelegation,
 } from "@/app/api/common/voting-power/getVotingPower";
-import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
+import {
+  fetchDelegate as apiFetchDelegate,
+  fetchVoterStats as apiFetchVoterStats,
+} from "@/app/api/common/delegates/getDelegates";
 import { fetchDelegateStatement as apiFetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import {
   fetchAllDelegatorsInChains,
@@ -23,6 +26,10 @@ import { PaginationParams } from "../lib/pagination";
 
 export async function fetchDelegate(address: string) {
   return apiFetchDelegate(address);
+}
+
+export async function fetchVoterStats(address: string) {
+  return apiFetchVoterStats(address);
 }
 
 export async function fetchDelegateStatement(address: string) {

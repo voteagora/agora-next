@@ -1,12 +1,11 @@
 import React from "react";
-import { BigNumberish } from "ethers";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 
 interface StakingStatsProps {
   rewardDuration: string;
-  rewardPerToken: BigNumberish;
-  totalStaked: BigNumberish;
-  totalSupply: BigNumberish;
+  rewardPerToken: bigint;
+  totalStaked: bigint;
+  totalSupply: bigint;
 }
 
 export const StakingStats = ({

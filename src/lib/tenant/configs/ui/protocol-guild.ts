@@ -1,12 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import pguildLogo from "@/assets/tenant/pguild_logo.svg";
 import pguildHero from "@/assets/tenant/pguild_hero.svg";
-import successImage from "@/assets/tenant/ens_success.svg";
-import pendingImage from "@/assets/tenant/ens_pending.svg";
-import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
-import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
-import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
-import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
@@ -17,8 +11,8 @@ export const protocolGuildTenantUIConfig = new TenantUI({
 
   assets: {
     // TODO: Replace success and pending images
-    success: successImage,
-    pending: pendingImage,
+    success: pguildHero,
+    pending: pguildHero,
     delegate: delegateAvatar,
   },
 
@@ -130,6 +124,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
 
   toggles: [
     {
+      name: "admin",
+      enabled: true,
+    },
+    {
       name: "proposals",
       enabled: true,
     },
@@ -187,7 +185,12 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         proposalTypes: [ProposalType?.BASIC],
         copy: {
           helperText: `
-                ## Proposal checklist`.trim(),
+                ## Proposal checklist
+- Make sure that you have simulated and review your transactions before seeking sponsorship.
+- Check your markdown previews to ensure you didn't break any links.
+- Review your description and make sure it's clear and concise.
+- Remember that everything lasts forever onchain, check your spelling and grammar and make this one count. You got this.
+`.trim(),
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },

@@ -75,7 +75,7 @@ export default async function DraftProposalPage({
           <section className="col-span-1">
             <div className="bg-wash border border-line rounded-2xl p-4">
               <p className="mt-2">
-                <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2">
+                <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2 prose-li:list-inside prose-li:list-disc prose-li:my-2">
                   {
                     (proposalLifecycleToggle.config as PLMConfig)?.copy
                       .helperText

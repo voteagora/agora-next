@@ -2,17 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { DelegateActions } from "../DelegateCard/DelegateActions";
-import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-import Link from "next/link";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import Tenant from "@/lib/tenant/tenant";
+import DelegateCard from "./DelegateCard";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
@@ -29,6 +27,7 @@ export default function DelegateCardList({
   fetchDelegates,
   isDelegatesCitizensFetching,
 }: Props) {
+  const { token } = Tenant.current();
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
@@ -74,7 +73,7 @@ export default function DelegateCardList({
         }
         element="div"
       >
-        {delegates?.map((delegate) => {
+        {delegates?.map((delegate, idx) => {
           let truncatedStatement = "";
 
           if (delegate?.statement?.payload) {
@@ -85,38 +84,14 @@ export default function DelegateCardList({
           }
 
           return (
-            <div
-              key={delegate.address}
-              className={cn(
-                "flex flex-col",
-                isDelegatesCitizensFetching || isDelegatesFiltering
-                  ? "animate-pulse"
-                  : ""
-              )}
-            >
-              <Link href={`/delegates/${delegate.address}`}>
-                <div className="flex flex-col gap-4 h-full p-6 rounded-xl bg-white border border-line shadow-newDefault">
-                  <div className="flex flex-col gap-4 justify-center">
-                    <DelegateProfileImage
-                      endorsed={delegate.statement?.endorsed}
-                      address={delegate.address}
-                      votingPower={delegate.votingPower.total}
-                      citizen={delegate.citizen}
-                    />
-                    <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
-                      {truncatedStatement}
-                    </p>
-                  </div>
-                  <div className="min-h-[24px]">
-                    <DelegateActions
-                      delegate={delegate}
-                      isAdvancedUser={isAdvancedUser}
-                      delegators={advancedDelegators}
-                    />
-                  </div>
-                </div>
-              </Link>
-            </div>
+            <DelegateCard
+              key={idx}
+              delegate={delegate}
+              truncatedStatement={truncatedStatement}
+              isDelegatesCitizensFetching={isDelegatesCitizensFetching}
+              isDelegatesFiltering={isDelegatesFiltering}
+              isAdvancedUser={isAdvancedUser}
+            />
           );
         })}
       </InfiniteScroll>

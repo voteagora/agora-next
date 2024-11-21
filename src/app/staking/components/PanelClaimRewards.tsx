@@ -26,7 +26,7 @@ export const PanelClaimRewards = () => {
               Available to collect
             </p>
             <h6 className="text-base font-medium text-primary">
-              {formatNumber(0, 18)} WETH
+              {formatNumber(0n, 18)} WETH
             </h6>
           </div>
         </div>

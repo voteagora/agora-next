@@ -15,7 +15,7 @@ async function getCitizens({
   sort = "shuffle",
   seed,
 }: {
-  pagination: PaginationParams;
+  pagination?: PaginationParams;
   sort: string;
   seed?: number;
 }): Promise<PaginatedResult<DelegateChunk[]>> {
@@ -26,7 +26,7 @@ async function getCitizens({
       if (sort === "shuffle") {
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
-          SELECT 
+          SELECT
             citizens.address AS delegate,
             delegate.voting_power,
             advanced_vp,
@@ -54,7 +54,7 @@ async function getCitizens({
           WHERE citizens.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
           ORDER BY md5(CAST(citizens.address AS TEXT) || CAST($2 AS TEXT))
           OFFSET $3
-          LIMIT $4;        
+          LIMIT $4;
             `,
           slug,
           seed,
@@ -64,7 +64,7 @@ async function getCitizens({
       } else {
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
-            SELECT 
+            SELECT
               citizens.address AS delegate,
               delegate.voting_power,
               direct_vp,
@@ -92,7 +92,7 @@ async function getCitizens({
             AND citizens.dao_slug = $1::config.dao_slug
             WHERE citizens.retro_funding_round = (SELECT MAX(retro_funding_round) FROM agora.citizens)
             ORDER BY COALESCE(delegate.voting_power, 0) DESC,
-            citizens.address ASC 
+            citizens.address ASC
             OFFSET $2
             LIMIT $3;
           `,
@@ -114,6 +114,7 @@ async function getCitizens({
         direct: citizen.direct_vp?.toFixed(0) || "0",
         advanced: citizen.advanced_vp?.toFixed(0) || "0",
       },
+      votingParticipation: 0,
       citizen: citizen.citizen,
       statement: citizen.statement,
     })),

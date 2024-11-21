@@ -9,6 +9,7 @@ import {
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
+import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
 
 async function fetchProposalVotes(
   proposalId: string,
@@ -50,6 +51,7 @@ export default async function OPProposalApprovalPage({
   proposal: Proposal;
 }) {
   const proposalVotes = await fetchProposalVotes(proposal.id);
+  const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
 
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
@@ -72,6 +74,7 @@ export default async function OPProposalApprovalPage({
             <ApprovalVotesPanel
               proposal={proposal}
               initialProposalVotes={proposalVotes}
+              nonVoters={nonVoters}
               fetchVotesForProposal={fetchProposalVotes}
               fetchAllForVoting={fetchAllForVoting}
               fetchUserVotesForProposal={fetchUserVotesForProposal}
