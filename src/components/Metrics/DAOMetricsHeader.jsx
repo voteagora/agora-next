@@ -1,7 +1,6 @@
 "use client";
 
 import discord from "@/icons/discord.svg";
-import infoTransparent from "@/icons/info-transparent.svg";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
 import { cn } from "@/lib/utils";
