@@ -17,6 +17,7 @@ import Image from "next/image";
 import { PaginationParams } from "./lib/pagination";
 
 // Revalidate cache every 60 seconds
+// Test e
 export const revalidate = 60;
 
 async function fetchProposals(
