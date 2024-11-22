@@ -50,12 +50,10 @@ export default function VoterHoverCard({
     );
   }
 
-  if (delegate.statement === null) {
-    return <p className="text-center">No statement</p>;
-  }
-
   const truncatedStatement =
-    delegate.statement.payload?.delegateStatement?.slice(0, 120) || "";
+    delegate.statement === null
+      ? null
+      : delegate.statement.payload?.delegateStatement?.slice(0, 120) || "";
 
   return (
     <VStack gap={4} className="h-full w-[300px]">
@@ -63,26 +61,29 @@ export default function VoterHoverCard({
         <VStack gap={4} justifyContent="justify-center">
           <DelegateProfileImage
             address={address}
-            endorsed={!!delegate ? delegate.statement.endorsed : false}
-            votingPower={!!delegate ? delegate.votingPower.total : "0"}
+            endorsed={!!delegate.statement?.endorsed}
+            votingPower={delegate.votingPower.total}
           />
           <p
             className={`break-words text-secondary overflow-hidden line-clamp-2 text-ellipsis`}
           >
-            {truncatedStatement}
+            {truncatedStatement === null
+              ? "This delegate has not yet created a delegate statement."
+              : truncatedStatement}
           </p>
         </VStack>
       </Link>
       <div className="flex-grow" />
       <HStack alignItems="items-stretch" className={"justify-between"}>
-        <DelegateSocialLinks
-          warpcast={delegate?.statement.warpcast}
-          discord={delegate?.statement.discord}
-          twitter={delegate?.statement.twitter}
-        />
+        {delegate.statement !== null && (
+          <DelegateSocialLinks
+            warpcast={delegate.statement.warpcast}
+            discord={delegate.statement.discord}
+            twitter={delegate.statement.twitter}
+          />
+        )}
         <div>
-          {!!delegate &&
-            isConnected &&
+          {isConnected &&
             connectedAddress &&
             (isAdvancedUser ? (
               <AdvancedDelegateButton
@@ -92,7 +93,7 @@ export default function VoterHoverCard({
             ) : (
               <DelegateButton
                 full={
-                  !delegate?.statement.twitter && !delegate?.statement.discord
+                  !delegate.statement?.twitter && !delegate.statement?.discord
                 }
                 delegate={delegate}
               />
