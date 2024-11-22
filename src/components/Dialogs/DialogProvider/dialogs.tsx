@@ -33,8 +33,6 @@ import { SCWDelegateDialog } from "@/components/Dialogs/SCWDelegateDialog/SCWDel
 export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
-  | DelegateDialogType
-  | UndelegateDialogType
   | CastProposalDialogType
   | CastVoteDialogType
   | CreateDraftProposalDialog
@@ -47,6 +45,7 @@ export type DialogType =
   | SponsorOnchainDraftProposalDialog
   | SponsorSnapshotDraftProposalDialog
   | SwithcNetworkDialogType
+  | UndelegateDialogType
   | UpdateDraftProposalDialog;
 // | FaqDialogType
 
