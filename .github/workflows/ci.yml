@@ -15,16 +15,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Install Swagger dependencies
         run: |
           yarn install
           yarn add @swagger-api/apidom-parser-adapter-api-design-systems-json
+
+      - name: Debug node_modules
+        run: |
+          ls -la node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json
+          cat node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json/package.json
 
       - name: Validate OpenAPI definition
         uses: char0n/apidom-validate@v1
         with:
           fails-on: 2
           definition-file: spec/oas_v1.yaml
+
   lint-prettier:
     runs-on: ubuntu-latest
     steps:
