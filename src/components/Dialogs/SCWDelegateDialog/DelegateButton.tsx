@@ -2,7 +2,6 @@
 
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { Button as ShadcnButton } from "@/components/ui/button";
-import { Contract } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useState } from "react";
@@ -22,14 +21,14 @@ export const DelegateButton = ({ delegate, onSuccess }: Props) => {
 
   const { setRefetchDelegate } = useConnectButtonContext();
 
-  const contract = new Contract(contracts.token.address, contracts.token.abi);
-  const data = contract.interface.encodeFunctionData("delegate", [
-    delegate.address as any,
-  ]) as `0x${string}`;
+  const data = contracts.token.contract.interface.encodeFunctionData(
+    "delegate",
+    [delegate.address as any]
+  ) as `0x${string}`;
 
-  const { data: lyraClient } = useLyraDeriveAccount();
+  const { data: smartAccountClient } = useLyraDeriveAccount();
 
-  if (!lyraClient) {
+  if (!smartAccountClient) {
     return null;
   }
 
@@ -39,18 +38,17 @@ export const DelegateButton = ({ delegate, onSuccess }: Props) => {
 
   if (error) {
     return (
-      <div className="px-3 py-2 bg-red-300 border border-red-500 rounded-md text-sm text-red">
+      <div className="px-3 py-2 bg-red-300 border border-red-500 rounded-md text-sm">
         There was an error with the delegation from your Smart Account. Please
         try again later.
       </div>
     );
   }
 
-  if (txn) {
-    // TODO: Improve the success state
+  if (txn && !error) {
     return (
-      <div>
-        Delegation completed!
+      <div className="px-3 py-2 bg-green-200 border border-green-300 rounded-md text-sm">
+        <div className="font-semibold">Delegation completed!</div>
         <BlockScanUrls hash1={data} />
       </div>
     );
@@ -59,18 +57,18 @@ export const DelegateButton = ({ delegate, onSuccess }: Props) => {
   return (
     <ShadcnButton
       onClick={() => {
-        lyraClient
+        smartAccountClient
           .sendUserOperation({
-            account: lyraClient.account!,
+            account: smartAccountClient.account!,
             uo: {
               target: contracts.token.address as `0x${string}`,
               data: data,
             },
           })
-          .then((tx: any) => {
-            onSuccess(tx.hash);
+          .then((txn: any) => {
+            onSuccess(txn.hash);
             setError(null);
-            setTxn(tx);
+            setTxn(txn);
 
             // TODO: Andrei - this is an anti-pattern, we should use a reactQuery
             //  and invalidate the cache for the delegate
