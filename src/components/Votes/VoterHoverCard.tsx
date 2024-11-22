@@ -74,7 +74,12 @@ export default function VoterHoverCard({
         </VStack>
       </Link>
       <div className="flex-grow" />
-      <HStack alignItems="items-stretch" className={"justify-between"}>
+      <HStack
+        alignItems="items-stretch"
+        className={
+          delegate.statement === null ? "justify-end" : "justify-between"
+        }
+      >
         {delegate.statement !== null && (
           <DelegateSocialLinks
             warpcast={delegate.statement.warpcast}
