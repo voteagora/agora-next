@@ -22,9 +22,18 @@ jobs:
           yarn add @swagger-api/apidom-parser-adapter-api-design-systems-json
 
       - name: Debug node_modules
-        run: |
-          ls -la node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json
-          cat node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json/package.json
+    run: |
+      ls -la node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json
+      if [ -f node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json/package.json ]; then
+        cat node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json/package.json
+      else
+        echo "package.json not found in module directory"
+      fi
+      if [ -f node_modules/@swagger-api/apidom-parser-adapter-api-design-systems-json/src/adapter.cjs ]; then
+        echo "adapter.cjs found"
+      else
+        echo "adapter.cjs not found in module directory"
+      fi
 
       - name: Validate OpenAPI definition
         uses: char0n/apidom-validate@v1
