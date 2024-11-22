@@ -68,6 +68,7 @@ function NumberInput<
                 className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary`}
                 {...field}
                 placeholder={placeholder}
+                onWheel={(e) => e.currentTarget.blur()}
               />
             </div>
           </FormControl>
