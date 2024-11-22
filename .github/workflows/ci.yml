@@ -8,6 +8,7 @@ on:
     branches:
       - 'main'
 
+
 jobs:
   swagger_lint:
     runs-on: ubuntu-latest
@@ -15,11 +16,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: Install Swagger dependencies
+        run: npm install @swagger-api/apidom-parser-adapter-api-design-systems-json
       - name: Validate OpenAPI definition
         uses: char0n/apidom-validate@v1
         with:
           fails-on: 2
           definition-file: spec/oas_v1.yaml
+
   lint-prettier:
     runs-on: ubuntu-latest
     steps:
