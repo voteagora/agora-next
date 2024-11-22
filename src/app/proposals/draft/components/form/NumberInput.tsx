@@ -69,6 +69,7 @@ function NumberInput<
                 {...field}
                 placeholder={placeholder}
                 onWheel={(e) => e.currentTarget.blur()}
+                min={0}
               />
             </div>
           </FormControl>
