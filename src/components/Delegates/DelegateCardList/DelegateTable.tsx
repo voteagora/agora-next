@@ -27,9 +27,11 @@ export default function DelegateTable({
   initialDelegates,
   fetchDelegates,
 }: Props) {
-  const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
+
+  const fetching = useRef(false);
+
   const { setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
