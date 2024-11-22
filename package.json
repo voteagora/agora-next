@@ -16,8 +16,21 @@
     "prettier-src": "prettier -w src/",
     "test": "jest"
   },
+  "overrides": {
+    "@swagger-api/apidom-core": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-error": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-json-pointer": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-ns-openapi-3-1": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-reference": ">=1.0.0-beta.2 <1.0.0-rc.0"
+  },
+  "resolutions": {
+    "@swagger-api/apidom-core": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-error": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-json-pointer": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-ns-openapi-3-1": ">=1.0.0-beta.2 <1.0.0-rc.0",
+    "@swagger-api/apidom-reference": ">=1.0.0-beta.2 <1.0.0-rc.0"
+  },
   "dependencies": {
-    "@swagger-api/apidom-json-pointer": "^1.0.0-beta.2",
     "@aa-sdk/core": "^4.0.0-beta.10",
     "@account-kit/infra": "^4.0.0-beta.10",
     "@account-kit/smart-contracts": "^4.0.0-beta.10",
