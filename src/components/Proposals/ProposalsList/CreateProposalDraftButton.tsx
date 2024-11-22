@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { UpdatedButton } from "@/components/Button";
 import createProposalDraft from "./actions/createProposalDraft";
-// import classNames from "classnames";
+import classNames from "classnames";
 
 const CreateProposalDraftButton = ({
   address,
@@ -27,7 +27,7 @@ const CreateProposalDraftButton = ({
       variant="rounded"
       type="primary"
       isLoading={isPending}
-      className={""}
+      className={classNames(className)}
       onClick={async () => {
         setIsPending(true);
         const proposal = await createProposalDraft(address);

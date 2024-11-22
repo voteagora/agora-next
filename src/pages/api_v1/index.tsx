@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-// import SwaggerUI from "swagger-ui-react";
-// import "swagger-ui-react/swagger-ui.css";
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +18,7 @@ export default function SpecUI() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${inter.className}`}>
-        {/*<SwaggerUI url="/api/v1/spec" />*/}
+        <SwaggerUI url="/api/v1/spec" />
       </main>
     </>
   );
