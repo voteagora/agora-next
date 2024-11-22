@@ -16,7 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Swagger dependencies
-        run: yarn add @swagger-api/apidom-parser-adapter-api-design-systems-json
+        run: |
+          yarn install
+          yarn add @swagger-api/apidom-parser-adapter-api-design-systems-json
+
       - name: Validate OpenAPI definition
         uses: char0n/apidom-validate@v1
         with:
