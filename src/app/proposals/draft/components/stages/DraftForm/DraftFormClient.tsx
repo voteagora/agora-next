@@ -133,6 +133,7 @@ const DraftFormClient = ({
       }
     } catch (error: any) {
       setIsPending(false);
+      console.error("An error was uncaught in `draftProposalAction`: ", error);
       toast(error.message);
     }
   };

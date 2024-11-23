@@ -60,6 +60,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
       );
     } catch (e: any) {
+      console.error("An error was uncaught in `tempCheckAction`: ", e);
       toast.error(e.message);
     }
   };
