@@ -17,6 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@swagger-api/apidom-parser-adapter-api-design-systems-json": "^1.0.0-beta.2",
     "@aa-sdk/core": "^4.0.0-beta.10",
     "@account-kit/infra": "^4.0.0-beta.10",
     "@account-kit/smart-contracts": "^4.0.0-beta.10",
@@ -101,6 +102,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@swagger-api/apidom-parser-adapter-api-design-systems-json": "^1.0.0-beta.2",
     "@aws-sdk/client-dynamodb": "^3.454.0",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
