@@ -113,7 +113,8 @@ const DraftFormClient = ({
 
     try {
       if (!address) {
-        throw new Error("No address found");
+        toast("Account not connected.");
+        return;
       }
       const res = await draftProposalAction({
         ...data,
@@ -122,16 +123,17 @@ const DraftFormClient = ({
       });
       if (!res.ok) {
         setIsPending(false);
-        toast("Something went wrong...");
+        toast(res.message);
+        return;
       } else {
         invalidatePath(draftProposal.id);
         router.push(
           `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       setIsPending(false);
-      toast("Something went wrong...");
+      toast(error.message);
     }
   };
 

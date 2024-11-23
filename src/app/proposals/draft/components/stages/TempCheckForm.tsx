@@ -47,16 +47,20 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         toast.error("No address connected");
         return;
       }
-      await tempCheckAction({
+      const res = await tempCheckAction({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
       });
+      if (!res.ok) {
+        toast.error(res.message);
+        return;
+      }
       router.push(
         `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
       );
-    } catch (e) {
-      toast.error("Something went wrong...");
+    } catch (e: any) {
+      toast.error(e.message);
     }
   };
 

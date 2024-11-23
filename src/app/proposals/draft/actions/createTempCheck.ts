@@ -62,10 +62,10 @@ export async function onSubmitAction(
         ok: true,
         message: `Temp check saved.`,
       };
-    } catch (error) {
+    } catch (e: any) {
       return {
         ok: false,
-        message: "Error saving temp check",
+        message: e.message,
       };
     }
   } catch (e) {
