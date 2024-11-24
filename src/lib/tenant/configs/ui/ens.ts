@@ -134,12 +134,12 @@ export const ensTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType.BASIC,
+            type: ProposalType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType.SOCIAL,
+            type: ProposalType?.SOCIAL,
             prodAddress: null,
             testnetAddress: null,
           },

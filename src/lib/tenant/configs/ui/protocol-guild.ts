@@ -184,7 +184,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType.BASIC,
+            type: ProposalType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },

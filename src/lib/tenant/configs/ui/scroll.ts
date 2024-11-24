@@ -274,17 +274,17 @@ export const scrollTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType.BASIC,
+            type: ProposalType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType.APPROVAL,
+            type: ProposalType?.APPROVAL,
             prodAddress: "0xe5bAF6359d200C144A9e52E3361efA6Dc5780cC9",
             testnetAddress: null,
           },
           {
-            type: ProposalType.OPTIMISTIC,
+            type: ProposalType?.OPTIMISTIC,
             prodAddress: "0x89c4C0E77f7876415d07a2e43E5e9a6A4Cab3538",
             testnetAddress: null,
           },
