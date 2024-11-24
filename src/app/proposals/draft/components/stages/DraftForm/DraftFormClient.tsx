@@ -49,15 +49,26 @@ const getValidProposalTypesForVotingType = (
   proposalType: ProposalType
 ) => {
   switch (proposalType) {
+    case ProposalType.APPROVAL:
+      return proposalTypes.filter((type) => {
+        return type.name.toLowerCase().includes("approval");
+      });
+
     case ProposalType.OPTIMISTIC:
       return proposalTypes.filter((type) => {
-        return type.quorum === "0" && type.approval_threshold === "0";
+        return type.name.toLowerCase().includes("optimistic");
+      });
+
+    case ProposalType.BASIC:
+      return proposalTypes.filter((type) => {
+        return (
+          !type.name.toLowerCase().includes("approval") &&
+          !type.name.toLowerCase().includes("optimistic")
+        );
       });
 
     // currently no constraints on these voting modules
-    case ProposalType.BASIC:
     case ProposalType.SOCIAL:
-    case ProposalType.APPROVAL:
     default:
       return proposalTypes;
   }
