@@ -1,6 +1,5 @@
 "use client";
 
-import { VStack, HStack } from "@/components/Layout/Stack";
 import { useState } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { SupportTextProps } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import { checkMissingVoteForDelegate, MissingVote } from "@/lib/voteUtils";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 
 type Props = {
@@ -27,9 +26,7 @@ export default function CastVoteInput({
   const [reason, setReason] = useState("");
   const openDialog = useOpenDialog();
   const { chains, delegate, isSuccess, votes, votingPower } =
-    useFetchAllForVoting({
-      proposal,
-    });
+    useFetchAllForVoting({ proposal });
 
   if (!isConnected) {
     return (
@@ -50,18 +47,14 @@ export default function CastVoteInput({
   }
 
   return (
-    <VStack className="bg-neutral border border-line rounded-lg flex-shrink mx-4">
+    <div className="flex flex-col bg-neutral border border-line rounded-lg flex-shrink mx-4">
       <textarea
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         className="text-sm p-4 resize-none rounded-lg border-0 focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0"
       />
-      <VStack
-        justifyContent="justify-between"
-        alignItems="items-stretch"
-        className="px-3 pb-3 pt-1"
-      >
+      <div className="flex flex-col px-3 pb-3 pt-1 justify-between items-stretch">
         <VoteButtons
           onClick={(
             supportType: SupportTextProps["supportType"],
@@ -85,8 +78,8 @@ export default function CastVoteInput({
           isOptimistic={isOptimistic}
           votingPower={votingPower}
         />
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }
 
@@ -117,7 +110,7 @@ function VoteButtons({
   }
 
   return (
-    <HStack gap={2} className="pt-1">
+    <div className="flex flex-row pt-1 gap-2">
       {(isOptimistic ? ["AGAINST"] : ["FOR", "AGAINST", "ABSTAIN"]).map(
         (supportType) => (
           <VoteButton
@@ -132,7 +125,7 @@ function VoteButtons({
           />
         )
       )}
-    </HStack>
+    </div>
   );
 }
 
