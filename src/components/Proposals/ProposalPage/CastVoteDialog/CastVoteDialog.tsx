@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
@@ -23,12 +22,11 @@ export function CastVoteDialog(props: CastVoteDialogProps) {
   const { ui, contracts } = Tenant.current();
   const scwConfig = ui.smartAccountConfig;
 
-  // Assume voting from SCW if the voting power is set
+  // Assume voting from SCW if config is present on the tenant
   if (scwConfig?.factoryAddress) {
     return <SCWVoteDialog {...props} />;
   }
 
-  // TODO: Andrei - refactor to use governor types
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
   ) : (
@@ -102,14 +100,10 @@ const SCWVoteDialog = ({
             )}
           </div>
           <div>
-            {delegate.statement ? (
-              <VoteButton onClick={write}>
-                Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDisplay amount={vpToDisplay} />
-              </VoteButton>
-            ) : (
-              <NoStatementView closeDialog={closeDialog} />
-            )}
+            <VoteButton onClick={write}>
+              Vote {supportType.toLowerCase()} with{"\u00A0"}
+              <TokenAmountDisplay amount={vpToDisplay} />
+            </VoteButton>
           </div>
         </div>
       )}
@@ -152,8 +146,8 @@ const BasicVoteDialog = ({
           className="flex flex-col gap-4 w-full relative"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <HStack justifyContent="justify-between">
-            <VStack>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
                   <HumanAddress address={delegate.address} />
@@ -166,12 +160,12 @@ const BasicVoteDialog = ({
               <div className="text-lg text-primary font-extrabold">
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
-            </VStack>
-            <VStack alignItems="items-end">
+            </div>
+            <div className="flex flex-col items-end">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
-            </VStack>
-          </HStack>
+            </div>
+          </div>
           <div>
             {reason ? (
               <div className="max-h-[40vh] overflow-y-scroll text-secondary">
@@ -237,8 +231,8 @@ function AdvancedVoteDialog({
           className="w-full relative gap-4"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <HStack justifyContent="justify-between">
-            <VStack>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
                   <HumanAddress address={delegate.address} />
@@ -251,12 +245,12 @@ function AdvancedVoteDialog({
               <div className="text-lg text-primary font-extrabold">
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
-            </VStack>
-            <VStack alignItems="items-end">
+            </div>
+            <div className="flex flex-col items-end">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
-            </VStack>
-          </HStack>
+            </div>
+          </div>
           <div>
             {reason ? (
               <div className="max-h-[40vh] overflow-y-scroll text-secondary">
@@ -313,7 +307,7 @@ export function SuccessMessage({
   const { ui } = Tenant.current();
 
   return (
-    <VStack className="w-full">
+    <div className="flex flex-col w-full">
       <Image
         width="457"
         height="155"
@@ -344,7 +338,7 @@ export function SuccessMessage({
         hash1={data?.standardTxHash}
         hash2={data?.advancedTxHash}
       />
-    </VStack>
+    </div>
   );
 }
 
@@ -352,7 +346,7 @@ export function LoadingVote() {
   const { ui } = Tenant.current();
 
   return (
-    <VStack className="w-full">
+    <div className="flex flex-col w-full">
       <Image
         src={ui.assets.pending}
         className="w-full mb-3"
@@ -371,7 +365,7 @@ export function LoadingVote() {
           </div>
         </div>
       </div>
-    </VStack>
+    </div>
   );
 }
 
@@ -398,7 +392,7 @@ export function DisabledVoteDialog({
   const { ui } = Tenant.current();
 
   return (
-    <VStack className="w-full">
+    <div className="flex flex-col w-full">
       <Image
         width="457"
         height="155"
@@ -422,6 +416,6 @@ export function DisabledVoteDialog({
           <div className="font-medium">Got it, I’ll come back later</div>
         </div>
       </div>
-    </VStack>
+    </div>
   );
 }

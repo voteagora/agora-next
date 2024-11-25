@@ -1,9 +1,7 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useState } from "react";
-import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { useLyraDeriveAccount } from "@/hooks/useSmartAccountDerive";
-import { setError } from "@opentelemetry/instrumentation-dns/build/src/utils";
 
 export const useScwVoting = ({
   proposalId,
