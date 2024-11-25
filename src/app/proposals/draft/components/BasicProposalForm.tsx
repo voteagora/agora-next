@@ -240,6 +240,7 @@ const BasicProposalForm = () => {
         }
       });
     } catch (e) {
+      console.error(e);
       toast.error("Error simulating transactions");
     } finally {
       setFormDirty(false);

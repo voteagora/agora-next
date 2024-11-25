@@ -3,6 +3,7 @@ import {
   ERC20__factory,
   OptimismGovernor__factory,
   ProposalTypesConfigurator__factory,
+  AgoraTimelock__factory,
 } from "@/lib/contracts/generated";
 import { AlchemyProvider, BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
@@ -31,6 +32,11 @@ export const optimismTenantContractConfig = ({
   const TYPES = isProd
     ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
     : "0x2e0C197f1fca7628ADfa2bdaabd1df4670186C06";
+
+  // TODO: replace prod timelock when the contract is deployed
+  const TIMELOCK = isProd
+    ? "0x0000000000000000000000000000000000000000"
+    : "0x85c118971C058677DC502854d56A483BF5548042";
 
   const provider = new AlchemyProvider("optimism", alchemyId);
   const chain = optimism;
@@ -68,6 +74,14 @@ export const optimismTenantContractConfig = ({
       address: TYPES,
       chain,
       contract: OptimismGovernor__factory.connect(TYPES, provider),
+      provider,
+    }),
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
   };

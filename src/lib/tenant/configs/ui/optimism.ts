@@ -258,7 +258,7 @@ export const optimismTenantUIConfig = new TenantUI({
           {
             type: ProposalType?.OPTIMISTIC,
             prodAddress: "0x27964c5f4F389B8399036e1076d84c6984576C33",
-            testnetAddress: "0x27964c5f4F389B8399036e1076d84c6984576C33",
+            testnetAddress: "0x4ab438e093647fC5eC7B773D1A5f6d3C2C7F0593",
           },
         ],
         copy: {
