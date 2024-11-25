@@ -35,6 +35,8 @@ export function findDelagatee({
       return prisma.deriveDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildDelegatees.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+        return prisma.boostDelegatees.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -92,6 +94,10 @@ export function findAdvancedDelegatee({
       return prisma.pguildAdvancedDelegatees.findMany(
         partial ? undefined : condition
       );
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostAdvancedDelegatees.findMany(
+        partial ? undefined : condition
+      );
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -119,6 +125,8 @@ export function findVotableSupply({
       return prisma.deriveVotableSupply.findFirst({});
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildVotableSupply.findFirst({});
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostVotableSupply.findFirst({});
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -166,6 +174,8 @@ export function findProposalsQuery({
       return prisma.deriveProposals.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildProposals.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostProposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -201,6 +211,8 @@ export function findProposal({
       return prisma.deriveProposals.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildProposals.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostProposals.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -239,6 +251,8 @@ export function findProposalType({
       return prisma.deriveProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildProposalTypes.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostProposalTypes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -274,6 +288,8 @@ export function findVotes({
       return prisma.deriveVotes.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildVotes.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostVotes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -312,6 +328,8 @@ export function findVotingPower({
       return prisma.deriveVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -350,6 +368,8 @@ export function findAdvancedVotingPower({
       return prisma.deriveAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildAdvancedVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostAdvancedVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -385,6 +405,8 @@ export async function findStakedDeposit({
       return prisma.deriveStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildStakedDeposits.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostStakedDeposits.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -432,6 +454,8 @@ export function findStakedDeposits({
       return prisma.deriveStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildStakedDeposits.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostStakedDeposits.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
