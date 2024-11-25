@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { useLyraDeriveAccount } from "@/hooks/useSmartAccountDerive";
+import { setError } from "@opentelemetry/instrumentation-dns/build/src/utils";
 
 export const useScwVoting = ({
   proposalId,
@@ -19,18 +20,12 @@ export const useScwVoting = ({
 }) => {
   const { contracts } = Tenant.current();
 
-  const { writeContractAsync: standardVote, isError: _standardVoteError } =
-    useWriteContract();
-
   const { data: smartAccountClient } = useLyraDeriveAccount();
 
-  const [standardVoteError, setStandardVoteError] =
-    useState(_standardVoteError);
-  const [standardVoteLoading, setStandardVoteLoading] = useState(false);
-  const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
-  const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
-    undefined
-  );
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [txnHash, setTxnHash] = useState<string | undefined>(undefined);
 
   const data = contracts.governor.contract.interface.encodeFunctionData(
     !!reason ? "castVoteWithReason" : "castVote",
@@ -50,19 +45,23 @@ export const useScwVoting = ({
           },
         })
         .then((txn: any) => {
-          console.log(txn);
+          setIsLoading(false);
+          setIsError(false);
+          setIsSuccess(true);
+          setTxnHash(txn.hash);
         })
         .catch((error) => {
-          console.log(error);
+          setIsError(true);
+          setIsSuccess(false);
         });
     }
   };
 
   return {
-    isLoading: standardVoteLoading,
-    isError: standardVoteError,
-    isSuccess: standardVoteSuccess,
+    isLoading: isLoading,
+    isError: isError,
+    isSuccess: isSuccess,
     write,
-    data: { standardTxHash },
+    data: { standardTxHash: txnHash, advancedTxHash: undefined },
   };
 };

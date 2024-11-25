@@ -13,14 +13,22 @@ import { getVpToDisplay } from "@/lib/voteUtils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
+import { useScwVoting } from "@/hooks/useScwVoting";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
 };
 
-// TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: CastVoteDialogProps) {
-  const { contracts } = Tenant.current();
+  const { ui, contracts } = Tenant.current();
+  const scwConfig = ui.smartAccountConfig;
+
+  // Assume voting from SCW if the voting power is set
+  if (scwConfig?.factoryAddress) {
+    return <SCWVoteDialog {...props} />;
+  }
+
+  // TODO: Andrei - refactor to use governor types
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
   ) : (
@@ -28,7 +36,7 @@ export function CastVoteDialog(props: CastVoteDialogProps) {
   );
 }
 
-function BasicVoteDialog({
+const SCWVoteDialog = ({
   proposalId,
   reason,
   supportType,
@@ -36,7 +44,89 @@ function BasicVoteDialog({
   votingPower,
   delegate,
   missingVote,
-}: CastVoteDialogProps) {
+}: CastVoteDialogProps) => {
+  const { write, isLoading, isSuccess, data } = useScwVoting({
+    proposalId,
+    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
+    reason,
+    missingVote,
+  });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  if (!delegate) {
+    // todo: log
+    return null;
+  }
+
+  if (isLoading) {
+    return <LoadingVote />;
+  }
+
+  return (
+    <>
+      {!isSuccess && (
+        <div
+          className="flex flex-col gap-4 w-full relative"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
+              {delegate.address ? (
+                <div className="text-xs text-tertiary font-medium">
+                  <HumanAddress address={delegate.address} />
+                </div>
+              ) : (
+                <div className="text-xs text-tertiary font-medium">
+                  Anonymous
+                </div>
+              )}
+              <div className="text-lg text-primary font-extrabold">
+                Casting vote&nbsp;{supportType.toLowerCase()}
+              </div>
+            </div>
+            <div className="flex flex-col items-end">
+              <div className="text-xs text-tertiary font-medium">with</div>
+              <TokenAmountDisplay amount={vpToDisplay} />
+            </div>
+          </div>
+          <div>
+            {reason ? (
+              <div className="max-h-[40vh] overflow-y-scroll text-secondary">
+                {reason}
+              </div>
+            ) : (
+              <div className="w-full py-6 px-4 rounded-lg border border-line text-center text-secondary">
+                No voting reason provided
+              </div>
+            )}
+          </div>
+          <div>
+            {delegate.statement ? (
+              <VoteButton onClick={write}>
+                Vote {supportType.toLowerCase()} with{"\u00A0"}
+                <TokenAmountDisplay amount={vpToDisplay} />
+              </VoteButton>
+            ) : (
+              <NoStatementView closeDialog={closeDialog} />
+            )}
+          </div>
+        </div>
+      )}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
+    </>
+  );
+};
+
+const BasicVoteDialog = ({
+  proposalId,
+  reason,
+  supportType,
+  closeDialog,
+  votingPower,
+  delegate,
+  missingVote,
+}: CastVoteDialogProps) => {
   const { write, isLoading, isSuccess, data } = useStandardVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
@@ -108,7 +198,7 @@ function BasicVoteDialog({
       {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
     </>
   );
-}
+};
 
 function AdvancedVoteDialog({
   proposalId,
