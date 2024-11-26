@@ -117,8 +117,14 @@ export default function DAOMetricsHeader({ metrics }) {
                       <ExternalLinkItem link={governanceForumLink} />
                       <ExternalLinkItem link={bugsLink} />
                       {changeLogLink && (
-                        <Link href={changeLogLink.url} className="text-center">
-                          {changeLogLink.title}
+                        <Link
+                          href={changeLogLink.url}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-secondary/80 text-sm">
+                            {changeLogLink.title}
+                          </span>
+                          <ExternalLink className="h-4 w-4 text-secondary/50" />
                         </Link>
                       )}
                       <ExternalLinkItem link={faqLink} />
