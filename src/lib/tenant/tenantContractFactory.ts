@@ -8,6 +8,7 @@ import { cyberTenantConfig } from "@/lib/tenant/configs/contracts/cyber";
 import { deriveTenantConfig } from "@/lib/tenant/configs/contracts/derive";
 import { scrollTenantContractConfig } from "@/lib/tenant/configs/contracts/scroll";
 import { protocolGuildTenantContractConfig } from "./configs/contracts/protocol-guild";
+import { boostTenantConfig } from "./configs/contracts/boost";
 
 export default class TenantContractFactory {
   public static create(
@@ -32,6 +33,8 @@ export default class TenantContractFactory {
         return scrollTenantContractConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.PGUILD:
         return protocolGuildTenantContractConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.BOOST:
+        return boostTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

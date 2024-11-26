@@ -14,6 +14,7 @@ const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
   etherfi: "EtherFi",
   pguild: "PGuild",
+  boost: "Boost",
 };
 
 export default class Tenant {

@@ -58,6 +58,13 @@ export default class TenantTokenFactory {
           symbol: "PGUILD",
           decimals: 0,
         };
+
+      case TENANT_NAMESPACES.BOOST:
+        return {
+          name: "Boost Protocol",
+          symbol: "BOOST",
+          decimals: 0,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

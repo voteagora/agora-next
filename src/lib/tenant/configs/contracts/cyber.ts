@@ -4,7 +4,6 @@ import {
   CyberProposalTypes__factory,
   ERC20__factory,
 } from "@/lib/contracts/generated";
-import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
