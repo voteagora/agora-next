@@ -1,7 +1,6 @@
 "use client";
 
 import discord from "@/icons/discord.svg";
-import infoTransparent from "@/icons/info-transparent.svg";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
 import { cn } from "@/lib/utils";
@@ -14,6 +13,26 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Menu, ExternalLink } from "lucide-react";
+
+function ExternalLinkItem({ link }) {
+  if (!link) {
+    return null;
+  }
+
+  return (
+    <a
+      href={link.url}
+      rel="noreferrer nonopener"
+      target="_blank"
+      className="flex items-center justify-between"
+    >
+      <span className="text-secondary/80 text-sm">{link.title}</span>
+      <ExternalLink className="h-4 w-4 text-secondary/50" />
+    </a>
+  );
+}
 
 export default function DAOMetricsHeader({ metrics }) {
   const { token, ui, contracts } = Tenant.current();
@@ -25,11 +44,6 @@ export default function DAOMetricsHeader({ metrics }) {
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
   const agoraLink = ui.link("agora");
-
-  // discord + agora are hidden on mobile
-  const hasLinksMobile =
-    !!governanceForumLink || !!bugsLink || !!changeLogLink || !!faqLink;
-  const hasLinksDesktop = hasLinksMobile || !!discordLink || !!agoraLink;
 
   useEffect(() => {
     setIsClient(true);
@@ -46,7 +60,7 @@ export default function DAOMetricsHeader({ metrics }) {
     return (
       <>
         {createPortal(
-          <div className="sm:min-w-desktop sticky z-50 bottom-10 sm:bottom-0 left-0 flex justify-center">
+          <div className="sm:min-w-desktop sticky z-50 bottom-0 sm:bottom-0 left-0 flex justify-center">
             <div
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
@@ -55,7 +69,7 @@ export default function DAOMetricsHeader({ metrics }) {
                 `transition-all duration-200 ease-in-out transform sm:transition-none sm:translate-y-0`
               )}
             >
-              <div className="w-full sm:w-3/5 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10">
+              <div className="w-full flex items-center px-6 sm:px-8 gap-8 justify-between h-10">
                 <div className="flex gap-6 sm:gap-8">
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger>
@@ -93,74 +107,35 @@ export default function DAOMetricsHeader({ metrics }) {
                     </HoverCard>
                   )}
                 </div>
-              </div>
-              <div className="block bg-line w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div
-                className={`w-full sm:w-2/5 justify-end items-center px-6 sm:px-8 gap-4 h-10 ${
-                  hasLinksMobile
-                    ? "flex"
-                    : hasLinksDesktop
-                      ? "hidden sm:flex"
-                      : "hidden"
-                }`}
-              >
-                {governanceForumLink && (
-                  <a
-                    href={governanceForumLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="text-center"
-                  >
-                    {governanceForumLink.title}
-                  </a>
-                )}
-                {bugsLink && (
-                  <a
-                    href={bugsLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="text-center"
-                  >
-                    {bugsLink.title}
-                  </a>
-                )}
-                {changeLogLink && (
-                  <Link href={changeLogLink.url} className="text-center">
-                    {changeLogLink.title}
-                  </Link>
-                )}
-                {faqLink && (
-                  <a
-                    href={faqLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="text-center"
-                  >
-                    {faqLink.title}
-                  </a>
-                )}
 
-                {discordLink && (
-                  <a
-                    href={discordLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="hidden sm:inline"
-                  >
-                    <Image src={discord} alt={discordLink.title} />
-                  </a>
-                )}
-
-                {agoraLink && (
-                  <a
-                    href={agoraLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="hidden sm:inline"
-                  >
-                    {agoraLink.title}
-                  </a>
-                )}
+                <Drawer>
+                  <DrawerTrigger>
+                    <Menu className="h-4 w-4 sm:h-5 sm:w-5 text-secondary/50" />
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="space-y-4 px-2 py-5 sm:py-8 max-w-[400px] w-full mx-auto">
+                      <ExternalLinkItem link={governanceForumLink} />
+                      <ExternalLinkItem link={bugsLink} />
+                      {changeLogLink && (
+                        <Link href={changeLogLink.url} className="text-center">
+                          {changeLogLink.title}
+                        </Link>
+                      )}
+                      <ExternalLinkItem link={faqLink} />
+                      {discordLink && (
+                        <a
+                          href={discordLink.url}
+                          rel="noreferrer nonopener"
+                          target="_blank"
+                          className="hidden sm:inline"
+                        >
+                          <Image src={discord} alt={discordLink.title} />
+                        </a>
+                      )}
+                      <ExternalLinkItem link={agoraLink} />
+                    </div>
+                  </DrawerContent>
+                </Drawer>
               </div>
             </div>
           </div>,
