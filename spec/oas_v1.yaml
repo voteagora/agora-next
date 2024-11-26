@@ -1123,12 +1123,9 @@ components:
                   details:
                     type: string
         pricingModel:
-          type: object
-          properties:
-            type:
-              type: string
-            details:
-              type: string
+          type: string
+        pricingModelDetails:
+          type: string
         impactStatement:
           type: object
           properties:
