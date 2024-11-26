@@ -36,7 +36,7 @@ export function findDelagatee({
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
-        return prisma.boostDelegatees.findFirst(condition);
+      return prisma.boostDelegatees.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
