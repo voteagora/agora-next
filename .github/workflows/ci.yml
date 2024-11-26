@@ -21,6 +21,20 @@ jobs:
         with:
           fails-on: 2
           definition-file: spec/oas_v1.yaml
+        env:
+          # Enable debugging output
+          DEBUG: 'true'  # This will print more verbose output if supported by the tool
+      - name: Show YAML file content
+        run: |
+          echo "Displaying the OpenAPI spec for debugging purposes..."
+          cat spec/oas_v1.yaml
+      - name: Print node and npm versions
+        run: |
+          echo "Node version:"
+          node -v
+          echo "npm version:"
+          npm -v
+          
 
   lint-prettier:
     runs-on: ubuntu-latest
