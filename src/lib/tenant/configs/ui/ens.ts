@@ -88,6 +88,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegates/my-delegates-filter",
+      enabled: true,
+    },
+    {
       name: "proposal-execute",
       enabled: true,
     },
