@@ -3320,7 +3320,7 @@ view boostProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals")
   @@schema("boost")
 }
 
