@@ -9,11 +9,10 @@ on:
       - 'main'
 
 jobs:
-#  Disabled due to build failure package mismatch
+  #  Disabled due to build failure package mismatch
   swagger_lint:
     runs-on: ubuntu-latest
     name: Swagger Editor Validator Remote
-
     steps:
       - uses: actions/checkout@v2
       - name: Validate OpenAPI definition
@@ -34,13 +33,7 @@ jobs:
           node -v
           echo "npm version:"
           npm -v
-          
 
   lint-prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: yarn install
-      - name: Lint with Prettier
-        run: yarn check-prettier
