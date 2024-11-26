@@ -8,6 +8,7 @@ import { cyberTenantUIConfig } from "@/lib/tenant/configs/ui/cyber";
 import { deriveTenantUIConfig } from "@/lib/tenant/configs/ui/derive";
 import { scrollTenantUIConfig } from "@/lib/tenant/configs/ui/scroll";
 import { protocolGuildTenantUIConfig } from "@/lib/tenant/configs/ui/protocol-guild";
+import { boostTenantUIConfig } from "@/lib/tenant/configs/ui/boost";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -35,6 +36,9 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.PGUILD:
         return protocolGuildTenantUIConfig;
+
+      case TENANT_NAMESPACES.BOOST:
+        return boostTenantUIConfig;
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
