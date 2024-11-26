@@ -9,7 +9,6 @@ on:
       - 'main'
 
 jobs:
-  #  Disabled due to build failure package mismatch
   swagger_lint:
     runs-on: ubuntu-latest
     name: Swagger Editor Validator Remote
@@ -21,8 +20,7 @@ jobs:
           fails-on: 2
           definition-file: spec/oas_v1.yaml
         env:
-          # Enable debugging output
-          DEBUG: 'true'  # This will print more verbose output if supported by the tool
+          DEBUG: 'true'
       - name: Show YAML file content
         run: |
           echo "Displaying the OpenAPI spec for debugging purposes..."
@@ -37,3 +35,8 @@ jobs:
   lint-prettier:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn install
+      - name: Lint with Prettier
+        run: yarn check-prettier
