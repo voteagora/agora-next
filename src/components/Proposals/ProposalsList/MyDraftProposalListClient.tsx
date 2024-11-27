@@ -8,14 +8,17 @@ import {
   getStageIndexForTenant,
   isPostSubmission,
 } from "@/app/proposals/draft/utils/stages";
-import { motion } from "framer-motion";
 import { useMyDraftProposalsInfinite } from "@/hooks/useMyDraftProposals";
 import { formatFullDate } from "@/lib/utils";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { myDraftsSortOptions } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
+import { PencilIcon, EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
+  const openDialog = useOpenDialog();
   const isDrafting = !isPostSubmission(proposal.stage);
   return (
     <Link
@@ -46,9 +49,42 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
             <div className="flex flex-row gap-1 text-xs text-tertiary">
               <div>Status</div>
             </div>
-            <div className="bg-wash text-secondary border border-line text-xs font-medium px-1 py-0.5 rounded">
-              Draft
-            </div>
+            <div className="text-primary">Draft</div>
+          </div>
+          <div className="flex flex-row gap-2 items-center text-tertiary ">
+            <span className="cursor-pointer flex flex-row items-center bg-neutral rounded-full p-2 hover:text-secondary transition-colors">
+              <PencilIcon className="w-5 h-5" />
+            </span>
+            <span className="cursor-pointer flex flex-row items-center bg-neutral rounded-full p-2 hover:text-secondary transition-colors">
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <EllipsisVerticalIcon className="w-5 h-5" />
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="DropdownMenuContent bg-neutral rounded-lg border border-line shadow-newDefault w-[250px]"
+                    sideOffset={10}
+                    alignOffset={0}
+                    align="end"
+                  >
+                    <div
+                      className="py-3 px-5 border-b border-line cursor-pointer hover:bg-tertiary/5"
+                      onClick={(evt) => {
+                        evt.stopPropagation();
+                        openDialog({
+                          type: "DELETE_DRAFT_PROPOSAL",
+                          params: {
+                            proposalId: proposal.id,
+                          },
+                        });
+                      }}
+                    >
+                      Delete
+                    </div>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            </span>
           </div>
         </div>
       </div>

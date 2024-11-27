@@ -5,10 +5,9 @@ import {
 } from "@prisma/client";
 import Link from "next/link";
 import HumanAddress from "@/components/shared/HumanAddress";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useAccount } from "wagmi";
-import voteForProposalDraft from "./actions/voteForProposalDraft";
-import { formatFullDate } from "@/lib/utils";
+import { cn, formatFullDate } from "@/lib/utils";
+import DraftProposalVoteContainer from "./DraftProposalVoteContainer";
 
 const getDraftProposalStatus = (
   proposal: ProposalDraft & {
@@ -49,27 +48,7 @@ const DraftProposalCard = ({
   updateProposalVote: (proposalId: number, vote: any) => void;
 }) => {
   const { address } = useAccount();
-  const voterInVotes = proposal.votes.find((v) => v.voter === address);
-
-  const handleVote = async (direction: 1 | -1) => {
-    if (!address) return;
-
-    updateProposalVote(proposal.id, {
-      voter: address,
-      weight: 1,
-      direction,
-    });
-
-    await voteForProposalDraft({
-      address,
-      proposalId: proposal.id.toString(),
-      direction,
-    });
-
-    // Don't refetch -- it messes up the sort order. We can refetch with a dx to sort/filter
-    // or hard refresh -- the changes are already in bc of the updates to query cache.
-    // If we try catch, maybe we can revalidate on error.
-  };
+  const status = getDraftProposalStatus(proposal, address);
 
   return (
     <Link
@@ -77,42 +56,9 @@ const DraftProposalCard = ({
       href={`/proposals/sponsor/${proposal.id}`}
       className="block cursor-pointer border-b border-line last:border-b-0 hover:bg-tertiary/5 transition-colors"
     >
-      <div className="py-2 px-2.5 flex flex-row gap-8 items-center">
-        <div className="flex flex-col items-center bg-neutral rounded-full p-1">
-          <div
-            className={`w-6 h-6 bg-neutral rounded flex items-center justify-center ${
-              voterInVotes && voterInVotes.direction === 1
-                ? "text-green-500"
-                : "text-tertiary/50 hover:text-green-500"
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!address) return;
-              handleVote(1);
-            }}
-          >
-            <ChevronUpIcon className="w-6 h-6" />
-          </div>
-          <div className="text-secondary font-medium">
-            {proposal.vote_weight}
-          </div>
-          <div
-            className={`w-6 h-6 bg-neutral rounded flex items-center justify-center ${
-              voterInVotes && voterInVotes.direction === -1
-                ? "text-red-500"
-                : "text-tertiary/50 hover:text-red-500"
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!address) return;
-              handleVote(-1);
-            }}
-          >
-            <ChevronDownIcon className="w-6 h-6" />
-          </div>
-        </div>
+      <div className="py-4 px-6 flex flex-row gap-8 items-center">
+        {/* Voting component -- we are holding this until phase 2 */}
+        {/* <DraftProposalVoteContainer proposal={proposal} /> */}
         <div className="w-full sm:w-[55%] flex flex-col justify-between gap-y-1">
           <div className="flex flex-row gap-1 text-xs text-tertiary">
             <div>
@@ -120,7 +66,15 @@ const DraftProposalCard = ({
             </div>
           </div>
           <div className="flex flex-row gap-1">
-            <span className="text-primary">{proposal.title || "Untitled"}</span>
+            <span
+              className={cn(
+                "text-primary",
+                status === "Requests you" ? "font-bold" : "",
+                status === "You declined" ? "text-tertiary" : ""
+              )}
+            >
+              {proposal.title || "Untitled"}
+            </span>
           </div>
         </div>
         <div className="flex-row gap-24 hidden sm:flex">
@@ -134,9 +88,7 @@ const DraftProposalCard = ({
             <div className="flex flex-row gap-1 text-xs text-tertiary">
               <div>Status</div>
             </div>
-            <div className="bg-wash text-secondary border border-line text-xs font-medium px-1 py-0.5 rounded">
-              {getDraftProposalStatus(proposal, address)}
-            </div>
+            <div className="text-primary">{status}</div>
           </div>
         </div>
       </div>
