@@ -2,6 +2,10 @@ import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegate } from "@/app/delegates/actions";
+import {
+  fetchProposals,
+  fetchProposalsCount,
+} from "@/app/api/common/proposals/getProposals";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
@@ -82,7 +86,10 @@ export default async function Page({
   params: { addressOrENSName: string };
 }) {
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const delegate = await fetchDelegate(address);
+  const [delegate, totalProposals] = await Promise.all([
+    fetchDelegate(address),
+    fetchProposalsCount(),
+  ]);
 
   if (!delegate) {
     return (
@@ -93,7 +100,7 @@ export default async function Page({
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-        <DelegateCard delegate={delegate} />
+        <DelegateCard delegate={delegate} totalProposals={totalProposals} />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <Suspense fallback={<DelegateStatementSkeleton />}>
