@@ -1,5 +1,4 @@
 import prisma from "@/app/lib/prisma";
-import SponsorAuthCheck from "../components/SponsorAuthCheck";
 import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
 import { DraftProposal } from "../../../proposals/draft/types";
 import SponsorActionPanel from "../components/SponsorActionPanel";
@@ -11,6 +10,16 @@ import {
 } from "@prisma/client";
 import MobileSponsorActionPanel from "./MobileSponsorActionPanel";
 import CommentPanel from "./CommentPanel";
+import { ChevronLeftIcon } from "@heroicons/react/20/solid";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { proposalTypeDescriptionMap } from "@/app/proposals/draft/types";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -49,10 +58,31 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
     <main className="max-w-screen-xl mx-auto mt-12">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
         <div className="col-span-1 sm:col-span-2">
-          <h1 className="font-black text-2xl text-primary">
-            {draftProposal.title}
-          </h1>
-          <div className="mt-6">
+          <div className="flex flex-row items-center gap-4">
+            <Link
+              className="cursor-pointer border border-agora-stone-100 rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
+              href={`/proposals/`}
+            >
+              <ChevronLeftIcon className="h-6 w-6 text-agora-stone-700" />
+            </Link>
+            <h1 className="font-bold text-2xl text-primary">
+              {draftProposal.title}
+            </h1>
+          </div>
+          <div className="mt-6 border border-line rounded-lg p-4">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="flex flex-row space-x-1 items-center mb-4">
+                  <span className="font-medium">
+                    {draftProposal.voting_module_type} proposal
+                  </span>
+                  <InformationCircleIcon className="h-4 w-4 text-secondary" />
+                </TooltipTrigger>
+                <TooltipContent className="text-sm max-w-[200px]">
+                  {proposalTypeDescriptionMap[draftProposal.voting_module_type]}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             {draftProposal.voting_module_type === ProposalType.BASIC && (
               <ProposalTransactionDisplay
                 descriptions={(draftProposal as BasicProposal).transactions.map(
@@ -77,12 +107,14 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                 }}
               />
             )}
+            <p className="prose mt-6">{draftProposal.abstract}</p>
           </div>
-          <p className="prose mt-6">{draftProposal.abstract}</p>
-          <CommentPanel
+
+          {/* Comments are coming in the next phase */}
+          {/* <CommentPanel
             comments={draftProposal.comments}
             params={{ id: params.id }}
-          />
+          /> */}
         </div>
         <div className="self-start hidden sm:block">
           <SponsorActionPanel draftProposal={draftProposal} />

@@ -241,3 +241,10 @@ export type DraftProposal =
   | SocialProposal
   | ApprovalProposal
   | OptimisticProposal;
+
+export const proposalTypeDescriptionMap = {
+  [ProposalType.SOCIAL]:
+    "Social proposals are offchain proposals that are submitted to snapshot and used to gauge support for a proposal.",
+  [ProposalType.BASIC]:
+    "Basic proposals are onchain proposals with for/against/abstain vote types.",
+} as Record<ProposalType, string>;
