@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   enabled: boolean;
@@ -13,7 +14,9 @@ export const useGovernorAdmin = ({ enabled }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     queryKey: [MANAGER_QK],
     queryFn: async () => {
-      return await contracts.governor.contract.admin!();
+      return await (namespace === TENANT_NAMESPACES.OPTIMISM
+        ? contracts.governor.contract.manager!()
+        : contracts.governor.contract.admin!());
     },
     enabled: enabled,
   });
