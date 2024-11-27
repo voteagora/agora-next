@@ -23,19 +23,21 @@ export const optimismTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = "0x4200000000000000000000000000000000000042";
+
   const GOVERNOR = isProd
     ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
     : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f";
+
   const ALLIGATOR = isProd
     ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
     : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6";
+
   const TYPES = isProd
-    ? "0x67ecA7B65Baf0342CE7fBf0AA15921524414C09f"
+    ? "0xCE52b7cc490523B3e81C3076D5ae5Cca9a3e2D6F"
     : "0x2e0C197f1fca7628ADfa2bdaabd1df4670186C06";
 
-  // TODO: replace prod timelock when the contract is deployed
   const TIMELOCK = isProd
-    ? "0x0000000000000000000000000000000000000000"
+    ? "0x0eDd4B2cCCf41453D8B5443FBB96cc577d1d06bF"
     : "0x85c118971C058677DC502854d56A483BF5548042";
 
   const provider = new AlchemyProvider("optimism", alchemyId);
