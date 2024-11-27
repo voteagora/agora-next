@@ -48,7 +48,7 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
     canExecute = currentTimeInSeconds >= executeTimeInSeconds;
   }
 
-  const { data, writeContract: write, error: writeError } = useWriteContract();
+  const { data, writeContract: write } = useWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({ hash: data });
