@@ -56,7 +56,12 @@ const DraftProposalCard = ({
       href={`/proposals/sponsor/${proposal.id}`}
       className="block cursor-pointer border-b border-line last:border-b-0 hover:bg-tertiary/5 transition-colors"
     >
-      <div className="py-4 px-6 flex flex-row gap-8 items-center">
+      <div
+        className={cn(
+          "py-4 px-6 flex flex-row gap-8 items-center",
+          status === "You declined" ? "bg-tertiary/5" : ""
+        )}
+      >
         {/* Voting component -- we are holding this until phase 2 */}
         {/* <DraftProposalVoteContainer proposal={proposal} /> */}
         <div className="w-full sm:w-[55%] flex flex-col justify-between gap-y-1">
@@ -82,13 +87,29 @@ const DraftProposalCard = ({
             <div className="flex flex-row gap-1 text-xs text-tertiary">
               <div>Submitted on</div>
             </div>
-            <div>{formatFullDate(proposal.created_at)}</div>
+            <div
+              className={cn(
+                "text-primary",
+                status === "Requests you" ? "font-bold" : "",
+                status === "You declined" ? "text-tertiary" : ""
+              )}
+            >
+              {formatFullDate(proposal.created_at)}
+            </div>
           </div>
           <div className="flex flex-col justify-between gap-y-1">
             <div className="flex flex-row gap-1 text-xs text-tertiary">
               <div>Status</div>
             </div>
-            <div className="text-primary">{status}</div>
+            <div
+              className={cn(
+                "text-primary",
+                status === "Requests you" ? "font-bold" : "",
+                status === "You declined" ? "text-tertiary" : ""
+              )}
+            >
+              {status}
+            </div>
           </div>
         </div>
       </div>

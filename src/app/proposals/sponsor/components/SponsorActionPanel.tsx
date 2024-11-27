@@ -19,13 +19,6 @@ import { DraftProposal, ProposalType } from "../../draft/types";
 import { ackSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
 import { motion, AnimatePresence } from "framer-motion";
 
-const proposalTypeDescriptionMap = {
-  [ProposalType.SOCIAL]:
-    "Social proposals are offchain proposals that are submitted to snapshot and used to gauge support for a proposal.",
-  [ProposalType.BASIC]:
-    "Basic proposals are onchain proposals with for/against/abstain vote types.",
-} as Record<ProposalType, string>;
-
 const SponsorActionPanel = ({
   draftProposal,
 }: {
@@ -88,17 +81,9 @@ const SponsorActionPanel = ({
   return (
     <div className="relative z-20">
       <div className="border border-line p-6 rounded-lg z-20 relative bg-neutral shadow-newDefault">
-        <h3 className="font-bold text-primary capitalize">
-          {draftProposal.voting_module_type} proposal
-        </h3>
-        <section className="border-b border-line pb-4">
-          <p className="text-secondary mt-2">
-            {proposalTypeDescriptionMap[draftProposal.voting_module_type]}
-          </p>
-        </section>
         {renderDetails()}
         {optimisticDraftProposal.approved_sponsors.length > 0 && (
-          <section className="border-b border-line pt-4 pb-4">
+          <section className="border-b border-line pb-4">
             <h3 className="font-bold text-primary capitalize">Sponsors</h3>
             <p className="text-secondary mt-2">
               This is a private draft viewable by the following users:
