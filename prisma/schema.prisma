@@ -97,7 +97,7 @@ model SnapshotProposal {
   type           String?
   votes          Decimal?  @db.Decimal
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("snapshot")
 }
 
