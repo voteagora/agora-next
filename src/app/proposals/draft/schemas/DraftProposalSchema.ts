@@ -62,8 +62,8 @@ const approvalProposal = z
   .object({
     criteria: z.nativeEnum(ApprovalProposalType),
     budget: z.string().min(1, { message: "Budget cannot be empty" }),
-    maxOptions: z.string().min(1).optional(),
-    threshold: z.string().min(1).optional(),
+    maxOptions: z.string().optional(),
+    threshold: z.string().optional(),
     topChoices: z
       .string()
       .min(1, { message: "Top choices must be at least 1" })
@@ -98,6 +98,23 @@ const approvalProposal = z
       message:
         "Max options must be less than or equal to the number of options",
       path: ["maxOptions"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.criteria === ApprovalProposalType.THRESHOLD) {
+        if (data.threshold === undefined) {
+          return false;
+        }
+        const threshold = parseInt(data.threshold);
+        return !isNaN(threshold);
+      }
+
+      return true;
+    },
+    {
+      message: "Threshold must be be a positive number",
+      path: ["threshold"],
     }
   );
 
