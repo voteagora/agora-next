@@ -17,6 +17,7 @@ import {
   findProposal,
   findProposalType,
   findProposalsQuery,
+  getProposalsCount,
 } from "@/lib/prismaUtils";
 
 async function getProposals({
@@ -156,6 +157,15 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
   });
 }
 
+async function getTotalProposalsCount(): Promise<number> {
+  const { namespace, contracts } = Tenant.current();
+  return getProposalsCount({
+    namespace,
+    contract: contracts.governor.address,
+  });
+}
+
+export const fetchProposalsCount = cache(getTotalProposalsCount);
 export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
 export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
