@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { proposalTypeDescriptionMap } from "@/app/proposals/draft/types";
+import SponsorActionTab from "./SponsorActionTab";
 
 const getDraftProposal = async (id: number) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -56,30 +57,48 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <main className="max-w-screen-xl mx-auto mt-12">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
+      <div className="flex flex-row items-center justify-between gap-4">
+        <div className="flex flex-row items-center gap-4">
+          <Link
+            className="cursor-pointer border border-agora-stone-100 rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
+            href={`/proposals/`}
+          >
+            <ChevronLeftIcon className="h-6 w-6 text-agora-stone-700" />
+          </Link>
+          <h1 className="font-bold text-2xl text-primary">
+            {draftProposal.title}
+          </h1>
+        </div>
+        <SponsorActionTab draftProposal={draftProposal} />
+      </div>
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-12">
         <div className="col-span-1 sm:col-span-2">
-          <div className="flex flex-row items-center gap-4">
-            <Link
-              className="cursor-pointer border border-agora-stone-100 rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
-              href={`/proposals/`}
-            >
-              <ChevronLeftIcon className="h-6 w-6 text-agora-stone-700" />
-            </Link>
-            <h1 className="font-bold text-2xl text-primary">
-              {draftProposal.title}
-            </h1>
-          </div>
-          <div className="mt-6 border border-line rounded-lg p-4">
+          <div className="border border-line rounded-lg p-4">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center mb-4">
-                  <span className="font-medium">
+                  <span className="font-medium capitalize">
                     {draftProposal.voting_module_type} proposal
                   </span>
                   <InformationCircleIcon className="h-4 w-4 text-secondary" />
                 </TooltipTrigger>
-                <TooltipContent className="text-sm max-w-[200px]">
-                  {proposalTypeDescriptionMap[draftProposal.voting_module_type]}
+                <TooltipContent
+                  className="text-sm max-w-[250px]"
+                  side="bottom"
+                  align="start"
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className="font-medium capitalize">
+                      {draftProposal.voting_module_type} proposal
+                    </span>
+                    <span className="text-secondary text-xs">
+                      {
+                        proposalTypeDescriptionMap[
+                          draftProposal.voting_module_type
+                        ]
+                      }
+                    </span>
+                  </div>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
