@@ -1,23 +1,17 @@
 "use client";
 
-import { getIndexForStage } from "@/app/proposals/draft/utils/stages";
 import { UpdatedButton } from "@/components/Button";
-import {
-  ArrowUturnRightIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/20/solid";
-import { ProposalDraftApprovedSponsors, ProposalStage } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import { ProposalDraftApprovedSponsors } from "@prisma/client";
 import { useOptimistic, useTransition } from "react";
-import toast from "react-hot-toast";
 import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 import AvatarAddress from "../../draft/components/AvatarAdress";
 import ProposalRequirements from "../../draft/components/ProposalRequirements";
 import { useCanSponsor } from "../../draft/hooks/useCanSponsor";
-import { DraftProposal, ProposalType } from "../../draft/types";
+import { DraftProposal } from "../../draft/types";
 import { ackSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const SponsorActionPanel = ({
   draftProposal,
@@ -27,7 +21,6 @@ const SponsorActionPanel = ({
   };
 }) => {
   const { address } = useAccount();
-  const router = useRouter();
   const { data: canSponsor, status } = useCanSponsor(address);
   const [_, startTransition] = useTransition();
   const [optimisticDraftProposal, setOptimisticDraftProposal] = useOptimistic<
@@ -44,58 +37,65 @@ const SponsorActionPanel = ({
     };
   });
 
-  const renderDetails = () => {
-    switch (draftProposal.voting_module_type) {
-      case ProposalType.SOCIAL:
-        return (
-          <section className="py-4 border-b border-line">
-            <div className="flex flex-col gap-2">
-              <span className="flex flex-row justify-between items-center">
-                <span className="text-tertiary">Starts</span>
-                <span className="text-primary">2024-01-01</span>
-              </span>
-              <span className="flex flex-row justify-between items-center">
-                <span className="text-tertiary">Ends</span>
-                <span className="text-primary">2024-01-01</span>
-              </span>
-              <span className="flex flex-row justify-between items-center gap-4">
-                <span className="text-tertiary">Options</span>
-                <span className="text-primary lowercase">
-                  {draftProposal.social_options
-                    .map((option) => option.text)
-                    .join(", ")}
-                </span>
-              </span>
-            </div>
-          </section>
-        );
+  //   const renderDetails = () => {
+  //     switch (draftProposal.voting_module_type) {
+  //       case ProposalType.SOCIAL:
+  //         return (
+  //           <section className="py-4 border-b border-line">
+  //             <div className="flex flex-col gap-2">
+  //               <span className="flex flex-row justify-between items-center">
+  //                 <span className="text-tertiary">Starts</span>
+  //                 <span className="text-primary">2024-01-01</span>
+  //               </span>
+  //               <span className="flex flex-row justify-between items-center">
+  //                 <span className="text-tertiary">Ends</span>
+  //                 <span className="text-primary">2024-01-01</span>
+  //               </span>
+  //               <span className="flex flex-row justify-between items-center gap-4">
+  //                 <span className="text-tertiary">Options</span>
+  //                 <span className="text-primary lowercase">
+  //                   {draftProposal.social_options
+  //                     .map((option) => option.text)
+  //                     .join(", ")}
+  //                 </span>
+  //               </span>
+  //             </div>
+  //           </section>
+  //         );
 
-      case ProposalType.BASIC:
-        return null;
+  //       case ProposalType.BASIC:
+  //         return null;
 
-      default:
-        return null;
-    }
-  };
+  //       default:
+  //         return null;
+  //     }
+  //   };
 
   return (
     <div className="relative z-20">
-      <div className="border border-line p-6 rounded-lg z-20 relative bg-neutral shadow-newDefault">
-        {renderDetails()}
+      <div className="border border-line rounded-lg z-20 relative bg-neutral shadow-newDefault">
         {optimisticDraftProposal.approved_sponsors.length > 0 && (
-          <section className="border-b border-line pb-4">
-            <h3 className="font-bold text-primary capitalize">Sponsors</h3>
-            <p className="text-secondary mt-2">
-              This is a private draft viewable by the following users:
+          <section className="border-b border-line p-6">
+            <h3 className="font-semibold text-primary">Sponsorship requests</h3>
+            <p className="text-tertiary mt-2">
+              This is a private draft only viewable to invited users.
             </p>
-            <div className="flex flex-col gap-2 mt-3">
+            <div className="flex flex-col gap-4 mt-3">
               {optimisticDraftProposal.approved_sponsors.map((sponsor) => (
                 <>
-                  <div className="flex flex-row items-center space-x-2 relative">
+                  <div
+                    className={cn(
+                      "flex flex-row items-center justify-between space-x-2 relative",
+                      sponsor.status === "REJECTED" && "opacity-50"
+                    )}
+                  >
                     {isAddress(sponsor.sponsor_address) && (
                       <AvatarAddress address={sponsor.sponsor_address} />
                     )}
-                    <AnimatePresence initial={false}>
+                    <span className="text-secondary bg-tertiary/5 border border-line rounded px-1 py-0.5 text-xs lowercase first-letter:uppercase">
+                      {sponsor.status}
+                    </span>
+                    {/* <AnimatePresence initial={false}>
                       {sponsor.status === "REJECTED" && (
                         <motion.div
                           key={`${sponsor.sponsor_address}-rejected`}
@@ -122,102 +122,69 @@ const SponsorActionPanel = ({
                           </motion.span>
                         </motion.div>
                       )}
-                    </AnimatePresence>
+                    </AnimatePresence> */}
                   </div>
                 </>
               ))}
             </div>
           </section>
         )}
-        <div className="flex flex-col gap-2 mt-4">
-          <UpdatedButton
-            type="secondary"
-            className="w-full flex items-center justify-center"
-            onClick={() => {
-              navigator.clipboard.writeText(
-                `${window.location.origin}/proposals/sponsor/${draftProposal.id}`
-              );
-              toast("Proposal link copied to clipboard!");
-            }}
-          >
-            <span className="flex flex-row items-center gap-2">
-              <ArrowUturnRightIcon className="w-4 h-4" />
-              Share proposal
-            </span>
-          </UpdatedButton>
-          {address === draftProposal.author_address && (
-            <UpdatedButton
-              type="secondary"
-              className="w-full flex items-center justify-center"
-              onClick={() => {
-                router.push(
-                  `/proposals/draft/${draftProposal.id}?stage=${getIndexForStage(
-                    ProposalStage.AWAITING_SPONSORSHIP
-                  )}`
-                );
-              }}
-            >
-              <span className="flex flex-row items-center gap-2">
-                <PencilSquareIcon className="w-4 h-4" />
-                Edit proposal
-              </span>
-            </UpdatedButton>
-          )}
-        </div>
-      </div>
-      <div className="bg-tertiary/5 p-6 pt-10 relative z-10 -mt-6 w-full rounded-lg border border-line">
-        <h2 className="text-primary font-semibold">Sponsorship requirements</h2>
-        <div className="mt-4 bg-neutral rounded-xl">
-          <ProposalRequirements proposalDraft={draftProposal} />
-        </div>
-        {status === "pending" ? (
-          <span className="w-full bg-tertiary/5 animate-pulse italic block mt-4 rounded-lg p-2 text-tertiary text-sm text-center">
-            Loading actions...
-          </span>
-        ) : canSponsor ? (
-          <div className="flex flex-col gap-2 mt-6">
-            <UpdatedButton type="primary" className="w-full">
-              Sponsor proposal
-            </UpdatedButton>
-
-            <UpdatedButton
-              type="secondary"
-              className="w-full"
-              onClick={(event: any) => {
-                event.preventDefault();
-                startTransition(async () => {
-                  const sponsor = draftProposal.approved_sponsors.find(
-                    (sponsor) => sponsor.sponsor_address === address
-                  ) as ProposalDraftApprovedSponsors;
-
-                  const newStatus =
-                    sponsor.status === "REJECTED" ? "PENDING" : "REJECTED";
-
-                  setOptimisticDraftProposal({
-                    ...sponsor,
-                    status: newStatus,
-                  });
-
-                  await ackSponsorshipRequest({
-                    address: address as `0x${string}`,
-                    proposalId: draftProposal.id.toString(),
-                    status: newStatus,
-                  });
-                });
-              }}
-            >
-              {optimisticDraftProposal.approved_sponsors.find(
-                (sponsor) => sponsor.sponsor_address === address
-              )?.status === "REJECTED"
-                ? "Un-decline sponsorship"
-                : "Decline sponsorship"}
-            </UpdatedButton>
+        <section className="p-6">
+          <h2 className="text-primary font-semibold">
+            Sponsorship requirements
+          </h2>
+          <div className="mt-4 bg-tertiary/5 rounded-xl">
+            <ProposalRequirements proposalDraft={draftProposal} />
           </div>
-        ) : (
-          <p className="text-secondary text-xs mt-2">
-            You are not eligible to sponsor this proposal.
-          </p>
-        )}
+          {status === "pending" ? (
+            <span className="w-full bg-tertiary/5 animate-pulse italic block mt-4 rounded-lg p-2 text-tertiary text-sm text-center">
+              Loading actions...
+            </span>
+          ) : canSponsor ? (
+            <div className="flex flex-col gap-2 mt-6">
+              <UpdatedButton type="primary" className="w-full">
+                Sponsor proposal
+              </UpdatedButton>
+
+              <UpdatedButton
+                type="secondary"
+                className="w-full"
+                onClick={(event: any) => {
+                  event.preventDefault();
+                  startTransition(async () => {
+                    const sponsor = draftProposal.approved_sponsors.find(
+                      (sponsor) => sponsor.sponsor_address === address
+                    ) as ProposalDraftApprovedSponsors;
+
+                    const newStatus =
+                      sponsor.status === "REJECTED" ? "PENDING" : "REJECTED";
+
+                    setOptimisticDraftProposal({
+                      ...sponsor,
+                      status: newStatus,
+                    });
+
+                    await ackSponsorshipRequest({
+                      address: address as `0x${string}`,
+                      proposalId: draftProposal.id.toString(),
+                      status: newStatus,
+                    });
+                  });
+                }}
+              >
+                {optimisticDraftProposal.approved_sponsors.find(
+                  (sponsor) => sponsor.sponsor_address === address
+                )?.status === "REJECTED"
+                  ? "Un-decline sponsorship"
+                  : "Decline sponsorship"}
+              </UpdatedButton>
+            </div>
+          ) : (
+            <p className="text-secondary text-xs mt-2">
+              You are not eligible to sponsor this proposal.
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );
