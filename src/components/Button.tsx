@@ -69,7 +69,7 @@ export function UpdatedButton({
             className,
             "font-semibold py-2 px-4 border border-line cursor-pointer",
             type === "primary" &&
-              "bg-primary hover:bg-primary/90 text-neutral transition-shadow",
+              "bg-primary hover:bg-primary/90 text-neutral transition-shadow border-primary",
             type === "secondary" &&
               "bg-neutral text-primary hover:bg-tertiary/5",
             type === "link" && "",
