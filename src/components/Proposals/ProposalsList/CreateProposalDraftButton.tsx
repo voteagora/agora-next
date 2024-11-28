@@ -25,7 +25,7 @@ const CreateProposalDraftButton = ({
   return (
     <UpdatedButton
       variant="rounded"
-      type="primary"
+      type="secondary"
       isLoading={isPending}
       className={classNames(className)}
       onClick={async () => {

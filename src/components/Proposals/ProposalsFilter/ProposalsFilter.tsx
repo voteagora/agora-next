@@ -25,12 +25,14 @@ export default function ProposalsFilter() {
   }, [router, selected, isRecentFilter]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full sm:w-fit">
       <Listbox value={selected} onChange={setSelected}>
-        <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
-          {selected === proposalsFilterOptions.relevant.filter
-            ? proposalsFilterOptions.relevant.value
-            : proposalsFilterOptions.everything.value}
+        <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center justify-between">
+          <span>
+            {selected === proposalsFilterOptions.relevant.filter
+              ? proposalsFilterOptions.relevant.value
+              : proposalsFilterOptions.everything.value}
+          </span>
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
         </Listbox.Button>
         <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-10 w-max">
