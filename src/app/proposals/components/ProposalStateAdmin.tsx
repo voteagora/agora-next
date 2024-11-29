@@ -66,11 +66,14 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
         return "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
         if (namespace === TENANT_NAMESPACES.OPTIMISM) {
-          if (proposal.proposalType !== "STANDARD") {
-            return "This proposal can still be cancelled by the admin.";
+          if (
+            proposal.proposalType === "APPROVAL" ||
+            proposal.proposalType === "STANDARD"
+          ) {
+            return "This proposal is now passed and can be queued for execution.";
           }
+          return "This proposal can still be cancelled by the admin.";
         }
-        return "This proposal is now passed and can be queued for execution.";
 
       case PROPOSAL_STATUS.QUEUED:
         return "This proposal can be executed after the timelock passes.";
@@ -132,7 +135,10 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
       );
 
     case TENANT_NAMESPACES.OPTIMISM:
-      if (proposal.proposalType === "STANDARD") {
+      if (
+        proposal.proposalType === "STANDARD" ||
+        proposal.proposalType === "APPROVAL"
+      ) {
         return (
           <div className="flex flex-row gap-2">
             <AgoraOptimismGovCancel proposal={proposal} />
