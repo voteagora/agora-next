@@ -38,7 +38,7 @@ const ProposalTransactionDisplay = ({
   if (targets.length === 0) {
     return (
       <div>
-        <div className="flex flex-col border rounded-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
+        <div className="flex flex-col border rounded-lg border-line bg-tertiary/5 p-4 text-xs text-secondary font-mono break-words overflow-hidden">
           <div className="w-full flex items-center justify-between">
             <span className="text-xs text-tertiary">Proposed transactions</span>
           </div>
@@ -52,7 +52,7 @@ const ProposalTransactionDisplay = ({
 
   return (
     <div>
-      <div className="flex flex-col border border-b-0 rounded-t-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
+      <div className="flex flex-col border border-b-0 rounded-t-lg border-line bg-tertiary/5 p-4 text-xs text-secondary font-mono break-words overflow-hidden">
         <div className="w-full flex items-center justify-between">
           <span className="text-xs text-tertiary">Proposed transactions</span>
           {executedTransactionHash && (

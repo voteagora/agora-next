@@ -98,20 +98,15 @@ const MyDraftProposalListClient = () => {
   const sort =
     useSearchParams()?.get("sort") || myDraftsSortOptions.newest.sort;
 
-  const {
-    data: myDraftProposals,
-    isLoading: infiniteIsLoading,
-    fetchNextPage: infiniteFetchNextPage,
-    hasNextPage: infiniteHasNextPage,
-    isFetchingNextPage: infiniteIsFetchingNextPage,
-  } = useMyDraftProposalsInfinite({
-    address,
-    sort,
-    pagination: {
-      limit: 10,
-      offset: 0,
-    },
-  });
+  const { data: myDraftProposals, isLoading: infiniteIsLoading } =
+    useMyDraftProposalsInfinite({
+      address,
+      sort,
+      pagination: {
+        limit: 10,
+        offset: 0,
+      },
+    });
 
   return (
     <>

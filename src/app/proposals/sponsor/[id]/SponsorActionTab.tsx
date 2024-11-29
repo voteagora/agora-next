@@ -7,20 +7,35 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { ProposalDraft, ProposalStage } from "@prisma/client";
 import { getIndexForStage } from "../../draft/utils/stages";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const SponsorActionTab = ({
   draftProposal,
 }: {
   draftProposal: ProposalDraft;
 }) => {
+  const openDialog = useOpenDialog();
+
   const { address } = useAccount();
   const router = useRouter();
 
   return (
     <div className="flex flex-row items-center gap-4">
-      <div className="border border-line rounded p-1 h-[42px] aspect-square flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 transition-colors cursor-pointer">
-        <TrashIcon className="h-4 w-4 text-secondary" />
-      </div>
+      {address === draftProposal.author_address && (
+        <div
+          className="border border-line rounded p-1 h-[42px] aspect-square flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 transition-colors cursor-pointer"
+          onClick={() => {
+            openDialog({
+              type: "DELETE_DRAFT_PROPOSAL",
+              params: {
+                proposalId: draftProposal.id,
+              },
+            });
+          }}
+        >
+          <TrashIcon className="h-4 w-4 text-secondary" />
+        </div>
+      )}
       <div
         className="border border-line rounded p-1 h-[42px] aspect-square flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 transition-colors cursor-pointer"
         onClick={() => {

@@ -5,6 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { DraftProposal } from "@/app/proposals/draft/types";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const ProposalRequirements = ({
   proposalDraft,
@@ -22,7 +23,7 @@ const ProposalRequirements = ({
   const renderProposalRequirements = () => {
     if (votingModuleType === ProposalType.SOCIAL) {
       return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
           <p className="flex-grow">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
@@ -38,10 +39,10 @@ const ProposalRequirements = ({
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
       return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
           <p className="flex-grow">Manager address</p>
           <span className="text-secondary font-mono text-xs">
-            {manager?.toString()}
+            {truncateAddress(manager?.toString() ?? "", 6)}
           </span>
         </div>
       );
@@ -52,7 +53,7 @@ const ProposalRequirements = ({
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
       return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
           <p className="flex-grow">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
