@@ -194,6 +194,13 @@ const ApprovalProposalForm = () => {
   } = useFieldArray({
     control,
     name: "approvalProposal.options",
+    rules: {
+      validate: {
+        validateOnlyOnSubmit: (value) => {
+          return true;
+        },
+      },
+    },
   });
 
   return (

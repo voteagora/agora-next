@@ -1,18 +1,9 @@
-import React from "react";
-
+// Optimistic proposals have no form.
+// Creating a component for readability so the component that renders
+// this component is not returning the null. This feels more clear
+// -MG
 const OptimisticProposalForm = () => {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-stone-900 font-semibold">
-          Voting strategy and choices
-        </h3>
-        <p className="mt-2 stone-700">
-          Choose the voting strategy and options for your proposal.
-        </p>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default OptimisticProposalForm;

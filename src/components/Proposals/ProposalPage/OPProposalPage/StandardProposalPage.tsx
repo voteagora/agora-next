@@ -1,12 +1,10 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import StandardProposalDelete from "./StandardProposalDelete";
 import {
   fetchProposalVotes,
   fetchVotersWhoHaveNotVotedForProposal,
 } from "@/app/proposals/actions";
 import ProposalVotesCard from "./ProposalVotesCard/ProposalVotesCard";
-import Tenant from "@/lib/tenant/tenant";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 
 export default async function StandardProposalPage({
@@ -14,10 +12,7 @@ export default async function StandardProposalPage({
 }: {
   proposal: Proposal;
 }) {
-  const { contracts } = Tenant.current();
-
   // TODO: Replace with governor-level check
-  const isAlligator = Boolean(contracts?.alligator);
   const proposalVotes = await fetchProposalVotes(proposal.id);
   const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
 
@@ -30,7 +25,6 @@ export default async function StandardProposalPage({
           proposal={proposal}
         />
         <div>
-          {isAlligator && <StandardProposalDelete proposal={proposal} />}
           <ProposalVotesCard
             proposal={proposal}
             proposalVotes={proposalVotes}

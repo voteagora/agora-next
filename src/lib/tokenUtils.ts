@@ -53,8 +53,16 @@ export function formatNumber(
   amount: string | BigInt,
   maximumSignificantDigits = 4
 ) {
-  const { token } = Tenant.current();
-  const number = Number(ethers.formatUnits(amount.toString(), token.decimals));
+  let number = 0;
+
+  //Hotfix: The formatNumber is called before the Tenant is initialized, thus the token is not available.
+  //This is a temporary solution to avoid the error.
+  try {
+    const { token } = Tenant.current();
+    number = Number(ethers.formatUnits(amount.toString(), token.decimals));
+  } catch (e) {
+    number = Number(ethers.formatUnits(amount.toString(), 18));
+  }
 
   const numberFormat = new Intl.NumberFormat("en", {
     style: "currency",

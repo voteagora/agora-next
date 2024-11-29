@@ -144,6 +144,13 @@ const BasicProposalForm = () => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "transactions",
+    rules: {
+      validate: {
+        validateOnlyOnSubmit: () => {
+          return true;
+        },
+      },
+    },
   });
 
   /**
@@ -189,6 +196,12 @@ const BasicProposalForm = () => {
       if (parts.length === 3 && parts[0] === "transactions") {
         const index = parseInt(parts[1]);
         const field = parts[2];
+
+        // skip if the transaction has not been simulated yet
+        const simulationState = value.transactions?.[index]?.simulation_state;
+        if (simulationState !== "CONFIRMED") {
+          return;
+        }
 
         if (
           [
@@ -240,6 +253,7 @@ const BasicProposalForm = () => {
         }
       });
     } catch (e) {
+      console.error(e);
       toast.error("Error simulating transactions");
     } finally {
       setFormDirty(false);

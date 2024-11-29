@@ -5,10 +5,6 @@ import { Form } from "./CreateProposalForm";
 import { AbiCoder, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  approvalModuleAddress,
-  optimisticModuleAddress,
-} from "@/lib/contracts/contracts";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   useAccount,
@@ -19,6 +15,8 @@ import {
 import { useModal } from "connectkit";
 import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
+import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { ProposalType } from "@/app/proposals/draft/types";
 
 const { contracts, ui } = Tenant.current();
 
@@ -159,6 +157,7 @@ function getInputData(form: Form): {
   inputData: InputData;
   error: unknown;
 } {
+  const tenant = Tenant.current();
   let error = null;
   const description = "# " + form.state.title + "\n" + form.state.description;
   let governorFunction: "propose" | "proposeWithModule" = "propose";
@@ -241,6 +240,16 @@ function getInputData(form: Form): {
         ethers.parseEther(form.state.budget.toString()),
       ];
 
+      const approvalModuleAddress = getProposalTypeAddress(
+        ProposalType.APPROVAL
+      );
+
+      if (!approvalModuleAddress) {
+        throw new Error(
+          `Approval module address not found for tenant ${tenant.namespace}`
+        );
+      }
+
       inputData = [
         approvalModuleAddress,
         abiCoder.encode(
@@ -258,6 +267,16 @@ function getInputData(form: Form): {
       governorFunction = "proposeWithModule";
 
       const settings = [disapprovalThreshold * 100, true];
+
+      const optimisticModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTIMISTIC
+      );
+
+      if (!optimisticModuleAddress) {
+        throw new Error(
+          `Optimistic module address not found for tenant ${tenant.namespace}`
+        );
+      }
 
       inputData = [
         optimisticModuleAddress,

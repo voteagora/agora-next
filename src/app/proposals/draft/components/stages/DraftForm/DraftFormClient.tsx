@@ -49,15 +49,26 @@ const getValidProposalTypesForVotingType = (
   proposalType: ProposalType
 ) => {
   switch (proposalType) {
+    case ProposalType.APPROVAL:
+      return proposalTypes.filter((type) => {
+        return type.name.toLowerCase().includes("approval");
+      });
+
     case ProposalType.OPTIMISTIC:
       return proposalTypes.filter((type) => {
-        return type.quorum === "0" && type.approval_threshold === "0";
+        return type.name.toLowerCase().includes("optimistic");
+      });
+
+    case ProposalType.BASIC:
+      return proposalTypes.filter((type) => {
+        return (
+          !type.name.toLowerCase().includes("approval") &&
+          !type.name.toLowerCase().includes("optimistic")
+        );
       });
 
     // currently no constraints on these voting modules
-    case ProposalType.BASIC:
     case ProposalType.SOCIAL:
-    case ProposalType.APPROVAL:
     default:
       return proposalTypes;
   }
@@ -83,7 +94,7 @@ const DraftFormClient = ({
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
     mode: "onSubmit",
-    reValidateMode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
   });
 
@@ -113,7 +124,8 @@ const DraftFormClient = ({
 
     try {
       if (!address) {
-        throw new Error("No address found");
+        toast("Account not connected.");
+        return;
       }
       const res = await draftProposalAction({
         ...data,
@@ -122,16 +134,18 @@ const DraftFormClient = ({
       });
       if (!res.ok) {
         setIsPending(false);
-        toast("Something went wrong...");
+        toast(res.message);
+        return;
       } else {
         invalidatePath(draftProposal.id);
         router.push(
           `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       setIsPending(false);
-      toast("Something went wrong...");
+      console.error("An error was uncaught in `draftProposalAction`: ", error);
+      toast(error.message);
     }
   };
 
@@ -146,9 +160,11 @@ const DraftFormClient = ({
                   control={control}
                   label="Voting module"
                   required={true}
-                  options={Object.values([
-                    ...((plmToggle?.config as PLMConfig)?.proposalTypes || []),
-                  ])}
+                  options={[
+                    ...(
+                      (plmToggle?.config as PLMConfig)?.proposalTypes || []
+                    ).map((pt) => pt.type),
+                  ]}
                   name="type"
                 />
 
