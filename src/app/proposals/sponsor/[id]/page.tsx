@@ -57,13 +57,13 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <main className="max-w-screen-xl mx-auto mt-12">
-      <div className="flex flex-row items-center justify-between gap-4">
+      <div className="flex flex-row items-end justify-between">
         <div className="flex flex-row items-center gap-4">
           <Link
-            className="cursor-pointer border border-agora-stone-100 rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
-            href={`/proposals/`}
+            className="cursor-pointer border border-agora-stone-100 bg-neutral rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
+            href={`/`}
           >
-            <ChevronLeftIcon className="h-6 w-6 text-agora-stone-700" />
+            <ChevronLeftIcon className="h-6 w-6 text-secondary" />
           </Link>
           <h1 className="font-bold text-2xl text-primary">
             {draftProposal.title}
@@ -71,9 +71,9 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
         </div>
         <SponsorActionTab draftProposal={draftProposal} />
       </div>
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-12">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="col-span-1 sm:col-span-2">
-          <div className="border border-line rounded-lg p-4">
+          <div className="border border-line rounded-lg p-4 bg-neutral">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center mb-4">
@@ -135,7 +135,7 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
             params={{ id: params.id }}
           /> */}
         </div>
-        <div className="self-start hidden sm:block">
+        <div className="self-start hidden sm:block sticky top-6">
           <SponsorActionPanel draftProposal={draftProposal} />
         </div>
         <MobileSponsorActionPanel draftProposal={draftProposal} />

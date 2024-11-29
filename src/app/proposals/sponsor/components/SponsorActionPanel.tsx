@@ -73,14 +73,14 @@ const SponsorActionPanel = ({
 
   return (
     <div className="relative z-20">
-      <div className="border border-line rounded-lg z-20 relative bg-neutral shadow-newDefault">
+      <div className="border border-line rounded-lg z-20 relative bg-neutral">
         {optimisticDraftProposal.approved_sponsors.length > 0 && (
           <section className="border-b border-line p-6">
             <h3 className="font-semibold text-primary">Sponsorship requests</h3>
             <p className="text-tertiary mt-2">
               This is a private draft only viewable to invited users.
             </p>
-            <div className="flex flex-col gap-4 mt-3">
+            <div className="flex flex-col gap-4 mt-3 max-h-[200px] overflow-y-scroll">
               {optimisticDraftProposal.approved_sponsors.map((sponsor) => (
                 <>
                   <div
