@@ -2,8 +2,8 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useReadContract,
-  useWriteContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
@@ -88,7 +88,7 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
     }
   }, [isSuccess, isError, error]);
 
-  // Note: Optimistic proposals are not queued
+  // Note: Optimistic proposals are not executed
   if (proposal.proposalType === "OPTIMISTIC") {
     return null;
   }

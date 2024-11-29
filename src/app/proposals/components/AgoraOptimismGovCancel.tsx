@@ -47,9 +47,6 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
         ProposalType.OPTIMISTIC
       );
 
-      console.log("optimistic address", optimisticModuleAddress);
-      console.log("approval address", approvalModuleAddress);
-
       const moduleAddress =
         proposal.proposalType === "APPROVAL"
           ? approvalModuleAddress
