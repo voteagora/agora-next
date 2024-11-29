@@ -204,6 +204,10 @@ export const scrollTenantUIConfig = new TenantUI({
 
   toggles: [
     {
+      name: "admin",
+      enabled: true,
+    },
+    {
       name: "proposals",
       enabled: true,
     },
