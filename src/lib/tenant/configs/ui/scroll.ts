@@ -313,7 +313,7 @@ Now that the vote and proposal type are set, you can create your proposal by giv
 If you meet the proposal threshold or are the manager of the governor, then you can submit your draft onchain as a proposal. If you do not meet these requirements, you can find a sponsor for your proposal who does.
         `.trim(),
         },
-        gatingType: ProposalGatingType?.GOVERNOR_V1,
+        gatingType: ProposalGatingType.TOKEN_THRESHOLD,
       },
     },
   ],
