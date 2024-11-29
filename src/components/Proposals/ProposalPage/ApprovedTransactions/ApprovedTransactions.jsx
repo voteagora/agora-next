@@ -36,8 +36,6 @@ export default function ApprovedTransactions({
         <p className="font-mono text-xs font-medium leading-4 text-tertiary">
           {isNoProposedTransactions ? "No " : ""}
           Proposed Transactions{" "}
-          {namespace === TENANT_NAMESPACES.OPTIMISM &&
-            "(signal only – transactions are manually executed by the Foundation)"}
         </p>
         {executedTransactionHash && (
           <a
