@@ -460,3 +460,40 @@ export function findStakedDeposits({
       throw new Error(`Unknown namespace: ${namespace}`);
   }
 }
+
+export function getProposalsCount({
+  namespace,
+  contract,
+}: {
+  namespace: TenantNamespace;
+  contract: string;
+}) {
+  const condition = {
+    where: {
+      contract,
+    },
+  };
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.OPTIMISM:
+      return prisma.optimismProposals.count(condition);
+    case TENANT_NAMESPACES.ENS:
+      return prisma.ensProposals.count(condition);
+    case TENANT_NAMESPACES.ETHERFI:
+      return prisma.etherfiProposals.count(condition);
+    case TENANT_NAMESPACES.UNISWAP:
+      return prisma.uniswapProposals.count(condition);
+    case TENANT_NAMESPACES.CYBER:
+      return prisma.cyberProposals.count(condition);
+    case TENANT_NAMESPACES.SCROLL:
+      return prisma.scrollProposals.count(condition);
+    case TENANT_NAMESPACES.DERIVE:
+      return prisma.deriveProposals.count(condition);
+    case TENANT_NAMESPACES.PGUILD:
+      return prisma.pguildProposals.count(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prisma.boostProposals.count(condition);
+    default:
+      throw new Error(`Unknown namespace: ${namespace}`);
+  }
+}
