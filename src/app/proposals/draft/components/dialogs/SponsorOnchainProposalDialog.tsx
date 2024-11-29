@@ -42,6 +42,12 @@ const SponsorOnchainProposalDialog = ({
                 It might take up to a minute for the changes to be reflected.
               </div>
             )}
+            {!isLoading && (
+              <div className="text-base text-secondary mb-5">
+                It may take a few minutes for the proposal to be indexed and
+                appear on Agora.
+              </div>
+            )}
             <div>
               <UpdatedButton
                 fullWidth={true}
@@ -55,7 +61,7 @@ const SponsorOnchainProposalDialog = ({
               >
                 {isLoading
                   ? "Saving your proposal onchain..."
-                  : "View proposal"}
+                  : "View Proposals"}
               </UpdatedButton>
             </div>
             {!isLoading && (
