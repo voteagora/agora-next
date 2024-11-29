@@ -81,7 +81,6 @@ const DraftFormClient = ({
   draftProposal: DraftProposal;
   proposalTypes: any[];
 }) => {
-  console.log(proposalTypes);
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
