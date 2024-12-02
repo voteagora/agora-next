@@ -7,13 +7,12 @@ import {
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
-import { HStack } from "@/components/Layout/Stack";
 import { disapprovalThreshold } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 import { formatUnits } from "ethers";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import StandardProposalDelete from "./StandardProposalDelete";
 import OptimisticProposalVotesCard from "../../ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
+import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 
 async function fetchProposalVotes(proposalId, pagintaion) {
   "use server";
@@ -78,16 +77,13 @@ export default async function OPProposalPage({ proposal }) {
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
 
   return (
-    // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
-    <HStack
-      gap={16}
-      justifyContent="justify-between"
-      alignItems="items-start"
-      className="max-w-[76rem] flex-col sm:flex-row items-stretch sm:items-start justify-end sm:justify-between"
-    >
-      <ProposalDescription proposalVotes={proposalVotes} proposal={proposal} />
-      <div>
-        <StandardProposalDelete proposal={proposal} />
+    <div className="flex flex-col">
+      <ProposalStateAdmin proposal={proposal} />
+      <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
+        <ProposalDescription
+          proposalVotes={proposalVotes}
+          proposal={proposal}
+        />
         <OptimisticProposalVotesCard
           proposal={proposal}
           proposalVotes={proposalVotes}
@@ -103,6 +99,6 @@ export default async function OPProposalPage({ proposal }) {
           status={status}
         />
       </div>
-    </HStack>
+    </div>
   );
 }

@@ -46,17 +46,32 @@ const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
   );
 };
 
-export default function DelegateCard({ delegate }: { delegate: Delegate }) {
+export default function DelegateCard({
+                                       delegate,
+                                       totalProposals,
+}: {
+  delegate: Delegate;
+  totalProposals: number;
+}) {
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
+export default function DelegateCard({
+  delegate,
+  totalProposals,
+}: {
+  delegate: Delegate;
+  totalProposals: number;
+}) {
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
-      {parseInt(delegate.lastTenProps) > 5 ? (
-        <ActiveHeader outOfTen={delegate.lastTenProps} />
-      ) : (
-        <InactiveHeader outOfTen={delegate.lastTenProps} />
-      )}
+      {totalProposals >= 3 ? (
+        parseInt(delegate.lastTenProps) > 5 ? (
+          <ActiveHeader outOfTen={delegate.lastTenProps} />
+        ) : (
+          <InactiveHeader outOfTen={delegate.lastTenProps} />
+        )
+      ) : null}
       <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">
         <div className="flex flex-col items-stretch p-4 border-b border-line">
           <DelegateProfileImage

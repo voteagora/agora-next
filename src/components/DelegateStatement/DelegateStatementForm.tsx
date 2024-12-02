@@ -13,6 +13,7 @@ import {
   fetchDelegate,
   submitDelegateStatement,
 } from "@/app/delegates/actions";
+import { fetchProposalsCount } from "@/app/proposals/actions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
@@ -34,6 +35,7 @@ export default function DelegateStatementForm({
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
+  const [totalProposals, setTotalProposals] = useState<number>(0);
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
@@ -50,14 +52,18 @@ export default function DelegateStatementForm({
   });
 
   useEffect(() => {
-    async function _getDelegate() {
-      const _delegate = await fetchDelegate(address as string);
-      setDelegate(_delegate);
+    async function fetchData() {
+      if (address) {
+        const [_delegate, _totalProposals] = await Promise.all([
+          fetchDelegate(address as string),
+          fetchProposalsCount(),
+        ]);
+        setDelegate(_delegate);
+        setTotalProposals(_totalProposals);
+      }
     }
 
-    if (address) {
-      _getDelegate();
-    }
+    fetchData();
   }, [address]);
 
   async function onSubmit(values: DelegateStatementFormValues) {
@@ -135,7 +141,7 @@ export default function DelegateStatementForm({
     <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-          <DelegateCard delegate={delegate} />
+          <DelegateCard delegate={delegate} totalProposals={totalProposals} />
         </div>
       )}
       <div className="flex flex-col w-full">

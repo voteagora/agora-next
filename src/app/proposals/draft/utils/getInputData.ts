@@ -2,13 +2,9 @@ import { ethers } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
 import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
-// TODO: these are the addresses for OP
-// maybe we need to move this to the tenant config if these are not shared between tenants
-import {
-  approvalModuleAddress,
-  optimisticModuleAddress,
-} from "@/lib/contracts/contracts";
-import { disapprovalThreshold, TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { disapprovalThreshold } from "@/lib/constants";
+import { getProposalTypeAddress } from "./stages";
 
 const transferABI = [
   {
@@ -196,13 +192,18 @@ export function getInputData(proposal: DraftProposal): {
         [options, settings]
       );
 
-      // TODO: change this so the module addresses are set via the tenant
-      // moving quickly atm
-      const finalApprovalModuleAddress =
-        contracts.governorApprovalModule || approvalModuleAddress;
+      const approvalModuleAddress = getProposalTypeAddress(
+        ProposalType.APPROVAL
+      );
+
+      if (!approvalModuleAddress) {
+        throw new Error(
+          `Approval module address not found for tenant ${namespace}`
+        );
+      }
 
       const approvalInputData: ApprovalInputData = [
-        finalApprovalModuleAddress,
+        approvalModuleAddress,
         calldata,
         description,
         parseInt(proposal.proposal_type || "0"),
@@ -230,6 +231,16 @@ export function getInputData(proposal: DraftProposal): {
           },
         ]
       );
+
+      const optimisticModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTIMISTIC
+      );
+
+      if (!optimisticModuleAddress) {
+        throw new Error(
+          `Optimistic module address not found for tenant ${namespace}`
+        );
+      }
 
       const optimisticInputData: ApprovalInputData = [
         optimisticModuleAddress,

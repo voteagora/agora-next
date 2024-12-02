@@ -8,20 +8,24 @@ import { useAccount } from "wagmi";
 import { AgoraGovCancel } from "@/app/proposals/components/AgoraGovCancel";
 import { AgoraGovQueue } from "@/app/proposals/components/AgoraGovQueue";
 import { BravoGovCancel } from "@/app/proposals/components/BravoGovCancel";
-import { type TenantNamespace } from "@/lib/types";
+import { TenantNamespace } from "@/lib/types";
 import { OZGovQueue } from "@/app/proposals/components/OZGovQueue";
 import { OZGovExecute } from "@/app/proposals/components/OZGovExecute";
 import { BravoGovExecute } from "@/app/proposals/components/BravoGovExecute";
 import { BravoGovQueue } from "@/app/proposals/components/BravoGovQueue";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import { AgoraOptimismGovCancel } from "@/app/proposals/components/AgoraOptimismGovCancel";
+import { AgoraOptimismGovQueue } from "@/app/proposals/components/AgoraOptimismGovQueue";
+import { AgoraOptimismGovExecute } from "@/app/proposals/components/AgoraOptimismGovExecute";
 
 interface Props {
   proposal: Proposal;
 }
 
 export const ProposalStateAdmin = ({ proposal }: Props) => {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
   const { isConnected, address } = useAccount();
+  const { namespace } = Tenant.current();
 
   const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
 
@@ -29,12 +33,10 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   // This check is used to hide the entire admin bar, not just the Cancel button.
   const isCancellable =
     proposal.status === PROPOSAL_STATUS.ACTIVE &&
-    [
-      TENANT_NAMESPACES.CYBER,
-      TENANT_NAMESPACES.DERIVE,
-      TENANT_NAMESPACES.SCROLL,
-      TENANT_NAMESPACES.UNISWAP,
-    ].includes(namespace as any);
+    (namespace === TENANT_NAMESPACES.CYBER ||
+      namespace === TENANT_NAMESPACES.SCROLL ||
+      namespace === TENANT_NAMESPACES.OPTIMISM ||
+      namespace === TENANT_NAMESPACES.UNISWAP);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
@@ -61,9 +63,18 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     switch (proposal.status) {
       case PROPOSAL_STATUS.ACTIVE:
       case PROPOSAL_STATUS.PENDING:
-        return "This proposal can still be cancelled by the admin";
+        return "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
-        return "This proposal is now passed and can be queued for execution.";
+        if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+          if (
+            proposal.proposalType === "APPROVAL" ||
+            proposal.proposalType === "STANDARD"
+          ) {
+            return "This proposal is now passed and can be queued for execution.";
+          }
+          return "This proposal can still be cancelled by the admin.";
+        }
+
       case PROPOSAL_STATUS.QUEUED:
         return "This proposal can be executed after the timelock passes.";
     }
@@ -116,13 +127,27 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
-    case TENANT_NAMESPACES.DERIVE:
       return (
         <div className="flex flex-row gap-2">
           <AgoraGovCancel proposal={proposal} />
           <AgoraGovQueue proposal={proposal} />
         </div>
       );
+
+    case TENANT_NAMESPACES.OPTIMISM:
+      if (
+        proposal.proposalType === "STANDARD" ||
+        proposal.proposalType === "APPROVAL"
+      ) {
+        return (
+          <div className="flex flex-row gap-2">
+            <AgoraOptimismGovCancel proposal={proposal} />
+            <AgoraOptimismGovQueue proposal={proposal} />
+          </div>
+        );
+      } else {
+        return <AgoraOptimismGovCancel proposal={proposal} />;
+      }
 
     case TENANT_NAMESPACES.UNISWAP:
       return <BravoGovQueue proposal={proposal} />;
@@ -137,10 +162,12 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
 
 const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
-    case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return <AgoraGovExecute proposal={proposal} />;
+
+    case TENANT_NAMESPACES.OPTIMISM:
+      return <AgoraOptimismGovExecute proposal={proposal} />;
 
     case TENANT_NAMESPACES.ENS:
       return <OZGovExecute proposal={proposal} />;
@@ -155,10 +182,12 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
 
 const activeStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
-    case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
       return <AgoraGovCancel proposal={proposal} />;
+
+    case TENANT_NAMESPACES.OPTIMISM:
+      return <AgoraOptimismGovCancel proposal={proposal} />;
 
     case TENANT_NAMESPACES.ENS:
       // Cancelling proposals is not supported for ENS

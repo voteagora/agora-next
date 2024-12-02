@@ -5,7 +5,6 @@ import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovedTransactions({
@@ -36,8 +35,6 @@ export default function ApprovedTransactions({
         <p className="font-mono text-xs font-medium leading-4 text-tertiary">
           {isNoProposedTransactions ? "No " : ""}
           Proposed Transactions{" "}
-          {namespace === TENANT_NAMESPACES.OPTIMISM &&
-            "(signal only – transactions are manually executed by the Foundation)"}
         </p>
         {executedTransactionHash && (
           <a
