@@ -33,10 +33,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   // This check is used to hide the entire admin bar, not just the Cancel button.
   const isCancellable =
     proposal.status === PROPOSAL_STATUS.ACTIVE &&
-    (namespace === TENANT_NAMESPACES.CYBER ||
-      namespace === TENANT_NAMESPACES.SCROLL ||
-      namespace === TENANT_NAMESPACES.OPTIMISM ||
-      namespace === TENANT_NAMESPACES.UNISWAP);
+    namespace !== TENANT_NAMESPACES.ENS;
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
@@ -65,15 +62,13 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       case PROPOSAL_STATUS.PENDING:
         return "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
-        if (namespace === TENANT_NAMESPACES.OPTIMISM) {
-          if (
-            proposal.proposalType === "APPROVAL" ||
-            proposal.proposalType === "STANDARD"
-          ) {
-            return "This proposal is now passed and can be queued for execution.";
-          }
+        if (
+          namespace === TENANT_NAMESPACES.OPTIMISM &&
+          proposal.proposalType === "OPTIMISTIC"
+        ) {
           return "This proposal can still be cancelled by the admin.";
         }
+        return "This proposal is now passed and can be queued for execution.";
 
       case PROPOSAL_STATUS.QUEUED:
         return "This proposal can be executed after the timelock passes.";
@@ -125,8 +120,9 @@ interface ActionProps {
 
 const successActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
-    case TENANT_NAMESPACES.SCROLL:
+    case TENANT_NAMESPACES.BOOST:
     case TENANT_NAMESPACES.CYBER:
+    case TENANT_NAMESPACES.SCROLL:
       return (
         <div className="flex flex-row gap-2">
           <AgoraGovCancel proposal={proposal} />
@@ -162,10 +158,6 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
 
 const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
-    case TENANT_NAMESPACES.SCROLL:
-    case TENANT_NAMESPACES.CYBER:
-      return <AgoraGovExecute proposal={proposal} />;
-
     case TENANT_NAMESPACES.OPTIMISM:
       return <AgoraOptimismGovExecute proposal={proposal} />;
 
@@ -182,10 +174,6 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
 
 const activeStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
-    case TENANT_NAMESPACES.SCROLL:
-    case TENANT_NAMESPACES.CYBER:
-      return <AgoraGovCancel proposal={proposal} />;
-
     case TENANT_NAMESPACES.OPTIMISM:
       return <AgoraOptimismGovCancel proposal={proposal} />;
 
