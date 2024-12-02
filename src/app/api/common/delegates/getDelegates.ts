@@ -389,11 +389,35 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
         FROM ${namespace + ".advanced_delegatees"}
         WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0`;
-  const numOfDirectDelegationsQuery = `        SELECT
-          SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-        FROM ${namespace + ".delegate_changed_events"}
-        WHERE to_delegate=$1 OR from_delegate=$1`;
+  var numOfDirectDelegationsQuery;
 
+  if (contracts.token.isERC20()) {
+    numOfDirectDelegationsQuery = `        SELECT
+        SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+      FROM ${namespace + ".delegate_changed_events"}
+      WHERE to_delegate=$1 OR from_delegate=$1`;
+  } else if (contracts.token.isERC721()) {
+    numOfDirectDelegationsQuery = `with latest_delegations AS (
+                                          SELECT DISTINCT ON (delegator) 
+                                              delegator,
+                                              to_delegate,
+                                              chain_id,
+                                              address,
+                                              block_number,
+                                              transaction_index,
+                                              log_index
+                                          FROM
+                                              ${namespace}.delegate_changed_events WHERE address = $2
+                                          ORDER BY
+                                              delegator,
+                                              block_number DESC,
+                                              transaction_index DESC,
+                                              log_index DESC)
+  
+                                          SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
+  } else {
+    throw new Error("Token contract is neither ERC20 nor ERC721?");
+  }
   var numOfDelegationsQuery;
 
   const partialDelegationContract = contracts.alligator
@@ -434,6 +458,14 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     delegate.num_of_delegators?.toFixed() || "0"
   );
 
+  const usedNumOfDelegators =
+    cachedNumOfDelegators < 1000n
+      ? BigInt(
+          (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
+            "0"
+        )
+      : cachedNumOfDelegators;
+
   // Build out delegate JSON response
   return {
     address: address,
@@ -458,14 +490,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     votedAbstain: delegate?.abstain?.toString() || "0",
     votingParticipation: delegate?.participation_rate || 0,
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
-    numOfDelegators:
-      // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
-              "0"
-          )
-        : cachedNumOfDelegators,
+    numOfDelegators: usedNumOfDelegators,
     statement: delegate?.statement || null,
   };
 }
