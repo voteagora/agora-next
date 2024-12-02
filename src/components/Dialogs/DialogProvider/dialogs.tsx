@@ -31,11 +31,8 @@ import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDia
 import { SCWDelegateDialog } from "@/components/Dialogs/SCWDelegateDialog/SCWDelegateDialog";
 
 export type DialogType =
-<<<<<<< HEAD
   | DelegateDialogType
   | UndelegateDialogType
-=======
->>>>>>> d5748de3 (WIP scw voting)
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | CastProposalDialogType
