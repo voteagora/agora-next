@@ -1,10 +1,5 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import boostLogo from "@/assets/tenant/boost_logo.svg";
-import infoPageCard01 from "@/assets/tenant/boost_info_1.png";
-import infoPageCard02 from "@/assets/tenant/boost_info_2.png";
-import infoPageCard03 from "@/assets/tenant/boost_info_3.png";
-import infoPageCard04 from "@/assets/tenant/boost_info_4.png";
-import boostHero from "@/assets/tenant/boost_hero.png";
 import boostBanner from "@/assets/tenant/boost_banner.png";
 import successImage from "@/assets/tenant/boost_banner.png";
 import pendingImage from "@/assets/tenant/boost_banner.png";
@@ -116,56 +111,6 @@ export const boostTenantUIConfig = new TenantUI({
         imageDescription: "ADD BOOST DESCRIPTION",
       },
     },
-    {
-      route: "info",
-      title: "Welcome to the Boost Collective",
-      description: "ADD BOOST DESCRIPTION",
-      hero: boostBanner,
-      meta: {
-        title: "Info of Agora",
-        description: "ADD BOOST DESCRIPTION",
-        imageTitle: "Info of Agora",
-        imageDescription: "ADD BOOST DESCRIPTION",
-      },
-      links: [
-        {
-          name: "Community Discord",
-          title: "Community Discord",
-          url: "",
-          image: infoPageCard01,
-        },
-        {
-          name: "Governance Forums",
-          title: "Governance Forums",
-          url: "",
-          image: infoPageCard02,
-        },
-        {
-          name: "Protocol Docs",
-          title: "Protocol Docs",
-          url: "",
-          image: infoPageCard03,
-        },
-        {
-          name: "Optimistic Vision",
-          title: "Optimistic Vision",
-          url: "",
-          image: infoPageCard04,
-        },
-      ],
-    },
-    {
-      route: "info/about",
-      title: "About Boost",
-      hero: boostHero,
-      description: "ADD BOOST DESCRIPTION",
-      meta: {
-        title: "About Boost",
-        description: "ADD BOOST DESCRIPTION",
-        imageTitle: "About Boost",
-        imageDescription: "ADD BOOST DESCRIPTION",
-      },
-    },
   ],
 
   toggles: [
@@ -216,19 +161,31 @@ export const boostTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        // 0xEE0178EabB933A5eDA6309AC1D1678A0670103e3 -- approval prod
-        // 0x044e697c37B974d3822832934fC88fA07fa18Fb2 -- approval dev
-        // 0x38947322EBDb3e892DED2EDca9AA35dD177CCd06 -- optimistic prod
-        // 0x7dB0853038F845c70A278F0dc23d7437404F44fd -- optimistic dev
+
         proposalTypes: [
-          ProposalType?.BASIC,
-          ProposalType?.APPROVAL,
-          ProposalType?.OPTIMISTIC,
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0xEE0178EabB933A5eDA6309AC1D1678A0670103e3",
+            testnetAddress: "0x044e697c37B974d3822832934fC88fA07fa18Fb2",
+          },
+          {
+            type: ProposalType?.OPTIMISTIC,
+            prodAddress: "0x38947322EBDb3e892DED2EDca9AA35dD177CCd06",
+            testnetAddress: "0x7dB0853038F845c70A278F0dc23d7437404F44fd",
+          },
         ],
         copy: {
           helperText: `
 ## Proposal checklist
-
+1. Select the correct proposal type that matches the correct transfer size.
+2. Add a title, description
+3. Add transactions.
+If you need help creating transactions / calldata, please see this [video](https://www.loom.com/share/33b000ef682c4129995c8fa4bc35db57).
 `.trim(),
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
