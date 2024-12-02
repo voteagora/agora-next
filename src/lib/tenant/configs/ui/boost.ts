@@ -186,10 +186,6 @@ export const boostTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "info",
-      enabled: true,
-    },
-    {
       name: "proposal-lifecycle",
       enabled: true,
       config: {
