@@ -508,12 +508,23 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
         SELECT
           voter,
           participation_rate,
-          last_10_props
-        FROM ${namespace + ".voter_stats"}
-        WHERE voter = $1 AND contract = $2
+          last_10_props,
+          COUNT(p.id) as total_proposals
+        FROM ${namespace + ".voter_stats"} v
+        LEFT JOIN alltenant.proposals p ON
+          p.contract = v.contract
+          AND p.chain_id = $3
+        WHERE
+          v.voter = $1
+          AND v.contract = $2
+        GROUP BY
+          v.voter,
+          v.participation_rate,
+          v.last_10_props
         `,
     address,
-    contracts.governor.address
+    contracts.governor.address.toLowerCase(),
+    contracts.governor.chain.id
   );
 
   return statsQuery?.[0] || undefined;
