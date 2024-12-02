@@ -25,21 +25,33 @@ const CardHeader = ({
   );
 };
 
-const ActiveHeader = ({ outOfTen }: { outOfTen: string }) => {
+const ActiveHeader = ({
+  outOfTen,
+  totalProposals,
+}: {
+  outOfTen: string;
+  totalProposals: number;
+}) => {
   return (
     <CardHeader
       title="Active delegate"
-      cornerTitle={`🎉 ${parseInt(outOfTen) * 10}%`}
+      cornerTitle={`🎉 ${parseInt(outOfTen) * Math.min(10, totalProposals)}%`}
       subtitle={`Voted in ${outOfTen}/10 of the most recent proposals`}
     />
   );
 };
 
-const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
+const InactiveHeader = ({
+  outOfTen,
+  totalProposals,
+}: {
+  outOfTen: string;
+  totalProposals: number;
+}) => {
   return (
     <CardHeader
       title="Inactive delegate"
-      cornerTitle={`💤 ${parseInt(outOfTen) * 10}%`}
+      cornerTitle={`💤 ${parseInt(outOfTen) * Math.min(10, totalProposals)}%`}
       subtitle={`Voted in ${outOfTen}/10 of the most recent proposals`}
     />
   );
@@ -56,9 +68,15 @@ export default function DelegateCard({
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       {totalProposals >= 3 ? (
         parseInt(delegate.lastTenProps) > 5 ? (
-          <ActiveHeader outOfTen={delegate.lastTenProps} />
+          <ActiveHeader
+            outOfTen={delegate.lastTenProps}
+            totalProposals={totalProposals}
+          />
         ) : (
-          <InactiveHeader outOfTen={delegate.lastTenProps} />
+          <InactiveHeader
+            outOfTen={delegate.lastTenProps}
+            totalProposals={totalProposals}
+          />
         )
       ) : null}
       <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">

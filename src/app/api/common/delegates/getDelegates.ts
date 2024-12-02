@@ -330,23 +330,23 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       num_of_delegators,
       proposals_proposed,
       citizen.citizen,
-      statement.statement
+      statement.statement,
+      COALESCE(total_proposals.count, 0) as total_proposals
     FROM
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN
         (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $4) a ON TRUE
     LEFT JOIN
-      ${
-        namespace + ".advanced_voting_power"
-      } av ON av.delegate = $1 AND av.contract = $2
+      ${namespace + ".advanced_voting_power"} av ON av.delegate = $1 AND av.contract = $2
     LEFT JOIN
-        (SELECT num_of_delegators FROM ${
-          namespace + ".delegates"
-        } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN
-        (SELECT * FROM ${
-          namespace + ".voting_power"
-        } vp WHERE vp.delegate = $1 AND vp.contract = $5  LIMIT 1) c ON TRUE
+        (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1 AND vp.contract = $5 LIMIT 1) c ON TRUE
+    LEFT JOIN
+        (SELECT COUNT(*) as count
+         FROM ${namespace + ".proposals"} p
+         WHERE p.contract = $4
+        ) total_proposals ON TRUE
     LEFT JOIN
         (SELECT
           CASE
@@ -398,7 +398,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       WHERE to_delegate=$1 OR from_delegate=$1`;
   } else if (contracts.token.isERC721()) {
     numOfDirectDelegationsQuery = `with latest_delegations AS (
-                                          SELECT DISTINCT ON (delegator) 
+                                          SELECT DISTINCT ON (delegator)
                                               delegator,
                                               to_delegate,
                                               chain_id,
@@ -413,7 +413,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                                               block_number DESC,
                                               transaction_index DESC,
                                               log_index DESC)
-  
+
                                           SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
   } else {
     throw new Error("Token contract is neither ERC20 nor ERC721?");
@@ -491,6 +491,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     votingParticipation: delegate?.participation_rate || 0,
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators: usedNumOfDelegators,
+    totalProposals: delegate?.total_proposals || 0,
     statement: delegate?.statement || null,
   };
 }
@@ -511,9 +512,8 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
           last_10_props,
           COUNT(p.id) as total_proposals
         FROM ${namespace + ".voter_stats"} v
-        LEFT JOIN alltenant.proposals p ON
+        LEFT JOIN ${namespace + ".proposals"} p ON
           p.contract = v.contract
-          AND p.chain_id = $3
         WHERE
           v.voter = $1
           AND v.contract = $2
