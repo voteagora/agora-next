@@ -58,37 +58,46 @@ export const boostTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Agora is the home of Boost voters",
-      description: "ADD BOOST DESCRIPTION",
+      description:
+        "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
       hero: boostBanner,
       meta: {
         title: "Boost Agora",
-        description: "ADD BOOST DESCRIPTION",
+        description:
+          "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
         imageTitle: "Boost Agora",
-        imageDescription: "ADD BOOST DESCRIPTION",
+        imageDescription:
+          "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
       },
     },
     {
       route: "proposals",
       title: "Agora is the home of Boost voters",
-      description: "ADD BOOST DESCRIPTION",
+      description:
+        "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
       hero: boostBanner,
       meta: {
         title: "Boost Agora",
-        description: "ADD BOOST DESCRIPTION",
+        description:
+          "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
         imageTitle: "Boost Agora",
-        imageDescription: "ADD BOOST DESCRIPTION",
+        imageDescription:
+          "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
       },
     },
     {
       route: "delegates",
       title: "Agora is the home of Boost voters",
-      description: "ADD BOOST DESCRIPTION",
+      description:
+        "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
       hero: boostBanner,
       meta: {
         title: "Voter on Agora",
-        description: "ADD BOOST DESCRIPTION",
+        description:
+          "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
         imageTitle: "Voter on Agora",
-        imageDescription: "ADD BOOST DESCRIPTION",
+        imageDescription:
+          "This is the home of the Boost Collective's Governance. Membership is determined by holding the Boost DAO NFT.",
       },
     },
   ],
