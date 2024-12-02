@@ -106,7 +106,7 @@ async function getProposalTypes() {
     namespace,
     contract: contracts.proposalTypesConfigurator!.address,
   });
-  
+
   return results;
 }
 
