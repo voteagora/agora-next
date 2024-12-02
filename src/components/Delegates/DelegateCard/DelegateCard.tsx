@@ -5,10 +5,10 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
 
 const CardHeader = ({
-  title,
-  cornerTitle,
-  subtitle,
-}: {
+                      title,
+                      cornerTitle,
+                      subtitle,
+                    }: {
   title: string;
   cornerTitle: string;
   subtitle: string;
@@ -47,22 +47,16 @@ const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
 };
 
 export default function DelegateCard({
-                                       delegate,
-                                       totalProposals,
-}: {
-  delegate: Delegate;
-  totalProposals: number;
-}) {
-  // Display SCW if exists
-  const hasSCWAddress = Boolean(delegate.statement?.scw_address);
-
-export default function DelegateCard({
   delegate,
   totalProposals,
 }: {
   delegate: Delegate;
   totalProposals: number;
 }) {
+
+  // Display SCW if exists
+  const hasSCWAddress = Boolean(delegate.statement?.scw_address);
+
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       {totalProposals >= 3 ? (
