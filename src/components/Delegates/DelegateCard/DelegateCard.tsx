@@ -35,8 +35,8 @@ const ActiveHeader = ({
   return (
     <CardHeader
       title="Active delegate"
-      cornerTitle={`🎉 ${parseInt(outOfTen) * Math.min(10, totalProposals)}%`}
-      subtitle={`Voted in ${outOfTen}/10 of the most recent proposals`}
+      cornerTitle={`🎉 ${(parseInt(outOfTen) / Math.min(10, totalProposals)) * 100 || 0}%`}
+      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
     />
   );
 };
@@ -51,8 +51,8 @@ const InactiveHeader = ({
   return (
     <CardHeader
       title="Inactive delegate"
-      cornerTitle={`💤 ${parseInt(outOfTen) * Math.min(10, totalProposals)}%`}
-      subtitle={`Voted in ${outOfTen}/10 of the most recent proposals`}
+      cornerTitle={`💤 ${(parseInt(outOfTen) / Math.min(10, totalProposals)) * 100 || 0}%`}
+      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
     />
   );
 };

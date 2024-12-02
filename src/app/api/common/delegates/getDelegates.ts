@@ -510,7 +510,7 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
           voter,
           participation_rate,
           last_10_props,
-          COUNT(p.id) as total_proposals
+          COUNT(p.proposal_id) as total_proposals
         FROM ${namespace + ".voter_stats"} v
         LEFT JOIN ${namespace + ".proposals"} p ON
           p.contract = v.contract

@@ -57,8 +57,9 @@ const DelegateCard = ({
               </span>
               {!isVotingStatsPending && (
                 <span className="text-primary font-bold">
-                  {(votingStats?.last_10_props || 0) *
-                    Math.min(10, votingStats?.total_proposals || 0)}
+                  {((votingStats?.last_10_props || 0) /
+                    Math.min(10, votingStats?.total_proposals || 0)) *
+                    100 || "0"}
                   % Participation
                 </span>
               )}
