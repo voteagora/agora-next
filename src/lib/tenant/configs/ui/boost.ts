@@ -43,11 +43,6 @@ export const boostTenantUIConfig = new TenantUI({
 
   links: [
     {
-      name: "faq",
-      title: "FAQ",
-      url: "TODO",
-    },
-    {
       name: "changelog",
       title: "Change log",
       url: "/changelog",
@@ -55,22 +50,7 @@ export const boostTenantUIConfig = new TenantUI({
     {
       name: "discord",
       title: "Discord",
-      url: "TODO",
-    },
-    {
-      name: "governance-forum",
-      title: "Governance Forum",
-      url: "TODO",
-    },
-    {
-      name: "code-of-conduct",
-      title: "Delegate Code of Conduct",
-      url: "TODO",
-    },
-    {
-      name: "delegate-statement-template",
-      title: "View Template",
-      url: "TODO",
+      url: "https://discord.com/invite/53c3CxDneJ",
     },
   ],
 
