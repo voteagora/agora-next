@@ -316,7 +316,7 @@ async function getCurrentDelegatorsForAddress({
   }
 
   const filteredDelegatorsData = delagtorsData.filter(
-    (delegator) => BigInt(delegator.allowance) > balanceFilter; // filter out delegators with 0 (or close to 0) balance
+    (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
   );
 
   return {
