@@ -45,7 +45,7 @@ export function findDelagatee({
 export function findAdvancedDelegatee({
   namespace,
   address,
-  contract
+  contract,
 }: {
   namespace: TenantNamespace;
   address: string;
