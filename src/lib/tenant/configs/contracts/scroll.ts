@@ -93,21 +93,5 @@ export const scrollTenantContractConfig = ({
     }),
 
     treasury: TREASURY,
-
-    timelock: new TenantContract<IGovernorContract>({
-      abi: AgoraTimelock__factory.abi,
-      address: TIMELOCK,
-      chain: scroll,
-      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
-      provider,
-    }),
-
-    proposalTypesConfigurator: new TenantContract<BaseContract>({
-      abi: ProposalTypesConfigurator__factory.abi,
-      address: TYPES,
-      chain: scroll,
-      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
-      provider,
-    }),
   };
 };
