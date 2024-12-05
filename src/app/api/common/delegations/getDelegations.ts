@@ -53,7 +53,6 @@ async function getCurrentDelegateesForAddress({
       namespace,
       address,
       contract: contracts.token.address,
-      partial: true,
     });
     directDelegatee = null;
   } else {
