@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/tooltip";
 import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 import { useState, useEffect } from "react";
-import MarkdownPreview from "@uiw/react-markdown-preview";
 import {
   ControllerProps,
   FieldPath,
@@ -23,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 type MarkdownTextareaInputProps = {
   label: string;
@@ -99,16 +99,11 @@ function MarkdownTextareaInput<
                 />
 
                 <div>
-                  <MarkdownPreview
-                    source={value}
+                  <div
                     className={`h-full py-3 px-4 rounded-t-lg max-w-[650px] bg-transparent prose ${selectedMode === "write" ? "hidden" : "visible"}`}
-                    style={{
-                      backgroundColor: "transparent",
-                    }}
-                    wrapperElement={{
-                      "data-color-mode": "light",
-                    }}
-                  />
+                  >
+                    <Markdown content={value} />
+                  </div>
                 </div>
               </div>
               <div className="w-full flex flex-row justify-end py-3 gap-x-1 rounded-b-lg border-x border-b border-line pr-2">
