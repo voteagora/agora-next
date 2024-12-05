@@ -456,7 +456,7 @@ view OptimismProposals {
   queued_transaction_hash    String?
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals")
   @@schema("optimism")
 }
 
