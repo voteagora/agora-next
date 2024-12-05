@@ -1,3 +1,5 @@
+"use client";
+
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import styles from "./markdown.module.scss";
 import Tenant from "@/lib/tenant/tenant";
