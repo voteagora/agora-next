@@ -1,5 +1,6 @@
 import {
   AgoraGovernor__factory,
+  AgoraTimelock__factory,
   AgoraToken__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
@@ -81,6 +82,14 @@ export const scrollTenantContractConfig = ({
       address: TYPES,
       chain: scroll,
       contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
+      provider,
+    }),
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain: scroll,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
 
