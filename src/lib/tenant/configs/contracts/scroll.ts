@@ -7,7 +7,6 @@ import {
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { scroll } from "viem/chains";
-
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { FallbackProvider, JsonRpcProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
@@ -94,5 +93,21 @@ export const scrollTenantContractConfig = ({
     }),
 
     treasury: TREASURY,
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain: scroll,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
+      provider,
+    }),
+
+    proposalTypesConfigurator: new TenantContract<BaseContract>({
+      abi: ProposalTypesConfigurator__factory.abi,
+      address: TYPES,
+      chain: scroll,
+      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
+      provider,
+    }),
   };
 };

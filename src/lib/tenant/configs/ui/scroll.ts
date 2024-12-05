@@ -285,12 +285,12 @@ export const scrollTenantUIConfig = new TenantUI({
           {
             type: ProposalType?.APPROVAL,
             prodAddress: "0xe5bAF6359d200C144A9e52E3361efA6Dc5780cC9",
-            testnetAddress: null,
+            testnetAddress: "0x678dEbd4B7bEB0412B2848FfEcbE761D39b961c4",
           },
           {
             type: ProposalType?.OPTIMISTIC,
             prodAddress: "0x89c4C0E77f7876415d07a2e43E5e9a6A4Cab3538",
-            testnetAddress: null,
+            testnetAddress: "0x5fA0a34a3262d646E7e28a621F631bBA5Ae029c5",
           },
         ],
         copy: {
@@ -313,7 +313,7 @@ Now that the vote and proposal type are set, you can create your proposal by giv
 If you meet the proposal threshold or are the manager of the governor, then you can submit your draft onchain as a proposal. If you do not meet these requirements, you can find a sponsor for your proposal who does.
         `.trim(),
         },
-        gatingType: ProposalGatingType?.GOVERNOR_V1,
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
   ],
