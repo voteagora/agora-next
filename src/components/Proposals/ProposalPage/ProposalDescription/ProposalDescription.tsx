@@ -1,16 +1,36 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
-import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-
 import { Vote } from "@/app/api/common/votes/vote";
 import { PaginatedResult } from "@/app/lib/pagination";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import Tenant from "@/lib/tenant/tenant";
+
+const defaults = {
+  primary: "23 23 23",
+  secondary: "64 64 64",
+  tertiary: "115 115 115",
+  neutral: "255 255 255",
+  wash: "250 250 250",
+  line: "229 229 229",
+  positive: "0 153 43",
+  negative: "197 47 0",
+  brandPrimary: "23 23 23",
+  brandSecondary: "255 255 255",
+  font: "var(--font-inter)",
+};
+
+const toRGBA = (hex: string, alpha: number) => {
+  return `rgba(${hex
+    .split(" ")
+    .map((n) => parseInt(n, 10))
+    .join(",")}, ${alpha})`;
+};
 
 export default function ProposalDescription({
   proposal,
@@ -19,6 +39,13 @@ export default function ProposalDescription({
   proposal: Proposal;
   proposalVotes: PaginatedResult<Vote[]>;
 }) {
+  const { ui } = Tenant.current();
+  const primary = ui?.customization?.primary ?? defaults.primary;
+  const secondary = ui?.customization?.secondary ?? defaults.secondary;
+  const tertiary = ui?.customization?.tertiary ?? defaults.tertiary;
+  const line = ui?.customization?.line ?? defaults.line;
+  const positive = ui?.customization?.positive ?? defaults.positive;
+
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
     "64930538748268257621925093712454552173772860987977453334165023026835711650357",
@@ -78,11 +105,29 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
-        <ReactMarkdown
-          className={cn(styles.proposal_description_md, "max-w-none", "prose")}
-        >
-          {stripTitleFromDescription(shortTitle, patchedDescription ?? "")}
-        </ReactMarkdown>
+        <div className={styles.proposal_description_md}>
+          <MarkdownPreview
+            source={stripTitleFromDescription(
+              shortTitle,
+              patchedDescription ?? ""
+            )}
+            style={
+              {
+                "--color-fg-default": toRGBA(secondary, 1),
+                "--color-canvas-default": toRGBA(primary, 0),
+                "--color-border-default": toRGBA(line, 1),
+                "--color-border-muted": toRGBA(line, 1),
+                "--color-canvas-subtle": toRGBA(tertiary, 0.05),
+                "--color-prettylights-syntax-entity-tag": toRGBA(positive, 1),
+                fontFamily: ui?.customization?.font ?? defaults.font,
+              } as React.CSSProperties
+            }
+            className={`h-full py-3 rounded-t-lg max-w-full bg-transparent prose prose-code:bg-wash`}
+            wrapperElement={{
+              "data-color-mode": "light",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
