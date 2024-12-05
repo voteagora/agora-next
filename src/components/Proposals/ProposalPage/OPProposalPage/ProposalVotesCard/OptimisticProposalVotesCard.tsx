@@ -11,6 +11,7 @@ import { PaginatedResult } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
+import Tenant from "@/lib/tenant/tenant";
 
 const OptimisticProposalVotesCard = ({
   proposal,
@@ -39,6 +40,7 @@ const OptimisticProposalVotesCard = ({
   fetchCurrentDelegators: (proposalId: string) => void;
   status: string;
 }) => {
+  const { token } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
   const handleClick = () => {
@@ -83,9 +85,9 @@ const OptimisticProposalVotesCard = ({
 
                 <p className="mt-1 font-normal text-secondary">
                   This proposal will automatically pass unless{" "}
-                  {disapprovalThreshold}% of the votable supply of OP is
-                  against. Currently {againstRelativeAmount}% (
-                  {againstLengthString} OP) is against.
+                  {disapprovalThreshold}% of the votable supply of{" "}
+                  {token.symbol} is against. Currently {againstRelativeAmount}%
+                  ({againstLengthString} {token.symbol}) is against.
                 </p>
               </div>
             )}

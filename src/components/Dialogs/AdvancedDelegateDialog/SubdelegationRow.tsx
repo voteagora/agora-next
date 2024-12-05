@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
 import { useState, SetStateAction, useEffect, type Dispatch } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 function SubdelegationToRow({
   to,
@@ -21,6 +22,7 @@ function SubdelegationToRow({
   index: number;
   setOverFlowDelegation: Dispatch<SetStateAction<boolean>>;
 }) {
+  const { token } = Tenant.current();
   const [newAllowanceInput, setNewAllowanceInput] = useState("");
 
   const allowance = allowances[index];
@@ -146,7 +148,7 @@ function SubdelegationToRow({
             inputMode="numeric"
           />
           <div className="flex items-center pr-2 pl-1 w-[100px]">
-            <p>OP</p>
+            <p>{token.symbol}</p>
             <div className="bg-input w-[1px] h-6 mx-1"></div>
             <p>{percent}%</p>
           </div>
