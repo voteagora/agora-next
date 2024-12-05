@@ -25,6 +25,14 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       return await contracts.governor.contract.quorumVotes!();
 
     case TENANT_NAMESPACES.OPTIMISM:
+      if (
+        contracts.governor.v6UpgradeBlock &&
+        proposal.created_block &&
+        proposal.created_block < contracts.governor.v6UpgradeBlock
+      ) {
+        return 0n;
+      }
+
       quorum = await contracts.governor.contract.quorum!(proposal.proposal_id);
 
       // If no quorum is set, calculate it based on votable supply
