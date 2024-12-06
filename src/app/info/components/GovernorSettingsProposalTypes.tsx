@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
+import { formatNumber } from "@/lib/tokenUtils";
 
 const GovernorSettingsProposalTypes = ({
   proposalTypes,
@@ -162,7 +163,7 @@ const GovernorSettingsProposalTypes = ({
               {Number(proposalType.approval_threshold) / 100} %
             </TableCell>
             <TableCell colSpan={3} className="rounded-bl-xl">
-              {threshold?.toString()}
+              {threshold && formatNumber(threshold)}
             </TableCell>
             <TableCell colSpan={4} className="rounded-br-xl">
               {Number(proposalType.quorum) / 100} %
