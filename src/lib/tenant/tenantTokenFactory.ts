@@ -40,8 +40,8 @@ export default class TenantTokenFactory {
 
       case TENANT_NAMESPACES.DERIVE:
         return {
-          name: "CHANGEME - Derive",
-          symbol: "DERIVE",
+          name: "Staked Derive",
+          symbol: "stDRV",
           decimals: 18,
         };
 

@@ -44,6 +44,11 @@ export default function ProposalStatusDetail({
             DEFEATED
           </p>
         )}
+        {proposalStatus === "FAILED" && (
+          <p className="text-gray-600 bg-gray-300 rounded-sm px-1 py-0.5 font-semibold">
+            FAILED
+          </p>
+        )}
         {proposalStatus === "CANCELLED" && (
           <div className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
             {cancelledTransactionHash ? (
