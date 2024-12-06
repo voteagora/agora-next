@@ -74,6 +74,7 @@ export default function DelegateCard({
   const percentParticipation =
     (lastTenProps / Math.min(10, totalProposals)) * 100 || 0;
 
+  // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
