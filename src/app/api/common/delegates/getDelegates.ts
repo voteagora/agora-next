@@ -398,7 +398,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       WHERE to_delegate=$1 OR from_delegate=$1`;
   } else if (contracts.token.isERC721()) {
     numOfDirectDelegationsQuery = `with latest_delegations AS (
-                                          SELECT DISTINCT ON (delegator) 
+                                          SELECT DISTINCT ON (delegator)
                                               delegator,
                                               to_delegate,
                                               chain_id,
@@ -413,7 +413,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                                               block_number DESC,
                                               transaction_index DESC,
                                               log_index DESC)
-  
+
                                           SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
   } else {
     throw new Error("Token contract is neither ERC20 nor ERC721?");
@@ -516,7 +516,13 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
     contracts.governor.address
   );
 
-  return statsQuery?.[0] || undefined;
+  return (
+    statsQuery?.[0] || {
+      voter: address,
+      participation_rate: 0,
+      last_10_props: 0,
+    }
+  );
 }
 
 export const fetchDelegates = cache(getDelegates);
