@@ -100,7 +100,7 @@ function MarkdownTextareaInput<
 
                 <div>
                   <div
-                    className={`h-full py-3 px-4 rounded-t-lg max-w-[650px] bg-transparent prose ${selectedMode === "write" ? "hidden" : "visible"}`}
+                    className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose ${selectedMode === "write" ? "hidden" : "visible"}`}
                   >
                     <Markdown content={value} />
                   </div>

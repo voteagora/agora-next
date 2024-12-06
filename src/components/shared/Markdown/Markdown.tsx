@@ -3,6 +3,7 @@
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import styles from "./markdown.module.scss";
 import Tenant from "@/lib/tenant/tenant";
+import cn from "classnames";
 
 const defaults = {
   primary: "23 23 23",
@@ -33,7 +34,7 @@ export default function Markdown({ content }: { content: string }) {
   const line = ui?.customization?.line ?? defaults.line;
   const positive = ui?.customization?.positive ?? defaults.positive;
   return (
-    <div className={styles.proposal_description_md}>
+    <div className={cn(styles.proposal_description_md, "max-w-full")}>
       <MarkdownPreview
         source={content}
         style={
@@ -47,7 +48,7 @@ export default function Markdown({ content }: { content: string }) {
             fontFamily: ui?.customization?.font ?? defaults.font,
           } as React.CSSProperties
         }
-        className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash`}
+        className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash prose-code:text-primary`}
         wrapperElement={{
           "data-color-mode": "light",
         }}
