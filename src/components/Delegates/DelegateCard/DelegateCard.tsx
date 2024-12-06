@@ -5,10 +5,10 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
 
 const CardHeader = ({
-                      title,
-                      cornerTitle,
-                      subtitle,
-                    }: {
+  title,
+  cornerTitle,
+  subtitle,
+}: {
   title: string;
   cornerTitle: string;
   subtitle: string;
@@ -53,7 +53,6 @@ export default function DelegateCard({
   delegate: Delegate;
   totalProposals: number;
 }) {
-
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 

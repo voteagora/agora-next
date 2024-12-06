@@ -27,6 +27,19 @@ export const deriveTenantUIConfig = new TenantUI({
     retired: [],
   },
 
+  customization: {
+    primary: "233 232 226",
+    secondary: "148 158 158",
+    tertiary: "231 243 243",
+    neutral: "20 20 20",
+    wash: "10 10  10",
+    line: "39 42 42",
+    positive: "19 238 154",
+    negative: "246 62 88",
+    brandPrimary: "0 0 0",
+    brandSecondary: "0 0 0",
+  },
+
   links: [
     {
       name: "discord",

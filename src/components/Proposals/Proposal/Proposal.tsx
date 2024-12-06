@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
 import OPStandardProposalStatus from "./OPStandardProposalStatus";
 import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
@@ -35,19 +34,19 @@ export default function Proposal({
       target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
     >
       <div className="border-b border-line items-center flex flex-row bg-neutral">
-        <VStack
+        <div
           className={cn(
-            "whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",
+            "flex flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",
             "w-full sm:w-[55%] items-start justify-center"
           )}
         >
           {proposal.proposalType === "SNAPSHOT" ? (
-            <HStack className="text-xs text-secondary" gap={1}>
+            <div className="flex flex-row text-xs text-secondary gap-1">
               <p>Snapshot Proposal</p>
               <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />
-            </HStack>
+            </div>
           ) : (
-            <HStack className="text-xs text-secondary" gap={1}>
+            <div className="flex flex-row text-xs text-secondary gap-1">
               {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
               <div>
                 {proposalText}{" "}
@@ -64,18 +63,16 @@ export default function Proposal({
               <div className="block sm:hidden">
                 <ProposalStatus proposal={proposal} />
               </div>
-            </HStack>
+            </div>
           )}
-          <div
-            className={`overflow-ellipsis overflow-visible whitespace-normal break-words`}
-          >
+          <div className="overflow-ellipsis overflow-visible whitespace-normal break-words text-primaryW">
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`
               : proposal.markdowntitle}
           </div>
-        </VStack>
-        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[20%] flex-start justify-center hidden sm:block">
-          <VStack alignItems="items-end">
+        </div>
+        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[20%] flex-start justify-center hidden sm:block">
+          <div className="flex flex-col items-end">
             <div className="text-xs text-secondary">
               <ProposalTimeStatus
                 proposalStatus={proposal.status}
@@ -85,9 +82,9 @@ export default function Proposal({
               />
             </div>
             <ProposalStatus proposal={proposal} />
-          </VStack>
-        </VStack>
-        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden sm:block">
+          </div>
+        </div>
+        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden sm:block">
           <div className="overflow-hidden overflow-ellipsis">
             {proposal.proposalType === "SNAPSHOT" && (
               <SnapshotProposalStatus proposal={proposal} />
@@ -107,7 +104,7 @@ export default function Proposal({
               <OPApprovalProposalStatus proposal={proposal} />
             )}
           </div>
-        </VStack>
+        </div>
       </div>
     </Link>
   );
