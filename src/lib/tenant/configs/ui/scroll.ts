@@ -20,6 +20,8 @@ export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Governance",
   logo: scrollLogo,
 
+  // Preview
+
   googleAnalytics: "G-SV1E7HY7YZ",
 
   assets: {
