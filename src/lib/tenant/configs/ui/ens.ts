@@ -92,6 +92,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "sponsoredDelegate",
+      enabled: true,
+    },
+    {
       name: "proposal-execute",
       enabled: true,
     },
