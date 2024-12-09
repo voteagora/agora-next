@@ -46,7 +46,7 @@ const ProposalNonVoterList = ({
         }
         element="main"
       >
-        <ul className="flex flex-col">
+        <ul className="flex flex-col gap-2">
           {voters.map((voter) => (
             <li key={voter.delegate} className="">
               <ProposalSingleNonVoter voter={voter} />

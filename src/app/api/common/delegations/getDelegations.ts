@@ -53,7 +53,6 @@ async function getCurrentDelegateesForAddress({
       namespace,
       address,
       contract: contracts.token.address,
-      partial: true,
     });
     directDelegatee = null;
   } else {
@@ -180,6 +179,33 @@ async function getCurrentDelegatorsForAddress({
             WHERE
               ghost."to" = $3
               AND ghost."from" = $3`;
+  } else if (contracts.token.isERC721()) {
+    directDelegatorsSubQry = `
+          with latest_delegations AS (
+                                          SELECT DISTINCT ON (delegator) 
+                                              delegator,
+                                              to_delegate,
+                                              chain_id,
+                                              address,
+                                              block_number,
+                                              transaction_index,
+                                              log_index,
+                                              transaction_hash
+                                          FROM
+                                              ${namespace}.delegate_changed_events WHERE address = $2
+                                          ORDER BY
+                                              delegator,
+                                              block_number DESC,
+                                              transaction_index DESC,
+                                              log_index DESC)
+  
+                                          SELECT delegator as "from",
+                                                 to_delegate as "to",
+                                                 null::numeric as allowance,
+                                                 'DIRECT' as type,
+                                                 block_number,
+                                                 'FULL' as amount,
+                                                 transaction_hash from latest_delegations where to_delegate = LOWER($1) or delegator = LOWER($1)`;
   } else {
     directDelegatorsSubQry = `
           SELECT
@@ -276,8 +302,20 @@ async function getCurrentDelegatorsForAddress({
     }))
   );
 
+  var balanceFilter = BigInt(0);
+
+  if (contracts.token.isERC20()) {
+    balanceFilter = BigInt(1e15);
+  } else if (contracts.token.isERC721()) {
+    balanceFilter = BigInt(0);
+  } else {
+    throw new Error(
+      "Token is neither ERC20 nor ERC721, therefore unsupported."
+    );
+  }
+
   const filteredDelegatorsData = delagtorsData.filter(
-    (delegator) => BigInt(delegator.allowance) > BigInt(1e15) // filter out delegators with 0 (or close to 0) balance
+    (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
   );
 
   return {

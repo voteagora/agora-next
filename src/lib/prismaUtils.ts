@@ -46,12 +46,10 @@ export function findAdvancedDelegatee({
   namespace,
   address,
   contract,
-  partial,
 }: {
   namespace: TenantNamespace;
   address: string;
   contract?: string;
-  partial?: boolean;
 }) {
   const condition = {
     where: {
@@ -63,41 +61,23 @@ export function findAdvancedDelegatee({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.optimismAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.ensAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.etherfiAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.uniswapAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.cyberAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.scrollAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.deriveAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.pguildAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostAdvancedDelegatees.findMany(
-        partial ? undefined : condition
-      );
+      return prisma.boostAdvancedDelegatees.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

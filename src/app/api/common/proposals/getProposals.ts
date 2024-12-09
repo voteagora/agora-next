@@ -102,15 +102,12 @@ async function getProposal(proposalId: string) {
 async function getProposalTypes() {
   const { namespace, contracts } = Tenant.current();
 
-  try {
-    const results = await findProposalType({
-      namespace,
-      contract: contracts.proposalTypesConfigurator!.address,
-    });
-    return results;
-  } catch (error) {
-    return [];
-  }
+  const results = await findProposalType({
+    namespace,
+    contract: contracts.proposalTypesConfigurator!.address,
+  });
+
+  return results;
 }
 
 async function getDraftProposals(address: `0x${string}`) {

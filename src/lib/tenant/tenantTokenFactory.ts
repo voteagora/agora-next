@@ -62,7 +62,7 @@ export default class TenantTokenFactory {
       case TENANT_NAMESPACES.BOOST:
         return {
           name: "Boost Protocol",
-          symbol: "BOOST",
+          symbol: "BGUILD",
           decimals: 0,
         };
       default:

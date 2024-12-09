@@ -5,8 +5,10 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
 import { Switch } from "@/components/shared/Switch";
 import LabelWithInfo from "./LabelWithInfo";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovalCriteriaRow({ form }: { form: Form }) {
+  const { token } = Tenant.current();
   return (
     <>
       <h4 className="pb-1 font-semibold">Approval parameters</h4>
@@ -16,12 +18,12 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
       </p>
       <HStack className="w-full mb-4" gap={4}>
         <VStack className="w-full">
-          <LabelWithInfo label="Budget (OP)">
+          <LabelWithInfo label={`Budget (${token.symbol})`}>
             This is the maximum number of tokens that can be transferred from
             all the options in this proposal.
           </LabelWithInfo>
           <InputBox
-            placeholder={"30 000 000 OP"}
+            placeholder={`3 000 000 ${token.symbol}`}
             value={form.state.budget}
             onChange={(next) => form.onChange.budget(next)}
             required
@@ -69,7 +71,7 @@ export default function ApprovalCriteriaRow({ form }: { form: Form }) {
               winner
             </LabelWithInfo>
             <InputBox
-              placeholder={"3 000 000 OP"}
+              placeholder={`3 000 000 ${token.symbol}`}
               value={form.state.threshold}
               type="number"
               onChange={(next) => form.onChange.threshold(next)}

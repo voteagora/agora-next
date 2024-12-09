@@ -88,8 +88,9 @@ const DraftFormClient = ({
 
   const router = useRouter();
   const { address } = useAccount();
-  const tenant = Tenant.current();
-  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+
+  const { ui } = Tenant.current();
+  const plmToggle = ui.toggle("proposal-lifecycle");
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),

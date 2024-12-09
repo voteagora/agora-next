@@ -1,13 +1,14 @@
 import {
   AgoraGovernor__factory,
+  AgoraTimelock__factory,
   AgoraToken__factory,
+  ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { scroll } from "viem/chains";
-
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { FallbackProvider, JsonRpcProvider } from "ethers";
+import { FallbackProvider, JsonRpcProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 
 interface Props {
@@ -72,6 +73,22 @@ export const scrollTenantContractConfig = ({
       address: GOVERNOR,
       chain: scroll,
       contract: AgoraGovernor__factory.connect(GOVERNOR, provider),
+      provider,
+    }),
+
+    proposalTypesConfigurator: new TenantContract<BaseContract>({
+      abi: ProposalTypesConfigurator__factory.abi,
+      address: TYPES,
+      chain: scroll,
+      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
+      provider,
+    }),
+
+    timelock: new TenantContract<IGovernorContract>({
+      abi: AgoraTimelock__factory.abi,
+      address: TIMELOCK,
+      chain: scroll,
+      contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
 
