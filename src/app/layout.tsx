@@ -34,7 +34,7 @@ const defaults = {
   negative: "197 47 0",
   brandPrimary: "23 23 23",
   brandSecondary: "255 255 255",
-  font: "TransSansPremium",
+  font: "var(--font-inter)",
 };
 
 const defaultFavicons = {
