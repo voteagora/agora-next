@@ -96,24 +96,23 @@ const GovernorSettingsProposalTypes = ({
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          {isQuorumSupportedByGovernor ||
-            (proposalTypes.length > 0 && (
-              <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger className="flex flex-row space-x-1 items-center">
-                      <span>Quorum</span>
-                      <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
-                    </TooltipTrigger>
-                    <TooltipContent className="text-sm max-w-[200px]">
-                      What percentage of the total supply of voting power must
-                      vote For, Against, or Abstain in order for a vote to be
-                      valid.
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </TableHead>
-            ))}
+          {(isQuorumSupportedByGovernor || proposalTypes.length > 0) && (
+            <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="flex flex-row space-x-1 items-center">
+                    <span>Quorum</span>
+                    <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                  </TooltipTrigger>
+                  <TooltipContent className="text-sm max-w-[200px]">
+                    What percentage of the total supply of voting power must
+                    vote For, Against, or Abstain in order for a vote to be
+                    valid.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </TableHead>
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
