@@ -304,6 +304,7 @@ async function getDelegates({
       },
       citizen: delegate.citizen,
       statement: delegate.statement,
+      numOfDelegators: BigInt(delegate.num_of_delegators),
     })),
     seed,
   };

@@ -1,7 +1,6 @@
 import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
 import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
-import DelegateCardList from "@/components/Delegates/DelegateCardList/DelegateCardList";
 import CitizenCardList from "@/components/Delegates/DelegateCardList/CitzenCardList";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import { TabsContent } from "@/components/ui/tabs";
@@ -10,6 +9,7 @@ import Tenant from "@/lib/tenant/tenant";
 import React from "react";
 import { PaginationParams } from "@/app/lib/pagination";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
+import DelegateContent from "./DelegateContent";
 
 async function fetchCitizens(
   sort: string,
@@ -80,7 +80,7 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
   return (
     <DelegateTabs>
       <TabsContent value="delegates">
-        <DelegateCardList
+        <DelegateContent
           isDelegatesCitizensFetching={tab === "citizens"}
           initialDelegates={delegates}
           fetchDelegates={async (pagination, seed) => {
