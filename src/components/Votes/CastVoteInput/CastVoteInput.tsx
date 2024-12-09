@@ -49,10 +49,10 @@ export default function CastVoteInput({
   return (
     <div className="flex flex-col bg-neutral border border-line rounded-lg flex-shrink mx-4">
       <textarea
+        className="text-sm text-primary bg-neutral p-4 resize-none rounded-lg border-0 focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0"
         placeholder="I believe..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        className="text-sm p-4 resize-none rounded-lg border-0 focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0"
       />
       <div className="flex flex-col px-3 pb-3 pt-1 justify-between items-stretch">
         <VoteButtons
