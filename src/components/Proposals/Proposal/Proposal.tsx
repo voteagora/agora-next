@@ -65,7 +65,7 @@ export default function Proposal({
               </div>
             </div>
           )}
-          <div className="overflow-ellipsis overflow-visible whitespace-normal break-words text-primaryW">
+          <div className="overflow-ellipsis overflow-visible whitespace-normal break-words text-primary">
             {proposal.markdowntitle.length > 80
               ? `${proposal.markdowntitle.slice(0, 80)}...`
               : proposal.markdowntitle}
