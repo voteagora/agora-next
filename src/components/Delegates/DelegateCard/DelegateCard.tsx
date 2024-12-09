@@ -77,7 +77,7 @@ export default function DelegateCard({
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
   return (
-    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
+    <div className="flex flex-col sticky top-16 bg-neutral flex-shrink-0 width-[20rem]">
       {totalProposals >= 3 ? (
         percentParticipation > 50 ? (
           <ActiveHeader
