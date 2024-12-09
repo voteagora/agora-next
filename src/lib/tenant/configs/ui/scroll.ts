@@ -136,7 +136,8 @@ export const scrollTenantUIConfig = new TenantUI({
         title: "Voters of Scroll Governance",
         description: "Delegate your voting power to a trusted representative",
         imageTitle: "Scroll Governance",
-        imageDescription: "Delegate your voting power to a trusted representative",
+        imageDescription:
+          "Delegate your voting power to a trusted representative",
       },
     },
     {
