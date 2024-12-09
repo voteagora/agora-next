@@ -136,7 +136,8 @@ export const scrollTenantUIConfig = new TenantUI({
         title: "Voters of Scroll Governance",
         description: "Delegate your voting power to a trusted representative",
         imageTitle: "Scroll Governance",
-        imageDescription: "Delegate your voting power to a trusted representative",
+        imageDescription:
+          "Delegate your voting power to a trusted representative",
       },
     },
     {
@@ -180,16 +181,14 @@ export const scrollTenantUIConfig = new TenantUI({
       links: [
         {
           name: "Governance Forums",
-          title: "Gov. Forums (Soon!)",
-          url: "",
-          //   url: "https://gov.scroll.io/forum",
+          title: "Gov. Forums",
+          url: "https://forum.scroll.io",
           image: infoPageCard02,
         },
         {
           name: "Governance Docs",
-          title: "Gov. Docs (Soon!)",
-          url: "",
-          //   url: "https://gov.scroll.io/docs",
+          title: "Gov. Docs",
+          url: "https://scroll.io/gov-docs/content/overview",
           image: infoPageCard03,
         },
         {
