@@ -57,7 +57,7 @@ export default function DelegateCard({
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
   return (
-    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
+    <div className="flex flex-col sticky top-16 bg-neutral flex-shrink-0 width-[20rem]">
       {totalProposals >= 3 ? (
         parseInt(delegate.lastTenProps) > 5 ? (
           <ActiveHeader outOfTen={delegate.lastTenProps} />

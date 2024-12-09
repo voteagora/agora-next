@@ -57,17 +57,17 @@ export default function ProposalVotesSummaryDetails({
   const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
   return (
-    <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px]">
+    <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
       <ProposalVotesBar proposal={proposal} votes={votes} />
       <div className="flex flex-col gap-2 w-full mt-4">
-        <div className="flex justify-between gl_votes_for">
+        <div className="flex justify-between text-positive">
           FOR <AmountAndPercent amount={results.for} total={totalVotes} />
         </div>
-        <div className="gl_votes_abstain flex justify-between">
+        <div className="text-neutral flex justify-between">
           ABSTAIN{" "}
           <AmountAndPercent amount={results.abstain} total={totalVotes} />
         </div>
-        <div className="gl_votes_against flex justify-between">
+        <div className="text-negative flex justify-between">
           AGAINST{" "}
           <AmountAndPercent amount={results.against} total={totalVotes} />
         </div>
