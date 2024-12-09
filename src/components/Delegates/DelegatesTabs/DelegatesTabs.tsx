@@ -85,7 +85,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2">
               <button onClick={() => setLayout("grid")}>
                 <LayoutGrid
-                  className={`h-6 w-6 ${layout === "grid" ? "text-secondary fill-secondary" : "text-secondary/30 fill-secondary/30"}`}
+                  className={`h-6 w-6 ${layout === "grid" ? "text-secondary" : "text-secondary/30"}`}
                 />
               </button>
               <button onClick={() => setLayout("list")}>
