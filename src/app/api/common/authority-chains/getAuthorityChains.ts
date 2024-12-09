@@ -48,11 +48,6 @@ async function getAuthorityChains({
   ]);
 
   const reversedChains = chains
-    // TODO: revert once launamu votes
-    .filter(
-      (chain) =>
-        !chain.chain.includes("0x7fc80fad32ec41fd5cfcc14eee9c31953b6b4a8b")
-    )
     .filter((chain) => validateChain(chain, latestBlockNumber))
     .map((chain) => {
       const chains = chain.chain.reverse();
