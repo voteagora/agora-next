@@ -193,7 +193,7 @@ async function getDelegates({
           WHERE num_of_delegators IS NOT NULL
           AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
           ${delegateStatementFiler}
-          ORDER BY num_of_delegators DESC
+          ORDER BY num_of_delegators DESC, d.delegate
           OFFSET $1
           LIMIT $2;
         `;
@@ -274,7 +274,7 @@ async function getDelegates({
           FROM del_card_universe d
           WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
           ${delegateStatementFiler}
-          ORDER BY voting_power DESC
+          ORDER BY voting_power DESC, d.delegate
           OFFSET $1
           LIMIT $2;
           `;
