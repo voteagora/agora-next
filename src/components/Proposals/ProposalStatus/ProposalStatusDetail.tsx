@@ -17,7 +17,7 @@ export default function ProposalStatusDetail({
   cancelledTransactionHash: string | null;
 }) {
   return (
-    <div className="flex flex-row justify-between items-center gap-4 bg-wash border-t -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs">
+    <div className="flex flex-row justify-between items-center gap-4 bg-wash border-t border-line -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs">
       <div>
         {proposalStatus === "ACTIVE" && (
           <p className="text-blue-600 bg-sky-200 rounded-sm px-1 py-0.5 font-semibold">
@@ -42,6 +42,11 @@ export default function ProposalStatusDetail({
         {proposalStatus === "DEFEATED" && (
           <p className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
             DEFEATED
+          </p>
+        )}
+        {proposalStatus === "FAILED" && (
+          <p className="text-gray-600 bg-gray-300 rounded-sm px-1 py-0.5 font-semibold">
+            FAILED
           </p>
         )}
         {proposalStatus === "CANCELLED" && (

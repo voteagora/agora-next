@@ -59,7 +59,7 @@ export default function IssuesFilter() {
     >
       {() => (
         <>
-          <Listbox.Button className="w-full sm:w-[200px] bg-wash text-base font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between">
+          <Listbox.Button className="w-full sm:w-[200px] font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between bg-neutral text-primary">
             <span>
               {issuesFilterOptions[filterParam]?.value ||
                 issuesFilterOptions.all.value}
