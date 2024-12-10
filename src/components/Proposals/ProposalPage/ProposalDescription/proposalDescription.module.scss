@@ -10,42 +10,46 @@
 .proposal_description_md {
   h1 {
     font-size: $font-size-2xl;
+    font-weight: 700;
   }
 
   h2 {
     font-size: $font-size-xl;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
+    font-weight: 700;
   }
 
   h3 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
+    font-weight: 700;
   }
 
   h4 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
+    font-weight: 700;
   }
 
   h5 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
+    font-weight: 700;
   }
 
   h6 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
+    font-weight: 700;
   }
 
   pre {
-    background-color: var(--neutral);
     border-radius: $border-radius-lg;
-    border: 1px solid var(--line);
   }
 
   code {
@@ -82,7 +86,12 @@
   p {
     word-break: break-word;
   }
+
   pre {
     white-space: pre-wrap;
+  }
+
+  code {
+    border-radius: $border-radius-lg;
   }
 }
