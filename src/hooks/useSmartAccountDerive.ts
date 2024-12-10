@@ -101,13 +101,14 @@ const dummyPaymasterAndData = (): `0x${string}` => {
 };
 
 const derivePaymasterAndData: ClientMiddlewareFn = async (uo) => {
+
   const res = await fetch("https://derive.xyz/api/paymaster", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      secret: process.env.NEXT_PUBLIC_DERIVE_SECRET,
+      secret: process.env.NEXT_PUBLIC_DERIVE_PAYMASTER_KEY,
       userOp: {
         callData: await uo.callData,
         sender: await uo.sender,
