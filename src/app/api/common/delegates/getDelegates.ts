@@ -330,23 +330,24 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       num_of_delegators,
       proposals_proposed,
       citizen.citizen,
-      statement.statement
+      statement.statement,
+      COALESCE(total_proposals.count, 0) as total_proposals
     FROM
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN
         (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $4) a ON TRUE
     LEFT JOIN
-      ${
-        namespace + ".advanced_voting_power"
-      } av ON av.delegate = $1 AND av.contract = $2
+      ${namespace + ".advanced_voting_power"} av ON av.delegate = $1 AND av.contract = $2
     LEFT JOIN
-        (SELECT num_of_delegators FROM ${
-          namespace + ".delegates"
-        } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN
-        (SELECT * FROM ${
-          namespace + ".voting_power"
-        } vp WHERE vp.delegate = $1 AND vp.contract = $5  LIMIT 1) c ON TRUE
+        (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1 AND vp.contract = $5 LIMIT 1) c ON TRUE
+    LEFT JOIN
+        (SELECT COUNT(*) as count
+         FROM ${namespace + ".proposals_v2"} p
+         WHERE p.contract = $4
+         AND p.cancelled_block IS NULL
+        ) total_proposals ON TRUE
     LEFT JOIN
         (SELECT
           CASE
@@ -491,6 +492,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     votingParticipation: delegate?.participation_rate || 0,
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
     numOfDelegators: usedNumOfDelegators,
+    totalProposals: delegate?.total_proposals || 0,
     statement: delegate?.statement || null,
   };
 }
@@ -508,12 +510,23 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
         SELECT
           voter,
           participation_rate,
-          last_10_props
-        FROM ${namespace + ".voter_stats"}
-        WHERE voter = $1 AND contract = $2
+          last_10_props,
+          COUNT(p.proposal_id) as total_proposals
+        FROM ${namespace + ".voter_stats"} v
+        LEFT JOIN ${namespace + ".proposals_v2"} p ON
+          p.contract = v.contract
+        WHERE
+          v.voter = $1
+          AND v.contract = $2
+          AND p.cancelled_block IS NULL
+        GROUP BY
+          v.voter,
+          v.participation_rate,
+          v.last_10_props
         `,
     address,
-    contracts.governor.address
+    contracts.governor.address.toLowerCase(),
+    contracts.governor.chain.id
   );
 
   return (
