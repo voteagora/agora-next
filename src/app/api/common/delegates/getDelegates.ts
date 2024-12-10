@@ -344,8 +344,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1 AND vp.contract = $5 LIMIT 1) c ON TRUE
     LEFT JOIN
         (SELECT COUNT(*) as count
-         FROM ${namespace + ".proposals"} p
+         FROM ${namespace + ".proposals_v2"} p
          WHERE p.contract = $4
+         AND p.cancelled_block IS NULL
         ) total_proposals ON TRUE
     LEFT JOIN
         (SELECT
@@ -512,11 +513,12 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
           last_10_props,
           COUNT(p.proposal_id) as total_proposals
         FROM ${namespace + ".voter_stats"} v
-        LEFT JOIN ${namespace + ".proposals"} p ON
+        LEFT JOIN ${namespace + ".proposals_v2"} p ON
           p.contract = v.contract
         WHERE
           v.voter = $1
           AND v.contract = $2
+          AND p.cancelled_block IS NULL
         GROUP BY
           v.voter,
           v.participation_rate,
