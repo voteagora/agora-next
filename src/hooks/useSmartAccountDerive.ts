@@ -44,11 +44,12 @@ const bundlerRpcMethods = new Set([
     : null,
 ]);
 
-const bundlerTransport = http(LYRA_TESTNET_BUNDLER_URL);
-const nodeTransport = http(
-  `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
-);
 const { contracts } = Tenant.current();
+
+export const lyraEntrypoint = getEntryPoint(contracts.token.chain, {
+  version: "0.6.0",
+  addressOverride: TESTNET_ENTRY_POINT,
+});
 
 const combinedTransport = custom({
   async request({ method, params }) {
@@ -66,11 +67,16 @@ const combinedTransport = custom({
   },
 });
 
-const toHexOrString = (
-  input: PromiseOrValue<BigNumberish | undefined> | bigint
-) => {
-  return isHex(input) ? input : toHex(input as bigint);
-};
+const lyraBundlerClient = createBundlerClient({
+  chain: contracts.token.chain,
+  transport: combinedTransport,
+  cacheTime: 1000,
+});
+
+const bundlerTransport = http(LYRA_TESTNET_BUNDLER_URL);
+const nodeTransport = http(
+  `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
+);
 
 const dummyPaymasterAndData = (): `0x${string}` => {
   const validUntil = BigInt(Math.floor(Date.now() / 1000 + 120));
@@ -94,13 +100,14 @@ const dummyPaymasterAndData = (): `0x${string}` => {
   ]) as `0x${string}`;
 };
 
-const paymasterAndData: ClientMiddlewareFn = async (uo) => {
-  const res = await fetch("/api/paymaster", {
+const derivePaymasterAndData: ClientMiddlewareFn = async (uo) => {
+  const res = await fetch("https://derive.xyz/api/paymaster", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      secret: process.env.NEXT_PUBLIC_DERIVE_SECRET,
       userOp: {
         callData: await uo.callData,
         sender: await uo.sender,
@@ -129,16 +136,11 @@ const paymasterAndData: ClientMiddlewareFn = async (uo) => {
   return { ...uo, paymasterAndData };
 };
 
-export const lyraEntrypoint = getEntryPoint(contracts.token.chain, {
-  version: "0.6.0",
-  addressOverride: TESTNET_ENTRY_POINT,
-});
-
-const lyraBundlerClient = createBundlerClient({
-  chain: contracts.token.chain,
-  transport: combinedTransport,
-  cacheTime: 1000,
-});
+const toHexOrString = (
+  input: PromiseOrValue<BigNumberish | undefined> | bigint
+) => {
+  return isHex(input) ? input : toHex(input as bigint);
+};
 
 export const useLyraDeriveAccount = () => {
   const [client, setClient] = useState<SmartAccountClient | undefined>(
@@ -172,7 +174,7 @@ export const useLyraDeriveAccount = () => {
           account,
           paymasterAndData: {
             dummyPaymasterAndData,
-            paymasterAndData,
+            paymasterAndData: derivePaymasterAndData,
           },
         })
       );
