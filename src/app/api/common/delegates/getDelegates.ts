@@ -362,12 +362,14 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             signature,
             payload,
             twitter,
+            email,
             discord,
             created_at,
             updated_at,
             warpcast,
             endorsed,
-            scw_address
+            scw_address,
+            notification_preferences
           FROM agora.delegate_statements s
           WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
           LIMIT 1

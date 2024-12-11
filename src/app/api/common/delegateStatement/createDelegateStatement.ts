@@ -2,9 +2,9 @@ import "server-only";
 
 import prisma from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { Prisma } from "@prisma/client";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
+import { Prisma } from "@prisma/client";
 
 export async function createDelegateStatement({
   address,
@@ -19,7 +19,8 @@ export async function createDelegateStatement({
   message: string;
   scwAddress?: string;
 }) {
-  const { twitter, warpcast, discord, email } = delegateStatement;
+  const { twitter, warpcast, discord, email, notificationPreferences } =
+    delegateStatement;
   const { slug } = Tenant.current();
 
   const valid = await verifyMessage({
@@ -42,6 +43,7 @@ export async function createDelegateStatement({
     discord,
     email,
     scw_address: scwAddress,
+    notification_preferences: notificationPreferences,
   };
 
   return prisma.delegateStatements.upsert({
