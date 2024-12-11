@@ -366,8 +366,8 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
     />
   ),
-  SUBSCRIBE: () => {
-    return <SubscribeDialog />;
+  SUBSCRIBE: (_, closeDialog) => {
+    return <SubscribeDialog closeDialog={closeDialog} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;

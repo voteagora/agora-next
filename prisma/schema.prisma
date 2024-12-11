@@ -23,6 +23,7 @@ model DelegateStatements {
   warpcast  String?
   endorsed  Boolean   @default(false)
   scw_address  String?
+  notification_preferences Json?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")

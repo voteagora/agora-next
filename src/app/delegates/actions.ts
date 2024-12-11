@@ -23,7 +23,7 @@ import {
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
-
+import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 export async function fetchDelegate(address: string) {
   return apiFetchDelegate(address);
 }
@@ -141,3 +141,13 @@ export const revalidateDelegateAddressPage = async (
 ) => {
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
+
+export async function updateNotificationPreferencesForAddress(
+  address: `0x${string}`,
+  options: {
+    wants_proposal_created_email: "not-voted" | true | false;
+    wants_proposal_ending_soon_email: "not-voted" | true | false;
+  }
+) {
+  return fetchUpdateNotificationPreferencesForAddress(address, options);
+}
