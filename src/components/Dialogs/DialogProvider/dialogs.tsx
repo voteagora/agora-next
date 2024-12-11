@@ -200,7 +200,7 @@ export type OpenGithubPRDialog = {
 
 export type SubscribeDialog = {
   type: "SUBSCRIBE";
-  params: {};
+  params: { type: "root" | "vote" };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -366,8 +366,8 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
     />
   ),
-  SUBSCRIBE: (_, closeDialog) => {
-    return <SubscribeDialog closeDialog={closeDialog} />;
+  SUBSCRIBE: ({ type }, closeDialog) => {
+    return <SubscribeDialog closeDialog={closeDialog} type={type} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;

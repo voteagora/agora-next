@@ -361,6 +361,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             signature,
             payload,
             twitter,
+            email,
             discord,
             created_at,
             updated_at,

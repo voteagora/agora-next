@@ -144,10 +144,11 @@ export const revalidateDelegateAddressPage = async (
 
 export async function updateNotificationPreferencesForAddress(
   address: `0x${string}`,
+  email: string,
   options: {
-    wants_proposal_created_email: "not-voted" | true | false;
-    wants_proposal_ending_soon_email: "not-voted" | true | false;
+    wants_proposal_created_email: "prompt" | "prompted" | true | false;
+    wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
   }
 ) {
-  return fetchUpdateNotificationPreferencesForAddress(address, options);
+  return fetchUpdateNotificationPreferencesForAddress(address, email, options);
 }

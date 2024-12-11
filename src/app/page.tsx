@@ -14,7 +14,7 @@ import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 import { PaginationParams } from "./lib/pagination";
-import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogLauncher";
+import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;

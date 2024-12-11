@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { updateNotificationPreferencesForAddress } from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
+import { useDelegate } from "@/hooks/useDelegate";
 
 const HeroImage = ({ isHovering }: { isHovering: boolean }) => {
   return (
@@ -47,9 +48,19 @@ const HeroImage = ({ isHovering }: { isHovering: boolean }) => {
   );
 };
 
-const SubscribeDialog = ({ closeDialog }: { closeDialog: () => void }) => {
+const SubscribeDialog = ({
+  closeDialog,
+  type,
+}: {
+  closeDialog: () => void;
+  type: "root" | "vote";
+}) => {
   const { address } = useAccount();
   const [isHovering, setIsHovering] = useState(false);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const { data: delegate } = useDelegate({ address: address });
+  const existingEmail = delegate?.statement.email;
+  const hasEmail = existingEmail && existingEmail !== "";
 
   if (!address) return null;
 
@@ -63,18 +74,36 @@ const SubscribeDialog = ({ closeDialog }: { closeDialog: () => void }) => {
         Receive email notifications when proposals go live, and when the voting
         window is ending soon.
       </p>
+      {!hasEmail && (
+        <div className="flex flex-col gap-1 w-full mt-4">
+          <label className="text-xs font-semibold secondary">
+            Email address
+          </label>
+          <input
+            type="text"
+            className="border bg-wash border-line placeholder:text-tertiary text-primary p-2 rounded-lg w-full"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+      )}
       <div className="flex flex-col items-center gap-1 mt-4">
         <Button
           variant="outline"
           className="w-full"
           onClick={async () => {
-            // TODO: we don't want to wipe out any existing preferences
-            // setting both to false might not be the best solution?
-            // If this dialog tightly couples both preferences, we might have to...
-            await updateNotificationPreferencesForAddress(address, {
-              wants_proposal_created_email: false,
-              wants_proposal_ending_soon_email: false,
-            });
+            localStorage.setItem(
+              `agora-email-subscriptions--${type}`,
+              "prompted"
+            );
+            await updateNotificationPreferencesForAddress(
+              address,
+              existingEmail || email,
+              {
+                wants_proposal_created_email: "prompted",
+                wants_proposal_ending_soon_email: "prompted",
+              }
+            );
             closeDialog();
           }}
         >
@@ -89,10 +118,14 @@ const SubscribeDialog = ({ closeDialog }: { closeDialog: () => void }) => {
             setIsHovering(false);
           }}
           onClick={async () => {
-            await updateNotificationPreferencesForAddress(address, {
-              wants_proposal_created_email: true,
-              wants_proposal_ending_soon_email: true,
-            });
+            await updateNotificationPreferencesForAddress(
+              address,
+              existingEmail || email,
+              {
+                wants_proposal_created_email: true,
+                wants_proposal_ending_soon_email: true,
+              }
+            );
             closeDialog();
             toast.success("Preferences saved.");
           }}
