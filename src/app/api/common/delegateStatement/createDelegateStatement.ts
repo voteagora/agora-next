@@ -19,7 +19,8 @@ export async function createDelegateStatement({
   message: string;
   scwAddress?: string;
 }) {
-  const { twitter, warpcast, discord, email } = delegateStatement;
+  const { twitter, warpcast, discord, email, notificationPreferences } =
+    delegateStatement;
   const { slug } = Tenant.current();
 
   const valid = await verifyMessage({
@@ -42,6 +43,7 @@ export async function createDelegateStatement({
     discord,
     email,
     scw_address: scwAddress,
+    notification_preferences: notificationPreferences,
   };
 
   return prisma.delegateStatements.upsert({
