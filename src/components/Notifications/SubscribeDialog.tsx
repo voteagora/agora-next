@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import StarIcon from "./DialogImage/Star";
-import EnvelopeBottom from "./DialogImage/EnvelopeBottom";
-import EnvelopeTop from "./DialogImage/EnvelopeTop";
-import EnvelopePaper from "./DialogImage/EnvelopePaper";
-import { Button } from "../ui/button";
 import { updateNotificationPreferencesForAddress } from "@/app/delegates/actions";
-import { useAccount } from "wagmi";
-import toast from "react-hot-toast";
 import { useDelegate } from "@/hooks/useDelegate";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useAccount } from "wagmi";
+import { Button } from "../ui/button";
+import EnvelopeBottom from "./DialogImage/EnvelopeBottom";
+import EnvelopePaper from "./DialogImage/EnvelopePaper";
+import EnvelopeTop from "./DialogImage/EnvelopeTop";
+import StarIcon from "./DialogImage/Star";
 
 const HeroImage = ({ isHovering }: { isHovering: boolean }) => {
   return (
@@ -96,15 +96,20 @@ const SubscribeDialog = ({
               `agora-email-subscriptions--${type}`,
               "prompted"
             );
-            await updateNotificationPreferencesForAddress(
-              address,
-              existingEmail || email,
-              {
-                wants_proposal_created_email: "prompted",
-                wants_proposal_ending_soon_email: "prompted",
-              }
-            );
-            closeDialog();
+            try {
+              await updateNotificationPreferencesForAddress(
+                address,
+                existingEmail || email,
+                {
+                  wants_proposal_created_email: "prompted",
+                  wants_proposal_ending_soon_email: "prompted",
+                }
+              );
+              closeDialog();
+            } catch (error) {
+              toast.error("Error updating notification preferences.");
+              console.error(error);
+            }
           }}
         >
           Maybe later
@@ -118,16 +123,21 @@ const SubscribeDialog = ({
             setIsHovering(false);
           }}
           onClick={async () => {
-            await updateNotificationPreferencesForAddress(
-              address,
-              existingEmail || email,
-              {
-                wants_proposal_created_email: true,
-                wants_proposal_ending_soon_email: true,
-              }
-            );
-            closeDialog();
-            toast.success("Preferences saved.");
+            try {
+              await updateNotificationPreferencesForAddress(
+                address,
+                existingEmail || email,
+                {
+                  wants_proposal_created_email: true,
+                  wants_proposal_ending_soon_email: true,
+                }
+              );
+              closeDialog();
+              toast.success("Preferences saved.");
+            } catch (error) {
+              toast.error("Error updating notification preferences.");
+              console.error(error);
+            }
           }}
         >
           Notify me

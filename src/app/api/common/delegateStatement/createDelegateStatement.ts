@@ -2,9 +2,9 @@ import "server-only";
 
 import prisma from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { Prisma } from "@prisma/client";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
+import { Prisma } from "@prisma/client";
 
 export async function createDelegateStatement({
   address,

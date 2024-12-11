@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import Tenant from "@/lib/tenant/tenant";
-import { useAccount } from "wagmi";
 import { useDelegate } from "@/hooks/useDelegate";
+import Tenant from "@/lib/tenant/tenant";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 const SubscribeDialogLauncher = () => {
   const { address } = useAccount();
