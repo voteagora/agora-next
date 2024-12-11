@@ -48,7 +48,7 @@ export default function Markdown({ content }: { content: string }) {
             fontFamily: ui?.customization?.font ?? defaults.font,
           } as React.CSSProperties
         }
-        className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash prose-code:text-primary`}
+        className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash prose-code:text-tertiary prose-pre:text-tertiary`}
         wrapperElement={{
           "data-color-mode": "light",
         }}
