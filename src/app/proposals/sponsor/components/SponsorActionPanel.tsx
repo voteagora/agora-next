@@ -180,7 +180,7 @@ const SponsorActionPanel = ({
               </UpdatedButton>
             </div>
           ) : (
-            <p className="text-secondary text-xs mt-2">
+            <p className="text-secondary text-xs mt-4 text-center">
               You are not eligible to sponsor this proposal.
             </p>
           )}

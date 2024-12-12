@@ -14,6 +14,7 @@ import DraftProposalsSort from "../ProposalsFilter/DraftProposalsSort";
 import MyDraftsSort from "../ProposalsFilter/MyDraftsSort";
 import useUnreadDraftCount from "@/hooks/useUnreadDraftCount";
 import CurrentGovernanceStage from "../CurrentGovernanceStage/CurrentGovernanceStage";
+import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
 
 enum ProposalListTab {
   ALL = "all",
@@ -145,6 +146,52 @@ const ProposalListContainer = ({
         {activeTab === ProposalListTab.DRAFT && draftProposalsListElement}
         {activeTab === ProposalListTab.MY_DRAFTS && myDraftProposalsListElement}
       </section>
+    </div>
+  );
+};
+
+export const ProposalListContainerSkeleton = () => {
+  return (
+    <div>
+      <div className="flex flex-col max-w-[76rem]">
+        <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-2 sm:mb-auto">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 w-full items-center mt-6 sm:mt-0">
+            <div className="flex flex-row space-x-4">
+              <button
+                type="button"
+                className="sm:text-xl mb-0 text-primary border-b-2 border-primary"
+                onClick={() => {}}
+              >
+                Proposals
+              </button>
+              <button
+                type="button"
+                className="sm:text-xl mb-0 flex flex-row gap-2 items-center text-primary/40 hover:text-primary/80 transition-colors"
+                onClick={() => {}}
+              >
+                <span>Submissions</span>
+              </button>
+              <button
+                type="button"
+                className="sm:text-xl mb-0 flex flex-row gap-2 items-center text-primary/40 hover:text-primary/80 transition-colors"
+                onClick={() => {}}
+              >
+                Drafts
+              </button>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end gap-4 items-center flex-1 w-full sm:w-fit">
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        <section className="mt-4">
+          <div className="flex flex-col justify-center py-8 text-center space-y-2 border border-line rounded-lg shadow-newDefault">
+            <AgoraLoaderSmall />
+            <span className="text-tertiary">Loading proposals</span>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
