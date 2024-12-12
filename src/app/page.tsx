@@ -34,6 +34,10 @@ export async function generateMetadata() {
   };
 }
 
-export default async function Home() {
-  return <ProposalsHome />;
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { filter?: string; sort?: string };
+}) {
+  return <ProposalsHome searchParams={searchParams} />;
 }
