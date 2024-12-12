@@ -1,15 +1,36 @@
-import {
-  createWalletClient,
-  createPublicClient,
-  custom,
-  http,
-  Chain,
-} from "viem";
-import { mainnet, sepolia, optimism, scroll } from "viem/chains";
-import { cyber } from "@/lib/tenant/configs/contracts/cyber";
+import { createWalletClient, createPublicClient, defineChain,custom, http, Chain } from "viem";
+import { mainnet, sepolia, optimism, scroll, lyra, cyber } from "viem/chains";
 import "viem/window";
-import Tenant from "./tenant/tenant";
-import { getTransportForChain } from "./utils";
+
+import Tenant from "@/lib/tenant/tenant";
+import { getTransportForChain } from "@/lib/utils";
+
+export const lyraTestnet = /*#__PURE__*/ defineChain({
+  id: 901,
+  name: "Derive Testnet",
+  network: "derive testnet",
+  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [
+        `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`,
+      ],
+    },
+    public: {
+      http: [
+        `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`,
+      ],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Testnet Scan",
+      url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz/",
+    },
+  },
+
+  testnet: true,
+});
 
 export const getWalletClient = (chainId: number) => {
   switch (chainId) {
@@ -33,6 +54,17 @@ export const getWalletClient = (chainId: number) => {
         chain: cyber,
         transport: custom(window.ethereum!),
       });
+    case lyra.id:
+      return createWalletClient({
+        chain: lyra,
+        transport: custom(window.ethereum!),
+      });
+
+    case lyraTestnet.id:
+      return createWalletClient({
+        chain: lyraTestnet,
+        transport: custom(window.ethereum!),
+      });
 
     case scroll.id:
       return createWalletClient({
@@ -49,11 +81,11 @@ export const getPublicClient = (chain?: Chain) => {
   const { contracts } = Tenant.current();
 
   const transport = getTransportForChain(
-    chain?.id ?? contracts.governor.chain.id
+    chain?.id ?? contracts.token.chain.id
   )!;
 
   return createPublicClient({
-    chain: chain ?? contracts.governor.chain,
+    chain: chain ?? contracts.token.chain,
     transport,
   });
 };

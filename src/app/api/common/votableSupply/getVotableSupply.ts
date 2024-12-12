@@ -1,13 +1,11 @@
-import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
+import { findVotableSupply } from "@/lib/prismaUtils";
 
 async function getVotableSupply() {
   const { namespace } = Tenant.current();
   try {
-    const votableSupply = await prisma[`${namespace}VotableSupply`].findFirst(
-      {}
-    );
+    const votableSupply = await findVotableSupply({ namespace });
     return votableSupply?.votable_supply || "0";
   } catch (error) {
     console.log("Error fetching votable supply:", error);

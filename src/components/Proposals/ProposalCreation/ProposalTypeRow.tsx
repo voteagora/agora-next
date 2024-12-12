@@ -22,7 +22,7 @@ function ProposalTypeRow({
 }) {
   const { proposalType, proposalSettings } = form.state;
   const optimisticProposalSettingsIndex = proposalSettingsList.find(
-    (item) => item.name === "Optimistic"
+    (item) => item?.name === "Optimistic"
   )?.proposal_type_id;
   const infoText = () => {
     switch (proposalType) {
@@ -80,7 +80,7 @@ function ProposalTypeRow({
             disabled={proposalType === "Optimistic"}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={proposalSettingsList[0].name} />
+              <SelectValue placeholder={proposalSettingsList?.[0]?.name} />
             </SelectTrigger>
             <SelectContent>
               {proposalSettingsList

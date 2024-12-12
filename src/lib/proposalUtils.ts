@@ -344,6 +344,10 @@ export type ParsedProposalData = {
   };
 };
 
+export function parseIfNecessary(obj: string | object) {
+  return typeof obj === "string" ? JSON.parse(obj) : obj;
+}
+
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType
@@ -369,18 +373,21 @@ export function parseProposalData(
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       try {
-        const calldatas = JSON.parse(parsedProposalData.calldatas);
+        const calldatas = parseIfNecessary(parsedProposalData.calldatas);
         const functionArgsName = decodeCalldata(calldatas);
+        const targets = parseIfNecessary(parsedProposalData.targets);
+        const values = parseIfNecessary(parsedProposalData.values);
+        const signatures = parseIfNecessary(parsedProposalData.signatures);
 
         return {
           key: "STANDARD",
           kind: {
             options: [
               {
-                targets: JSON.parse(parsedProposalData.targets),
-                values: JSON.parse(parsedProposalData.values),
-                signatures: JSON.parse(parsedProposalData.signatures),
-                calldatas: calldatas,
+                targets,
+                values,
+                signatures,
+                calldatas,
                 functionArgsName,
               },
             ],

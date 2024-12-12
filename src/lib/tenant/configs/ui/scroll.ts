@@ -135,8 +135,9 @@ export const scrollTenantUIConfig = new TenantUI({
       meta: {
         title: "Voters of Scroll Governance",
         description: "Delegate your voting power to a trusted representative",
-        imageTitle: "IN IMAGE",
-        imageDescription: "IN IMAGE DESCRIPTION",
+        imageTitle: "Scroll Governance",
+        imageDescription:
+          "Delegate your voting power to a trusted representative",
       },
     },
     {
@@ -180,16 +181,14 @@ export const scrollTenantUIConfig = new TenantUI({
       links: [
         {
           name: "Governance Forums",
-          title: "Gov. Forums (Soon!)",
-          url: "",
-          //   url: "https://gov.scroll.io/forum",
+          title: "Gov. Forums",
+          url: "https://forum.scroll.io",
           image: infoPageCard02,
         },
         {
           name: "Governance Docs",
-          title: "Gov. Docs (Soon!)",
-          url: "",
-          //   url: "https://gov.scroll.io/docs",
+          title: "Gov. Docs",
+          url: "https://scroll.io/gov-docs/content/overview",
           image: infoPageCard03,
         },
         {
@@ -203,6 +202,10 @@ export const scrollTenantUIConfig = new TenantUI({
   ],
 
   toggles: [
+    {
+      name: "admin",
+      enabled: true,
+    },
     {
       name: "proposals",
       enabled: true,
@@ -272,7 +275,23 @@ export const scrollTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [ProposalType?.BASIC, ProposalType?.APPROVAL],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0xe5bAF6359d200C144A9e52E3361efA6Dc5780cC9",
+            testnetAddress: "0x678dEbd4B7bEB0412B2848FfEcbE761D39b961c4",
+          },
+          //   {
+          //     type: ProposalType?.OPTIMISTIC,
+          //     prodAddress: "0x89c4C0E77f7876415d07a2e43E5e9a6A4Cab3538",
+          //     testnetAddress: "0x5fA0a34a3262d646E7e28a621F631bBA5Ae029c5",
+          //   },
+        ],
         copy: {
           helperText: `
 ## Proposal checklist
@@ -293,7 +312,7 @@ Now that the vote and proposal type are set, you can create your proposal by giv
 If you meet the proposal threshold or are the manager of the governor, then you can submit your draft onchain as a proposal. If you do not meet these requirements, you can find a sponsor for your proposal who does.
         `.trim(),
         },
-        gatingType: ProposalGatingType?.GOVERNOR_V1,
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
   ],

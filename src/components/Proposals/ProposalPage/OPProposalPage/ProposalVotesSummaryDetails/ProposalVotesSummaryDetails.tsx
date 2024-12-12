@@ -11,6 +11,22 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { Vote } from "@/app/api/common/votes/vote";
 
+function AmountAndPercent({
+  amount,
+  total,
+}: {
+  amount: bigint;
+  total: bigint;
+}) {
+  const percent =
+    total > 0 ? ((Number(amount) / Number(total)) * 100).toFixed(2) : undefined;
+  return (
+    <span>
+      <TokenAmountDisplay amount={amount} /> {percent && `(${percent}%)`}
+    </span>
+  );
+}
+
 export default function ProposalVotesSummaryDetails({
   proposal,
   votes,
@@ -40,39 +56,20 @@ export default function ProposalVotesSummaryDetails({
   );
   const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
-  const forPercent = ((Number(results.for) / Number(totalVotes)) * 100).toFixed(
-    2
-  );
-  const againstPercent = (
-    (Number(results.against) / Number(totalVotes)) *
-    100
-  ).toFixed(2);
-  const abstainPercent = (
-    (Number(results.abstain) / Number(totalVotes)) *
-    100
-  ).toFixed(2);
-
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px]">
       <ProposalVotesBar proposal={proposal} votes={votes} />
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between gl_votes_for">
-          FOR{" "}
-          <span>
-            <TokenAmountDisplay amount={results.for} /> ({forPercent}%)
-          </span>
+          FOR <AmountAndPercent amount={results.for} total={totalVotes} />
         </div>
         <div className="gl_votes_abstain flex justify-between">
-          ABSTAIN
-          <span>
-            <TokenAmountDisplay amount={results.abstain} /> ({abstainPercent}% )
-          </span>
+          ABSTAIN{" "}
+          <AmountAndPercent amount={results.abstain} total={totalVotes} />
         </div>
         <div className="gl_votes_against flex justify-between">
           AGAINST{" "}
-          <span>
-            <TokenAmountDisplay amount={results.against} /> ({againstPercent}% )
-          </span>
+          <AmountAndPercent amount={results.against} total={totalVotes} />
         </div>
       </div>
 

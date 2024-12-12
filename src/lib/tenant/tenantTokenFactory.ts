@@ -38,11 +38,32 @@ export default class TenantTokenFactory {
           decimals: 18,
         };
 
+      case TENANT_NAMESPACES.DERIVE:
+        return {
+          name: "CHANGEME - Derive",
+          symbol: "DERIVE",
+          decimals: 18,
+        };
+
       case TENANT_NAMESPACES.SCROLL:
         return {
           name: "Scroll",
           symbol: "SCR",
           decimals: 18,
+        };
+
+      case TENANT_NAMESPACES.PGUILD:
+        return {
+          name: "Protocol Guild",
+          symbol: "PGUILD",
+          decimals: 0,
+        };
+
+      case TENANT_NAMESPACES.BOOST:
+        return {
+          name: "Boost Protocol",
+          symbol: "BGUILD",
+          decimals: 0,
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

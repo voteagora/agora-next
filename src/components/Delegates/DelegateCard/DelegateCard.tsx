@@ -1,13 +1,94 @@
-import { bpsToString, pluralizeAddresses } from "@/lib/utils";
 import { DelegateProfileImage } from "./DelegateProfileImage";
 import DelegateCardClient from "./DelegateCardClient";
+import { formatNumber } from "@/lib/tokenUtils";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
-export default function DelegateCard({ delegate }: { delegate: Delegate }) {
+const CardHeader = ({
+  title,
+  cornerTitle,
+  subtitle,
+}: {
+  title: string;
+  cornerTitle: string;
+  subtitle: string;
+}) => {
+  return (
+    <div className="px-4 pt-4 pb-8 border border-line bg-tertiary/5 rounded-lg mb-[-16px]">
+      <div className="flex flex-col gap-0.5">
+        <div className="flex flex-row justify-between">
+          <h3 className="text-primary font-bold">{title}</h3>
+          <span className="text-primary font-bold">{cornerTitle}</span>
+        </div>
+        <p className="text-xs text-tertiary">{subtitle}</p>
+      </div>
+    </div>
+  );
+};
+
+const ActiveHeader = ({
+  outOfTen,
+  totalProposals,
+  percentParticipation,
+}: {
+  outOfTen: string;
+  totalProposals: number;
+  percentParticipation: number;
+}) => {
+  return (
+    <CardHeader
+      title="Active delegate"
+      cornerTitle={`🎉 ${percentParticipation}%`}
+      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+    />
+  );
+};
+
+const InactiveHeader = ({
+  outOfTen,
+  totalProposals,
+  percentParticipation,
+}: {
+  outOfTen: string;
+  totalProposals: number;
+  percentParticipation: number;
+}) => {
+  return (
+    <CardHeader
+      title="Inactive delegate"
+      cornerTitle={`💤 ${percentParticipation}%`}
+      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+    />
+  );
+};
+
+export default function DelegateCard({
+  delegate,
+  totalProposals,
+}: {
+  delegate: Delegate;
+  totalProposals: number;
+}) {
+  const percentParticipation =
+    (parseInt(delegate.lastTenProps) / Math.min(10, totalProposals)) * 100 || 0;
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
+      {totalProposals >= 3 ? (
+        percentParticipation > 50 ? (
+          <ActiveHeader
+            outOfTen={delegate.lastTenProps}
+            totalProposals={totalProposals}
+            percentParticipation={percentParticipation}
+          />
+        ) : (
+          <InactiveHeader
+            outOfTen={delegate.lastTenProps}
+            totalProposals={totalProposals}
+            percentParticipation={percentParticipation}
+          />
+        )
+      ) : null}
       <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">
-        <div className="flex flex-col items-stretch p-6 border-b border-line">
+        <div className="flex flex-col items-stretch p-4 border-b border-line">
           <DelegateProfileImage
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
@@ -17,9 +98,13 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
           />
         </div>
 
-        <div className="flex flex-col p-6">
+        <div className="flex flex-col p-4">
           <div className="flex flex-col gap-4">
             <PanelRow
+              title="Voting power"
+              detail={formatNumber(delegate.votingPower.total)}
+            />
+            {/* <PanelRow
               title="Proposals Voted"
               detail={
                 !delegate.proposalsVotedOn
@@ -28,26 +113,39 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
                       delegate.votingParticipation * 100
                     )})`
               }
-            />
-            <PanelRow
-              title="For / Against / Abstain"
-              detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
-            />
-            <PanelRow
+            /> */}
+            {/* <PanelRow
               title="Recent activity"
               detail={
                 delegate.lastTenProps
                   ? `${delegate.lastTenProps} of 10 last props`
                   : "N/A"
               }
+            /> */}
+            <PanelRow
+              title="Delegated addresses"
+              detail={delegate.numOfDelegators.toString()}
             />
             <PanelRow
               title="Proposals created"
               detail={`${delegate.proposalsCreated}`}
             />
             <PanelRow
-              title="Delegated from"
-              detail={pluralizeAddresses(Number(delegate.numOfDelegators))}
+              title="For/Against/Abstain"
+              //   detail={`${delegate.votedFor} / ${delegate.votedAgainst} / ${delegate.votedAbstain}`}
+              detail={
+                <div className="flex flex-row gap-2">
+                  <span className="text-positive font-bold border border-line rounded-md px-2 py-1">
+                    {delegate.votedFor}
+                  </span>
+                  <span className="text-negative font-bold border border-line rounded-md px-2 py-1">
+                    {delegate.votedAgainst}
+                  </span>
+                  <span className="text-tertiary font-bold border border-line rounded-md px-2 py-1">
+                    {delegate.votedAbstain}
+                  </span>
+                </div>
+              }
             />
             <DelegateCardClient delegate={delegate} />
           </div>
@@ -66,8 +164,16 @@ export const PanelRow = ({
 }) => {
   return (
     <div className="flex flex-row gap-2 justify-between items-center">
-      <span className="whitespace-nowrap">{title}</span>
-      <span className="text-right text-sm text-theme-700">{detail}</span>
+      <span className="whitespace-nowrap text-sm text-secondary">{title}</span>
+      <span className="text-right text-sm text-secondary font-bold">
+        {detail}
+      </span>
     </div>
+  );
+};
+
+export const DelegateCardSkeleton = () => {
+  return (
+    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem] h-[300px] bg-tertiary/10 animate-pulse rounded-lg"></div>
   );
 };

@@ -148,7 +148,18 @@ export const ensTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [ProposalType?.BASIC, ProposalType?.SOCIAL],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+          {
+            type: ProposalType?.SOCIAL,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
         snapshotConfig: {
           domain: "ens.eth",
           requiredTokens: 10000,

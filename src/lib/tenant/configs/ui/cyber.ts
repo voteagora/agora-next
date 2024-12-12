@@ -252,7 +252,18 @@ export const cyberTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [ProposalType?.BASIC, ProposalType?.APPROVAL],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0x751a4989E01776522B6989511D0B969311Dd5f4e",
+            testnetAddress: "0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49",
+          },
+        ],
         copy: {
           helperText: `
 ## Proposal checklist

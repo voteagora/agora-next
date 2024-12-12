@@ -11,6 +11,7 @@ import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
 import IssuesFilter from "@/app/delegates/components/IssuesFilter";
 import EndorsedFilter from "@/app/delegates/components/EndorsedFilter";
+import DelegateeFilter from "@/app/delegates/components/DelegatorFilter";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
   const { ui } = Tenant.current();
@@ -23,6 +24,10 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
   );
   const hasEndorsedFilter = Boolean(
     ui.toggle("delegates/endorsed-filter")?.enabled
+  );
+
+  const hasMyDelegatesFilter = Boolean(
+    ui.toggle("delegates/my-delegates-filter")?.enabled
   );
 
   const router = useRouter();
@@ -61,6 +66,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
         </TabsList>
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
           <DelegatesSearch />
+          {hasMyDelegatesFilter && <DelegateeFilter />}
           {hasStakeholdersFilter && tabParam !== "citizens" && (
             <StakeholdersFilter />
           )}

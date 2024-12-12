@@ -35,7 +35,9 @@ export default async function Page({ params: { addressOrENSName } }) {
 
   const [totalSupply, totalStaked, rewardPerToken, rewardDuration] =
     await Promise.all([
-      contracts.token.contract.totalSupply(),
+      contracts.token.isERC20()
+        ? contracts.token.contract.totalSupply()
+        : Promise.resolve(0),
       contracts.staker.contract.totalStaked(),
       contracts.staker.contract.rewardPerTokenAccumulated(),
       contracts.staker.contract.REWARD_DURATION(),

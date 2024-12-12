@@ -9,6 +9,7 @@ import InputBox from "@/components/shared/InputBox";
 import { MultiButtons } from "@/components/shared/MultiButtons";
 import SimulateTransaction from "@/components/shared/SimulateTransaction";
 import { formatEther, parseUnits } from "viem";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function AddTransactionsDetails({
   form,
@@ -17,6 +18,7 @@ export default function AddTransactionsDetails({
   form: Form;
   optionIndex: number;
 }) {
+  const { token } = Tenant.current();
   const addTransaction = (type: "Transfer" | "Custom") => {
     form.onChange.options(
       form.state.options.map((option, i) => {
@@ -112,10 +114,10 @@ export default function AddTransactionsDetails({
                   </VStack>
                   <VStack className="w-full">
                     <label className="text-xs text-tertiary font-semibold">
-                      Transfer amount requested (OP)
+                      Transfer amount requested ({token.symbol})
                     </label>
                     <InputBox
-                      placeholder={"3 000 000 OP"}
+                      placeholder={`3 000 000 ${token.symbol}`}
                       value={formatEther(transaction.transferAmount)}
                       type="number"
                       onChange={(next) =>

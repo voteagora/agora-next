@@ -17,6 +17,7 @@ import prisma from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
+import { findVotes } from "@/lib/prismaUtils";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -85,7 +86,7 @@ async function getVotesForDelegateForAddress({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM
-              ${namespace + ".proposals"} proposals
+              ${namespace + ".proposals_v2"} proposals
             WHERE
               proposals.proposal_id = av.proposal_id AND proposals.contract = av.contract) p ON TRUE
         ) q
@@ -193,6 +194,64 @@ async function getSnapshotVotesForDelegateForAddress({
   }
 }
 
+async function getVotersWhoHaveNotVotedForProposal({
+  proposalId,
+  pagination = { offset: 0, limit: 20 },
+}: {
+  proposalId: string;
+  pagination?: PaginationParams;
+}) {
+  const { namespace, contracts, slug } = Tenant.current();
+
+  const queryFunction = (skip: number, take: number) => {
+    const notVotedQuery = `
+    SELECT
+      del.*,
+      ds.twitter,
+      ds.discord,
+      ds.warpcast
+    FROM ${namespace + ".delegates"} del
+    LEFT JOIN agora.delegate_statements ds
+      ON del.delegate = ds.address
+      AND ds.dao_slug = '${slug}'
+    WHERE del.delegate NOT IN (
+      SELECT voter FROM ${namespace + ".vote_cast_events"} WHERE proposal_id = $1
+    )
+      AND del.contract = $2
+      ORDER BY del.voting_power DESC
+  `;
+
+    return prisma.$queryRawUnsafe<VotePayload[]>(
+      `${notVotedQuery}
+        OFFSET $3
+        LIMIT $4;`,
+      proposalId,
+      contracts.token.address.toLowerCase(),
+      skip,
+      take
+    );
+  };
+
+  const [{ meta, data: nonVoters }, latestBlock] = await Promise.all([
+    doInSpan({ name: "getVotersWhoHaveNotVotedForProposal" }, async () =>
+      paginateResult(queryFunction, pagination)
+    ),
+    contracts.token.provider.getBlock("latest"),
+  ]);
+
+  if (!nonVoters || nonVoters.length === 0) {
+    return {
+      meta,
+      data: [],
+    };
+  }
+
+  return {
+    meta,
+    data: nonVoters,
+  };
+}
+
 async function getVotesForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
@@ -250,13 +309,13 @@ async function getVotesForProposal({
             proposals.description,
             proposals.proposal_data,
             proposals.proposal_type::config.proposal_type AS proposal_type
-          FROM ${namespace + ".proposals"} proposals
+          FROM ${namespace + ".proposals_v2"} proposals
           WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
       ) q
       ORDER BY ${sort} DESC
       OFFSET $3
-      LIMIT $4;
-    `;
+      LIMIT $4;`;
+
     return prisma.$queryRawUnsafe<VotePayload[]>(
       query,
       proposalId,
@@ -279,6 +338,8 @@ async function getVotesForProposal({
       data: [],
     };
   }
+
+  console.log("votes", votes);
 
   const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
@@ -347,8 +408,10 @@ async function getVotesForProposalAndDelegate({
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
-  const votes = await prisma[`${namespace}Votes`].findMany({
-    where: { proposal_id: proposalId, voter: address?.toLowerCase() },
+  const votes = await findVotes({
+    namespace,
+    proposalId,
+    voter: address.toLowerCase(),
   });
 
   const latestBlock = await contracts.token.provider.getBlock("latest");
@@ -371,4 +434,7 @@ export const fetchVotesForProposal = cache(getVotesForProposal);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
 export const fetchVotesForProposalAndDelegate = cache(
   getVotesForProposalAndDelegate
+);
+export const fetchVotersWhoHaveNotVotedForProposal = cache(
+  getVotersWhoHaveNotVotedForProposal
 );

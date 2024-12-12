@@ -49,28 +49,37 @@ export default function GovernorSettings() {
   useEffect(() => {
     if (data) {
       setVotingPeriod(
-        (Number(initVotingPeriod!.result) * secondsPerBlock) / SECONDS_IN_HOUR
+        (
+          (Number(initVotingPeriod!.result) * secondsPerBlock) /
+          SECONDS_IN_HOUR
+        ).toString()
       );
       setVotingDelay(
-        (Number(initVotingDelay!.result) * secondsPerBlock) / SECONDS_IN_HOUR
+        (
+          (Number(initVotingDelay!.result) * secondsPerBlock) /
+          SECONDS_IN_HOUR
+        ).toString()
       );
       setManager(String(initManager!.result));
     }
   }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [manager, setManager] = useState("0x...");
-  const [votingPeriod, setVotingPeriod] = useState<number>();
+  const [votingPeriod, setVotingPeriod] = useState("");
+
+  function convertToBlocks(valueInHours: string) {
+    return BigInt(
+      Math.floor((Number(valueInHours) * SECONDS_IN_HOUR) / secondsPerBlock)
+    );
+  }
 
   const { data: setVotingPeriodConfig, isError: setVotingPeriodError } =
     useSimulateContract({
       ...govContract,
       functionName: "setVotingPeriod",
-      args: [
-        (votingPeriod
-          ? BigInt(Math.floor(votingPeriod) * SECONDS_IN_HOUR)
-          : BigInt(secondsPerBlock)) / BigInt(secondsPerBlock),
-      ],
+      args: [votingPeriod === "" ? 0n : convertToBlocks(votingPeriod)],
     });
+
   const {
     data: resultSetVotingPeriod,
     writeContract: writeSetVotingPeriod,
@@ -83,15 +92,12 @@ export default function GovernorSettings() {
   const isDisabledSetVotingPeriod =
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
-  const [votingDelay, setVotingDelay] = useState<number>();
+  const [votingDelay, setVotingDelay] = useState("");
   const { data: setVotingDelayConfig, isError: setVotingDelayError } =
     useSimulateContract({
       ...govContract,
       functionName: "setVotingDelay",
-      args: [
-        BigInt(Math.floor((votingDelay || 0) * SECONDS_IN_HOUR)) /
-          BigInt(secondsPerBlock),
-      ],
+      args: [votingDelay === "" ? 0n : convertToBlocks(votingDelay)],
     });
   const {
     data: resultSetVotingDelay,
@@ -121,8 +127,9 @@ export default function GovernorSettings() {
               <Input
                 min={0}
                 value={votingPeriod}
-                onChange={(e) => setVotingPeriod(parseInt(e.target.value))}
+                onChange={(e) => setVotingPeriod(e.target.value)}
                 disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
+                step={0.01}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -135,7 +142,8 @@ export default function GovernorSettings() {
                 loading={isDisabledSetVotingPeriod}
                 disabled={
                   /* isInitializing || */ isDisabledSetVotingPeriod ||
-                  setVotingPeriodError
+                  setVotingPeriodError ||
+                  votingPeriod === ""
                 }
                 onClick={() => {
                   writeSetVotingPeriod(setVotingPeriodConfig!.request);
@@ -151,8 +159,9 @@ export default function GovernorSettings() {
               <Input
                 min={0}
                 value={votingDelay}
-                onChange={(e) => setVotingDelay(parseInt(e.target.value))}
+                onChange={(e) => setVotingDelay(e.target.value)}
                 disabled={/* isInitializing || */ isDisabledSetVotingDelay}
+                step={0.01}
                 type="number"
               />
               <p className="absolute text-sm text-muted-foreground right-[96px]">
@@ -165,7 +174,8 @@ export default function GovernorSettings() {
                 loading={isDisabledSetVotingDelay}
                 disabled={
                   /* isInitializing || */ isDisabledSetVotingDelay ||
-                  setVotingDelayError
+                  setVotingDelayError ||
+                  votingDelay === ""
                 }
                 onClick={() => {
                   writeSetVotingDelay(setVotingDelayConfig!.request);

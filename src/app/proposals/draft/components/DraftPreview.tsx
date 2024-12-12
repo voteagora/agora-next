@@ -16,9 +16,7 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
-import styles from "@/components/Proposals/ProposalPage/ProposalDescription/proposalDescription.module.scss";
-import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
+import MarkdownPreview from "@uiw/react-markdown-preview";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -43,6 +41,7 @@ const DraftPreview = ({
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: blockNumber } = useBlockNumber();
+
   const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,
     abi: tenant.contracts.governor.abi,
@@ -238,15 +237,16 @@ const DraftPreview = ({
 
         <h3 className="font-semibold mt-6">Description</h3>
         <div className="mt-2 p-4 bg-wash border border-line rounded-lg">
-          <ReactMarkdown
-            className={cn(
-              styles.proposal_description_md,
-              "max-w-none",
-              "prose"
-            )}
-          >
-            {proposalDraft.abstract}
-          </ReactMarkdown>
+          <MarkdownPreview
+            source={proposalDraft.abstract}
+            className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
+            style={{
+              backgroundColor: "transparent",
+            }}
+            wrapperElement={{
+              "data-color-mode": "light",
+            }}
+          />
         </div>
       </FormCard.Section>
       <FormCard.Section className="z-0">

@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { AgoraGovernor } from "./AgoraGovernor";
+export type { AgoraGovernor_11 } from "./AgoraGovernor_11";
 export type { AgoraTimelock } from "./AgoraTimelock";
 export type { AgoraToken } from "./AgoraToken";
 export type { AlligatorOPV5 } from "./AlligatorOPV5";
@@ -10,6 +11,7 @@ export type { CyberProposalTypes } from "./CyberProposalTypes";
 export type { ENSGovernor } from "./ENSGovernor";
 export type { ENSTimelock } from "./ENSTimelock";
 export type { ERC20 } from "./ERC20";
+export type { Membership } from "./Membership";
 export type { NounsGovernor } from "./NounsGovernor";
 export type { OptimismGovernor } from "./OptimismGovernor";
 export type { ProposalTypesConfigurator } from "./ProposalTypesConfigurator";
@@ -19,6 +21,7 @@ export type { UniswapTimelock } from "./UniswapTimelock";
 export type { VotableSupplyOracle } from "./VotableSupplyOracle";
 export * as factories from "./factories";
 export { AgoraGovernor__factory } from "./factories/AgoraGovernor__factory";
+export { AgoraGovernor_11__factory } from "./factories/AgoraGovernor_11__factory";
 export { AgoraTimelock__factory } from "./factories/AgoraTimelock__factory";
 export { AgoraToken__factory } from "./factories/AgoraToken__factory";
 export { AlligatorOPV5__factory } from "./factories/AlligatorOPV5__factory";
@@ -27,6 +30,7 @@ export { CyberProposalTypes__factory } from "./factories/CyberProposalTypes__fac
 export { ENSGovernor__factory } from "./factories/ENSGovernor__factory";
 export { ENSTimelock__factory } from "./factories/ENSTimelock__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
+export { Membership__factory } from "./factories/Membership__factory";
 export { NounsGovernor__factory } from "./factories/NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./factories/OptimismGovernor__factory";
 export { ProposalTypesConfigurator__factory } from "./factories/ProposalTypesConfigurator__factory";

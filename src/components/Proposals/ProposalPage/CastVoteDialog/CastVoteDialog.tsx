@@ -151,11 +151,11 @@ function AdvancedVoteDialog({
           <HStack justifyContent="justify-between">
             <VStack>
               {delegate.address ? (
-                <div className="text-xs text-secondary font-medium">
+                <div className="text-xs text-tertiary font-medium">
                   <HumanAddress address={delegate.address} />
                 </div>
               ) : (
-                <div className="text-xs text-secondary font-medium">
+                <div className="text-xs text-tertiary font-medium">
                   Anonymous
                 </div>
               )}
@@ -164,7 +164,7 @@ function AdvancedVoteDialog({
               </div>
             </VStack>
             <VStack alignItems="items-end">
-              <div className="text-xs text-secondary font-medium">with</div>
+              <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
             </VStack>
           </HStack>
@@ -240,7 +240,11 @@ export function SuccessMessage({
       </div>
       <div>
         <div
-          onClick={closeDialog}
+          onClick={() => {
+            // temporary solution rather than actually changing UI state
+            window.location.reload();
+            closeDialog();
+          }}
           className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary"
         >
           Got it

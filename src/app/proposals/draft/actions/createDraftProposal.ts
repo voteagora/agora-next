@@ -117,7 +117,9 @@ export async function onSubmitAction(
   if (!parsed.success) {
     return {
       ok: false,
-      message: "Invalid form data",
+      message: `Invalid form data: ${parsed.error.errors
+        .map((e) => e.message)
+        .join(", ")}`,
     };
   }
 
@@ -171,11 +173,10 @@ export async function onSubmitAction(
       ok: true,
       message: "Success!",
     };
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
     return {
       ok: false,
-      message: "Error saving draft proposal",
+      message: error.message,
     };
   }
 }

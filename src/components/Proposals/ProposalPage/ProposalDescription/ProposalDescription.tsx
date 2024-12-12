@@ -1,16 +1,14 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import styles from "./proposalDescription.module.scss";
-import { cn } from "@/lib/utils";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-
 import { Vote } from "@/app/api/common/votes/vote";
 import { PaginatedResult } from "@/app/lib/pagination";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 export default function ProposalDescription({
   proposal,
@@ -64,7 +62,7 @@ export default function ProposalDescription({
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
         {/* This is a feature for ENS, they use standard only, so we should be good for now */}
         {/* TODO: abstract this into better decoding for all proposal types */}
-        {proposal.proposalType === "STANDARD" ? (
+        {proposal.proposalType === "STANDARD" && !!option ? (
           <ProposalTransactionDisplay
             targets={option.targets}
             calldatas={option.calldatas}
@@ -78,11 +76,14 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
-        <ReactMarkdown
-          className={cn(styles.proposal_description_md, "max-w-none", "prose")}
-        >
-          {stripTitleFromDescription(shortTitle, patchedDescription ?? "")}
-        </ReactMarkdown>
+        <div className={styles.proposal_description_md}>
+          <Markdown
+            content={stripTitleFromDescription(
+              shortTitle,
+              patchedDescription ?? ""
+            )}
+          />
+        </div>
       </div>
     </div>
   );

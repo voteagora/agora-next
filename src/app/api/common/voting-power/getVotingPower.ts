@@ -8,6 +8,11 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import { VotingPowerData, VotingPowerSnapsPayload } from "./votingPower";
 import { AuhtorityChainsAggregate } from "../authority-chains/authorityChains";
 import Tenant from "@/lib/tenant/tenant";
+import {
+  findAdvancedVotingPower,
+  findDelagatee,
+  findVotingPower,
+} from "@/lib/prismaUtils";
 
 /**
  * Voting Power for a given block
@@ -141,21 +146,17 @@ async function getCurrentVotingPowerForAddress({
   address: string;
 }): Promise<VotingPowerData> {
   const { namespace, contracts } = Tenant.current();
-  const votingPower = await prisma[`${namespace}VotingPower`].findFirst({
-    where: {
-      delegate: address,
-      contract: contracts.token.address,
-    },
+  const votingPower = await findVotingPower({
+    namespace,
+    address,
+    contract: contracts.token.address,
   });
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPower = await prisma[
-    `${namespace}AdvancedVotingPower`
-  ].findFirst({
-    where: {
-      delegate: address,
-      contract: contracts.alligator!.address,
-    },
+  const advancedVotingPower = await findAdvancedVotingPower({
+    namespace,
+    address,
+    contract: contracts.alligator!.address,
   });
 
   return {
@@ -184,13 +185,10 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
   address: string;
 }): Promise<string> {
   const { namespace, contracts } = Tenant.current();
-  const advancedVotingPower = await prisma[
-    `${namespace}AdvancedVotingPower`
-  ].findFirst({
-    where: {
-      delegate: address,
-      contract: contracts.alligator!.address,
-    },
+  const advancedVotingPower = await findAdvancedVotingPower({
+    namespace,
+    address,
+    contract: contracts.alligator!.address,
   });
 
   const undelegatedVotingPower = (async () => {
@@ -242,9 +240,7 @@ async function isAddressDelegatingToProxy({
   const { namespace } = Tenant.current();
   const [proxyAddress, delegatee] = await Promise.all([
     getProxyAddress(address),
-    prisma[`${namespace}Delegatees`].findFirst({
-      where: { delegator: address.toLowerCase() },
-    }),
+    findDelagatee({ namespace, address }),
   ]);
 
   if (

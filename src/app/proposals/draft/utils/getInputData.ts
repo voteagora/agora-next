@@ -2,15 +2,9 @@ import { ethers } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
 import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
-// TODO: these are the addresses for OP
-// maybe we need to move this to the tenant config if these are not shared between tenants
-import {
-  approvalModuleAddress,
-  optimisticModuleAddress,
-  cyberApprovalModuleAddress,
-} from "@/lib/contracts/contracts";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
+import { getProposalTypeAddress } from "./stages";
 
 const transferABI = [
   {
@@ -88,9 +82,11 @@ export function getInputData(proposal: DraftProposal): {
       ];
 
       if (proposal.transactions.length === 0) {
-        targets.push(ethers.ZeroAddress as `0x${string}`);
+        // empty eth transfer from governor
+        const governorAddress = tenant.contracts.governor.address;
+        targets.push(governorAddress as `0x${string}`);
         values.push(0);
-        calldatas.push("0x");
+        calldatas.push("0x" as `0x${string}`);
       } else {
         proposal.transactions.forEach((t) => {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);
@@ -196,15 +192,18 @@ export function getInputData(proposal: DraftProposal): {
         [options, settings]
       );
 
-      // TODO: change this so the module addresses are set via the tenant
-      // moving quickly atm
-      const finalApprovalModuleAddress =
-        tenant.namespace === TENANT_NAMESPACES.CYBER
-          ? cyberApprovalModuleAddress
-          : approvalModuleAddress;
+      const approvalModuleAddress = getProposalTypeAddress(
+        ProposalType.APPROVAL
+      );
+
+      if (!approvalModuleAddress) {
+        throw new Error(
+          `Approval module address not found for tenant ${tenant.namespace}`
+        );
+      }
 
       const approvalInputData: ApprovalInputData = [
-        finalApprovalModuleAddress,
+        approvalModuleAddress,
         calldata,
         description,
         parseInt(proposal.proposal_type || "0"),
@@ -232,6 +231,16 @@ export function getInputData(proposal: DraftProposal): {
           },
         ]
       );
+
+      const optimisticModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTIMISTIC
+      );
+
+      if (!optimisticModuleAddress) {
+        throw new Error(
+          `Optimistic module address not found for tenant ${tenant.namespace}`
+        );
+      }
 
       const optimisticInputData: ApprovalInputData = [
         optimisticModuleAddress,

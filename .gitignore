@@ -50,3 +50,6 @@ next-env.d.ts
 /src/lib/contracts/generated
 
 dist
+
+# version manager
+.tool-versions

@@ -30,6 +30,9 @@ export const TENANT_NAMESPACES = {
   UNISWAP: "uniswap",
   CYBER: "cyber",
   SCROLL: "scroll",
+  DERIVE: "derive",
+  PGUILD: "pguild",
+  BOOST: "boost",
 } as const;
 
 export const proposalsFilterOptions = {
@@ -56,6 +59,7 @@ export const delegatesFilterOptions = {
     value: "Most delegators",
   },
 };
+
 export const citizensFilterOptions = {
   mostVotingPower: {
     value: "Most voting power",

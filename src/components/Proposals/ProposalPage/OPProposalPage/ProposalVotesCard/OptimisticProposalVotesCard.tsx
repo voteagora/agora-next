@@ -9,10 +9,14 @@ import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ProposalVotesFilter from "./ProposalVotesFilter";
+import Tenant from "@/lib/tenant/tenant";
 
 const OptimisticProposalVotesCard = ({
   proposal,
   proposalVotes,
+  nonVoters,
   disapprovalThreshold,
   againstRelativeAmount,
   againstLengthString,
@@ -25,6 +29,7 @@ const OptimisticProposalVotesCard = ({
 }: {
   proposal: Proposal;
   proposalVotes: any;
+  nonVoters: any;
   disapprovalThreshold: number;
   againstRelativeAmount: string;
   againstLengthString: string;
@@ -35,7 +40,9 @@ const OptimisticProposalVotesCard = ({
   fetchCurrentDelegators: (proposalId: string) => void;
   status: string;
 }) => {
+  const { token } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [showVoters, setShowVoters] = useState(true);
   const handleClick = () => {
     setIsClicked(!isClicked);
     // var div = document.getElementsByClassName("mobile-web-scroll-div")[0];
@@ -78,9 +85,9 @@ const OptimisticProposalVotesCard = ({
 
                 <p className="mt-1 font-normal text-secondary">
                   This proposal will automatically pass unless{" "}
-                  {disapprovalThreshold}% of the votable supply of OP is
-                  against. Currently {againstRelativeAmount}% (
-                  {againstLengthString} OP) is against.
+                  {disapprovalThreshold}% of the votable supply of{" "}
+                  {token.symbol} is against. Currently {againstRelativeAmount}%
+                  ({againstLengthString} {token.symbol}) is against.
                 </p>
               </div>
             )}
@@ -93,11 +100,26 @@ const OptimisticProposalVotesCard = ({
             />
           </div>
         </div>
+        <div className="px-4">
+          <ProposalVotesFilter
+            initialSelection={showVoters ? "Voters" : "Hasn't voted"}
+            onSelectionChange={(value) => {
+              setShowVoters(value === "Voters");
+            }}
+          />
+        </div>
         {/* Show the scrolling list of votes for the proposal */}
-        <ProposalVotesList
-          initialProposalVotes={proposalVotes}
-          proposalId={proposal.id}
-        />
+        {showVoters ? (
+          <ProposalVotesList
+            initialProposalVotes={proposalVotes}
+            proposalId={proposal.id}
+          />
+        ) : (
+          <ProposalNonVoterList
+            proposalId={proposal.id}
+            initialNonVoters={nonVoters}
+          />
+        )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} isOptimistic />
         <p className="mx-4 text-xs text-secondary">

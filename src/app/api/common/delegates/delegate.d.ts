@@ -1,6 +1,5 @@
 import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime";
 
 export type Delegate = {
   address: string;
@@ -19,6 +18,7 @@ export type Delegate = {
   votedAbstain: string;
   votingParticipation: number;
   lastTenProps: string;
+  totalProposals: number;
   numOfDelegators: bigint;
   statement: DelegateStatement | null;
 };
@@ -36,9 +36,9 @@ export type DelegatePayload = Delegate & {
 export type DelegatesGetPayload = {
   delegate: string;
   num_of_delegators: number;
-  direct_vp: Decimal;
-  advanced_vp: Decimal;
-  voting_power: Decimal;
+  direct_vp: Prisma.Decimal;
+  advanced_vp: Prisma.Decimal;
+  voting_power: Prisma.Decimal;
   citizen: boolean;
   statement: DelegateStatement;
 };
@@ -52,6 +52,7 @@ type DelegateStatement = {
   twitter: string | null;
   updated_at: Date;
   warpcast: string | null;
+  scw_address: string | null;
 };
 
 export type DelegateStats = {
@@ -66,6 +67,7 @@ export type DelegateStats = {
   advanced_vp: OptimismAdvancedVotingPower["advanced_vp"];
   num_of_delegators: OptimismDelegates["num_of_delegators"];
   proposals_proposed: OptimismDelegates["proposals_proposed"];
+  total_proposals: number;
   statement: DelegateStatement;
   citizen: boolean;
 };

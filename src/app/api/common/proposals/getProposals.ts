@@ -11,8 +11,14 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { Proposal } from "./proposal";
+import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
+import {
+  findProposal,
+  findProposalType,
+  findProposalsQuery,
+  getProposalsCount,
+} from "@/lib/prismaUtils";
 
 async function getProposals({
   filter,
@@ -23,36 +29,16 @@ async function getProposals({
 }): Promise<PaginatedResult<Proposal[]>> {
   const { namespace, contracts } = Tenant.current();
 
-  const getProposalsQuery = async (skip: number, take: number) => {
-    if (filter === "relevant") {
-      return prisma[`${namespace}Proposals`].findMany({
-        take,
-        skip,
-        orderBy: {
-          ordinal: "desc",
-        },
-        where: {
-          contract: contracts.governor.address,
-          cancelled_block: null,
-        },
-      });
-    } else {
-      return prisma[`${namespace}Proposals`].findMany({
-        take,
-        skip,
-        orderBy: {
-          ordinal: "desc",
-        },
-        where: {
-          contract: contracts.governor.address,
-        },
-      });
-    }
-  };
-
   const getProposalsExecution = doInSpan({ name: "getProposals" }, async () =>
     paginateResult(
-      (skip: number, take: number) => getProposalsQuery(skip, take),
+      (skip: number, take: number) =>
+        findProposalsQuery({
+          namespace,
+          skip,
+          take,
+          filter,
+          contract: contracts.governor.address,
+        }),
       pagination
     )
   );
@@ -64,7 +50,7 @@ async function getProposals({
   ]);
 
   const resolvedProposals = await Promise.all(
-    proposals.data.map(async (proposal) => {
+    proposals.data.map(async (proposal: ProposalPayload) => {
       const quorum = await fetchQuorumForProposal(proposal);
       return parseProposal(
         proposal,
@@ -84,8 +70,10 @@ async function getProposals({
 async function getProposal(proposalId: string) {
   const { namespace, contracts } = Tenant.current();
   const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
-    prisma[`${namespace}Proposals`].findFirst({
-      where: { proposal_id: proposalId, contract: contracts.governor.address },
+    findProposal({
+      namespace,
+      proposalId,
+      contract: contracts.governor.address,
     })
   );
 
@@ -114,19 +102,16 @@ async function getProposal(proposalId: string) {
 async function getProposalTypes() {
   const { namespace, contracts } = Tenant.current();
 
-  try {
-    const results = await prisma[`${namespace}ProposalTypes`].findMany({
-      where: {
-        contract: contracts.proposalTypesConfigurator!.address,
-        name: {
-          not: "",
-        },
-      },
-    });
-    return results;
-  } catch (error) {
+  if (!contracts.proposalTypesConfigurator) {
     return [];
   }
+
+  const results = await findProposalType({
+    namespace,
+    contract: contracts.proposalTypesConfigurator.address,
+  });
+
+  return results;
 }
 
 async function getDraftProposals(address: `0x${string}`) {
@@ -173,6 +158,15 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
   });
 }
 
+async function getTotalProposalsCount(): Promise<number> {
+  const { namespace, contracts } = Tenant.current();
+  return getProposalsCount({
+    namespace,
+    contract: contracts.governor.address,
+  });
+}
+
+export const fetchProposalsCount = cache(getTotalProposalsCount);
 export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
 export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);

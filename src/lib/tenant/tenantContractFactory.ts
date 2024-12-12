@@ -5,7 +5,10 @@ import { etherfiTenantContractConfig } from "@/lib/tenant/configs/contracts/ethe
 import { optimismTenantContractConfig } from "@/lib/tenant/configs/contracts/optimism";
 import { uniswapTenantContractConfig } from "@/lib/tenant/configs/contracts/uniswap";
 import { cyberTenantConfig } from "@/lib/tenant/configs/contracts/cyber";
+import { deriveTenantConfig } from "@/lib/tenant/configs/contracts/derive";
 import { scrollTenantContractConfig } from "@/lib/tenant/configs/contracts/scroll";
+import { protocolGuildTenantContractConfig } from "./configs/contracts/protocol-guild";
+import { boostTenantConfig } from "./configs/contracts/boost";
 
 export default class TenantContractFactory {
   public static create(
@@ -24,8 +27,14 @@ export default class TenantContractFactory {
         return uniswapTenantContractConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.CYBER:
         return cyberTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.DERIVE:
+        return deriveTenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.SCROLL:
         return scrollTenantContractConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.PGUILD:
+        return protocolGuildTenantContractConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.BOOST:
+        return boostTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

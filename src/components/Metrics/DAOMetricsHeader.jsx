@@ -1,7 +1,6 @@
 "use client";
 
 import discord from "@/icons/discord.svg";
-import infoTransparent from "@/icons/info-transparent.svg";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/hover-card";
 
 export default function DAOMetricsHeader({ metrics }) {
-  const { token, ui } = Tenant.current();
+  const { token, ui, contracts } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
 
   const governanceForumLink = ui.link("governance-forum");
@@ -46,7 +45,7 @@ export default function DAOMetricsHeader({ metrics }) {
     return (
       <>
         {createPortal(
-          <div className="sm:min-w-desktop sticky z-50 bottom-10 sm:bottom-0 left-0 flex justify-center">
+          <div className="sm:min-w-desktop sticky z-50 bottom-0 sm:bottom-0 left-0 flex justify-center">
             <div
               className={cn(
                 "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
@@ -72,21 +71,26 @@ export default function DAOMetricsHeader({ metrics }) {
                       <span>Total amount of {token.symbol} in existence</span>
                     </HoverCardContent>
                   </HoverCard>
-                  <HoverCard openDelay={100} closeDelay={100}>
-                    <HoverCardTrigger>
-                      <span className="cursor-default">
-                        {formattedMetrics.votableSupply} {token.symbol} votable
-                        <span className="hidden sm:inline">&nbsp;supply</span>
-                      </span>
-                    </HoverCardTrigger>
-                    <HoverCardContent
-                      className="w-full shadow"
-                      side="bottom"
-                      sideOffset={3}
-                    >
-                      <span>{token.symbol} currently delegated to a voter</span>
-                    </HoverCardContent>
-                  </HoverCard>
+                  {contracts.token.isERC20() && (
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger>
+                        <span className="cursor-default">
+                          {formattedMetrics.votableSupply} {token.symbol}{" "}
+                          votable
+                          <span className="hidden sm:inline">&nbsp;supply</span>
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        className="w-full shadow"
+                        side="bottom"
+                        sideOffset={3}
+                      >
+                        <span>
+                          {token.symbol} currently delegated to a voter
+                        </span>
+                      </HoverCardContent>
+                    </HoverCard>
+                  )}
                 </div>
               </div>
               <div className="block bg-line w-full sm:w-[1px] h-[1px] sm:h-10"></div>

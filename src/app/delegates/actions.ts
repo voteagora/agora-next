@@ -5,12 +5,14 @@ import { type DelegateStatementFormValues } from "@/components/DelegateStatement
 import { revalidatePath } from "next/cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
-  fetchProxy,
+  fetchIsDelegatingToProxy,
   fetchVotingPowerAvailableForDirectDelegation,
   fetchVotingPowerAvailableForSubdelegation,
-  fetchIsDelegatingToProxy,
 } from "@/app/api/common/voting-power/getVotingPower";
-import { fetchDelegate as apiFetchDelegate } from "@/app/api/common/delegates/getDelegates";
+import {
+  fetchDelegate as apiFetchDelegate,
+  fetchVoterStats as apiFetchVoterStats,
+} from "@/app/api/common/delegates/getDelegates";
 import { fetchDelegateStatement as apiFetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import {
   fetchAllDelegatorsInChains,
@@ -24,6 +26,10 @@ import { PaginationParams } from "../lib/pagination";
 
 export async function fetchDelegate(address: string) {
   return apiFetchDelegate(address);
+}
+
+export async function fetchVoterStats(address: string) {
+  return apiFetchVoterStats(address);
 }
 
 export async function fetchDelegateStatement(address: string) {
@@ -58,17 +64,20 @@ export async function submitDelegateStatement({
   delegateStatement,
   signature,
   message,
+  scwAddress,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
+  scwAddress?: string;
 }) {
   const response = await createDelegateStatement({
     address,
     delegateStatement,
     signature,
     message,
+    scwAddress,
   });
   revalidatePath("/delegates/create", "page");
   return response;

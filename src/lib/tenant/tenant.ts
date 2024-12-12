@@ -10,6 +10,13 @@ import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
 
+const BRAND_NAME_MAPPINGS: Record<string, string> = {
+  ens: "ENS",
+  etherfi: "EtherFi",
+  pguild: "PGuild",
+  boost: "Boost",
+};
+
 export default class Tenant {
   private static instance: Tenant;
 
@@ -19,6 +26,7 @@ export default class Tenant {
   private readonly _slug: DaoSlug;
   private readonly _token: TenantToken;
   private readonly _ui: TenantUI;
+  private readonly _brandName: string;
 
   private constructor() {
     this._namespace = process.env
@@ -32,6 +40,7 @@ export default class Tenant {
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);
     this._ui = TenantUIFactory.create(this._namespace);
+    this._brandName = this.deriveBrandName(this._namespace);
   }
 
   public get contracts(): TenantContracts {
@@ -58,10 +67,21 @@ export default class Tenant {
     return this._ui;
   }
 
+  public get brandName(): string {
+    return this._brandName;
+  }
+
   public static current(): Tenant {
     if (!Tenant.instance) {
       Tenant.instance = new Tenant();
     }
     return Tenant.instance;
+  }
+
+  private deriveBrandName(namespace: TenantNamespace): string {
+    if (namespace.toLowerCase() in BRAND_NAME_MAPPINGS) {
+      return BRAND_NAME_MAPPINGS[namespace.toLowerCase()];
+    }
+    return namespace.charAt(0).toUpperCase() + namespace.slice(1).toLowerCase();
   }
 }

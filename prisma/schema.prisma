@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "alltenant", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap"]
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap"]
 }
 
 model DelegateStatements {
@@ -22,6 +22,7 @@ model DelegateStatements {
   updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
   warpcast  String?
   endorsed  Boolean   @default(false)
+  scw_address  String?
 
   @@id([address, dao_slug])
   @@index([email], map: "idx_delegate_statements_email")
@@ -96,7 +97,7 @@ model SnapshotProposal {
   type           String?
   votes          Decimal?  @db.Decimal
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("snapshot")
 }
 
@@ -455,7 +456,7 @@ view OptimismProposals {
   queued_transaction_hash    String?
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("optimism")
 }
 
@@ -628,7 +629,7 @@ view ensProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("ens")
 }
 
@@ -854,7 +855,7 @@ view etherfiProposals {
   cancelled_transaction_hash String?
   executed_transaction_hash  String?
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("etherfi")
 }
 
@@ -1052,7 +1053,7 @@ view uniswapProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("uniswap")
 }
 
@@ -2007,7 +2008,7 @@ view cyberProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("cyber")
 }
 
@@ -2135,6 +2136,7 @@ view cyberVotingPowerSnaps {
   @@schema("cyber")
   @@map("voting_power_snaps")
 }
+
 
 // ##############################################
 //
@@ -2343,7 +2345,7 @@ view scrollProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("scroll")
 }
 
@@ -2460,7 +2462,7 @@ view scrollVotingPowerSnaps {
 }
 
 
- 
+
 // ##############################################
 //
 //    Derive
@@ -2668,7 +2670,7 @@ view deriveProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("derive")
 }
 
@@ -2784,7 +2786,7 @@ view deriveVotingPowerSnaps {
   @@schema("derive")
   @@map("voting_power_snaps")
 }
- 
+
 
 // ##############################################
 //
@@ -2993,7 +2995,7 @@ view pguildProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals")
+  @@map("proposals_v2")
   @@schema("pguild")
 }
 
@@ -3111,6 +3113,331 @@ view pguildVotingPowerSnaps {
 }
 
 
+// ##############################################
+//
+//    Boost
+//
+// ##############################################
+
+
+view boostAdvancedDelegatees {
+  pair             String   @unique
+  from             String
+  to               String
+  delegated_amount Decimal  @db.Decimal
+  delegated_share  Decimal  @db.Decimal
+  block_number     BigInt
+  contract         String?  @db.VarChar
+  transaction_hash String?
+
+  @@schema("boost")
+  @@map("advanced_delegatees")
+}
+
+view boostAdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String   @db.VarChar
+
+  @@schema("boost")
+  @@map("advanced_voting_power")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view boost_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("boost")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view boost_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("boost")
+}
+
+view boostAuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json?
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String   @db.VarChar
+  balance_block_number BigInt?
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@schema("boost")
+  @@map("authority_chains_snaps")
+}
+
+view boostDelegateChangedEvents {
+  chain_id          Int
+  address           String  @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String  @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String  @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@schema("boost")
+  @@map("delegate_changed_events")
+}
+
+view boostDelegatees {
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@schema("boost")
+  @@map("delegatees")
+}
+
+view boostDelegates {
+  delegate          String   @unique
+  contract          String?  @db.VarChar(42)
+  num_of_delegators Decimal  @db.Decimal
+  direct_vp         Decimal  @db.Decimal
+  advanced_vp       Decimal  @db.Decimal
+  voting_power      Decimal  @db.Decimal
+
+  @@schema("boost")
+  @@map("delegates")
+}
+
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+view boost_delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("boost")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view boost_direct_chains {
+  delegate  String?
+  rules     Json? // Uh oh, this is a Json[] for optimism, [] for uniswap
+  chain     String?
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("direct_chains")
+  @@ignore
+  @@schema("boost")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view boost_direct_chains_snaps {
+  delegate             String?
+  rules                Json?
+  chain                String?
+  proxy                String?
+  balance              Decimal? @db.Decimal
+  balance_block_number BigInt?
+  allowance            Decimal? @db.Decimal
+  contract             String?  @db.VarChar
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("direct_chains_snaps")
+  @@ignore
+  @@schema("boost")
+}
+
+view boostProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@schema("boost")
+  @@map("proposal_types")
+}
+
+view boostProposals {
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  queued_block               BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  queued_transaction_hash    String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
+
+  @@map("proposals")
+  @@schema("boost")
+}
+
+view boostStakedDeposits {
+  deposit_id  BigInt   @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal  @db.Decimal
+
+  @@schema("boost")
+  @@map("staked_deposits")
+}
+
+view boostVotableSupply {
+  votable_supply String @unique
+
+  @@schema("boost")
+  @@map("votable_supply")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view boost_vote_cast_events {
+  transaction_hash String?  @db.VarChar(66)
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("boost")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view boost_vote_cast_with_params_events {
+  transaction_hash String?
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("boost")
+}
+
+view boostVoterStats {
+  voter              String  @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+  proposals_proposed BigInt?
+  contract           String?  @db.VarChar(42)
+
+  @@schema("boost")
+  @@map("voter_stats")
+}
+
+view boostVotes {
+  transaction_hash String       @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal      @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    ProposalType
+  contract         String?       @db.VarChar(42)
+  chain_id         Int?
+
+  @@map("votes")
+  @@schema("boost")
+}
+
+view boostVotingPower {
+  delegate     String  @unique
+  voting_power String?
+  contract     String  @db.VarChar(42)
+
+  @@schema("boost")
+  @@map("voting_power")
+}
+
+
+view boostVotingPowerSnaps {
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
+  contract          String?  @db.VarChar(42)
+
+  @@schema("boost")
+  @@map("voting_power_snaps")
+}
+
+
 enum DaoSlug {
   OP
   ENS
@@ -3123,6 +3450,7 @@ enum DaoSlug {
   SCROLL
   DERIVE
   PGUILD
+  BOOST
 
   @@map("dao_slug")
   @@schema("config")

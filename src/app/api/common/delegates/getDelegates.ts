@@ -18,6 +18,7 @@ import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getProxyAddress } from "@/lib/alligatorUtils";
 
 /*
  * Fetches a list of delegates
@@ -35,10 +36,11 @@ async function getDelegates({
   seed,
   filters,
 }: {
-  pagination: PaginationParams;
+  pagination?: PaginationParams;
   sort: string;
   seed?: number;
   filters?: {
+    delegator?: `0x${string}`;
     issues?: string;
     stakeholders?: string;
     endorsed?: boolean;
@@ -102,22 +104,57 @@ async function getDelegates({
       : "";
 
   let delegateUniverseCTE: string;
-
   const tokenAddress = contracts.token.address;
+  const proxyAddress = filters?.delegator
+    ? await getProxyAddress(filters?.delegator?.toLowerCase())
+    : null;
 
-  delegateUniverseCTE = `with del_statements as (select address from agora.delegate_statements where dao_slug='${slug}'),
-                              del_with_del as (select * from ${namespace + ".delegates"} d where contract = '${tokenAddress}'),
-                              del_card_universe as (select COALESCE(d.delegate, ds.address) as delegate, 
-                                      coalesce(d.num_of_delegators, 0) as num_of_delegators, 
-                                      coalesce(d.direct_vp, 0) as direct_vp, 
-                                      coalesce(d.advanced_vp, 0) as advanced_vp,
-                                      coalesce(d.voting_power, 0) as voting_power
-                                      from del_with_del d full join del_statements ds on d.delegate = ds.address)`;
+  delegateUniverseCTE = `
+    with del_statements as (
+      select address
+      from agora.delegate_statements
+      where dao_slug='${slug}'
+    ),
+    filtered_delegates as (
+      select d.*
+      from ${namespace}.delegates d
+      where d.contract = '${tokenAddress}'
+      ${
+        filters?.delegator
+          ? `
+        AND d.delegate IN (
+          SELECT delegatee
+          FROM (
+            SELECT delegatee, block_number
+            FROM ${namespace}.delegatees
+            WHERE delegator = '${filters.delegator.toLowerCase()}'
+            ${proxyAddress ? `AND delegatee <> '${proxyAddress.toLowerCase()}'` : ""}
+            AND contract = '${tokenAddress}'
+            UNION ALL
+            SELECT "to" as delegatee, block_number
+            FROM ${namespace}.advanced_delegatees
+            WHERE "from" = '${filters.delegator.toLowerCase()}'
+            AND delegated_amount > 0
+            AND contract = '${contracts.alligator?.address || tokenAddress}'
+          ) combined_delegations
+          ORDER BY block_number DESC
+        )
+      `
+          : ""
+      }
+    ),
+    del_card_universe as (
+      select
+        d.delegate as delegate,
+        d.num_of_delegators as num_of_delegators,
+        d.direct_vp as direct_vp,
+        d.advanced_vp as advanced_vp,
+        d.voting_power as voting_power
+      from filtered_delegates d
+    )`;
 
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
-    console.log(sort);
-
     const allowListString = allowList.map((value) => `'${value}'`).join(", ");
 
     switch (sort) {
@@ -142,7 +179,7 @@ async function getDelegates({
                   discord,
                   created_at,
                   updated_at,
-                  warpcast, 
+                  warpcast,
                   endorsed
                 FROM agora.delegate_statements s
                 WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
@@ -154,13 +191,12 @@ async function getDelegates({
             ) AS statement
           FROM del_card_universe d
           WHERE num_of_delegators IS NOT NULL
-          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
+          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
           ${delegateStatementFiler}
-          ORDER BY num_of_delegators DESC
+          ORDER BY num_of_delegators DESC, d.delegate
           OFFSET $1
           LIMIT $2;
-          `;
-        // console.log(QRY1);
+        `;
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY1, skip, take);
 
       case "weighted_random":
@@ -202,7 +238,6 @@ async function getDelegates({
           OFFSET $1
           LIMIT $2;
           `;
-        // console.log(QRY2);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY2, skip, take);
 
       default:
@@ -239,11 +274,10 @@ async function getDelegates({
           FROM del_card_universe d
           WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
           ${delegateStatementFiler}
-          ORDER BY voting_power DESC
+          ORDER BY voting_power DESC, d.delegate
           OFFSET $1
           LIMIT $2;
           `;
-        // console.log(QRY3);
         return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(QRY3, skip, take);
     }
   };
@@ -296,23 +330,24 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       num_of_delegators,
       proposals_proposed,
       citizen.citizen,
-      statement.statement
+      statement.statement,
+      COALESCE(total_proposals.count, 0) as total_proposals
     FROM
         (SELECT 1 as dummy) dummy_table
     LEFT JOIN
         (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $4) a ON TRUE
     LEFT JOIN
-      ${
-        namespace + ".advanced_voting_power"
-      } av ON av.delegate = $1 AND av.contract = $2
+      ${namespace + ".advanced_voting_power"} av ON av.delegate = $1 AND av.contract = $2
     LEFT JOIN
-        (SELECT num_of_delegators FROM ${
-          namespace + ".delegates"
-        } nd WHERE delegate = $1 LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 LIMIT 1) b ON TRUE
     LEFT JOIN
-        (SELECT * FROM ${
-          namespace + ".voting_power"
-        } vp WHERE vp.delegate = $1 AND vp.contract = $5  LIMIT 1) c ON TRUE
+        (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1 AND vp.contract = $5 LIMIT 1) c ON TRUE
+    LEFT JOIN
+        (SELECT COUNT(*) as count
+         FROM ${namespace + ".proposals_v2"} p
+         WHERE p.contract = $4
+         AND p.cancelled_block IS NULL
+        ) total_proposals ON TRUE
     LEFT JOIN
         (SELECT
           CASE
@@ -331,8 +366,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             created_at,
             updated_at,
             warpcast,
-            endorsed
-          FROM agora.delegate_statements s 
+            endorsed,
+            scw_address
+          FROM agora.delegate_statements s
           WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
           LIMIT 1
         ) sub
@@ -354,11 +390,35 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
         FROM ${namespace + ".advanced_delegatees"}
         WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0`;
-  const numOfDirectDelegationsQuery = `        SELECT
-          SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-        FROM ${namespace + ".delegate_changed_events"}
-        WHERE to_delegate=$1 OR from_delegate=$1`;
+  var numOfDirectDelegationsQuery;
 
+  if (contracts.token.isERC20()) {
+    numOfDirectDelegationsQuery = `        SELECT
+        SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
+      FROM ${namespace + ".delegate_changed_events"}
+      WHERE to_delegate=$1 OR from_delegate=$1`;
+  } else if (contracts.token.isERC721()) {
+    numOfDirectDelegationsQuery = `with latest_delegations AS (
+                                          SELECT DISTINCT ON (delegator)
+                                              delegator,
+                                              to_delegate,
+                                              chain_id,
+                                              address,
+                                              block_number,
+                                              transaction_index,
+                                              log_index
+                                          FROM
+                                              ${namespace}.delegate_changed_events WHERE address = $2
+                                          ORDER BY
+                                              delegator,
+                                              block_number DESC,
+                                              transaction_index DESC,
+                                              log_index DESC)
+
+                                          SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
+  } else {
+    throw new Error("Token contract is neither ERC20 nor ERC721?");
+  }
   var numOfDelegationsQuery;
 
   const partialDelegationContract = contracts.alligator
@@ -370,7 +430,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       { num_of_delegators: BigInt }[]
     >(
       `
-      SELECT 
+      SELECT
         SUM(num_of_delegators) as num_of_delegators
       FROM (
         ${numOfAdvancedDelegationsQuery}
@@ -399,6 +459,14 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     delegate.num_of_delegators?.toFixed() || "0"
   );
 
+  const usedNumOfDelegators =
+    cachedNumOfDelegators < 1000n
+      ? BigInt(
+          (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
+            "0"
+        )
+      : cachedNumOfDelegators;
+
   // Build out delegate JSON response
   return {
     address: address,
@@ -408,9 +476,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       direct: delegate?.voting_power?.toString() || "0",
       advanced: delegate?.advanced_vp?.toFixed(0) || "0",
     },
-    votingPowerRelativeToVotableSupply: Number(
-      totalVotingPower / BigInt(votableSupply || 0)
-    ),
+    votingPowerRelativeToVotableSupply:
+      votableSupply && BigInt(votableSupply) > 0n
+        ? Number(totalVotingPower / BigInt(votableSupply || 0))
+        : 0,
     votingPowerRelativeToQuorum:
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
@@ -422,17 +491,53 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     votedAbstain: delegate?.abstain?.toString() || "0",
     votingParticipation: delegate?.participation_rate || 0,
     lastTenProps: delegate?.last_10_props?.toFixed() || "0",
-    numOfDelegators:
-      // Use cached amount when recalculation is expensive
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
-              "0"
-          )
-        : cachedNumOfDelegators,
+    numOfDelegators: usedNumOfDelegators,
+    totalProposals: delegate?.total_proposals || 0,
     statement: delegate?.statement || null,
   };
 }
 
+async function getVoterStats(addressOrENSName: string): Promise<any> {
+  const { namespace, contracts } = Tenant.current();
+  const address = isAddress(addressOrENSName)
+    ? addressOrENSName.toLowerCase()
+    : await resolveENSName(addressOrENSName);
+
+  const statsQuery = await prisma.$queryRawUnsafe<
+    Pick<DelegateStats, "voter" | "participation_rate" | "last_10_props">[]
+  >(
+    `
+        SELECT
+          voter,
+          participation_rate,
+          last_10_props,
+          COUNT(p.proposal_id) as total_proposals
+        FROM ${namespace + ".voter_stats"} v
+        LEFT JOIN ${namespace + ".proposals_v2"} p ON
+          p.contract = v.contract
+        WHERE
+          v.voter = $1
+          AND v.contract = $2
+          AND p.cancelled_block IS NULL
+        GROUP BY
+          v.voter,
+          v.participation_rate,
+          v.last_10_props
+        `,
+    address,
+    contracts.governor.address.toLowerCase(),
+    contracts.governor.chain.id
+  );
+
+  return (
+    statsQuery?.[0] || {
+      voter: address,
+      participation_rate: 0,
+      last_10_props: 0,
+    }
+  );
+}
+
 export const fetchDelegates = cache(getDelegates);
 export const fetchDelegate = cache(getDelegate);
+export const fetchVoterStats = cache(getVoterStats);

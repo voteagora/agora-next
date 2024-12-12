@@ -35,7 +35,7 @@ const ProposalTransactionDisplay = ({
 }) => {
   const [collapsed, setCollapsed] = useState(true);
 
-  if (!targets.length) {
+  if (targets.length === 0) {
     return (
       <div>
         <div className="flex flex-col border rounded-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
@@ -49,6 +49,7 @@ const ProposalTransactionDisplay = ({
       </div>
     );
   }
+
   return (
     <div>
       <div className="flex flex-col border border-b-0 rounded-t-lg border-line bg-wash p-4 text-xs text-secondary font-mono break-words overflow-hidden">
@@ -125,7 +126,7 @@ const ProposalTransactionItem = ({
   const [decodingMetadata, setDecodingMetadata] = useState<any>(null);
 
   useEffect(() => {
-    if (calldata === "0x") {
+    if (calldata === "0x" || !calldata) {
       return;
     }
 
