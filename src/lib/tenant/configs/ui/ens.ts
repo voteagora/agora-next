@@ -90,6 +90,18 @@ export const ensTenantUIConfig = new TenantUI({
     {
       name: "sponsoredVote",
       enabled: true,
+      config: {
+        domain: "ENS Governor",
+        version: "1",
+      },
+    },
+    {
+      name: "sponsoredDelegate",
+      enabled: true,
+      config: {
+        domain: "Ethereum Name Service",
+        version: "1",
+      },
     },
     {
       name: "proposal-execute",

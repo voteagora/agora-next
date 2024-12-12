@@ -117,8 +117,6 @@ function CastVoteInputContent({
 
   const canUseRelay = ui.toggle("sponsoredVote") && !reason;
 
-  console.log(canUseRelay, fallbackToStandardVote, isError);
-
   return (
     <VStack className="flex-shrink bg-wash">
       <VStack

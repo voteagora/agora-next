@@ -6,19 +6,22 @@ import { privateKeyToAccount } from "viem/accounts";
 
 const SPONSOR_PRIVATE_KEY = process.env.NEXT_PUBLIC_GAS_SPONSOR_PK;
 
-export async function voteBySignatureApi({
+export async function delegateBySignatureApi({
   signature,
-  proposalId,
-  support,
+  delegatee,
+  nonce,
+  expiry,
 }: {
   signature: `0x${string}`;
-  proposalId: string;
-  support: number;
+  delegatee: `0x${string}`;
+  nonce: string;
+  expiry: number;
 }): Promise<`0x${string}`> {
-  const request = await prepareVoteBySignatureApi({
+  const request = await prepareDelegateBySignatureApi({
     signature,
-    proposalId,
-    support,
+    delegatee,
+    nonce,
+    expiry,
   });
 
   const { governor } = Tenant.current().contracts;
@@ -32,20 +35,22 @@ export async function voteBySignatureApi({
   return walletClient.writeContract(request);
 }
 
-async function prepareVoteBySignatureApi({
+async function prepareDelegateBySignatureApi({
   signature,
-  proposalId,
-  support,
+  delegatee,
+  nonce,
+  expiry,
 }: {
   signature: `0x${string}`;
-  proposalId: string;
-  support: number;
+  delegatee: `0x${string}`;
+  nonce: string;
+  expiry: number;
 }) {
   if (!SPONSOR_PRIVATE_KEY || !isHex(SPONSOR_PRIVATE_KEY)) {
     throw new Error("incorrect or missing SPONSOR_PRIVATE_KEY");
   }
 
-  const { governor } = Tenant.current().contracts;
+  const { token } = Tenant.current().contracts;
 
   const publicClient = getPublicClient();
 
@@ -58,10 +63,10 @@ async function prepareVoteBySignatureApi({
   const account = privateKeyToAccount(SPONSOR_PRIVATE_KEY);
 
   const { request } = await publicClient.simulateContract({
-    address: governor.address as `0x${string}`,
-    abi: governor.abi,
-    functionName: "castVoteBySig",
-    args: [BigInt(proposalId), support, v, r, s],
+    address: token.address as `0x${string}`,
+    abi: token.abi,
+    functionName: "delegateBySig",
+    args: [delegatee, BigInt(nonce), BigInt(expiry), v, r, s],
     account: account,
   });
 
