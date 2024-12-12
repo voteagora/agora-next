@@ -94,6 +94,10 @@ export const ensTenantUIConfig = new TenantUI({
     {
       name: "sponsoredDelegate",
       enabled: true,
+      config: {
+        domain: "Ethereum Name Service",
+        version: "1",
+      },
     },
     {
       name: "proposal-execute",

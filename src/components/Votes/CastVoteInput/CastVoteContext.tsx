@@ -2,7 +2,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
-import useSponsoredVoting from "@/hooks/useSponsoredVoting";
+import useSponsoredVoting from "@/hooks/useSponsoredDelegation";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
 import { checkMissingVoteForDelegate, MissingVote } from "@/lib/voteUtils";

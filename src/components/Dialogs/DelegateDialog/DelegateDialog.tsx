@@ -1,10 +1,8 @@
 import {
   useAccount,
-  useWriteContract,
   useEnsName,
   useWaitForTransactionReceipt,
-  useSignTypedData,
-  useReadContract,
+  useWriteContract,
 } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
@@ -22,16 +20,7 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
-import { Address, Hash } from "viem";
-import AgoraAPI from "@/app/lib/agoraAPI";
-
-const types = {
-  Delegation: [
-    { name: "delegatee", type: "address" },
-    { name: "nonce", type: "uint256" },
-    { name: "expiry", type: "uint256" },
-  ],
-};
+import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 
 export function DelegateDialog({
   delegate,
@@ -54,14 +43,11 @@ export function DelegateDialog({
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [sponsoredVoteTxHash, setSponsoredVoteTxHash] = useState<
-    Hash | undefined
-  >(undefined);
 
   const { setRefetchDelegate } = useConnectButtonContext();
-  const sameDelegatee = delegate.address === delegatee?.delegatee;
+  const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
 
-  const { signTypedDataAsync } = useSignTypedData();
+  const sameDelegatee = delegate.address === delegatee?.delegatee;
 
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
 
@@ -76,6 +62,16 @@ export function DelegateDialog({
   });
 
   const {
+    call,
+    isFetching: isProcessingSponsoredDelegation,
+    isFetched: didProcessSponsoredDelegation,
+    txHash: sponsoredTxnHash,
+  } = useSponsoredDelegation({
+    address: accountAddress,
+    delegate,
+  });
+
+  const {
     isError,
     writeContract: write,
     data: delegateTxHash,
@@ -86,18 +82,8 @@ export function DelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: ui.toggle("sponsoredDelegate") ? sponsoredVoteTxHash : delegateTxHash,
+    hash: isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash,
   });
-
-  const { data: nonce } = useReadContract({
-    address: contracts.token.address as `0x${string}`,
-    abi: contracts.token.abi,
-    functionName: "nonces",
-    args: [accountAddress!],
-    query: {
-      enabled: !!accountAddress && ui.toggle("sponsoredDelegate")?.enabled,
-    },
-  }) as { data: bigint | undefined; isFetched: boolean };
 
   const fetchData = useCallback(async () => {
     setIsReady(false);
@@ -115,36 +101,8 @@ export function DelegateDialog({
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   async function executeDelegate() {
-    if (ui.toggle("sponsoredDelegate")) {
-      const latestBlock = await contracts.token.provider.getBlock("latest");
-
-      const expiry = (latestBlock?.timestamp || 0) + 1000;
-
-      const signature = await signTypedDataAsync({
-        domain: {
-          name: "ERC20Votes",
-          version: "1",
-          chainId: contracts.token.chain.id,
-          verifyingContract: contracts.token.address as Address,
-        },
-        types,
-        primaryType: "Delegation",
-        message: {
-          delegatee: delegate.address,
-          nonce,
-          expiry,
-        },
-      });
-
-      const agoraAPI = new AgoraAPI();
-      const response = await agoraAPI.post("/relay/delegate", "v1", {
-        signature,
-        delegatee: delegate.address,
-        nonce: nonce?.toString(),
-        expiry,
-      });
-
-      setSponsoredVoteTxHash(await response.json());
+    if (isGasRelayEnabled) {
+      await call();
     } else {
       write({
         address: contracts.token.address as any,
@@ -180,22 +138,18 @@ export function DelegateDialog({
       );
     }
 
-    if (isProcessingDelegation) {
+    if (isProcessingDelegation || isProcessingSponsoredDelegation) {
       return <Button disabled={true}>Submitting your delegation...</Button>;
     }
 
-    if (didProcessDelegation) {
+    if (didProcessDelegation || didProcessSponsoredDelegation) {
       return (
         <div>
           <Button className="w-full" disabled={false}>
             Delegation completed!
           </Button>
           <BlockScanUrls
-            hash1={
-              ui.toggle("sponsoredDelegate")
-                ? sponsoredVoteTxHash
-                : delegateTxHash
-            }
+            hash1={isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash}
           />
         </div>
       );
@@ -209,7 +163,7 @@ export function DelegateDialog({
       fetchData();
     }
 
-    if (didProcessDelegation) {
+    if (didProcessDelegation || didProcessSponsoredDelegation) {
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
