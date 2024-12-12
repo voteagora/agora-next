@@ -20,6 +20,8 @@ import { ProposalStage } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useCanSponsor } from "../hooks/useCanSponsor";
 import { useAccount } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "../types";
 
 enum Visibility {
   PUBLIC = "Public",
@@ -42,8 +44,6 @@ const SponsorInput = ({
     isFetching,
     isSuccess,
   } = useCanSponsor(address);
-
-  console.log("isFetching", isFetching);
 
   return (
     <>
@@ -93,6 +93,11 @@ const RequestSponsorshipForm = ({
 }: {
   draftProposal: DraftProposal;
 }) => {
+  const { ui } = Tenant.current();
+  const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+  const proposalLifecycleConfig = proposalLifecycleToggle?.config as PLMConfig;
+  const tenantSupportsPublicDrafts = proposalLifecycleConfig?.public;
+
   const { address } = useAccount();
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
@@ -110,13 +115,15 @@ const RequestSponsorshipForm = ({
 
   return (
     <div className="mt-4">
-      <SwitchInput
-        control={control}
-        label="Draft proposal visibility"
-        required={true}
-        options={Object.values(Visibility)}
-        name="visibility"
-      />
+      {tenantSupportsPublicDrafts && (
+        <SwitchInput
+          control={control}
+          label="Draft proposal visibility"
+          required={true}
+          options={Object.values(Visibility)}
+          name="visibility"
+        />
+      )}
       {visibility === Visibility.PRIVATE && (
         <div className="grid grid-cols-2 gap-4 mt-4">
           {fields.map((_field, index) => (

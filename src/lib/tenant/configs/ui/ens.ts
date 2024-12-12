@@ -220,6 +220,7 @@ Now you're ready to use this form to create your proposal. Choose whether your p
 For a full walkthrough of the proposal process, check out the [ENS DAO docs](https://docs.ens.domains/dao/proposals/submit)
 `.trim(),
         },
+        public: false,
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },

@@ -115,13 +115,13 @@ const MyDraftProposalListClient = () => {
   return (
     <>
       {infiniteIsLoading ? (
-        <div className="flex flex-col justify-center py-8 text-center space-y-2">
+        <div className="flex flex-col justify-center py-8 text-center space-y-2 border border-line rounded-lg shadow-newDefault">
           <AgoraLoaderSmall />
           <span className="text-tertiary">Loading draft proposals</span>
         </div>
       ) : myDraftProposals.length === 0 ? (
-        <div className="flex flex-row justify-center py-8 text-tertiary">
-          No draft proposals found
+        <div className="flex flex-row justify-center py-8 text-tertiary text-center space-y-2 border border-line rounded-lg shadow-newDefault">
+          <span>No draft proposals found</span>
         </div>
       ) : (
         <div
