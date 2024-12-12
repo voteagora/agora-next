@@ -5,6 +5,8 @@ import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
+import X from "@/assets/icons/x.svg";
+import Image from "next/image";
 
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
@@ -35,6 +37,7 @@ export const DeleteDraftProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const [isPending, setIsPending] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   return (
     <div>
       <h3 className="text-center text-primary font-semibold text-lg mb-1">
@@ -51,7 +54,7 @@ export const DeleteDraftProposalDialog = ({
             closeDialog();
           }}
         >
-          No
+          Cancel
         </UpdatedButton>
         <UpdatedButton
           type="primary"
@@ -62,8 +65,10 @@ export const DeleteDraftProposalDialog = ({
             await deleteAction(proposalId);
             window.location.href = "/";
           }}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
         >
-          Yes
+          Delete forever
         </UpdatedButton>
       </div>
     </div>
