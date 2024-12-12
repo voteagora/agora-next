@@ -14,7 +14,7 @@ export const useSmartAccountAddress = ({ owner }: Props) => {
   const { ui, contracts } = Tenant.current();
   const scwConfig = ui.smartAccountConfig;
 
-  const client = getPublicClient(contracts.governor.chain.id);
+  const client = getPublicClient(contracts.governor.chain);
 
   const { data, isFetching, isFetched } = useQuery({
     enabled: Boolean(scwConfig?.factoryAddress && owner !== undefined),

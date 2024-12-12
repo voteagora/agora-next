@@ -34,7 +34,6 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
   const { data: nonce } = useNonce({
     address: address,
-    contract: contracts.token.contract,
     enabled: isGasRelayEnabled && !!address,
   });
 
