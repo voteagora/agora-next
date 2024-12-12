@@ -1,24 +1,24 @@
-import { fetchDraftProposalsV2 as apiFetchDraftProposals } from "@/app/api/common/proposals/getProposals";
+import { fetchMyDraftProposals as apiFetchMyDraftProposals } from "@/app/api/common/proposals/getProposals";
 import {
   draftProposalsFilterOptions,
   draftProposalsSortOptions,
 } from "@/lib/constants";
-import DraftProposalListClient from "./DraftProposalListClient";
+import MyDraftProposalListServerClient from "./MyDraftProposalListServerClient";
 import { getConnectedAccountFromCookies } from "@/lib/wagmi";
 
 const pagination = { limit: 10, offset: 0 };
 
-async function fetchDraftProposals(
+async function fetchMyDraftProposals(
   address: `0x${string}` | undefined,
   filter: string,
   sort: string,
   pagination = { limit: 10, offset: 0 }
 ) {
   "use server";
-  return apiFetchDraftProposals(address, filter, sort, pagination);
+  return apiFetchMyDraftProposals(address, filter, sort, pagination);
 }
 
-const DraftProposalList = async ({
+const MyDraftProposalListServer = async ({
   searchParams,
 }: {
   searchParams: { filter?: string; sort?: string };
@@ -28,7 +28,7 @@ const DraftProposalList = async ({
     searchParams.filter || draftProposalsFilterOptions.allDrafts.value;
   const sort = searchParams.sort || draftProposalsSortOptions.newest.sort;
 
-  const draftProposals = await fetchDraftProposals(
+  const draftProposals = await fetchMyDraftProposals(
     connectedAccount,
     filter,
     sort,
@@ -36,11 +36,11 @@ const DraftProposalList = async ({
   );
 
   return (
-    <DraftProposalListClient
-      initDraftProposals={draftProposals}
-      fetchDraftProposals={fetchDraftProposals}
+    <MyDraftProposalListServerClient
+      initMyDraftProposals={draftProposals}
+      fetchMyDraftProposals={fetchMyDraftProposals}
     />
   );
 };
 
-export default DraftProposalList;
+export default MyDraftProposalListServer;
