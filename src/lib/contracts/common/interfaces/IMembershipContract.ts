@@ -2,7 +2,6 @@ import type { TypedContractMethod } from "@/lib/contracts/generated/common";
 import type { BaseContract, AddressLike } from "ethers";
 
 export interface IMembershipContract extends BaseContract {
-
   balanceOf: TypedContractMethod<[account: AddressLike], [bigint], "view">;
   delegate?: TypedContractMethod<
     [delegatee: AddressLike],
