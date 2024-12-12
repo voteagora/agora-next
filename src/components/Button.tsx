@@ -56,7 +56,7 @@ export function UpdatedButton({
             type === "link" && "",
             variant === "rounded" && "rounded-full",
             fullWidth && "w-full",
-            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer"
+            "font-semibold py-2 px-4 border border-line cursor-pointer"
           )}
         >
           <Link href={href} {...props}>
@@ -69,7 +69,7 @@ export function UpdatedButton({
             className,
             "font-semibold py-2 px-4 border border-line cursor-pointer",
             type === "primary" &&
-              "bg-primary hover:bg-primary/90 text-neutral transition-shadow",
+              "bg-primary hover:bg-primary/90 text-neutral transition-shadow border-primary",
             type === "secondary" &&
               "bg-neutral text-primary hover:bg-tertiary/5",
             type === "link" && "",

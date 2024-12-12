@@ -4,7 +4,7 @@ import { useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
-import { config } from "@/app/Web3Provider";
+import { config } from "@/app/config";
 
 const useStandardVoting = ({
   proposalId,

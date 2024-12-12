@@ -117,18 +117,23 @@ export const ensTenantUIConfig = new TenantUI({
             isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.PENDING,
+            stage: PrismaProposalStage.AWAITING_SPONSORSHIP,
             order: 4,
             isPreSubmission: false,
           },
           {
-            stage: PrismaProposalStage.QUEUED,
+            stage: PrismaProposalStage.PENDING,
             order: 5,
             isPreSubmission: false,
           },
           {
-            stage: PrismaProposalStage.EXECUTED,
+            stage: PrismaProposalStage.QUEUED,
             order: 6,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 7,
             isPreSubmission: false,
           },
         ],
@@ -169,6 +174,7 @@ Now you're ready to use this form to create your proposal. Choose whether your p
 For a full walkthrough of the proposal process, check out the [ENS DAO docs](https://docs.ens.domains/dao/proposals/submit)
 `.trim(),
         },
+        public: false,
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },

@@ -42,12 +42,12 @@ export default function Proposal({
           )}
         >
           {proposal.proposalType === "SNAPSHOT" ? (
-            <HStack className="text-xs text-secondary" gap={1}>
+            <HStack className="text-xs text-tertiary" gap={1}>
               <p>Snapshot Proposal</p>
               <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />
             </HStack>
           ) : (
-            <HStack className="text-xs text-secondary" gap={1}>
+            <HStack className="text-xs text-tertiary" gap={1}>
               {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
               <div>
                 {proposalText}{" "}
@@ -74,9 +74,9 @@ export default function Proposal({
               : proposal.markdowntitle}
           </div>
         </VStack>
-        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[20%] flex-start justify-center hidden sm:block">
+        <VStack className="whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[22%] flex-start justify-center hidden sm:block">
           <VStack alignItems="items-end">
-            <div className="text-xs text-secondary">
+            <div className="text-xs text-tertiary">
               <ProposalTimeStatus
                 proposalStatus={proposal.status}
                 proposalStartTime={proposal.startTime}

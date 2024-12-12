@@ -29,7 +29,7 @@ import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
-import { config } from "@/app/Web3Provider";
+import { config } from "@/app/config";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;

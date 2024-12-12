@@ -12,6 +12,7 @@ import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
 import IssuesFilter from "@/app/delegates/components/IssuesFilter";
 import EndorsedFilter from "@/app/delegates/components/EndorsedFilter";
 import DelegateeFilter from "@/app/delegates/components/DelegatorFilter";
+import { cn } from "@/lib/utils";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
   const { ui } = Tenant.current();
@@ -47,6 +48,8 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
     );
   };
 
+  console.log(tabParam);
+
   return (
     <Tabs
       className="max-w-full"
@@ -55,11 +58,21 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
     >
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
         <TabsList>
-          <TabsTrigger className="text-2xl" value="delegates">
+          <TabsTrigger
+            variant={
+              tabParam === "delegates" || tabParam === null
+                ? "newActive"
+                : "newInactive"
+            }
+            value="delegates"
+          >
             Delegates
           </TabsTrigger>
           {hasCitizens && (
-            <TabsTrigger className="text-2xl" value="citizens">
+            <TabsTrigger
+              variant={tabParam === "citizens" ? "newActive" : "newInactive"}
+              value="citizens"
+            >
               Citizens
             </TabsTrigger>
           )}
