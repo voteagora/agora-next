@@ -1,5 +1,9 @@
 import { fetchProposals as apiFetchProposals } from "@/app/api/common/proposals/getProposals";
-import { proposalsFilterOptions } from "@/lib/constants";
+import {
+  draftProposalsFilterOptions,
+  draftProposalsSortOptions,
+  proposalsFilterOptions,
+} from "@/lib/constants";
 import AllProposalListClient from "./AllProposalListClient";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
@@ -11,11 +15,16 @@ async function fetchProposals(
   return apiFetchProposals({ filter, pagination });
 }
 
-const AllProposalList = async ({
+const DraftProposalListServer = async ({
   searchParams,
 }: {
   searchParams: { filter?: string; sort?: string };
 }) => {
+  const filter =
+    searchParams.filter || draftProposalsFilterOptions.allDrafts.value;
+  const sort = searchParams.sort || draftProposalsSortOptions.newest.sort;
+
+  // fetchDraftProposals
   const proposals = await fetchProposals(
     proposalsFilterOptions.everything.filter
   );
@@ -31,4 +40,4 @@ const AllProposalList = async ({
   );
 };
 
-export default AllProposalList;
+export default DraftProposalListServer;

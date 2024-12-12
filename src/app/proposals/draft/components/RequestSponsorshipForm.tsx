@@ -64,7 +64,7 @@ const SponsorInput = ({
                 <LoadingSpinner className="w-5 h-5 text-tertiary" />
               ) : isError ? (
                 <span className="text-negative">Error checking status</span>
-              ) : isSuccess ? (
+              ) : isAddress(address) && isSuccess ? (
                 <span
                   className={
                     canAddressSponsor ? "text-positive" : "text-negative"
