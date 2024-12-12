@@ -5,14 +5,14 @@ import { useRef, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { useAccount } from "wagmi";
-import DraftProposalCard from "./DraftProposalCard";
+import MyDraftProposalCard from "./MyDraftProposalCard";
 
-const DraftProposalListClient = ({
-  initDraftProposals,
-  fetchDraftProposals,
+const MyDraftProposalListServerClient = ({
+  initMyDraftProposals,
+  fetchMyDraftProposals,
 }: {
-  initDraftProposals: PaginatedResult<any[]>;
-  fetchDraftProposals: (
+  initMyDraftProposals: PaginatedResult<any[]>;
+  fetchMyDraftProposals: (
     address: `0x${string}` | undefined,
     filter: string,
     sort: string,
@@ -20,8 +20,8 @@ const DraftProposalListClient = ({
   ) => Promise<PaginatedResult<any[]>>;
 }) => {
   const { address } = useAccount();
-  const [pages, setPages] = useState([initDraftProposals]);
-  const [meta, setMeta] = useState(initDraftProposals.meta);
+  const [pages, setPages] = useState([initMyDraftProposals]);
+  const [meta, setMeta] = useState(initMyDraftProposals.meta);
   const filter = useSearchParams()?.get("filter") || "relevant";
   const sort = useSearchParams()?.get("sort") || "newest";
   const fetching = useRef(false);
@@ -29,7 +29,7 @@ const DraftProposalListClient = ({
   useEffect(() => {
     const resetAndFetch = async () => {
       fetching.current = true;
-      const data = await fetchDraftProposals(address, filter, sort, {
+      const data = await fetchMyDraftProposals(address, filter, sort, {
         limit: 10,
         offset: 0,
       });
@@ -44,7 +44,7 @@ const DraftProposalListClient = ({
   const loadMore = async () => {
     if (fetching.current || !meta.has_next) return;
     fetching.current = true;
-    const data = await fetchDraftProposals(address, filter, sort, {
+    const data = await fetchMyDraftProposals(address, filter, sort, {
       limit: 10,
       offset: meta.next_offset,
     });
@@ -55,16 +55,12 @@ const DraftProposalListClient = ({
 
   const proposals = pages.flatMap((page) => page.data);
 
-  const updateProposalVote = (proposalId: number, vote: any) => {
-    console.log("updateProposalVote", proposalId, vote);
-  };
-
   return (
     <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
       <div>
         {proposals.length === 0 ? (
           <div className="flex flex-row justify-center py-8 text-secondary">
-            No proposals currently
+            No drafts currently
           </div>
         ) : (
           <InfiniteScroll
@@ -84,11 +80,7 @@ const DraftProposalListClient = ({
             element="main"
           >
             {proposals.map((proposal) => (
-              <DraftProposalCard
-                key={proposal.id}
-                proposal={proposal}
-                updateProposalVote={updateProposalVote}
-              />
+              <MyDraftProposalCard key={proposal.id} proposal={proposal} />
             ))}
           </InfiniteScroll>
         )}
@@ -97,4 +89,4 @@ const DraftProposalListClient = ({
   );
 };
 
-export default DraftProposalListClient;
+export default MyDraftProposalListServerClient;

@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown";
 import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
-import { cookies } from "next/headers";
+import { getConnectedAccountFromCookies } from "@/lib/wagmi";
 
 export default async function DraftProposalPage({
   params,
@@ -17,15 +17,8 @@ export default async function DraftProposalPage({
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const cookieStore = cookies();
-  const wagmiStore = cookieStore.get("wagmi.store");
-  const wagmiStoreJson = wagmiStore?.value
-    ? JSON.parse(wagmiStore.value)
-    : null;
-  const connectedAccount =
-    wagmiStoreJson?.state?.connections?.value[0]?.[1]?.accounts?.[0];
-
   const { ui } = Tenant.current();
+  const connectedAccount = getConnectedAccountFromCookies();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const tenantSupportsProposalLifecycle = proposalLifecycleToggle?.enabled;
 
