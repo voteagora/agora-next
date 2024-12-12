@@ -2,122 +2,220 @@
 
 import { isAddress } from "viem";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import {
+  useFormContext,
+  useFieldArray,
+  UseFieldArrayRemove,
+} from "react-hook-form";
 import AddressInput from "./form/AddressInput";
-import { useBlockNumber } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
-import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { useGetVotes } from "@/hooks/useGetVotes";
-import { useManager } from "@/hooks/useManager";
-import {
-  DraftProposal,
-  PLMConfig,
-  ProposalGatingType,
-  ProposalType,
-} from "../types";
+import { DraftProposal } from "../types";
+import SwitchInput from "./form/SwitchInput";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { ProposalStage } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useCanSponsor } from "../hooks/useCanSponsor";
+import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "../types";
+
+enum Visibility {
+  PUBLIC = "Public",
+  PRIVATE = "Private",
+}
+
+const SponsorInput = ({
+  index,
+  remove,
+}: {
+  index: number;
+  remove: UseFieldArrayRemove;
+}) => {
+  const { control, watch } = useFormContext();
+  const address = watch(`sponsors.${index}.address`);
+
+  const {
+    data: canAddressSponsor,
+    isError,
+    isFetching,
+    isSuccess,
+  } = useCanSponsor(address);
+
+  return (
+    <>
+      <AddressInput
+        control={control}
+        label="Sponsor address"
+        name={`sponsors.${index}.address`}
+      />
+      <div className="space-y-1">
+        <label className="text-xs font-semibold text-secondary block">
+          Sponsor verification
+        </label>
+        <div className="flex items-center justify-between gap-2">
+          <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
+            {isAddress(address) && <AvatarAddress address={address} />}
+            <div className="absolute right-2 top-2.5 text-sm">
+              {isFetching ? (
+                <LoadingSpinner className="w-5 h-5 text-tertiary" />
+              ) : isError ? (
+                <span className="text-negative">Error checking status</span>
+              ) : isAddress(address) && isSuccess ? (
+                <span
+                  className={
+                    canAddressSponsor ? "text-positive" : "text-negative"
+                  }
+                >
+                  {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="border border-line rounded-lg h-[42px] w-[42px] flex items-center justify-center hover:bg-tertiary/5 transition-colors cursor-pointer"
+          >
+            <XMarkIcon className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const RequestSponsorshipForm = ({
   draftProposal,
 }: {
   draftProposal: DraftProposal;
 }) => {
-  const tenant = Tenant.current();
-  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
+  const { ui } = Tenant.current();
+  const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+  const proposalLifecycleConfig = proposalLifecycleToggle?.config as PLMConfig;
+  const tenantSupportsPublicDrafts = proposalLifecycleConfig?.public;
+
+  const { address } = useAccount();
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const { watch, control } = useFormContext();
-
-  const address = watch("sponsorAddress");
-  const votingModuleType = draftProposal.voting_module_type;
-
-  const { data: threshold } = useProposalThreshold();
-  const { data: manager } = useManager();
-  const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useGetVotes({
-    address: address as `0x${string}`,
-    blockNumber: blockNumber || BigInt(0),
+  const { watch, control, formState } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "sponsors",
   });
 
-  const canSponsor = () => {
-    if (votingModuleType === ProposalType.SOCIAL) {
-      const requiredTokensForSnapshot = (plmToggle?.config as PLMConfig)
-        ?.snapshotConfig?.requiredTokens;
-      return (
-        accountVotesData !== undefined &&
-        requiredTokensForSnapshot !== undefined &&
-        accountVotesData >= requiredTokensForSnapshot
-      );
-    }
-    switch (gatingType) {
-      case ProposalGatingType.MANAGER:
-        return manager === address;
-      case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotesData !== undefined && threshold !== undefined
-          ? accountVotesData >= threshold
-          : false;
-      case ProposalGatingType.GOVERNOR_V1:
-        return (
-          manager === address ||
-          (accountVotesData !== undefined && threshold !== undefined
-            ? accountVotesData >= threshold
-            : false)
-        );
-      default:
-        return false;
-    }
-  };
+  const formValid = true;
+  const visibility = watch("visibility");
+  const sponsors = watch("sponsors");
 
-  const canAddressSponsor = canSponsor();
+  const { data: canUserSponsor } = useCanSponsor(address as `0x${string}`);
 
   return (
-    <>
-      <div className="grid grid-cols-2 gap-4">
-        <AddressInput
+    <div className="mt-4">
+      {tenantSupportsPublicDrafts && (
+        <SwitchInput
           control={control}
-          label="Sponsor address"
-          name="sponsorAddress"
+          label="Draft proposal visibility"
+          required={true}
+          options={Object.values(Visibility)}
+          name="visibility"
         />
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-secondary block">
-            Sponsor verification
-          </label>
-          <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
-            {isAddress(address) && <AvatarAddress address={address} />}
-            <div
-              className={`absolute right-2 top-2.5 text-sm ${canAddressSponsor ? "text-positive" : "text-negative"}`}
-            >
-              {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
-            </div>
-          </div>
+      )}
+      {visibility === Visibility.PRIVATE && (
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          {fields.map((_field, index) => (
+            <SponsorInput
+              key={`sponsor-${index}`}
+              index={index}
+              remove={remove}
+            />
+          ))}
+          <button
+            type="button"
+            onClick={() => append({ address: "" })}
+            className="bg-neutral text-primary col-span-2 border border-line rounded-lg p-2 font-semibold"
+          >
+            Add sponsor
+          </button>
         </div>
-      </div>
+      )}
       <UpdatedButton
         fullWidth={true}
         isSubmit={false}
         isLoading={isPending}
-        type={canAddressSponsor ? "primary" : "disabled"}
+        type={formValid ? "primary" : "disabled"}
         className="mt-6"
         onClick={async () => {
-          if (canAddressSponsor) {
+          if (formValid) {
             setIsPending(true);
             const res = await requestSponsorshipAction({
               draftProposalId: draftProposal.id,
-              sponsor_address: address,
+              is_public: visibility === Visibility.PUBLIC,
+              sponsors: sponsors.filter((sponsor: { address: `0x${string}` }) =>
+                isAddress(sponsor.address)
+              ),
             });
-            setIsPending(false);
             if (res.ok) {
               invalidatePath(draftProposal.id);
+              router.push(`/proposals/sponsor/${draftProposal.id}`);
+            } else {
+              console.error(res.message);
             }
+            setIsPending(false);
           }
         }}
       >
-        Request sponsorship
+        {draftProposal.stage === ProposalStage.AWAITING_SPONSORSHIP
+          ? "Update draft"
+          : "Create draft"}
       </UpdatedButton>
-    </>
+      {canUserSponsor && (
+        <>
+          <div className="flex flex-row items-center justify-center mt-4 gap-2">
+            <span className="h-[1px] w-full border-b border-line block"></span>
+            <span className="text-xs">OR</span>
+            <span className="h-[1px] w-full border-b border-line block"></span>
+          </div>
+          <UpdatedButton
+            fullWidth={true}
+            isSubmit={false}
+            isLoading={isPending}
+            type={formValid ? "primary" : "disabled"}
+            className="mt-4"
+            onClick={async () => {
+              if (formValid) {
+                setIsPending(true);
+                const res = await requestSponsorshipAction({
+                  draftProposalId: draftProposal.id,
+                  is_public: visibility === Visibility.PUBLIC,
+                  sponsors: sponsors.filter(
+                    (sponsor: { address: `0x${string}` }) =>
+                      isAddress(sponsor.address)
+                  ),
+                });
+                if (res.ok) {
+                  invalidatePath(draftProposal.id);
+                  router.push(`/proposals/sponsor/${draftProposal.id}`);
+                } else {
+                  console.error(res.message);
+                }
+                setIsPending(false);
+              }
+            }}
+          >
+            Publish onchain
+          </UpdatedButton>
+          <p className="text-xs text-secondary mt-2">
+            You meet the criteria for publishing a proposal onchain. If you
+            would like, you can publish it now. Or, create a draft to create a
+            sharable offchain proposal for early feedback.
+          </p>
+        </>
+      )}
+    </div>
   );
 };
 

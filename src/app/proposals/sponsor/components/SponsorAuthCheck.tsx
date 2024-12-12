@@ -1,17 +1,29 @@
 "use client";
 
 import { useAccount } from "wagmi";
+import { useIsMounted } from "connectkit";
+import AgoraLoader, {
+  LogoLoader,
+} from "@/components/shared/AgoraLoader/AgoraLoader";
+import Tenant from "@/lib/tenant/tenant";
 
 const SponsorAuthCheck = ({
-  sponsorAddress,
+  sponsorAddresses,
   children,
 }: {
-  sponsorAddress: string;
+  sponsorAddresses: `0x${string}`[];
   children: React.ReactNode;
 }) => {
-  const { address, isConnecting, isReconnecting } = useAccount();
+  const { address, isConnecting } = useAccount();
+  const isMounted = useIsMounted();
+  const { ui } = Tenant.current();
+  const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  if (isConnecting || isReconnecting) {
+  if (!isMounted) {
+    return shouldHideAgoraBranding ? <LogoLoader /> : <AgoraLoader />;
+  }
+
+  if (isConnecting) {
     return (
       <main className="max-w-screen-xl mx-auto mt-10">
         <div className="grid grid-cols-3 gap-12 animate-pulse">
@@ -21,16 +33,12 @@ const SponsorAuthCheck = ({
       </main>
     );
   }
-
-  if (sponsorAddress !== address) {
+  if (!sponsorAddresses.includes(address as `0x${string}`)) {
     return (
-      <main className="max-w-screen-xl mx-auto mt-10">
-        <div className="bg-agora-stone-50 border border-agora-stone-100 p-8 rounded-lg text-center">
-          <h1 className="text-2xl font-black">Unauthorized</h1>
-          <h3 className="text-m font-black">
-            Only the sponsor of the proposal or the author is able to view this
-            draft.
-          </h3>
+      <main className="mx-auto mt-10 h-[calc(100vh-240px)] w-full flex flex-col justify-center items-center bg-tertiary/5 border border-line rounded-lg">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Unauthorized</h1>
+          <h3 className="">This is a private draft proposal.</h3>
         </div>
       </main>
     );

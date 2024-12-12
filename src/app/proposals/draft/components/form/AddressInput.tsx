@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,7 +22,6 @@ import {
 } from "@/components/ui/form";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { isAddress } from "viem";
-import { normalize } from "viem/ens";
 
 type AddressInputProps = {
   label: string;
@@ -42,7 +42,6 @@ function AddressInput<
   tooltip,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & AddressInputProps) {
   const { watch, setValue } = useFormContext();
-
   const address = watch(name);
 
   const { data: ensAddress } = useEnsAddress({
