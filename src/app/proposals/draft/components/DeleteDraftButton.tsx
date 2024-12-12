@@ -40,13 +40,22 @@ export const DeleteDraftProposalDialog = ({
   const [isHovering, setIsHovering] = useState(false);
   return (
     <div>
-      <h3 className="text-center text-primary font-semibold text-lg mb-1">
-        Delete my draft
+      <div className="flex items-center gap-2 bg-tertiary/5 rounded-lg relative overflow-y-hidden py-4 mt-2">
+        <div className="absolute w-full h-full bg-[url('/images/grid.svg')]"></div>
+        <div className="mt-2 relative block h-[85px] w-[85px] mx-auto">
+          <Image
+            src={X}
+            alt="X"
+            width={85}
+            height={85}
+            className={`${isHovering ? "duration-500 scale-105" : "duration-300 scale-100"} transition-all`}
+          />
+        </div>
+      </div>
+      <h3 className="text-primary text-xl font-bold mt-4">
+        Are you sure you want to delete your proposal?
       </h3>
-      <p className="text-center text-secondary">
-        Are you sure you want to delete this proposal?
-      </p>
-      <div className="mt-6 flex items-center justify-between space-x-2">
+      <div className="flex flex-col items-center gap-2 mt-4">
         <UpdatedButton
           type="secondary"
           fullWidth

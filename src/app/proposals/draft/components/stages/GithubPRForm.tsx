@@ -118,7 +118,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               fullWidth={true}
               type="primary"
               onClick={() => {
-                router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+                handleSkip();
               }}
             >
               Continue

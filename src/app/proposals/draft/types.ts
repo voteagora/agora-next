@@ -190,6 +190,8 @@ export type PLMConfig = {
     domain: string;
     requiredTokens: number;
   };
+  // If drafts are are able to set to public, otherwise private by default
+  public?: boolean;
   // The method for gating who can create a proposal
   // Manager -- only the manager can create proposals
   // Token Threshold -- a certain amount of tokens must be held
