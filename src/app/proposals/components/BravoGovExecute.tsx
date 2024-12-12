@@ -8,7 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
   Tooltip,
@@ -26,7 +25,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
   const [canExecute, setCanExecute] = useState(false);
   const [executeTime, setExecuteTime] = useState<Date | undefined>();
 
-  const { data: executionDelayInBlocks, isFetched: executionDelayFetched } =
+  const { data: executionDelayInSeconds, isFetched: executionDelayFetched } =
     useReadContract({
       address: contracts.timelock!.address as `0x${string}`,
       abi: contracts.timelock!.abi,
@@ -41,11 +40,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
     });
 
   useEffect(() => {
-    const delayInSeconds =
-      Number(executionDelayInBlocks?.toString()) > 0
-        ? blocksToSeconds(Number(executionDelayInBlocks))
-        : 0;
-
+    const delayInSeconds = Number(executionDelayInSeconds?.toString()) ?? 0;
     let executeTimeInSeconds = 0;
 
     if (proposal.queuedTime) {
