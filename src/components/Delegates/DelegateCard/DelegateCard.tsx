@@ -28,14 +28,16 @@ const CardHeader = ({
 const ActiveHeader = ({
   outOfTen,
   totalProposals,
+  percentParticipation,
 }: {
   outOfTen: string;
   totalProposals: number;
+  percentParticipation: number;
 }) => {
   return (
     <CardHeader
       title="Active delegate"
-      cornerTitle={`🎉 ${(parseInt(outOfTen) / Math.min(10, totalProposals)) * 100 || 0}%`}
+      cornerTitle={`🎉 ${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
     />
   );
@@ -44,14 +46,16 @@ const ActiveHeader = ({
 const InactiveHeader = ({
   outOfTen,
   totalProposals,
+  percentParticipation,
 }: {
   outOfTen: string;
   totalProposals: number;
+  percentParticipation: number;
 }) => {
   return (
     <CardHeader
       title="Inactive delegate"
-      cornerTitle={`💤 ${(parseInt(outOfTen) / Math.min(10, totalProposals)) * 100 || 0}%`}
+      cornerTitle={`💤 ${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
     />
   );
@@ -64,18 +68,22 @@ export default function DelegateCard({
   delegate: Delegate;
   totalProposals: number;
 }) {
+  const percentParticipation =
+    (parseInt(delegate.lastTenProps) / Math.min(10, totalProposals)) * 100 || 0;
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       {totalProposals >= 3 ? (
-        parseInt(delegate.lastTenProps) > 5 ? (
+        percentParticipation > 50 ? (
           <ActiveHeader
             outOfTen={delegate.lastTenProps}
             totalProposals={totalProposals}
+            percentParticipation={percentParticipation}
           />
         ) : (
           <InactiveHeader
             outOfTen={delegate.lastTenProps}
             totalProposals={totalProposals}
+            percentParticipation={percentParticipation}
           />
         )
       ) : null}
