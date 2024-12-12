@@ -9,6 +9,7 @@ import DraftProposalList from "@/components/Proposals/ProposalsList/DraftProposa
 import MyDraftProposalList from "@/components/Proposals/ProposalsList/MyDraftProposalList";
 import AllProposalList from "@/components/Proposals/ProposalsList/AllProposalList";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
+import MyDraftProposalListServer from "@/components/Proposals/ProposalsList/MyDraftProposalListServer";
 import { Suspense } from "react";
 
 async function fetchGovernanceCalendar() {
@@ -43,7 +44,7 @@ export default async function ProposalsHome({
             <DraftProposalList searchParams={searchParams} />
           }
           myDraftProposalsListElement={
-            <MyDraftProposalList searchParams={searchParams} />
+            <MyDraftProposalListServer searchParams={searchParams} />
           }
           governanceCalendar={governanceCalendar}
         />

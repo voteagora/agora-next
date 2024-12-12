@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount } from "wagmi";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { ProposalDraft } from "@prisma/client";
 import Link from "next/link";
@@ -9,16 +8,12 @@ import {
   getStageIndexForTenant,
   isPostSubmission,
 } from "@/app/proposals/draft/utils/stages";
-import { useMyDraftProposalsInfinite } from "@/hooks/useMyDraftProposals";
 import { formatFullDate } from "@/lib/utils";
-import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { myDraftsSortOptions } from "@/lib/constants";
-import { useSearchParams } from "next/navigation";
 import { PencilIcon, EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
-const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
+const MyDraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   const openDialog = useOpenDialog();
   const isDrafting = !isPostSubmission(proposal.stage);
   const [open, setOpen] = useState(false);
@@ -96,55 +91,4 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   );
 };
 
-const MyDraftProposalListClient = () => {
-  const { address } = useAccount();
-
-  const sort =
-    useSearchParams()?.get("sort") || myDraftsSortOptions.newest.sort;
-
-  const { data: myDraftProposals, isLoading: infiniteIsLoading } =
-    useMyDraftProposalsInfinite({
-      address,
-      sort,
-      pagination: {
-        limit: 10,
-        offset: 0,
-      },
-    });
-
-  return (
-    <>
-      {infiniteIsLoading ? (
-        <div className="flex flex-col justify-center py-8 text-center space-y-2 border border-line rounded-lg shadow-newDefault">
-          <AgoraLoaderSmall />
-          <span className="text-tertiary">Loading draft proposals</span>
-        </div>
-      ) : myDraftProposals.length === 0 ? (
-        <div className="flex flex-row justify-center py-8 text-tertiary text-center space-y-2 border border-line rounded-lg shadow-newDefault">
-          <span>No draft proposals found</span>
-        </div>
-      ) : (
-        <div
-          key="my-drafts"
-          className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden"
-        >
-          <div>
-            {!myDraftProposals || myDraftProposals?.length === 0 ? (
-              <div className="flex flex-row justify-center py-8 text-tertiary">
-                No drafts found
-              </div>
-            ) : (
-              <div>
-                {myDraftProposals?.map((proposal) => (
-                  <DraftProposalCard key={proposal.id} proposal={proposal} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-export default MyDraftProposalListClient;
+export default MyDraftProposalCard;
