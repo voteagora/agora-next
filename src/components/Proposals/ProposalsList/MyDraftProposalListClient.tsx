@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAccount } from "wagmi";
 import HumanAddress from "@/components/shared/HumanAddress";
 import { ProposalDraft } from "@prisma/client";
@@ -20,6 +21,8 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
   const openDialog = useOpenDialog();
   const isDrafting = !isPostSubmission(proposal.stage);
+  const [open, setOpen] = useState(false);
+
   return (
     <Link
       href={
@@ -56,7 +59,7 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
               <PencilIcon className="w-5 h-5" />
             </span>
             <span className="cursor-pointer flex flex-row items-center bg-neutral rounded-full p-2 hover:text-secondary transition-colors">
-              <DropdownMenu.Root>
+              <DropdownMenu.Root open={open} onOpenChange={setOpen}>
                 <DropdownMenu.Trigger asChild>
                   <EllipsisVerticalIcon className="w-5 h-5" />
                 </DropdownMenu.Trigger>
@@ -71,6 +74,7 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
                       className="py-3 px-5 border-b border-line cursor-pointer hover:bg-tertiary/5"
                       onClick={(evt) => {
                         evt.stopPropagation();
+                        setOpen(false);
                         openDialog({
                           type: "DELETE_DRAFT_PROPOSAL",
                           params: {
