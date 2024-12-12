@@ -3,7 +3,7 @@ import { cache } from "react";
 import { formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-const SPONSOR_PRIVATE_KEY = process.env.NEXT_PUBLIC_GAS_SPONSOR_PK;
+const SPONSOR_PRIVATE_KEY = process.env.GAS_SPONSOR_PK;
 const GAS_COST = 0.001108297;
 
 async function getRelayStatus() {

@@ -4,7 +4,7 @@ import { getPublicClient } from "@/lib/viem";
 import { createWalletClient, parseSignature, isHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-const SPONSOR_PRIVATE_KEY = process.env.NEXT_PUBLIC_GAS_SPONSOR_PK;
+const SPONSOR_PRIVATE_KEY = process.env.GAS_SPONSOR_PK;
 
 export async function voteBySignatureApi({
   signature,
