@@ -1,6 +1,10 @@
 import MyDraftProposalListClient from "./MyDraftProposalListClient";
 
-const MyDraftProposalList = () => {
+const MyDraftProposalList = ({
+  searchParams,
+}: {
+  searchParams: { filter?: string; sort?: string };
+}) => {
   return <MyDraftProposalListClient />;
 };
 

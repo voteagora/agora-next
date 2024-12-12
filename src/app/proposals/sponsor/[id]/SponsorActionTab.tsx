@@ -18,6 +18,7 @@ const SponsorActionTab = ({
 
   const { address } = useAccount();
   const router = useRouter();
+  const draftingStageIndex = getIndexForStage(ProposalStage.DRAFTING) ?? 0;
 
   return (
     <div className="flex flex-row items-center gap-4">
@@ -53,9 +54,7 @@ const SponsorActionTab = ({
           className="w-full flex items-center justify-center"
           onClick={() => {
             router.push(
-              `/proposals/draft/${draftProposal.id}?stage=${getIndexForStage(
-                ProposalStage.AWAITING_SPONSORSHIP
-              )}`
+              `/proposals/draft/${draftProposal.id}?stage=${draftingStageIndex}`
             );
           }}
         >
