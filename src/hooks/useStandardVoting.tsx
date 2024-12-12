@@ -5,6 +5,7 @@ import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
+import { event as gaEvent } from "@/lib/gtag";
 
 const useStandardVoting = ({
   proposalId,
@@ -81,6 +82,13 @@ const useStandardVoting = ({
       switch (missingVote) {
         case "DIRECT":
           track("Standard Vote", trackingData);
+          gaEvent({
+            action: "standard_vote",
+            category: "governance",
+            label: slug,
+            value: Number(proposalId),
+            custom_params: trackingData,
+          });
           await _standardVote();
           break;
       }
