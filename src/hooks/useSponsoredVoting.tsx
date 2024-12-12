@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { useSignTypedData } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import AgoraAPI from "@/app/lib/agoraAPI";
+import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 
 const types = {
   Ballot: [
@@ -20,9 +20,10 @@ const useSponsoredVoting = ({
   proposalId: string;
   support: number;
 }) => {
-  const { slug, contracts } = Tenant.current();
-
+  const { slug, ui, contracts } = Tenant.current();
   const { signTypedDataAsync } = useSignTypedData();
+
+  const gasRelayConfig = ui.toggle("sponsoredVote")!.config as UIGasRelayConfig;
 
   const [signature, setSignature] = useState<string | undefined>(undefined);
   const [error, setError] = useState<any | undefined>(undefined);
@@ -41,8 +42,8 @@ const useSponsoredVoting = ({
       try {
         const signature = await signTypedDataAsync({
           domain: {
-            name: "ENS Governor",
-            version: "1",
+            name: gasRelayConfig.domain,
+            version: gasRelayConfig.version,
             chainId: contracts.governor.chain.id,
             verifyingContract: contracts.governor.address as `0x${string}`,
           },
@@ -88,17 +89,7 @@ const useSponsoredVoting = ({
     };
 
     const vote = async () => {
-      console.log("Voting");
-
-      const trackingData: any = {
-        dao_slug: slug,
-        proposal_id: BigInt(proposalId),
-        support: support,
-      };
-
       await _sponsoredVote();
-
-      track("Sponsored Vote", trackingData);
     };
 
     vote();
