@@ -6,6 +6,7 @@ import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/Appr
 import {
   ProposalDraftApprovedSponsors,
   ProposalDraftComment,
+  DaoSlug,
 } from "@prisma/client";
 import MobileSponsorActionPanel from "./MobileSponsorActionPanel";
 import CommentPanel from "./CommentPanel";
@@ -20,11 +21,13 @@ import {
 } from "@/components/ui/tooltip";
 import { proposalTypeDescriptionMap } from "@/app/proposals/draft/types";
 import SponsorActionTab from "./SponsorActionTab";
+import Tenant from "@/lib/tenant/tenant";
 
-const getDraftProposal = async (id: number) => {
+const getDraftProposal = async (id: number, slug: DaoSlug) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
     where: {
       id: id,
+      dao_slug: slug,
     },
     include: {
       transactions: true,
@@ -47,7 +50,16 @@ const getDraftProposal = async (id: number) => {
 };
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
-  const draftProposal = await getDraftProposal(parseInt(params.id));
+  const { slug } = await Tenant.current();
+  const draftProposal = await getDraftProposal(parseInt(params.id), slug);
+
+  if (!draftProposal) {
+    return (
+      <div className="w-full mt-6 border border-line bg-tertiary/5 rounded-lg h-[calc(100vh-200px)] flex items-center justify-center text-tertiary">
+        Submission not found.
+      </div>
+    );
+  }
 
   // implies that the proposal has been sponsored, and the sponsor view is archived
   if (!!draftProposal.sponsor_address) {
