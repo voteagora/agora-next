@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
   Tooltip,
