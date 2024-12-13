@@ -37,13 +37,16 @@ export const DeleteDraftProposalDialog = ({
   const [isPending, setIsPending] = useState(false);
   return (
     <div>
-      <h3 className="text-center font-semibold">Delete my draft</h3>
+      <h3 className="text-center font-semibold text-lg mb-1">
+        Delete my draft
+      </h3>
       <p className="text-center text-agora-stone-700">
         Are you sure you want to delete this proposal?
       </p>
-      <div className="mt-6 flex items-center justify-end space-x-2">
+      <div className="mt-6 flex items-center justify-between space-x-2">
         <UpdatedButton
           type="secondary"
+          fullWidth
           onClick={() => {
             closeDialog();
           }}
@@ -52,6 +55,7 @@ export const DeleteDraftProposalDialog = ({
         </UpdatedButton>
         <UpdatedButton
           type="primary"
+          fullWidth
           isLoading={isPending}
           onClick={async () => {
             setIsPending(true);
