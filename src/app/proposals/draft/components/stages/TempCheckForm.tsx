@@ -104,6 +104,7 @@ const TempCheckForm = ({
               <UpdatedButton
                 type="secondary"
                 isLoading={isSkipPending}
+                className="whitespace-nowrap min-w-[184px]"
                 onClick={handleSubmit(onSubmitSkip)}
               >
                 Skip
@@ -111,6 +112,7 @@ const TempCheckForm = ({
               <UpdatedButton
                 type="primary"
                 isLoading={isSubmitPending}
+                className="whitespace-nowrap min-w-[184px]"
                 onClick={handleSubmit(onSubmit)}
               >
                 Continue
