@@ -18,7 +18,7 @@ export const GET_DRAFT_STAGES = () => {
   }
 
   return (plmToggle.config as PLMConfig).stages.filter(
-    (stage) => stage.isPreSubmission
+    (stage) => stage.isPreSubmission && stage.stage !== "AWAITING_SPONSORSHIP"
   );
 };
 

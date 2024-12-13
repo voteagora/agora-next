@@ -90,9 +90,9 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
         </div>
         <SponsorActionTab draftProposal={draftProposal} />
       </div>
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-x-0 sm:gap-x-6 gap-y-4 sm:gap-y-0">
         <div className="col-span-1 sm:col-span-2">
-          <div className="border border-line rounded-lg p-4 bg-neutral">
+          <div className="border border-line rounded-2xl p-4 bg-neutral">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center mb-4">

@@ -171,6 +171,7 @@ const SubmitForm = ({
                 isSubmit={false}
                 isLoading={isPending}
                 type={formValid ? "primary" : "disabled"}
+                className="whitespace-nowrap min-w-[184px]"
                 onClick={async () => {
                   if (formValid) {
                     setIsPending(true);

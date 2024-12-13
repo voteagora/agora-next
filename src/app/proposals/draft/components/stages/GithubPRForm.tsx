@@ -116,6 +116,7 @@ const GithubPRForm = ({
               <UpdatedButton
                 fullWidth={true}
                 type="primary"
+                className="whitespace-nowrap min-w-[184px]"
                 onClick={() => {
                   handleSkip();
                 }}
@@ -128,12 +129,12 @@ const GithubPRForm = ({
               <UpdatedButton
                 isSubmit={false}
                 type="secondary"
+                className="whitespace-nowrap min-w-[184px]"
                 isLoading={isSkipPending}
                 onClick={() => {
                   // If we have already created a PR we don't even need to handleCLick, we can just redirect
                   handleSkip();
                 }}
-                className="shrink"
               >
                 Skip
               </UpdatedButton>
@@ -145,7 +146,7 @@ const GithubPRForm = ({
                 onClick={() => {
                   handleCreatePR();
                 }}
-                className="grow"
+                className="whitespace-nowrap min-w-[184px]"
               >
                 Update docs for me
               </UpdatedButton>

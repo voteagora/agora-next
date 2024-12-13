@@ -11,10 +11,9 @@ import Image from "next/image";
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
   return (
-    <button
-      className="flex flex-row items-center space-x-2 text-secondary"
-      onClick={(e: any) => {
-        e.preventDefault();
+    <div
+      className="border border-line rounded p-1 h-[42px] aspect-square flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 transition-colors cursor-pointer"
+      onClick={() => {
         openDialog({
           type: "DELETE_DRAFT_PROPOSAL",
           params: {
@@ -23,8 +22,8 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
         });
       }}
     >
-      <TrashIcon className="h-5 w-5" />
-    </button>
+      <TrashIcon className="h-4 w-4 text-secondary" />
+    </div>
   );
 };
 
