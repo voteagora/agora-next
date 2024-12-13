@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export function Button({ href = "", className = "", ...props }) {
   return (
@@ -64,7 +65,7 @@ export function UpdatedButton({
           </Link>
         </div>
       ) : (
-        <button
+        <motion.button
           className={cn(
             className,
             "font-semibold py-2 px-4 border border-line cursor-pointer",
@@ -107,7 +108,7 @@ export function UpdatedButton({
           ) : (
             children
           )}
-        </button>
+        </motion.button>
       )}
     </>
   );
